@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<!--
+    Demonstrates stretching a view to fill the space between two other views
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <RelativeLayout
+        android:id="@+id/relative_sublayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative_sublayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_toLeftOf="@id/relative_sublayout1">
+
+        <!-- view1 goes on top-right -->
+        <TextView
+            android:id="@+id/relative_view1"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/go"/>
+
+        <!-- view2 goes on the left-bottom -->
+        <TextView
+            android:id="@+id/relative_view2"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:text="@string/back"/>
+
+        <!-- view3 stretches betweeen view1 and view2 -->
+        <TextView
+            android:id="@+id/relative_view3"
+            android:background="@drawable/yellow"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_above="@id/relative_view2"
+            android:layout_below="@id/relative_view1"
+            android:layout_alignLeft="@id/relative_view2"
+            android:layout_alignRight="@id/relative_view1"/>
+
+        <!-- view4 stretches betweeen view1 and view2 -->
+        <TextView
+            android:id="@+id/relative_view4"
+            android:background="@drawable/blue"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_alignTop="@id/relative_view1"
+            android:layout_alignBottom="@id/relative_view2"
+            android:layout_toLeftOf="@id/relative_view1"
+            android:layout_toRightOf="@id/relative_view2"/>
+
+        <!-- view5 -->
+        <TextView
+            android:id="@+id/relative_view5"
+            android:background="@drawable/black"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_alignBaseline="@id/relative_view1"
+            android:layout_alignWithParentIfMissing="true"/>
+
+        <!-- view6 -->
+        <TextView
+            android:id="@+id/relative_view6"
+            android:background="@drawable/black"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_centerHorizontal="true"/>
+
+        <!-- view7 -->
+        <TextView
+            android:id="@+id/relative_view7"
+            android:background="@drawable/black"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_centerInParent="true"/>
+
+        <!-- view8 -->
+        <TextView
+            android:id="@+id/relative_view8"
+            android:background="@drawable/black"
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative_sublayout3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <!-- view9 -->
+        <TextView
+            android:id="@+id/relative_view9"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/go"/>
+
+        <!-- view10 -->
+        <TextView
+            android:id="@+id/relative_view10"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/relative_view9"
+            android:text="@string/go"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative_sublayout4"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:ignoreGravity="@+id/relative_view11"
+        android:gravity="right">
+
+        <!-- view11 -->
+        <TextView
+            android:id="@id/relative_view11"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/go"/>
+
+        <!-- view12 -->
+        <TextView
+            android:id="@+id/relative_view12"
+            android:background="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/relative_view11"
+            android:text="@string/go"/>
+    </RelativeLayout>
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:prompt="@string/text_view_hello"/>
+
+</RelativeLayout>
+

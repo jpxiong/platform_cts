@@ -1,0 +1,41 @@
+#! /bin/bash
+
+# Copyright (C) 2009 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# CONFIGURATION
+# Set this variable to the out/host/<platform> directory of your Android tree.
+ANDROID_ROOT=out/host/linux-x86
+
+# CONFIGURATION
+# Set this variable to the root of unzipped CTS directory
+CTS_ROOT=
+
+# If ANDROID_ROOT does not exist, complain and exit
+if [ ! -d ${ANDROID_ROOT} ]; then
+    echo "Error: Please set ANDROID_ROOT in $0."
+    exit
+fi
+
+# If CTS_ROOT not set, assume it's under ANDROID_ROOT
+if [ -z "${CTS_ROOT}" ]; then
+    CTS_ROOT=${ANDROID_ROOT}/cts/android-cts_linux-x86
+fi
+
+if [ ! -d ${CTS_ROOT} ]; then
+    echo "Error: Can't locate CTS. Have you set the CTS_ROOT in $0?"
+    exit
+fi
+
+ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CTS_ROOT}/repository/host_config.xml
