@@ -227,7 +227,6 @@ javax.security.auth.x500 \
 javax.security.cert \
 javax.sql \
 javax.xml.parsers \
-org.w3c.dom \
 org.xml.sax \
 org.xml.sax.ext \
 org.xml.sax.helpers"
@@ -355,6 +354,11 @@ elif [ ${testType} == "android" ]; then
 fi
 
 javadoc -J-Xmx512m -docletpath $CLASSES -doclet testprogress2.TestCoverageDoclet -f $TESTCOVERAGE_FLAGS -d $OUTPUT -sourcepath $SOURCE_PATH
+
+# left out on purpose:
+# org.w3c.dom packages: the tests in the xml module are superseded by the
+# official w3c test suite located in the dom module.
+#
 
 # left out on purpose:
 # concurrent packages: a full test suite exists (JCP JSR166 test suite) and it located at 
