@@ -24,5 +24,7 @@ LOCAL_PACKAGE_NAME := CtsHardwareTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
+LOCAL_SDK_VERSION := current
+
 include $(BUILD_PACKAGE)
 

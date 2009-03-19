@@ -16,18 +16,24 @@
 
 package android.util.cts;
 
+import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestStatus;
+import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetClass;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
+
 import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.util.Xml.Encoding;
-
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
-import dalvik.annotation.TestTargetClass;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -40,14 +46,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlSerializer;
-
 /**
  * TestCase for android.util.Xml. 
  */
@@ -55,7 +53,6 @@ import org.xmlpull.v1.XmlSerializer;
 public class XmlTest extends AndroidTestCase {
 
     private static final String STR_INVALIDATE_EN_CODING = "invalidateEnCoding";
-    private static final String STR_LINEAR_LAYOUT = "LinearLayout";
     private static final String STR_N2 = "-2";
     private static final String STR_N1 = "-1";
     private static final String STR_LAYOUT_HEIGHT = "layout_height";
@@ -115,10 +112,10 @@ public class XmlTest extends AndroidTestCase {
         )
     })
     public void testParseStringContentHandler() {
-        final String XML_STR = "<Test><Son name=\"abc\"/></Test>";
+        final String xmlStr = "<Test><Son name=\"abc\"/></Test>";
         DefaultContentHandler dc = new DefaultContentHandler();
         try {
-            Xml.parse(XML_STR, dc);
+            Xml.parse(xmlStr, dc);
             assertEquals(STR_SET_DOCUMENT_LOCATOR, dc.mVec.elementAt(0));
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
@@ -455,7 +452,7 @@ public class XmlTest extends AndroidTestCase {
             Xml.findEncodingByName(STR_INVALIDATE_EN_CODING);
             fail("should throw out exception");
         } catch (UnsupportedEncodingException e) {
-            // This test should throw out exception. See fail("should throw out exception"); 
+            // expect 
         }
     }
 
@@ -469,22 +466,37 @@ public class XmlTest extends AndroidTestCase {
         )
     })
     public void testAsAttributeSet() {
-        XmlResourceParser xp = getContext().getResources()
-                        .getLayout(com.android.cts.stub.R.layout.xml_test);
+        XmlResourceParser xp = getContext().getResources().getLayout(
+                com.android.cts.stub.R.layout.xml_test);
+        int eventType = -1;
         try {
-            XmlUtils.beginDocument(xp, STR_LINEAR_LAYOUT);
+            eventType = xp.getEventType();
         } catch (XmlPullParserException e) {
             fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
         }
-        AttributeSet set = Xml.asAttributeSet(xp);
-        assertEquals(2, set.getAttributeCount());
-        assertEquals(STR_LAYOUT_WIDTH, set.getAttributeName(0));
 
-        assertEquals(STR_N1, set.getAttributeValue(0));
-        assertEquals(STR_LAYOUT_HEIGHT, set.getAttributeName(1));
-        assertEquals(STR_N2, set.getAttributeValue(1));
+        // start to parse XML document
+        while (eventType != XmlResourceParser.START_TAG
+                && eventType != XmlResourceParser.END_DOCUMENT) {
+            try {
+                eventType = xp.next();
+            } catch (XmlPullParserException e) {
+                fail(e.getMessage());
+            } catch (IOException e) {
+                fail(e.getMessage());
+            }
+        }
+        if (eventType == XmlResourceParser.START_TAG) {
+            AttributeSet set = Xml.asAttributeSet(xp);
+            assertEquals(2, set.getAttributeCount());
+            assertEquals(STR_LAYOUT_WIDTH, set.getAttributeName(0));
+
+            assertEquals(STR_N1, set.getAttributeValue(0));
+            assertEquals(STR_LAYOUT_HEIGHT, set.getAttributeName(1));
+            assertEquals(STR_N2, set.getAttributeValue(1));
+        } else {
+            fail("XML parser didn't find the start element of the specified xml file.");
+        }
     }
 
 }

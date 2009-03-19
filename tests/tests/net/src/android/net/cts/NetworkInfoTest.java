@@ -16,6 +16,12 @@
 
 package android.net.cts;
 
+import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestStatus;
+import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.ToBeFixed;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,10 +29,6 @@ import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
-import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(NetworkInfo.class)
 public class NetworkInfoTest extends AndroidTestCase {
@@ -109,12 +111,10 @@ public class NetworkInfoTest extends AndroidTestCase {
         // test environment:connect as TYPE_MOBILE, and connect to internet.
         assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getType(),
                 ConnectivityManager.TYPE_MOBILE);
-        assertEquals(ni[ConnectivityManager.TYPE_WIFI].getType(),
-                ConnectivityManager.TYPE_WIFI);
-        assertEquals("MOBILE",ni[ConnectivityManager.TYPE_MOBILE].getTypeName());
-        assertEquals("WIFI",ni[ConnectivityManager.TYPE_WIFI].getTypeName());
-        assertTrue(ni[ConnectivityManager.TYPE_MOBILE]
-                .isConnectedOrConnecting());
+        assertEquals(ni[ConnectivityManager.TYPE_WIFI].getType(), ConnectivityManager.TYPE_WIFI);
+        assertEquals("MOBILE", ni[ConnectivityManager.TYPE_MOBILE].getTypeName());
+        assertEquals("WIFI", ni[ConnectivityManager.TYPE_WIFI].getTypeName());
+        assertTrue(ni[ConnectivityManager.TYPE_MOBILE].isConnectedOrConnecting());
         assertFalse(ni[ConnectivityManager.TYPE_WIFI].isConnectedOrConnecting());
         assertTrue(ni[ConnectivityManager.TYPE_MOBILE].isAvailable());
         assertFalse(ni[ConnectivityManager.TYPE_WIFI].isAvailable());
@@ -124,14 +124,13 @@ public class NetworkInfoTest extends AndroidTestCase {
         assertEquals(ni[ConnectivityManager.TYPE_MOBILE].describeContents(), 0);
         assertEquals(ni[ConnectivityManager.TYPE_WIFI].describeContents(), 0);
 
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getState(),
-                State.CONNECTED);
+        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getState(), State.CONNECTED);
         assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getDetailedState(),
                 DetailedState.CONNECTED);
 
         assertNull(ni[ConnectivityManager.TYPE_MOBILE].getReason());
         assertNull(ni[ConnectivityManager.TYPE_WIFI].getReason());
-        assertEquals("internet",ni[ConnectivityManager.TYPE_MOBILE].getExtraInfo());
+        assertEquals("internet", ni[ConnectivityManager.TYPE_MOBILE].getExtraInfo());
         assertNull(ni[ConnectivityManager.TYPE_WIFI].getExtraInfo());
 
         assertNotNull(ni[ConnectivityManager.TYPE_MOBILE].toString());
@@ -147,25 +146,13 @@ public class NetworkInfoTest extends AndroidTestCase {
           methodArgs = {Parcel.class, Integer.class}
         )
     })
+    @ToBeFixed(bug = "1703933", explanation = "Cannot test if the data was written correctly,"
+        + " if build CTS against SDK.")
     public void testWriteToParcel() {
-        NetworkInfo[] ni = mConnectivityManager.getAllNetworkInfo();
+        NetworkInfo[] networkInfos = mConnectivityManager.getAllNetworkInfo();
+        NetworkInfo mobileInfo = networkInfos[ConnectivityManager.TYPE_MOBILE];
         Parcel p = Parcel.obtain();
-        ni[ConnectivityManager.TYPE_MOBILE].writeToParcel(p, 1);
-        p.setDataPosition(0);
-        NetworkInfo mNetworkInfo = NetworkInfo.CREATOR.createFromParcel(p);
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getExtraInfo(),
-                mNetworkInfo.getExtraInfo());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getReason(),
-                mNetworkInfo.getReason());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getType(),
-                mNetworkInfo.getType());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getState(),
-                mNetworkInfo.getState());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].getDetailedState(),
-                mNetworkInfo.getDetailedState());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].isAvailable(),
-                mNetworkInfo.isAvailable());
-        assertEquals(ni[ConnectivityManager.TYPE_MOBILE].isFailover(),
-                mNetworkInfo.isFailover());
+
+        mobileInfo.writeToParcel(p, 1);
     }
 }

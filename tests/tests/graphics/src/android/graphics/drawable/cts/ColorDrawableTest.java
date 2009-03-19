@@ -16,12 +16,19 @@
 
 package android.graphics.drawable.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestStatus;
+import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
@@ -30,14 +37,7 @@ import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(android.graphics.drawable.ColorDrawable.class)
 public class ColorDrawableTest extends AndroidTestCase {
@@ -56,9 +56,7 @@ public class ColorDrawableTest extends AndroidTestCase {
     })
     public void testConstructors() {
         new ColorDrawable();
-
         new ColorDrawable(0);
-
         new ColorDrawable(1);
     }
 
@@ -115,7 +113,7 @@ public class ColorDrawableTest extends AndroidTestCase {
         )
     })
     public void testGetChangingConfigurations() {
-        ColorDrawable colorDrawable = new ColorDrawable();
+        final ColorDrawable colorDrawable = new ColorDrawable();
         assertEquals(0, colorDrawable.getChangingConfigurations());
 
         colorDrawable.setChangingConfigurations(1);
@@ -138,7 +136,7 @@ public class ColorDrawableTest extends AndroidTestCase {
         )
     })
     public void testGetConstantState() {
-        ColorDrawable colorDrawable = new ColorDrawable();
+        final ColorDrawable colorDrawable = new ColorDrawable();
         assertNotNull(colorDrawable.getConstantState());
         assertEquals(colorDrawable.getChangingConfigurations(),
                 colorDrawable.getConstantState().getChangingConfigurations());
@@ -174,14 +172,29 @@ public class ColorDrawableTest extends AndroidTestCase {
         )
     })
     public void testInflate() throws XmlPullParserException, IOException {
-        ColorDrawable colorDrawable = new ColorDrawable();
+        int eventType = -1;
+        final ColorDrawable colorDrawable = new ColorDrawable();
 
-        XmlPullParser parser = mContext.getResources().getXml(R.drawable.colordrawable_test);
-        XmlUtils.beginDocument(parser, "ColorDrawable");
-        AttributeSet attrs = Xml.asAttributeSet(parser);
-        colorDrawable.inflate(mContext.getResources(), parser, attrs);
-        // set the alpha to 2 in colordrawable_test.xml
-        assertEquals(2, colorDrawable.getAlpha());
+        final XmlPullParser parser = mContext.getResources().getXml(R.drawable.colordrawable_test);
+        // start to parse XML document
+        while (eventType != XmlResourceParser.START_TAG
+                && eventType != XmlResourceParser.END_DOCUMENT) {
+            try {
+                eventType = parser.next();
+            } catch (XmlPullParserException e) {
+                fail(e.getMessage());
+            } catch (IOException e) {
+                fail(e.getMessage());
+            }
+        }
+        if (eventType == XmlResourceParser.START_TAG) {
+            final AttributeSet attrs = Xml.asAttributeSet(parser);
+            colorDrawable.inflate(mContext.getResources(), parser, attrs);
+            // set the alpha to 2 in colordrawable_test.xml
+            assertEquals(2, colorDrawable.getAlpha());
+        } else {
+            fail("XML parser didn't find the start element of the specified xml file.");
+        }
     }
 
     @TestInfo(
@@ -194,7 +207,7 @@ public class ColorDrawableTest extends AndroidTestCase {
         )
     })
     public void testSetColorFilter() {
-        ColorDrawable colorDrawable = new ColorDrawable();
+        final ColorDrawable colorDrawable = new ColorDrawable();
 
         // setColorFilter(ColorFilter) is a non-operation function.
         colorDrawable.setColorFilter(null);

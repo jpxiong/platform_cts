@@ -230,7 +230,7 @@ public class TestSuite implements DeviceObserver {
      * @param javaPkgName The java package name.
      */
     public void run(final TestDevice device, final String javaPkgName)
-            throws IOException, DeviceDisconnectedException {
+            throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
         Iterator<TestSuite> subSuites = getSubSuites().iterator();
         Iterator<TestCase> testCases = getTestCases().iterator();
 
@@ -260,7 +260,7 @@ public class TestSuite implements DeviceObserver {
      * @param test The specific test to be run.
      */
     public void run(final TestDevice device, final Test test)
-            throws DeviceDisconnectedException {
+            throws DeviceDisconnectedException, ADBServerNeedRestartException {
         mTestStop = false;
         mCurrentTestCase = null;
         mCurrentSubSuite = null;

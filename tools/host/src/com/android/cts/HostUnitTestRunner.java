@@ -138,20 +138,24 @@ public class HostUnitTestRunner extends BaseTestRunner{
     }
 
     /** {@inheritDoc} */
+    @Override
     public void testStarted(String testName) {
 
     }
 
     /** {@inheritDoc} */
+    @Override
     public void testEnded(String testName) {
 
     }
 
     /** {@inheritDoc} */
+    @Override
     public void testFailed(int status, Test test, Throwable t) {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void runFailed(String message) {
         throw new RuntimeException(message);
     }

@@ -160,7 +160,8 @@ public class TestCase implements DeviceObserver {
      *
      * @param device The device to run the test case over.
      */
-    public void run(final TestDevice device) throws DeviceDisconnectedException {
+    public void run(final TestDevice device) throws DeviceDisconnectedException,
+            ADBServerNeedRestartException {
         mTestStop = false;
         Iterator<Test> tests = getTests().iterator();
         while (tests.hasNext() && (!mTestStop)) {
@@ -178,7 +179,7 @@ public class TestCase implements DeviceObserver {
      * @param test The specific test to be run.
      */
     public void run(final TestDevice device, final Test test)
-            throws DeviceDisconnectedException {
+            throws DeviceDisconnectedException, ADBServerNeedRestartException {
         mTestStop = false;
         mCurrentTest = test;
         mCurrentTest.run(device);

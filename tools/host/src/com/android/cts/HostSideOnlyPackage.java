@@ -47,8 +47,9 @@ public class HostSideOnlyPackage extends TestPackage {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void runImpl(final String javaPkgName)
-            throws IOException, DeviceDisconnectedException {
+            throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
         try {
             if (!mTestStop) {
                 Log.d("run in individual mode...");
@@ -61,7 +62,9 @@ public class HostSideOnlyPackage extends TestPackage {
     }
 
     /** {@inheritDoc} */
-    protected void runTestImpl(final Test test) throws DeviceDisconnectedException {
+    @Override
+    protected void runTestImpl(final Test test) throws DeviceDisconnectedException,
+                ADBServerNeedRestartException {
         try {
             if (!mTestStop) {
                 mCurrentTestSuite = test.getTestSuite();

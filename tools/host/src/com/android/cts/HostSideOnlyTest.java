@@ -100,11 +100,13 @@ public class HostSideOnlyTest extends Test {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected Result getTestResult() {
         return mHostSideTestRunner.getTestResult();
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void runImpl() {
         mHostSideTestRunner = new HostSideTestRunner(this);
         mHostSideTestRunner.start();

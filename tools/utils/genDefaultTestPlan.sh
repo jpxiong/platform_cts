@@ -32,7 +32,7 @@ parseXML() {
 generateSignatureCheckDescription() {
      echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ${SIGNATURE_CHECK_PATH}
      echo "<TestPackage AndroidFramework=\"Android 1.0\" jarPath=\"\" "\
-          "name=\"${SIGNATURE_CHECK_NAME}\" runner=\".InstrumentationRunner\" "\
+          "name=\"${SIGNATURE_TESTS}\" runner=\".InstrumentationRunner\" "\
           "targetNameSpace=\"\" targetBinaryName=\"\" version=\"1.0\" signatureCheck=\"true\" "\
           "appPackageName=\"android.tests.sigtest\">"  >> ${SIGNATURE_CHECK_PATH}
      echo "<TestSuite name=\"android\">"       >> ${SIGNATURE_CHECK_PATH}
@@ -48,30 +48,105 @@ generateSignatureCheckDescription() {
      echo "</TestPackage>" >> ${SIGNATURE_CHECK_PATH}
 }
 
-# Generate the default test plan.
-generateTestPlan() {
-    TEST_PLAN=${2}/CTS.xml
+# Genrate the header of the test plan XML file.
+genTestPlanHeader() {
+    TEST_PLAN=${1}
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" > ${TEST_PLAN}
     echo "<TestPlan version=\"1.0\">" >> ${TEST_PLAN}
+}
 
-    # Let the signature test to be the 1st entry of the plan.
-    if [ -f ${SIGNATURE_CHECK_PATH}  ]; then
-        URI=${SIGNATURE_CHECK_NAME}
-        echo "<Entry uri=\"${URI}\"/>" >> ${TEST_PLAN}
+# add one entry into test plan XML file.
+addTestPlanEntry() {
+    TEST_PLAN=${1}
+    APP_JAVA_PKG_NAME=${2}
+    entry=$(grep "<Entry uri=\"${APP_JAVA_PKG_NAME}\"/>" ${TEST_PLAN})
+    if [ "${entry}" == ""  ]; then
+        echo "<Entry uri=\"${APP_JAVA_PKG_NAME}\"/>" >> ${TEST_PLAN}
     fi
-    
-    for FILE_NAME in $(ls ${1}/*.xml); do
-        URI=$(basename ${FILE_NAME} .xml)
-        if [ "${URI}" != "${SIGNATURE_CHECK_NAME}" ]; then
-            APP_JAVA_PKG_NAME=$(parseXML ${FILE_NAME} TestPackage appPackageName | sed 's/\"//g')
-            echo "<Entry uri=\"${APP_JAVA_PKG_NAME}\"/>" >> ${TEST_PLAN}
+}
+
+# Process the inclusive list.
+procInclusiveList() {
+    TESTCASE_PATH=${1}
+    TEST_PLAN=${2}
+    INC_LIST=${3}
+
+    for FILE_NAME in $(ls ${TESTCASE_PATH}/*.xml); do
+        APP_JAVA_PKG_NAME=$(parseXML ${FILE_NAME} TestPackage appPackageName | sed 's/\"//g')
+        for INC_NAME in ${INC_LIST} ; do
+            if [ "${INC_NAME}" == "${APP_JAVA_PKG_NAME}" ]; then
+               addTestPlanEntry ${TEST_PLAN} ${APP_JAVA_PKG_NAME}
+            fi
+        done
+    done
+}
+
+# Process the exclusive list.
+procExclusiveList() {
+    TESTCASE_PATH=${1}
+    TEST_PLAN=${2}
+    EXC_LIST=${3}
+
+    for FILE_NAME in $(ls ${TESTCASE_PATH}/*.xml); do
+        APP_JAVA_PKG_NAME=$(parseXML ${FILE_NAME} TestPackage appPackageName | sed 's/\"//g')
+        excluded=""
+        for EXC_NAME in ${EXC_LIST} ; do
+            if [ "${EXC_NAME}" == "${APP_JAVA_PKG_NAME}" ]; then
+                excluded="true"
+            fi
+        done
+        if [ "${excluded}" != "true" ]; then
+            addTestPlanEntry ${TEST_PLAN} ${APP_JAVA_PKG_NAME}
         fi
     done
+}
+
+# Generate test plan with given information.
+genTestPlan() {
+    TESTCASE_PATH=${1}
+    TEST_PLAN=${2}
+    TYPE=${3}
+    LIST=${4}
+
+    genTestPlanHeader ${TEST_PLAN};
+    if [ "${TYPE}" == "inclusive" ]; then
+        procInclusiveList ${TESTCASE_PATH} ${TEST_PLAN} "${LIST}"
+    else
+        procExclusiveList ${TESTCASE_PATH} ${TEST_PLAN} "${LIST}"
+    fi
     echo "</TestPlan>" >> ${TEST_PLAN}
 }
 
-SIGNATURE_CHECK_NAME="SignatureTest"
-SIGNATURE_CHECK_PATH=${CTS_OUT_DIR}/repository/testcases/${SIGNATURE_CHECK_NAME}".xml"
+# Generate all of the default test plans
+generateAllTestPlans() {
+    TESTCASE_PATH=${1}
+    PLAN_PATH=${2}
+
+    TEST_PLAN=${PLAN_PATH}/CTS.xml
+    LIST=""
+    TYPE="exclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/Android.xml
+    LIST="${SIGNATURE_TESTS} ${ANDROID_CORE_TESTS} ${ANDROID_CORE_VM_TESTS}"
+    TYPE="exclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/Java.xml
+    LIST="${ANDROID_CORE_TESTS}"
+    TYPE="inclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/VM.xml
+    LIST="${ANDROID_CORE_VM_TESTS}"
+    TYPE="inclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/Signature.xml
+    LIST="${SIGNATURE_TESTS}"
+    TYPE="inclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+}
 
 # Build the DescriptionGenerator as the Doclet
 buildDescriptionGenerator() {
@@ -192,11 +267,11 @@ CTS_ROOT=${TOP_DIR}/cts/tools
 CASE_REPOSITORY=${OUT_DIR}/repository/testcases
 PLAN_REPOSITORY=${OUT_DIR}/repository/plans
 
-SIGNATURE_CHECK_NAME="SignatureTest"
-SIGNATURE_CHECK_PATH="${CASE_REPOSITORY}/${SIGNATURE_CHECK_NAME}.xml"
+SIGNATURE_TESTS="SignatureTest"
+SIGNATURE_CHECK_PATH="${CASE_REPOSITORY}/${SIGNATURE_TESTS}.xml"
 
-CORETESTS_NAME="android.core.tests"
-CORETESTS_PATH="${CASE_REPOSITORY}/${CORETESTS_NAME}.xml"
+ANDROID_CORE_TESTS="android.core.tests"
+ANDROID_CORE_VM_TESTS="android.core.vm-tests"
 
 #Creating Signature check description xml file, if not existed.
 generateSignatureCheckDescription
@@ -224,5 +299,5 @@ for CASE_SOURCE in $(find ${TESTCASES_SOURCE} -type d | grep "cts$" | sed 's/\/\
     fi
 done
 
-# Creating "Test plan" file
-generateTestPlan ${CASE_REPOSITORY} ${PLAN_REPOSITORY}
+# Creating the default test plans
+generateAllTestPlans ${CASE_REPOSITORY} ${PLAN_REPOSITORY}

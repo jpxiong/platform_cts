@@ -16,7 +16,6 @@
 
 package com.android.cts;
 
-import com.android.cts.TestDevice.ObjectSync;
 import com.android.ddmlib.MultiLineReceiver;
 
 import java.security.NoSuchAlgorithmException;
@@ -41,7 +40,6 @@ public class SignatureCheckPackage extends TestPackage {
     private static final String CAUGHT_EXCEPTION = "caught_exception";
     private static final String ACTION_CHECKAPI = "checkapi";
 
-    private ObjectSync mObjectSync;
     private ArrayList<String> mAPICheckResult;
 
     /**
@@ -102,7 +100,6 @@ public class SignatureCheckPackage extends TestPackage {
     public ArrayList<String> startSignatureTest(TestDevice device)
                 throws DeviceDisconnectedException {
         Log.d("installing APICheck apk");
-        mObjectSync = device.new ObjectSync();
         mAPICheckResult = new ArrayList<String>();
         // TODO: This is non-obvious and should be cleaned up
         device.setRuntimeListener(device);

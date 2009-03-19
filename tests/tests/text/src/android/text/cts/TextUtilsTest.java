@@ -16,18 +16,18 @@
 
 package android.text.cts;
 
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
 
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.AndroidTestCase;
 import android.text.GetChars;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -39,36 +39,50 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.TextAppearanceSpan;
 import android.text.style.URLSpan;
 
-import com.android.internal.R;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 /**
  * Test {@link TextUtils}.
  */
 @TestTargetClass(TextUtils.class)
 public class TextUtilsTest extends AndroidTestCase {
-    private static final String ELLIPSIS = Resources.getSystem().getString(R.string.ellipsis);
+    private static String mEllipsis;
     private int mStart;
     private int mEnd;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mEllipsis = getEllipsis();
+        resetRange();
+    }
+
+    private void resetRange() {
         mStart = 0;
         mEnd = 0;
+    }
+
+    /**
+     * Get the ellipsis from system.
+     * @return the string of ellipsis.
+     */
+    private String getEllipsis() {
+        String text = "xxxxx";
+        TextPaint p = new TextPaint();
+        float width = p.measureText(text.substring(1));
+        String re = TextUtils.ellipsize(text, p, width, TruncateAt.START).toString();
+        return re.substring(0, re.indexOf("x"));
     }
 
     @TestTargetNew(
         level = TestLevel.TODO,
         notes = "Test commaEllipsize method",
         method = "commaEllipsize",
-        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class, java.lang.String.class, java.lang.String.class}
+        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class,
+                java.lang.String.class, java.lang.String.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testCommaEllipsize() {
         TextPaint p = new TextPaint();
         String text = "long, string, to, truncate";
@@ -102,12 +116,14 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.commaEllipsize(null, p, 70f, "plus 1", "%d plus");
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         try {
             TextUtils.commaEllipsize(text, null, 70f, "plus 1", "%d plus");
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         assertEquals("long, string, to, null", TextUtils.commaEllipsize(
@@ -117,6 +133,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.commaEllipsize(text, p, 70f, "plus 1", null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -126,7 +143,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "concat",
         args = {java.lang.CharSequence[].class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testConcat() {
         CharSequence[] text = new CharSequence[0];
         assertEquals("", TextUtils.concat(text));
@@ -148,7 +165,7 @@ public class TextUtilsTest extends AndroidTestCase {
         text = new CharSequence[] { string1, comma, string2 };
         Spanned strResult = (Spanned)TextUtils.concat(text);
         assertEquals("first, second", strResult.toString());
-        Object spans[] = strResult.getSpans(0, strResult.length(), Object.class);
+        Object[] spans = strResult.getSpans(0, strResult.length(), Object.class);
         assertEquals(2, spans.length);
         assertEquals(URLSpan.class, spans[0].getClass());
         assertEquals("first", ((URLSpan) spans[0]).getURL());
@@ -166,6 +183,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.concat((CharSequence[]) null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -173,9 +191,10 @@ public class TextUtilsTest extends AndroidTestCase {
         level = TestLevel.TODO,
         notes = "Test copySpansFrom method",
         method = "copySpansFrom",
-        args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class, android.text.Spannable.class, int.class}
+        args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class,
+                android.text.Spannable.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testCopySpansFrom() {
         Object[] spans;
         String text = "content";
@@ -229,6 +248,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.copySpansFrom(source2, 0, source2.length(), Object.class, dest4, 0);
             fail("Should Throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         TextUtils.copySpansFrom(source2, 0, dest4.length(), Object.class, dest4, 0);
         spans = dest4.getSpans(0, dest4.length(), Object.class);
@@ -250,6 +270,7 @@ public class TextUtilsTest extends AndroidTestCase {
                     Object.class, dest5, dest5.length() - source2.length() + 2);
             fail("Should Throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
 
         // exceptional test
@@ -281,12 +302,14 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.copySpansFrom(source2, 0, source2.length(), Object.class, dest9, -1);
             fail("Should Throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.copySpansFrom(source2, 0, source2.length(),
                     Object.class, dest9, Integer.MAX_VALUE);
             fail("Should Throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
     }
 
@@ -294,9 +317,10 @@ public class TextUtilsTest extends AndroidTestCase {
         level = TestLevel.TODO,
         notes = "Test copySpansFrom method's NullPointerException",
         method = "copySpansFrom",
-        args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class, android.text.Spannable.class, int.class}
+        args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class,
+                android.text.Spannable.class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testCopySpansFromNullPointerException() {
         SpannableString source = new SpannableString("content");
         URLSpan urlSpan = new URLSpan(source.toString());
@@ -307,12 +331,14 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.copySpansFrom(null, 0, source.length(), Object.class, dest, 0);
             fail("Should Throw NullPointerException");
         } catch (NullPointerException e) {
+            // expect
         }
 
         try {
             TextUtils.copySpansFrom(source, 0, source.length(), Object.class, null, 0);
             fail("Should Throw NullPointerException");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -320,29 +346,30 @@ public class TextUtilsTest extends AndroidTestCase {
         level = TestLevel.TODO,
         notes = "Test ellipsize method",
         method = "ellipsize",
-        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class, android.text.TextUtils.TruncateAt.class}
+        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class,
+                android.text.TextUtils.TruncateAt.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testEllipsize() {
         TextPaint p = new TextPaint();
         CharSequence text = "long string to truncate";
 
-        float textWidth = p.measureText(ELLIPSIS + "uncate");
-        assertEquals(ELLIPSIS + "uncate",
+        float textWidth = p.measureText(mEllipsis + "uncate");
+        assertEquals(mEllipsis + "uncate",
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.START).toString());
 
-        textWidth = p.measureText("long str" + ELLIPSIS);
-        assertEquals("long str" + ELLIPSIS,
+        textWidth = p.measureText("long str" + mEllipsis);
+        assertEquals("long str" + mEllipsis,
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
 
-        textWidth = p.measureText("long" + ELLIPSIS + "ate");
-        assertEquals("long" + ELLIPSIS + "ate",
+        textWidth = p.measureText("long" + mEllipsis + "ate");
+        assertEquals("long" + mEllipsis + "ate",
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.MIDDLE).toString());
 
         assertEquals("", TextUtils.ellipsize(text, p, 1f, TruncateAt.END).toString());
 
-        textWidth = p.measureText(ELLIPSIS);
-        assertEquals(ELLIPSIS, TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
+        textWidth = p.measureText(mEllipsis);
+        assertEquals(mEllipsis, TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
 
         assertEquals("", TextUtils.ellipsize(text, p, -1f, TruncateAt.END).toString());
 
@@ -353,27 +380,32 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.ellipsize(text, null, 50f, TruncateAt.END).toString();
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         try {
             TextUtils.ellipsize(null, p, 50f, TruncateAt.END).toString();
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
     @TestTargetNew(
         level = TestLevel.TODO,
-        notes = "Test ellipsize method which can set callback class and can enable or disable to preserve length",
+        notes = "Test ellipsize method which can set callback class and can enable"
+            + "or disable to preserve length",
         method = "ellipsize",
-        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class, android.text.TextUtils.TruncateAt.class, boolean.class, android.text.TextUtils.EllipsizeCallback.class}
+        args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class,
+                android.text.TextUtils.TruncateAt.class, boolean.class,
+                android.text.TextUtils.EllipsizeCallback.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testEllipsizeCallback() {
         TextPaint p = new TextPaint();
 
         TextUtils.EllipsizeCallback callback = new TextUtils.EllipsizeCallback() {
-            public void ellipsized(int start, int end) {
+            public void ellipsized(final int start, final int end) {
                 mStart = start;
                 mEnd = end;
             }
@@ -381,61 +413,61 @@ public class TextUtilsTest extends AndroidTestCase {
 
         String text = "long string to truncate";
 
-        mStart = mEnd = 0;
-        assertEquals(ELLIPSIS + "uncate", TextUtils.ellipsize(text, p, 50f,
+        resetRange();
+        assertEquals(mEllipsis + "uncate", TextUtils.ellipsize(text, p, 50f,
                 TruncateAt.START, false, callback).toString());
         assertEquals(0, mStart);
         assertEquals("long string to tr".length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals(getBlankString(true, text.length() - 6) + "uncate",
                 TextUtils.ellipsize(text, p, 50f, TruncateAt.START, true, callback).toString());
         assertEquals(0, mStart);
         assertEquals("long string to tr".length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals("long str" + getBlankString(true, text.length() - 8),
                 TextUtils.ellipsize(text,p, 50f, TruncateAt.END, true, callback).toString());
         assertEquals("long str".length(), mStart);
         assertEquals(text.length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals("long" + getBlankString(true, text.length() - 7) + "ate",
                 TextUtils.ellipsize(text, p, 50f, TruncateAt.MIDDLE, true, callback).toString());
         assertEquals("long".length(), mStart);
         assertEquals("long string to trunc".length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals(getBlankString(false, text.length()), TextUtils.ellipsize(
                 text, p, 1f, TruncateAt.END, true, callback).toString());
         assertEquals(0, mStart);
         assertEquals(text.length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals("", TextUtils.ellipsize(text, p, 1f, TruncateAt.END,
                 false, callback).toString());
         assertEquals(0, mStart);
         assertEquals(text.length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals(getBlankString(true, text.length()), TextUtils.ellipsize(
                 text, p, 10f, TruncateAt.END, true, callback).toString());
         assertEquals(0, mStart);
         assertEquals(text.length(), mEnd);
 
-        mStart = mEnd = 0;
-        assertEquals(ELLIPSIS, TextUtils.ellipsize(text, p, 10f, TruncateAt.END,
+        resetRange();
+        assertEquals(mEllipsis, TextUtils.ellipsize(text, p, 10f, TruncateAt.END,
                 false, callback).toString());
         assertEquals(0, mStart);
         assertEquals(text.length(), mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals(text, TextUtils.ellipsize(text, p, Float.MAX_VALUE,
                 TruncateAt.END, true, callback).toString());
         assertEquals(0, mStart);
         assertEquals(0, mEnd);
 
-        mStart = mEnd = 0;
+        resetRange();
         assertEquals("long" + getBlankString(true, text.length() - 7) + "ate",
                 TextUtils.ellipsize(text, p, 50f, TruncateAt.MIDDLE, true, null).toString());
         assertEquals(0, mStart);
@@ -460,6 +492,7 @@ public class TextUtilsTest extends AndroidTestCase {
      *
      * @param isNeedStart - boolean whether need to start with char '\u2026' in the string.
      * @param len - int length of string.
+     * @return a blank string which is filled up by '\uFEFF'.
      */
     private String getBlankString(boolean isNeedStart, int len) {
         StringBuilder buf = new StringBuilder();
@@ -490,11 +523,9 @@ public class TextUtilsTest extends AndroidTestCase {
                 new String("different object")));
 
         SpannableString urlSpanString = new SpannableString("URL Spanable String");
-        SpannableString bgColorSpanString = new SpannableString(
-                "BackGroundColor Spanable String");
+        SpannableString bgColorSpanString = new SpannableString("BackGroundColor Spanable String");
         URLSpan urlSpan = new URLSpan(urlSpanString.toString());
-        urlSpanString.setSpan(urlSpan, 0, urlSpanString.length(),
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        urlSpanString.setSpan(urlSpan, 0, urlSpanString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         BackgroundColorSpan bgColorSpan = new BackgroundColorSpan(Color.GREEN);
         bgColorSpanString.setSpan(bgColorSpan, 0, bgColorSpanString.length(),
                 Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -511,30 +542,30 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "expandTemplate",
         args = {java.lang.CharSequence.class, java.lang.CharSequence[].class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testExpandTemplate() {
-        CharSequence values[] = createCharSequenceArray(1);
+        CharSequence[] values = createCharSequenceArray(1);
         assertEquals("template value1 to be expanded", TextUtils.expandTemplate(
                 "template ^1 to be expanded", values).toString());
-        assertEquals("value1 template to be expanded",
-                TextUtils.expandTemplate("^1 template to be expanded", values).toString());
-        assertEquals("template to be expanded value1",
-                TextUtils.expandTemplate("template to be expanded ^1", values).toString());
-        assertEquals("template value1 to be expanded",
-                TextUtils.expandTemplate("template ^1 to be expanded", values).toString());
+        assertEquals("value1 template to be expanded", TextUtils.expandTemplate(
+                "^1 template to be expanded", values).toString());
+        assertEquals("template to be expanded value1", TextUtils.expandTemplate(
+                "template to be expanded ^1", values).toString());
+        assertEquals("template value1 to be expanded", TextUtils.expandTemplate(
+                "template ^1 to be expanded", values).toString());
         // ^1 -> value1 and then append 0
-        assertEquals("template value10 to be expanded",
-                TextUtils.expandTemplate("template ^10 to be expanded", values).toString());
+        assertEquals("template value10 to be expanded", TextUtils.expandTemplate(
+                "template ^10 to be expanded", values).toString());
         assertEquals("template ^a to be expanded", TextUtils.expandTemplate(
                 "template ^a to be expanded", values).toString());
-        assertEquals("template to be expanded", TextUtils.expandTemplate(
-                "template to be expanded", values).toString());
+        assertEquals("template to be expanded", TextUtils.expandTemplate("template to be expanded",
+                values).toString());
         assertEquals("template ^to be expanded", TextUtils.expandTemplate(
                 "template ^^to be expanded", values).toString());
 
         values = createCharSequenceArray(9);
-        String expected = "value1 value2 template value3 value4 to value5 value6" +
-                " be value7 value8 expanded value9";
+        String expected = "value1 value2 template value3 value4 to value5 value6"
+                + " be value7 value8 expanded value9";
         String templete = "^1 ^2 template ^3 ^4 to ^5 ^6 be ^7 ^8 expanded ^9";
         assertEquals(expected, TextUtils.expandTemplate(templete, values).toString());
 
@@ -543,6 +574,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.expandTemplate(templete, values);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            // expect
         }
 
         values = createCharSequenceArray(1);
@@ -550,27 +582,37 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.expandTemplate("template ^0 to be expanded", values).toString();
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            // expect
         }
 
         try {
             TextUtils.expandTemplate("template ^2 to be expanded", values).toString();
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            // expect
         }
 
         try {
             TextUtils.expandTemplate(null, values);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         try {
-            TextUtils.expandTemplate("template ^1 to be expanded", (CharSequence[]) null);
+            TextUtils.expandTemplate("template ^1 to be expanded", (CharSequence[])null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
+    /**
+     * Create a char sequence array with the specified length
+     * @param len the length of the array 
+     * @return The char sequence array with the specified length.
+     * The value of each item is "value[index+1]"
+     */
     private CharSequence[] createCharSequenceArray(int len) {
         CharSequence array[] = new CharSequence[len];
 
@@ -587,7 +629,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getChars",
         args = {java.lang.CharSequence.class, int.class, int.class, char[].class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException" +
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException" +
             "and IndexOutOfBoundsException issue")
     public void testGetChars() {
         char[] dest = new char[2];
@@ -599,14 +641,18 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(source, -1, 2, dest, 0);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.getChars(source, Integer.MAX_VALUE, 2, dest, 0);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
-        dest = new char[] { '0', '1', '2', '3' };
+        dest = new char[] {
+                '0', '1', '2', '3'
+        };
         TextUtils.getChars(source, 0, 2, dest, 2);
         assertEquals("01so", new String(dest));
 
@@ -615,24 +661,30 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(source, 10, source.length() + 1, dest, 0);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.getChars(source, 10, -1, dest, 0);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         TextUtils.getChars(source, 10, source.length(), dest, 0);
         assertEquals("ing", new String(dest));
-        dest = new char[] { 'a', 'b', 'c' };
+        dest = new char[] {
+                'a', 'b', 'c'
+        };
         try {
             TextUtils.getChars(source, 10, source.length(), dest, Integer.MAX_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.getChars(source, 10, source.length(), dest, Integer.MIN_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
 
         dest = new char[2];
@@ -659,21 +711,23 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getChars",
         args = {java.lang.CharSequence.class, int.class, int.class, char[].class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testGetCharsNullPointerException() {
-        char dest[] = new char[3];
+        char[] dest = new char[3];
         String string = "source string";
 
         try {
             TextUtils.getChars(null, 10, string.length() - 1, dest, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         try {
             TextUtils.getChars(string, 10, string.length() - 1, null, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -706,7 +760,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     private class MockCharSequence implements CharSequence {
-        char mText[];
+        char[] mText;
 
         public MockCharSequence() {
             this("");
@@ -739,7 +793,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getOffsetAfter",
         args = {java.lang.CharSequence.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testGetOffsetAfter() {
         // the first '\uD800' is index 9, the second 'uD800' is index 16
         // the '\uDBFF' is index 26
@@ -755,12 +809,14 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getOffsetAfter(text, -1);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.getOffsetAfter(text, Integer.MAX_VALUE);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
     }
 
@@ -770,12 +826,13 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getOffsetAfter",
         args = {java.lang.CharSequence.class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testGetOffsetAfterNullPointerException() {
         try {
             TextUtils.getOffsetAfter(null, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -785,7 +842,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getOffsetBefore",
         args = {java.lang.CharSequence.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testGetOffsetBefore() {
         // the first '\uDC00' is index 10, the second 'uDC00' is index 17
         // the '\uDFFF' is index 27
@@ -801,11 +858,13 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getOffsetBefore(text, -1);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.getOffsetBefore(text, Integer.MAX_VALUE);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
     }
 
@@ -815,12 +874,13 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getOffsetBefore",
         args = {java.lang.CharSequence.class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testGetOffsetBeforeNullPointerException() {
         try {
             TextUtils.getOffsetBefore(null, 11);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -830,7 +890,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testGetReverse() {
         String source = "string to be reversed";
         assertEquals("gnirts", TextUtils.getReverse(source, 0, 6).toString());
@@ -841,6 +901,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getReverse(source, -1, 6).toString();
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
@@ -853,6 +914,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getReverse(source, 6, 0).toString();
             fail("Should throw NegativeArraySizeException!");
         } catch (NegativeArraySizeException e) {
+            // expect
         }
     }
 
@@ -862,13 +924,14 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1427107", explanation = "InternalError issue")
+    @ToBeFixed(bug = "1427107", explanation = "InternalError issue")
     public void testGetReverseInternalError() {
         String source = "string to be reversed";
         try {
             TextUtils.getReverse(source, 0, Integer.MAX_VALUE).toString();
             fail("Should throw InternalError!");
         } catch (InternalError e) {
+            // expect
         }
     }
 
@@ -878,13 +941,14 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1427101", explanation = "NegativeArraySizeException issue")
+    @ToBeFixed(bug = "1427101", explanation = "NegativeArraySizeException issue")
     public void testGetReverseNegativeArraySizeException() {
         String source = "string to be reversed";
         try {
             TextUtils.getReverse(source, Integer.MIN_VALUE, 6).toString();
             fail("Should throw NegativeArraySizeException!");
         } catch (NegativeArraySizeException e) {
+            // expect
         }
     }
 
@@ -900,6 +964,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getReverse(null, 0, 6).toString();
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -909,7 +974,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "getTrimmedLength",
         args = {java.lang.CharSequence.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testGetTrimmedLength() {
         assertEquals("normalstring".length(), TextUtils.getTrimmedLength("normalstring"));
         assertEquals("normal string".length(), TextUtils.getTrimmedLength("normal string"));
@@ -917,16 +982,18 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals("blank after".length(), TextUtils.getTrimmedLength("blank after   \n    "));
         assertEquals("blank both".length(), TextUtils.getTrimmedLength(" \t   blank both  \n "));
 
-        char[] allTrimmedChars = new char[] { '\u0000', '\u0001', '\u0002', '\u0003'
-                , '\u0004', '\u0005', '\u0006', '\u0007', '\u0008', '\u0009', '\u0010'
-                , '\u0011', '\u0012', '\u0013', '\u0014', '\u0015', '\u0016', '\u0017'
-                , '\u0018', '\u0019', '\u0020'};
+        char[] allTrimmedChars = new char[] {
+                '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
+                '\u0008', '\u0009', '\u0010', '\u0011', '\u0012', '\u0013', '\u0014', '\u0015',
+                '\u0016', '\u0017', '\u0018', '\u0019', '\u0020'
+        };
         assertEquals(0, TextUtils.getTrimmedLength(String.valueOf(allTrimmedChars)));
 
         try {
             TextUtils.getTrimmedLength(null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -936,15 +1003,16 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "htmlEncode",
         args = {java.lang.String.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testHtmlEncode() {
-        assertEquals("&lt;_html_&gt;\\ &amp;&quot;'string'&quot;",
+        assertEquals("&lt;_html_&gt;\\ &amp;&quot;&apos;string&apos;&quot;",
                 TextUtils.htmlEncode("<_html_>\\ &\"'string'\""));
 
          try {
              TextUtils.htmlEncode(null);
              fail("Should throw NullPointerException!");
          } catch (NullPointerException e) {
+             // expect
          }
     }
 
@@ -986,40 +1054,38 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "indexOf",
         args = {java.lang.CharSequence.class, char.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testIndexOf2() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
         final int INDEX_OF_SECOND_R = 16;
 
         assertEquals(INDEX_OF_FIRST_R, TextUtils.indexOf(searchString, 'r', 0));
-        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(searchString, 'r',
-                INDEX_OF_FIRST_R + 1));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(searchString, 'r', INDEX_OF_FIRST_R + 1));
         assertEquals(-1, TextUtils.indexOf(searchString, 'r', searchString.length()));
         assertEquals(INDEX_OF_FIRST_R, TextUtils.indexOf(searchString, 'r', Integer.MIN_VALUE));
         assertEquals(-1, TextUtils.indexOf(searchString, 'r', Integer.MAX_VALUE));
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
-        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuffer, 'r',
-                INDEX_OF_FIRST_R + 1));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuffer, 'r', INDEX_OF_FIRST_R + 1));
         try {
             TextUtils.indexOf(stringBuffer, 'r', Integer.MIN_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         assertEquals(-1, TextUtils.indexOf(stringBuffer, 'r', Integer.MAX_VALUE));
 
         StringBuilder stringBuilder = new StringBuilder(searchString);
-        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuilder, 'r',
-                INDEX_OF_FIRST_R + 1));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuilder, 'r', INDEX_OF_FIRST_R + 1));
 
         MockGetChars mockGetChars = new MockGetChars();
         TextUtils.indexOf(mockGetChars, 'r', INDEX_OF_FIRST_R + 1);
         assertTrue(mockGetChars.hasCalledGetChars());
 
         MockCharSequence mockCharSequence = new MockCharSequence(searchString);
-        assertEquals(INDEX_OF_SECOND_R,
-                TextUtils.indexOf(mockCharSequence, 'r', INDEX_OF_FIRST_R + 1));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(mockCharSequence, 'r',
+                INDEX_OF_FIRST_R + 1));
     }
 
     @TestTargetNew(
@@ -1028,7 +1094,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "indexOf",
         args = {java.lang.CharSequence.class, char.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testIndexOf3() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
@@ -1045,6 +1111,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.indexOf(searchString, 'r', Integer.MIN_VALUE, INDEX_OF_SECOND_R);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         assertEquals(-1,
                 TextUtils.indexOf(searchString, 'r', Integer.MAX_VALUE, INDEX_OF_SECOND_R));
@@ -1053,6 +1120,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.indexOf(searchString, 'r', 0, Integer.MAX_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
@@ -1107,7 +1175,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "indexOf",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testIndexOf5() {
         String searchString = "string to be searched by string";
         final int INDEX_OF_FIRST_STRING = 0;
@@ -1116,10 +1184,9 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string", 0));
         assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString, "string",
                 INDEX_OF_FIRST_STRING + 1));
-        assertEquals(-1,
-                TextUtils.indexOf(searchString, "string", INDEX_OF_SECOND_STRING + 1));
-        assertEquals(INDEX_OF_FIRST_STRING,
-                TextUtils.indexOf(searchString, "string", Integer.MIN_VALUE));
+        assertEquals(-1, TextUtils.indexOf(searchString, "string", INDEX_OF_SECOND_STRING + 1));
+        assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string",
+                Integer.MIN_VALUE));
         assertEquals(-1, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE));
 
         assertEquals(7, TextUtils.indexOf(searchString, "", 7));
@@ -1129,18 +1196,19 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(-1, TextUtils.indexOf(searchString, searchString + "longer needle", 0));
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING,
-                TextUtils.indexOf(stringBuffer, "string", INDEX_OF_FIRST_STRING + 1));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer, "string",
+                INDEX_OF_FIRST_STRING + 1));
         try {
             TextUtils.indexOf(stringBuffer, "string", Integer.MIN_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         assertEquals(-1, TextUtils.indexOf(stringBuffer, "string", Integer.MAX_VALUE));
 
         StringBuilder stringBuilder = new StringBuilder(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING,
-                TextUtils.indexOf(stringBuilder, "string", INDEX_OF_FIRST_STRING + 1));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuilder, "string",
+                INDEX_OF_FIRST_STRING + 1));
 
         MockGetChars mockGetChars = new MockGetChars();
         assertFalse(mockGetChars.hasCalledGetChars());
@@ -1148,8 +1216,8 @@ public class TextUtilsTest extends AndroidTestCase {
         assertTrue(mockGetChars.hasCalledGetChars());
 
         MockCharSequence mockCharSequence = new MockCharSequence(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING,
-                TextUtils.indexOf(mockCharSequence, "string", INDEX_OF_FIRST_STRING + 1));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(mockCharSequence, "string",
+                INDEX_OF_FIRST_STRING + 1));
     }
 
     @TestTargetNew(
@@ -1158,55 +1226,55 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "indexOf",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testIndexOf6() {
         String searchString = "string to be searched by string";
         final int INDEX_OF_FIRST_STRING = 0;
         final int INDEX_OF_SECOND_STRING = 25;
 
-        assertEquals(INDEX_OF_FIRST_STRING,
-                TextUtils.indexOf(searchString, "string", 0, searchString.length()));
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString,
-                "string", INDEX_OF_FIRST_STRING + 1, searchString.length()));
-        assertEquals(-1, TextUtils.indexOf(searchString, "string",
-                INDEX_OF_FIRST_STRING + 1, INDEX_OF_SECOND_STRING - 1));
-        assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString,
-                "string", Integer.MIN_VALUE, INDEX_OF_SECOND_STRING - 1));
-        assertEquals(-1, TextUtils.indexOf(searchString, "string",
-                Integer.MAX_VALUE, INDEX_OF_SECOND_STRING - 1));
+        assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string", 0,
+                searchString.length()));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString, "string",
+                INDEX_OF_FIRST_STRING + 1, searchString.length()));
+        assertEquals(-1, TextUtils.indexOf(searchString, "string", INDEX_OF_FIRST_STRING + 1,
+                INDEX_OF_SECOND_STRING - 1));
+        assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string",
+                Integer.MIN_VALUE, INDEX_OF_SECOND_STRING - 1));
+        assertEquals(-1, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE,
+                INDEX_OF_SECOND_STRING - 1));
 
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString,
-                "string", INDEX_OF_FIRST_STRING + 1, Integer.MIN_VALUE));
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString,
-                "string", INDEX_OF_FIRST_STRING + 1, Integer.MAX_VALUE));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString, "string",
+                INDEX_OF_FIRST_STRING + 1, Integer.MIN_VALUE));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString, "string",
+                INDEX_OF_FIRST_STRING + 1, Integer.MAX_VALUE));
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer,
-                "string", INDEX_OF_FIRST_STRING + 1, searchString.length()));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer, "string",
+                INDEX_OF_FIRST_STRING + 1, searchString.length()));
         try {
             TextUtils.indexOf(stringBuffer, "string", Integer.MIN_VALUE,
                     INDEX_OF_SECOND_STRING - 1);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
         assertEquals(-1, TextUtils.indexOf(stringBuffer, "string", Integer.MAX_VALUE, 10));
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer,
-                "string", INDEX_OF_FIRST_STRING + 1, Integer.MIN_VALUE));
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer,
-                "string", INDEX_OF_FIRST_STRING + 1, Integer.MAX_VALUE));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer, "string",
+                INDEX_OF_FIRST_STRING + 1, Integer.MIN_VALUE));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuffer, "string",
+                INDEX_OF_FIRST_STRING + 1, Integer.MAX_VALUE));
 
         StringBuilder stringBuilder = new StringBuilder(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuilder,
-                "string", INDEX_OF_FIRST_STRING + 1, searchString.length()));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(stringBuilder, "string",
+                INDEX_OF_FIRST_STRING + 1, searchString.length()));
 
         MockGetChars mockGetChars = new MockGetChars();
-        TextUtils.indexOf(mockGetChars, "string", INDEX_OF_FIRST_STRING + 1,
-                searchString.length());
+        TextUtils.indexOf(mockGetChars, "string", INDEX_OF_FIRST_STRING + 1, searchString.length());
         assertTrue(mockGetChars.hasCalledGetChars());
 
         MockCharSequence mockCharSequence = new MockCharSequence(searchString);
-        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(mockCharSequence,
-                "string", INDEX_OF_FIRST_STRING + 1, searchString.length()));
+        assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(mockCharSequence, "string",
+                INDEX_OF_FIRST_STRING + 1, searchString.length()));
     }
 
     @TestTargetNew(
@@ -1215,7 +1283,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "isDigitsOnly",
         args = {java.lang.CharSequence.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testIsDigitsOnly() {
         assertFalse(TextUtils.isDigitsOnly("no digit"));
         assertFalse(TextUtils.isDigitsOnly("character and 56 digits"));
@@ -1277,7 +1345,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "isGraphic",
         args = {java.lang.CharSequence.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testIsGraphic2() {
         assertTrue(TextUtils.isGraphic("printable characters"));
 
@@ -1289,6 +1357,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.isGraphic(null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -1299,7 +1368,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "join",
         args = {java.lang.CharSequence.class, java.lang.Iterable.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testJoin1() {
         ArrayList<CharSequence> charTokens = new ArrayList<CharSequence>();
         charTokens.add("string1");
@@ -1313,6 +1382,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.join("|", (Iterable) null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
         ArrayList<SpannableString> spannableStringTokens = new ArrayList<SpannableString>();
@@ -1328,9 +1398,9 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "join",
         args = {java.lang.CharSequence.class, java.lang.Object[].class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testJoin2() {
-        CharSequence charTokens[] = new CharSequence[] { "string1", "string2", "string3" };
+        CharSequence[] charTokens = new CharSequence[] { "string1", "string2", "string3" };
         assertEquals("string1|string2|string3", TextUtils.join("|", charTokens));
         assertEquals("string1; string2; string3", TextUtils.join("; ", charTokens));
         assertEquals("string1string2string3", TextUtils.join("", charTokens));
@@ -1339,9 +1409,10 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.join("|", (Object[]) null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
 
-        SpannableString spannableStringTokens[] = new SpannableString[] {
+        SpannableString[] spannableStringTokens = new SpannableString[] {
                 new SpannableString("span 1"),
                 new SpannableString("span 2"),
                 new SpannableString("span 3") };
@@ -1425,45 +1496,45 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "lastIndexOf",
         args = {java.lang.CharSequence.class, char.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException issue")
     public void testLastIndexOf3() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
         final int INDEX_OF_SECOND_R = 16;
 
-        assertEquals(INDEX_OF_SECOND_R,
-                TextUtils.lastIndexOf(searchString, 'r', 0, searchString.length()));
-        assertEquals(INDEX_OF_FIRST_R,
-                TextUtils.lastIndexOf(searchString, 'r', 0, INDEX_OF_SECOND_R - 1));
-        assertEquals(-1,
-                TextUtils.lastIndexOf(searchString, 'r', 0, INDEX_OF_FIRST_R - 1));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.lastIndexOf(searchString, 'r', 0,
+                searchString.length()));
+        assertEquals(INDEX_OF_FIRST_R, TextUtils.lastIndexOf(searchString, 'r', 0,
+                INDEX_OF_SECOND_R - 1));
+        assertEquals(-1, TextUtils.lastIndexOf(searchString, 'r', 0, INDEX_OF_FIRST_R - 1));
 
         try {
             TextUtils.lastIndexOf(searchString, 'r', Integer.MIN_VALUE, INDEX_OF_SECOND_R - 1);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expect
         }
-        assertEquals(-1, TextUtils.lastIndexOf(searchString, 'r',
-                Integer.MAX_VALUE, INDEX_OF_SECOND_R - 1));
+        assertEquals(-1, TextUtils.lastIndexOf(searchString, 'r', Integer.MAX_VALUE,
+                INDEX_OF_SECOND_R - 1));
         assertEquals(-1, TextUtils.lastIndexOf(searchString, 'r', 0, Integer.MIN_VALUE));
-        assertEquals(INDEX_OF_SECOND_R,
-                TextUtils.lastIndexOf(searchString, 'r', 0, Integer.MAX_VALUE));
+        assertEquals(INDEX_OF_SECOND_R, TextUtils.lastIndexOf(searchString, 'r', 0,
+                Integer.MAX_VALUE));
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
-        assertEquals(INDEX_OF_FIRST_R,
-                TextUtils.lastIndexOf(stringBuffer, 'r', 0, INDEX_OF_SECOND_R - 1));
+        assertEquals(INDEX_OF_FIRST_R, TextUtils.lastIndexOf(stringBuffer, 'r', 0,
+                INDEX_OF_SECOND_R - 1));
 
         StringBuilder stringBuilder = new StringBuilder(searchString);
-        assertEquals(INDEX_OF_FIRST_R,
-                TextUtils.lastIndexOf(stringBuilder, 'r', 0, INDEX_OF_SECOND_R - 1));
+        assertEquals(INDEX_OF_FIRST_R, TextUtils.lastIndexOf(stringBuilder, 'r', 0,
+                INDEX_OF_SECOND_R - 1));
 
         MockGetChars mockGetChars = new MockGetChars();
         TextUtils.lastIndexOf(mockGetChars, 'r', 0, INDEX_OF_SECOND_R - 1);
         assertTrue(mockGetChars.hasCalledGetChars());
 
         MockCharSequence mockCharSequence = new MockCharSequence(searchString);
-        assertEquals(INDEX_OF_FIRST_R,
-                TextUtils.lastIndexOf(mockCharSequence, 'r', 0, INDEX_OF_SECOND_R - 1));
+        assertEquals(INDEX_OF_FIRST_R, TextUtils.lastIndexOf(mockCharSequence, 'r', 0,
+                INDEX_OF_SECOND_R - 1));
     }
 
     @TestTargetNew(
@@ -1472,7 +1543,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "regionMatches",
         args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testRegionMatches() {
         assertFalse(TextUtils.regionMatches("one", 0, "two", 0, 3));
         assertTrue(TextUtils.regionMatches("one", 0, "one", 0, 3));
@@ -1480,6 +1551,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.regionMatches("one", 0, "one", 0, 4);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         String one = "Hello Android, hello World!";
@@ -1499,33 +1571,39 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.regionMatches(one, Integer.MIN_VALUE, two, 0, 5);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.regionMatches(one, Integer.MAX_VALUE, two, 0, 5);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.regionMatches(one, 0, two, Integer.MIN_VALUE, 5);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.regionMatches(one, 0, two, Integer.MAX_VALUE, 5);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.regionMatches(one, 0, two, 0, Integer.MIN_VALUE);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
         try {
             TextUtils.regionMatches(one, 0, two, 0, Integer.MAX_VALUE);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
     }
 
@@ -1535,7 +1613,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "regionMatches",
         args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testRegionMatchesNullPointerException() {
         String one = "Hello Android, hello World!";
         String two = "Hello World";
@@ -1544,11 +1622,13 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.regionMatches(null, 0, two, 0, 5);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
         try {
             TextUtils.regionMatches(one, 0, null, 0, 5);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -1556,58 +1636,59 @@ public class TextUtilsTest extends AndroidTestCase {
         level = TestLevel.TODO,
         notes = "Test replace method",
         method = "replace",
-        args = {java.lang.CharSequence.class, java.lang.String[].class, java.lang.CharSequence[].class}
+        args = {java.lang.CharSequence.class, java.lang.String[].class,
+                java.lang.CharSequence[].class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testReplace() {
         String template = "this is a string to be as the template for replacement";
         SpannableStringBuilder replacedString = null;
-        String sources[] = null;
-        CharSequence destinations[] = null;
+        String[] sources = null;
+        CharSequence[] destinations = null;
 
-        sources = new String[] { "string" };
-        destinations = new CharSequence[] { "text" };
-        replacedString = (SpannableStringBuilder) TextUtils.replace(template,
-                sources, destinations);
+        sources = new String[] {"string"};
+        destinations = new CharSequence[] {"text"};
+        replacedString = (SpannableStringBuilder)TextUtils.replace(template, sources, destinations);
         assertEquals("this is a text to be as the template for replacement",
                 replacedString.toString());
 
-        sources = new String[] { "is", "the", "for replacement" };
-        destinations = new CharSequence[] { "was", "", "to be replaced" };
-        replacedString = (SpannableStringBuilder) TextUtils.replace(template,
-                sources, destinations);
+        sources = new String[] {"is", "the", "for replacement"};
+        destinations = new CharSequence[] {"was", "", "to be replaced"};
+        replacedString = (SpannableStringBuilder)TextUtils.replace(template, sources, destinations);
         assertEquals("thwas is a string to be as  template to be replaced",
                 replacedString.toString());
 
-        sources = new String[] { "is", "for replacement" };
-        destinations = new CharSequence[] { "was", "", "to be replaced" };
-        replacedString = (SpannableStringBuilder) TextUtils.replace(template,
-                sources, destinations);
-        assertEquals("thwas is a string to be as the template ",
-                replacedString.toString());
+        sources = new String[] {"is", "for replacement"};
+        destinations = new CharSequence[] {"was", "", "to be replaced"};
+        replacedString = (SpannableStringBuilder)TextUtils.replace(template, sources, destinations);
+        assertEquals("thwas is a string to be as the template ", replacedString.toString());
 
-        sources = new String[] { "is", "the", "for replacement" };
-        destinations = new CharSequence[] { "was", "to be replaced" };
+        sources = new String[] {"is", "the", "for replacement"};
+        destinations = new CharSequence[] {"was", "to be replaced"};
         try {
             TextUtils.replace(template, sources, destinations);
             fail("should throw ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.replace(null, sources, destinations);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
         try {
             TextUtils.replace(template, null, destinations);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
         try {
             TextUtils.replace(template, sources, null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -1617,7 +1698,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "split",
         args = {java.lang.String.class, java.util.regex.Pattern.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testSplit1() {
         assertEquals(4, TextUtils.split("abccbadecdebz", Pattern.compile("c")).length);
         assertEquals(3, TextUtils.split("abccbadecdebz", Pattern.compile("a")).length);
@@ -1631,11 +1712,13 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.split(null, Pattern.compile("a"));
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
         try {
             TextUtils.split("abccbadecdebz", (Pattern)null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -1645,7 +1728,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "split",
         args = {java.lang.String.class, java.lang.String.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testSplit2() {
         assertEquals(4, TextUtils.split("abccbadecdebz", "c").length);
         assertEquals(3, TextUtils.split("abccbadecdebz", "a").length);
@@ -1658,11 +1741,13 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.split(null, "a");
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
         try {
             TextUtils.split("abccbadecdebz", (String)null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 
@@ -1697,7 +1782,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "substring",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
-    @ToBeFixed( bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
+    @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testSubString() {
         String string = "String";
         assertSame(string, TextUtils.substring(string, 0, string.length()));
@@ -1708,30 +1793,35 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.substring(string, 3, 2);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.substring(string, -1, 3);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.substring(string, Integer.MAX_VALUE, 3);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.substring(string, 0, -1);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         try {
             TextUtils.substring(string, 0, Integer.MAX_VALUE);
             fail("Should throw StringIndexOutOfBoundsException!");
         } catch (StringIndexOutOfBoundsException e) {
+            // expect
         }
 
         StringBuffer stringBuffer = new StringBuffer("String Buffer");
@@ -1749,7 +1839,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "writeToParcel",
         args = {java.lang.CharSequence.class, android.os.Parcel.class, int.class}
     )
-    @ToBeFixed( bug = "", explanation = "This test is broken and needs to be updated.")
+    @ToBeFixed(bug = "", explanation = "This test is broken and needs to be updated.")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
 
@@ -1775,7 +1865,7 @@ public class TextUtilsTest extends AndroidTestCase {
         p.setDataPosition(0);
         SpannableString ret = (SpannableString) creator.createFromParcel(p);
         assertEquals("Spannable String", ret.toString());
-        Object spans[] = ret.getSpans(0, ret.length(), Object.class);
+        Object[] spans = ret.getSpans(0, ret.length(), Object.class);
         assertEquals(1, spans.length);
         assertEquals("URL Span", ((URLSpan) spans[0]).getURL());
         assertEquals(1, ret.getSpanStart(spans[0]));
@@ -1784,10 +1874,14 @@ public class TextUtilsTest extends AndroidTestCase {
         p.recycle();
 
         ColorStateList colors = new ColorStateList(new int[][] {
-                new int[] {android.R.attr.state_focused}, new int[0],},
-                new int[] {Color.rgb(0, 255, 0), Color.BLACK,});
-        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(
-                null, Typeface.ITALIC, 20, colors, null);
+                new int[] {
+                    android.R.attr.state_focused
+                }, new int[0],
+        }, new int[] {
+                Color.rgb(0, 255, 0), Color.BLACK,
+        });
+        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(null, Typeface.ITALIC, 20,
+                colors, null);
         spannableString.setSpan(textAppearanceSpan, 0, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         TextUtils.writeToParcel(spannableString, p, -1);
         p.setDataPosition(0);
@@ -1818,7 +1912,7 @@ public class TextUtilsTest extends AndroidTestCase {
         method = "writeToParcel",
         args = {java.lang.CharSequence.class, android.os.Parcel.class, int.class}
     )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testWriteToParcelNullPointerException() {
         SpannableString spannableString = new SpannableString("Spannable String");
 
@@ -1826,6 +1920,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.writeToParcel(spannableString, null, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            // expect
         }
     }
 }

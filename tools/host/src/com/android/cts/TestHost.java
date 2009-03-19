@@ -454,32 +454,40 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
         sessionLog.setDeviceInfo(device.getDeviceInfo());
 
-        switch (type) {
-        case RUN_SINGLE_TEST:
-            ts.start(testFullName);
-            break;
-
-        case RUN_SINGLE_JAVA_PACKAGE:
-            ts.start(javaPkgName);
-            break;
-
-        case START_NEW_SESSION:
-            ts.start();
-            break;
-
-        case RESUME_SESSION:
-            ts.resume();
-            break;
-        }
-
-        synchronized (sTestSessionSync) {
+        boolean finish = false;
+        while (!finish) {
             try {
-                sTestSessionSync.wait();
-            } catch (InterruptedException e) {
-                Log.e("", e);
+                switch (type) {
+                case RUN_SINGLE_TEST:
+                    ts.start(testFullName);
+                    break;
+
+                case RUN_SINGLE_JAVA_PACKAGE:
+                    ts.start(javaPkgName);
+                    break;
+
+                case START_NEW_SESSION:
+                    ts.start();
+                    break;
+
+                case RESUME_SESSION:
+                    ts.resume();
+                    break;
+                }
+
+                finish = true;
+            } catch (ADBServerNeedRestartException e) {
+                Log.d(e.getMessage());
+                Log.i("Max ADB operations reached. Restarting ADB...");
+
+                TestSession.setADBServerRestartedMode();
+                sDeviceManager.restartADBServer(ts);
+
+                type = ActionType.RESUME_SESSION;
             }
         }
 
+        TestSession.resetADBServerRestartedMode();
         sDeviceManager.resetTestDevice(device);
     }
 
@@ -487,7 +495,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * Create {@link TestSession} according to the specified test plan.
      *
      * @param testPlanName the name of the specified test plan
-     * @return a {@link TestSession} 
+     * @return a {@link TestSession}
      */
     static public TestSession createSession(final String testPlanName)
             throws IOException, TestNotFoundException, SAXException,
@@ -587,7 +595,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
     /**
      * Get the first available device.
-     * 
+     *
      * @return the first available device or null if none are available.
      */
     public TestDevice getFirstAvailableDevice() {
@@ -598,7 +606,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         }
         return null;
     }
-    
+
     /**
      * Get session logs.
      *

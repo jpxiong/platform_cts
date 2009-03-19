@@ -42,16 +42,79 @@ public class TestSession {
     private int mRequiredDeviceNumber;
     private boolean mTestStop;
     private TestSessionThread mTestThread;
+    private boolean mNeedRestartAdbServer;
+    private static boolean mADBServerRestartedMode;
+
+    private static final long MAX_TEST_COUNT = 500;
+    private static long mTestCount;
 
     public TestSession(final TestSessionLog sessionLog,
             final int requiredDeviceNum) {
         mStatus = STATUS.INIT;
 
+        mNeedRestartAdbServer = false;
+        mADBServerRestartedMode = false;
+        mTestCount = 0;
         mSessionLog = sessionLog;
         mDevice = null;
         mRequiredDeviceNumber = requiredDeviceNum;
         mTestStop = false;
-        mId = sIdCounter ++;
+        mId = sIdCounter++;
+    }
+
+    /**
+     * Set ADB server restarted mode.
+     */
+    public static void setADBServerRestartedMode() {
+        mADBServerRestartedMode = true;
+    }
+
+    /**
+     * Reset ADB server restarted mode.
+     */
+    public static void resetADBServerRestartedMode() {
+        mADBServerRestartedMode = false;
+    }
+
+    /**
+     * Check if it's in ADB server restarted mode.
+     *
+     * @return If in ADB server restarted mode, return true; else, return false.
+     */
+    public static boolean isADBServerRestartedMode() {
+        return mADBServerRestartedMode;
+    }
+
+    /**
+     * Increase the test count.
+     */
+    public static void incTestCount() {
+        mTestCount++;
+    }
+
+    /**
+     * Reset the test count.
+     */
+    public static void resetTestCount() {
+        mTestCount = 0;
+    }
+
+    /**
+     * Get the test count recently has been run.
+     *
+     * @return The test count recently has been run.
+     */
+    public static long getTestCount() {
+        return mTestCount;
+    }
+
+    /**
+     * Check if the test count exceeds the max test count.
+     *
+     * @return If reached, return true; else, return false.
+     */
+    public static boolean exceedsMaxCount() {
+        return mTestCount >= MAX_TEST_COUNT;
     }
 
     /**
@@ -96,7 +159,7 @@ public class TestSession {
      * @param testFullName The test full name.
      */
     public void start(final String testFullName) throws TestNotFoundException,
-            IllegalTestNameException {
+            IllegalTestNameException, ADBServerNeedRestartException {
 
         if ((testFullName == null) || (testFullName.length() == 0)) {
             throw new IllegalArgumentException();
@@ -136,18 +199,37 @@ public class TestSession {
         if ((resultPath == null) || (resultPath.length() == 0)) {
             mSessionLog.setStartTime(System.currentTimeMillis());
         }
+
+        startImpl();
+    }
+
+    /**
+     * Implement starting/resuming session.
+     */
+    private void startImpl() throws ADBServerNeedRestartException {
+        resetTestCount();
         mTestThread.start();
+        try {
+            mTestThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (mNeedRestartAdbServer) {
+            throw new ADBServerNeedRestartException("Need restart ADB server");
+        }
     }
 
     /**
      * Resume the test session.
      */
-    public void resume() {
+    public void resume() throws ADBServerNeedRestartException {
         mStatus = STATUS.RESUMED;
         mTestThread = new TestSessionThread(this);
-        CUIOutputStream.println("resume test plan " + getSessionLog().getTestPlanName()
+        if (!isADBServerRestartedMode()) {
+            CUIOutputStream.println("resume test plan " + getSessionLog().getTestPlanName()
                 + " (session id = " + mId + ")");
-        mTestThread.start();
+        }
+        startImpl();
     }
 
     /**
@@ -195,13 +277,13 @@ public class TestSession {
     /**
      * Start a new test session thread to execute the specific test plan.
      */
-    public void start() {
+    public void start() throws ADBServerNeedRestartException {
         mStatus = STATUS.STARTED;
         mSessionLog.setStartTime(System.currentTimeMillis());
         mTestThread = new TestSessionThread(this);
 
         CUIOutputStream.println("start test plan " + getSessionLog().getTestPlanName());
-        mTestThread.start();
+        startImpl();
     }
 
     /**
@@ -286,8 +368,8 @@ public class TestSession {
         @Override
         public void run() {
             Log.d("Start a test session.");
+            mNeedRestartAdbServer = false;
             mResultObserver.setTestSessionLog(getSessionLog());
-            long startTime = System.currentTimeMillis();
             mResultObserver.start();
 
             try {
@@ -300,25 +382,74 @@ public class TestSession {
                     mTestPackage.run(mDevice, mJavaPackageName);
                 } else {
                     for (TestPackage pkg : mSessionLog.getTestPackages()) {
-                        pkg.setSessionThread(this);
-                        pkg.run(mDevice, null);
+                        if (!pkg.isAllTestsRun()) {
+                            pkg.setSessionThread(this);
+                            pkg.run(mDevice, null);
+                            if (!isAllTestsRun()) {
+                                markNeedRestartADBServer();
+                                return;
+                            } else {
+                                Log.d("All tests have been run.");
+                                break;
+                            }
+                        }
                     }
+                    mNeedRestartAdbServer = false;
                     displayTestResultSummary();
                 }
             } catch (IOException e) {
                 Log.e("Got exception when running the package", e);
             } catch (DeviceDisconnectedException e) {
                 Log.e("Device " + e.getMessage() + " disconnected ", null);
+            } catch (ADBServerNeedRestartException e) {
+                Log.d(e.getMessage());
+                if (mTest == null) {
+                    markNeedRestartADBServer();
+                    return;
+                }
             }
 
+            long startTime = getSessionLog().getStartTime().getTime();
             displayTimeInfo(startTime, System.currentTimeMillis());
 
             mStatus = STATUS.FINISHED;
             mTestSession.getSessionLog().setEndTime(System.currentTimeMillis());
             mSessionObserver.notifyFinished(mTestSession);
+            notifyResultObserver();
+        }
 
+        /**
+         * Mark need restarting ADB server.
+         */
+        private void markNeedRestartADBServer() {
+            Log.d("mark mNeedRestartAdbServer to true");
+            mNeedRestartAdbServer = true;
+            mStatus = STATUS.FINISHED;
+            notifyResultObserver();
+            return;
+        }
+
+        /**
+         * Notify result observer.
+         */
+        private void notifyResultObserver() {
             mResultObserver.notifyUpdate();
             mResultObserver.finish();
+        }
+
+        /**
+         * Check if all tests contained in all of the test packages has been run.
+         *
+         * @return If all tests have been run, return true; else, return false.
+         */
+        private boolean isAllTestsRun() {
+            Collection<TestPackage> pkgs = getTestPackages();
+            for (TestPackage pkg : pkgs) {
+                if (!pkg.isAllTestsRun()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /**
@@ -398,9 +529,11 @@ public class TestSession {
          * Notify this updating thread to update the test result to xml file.
          */
         public void notifyUpdate() {
-            synchronized (this) {
-                mNotified = true;
-                notify();
+            if (mObserver != null) {
+                synchronized (mObserver) {
+                    mNotified = true;
+                    mObserver.notify();
+                }
             }
         }
 
@@ -423,6 +556,7 @@ public class TestSession {
             notifyUpdate();
             try {
                 mObserver.join();
+                mObserver = null;
             } catch (InterruptedException e) {
             }
         }
@@ -439,7 +573,7 @@ public class TestSession {
                 while (!mFinished) {
                     try {
                         synchronized (this) {
-                            if (!mNotified) {
+                            if ((!mNotified) && (!mFinished)) {
                                 wait();
                             }
 

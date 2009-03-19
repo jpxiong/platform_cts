@@ -80,6 +80,7 @@ public class TestDevice implements DeviceObserver {
     private PackageActionTimer mPackageActionTimer;
 
     private ObjectSync mObjectSync;
+    private int mPackageActionResultCode;
 
     static {
         INSTRUMENT_RESULT_PATTERN = Pattern.compile(sInstrumentResultExpr);
@@ -118,6 +119,47 @@ public class TestDevice implements DeviceObserver {
             genDeviceInfo();
         }
         return mDeviceInfo;
+    }
+
+    /**
+     * Probe device status by pushing apk to device.
+     */
+    public void probeDeviceStatus() throws DeviceDisconnectedException {
+        String apkName = "DeviceInfoCollector";
+        Log.d("probe device status...");
+
+        String apkPath = HostConfig.getInstance().getCaseRepository().getApkPath(apkName);
+        if (!HostUtils.isFileExist(apkPath)) {
+            Log.e("File doesn't exist: " + apkPath, null);
+            return;
+        }
+
+        mDeviceInfo.set(DeviceParameterCollector.SERIAL_NUMBER, getSerialNumber());
+        Log.d("installing " + apkName + " apk");
+        mObjectSync = new ObjectSync();
+
+        // reset device observer
+        DeviceObserver tmpDeviceObserver = mDeviceObserver;
+        mDeviceObserver = this;
+
+        boolean success = false;
+        while (!success) {
+            Log.d("install get info ...");
+            mPackageActionResultCode = 0;
+            installAPK(apkPath);
+            waitForCommandFinish();
+            if (mPackageActionResultCode == DeviceObserver.SUCCESS) {
+                success = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+            }
+        }
+        mDeviceObserver = tmpDeviceObserver;
+        Log.d("probe device status succeds.");
     }
 
     /**
@@ -1422,7 +1464,9 @@ public class TestDevice implements DeviceObserver {
         if (mStatus == STATUS_BUSY) {
             mDeviceObserver.notifyTestingDeviceDisconnected();
         } else {
-            CUIOutputStream.printPrompt();
+            if (!TestSession.isADBServerRestartedMode()) {
+                CUIOutputStream.printPrompt();
+            }
         }
     }
 
@@ -1468,23 +1512,23 @@ public class TestDevice implements DeviceObserver {
             }
         }
     }
-    
+
     /**
-     * Start the action timer.  
-     * 
+     * Start the action timer.
+     *
      * @param action the action to start the timer.
      */
     void startActionTimer(String action) {
-       mPackageActionTimer.start(action, this); 
+       mPackageActionTimer.start(action, this);
     }
-    
+
     /**
      * Stop the action timer.
      */
     void stopActionTimer() {
-        mPackageActionTimer.stop();        
+        mPackageActionTimer.stop();
     }
-    
+
     /**
      * Allows an external test to signal that it's command is complete.
      */
@@ -1498,6 +1542,7 @@ public class TestDevice implements DeviceObserver {
      * Notify install complete.
      */
     public void notifyInstallingComplete(int resultCode) {
+        mPackageActionResultCode = resultCode;
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
             mPackageActionTimer.stop();
@@ -1506,6 +1551,7 @@ public class TestDevice implements DeviceObserver {
 
     /** {@inheritDoc} */
     public void notifyInstallingTimeout(TestDevice testDevice) {
+        mPackageActionResultCode = DeviceObserver.FAIL;
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
         }

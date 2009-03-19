@@ -357,9 +357,17 @@ public class Test implements DeviceObserver {
      *
      * @param device the device to run the test.
      */
-    public void run(final TestDevice device) throws DeviceDisconnectedException {
+    public void run(final TestDevice device) throws DeviceDisconnectedException,
+            ADBServerNeedRestartException {
+
         if ((getName() == null) || (getName().length() == 0)) {
             return;
+        }
+
+        if (TestSession.exceedsMaxCount()) {
+            throw new ADBServerNeedRestartException("Test count reached overflow point");
+        } else {
+            TestSession.incTestCount();
         }
 
         mTestStop = false;

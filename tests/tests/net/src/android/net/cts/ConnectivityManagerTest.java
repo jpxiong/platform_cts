@@ -16,12 +16,11 @@
 
 package android.net.cts;
 
-import com.android.internal.telephony.Phone;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -112,10 +111,10 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     })
     public void testAccessNetworkPreference() {
 
-        final int EXPECTED = 1;
+        final int expected = 1;
         int per = mCm.getNetworkPreference();
-        mCm.setNetworkPreference(EXPECTED);
-        assertEquals(EXPECTED, mCm.getNetworkPreference());
+        mCm.setNetworkPreference(expected);
+        assertEquals(expected, mCm.getNetworkPreference());
 
         mCm.setNetworkPreference(0);
         assertEquals(0, mCm.getNetworkPreference());
@@ -144,20 +143,22 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
         assertEquals(2, ni.length);
 
-        assertTrue(ni[0].getType() >=0 && ni[0].getType() <= 1);
-        assertTrue(ni[1].getType() >=0 && ni[1].getType() <= 1);
+        assertTrue(ni[0].getType() >= 0 && ni[0].getType() <= 1);
+        assertTrue(ni[1].getType() >= 0 && ni[1].getType() <= 1);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.TODO,
-            notes = "Test start and stop usingNetworkFeature(int networkType, String feature).",
+            notes = "Test startUsingNetworkFeature(int networkType, String feature)."
+                    + "Only test failure case.",
             method = "startUsingNetworkFeature",
             args = {int.class, java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.TODO,
-            notes = "Test start and stop usingNetworkFeature(int networkType, String feature).",
+            notes = "Test stopUsingNetworkFeature(int networkType, String feature)."
+                    + "Only test failure case.",
             method = "stopUsingNetworkFeature",
             args = {int.class, java.lang.String.class}
         )
@@ -165,16 +166,18 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public void testStartUsingNetworkFeature() {
 
         final String invalidateFeature = "invalidateFeature";
-        assertEquals(-1, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
+        // TODO: MMS feature string is not public
+        final String mmsFeature = "enableMMS";
+        final int failureCode = -1;
+
+        assertEquals(failureCode, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
+                invalidateFeature));
+        assertEquals(failureCode, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
                 invalidateFeature));
 
-        assertEquals(-1, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                invalidateFeature));
-
-        assertEquals(-1, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_WIFI,
-                Phone.FEATURE_ENABLE_MMS));
-        assertEquals(-1, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_WIFI,
-                Phone.FEATURE_ENABLE_MMS));
+        // Should return failure(-1) because MMS is not supported on WIFI.
+        assertEquals(failureCode, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
+        assertEquals(failureCode, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
     }
 
     @TestTargetNew(

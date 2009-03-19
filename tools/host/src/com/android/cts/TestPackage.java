@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TimerTask;
 
 import sun.misc.BASE64Encoder;
@@ -46,7 +47,7 @@ public class TestPackage implements DeviceObserver {
      * not too long, it's better choice to restart the timer each time
      * received the feedback from device. The following two variables
      * are used to restart/stop the timer, START for restarting and
-     * FINISH for stopping. 
+     * FINISH for stopping.
      */
     public static final String FINISH = "finish";
     public static final String START = "start";
@@ -203,7 +204,7 @@ public class TestPackage implements DeviceObserver {
      * @param caseNameList The case names list.
      */
     public void getTestSuiteNames(final String expectName,
-            ArrayList<String> suiteNameList, ArrayList<String> caseNameList) {
+            List<String> suiteNameList, List<String> caseNameList) {
 
         for (TestCase testCase : getAllTestCases()) {
             String testCaseName = testCase.getFullName();
@@ -227,8 +228,8 @@ public class TestPackage implements DeviceObserver {
      *
      * @return The test suite name list.
      */
-    public ArrayList<String> getAllTestSuiteNames() {
-        ArrayList<String> suiteNameList = new ArrayList<String>();
+    public List<String> getAllTestSuiteNames() {
+        List<String> suiteNameList = new ArrayList<String>();
         for (TestCase testCase : getAllTestCases()) {
             String testCaseName = testCase.getFullName();
             String suiteName = testCaseName.substring(0, testCaseName.lastIndexOf("."));
@@ -245,8 +246,8 @@ public class TestPackage implements DeviceObserver {
      * @param suiteFullName The full suite name.
      * @return All test case names.
      */
-    public ArrayList<String> getAllTestCaseNames(final String suiteFullName) {
-        ArrayList<String> caseNameList = new ArrayList<String>();
+    public List<String> getAllTestCaseNames(final String suiteFullName) {
+        List<String> caseNameList = new ArrayList<String>();
         TestSuite suite = getTestSuiteByName(suiteFullName);
         if (suite != null) {
             caseNameList.addAll(suite.getAllTestCaseNames());
@@ -260,8 +261,8 @@ public class TestPackage implements DeviceObserver {
      * @param testCaseFullName The full test case name.
      * @return All test names.
      */
-    public ArrayList<String> getAllTestNames(final String testCaseFullName) {
-        ArrayList<String> testNameList = new ArrayList<String>();
+    public List<String> getAllTestNames(final String testCaseFullName) {
+        List<String> testNameList = new ArrayList<String>();
         TestCase testCase = getTestCaseByName(testCaseFullName);
         if (testCase != null) {
             testNameList.addAll(testCase.getAllTestNames());
@@ -276,8 +277,8 @@ public class TestPackage implements DeviceObserver {
      * @param caseList The searched test case result.
      * @param testList The searched test result.
      */
-    public void getTestCaseNames(final String expectPackage, ArrayList<String> caseList,
-            ArrayList<String> testList) {
+    public void getTestCaseNames(final String expectPackage, List<String> caseList,
+            List<String> testList) {
 
         for (TestCase testCase : getAllTestCases()) {
             String testCaseName = testCase.getFullName();
@@ -298,7 +299,7 @@ public class TestPackage implements DeviceObserver {
      * @param expectPackage The expected package name.
      * @param testList The searched test result.
      */
-    public void getTestNames(final String expectPackage, ArrayList<String> testList) {
+    public void getTestNames(final String expectPackage, List<String> testList) {
 
         for (Test test : getTests()) {
             String testName = test.getFullName();
@@ -386,7 +387,7 @@ public class TestPackage implements DeviceObserver {
      * @return The tests of this test package.
      */
     public Collection<Test> getTests() {
-        ArrayList<Test> tests = new ArrayList<Test>();
+        List<Test> tests = new ArrayList<Test>();
         for (TestSuite s : mSuites) {
             tests.addAll(s.getTests());
         }
@@ -400,7 +401,7 @@ public class TestPackage implements DeviceObserver {
      * @return The test cases of this test package.
      */
     public Collection<TestCase> getAllTestCases() {
-        ArrayList<TestCase> testCases = new ArrayList<TestCase>();
+        List<TestCase> testCases = new ArrayList<TestCase>();
         for (TestSuite s : mSuites) {
             testCases.addAll(s.getAllTestCases());
         }
@@ -781,6 +782,27 @@ public class TestPackage implements DeviceObserver {
     }
 
     /**
+     * Get the first segment list of all of the test packages.
+     *
+     * @return the first segment list of all of the test packages contained in this test package;
+     */
+     List<String> getPackageNames() {
+        List<String> pkgNames = new ArrayList<String>();
+        List<String> suiteNames = getAllTestSuiteNames();
+        for (String suiteName : suiteNames) {
+            String pkgSeg = suiteName;
+            if (suiteName.contains(".")) {
+                pkgSeg = suiteName.split("\\.")[0];
+            }
+            if (!pkgNames.contains(pkgSeg)) {
+                pkgNames.add(pkgSeg);
+            }
+        }
+
+        return pkgNames;
+    }
+
+    /**
      * Run this package or the java package contained in this package in batch mode.
      *
      * @param javaPkgName The java package name. If null, run the whole package;
@@ -792,6 +814,21 @@ public class TestPackage implements DeviceObserver {
         mTimeOutTimer.start();
         mProgressObserver = new ProgressObserver();
 
+        if ((javaPkgName != null) && (javaPkgName.length() > 0)) {
+            runInBatchModeImpl(javaPkgName);
+        } else {
+            for (String pkgName : getPackageNames()) {
+                runInBatchModeImpl(pkgName);
+            }
+        }
+    }
+
+    /**
+     * Implementation of running in batch mode.
+     *
+     * @param javaPkgName The java package name.
+     */
+    private void runInBatchModeImpl(String javaPkgName) throws DeviceDisconnectedException {
         mDevice.runInBatchMode(this, javaPkgName);
 
         synchronized (mTimeOutTimer) {
@@ -820,7 +857,7 @@ public class TestPackage implements DeviceObserver {
      * @param javaPkgName The java package name.
      */
     protected void runInIndividualMode(final String javaPkgName) throws IOException,
-                    DeviceDisconnectedException {
+                    DeviceDisconnectedException, ADBServerNeedRestartException {
         Iterator<TestSuite> suites = getTestSuites().iterator();
         while (suites.hasNext() && (!mTestStop)) {
             mCurrentTestSuite = suites.next();
@@ -884,12 +921,26 @@ public class TestPackage implements DeviceObserver {
     }
 
     /**
+     * Check if any of the tests contained in this package have been executed.
+     *
+     * @return If no tests have been executed, return true, otherwise return false.
+     */
+    protected boolean noTestsExecuted() {
+        for (Test test : getTests()) {
+            if (test.getResultCode() != TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Run the java package contained within this package over device.
      *
      * @param device The device to run this package.getName
      */
     public void run(final TestDevice device, final String javaPkgName)
-            throws IOException, DeviceDisconnectedException {
+            throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
         if (isAllTestsRun()) {
             return;
         }
@@ -901,12 +952,10 @@ public class TestPackage implements DeviceObserver {
     /**
      * Implementation of running the test package.
      *
-     * @param javaPkgName
-     * @throws IOException
-     * @throws DeviceDisconnectedException
+     * @param javaPkgName The JAVA package name.
      */
     protected void runImpl(final String javaPkgName) throws IOException,
-            DeviceDisconnectedException {
+            DeviceDisconnectedException, ADBServerNeedRestartException {
         try {
             if (!install()) {
                 return;
@@ -922,12 +971,9 @@ public class TestPackage implements DeviceObserver {
                     mIsInBatchMode = true;
                     Log.d("run in batch mode...");
                     runInBatchMode(javaPkgName);
-
-                    //if there is any test not run after the batch mode,
-                    //start another round of test in individual mode
                     if (!isAllTestsRun()) {
                         mIsInBatchMode = false;
-                        Log.d("run in individual mode...");
+                        Log.d("run in individual mode");
                         runInIndividualMode(javaPkgName);
                     }
                 } else {
@@ -938,7 +984,9 @@ public class TestPackage implements DeviceObserver {
 
             if (!mTestStop) {
                 uninstall();
-                println(PKG_LOG_SEPARATOR);
+                if (!TestSession.isADBServerRestartedMode()) {
+                    println(PKG_LOG_SEPARATOR);
+                }
             }
         } catch (DeviceDisconnectedException e) {
             cleanUp();
@@ -953,12 +1001,14 @@ public class TestPackage implements DeviceObserver {
      * @param javaPkgName The JAVA package name.
      */
     protected void setup(final TestDevice device, final String javaPkgName) {
-        println(PKG_LOG_SEPARATOR);
-        if ((javaPkgName == null) || (javaPkgName.length() == 0)) {
-            println("Test package: " + getAppPackageName());
-        } else {
-            println("Test java package contained in test package "
-                    + getAppPackageName() + ": " + javaPkgName);
+        if (!TestSession.isADBServerRestartedMode() || noTestsExecuted()) {
+            println(PKG_LOG_SEPARATOR);
+            if ((javaPkgName == null) || (javaPkgName.length() == 0)) {
+                println("Test package: " + getAppPackageName());
+            } else {
+                println("Test java package contained in test package "
+                        + getAppPackageName() + ": " + javaPkgName);
+            }
         }
 
         mTestStop = false;
@@ -994,7 +1044,7 @@ public class TestPackage implements DeviceObserver {
      * @param test The specific test to be run.
      */
     public void runTest(final TestDevice device, final Test test)
-            throws DeviceDisconnectedException {
+            throws DeviceDisconnectedException, ADBServerNeedRestartException {
         if (test == null) {
             return;
         }
@@ -1012,9 +1062,10 @@ public class TestPackage implements DeviceObserver {
     /**
      * Implementation of running test.
      *
-     * @param test
+     * @param test The test to be run.
      */
-    protected void runTestImpl(final Test test) throws DeviceDisconnectedException {
+    protected void runTestImpl(final Test test) throws DeviceDisconnectedException,
+            ADBServerNeedRestartException {
         try {
             if (!install()) {
                 return;
