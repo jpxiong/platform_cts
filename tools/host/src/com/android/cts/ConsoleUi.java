@@ -486,12 +486,6 @@ public class ConsoleUi {
                         actionType = ActionType.RESUME_SESSION;
                     }
                 }
-            } else {
-                if ((testName != null) && (testName.length() != 0)) {
-                    Log.e("Running single test is just allowed when the session for the"
-                            + " plan existed by executing the test plan.", null);
-                    return;
-                }
             }
             
             if (deviceId == null) {

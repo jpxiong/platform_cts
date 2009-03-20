@@ -646,8 +646,12 @@ public class TestDevice implements DeviceObserver {
             runner = DEFAULT_TEST_RUNNER_NAME;
         }
 
+        // need to doubly escape any '$' chars in the name since this string is
+        // passed through two shells \\\$ -> \$ -> $
+        final String testName = test.getFullName().replaceAll("\\$", "\\\\\\$");
+        
         final String commandStr = "am instrument -w -r -e class "
-                + test.getFullName() + " " + appNameSpace + "/" + runner;
+                + testName + " " + appNameSpace + "/" + runner;
         Log.d(commandStr);
 
         mIndividualModeResultParser = new IndividualModeResultParser(test);

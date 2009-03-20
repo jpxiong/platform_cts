@@ -32,9 +32,9 @@ parseXML() {
 generateSignatureCheckDescription() {
      echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ${SIGNATURE_CHECK_PATH}
      echo "<TestPackage AndroidFramework=\"Android 1.0\" jarPath=\"\" "\
-          "name=\"${SIGNATURE_TESTS}\" runner=\".InstrumentationRunner\" "\
+          "name=\"${SIGNATURE_TEST_NAME}\" runner=\".InstrumentationRunner\" "\
           "targetNameSpace=\"\" targetBinaryName=\"\" version=\"1.0\" signatureCheck=\"true\" "\
-          "appPackageName=\"android.tests.sigtest\">"  >> ${SIGNATURE_CHECK_PATH}
+          "appPackageName=\"${SIGNATURE_TESTS}\">"  >> ${SIGNATURE_CHECK_PATH}
      echo "<TestSuite name=\"android\">"       >> ${SIGNATURE_CHECK_PATH}
      echo "<TestSuite name=\"tests\">"         >> ${SIGNATURE_CHECK_PATH}
      echo "<TestSuite name=\"sigtest\">"       >> ${SIGNATURE_CHECK_PATH}
@@ -267,8 +267,9 @@ CTS_ROOT=${TOP_DIR}/cts/tools
 CASE_REPOSITORY=${OUT_DIR}/repository/testcases
 PLAN_REPOSITORY=${OUT_DIR}/repository/plans
 
-SIGNATURE_TESTS="SignatureTest"
-SIGNATURE_CHECK_PATH="${CASE_REPOSITORY}/${SIGNATURE_TESTS}.xml"
+SIGNATURE_TEST_NAME="SignatureTest"
+SIGNATURE_TESTS="android.tests.sigtest"
+SIGNATURE_CHECK_PATH="${CASE_REPOSITORY}/${SIGNATURE_TEST_NAME}.xml"
 
 ANDROID_CORE_TESTS="android.core.tests"
 ANDROID_CORE_VM_TESTS="android.core.vm-tests"
