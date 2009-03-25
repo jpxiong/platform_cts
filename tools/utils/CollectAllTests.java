@@ -43,6 +43,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.lang.annotation.Annotation;
+import java.lang.ClassNotFoundException;
+import java.lang.NoSuchMethodException;
+
 public class CollectAllTests extends DescriptionGenerator {
 
     static final String ATTRIBUTE_RUNNER = "runner";
@@ -264,10 +268,48 @@ public class CollectAllTests extends DescriptionGenerator {
         }.doRun(TESTSUITE);
     }
 
+    private String getKnownFailure(final String testClassName, final String testName) {
+        try {
+            Class<?> testClass = Class.forName(testClassName);
+            Method testMethod = testClass.getMethod(testName, null);
+            Annotation[] annotations = testMethod.getAnnotations();
+            for (Annotation annot : annotations) {
+
+                if (annot.annotationType().getName().equals(KNOWN_FAILURE)) {
+                    String annotStr = annot.toString();
+                    String knownFailure = null;
+                    if (annotStr.contains("(value=")) {
+                        knownFailure =
+                            annotStr.substring(annotStr.indexOf("=") + 1, annotStr.length() - 1);
+
+                    }
+
+                    if (knownFailure == null) {
+                        knownFailure = "true";
+                    }
+
+                    return knownFailure;
+                }
+
+            }
+
+        } catch (java.lang.ClassNotFoundException e) {
+        } catch (java.lang.NoSuchMethodException e) {
+        }
+
+        return null;
+    }
+
+    private void println(final String message) {
+        System.out.println(message);
+    }
+
     private void addToTests(TestCase test) {
 
         String testClassName = test.getClass().getName();
         String testName = test.getName();
+        String knownFailure = getKnownFailure(testClassName, testName);
+
         if (!testName.startsWith("test")) {
             try {
                 test.runBare();
@@ -284,7 +326,7 @@ public class CollectAllTests extends DescriptionGenerator {
             testCases.put(testClassName, testClass);
         }
 
-        testClass.mCases.add(new TestMethod(testName, "", "", null));
+        testClass.mCases.add(new TestMethod(testName, "", "", knownFailure));
 
         try {
             test.getClass().getConstructor(new Class<?>[0]);
