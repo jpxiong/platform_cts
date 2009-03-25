@@ -225,6 +225,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.StubActivity"
+            android:label="StubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.ExpandableListWithHeaders"
             android:label="ExpandableListWithHeaders">
             <intent-filter>
@@ -247,6 +255,14 @@
         <activity android:name="android.view.cts.MenuInflaterStubActivity" android:label="MenuInflaterStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.method.cts.StubActivity"
+            android:label="StubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
             </intent-filter>
         </activity>
