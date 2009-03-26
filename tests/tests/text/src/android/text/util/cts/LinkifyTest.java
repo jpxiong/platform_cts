@@ -74,7 +74,7 @@ public class LinkifyTest extends AndroidTestCase {
     };
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor of {@link Linkify}",
         method = "Linkify",
         args = {}
@@ -84,7 +84,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(Spannable, int)}",
         method = "addLinks",
         args = {android.text.Spannable.class, int.class}
@@ -123,7 +123,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(TextView, int)}",
         method = "addLinks",
         args = {android.widget.TextView.class, int.class}
@@ -157,7 +157,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(TextView, Pattern, String)}",
         method = "addLinks",
         args = {android.widget.TextView.class, java.util.regex.Pattern.class,
@@ -207,7 +207,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(TextView, Pattern, String, MatchFilter,"
                 + " TransformFilter)}",
         method = "addLinks",
@@ -265,7 +265,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(Spannable, Pattern, String)}",
         method = "addLinks",
         args = {android.text.Spannable.class, java.util.regex.Pattern.class, java.lang.String.class}
@@ -302,7 +302,7 @@ public class LinkifyTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Linkify#addLinks(Spannable, Pattern, String, MatchFilter,"
             + " TransformFilter)}",
         method = "addLinks",

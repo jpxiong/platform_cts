@@ -49,13 +49,13 @@ import dalvik.annotation.ToBeFixed;
 public class ShapeDrawableTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test Constructors",
             method = "ShapeDrawable",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test Constructors",
             method = "ShapeDrawable",
             args = {android.graphics.drawable.shapes.Shape.class}
@@ -70,7 +70,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test draw(Canvas)",
         method = "draw",
         args = {android.graphics.Canvas.class}
@@ -88,7 +88,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChangingConfigurations()",
         method = "getChangingConfigurations",
         args = {}
@@ -113,7 +113,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getConstantState()",
         method = "getConstantState",
         args = {}
@@ -129,13 +129,13 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setIntrinsicHeight(int) and getIntrinsicHeight()",
             method = "setIntrinsicHeight",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setIntrinsicHeight(int) and getIntrinsicHeight()",
             method = "getIntrinsicHeight",
             args = {}
@@ -157,13 +157,13 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setIntrinsicWidth(int) and getIntrinsicWidth()",
             method = "setIntrinsicWidth",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setIntrinsicWidth(int) and getIntrinsicWidth()",
             method = "getIntrinsicWidth",
             args = {}
@@ -184,7 +184,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOpacity()",
         method = "getOpacity",
         args = {}
@@ -206,19 +206,19 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPadding(int,int,int,int), setPadding(Rect) and getPadding(Rect)",
             method = "setPadding",
             args = {int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPadding(int,int,int,int), setPadding(Rect) and getPadding(Rect)",
             method = "setPadding",
             args = {android.graphics.Rect.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPadding(int,int,int,int), setPadding(Rect) and getPadding(Rect)",
             method = "getPadding",
             args = {android.graphics.Rect.class}
@@ -270,7 +270,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getPaint()",
         method = "getPaint",
         args = {}
@@ -284,13 +284,13 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setShaderFactory(ShaderFactory) and getShaderFactory()",
             method = "setShaderFactory",
             args = {android.graphics.drawable.ShapeDrawable.ShaderFactory.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setShaderFactory(ShaderFactory) and getShaderFactory()",
             method = "getShaderFactory",
             args = {}
@@ -316,13 +316,13 @@ public class ShapeDrawableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getShape() and setShape(Shape)",
             method = "getShape",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getShape() and setShape(Shape)",
             method = "setShape",
             args = {android.graphics.drawable.shapes.Shape.class}
@@ -341,10 +341,11 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
         XmlPullParser parser = getContext().getResources().getXml(R.drawable.shapedrawable_test);
@@ -354,10 +355,11 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test inflateTag(String, Resources, XmlPullParser, AttributeSet)",
         method = "inflateTag",
-        args = {java.lang.String.class, android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {java.lang.String.class, android.content.res.Resources.class, 
+                org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
     )
     public void testInflateTag() throws XmlPullParserException, IOException {
         Resources resources = getContext().getResources();
@@ -381,7 +383,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onBoundsChange(Rect)",
         method = "onBoundsChange",
         args = {android.graphics.Rect.class}
@@ -431,10 +433,11 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onDraw(Shape, Canvas, Paint)",
         method = "onDraw",
-        args = {android.graphics.drawable.shapes.Shape.class, android.graphics.Canvas.class, android.graphics.Paint.class}
+        args = {android.graphics.drawable.shapes.Shape.class, android.graphics.Canvas.class, 
+                android.graphics.Paint.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testOnDraw() {
@@ -468,7 +471,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setAlpha(int)",
         method = "setAlpha",
         args = {int.class}
@@ -483,7 +486,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setColorFilter(ColorFilter)",
         method = "setColorFilter",
         args = {android.graphics.ColorFilter.class}
@@ -500,7 +503,7 @@ public class ShapeDrawableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setDither(boolean)",
         method = "setDither",
         args = {boolean.class}

@@ -26,7 +26,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(android.database.DataSetObserver.class)
 public class DataSetObserverTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onChanged, and this is an empty method.",
         method = "onChanged",
         args = {}
@@ -37,7 +37,7 @@ public class DataSetObserverTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test OnInvalidated, and this is an empty method.",
         method = "onInvalidated",
         args = {}

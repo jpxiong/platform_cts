@@ -27,13 +27,13 @@ import dalvik.annotation.TestTargetClass;
 public class StaleDataExceptionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of StaleDataException.",
             method = "StaleDataException",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of StaleDataException.",
             method = "StaleDataException",
             args = {java.lang.String.class}

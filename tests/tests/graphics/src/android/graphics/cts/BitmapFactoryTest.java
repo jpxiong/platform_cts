@@ -38,9 +38,7 @@ import com.android.cts.stub.R;
 
 @TestTargetClass(BitmapFactory.class)
 public class BitmapFactoryTest extends AndroidTestCase {
-
     private Resources mRes;
-    private String mPath;
     // opt for non-null
     private BitmapFactory.Options mOpt1;
     // opt for null
@@ -59,21 +57,22 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of BitmapFactory.",
         method = "BitmapFactory",
         args = {}
     )
     public void testConstructor() {
         // new the BitmapFactory instance
-        BitmapFactory bitmapFactory = new BitmapFactory();
+        new BitmapFactory();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeResource(Resources res, int id,BitmapFactory.Options opts).",
         method = "decodeResource",
-        args = {android.content.res.Resources.class, int.class, android.graphics.BitmapFactory.Options.class}
+        args = {android.content.res.Resources.class, int.class, 
+                android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeResource1() {
         Bitmap b = BitmapFactory.decodeResource(mRes, R.drawable.start,
@@ -87,7 +86,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeResource(Resources res, int id).",
         method = "decodeResource",
         args = {android.content.res.Resources.class, int.class}
@@ -101,8 +100,8 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test decodeByteArray(byte[] data, int offset, int length,BitmapFactory.Options opts).",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class, android.graphics.BitmapFactory.Options.class}
     )
@@ -118,7 +117,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeByteArray(byte[] data, int offset, int length).",
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class}
@@ -133,10 +132,11 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeStream(InputStream is, Rect outPadding,BitmapFactory.Options opts).",
         method = "decodeStream",
-        args = {java.io.InputStream.class, android.graphics.Rect.class, android.graphics.BitmapFactory.Options.class}
+        args = {java.io.InputStream.class, android.graphics.Rect.class, 
+                android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeStream1() {
         InputStream is = obtainInputStream();
@@ -151,7 +151,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeStream(InputStream is).",
         method = "decodeStream",
         args = {java.io.InputStream.class}
@@ -166,10 +166,11 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test decodeFileDescriptor(FileDescriptor fd, Rect outPadding,BitmapFactory.Options opts).",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "decodeFileDescriptor",
-        args = {java.io.FileDescriptor.class, android.graphics.Rect.class, android.graphics.BitmapFactory.Options.class}
+        args = {java.io.FileDescriptor.class, android.graphics.Rect.class, 
+                android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeFileDescriptor1() {
         try {
@@ -188,7 +189,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeFileDescriptor(FileDescriptor fd).",
         method = "decodeFileDescriptor",
         args = {java.io.FileDescriptor.class}
@@ -207,7 +208,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeFile(String pathName, BitmapFactory.Options opts).",
         method = "decodeFile",
         args = {java.lang.String.class, android.graphics.BitmapFactory.Options.class}
@@ -227,7 +228,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test decodeFile(String pathName).",
         method = "decodeFile",
         args = {java.lang.String.class}
@@ -276,6 +277,4 @@ public class BitmapFactoryTest extends AndroidTestCase {
         } while (read != -1);
         return(file.getPath());
     }
-
 }
-

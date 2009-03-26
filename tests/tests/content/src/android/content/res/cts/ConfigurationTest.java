@@ -54,13 +54,13 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "Configuration",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "Configuration",
             args = {android.content.res.Configuration.class}
@@ -79,7 +79,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test compareTo.",
         method = "compareTo",
         args = {android.content.res.Configuration.class}
@@ -168,7 +168,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents.",
         method = "describeContents",
         args = {}
@@ -178,7 +178,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test diff",
         method = "diff",
         args = {android.content.res.Configuration.class}
@@ -196,13 +196,13 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "equals",
             args = {android.content.res.Configuration.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "equals",
             args = {java.lang.Object.class}
@@ -214,7 +214,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hashCode.",
         method = "hashCode",
         args = {}
@@ -225,13 +225,13 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test updateFrom and needNewResources.",
             method = "needNewResources",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test updateFrom and needNewResources.",
             method = "updateFrom",
             args = {android.content.res.Configuration.class}
@@ -253,7 +253,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setToDefaults.",
         method = "setToDefaults",
         args = {}
@@ -266,7 +266,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString",
         method = "toString",
         args = {}
@@ -276,7 +276,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel.",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}

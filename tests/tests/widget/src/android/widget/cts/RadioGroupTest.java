@@ -73,13 +73,13 @@ public class RadioGroupTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "RadioGroup",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "RadioGroup",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -102,7 +102,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#setOnHierarchyChangeListener(OnHierarchyChangeListener)",
         method = "setOnHierarchyChangeListener",
         args = {android.view.ViewGroup.OnHierarchyChangeListener.class}
@@ -130,7 +130,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test PassThroughHierarchyChangeListener which is initialized in constructor",
         method = "RadioGroup",
         args = {android.content.Context.class}
@@ -148,7 +148,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test call back of OnCheckedChangeListener",
         method = "setOnCheckedChangeListener",
         args = {android.widget.RadioGroup.OnCheckedChangeListener.class}
@@ -185,7 +185,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#getCheckedRadioButtonId()}",
         method = "getCheckedRadioButtonId",
         args = {}
@@ -211,7 +211,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#clearCheck()}",
         method = "clearCheck",
         args = {}
@@ -255,7 +255,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#check(int)}",
         method = "check",
         args = {int.class}
@@ -307,7 +307,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#setOnCheckedChangeListener(OnCheckedChangeListener)}",
         method = "setOnCheckedChangeListener",
         args = {android.widget.RadioGroup.OnCheckedChangeListener.class}
@@ -352,7 +352,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#generateLayoutParams(AttributeSet)}",
         method = "generateLayoutParams",
         args = {android.util.AttributeSet.class}
@@ -387,7 +387,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#checkLayoutParams(android.view.ViewGroup.LayoutParams)}",
         method = "checkLayoutParams",
         args = {android.view.ViewGroup.LayoutParams.class}
@@ -411,7 +411,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#generateDefaultLayoutParams()}",
         method = "generateDefaultLayoutParams",
         args = {}
@@ -426,7 +426,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link RadioGroup#onFinishInflate()}",
         method = "onFinishInflate",
         args = {}

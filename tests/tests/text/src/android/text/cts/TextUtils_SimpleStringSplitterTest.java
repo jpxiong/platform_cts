@@ -32,7 +32,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(SimpleStringSplitter.class)
 public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "TextUtils.SimpleStringSplitter",
         args = {char.class}
@@ -46,7 +46,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasNext method",
         method = "hasNext",
         args = {}
@@ -69,7 +69,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test iterator method",
         method = "iterator",
         args = {}
@@ -92,7 +92,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test next method",
         method = "next",
         args = {}
@@ -113,7 +113,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test next method",
         method = "next",
         args = {}
@@ -138,7 +138,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test remove method",
         method = "remove",
         args = {}
@@ -154,7 +154,7 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setString method",
         method = "setString",
         args = {java.lang.String.class}

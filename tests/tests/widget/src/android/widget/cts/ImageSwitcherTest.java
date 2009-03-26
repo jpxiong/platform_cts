@@ -46,13 +46,13 @@ import dalvik.annotation.ToBeFixed;
 public class ImageSwitcherTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ImageSwitcher",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ImageSwitcher",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -80,7 +80,7 @@ public class ImageSwitcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setImageResource(int)",
         method = "setImageResource",
         args = {int.class}
@@ -116,7 +116,7 @@ public class ImageSwitcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setImageURI(Uri)",
         method = "setImageURI",
         args = {android.net.Uri.class}
@@ -129,7 +129,7 @@ public class ImageSwitcherTest extends AndroidTestCase {
         ImageView iv1 = new ImageView(getContext());
         imageSwitcher.addView(iv1);
 
-        // because I can not write file in /data/data/com.android.cts.stub, it will throw IOException.
+        // because I can not write file in /data/data/com.android, it will throw IOException.
         // I just write the image file into database test path.
         File imagefile = new File("/sqlite_stmt_journals", "tempimage.jpg");
         if (imagefile.exists()) {
@@ -164,7 +164,7 @@ public class ImageSwitcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setImageDrawable(Drawable)",
         method = "setImageDrawable",
         args = {android.graphics.drawable.Drawable.class}

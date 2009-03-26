@@ -36,7 +36,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of SyncResult.",
         method = "SyncResult",
         args = {}
@@ -46,7 +46,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasError().",
         method = "hasError",
         args = {}
@@ -57,7 +57,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clear().",
         method = "clear",
         args = {}
@@ -81,7 +81,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test madeSomeProgress().",
         method = "madeSomeProgress",
         args = {}
@@ -94,7 +94,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toDebugString().",
         method = "toDebugString",
         args = {}
@@ -115,7 +115,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString().",
         method = "toString",
         args = {}
@@ -146,7 +146,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasHardError().",
         method = "hasHardError",
         args = {}
@@ -160,7 +160,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(Parcel parcel, int flags).",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -188,7 +188,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(Parcel parcel, int flags).",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -204,7 +204,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents(). This method does nothing, and always return 0.",
         method = "describeContents",
         args = {}
@@ -214,7 +214,7 @@ public class SyncResultTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasSoftError().",
         method = "hasSoftError",
         args = {}

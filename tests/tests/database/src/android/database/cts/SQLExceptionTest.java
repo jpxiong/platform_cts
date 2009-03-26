@@ -28,13 +28,13 @@ public class SQLExceptionTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of SQLException.",
             method = "SQLException",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of SQLException.",
             method = "SQLException",
             args = {java.lang.String.class}

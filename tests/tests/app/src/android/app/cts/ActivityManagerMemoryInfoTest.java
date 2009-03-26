@@ -36,13 +36,13 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test describeContents function",
             method = "describeContents",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test describeContents function",
             method = "ActivityManager.MemoryInfo",
             args = {}
@@ -53,7 +53,7 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel function",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -83,7 +83,7 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test readFromParcel function",
         method = "readFromParcel",
         args = {android.os.Parcel.class}

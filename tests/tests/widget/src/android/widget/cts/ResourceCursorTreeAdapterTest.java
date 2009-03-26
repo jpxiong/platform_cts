@@ -80,22 +80,24 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ResourceCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, int.class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ResourceCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, int.class, int.class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test constructors",
+            level = TestLevel.COMPLETE,
             method = "ResourceCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, int.class, int.class, int.class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    int.class, int.class, int.class}
         )
     })
     public void testConstructor() {
@@ -122,11 +124,12 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link ResourceCursorTreeAdapter#newChildView(Context, Cursor, boolean, ViewGroup)}. The parameters Context and Cursor are never readin the method",
+        level = TestLevel.COMPLETE,
         method = "newChildView",
-        args = {android.content.Context.class, android.database.Cursor.class, boolean.class, android.view.ViewGroup.class}
+        args = {android.content.Context.class, android.database.Cursor.class, boolean.class, 
+                android.view.ViewGroup.class}
     )
+    // The parameters Context and Cursor are never readin the method
     public void testNewChildView() {
         mResourceCursorTreeAdapter = new MockResourceCursorTreeAdapter(mContext, null,
                 mGroupLayout, mChildLayout);
@@ -148,11 +151,12 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link ResourceCursorTreeAdapter#newGroupView(Context, Cursor, boolean, ViewGroup)}. The parameters Context and Cursor are never readin the method",
+        level = TestLevel.COMPLETE,
         method = "newGroupView",
-        args = {android.content.Context.class, android.database.Cursor.class, boolean.class, android.view.ViewGroup.class}
+        args = {android.content.Context.class, android.database.Cursor.class, boolean.class, 
+                android.view.ViewGroup.class}
     )
+    // The parameters Context and Cursor are never readin the method
     public void testNewGroupView() {
         mResourceCursorTreeAdapter = new MockResourceCursorTreeAdapter(mContext, null,
                 mGroupLayout, mChildLayout);
@@ -218,11 +222,13 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
         }
 
         @Override
-        protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
+        protected void bindChildView(View view, Context context, Cursor cursor,
+                boolean isLastChild) {
         }
 
         @Override
-        protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
+        protected void bindGroupView(View view, Context context, Cursor cursor,
+                boolean isExpanded) {
         }
 
         @Override

@@ -31,13 +31,13 @@ public class InterpolatorTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Interpolator.",
             method = "Interpolator",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Interpolator.",
             method = "Interpolator",
             args = {int.class, int.class}
@@ -53,13 +53,13 @@ public class InterpolatorTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset(int valueCount).",
             method = "reset",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset(int valueCount).",
             method = "getValueCount",
             args = {}
@@ -75,19 +75,19 @@ public class InterpolatorTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset(int valueCount, int frameCount).",
             method = "reset",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset(int valueCount, int frameCount).",
             method = "getKeyFrameCount",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset(int valueCount, int frameCount).",
             method = "getValueCount",
             args = {}
@@ -105,13 +105,13 @@ public class InterpolatorTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test timeToValues(float[] values).",
             method = "timeToValues",
             args = {float[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test timeToValues(float[] values).",
             method = "reset",
             args = {int.class}
@@ -149,20 +149,20 @@ public class InterpolatorTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test timeToValues(int msec, float[] values).",
             method = "timeToValues",
             args = {int.class, float[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test timeToValues(int msec, float[] values).",
             method = "reset",
             args = {int.class}
         )
     })
     @ToBeFixed( bug = "", explanation = "This test is broken and needs to be updated.")
-    public void TestTimeToValues2() {
+    public void _testTimeToValues2() {
 
         // new the Interpolator instance
         Interpolator interpolator = new Interpolator(1);
@@ -209,7 +209,7 @@ public class InterpolatorTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test finalize().",
         method = "finalize",
         args = {}
@@ -237,7 +237,7 @@ public class InterpolatorTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setKeyFrame(int index, int msec, float[] values).",
         method = "setKeyFrame",
         args = {int.class, int.class, float[].class}
@@ -252,7 +252,7 @@ public class InterpolatorTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setKeyFrame(int index, int msec, float[] values, float[] blend).",
         method = "setKeyFrame",
         args = {int.class, int.class, float[].class, float[].class}
@@ -269,7 +269,7 @@ public class InterpolatorTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setRepeatMirror(float repeatCount, boolean mirror).",
         method = "setRepeatMirror",
         args = {float.class, boolean.class}

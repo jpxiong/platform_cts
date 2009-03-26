@@ -59,7 +59,7 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor.",
         method = "StateListDrawable",
         args = {}
@@ -72,7 +72,7 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link StateListDrawable#addState(int[], Drawable)}.",
         method = "addState",
         args = {int[].class, android.graphics.drawable.Drawable.class}
@@ -107,7 +107,7 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link StateListDrawable#isStateful()}.Always returns true.",
         method = "isStateful",
         args = {}
@@ -117,7 +117,7 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link StateListDrawable#onStateChange(int[])}.",
         method = "onStateChange",
         args = {int[].class}
@@ -158,8 +158,9 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link StateListDrawable#onStateChange(int[])}. If drawable with wild card state is added before any other drawables, this drawable is always matched at first",
+        level = TestLevel.COMPLETE,
+        notes = "If drawable with wild card state is added before any other drawables, "
+                + "this drawable is always matched at first",
         method = "onStateChange",
         args = {int[].class}
     )
@@ -174,8 +175,7 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link StateListDrawable#onStateChange(int[])}. A drawable with null state can be added but NPE will be throw when matching the null state",
+        level = TestLevel.COMPLETE,
         method = "onStateChange",
         args = {int[].class}
     )
@@ -198,10 +198,11 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link StateListDrawable#inflate(Resources, XmlPullParser, AttributeSet)}.",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
         XmlResourceParser parser = getResourceParser(R.xml.selector_correct);
@@ -251,10 +252,11 @@ public class StateListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link StateListDrawable#inflate(Resources, XmlPullParser, AttributeSet)} with null parameters.",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "StateListDrawable#inflate(Resources, XmlPullParser, AttributeSet) when param r,"

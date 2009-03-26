@@ -27,18 +27,17 @@ import dalvik.annotation.TestTargetClass;
 public class PathEffectTest extends AndroidTestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of PathEffect.",
         method = "PathEffect",
         args = {}
     )
     public void testConstructor() {
-
-        PathEffect pathEffect = new PathEffect();
+        new PathEffect();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test finalize().",
         method = "finalize",
         args = {}
@@ -57,5 +56,4 @@ public class PathEffectTest extends AndroidTestCase {
             super.finalize();
         }
     }
-
 }

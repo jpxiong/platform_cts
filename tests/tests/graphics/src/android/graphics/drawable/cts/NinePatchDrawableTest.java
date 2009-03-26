@@ -18,9 +18,10 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -54,17 +55,19 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor.",
-      targets = {
-        @TestTarget(
-          methodName = "NinePatchDrawable",
-          methodArgs = {Bitmap.class, byte[].class, Rect.class, String.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor.",
+            method = "NinePatchDrawable",
+            args = {android.graphics.Bitmap.class, byte[].class, android.graphics.Rect.class, 
+                    java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "NinePatchDrawable",
-          methodArgs = {NinePatch.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor.",
+            method = "NinePatchDrawable",
+            args = {android.graphics.NinePatch.class}
         )
     })
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
@@ -127,15 +130,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#draw(Canvas)}.",
-      targets = {
-        @TestTarget(
-          methodName = "draw",
-          methodArgs = {Canvas.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#draw(Canvas)}.",
+        method = "draw",
+        args = {android.graphics.Canvas.class}
+    )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "NinePatchDrawable#draw(Canvas) when param canvas is null")
     public void testDraw() {
@@ -169,15 +169,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getChangingConfigurations()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getChangingConfigurations",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getChangingConfigurations()}.",
+        method = "getChangingConfigurations",
+        args = {}
+    )
     public void testGetChangingConfigurations() {
         ConstantState constantState = mNinePatchDrawable.getConstantState();
 
@@ -200,15 +197,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(0xffff,  mNinePatchDrawable.getChangingConfigurations());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getPadding(Rect)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPadding",
-          methodArgs = {Rect.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getPadding(Rect)}.",
+        method = "getPadding",
+        args = {android.graphics.Rect.class}
+    )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "NinePatchDrawable#getPadding(Rect) when param padding is null or "
             + "the insternal padding field is not set ")
@@ -241,15 +235,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#setAlpha(int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setAlpha",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#setAlpha(int)}.",
+        method = "setAlpha",
+        args = {int.class}
+    )
     public void testSetAlpha() {
         assertEquals(0xff, mNinePatchDrawable.getPaint().getAlpha());
 
@@ -263,15 +254,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(0xfe, mNinePatchDrawable.getPaint().getAlpha());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#setColorFilter(ColorFilter)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setColorFilter",
-          methodArgs = {ColorFilter.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#setColorFilter(ColorFilter)}.",
+        method = "setColorFilter",
+        args = {android.graphics.ColorFilter.class}
+    )
     public void testSetColorFilter() {
         assertNull(mNinePatchDrawable.getPaint().getColorFilter());
 
@@ -283,15 +271,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertNull(mNinePatchDrawable.getPaint().getColorFilter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#setDither(boolean)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setDither",
-          methodArgs = {boolean.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#setDither(boolean)}.",
+        method = "setDither",
+        args = {boolean.class}
+    )
     public void testSetDither() {
         assertFalse(mNinePatchDrawable.getPaint().isDither());
 
@@ -302,15 +287,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertFalse(mNinePatchDrawable.getPaint().isDither());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getPaint()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPaint",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getPaint()}.",
+        method = "getPaint",
+        args = {}
+    )
     public void testGetPaint() {
         Paint paint = mNinePatchDrawable.getPaint();
         assertNotNull(paint);
@@ -318,15 +300,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertSame(paint, mNinePatchDrawable.getPaint());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getIntrinsicWidth()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getIntrinsicWidth",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getIntrinsicWidth()}.",
+        method = "getIntrinsicWidth",
+        args = {}
+    )
     public void testGetIntrinsicWidth() {
         Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getIntrinsicWidth());
@@ -338,15 +317,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getIntrinsicWidth());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getMinimumWidth()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getMinimumWidth",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getMinimumWidth()}.",
+        method = "getMinimumWidth",
+        args = {}
+    )
     public void testGetMinimumWidth() {
         Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getMinimumWidth());
@@ -358,15 +334,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getMinimumWidth());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getIntrinsicHeight()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getIntrinsicHeight",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getIntrinsicHeight()}.",
+        method = "getIntrinsicHeight",
+        args = {}
+    )
     public void testGetIntrinsicHeight() {
         Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getIntrinsicHeight());
@@ -378,15 +351,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getIntrinsicHeight());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getMinimumHeight()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getMinimumHeight",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getMinimumHeight()}.",
+        method = "getMinimumHeight",
+        args = {}
+    )
     public void testGetMinimumHeight() {
         Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getMinimumHeight());
@@ -398,15 +368,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getMinimumHeight());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getOpacity()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getOpacity",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getOpacity()}.",
+        method = "getOpacity",
+        args = {}
+    )
     public void testGetOpacity() {
         assertEquals(PixelFormat.OPAQUE, mNinePatchDrawable.getOpacity());
 
@@ -414,15 +381,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, mNinePatchDrawable.getOpacity());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getTransparentRegion()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getTransparentRegion",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link NinePatchDrawable#getTransparentRegion()}.",
+        method = "getTransparentRegion",
+        args = {}
+    )
     public void testGetTransparentRegion() {
         // opaque image
         Region r = mNinePatchDrawable.getTransparentRegion();
@@ -443,16 +407,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(new Rect(1, 1, 7, 7), r.getBounds());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link NinePatchDrawable#getConstantState()}. "
-            + "This method will refresh the configuraion of the state.",
-      targets = {
-        @TestTarget(
-          methodName = "getConstantState",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "This method will refresh the configuraion of the state.",
+        method = "getConstantState",
+        args = {}
+    )
     public void testGetConstantState() {
         assertNotNull(mNinePatchDrawable.getConstantState());
 

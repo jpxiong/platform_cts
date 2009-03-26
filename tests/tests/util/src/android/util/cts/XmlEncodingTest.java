@@ -29,9 +29,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 /**
@@ -73,17 +74,18 @@ public class XmlEncodingTest extends TestCase {
     private static final String STR_START_TAG = "start:";
     private static final String STR_CHARACTERS_TAG = "characters:";
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test valueOf(String name).",
-      targets = {
-        @TestTarget(
-          methodName = "valueOf",
-          methodArgs = {String.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test valueOf(String name).",
+            method = "valueOf",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "values",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test valueOf(String name).",
+            method = "values",
+            args = {}
         )
     })
     public void testValueOf() {

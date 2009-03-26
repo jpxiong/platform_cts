@@ -29,9 +29,10 @@ import android.widget.TableLayout;
 import com.android.internal.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -50,33 +51,42 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         mTargetContext = getInstrumentation().getTargetContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
-      targets = {
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {int.class, int.class, float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {int.class, int.class, float.class}
         ),
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {android.view.ViewGroup.LayoutParams.class}
         ),
-        @TestTarget(
-          methodName = "TableLayout.LayoutParams",
-          methodArgs = {MarginLayoutParams.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout.LayoutParams}.",
+            method = "TableLayout.LayoutParams",
+            args = {android.view.ViewGroup.MarginLayoutParams.class}
         )
     })
     public void testConstructor() {
@@ -104,15 +114,12 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         assertEquals(300, layoutParams.height);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setBaseAttributes(TypedArray a, int widthAttr, int heightAttr)",
-      targets = {
-        @TestTarget(
-          methodName = "setBaseAttributes",
-          methodArgs = {TypedArray.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setBaseAttributes(TypedArray a, int widthAttr, int heightAttr)",
+        method = "setBaseAttributes",
+        args = {android.content.res.TypedArray.class, int.class, int.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testSetBaseAttributes() {
         MockTableLayout_LayoutParams mockLayoutParams = new MockTableLayout_LayoutParams(200, 300);
@@ -185,7 +192,8 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         XmlResourceParser parser = null;
         AttributeSet attrs = null;
         try {
-            parser = mTargetContext.getResources().getXml(com.android.cts.stub.R.xml.base_attributes);
+            parser = mTargetContext.getResources()
+                    .getXml(com.android.cts.stub.R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT

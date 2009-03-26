@@ -28,18 +28,18 @@ import android.graphics.Paint;
 public class Paint_FontMetricsIntTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of FontMetricsInt.",
         method = "Paint.FontMetricsInt",
         args = {}
     )
     public void testConstructor() {
         // new the FontMetricsInt instance
-    	Paint.FontMetricsInt fontMetricsInt = new Paint.FontMetricsInt();
+        new Paint.FontMetricsInt();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString().",
         method = "toString",
         args = {}
@@ -65,4 +65,3 @@ public class Paint_FontMetricsIntTest extends TestCase {
         assertEquals(expected, fontMetricsInt.toString());
     }
 }
-

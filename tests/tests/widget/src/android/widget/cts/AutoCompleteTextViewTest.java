@@ -41,9 +41,10 @@ import android.widget.AutoCompleteTextView.Validator;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -97,21 +98,24 @@ public class AutoCompleteTextViewTest extends
                 android.R.layout.simple_dropdown_item_1line, WORDS);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test the constructor AutoCompleteTextView(Context)",
-      targets = {
-        @TestTarget(
-          methodName = "AutoCompleteTextView",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test the constructor AutoCompleteTextView(Context)",
+            method = "AutoCompleteTextView",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "AutoCompleteTextView",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test the constructor AutoCompleteTextView(Context)",
+            method = "AutoCompleteTextView",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
-        @TestTarget(
-          methodName = "AutoCompleteTextView",
-          methodArgs = {Context.class, AttributeSet.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test the constructor AutoCompleteTextView(Context)",
+            method = "AutoCompleteTextView",
+            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
     @ToBeFixed(bug = "1417734", explanation = "should add NullPointerException @throws" +
@@ -148,15 +152,12 @@ public class AutoCompleteTextViewTest extends
         new AutoCompleteTextView(mActivity, null, -1);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#enoughToFilter()}.",
-      targets = {
-        @TestTarget(
-          methodName = "enoughToFilter",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#enoughToFilter()}.",
+        method = "enoughToFilter",
+        args = {}
+    )
     public void testEnoughToFilter() {
         mAutoCompleteTextView.setThreshold(3);
         assertEquals(3, mAutoCompleteTextView.getThreshold());
@@ -180,23 +181,21 @@ public class AutoCompleteTextViewTest extends
         assertFalse(mAutoCompleteTextView.enoughToFilter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#setAdapter(ListAdapter)} and " +
-            "{@link AutoCompleteTextView#getAdapter()} and " +
-            "{@link AutoCompleteTextView#setAdapter(getFilter)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setAdapter",
-          methodArgs = {ListAdapter.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAdapter",
+            args = {android.widget.ListAdapter.class}
         ),
-        @TestTarget(
-          methodName = "getAdapter",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getAdapter",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getFilter",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getFilter",
+            args = {}
         )
     })
     public void testAccessAdapter() {
@@ -222,18 +221,16 @@ public class AutoCompleteTextViewTest extends
         assertNull(autoCompleteTextView.getFilter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#setOnItemClickListener(AdapterView."
-          + "OnItemClickListener)} and {@link AutoCompleteTextView#getItemClickListener()}.",
-      targets = {
-        @TestTarget(
-          methodName = "setOnItemClickListener",
-          methodArgs = {AdapterView.OnItemClickListener.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOnItemClickListener",
+            args = {android.widget.AdapterView.OnItemClickListener.class}
         ),
-        @TestTarget(
-          methodName = "getItemClickListener",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getItemClickListener",
+            args = {}
         )
     })
     public void testAccessItemClickListener() {
@@ -252,20 +249,17 @@ public class AutoCompleteTextViewTest extends
         assertNull(mAutoCompleteTextView.getItemClickListener());
     }
 
-    @TestInfo(
-       status = TestStatus.TBR,
-       notes = "Test {@link AutoCompleteTextView#setOnItemSelectedListener(AdapterView."
-           + "OnItemSelectedListener)} and {@link AutoCompleteTextView#"
-           + "getItemSelectedListener()}.",
-       targets = {
-         @TestTarget(
-           methodName = "setOnItemSelectedListener",
-           methodArgs = {AdapterView.OnItemSelectedListener.class}
-         ),
-         @TestTarget(
-           methodName = "getItemSelectedListener",
-           methodArgs = {}
-         )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOnItemSelectedListener",
+            args = {android.widget.AdapterView.OnItemSelectedListener.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getItemSelectedListener",
+            args = {}
+        )
     })
     public void testAccessItemSelectedListener() {
         MockOnItemSelectedListener testOnItemSelectedListener = new MockOnItemSelectedListener();
@@ -283,15 +277,12 @@ public class AutoCompleteTextViewTest extends
         assertNull(mAutoCompleteTextView.getItemSelectedListener());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#convertSelectionToString(Object)}.",
-      targets = {
-        @TestTarget(
-          methodName = "convertSelectionToString",
-          methodArgs = {Object.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#convertSelectionToString(Object)}.",
+        method = "convertSelectionToString",
+        args = {java.lang.Object.class}
+    )
     public void testConvertSelectionToString() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -304,15 +295,12 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_TEST, autoCompleteTextView.convertSelectionToString(STRING_TEST));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#onTextChanged(CharSequence, int, int, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "onTextChanged",
-          methodArgs = {CharSequence.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#onTextChanged(CharSequence, int, int, int)}.",
+        method = "onTextChanged",
+        args = {java.lang.CharSequence.class, int.class, int.class, int.class}
+    )
     public void testOnTextChanged() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -341,26 +329,26 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_CHECK.length(), autoCompleteTextView.getAfter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onFocusChanged(boolean, int, Rect), dismissDropDown(), showDropDown()"
-          + " and isPopupShowing().",
-      targets = {
-        @TestTarget(
-          methodName = "onFocusChanged",
-          methodArgs = {boolean.class, int.class, Rect.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "onFocusChanged",
+            args = {boolean.class, int.class, android.graphics.Rect.class}
         ),
-        @TestTarget(
-          methodName = "dismissDropDown",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "dismissDropDown",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "showDropDown",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "showDropDown",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isPopupShowing",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isPopupShowing",
+            args = {}
         )
     })
     @UiThreadTest
@@ -388,15 +376,12 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_VALIDATED, mAutoCompleteTextView.getText().toString());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#replaceText(CharSequence)}.",
-      targets = {
-        @TestTarget(
-          methodName = "replaceText",
-          methodArgs = {CharSequence.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#replaceText(CharSequence)}.",
+        method = "replaceText",
+        args = {java.lang.CharSequence.class}
+    )
     public void testReplaceText() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -413,15 +398,12 @@ public class AutoCompleteTextViewTest extends
         assertTrue(autoCompleteTextView.isOnTextChanged());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#setFrame(int, int, int, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setFrame",
-          methodArgs = {int.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#setFrame(int, int, int, int)}.",
+        method = "setFrame",
+        args = {int.class, int.class, int.class, int.class}
+    )
     public void testSetFrame() {
         MockAutoCompleteTextView autoCompleteTextView = new MockAutoCompleteTextView(mActivity);
 
@@ -446,18 +428,16 @@ public class AutoCompleteTextViewTest extends
         assertEquals(5, autoCompleteTextView.getBottom());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#getThreshold()} and " +
-            "{@link AutoCompleteTextView#setThreshold(int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getThreshold",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getThreshold",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setThreshold",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setThreshold",
+            args = {int.class}
         )
     })
     public void testGetThreshold() {
@@ -478,18 +458,16 @@ public class AutoCompleteTextViewTest extends
         assertEquals(1, autoCompleteTextView.getThreshold());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#getValidator()} and " +
-            "{@link AutoCompleteTextView#setValidator(Validator)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getValidator",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getValidator",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setValidator",
-          methodArgs = {Validator.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setValidator",
+            args = {android.widget.AutoCompleteTextView.Validator.class}
         )
     })
     public void testAccessValidater() {
@@ -504,18 +482,14 @@ public class AutoCompleteTextViewTest extends
         assertNull(mAutoCompleteTextView.getValidator());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#onFilterComplete()}." +
-            " This function can only be test by indirect calling.",
-      targets = {
-        @TestTarget(
-          methodName = "onFilterComplete",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "onFilterComplete",
+        args = {int.class}
+    )
     @ToBeFixed(bug = "", explanation = "This case needs more carefully examined")
-    public void TestOnFilterComplete() {
+    // This function can only be test by indirect calling.
+    public void _testOnFilterComplete() {
         // Set Threshold to 4 characters
         mAutoCompleteTextView.setThreshold(4);
 
@@ -555,17 +529,18 @@ public class AutoCompleteTextViewTest extends
         assertTrue(mAutoCompleteTextView.isPopupShowing());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onKeyDown and performFiltering.",
-      targets = {
-        @TestTarget(
-          methodName = "onKeyDown",
-          methodArgs = {int.class, KeyEvent.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test onKeyDown and performFiltering.",
+            method = "onKeyDown",
+            args = {int.class, android.view.KeyEvent.class}
         ),
-        @TestTarget(
-          methodName = "performFiltering",
-          methodArgs = {CharSequence.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test onKeyDown and performFiltering.",
+            method = "performFiltering",
+            args = {java.lang.CharSequence.class, int.class}
         )
     })
     @ToBeFixed( bug = "", explanation = "mAutoCompleteTextView.isPopupShowing() should be false")
@@ -618,21 +593,22 @@ public class AutoCompleteTextViewTest extends
         assertEquals(STRING_TEST, filter.getResult());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test performCompletion() and onKeyUp(int , KeyEvent).",
-      targets = {
-        @TestTarget(
-          methodName = "performCompletion",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test performCompletion() and onKeyUp(int , KeyEvent).",
+            method = "performCompletion",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "onKeyUp",
-          methodArgs = {int.class, KeyEvent.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test performCompletion() and onKeyUp(int , KeyEvent).",
+            method = "onKeyUp",
+            args = {int.class, android.view.KeyEvent.class}
         )
     })
     @ToBeFixed( bug = "", explanation = "This test is really broken and needs to be updated.")
-    public void TestPerformCompletion() {
+    public void _testPerformCompletion() {
         final MockOnItemClickListener listener = new MockOnItemClickListener();
 
         mActivity.runOnUiThread(new Runnable() {
@@ -688,15 +664,12 @@ public class AutoCompleteTextViewTest extends
         assertNotSame("", mAutoCompleteTextView.getText().toString());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#onWindowFocusChanged(boolean)}.",
-      targets = {
-        @TestTarget(
-          methodName = "onWindowFocusChanged",
-          methodArgs = {boolean.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#onWindowFocusChanged(boolean)}.",
+        method = "onWindowFocusChanged",
+        args = {boolean.class}
+    )
     @UiThreadTest
     public void testOnWindowFocusChanged() {
         mAutoCompleteTextView.setText(STRING_TEST);
@@ -721,15 +694,12 @@ public class AutoCompleteTextViewTest extends
         mAutoCompleteTextView.onWindowFocusChanged(hasWindowFocus);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#performValidation()}.",
-      targets = {
-        @TestTarget(
-          methodName = "performValidation",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#performValidation()}.",
+        method = "performValidation",
+        args = {}
+    )
     @UiThreadTest
     public void testPerformValidation() {
         final CharSequence text = "this";
@@ -743,15 +713,12 @@ public class AutoCompleteTextViewTest extends
         mAutoCompleteTextView.setValidator(null);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link AutoCompleteTextView#setCompletionHint(CharSequence)}.",
-      targets = {
-        @TestTarget(
-          methodName = "setCompletionHint",
-          methodArgs = {CharSequence.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link AutoCompleteTextView#setCompletionHint(CharSequence)}.",
+        method = "setCompletionHint",
+        args = {java.lang.CharSequence.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "only setter no getter")
     public void testSetCompletionHint() {
         mAutoCompleteTextView.setCompletionHint("TEST HINT");

@@ -31,19 +31,19 @@ public class AndroidRuntimeExceptionTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test AndroidRuntimeException",
             method = "AndroidRuntimeException",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test AndroidRuntimeException",
             method = "AndroidRuntimeException",
             args = {java.lang.Exception.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test AndroidRuntimeException",
             method = "AndroidRuntimeException",
             args = {java.lang.String.class}

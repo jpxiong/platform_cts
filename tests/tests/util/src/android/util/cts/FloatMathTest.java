@@ -17,36 +17,44 @@ package android.util.cts;
 
 import junit.framework.TestCase;
 import android.util.FloatMath;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(FloatMath.class)
 public class FloatMathTest extends TestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test float math related methods",
-      targets = {
-        @TestTarget(
-          methodName = "ceil",
-          methodArgs = {float.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test float math related methods",
+            method = "ceil",
+            args = {float.class}
         ),
-        @TestTarget(
-          methodName = "floor",
-          methodArgs = {float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test float math related methods",
+            method = "floor",
+            args = {float.class}
         ),
-        @TestTarget(
-          methodName = "cos",
-          methodArgs = {float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test float math related methods",
+            method = "cos",
+            args = {float.class}
         ),
-        @TestTarget(
-          methodName = "sin",
-          methodArgs = {float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test float math related methods",
+            method = "sin",
+            args = {float.class}
         ),
-        @TestTarget(
-          methodName = "sqrt",
-          methodArgs = {float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test float math related methods",
+            method = "sqrt",
+            args = {float.class}
         )
     })
     public void testFloatMathMethods() {

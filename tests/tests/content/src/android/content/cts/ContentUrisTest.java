@@ -39,7 +39,7 @@ public class ContentUrisTest extends AndroidTestCase {
     private Uri uri2 = Uri.parse("content://" + AUTHORITY + "/" + PATH2);
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of ContentUris.",
         method = "ContentUris",
         args = {}
@@ -49,7 +49,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test parseId(Uri contentUri).",
         method = "parseId",
         args = {android.net.Uri.class}
@@ -66,7 +66,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test parseId(Uri contentUri).",
         method = "parseId",
         args = {android.net.Uri.class}
@@ -94,7 +94,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test withAppendedId(Uri contentUri, long id).",
         method = "withAppendedId",
         args = {android.net.Uri.class, long.class}
@@ -112,7 +112,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test withAppendedId(Uri contentUri, long id).",
         method = "withAppendedId",
         args = {android.net.Uri.class, long.class}
@@ -128,7 +128,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test appendId(Builder builder, long id).",
         method = "appendId",
         args = {android.net.Uri.Builder.class, long.class}
@@ -149,7 +149,7 @@ public class ContentUrisTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test appendId(Builder builder, long id).",
         method = "appendId",
         args = {android.net.Uri.Builder.class, long.class}

@@ -53,19 +53,19 @@ public class TwoLineListItemTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "TwoLineListItem",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "TwoLineListItem",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors.",
             method = "TwoLineListItem",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -108,14 +108,12 @@ public class TwoLineListItemTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link TwoLineListItem#getText1()} and {@link TwoLineListItem#getText2()}",
+            level = TestLevel.COMPLETE,
             method = "getText1",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link TwoLineListItem#getText1()} and {@link TwoLineListItem#getText2()}",
+            level = TestLevel.COMPLETE,
             method = "getText2",
             args = {}
         )
@@ -134,8 +132,7 @@ public class TwoLineListItemTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link TwoLineListItem#onFinishInflate()}. This test checks the function of the method only. This test does not check where this method is called.",
+        level = TestLevel.COMPLETE,
         method = "onFinishInflate",
         args = {}
     )

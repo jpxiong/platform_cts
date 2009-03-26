@@ -30,10 +30,12 @@ import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Intent.class)
 public class AvailableIntentsTest
@@ -139,24 +141,28 @@ public class AvailableIntentsTest
         fail("has not started target activity: " + targetActivity + " yet");
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test ACTION_VIEW when url is http://web_address," +
-            " it will open a browser window to the URL specified",
-      targets = {
-        @TestTarget(
-          methodName = "Intent",
-          methodArgs = {String.class, Uri.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "Intent",
+            args = {java.lang.String.class, android.net.Uri.class}
         ),
-        @TestTarget(
-          methodName = "getAction",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getAction",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getData",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getData",
+            args = {}
         )
     })
+    // test ACTION_VIEW when url is http://web_address,
+    // it will open a browser window to the URL specified
     public void testViewNormalUrl() {
         Uri uri = Uri.parse(NORMAL_URL);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -164,28 +170,32 @@ public class AvailableIntentsTest
 
         assertFalse(isRunningTargetActivity(targetActivity));
         mActivity.startActivity(intent);
-        // check whether start target activty.
+        // check whether start target activity.
         assertStartedTargetActivity(5000, targetActivity);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test ACTION_VIEW when url is https://web_address," +
-        " it will open a browser window to the URL specified",
-      targets = {
-        @TestTarget(
-          methodName = "Intent",
-          methodArgs = {String.class, Uri.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "Intent",
+            args = {java.lang.String.class, android.net.Uri.class}
         ),
-        @TestTarget(
-          methodName = "getAction",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getAction",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getData",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getData",
+            args = {}
         )
     })
+    // test ACTION_VIEW when url is https://web_address,
+    // it will open a browser window to the URL specified
     public void testViewSecureUrl() {
         Uri uri = Uri.parse(SECURE_URL);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -193,28 +203,32 @@ public class AvailableIntentsTest
 
         assertFalse(isRunningTargetActivity(targetActivity));
         mActivity.startActivity(intent);
-        // check whether start target activty.
+        // check whether start target activity.
         assertStartedTargetActivity(5000, targetActivity);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test ACTION_WEB_SEARCH when url is http://web_address," +
-        " it will open a browser window to the URL specified",
-      targets = {
-        @TestTarget(
-          methodName = "Intent",
-          methodArgs = {String.class, Uri.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "Intent",
+            args = {java.lang.String.class, android.net.Uri.class}
         ),
-        @TestTarget(
-          methodName = "getAction",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getAction",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getData",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getData",
+            args = {}
         )
     })
+    // test ACTION_WEB_SEARCH when url is http://web_address,
+    // it will open a browser window to the URL specified
     public void testWebSearchNormalUrl() {
         Uri uri = Uri.parse(NORMAL_URL);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -223,28 +237,32 @@ public class AvailableIntentsTest
 
         assertFalse(isRunningTargetActivity(targetActivity));
         mActivity.startActivity(intent);
-        // check whether start target activty.
+        // check whether start target activity.
         assertStartedTargetActivity(5000, targetActivity);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test ACTION_WEB_SEARCH when url is https://web_address" +
-        " it will open a browser window to the URL specified",
-      targets = {
-        @TestTarget(
-          methodName = "Intent",
-          methodArgs = {String.class, Uri.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "Intent",
+            args = {java.lang.String.class, android.net.Uri.class}
         ),
-        @TestTarget(
-          methodName = "getAction",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getAction",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getData",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getData",
+            args = {}
         )
     })
+    // test ACTION_WEB_SEARCH when url is https://web_address it will open a browser window to the 
+    // URL specified
     public void testWebSearchSecureUrl() {
         Uri uri = Uri.parse(SECURE_URL);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -253,26 +271,28 @@ public class AvailableIntentsTest
 
         assertFalse(isRunningTargetActivity(targetActivity));
         mActivity.startActivity(intent);
-        // check whether start target activty.
+        // check whether start target activity.
         assertStartedTargetActivity(5000, targetActivity);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test ACTION_WEB_SEARCH when url is empty string," +
-        " google search will be applied for the plain text",
-      targets = {
-        @TestTarget(
-          methodName = "Intent",
-          methodArgs = {String.class, Uri.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test ACTION_WEB_SEARCH when url is invalid, it should be taken as plain text",
+            method = "Intent",
+            args = {java.lang.String.class, android.net.Uri.class}
         ),
-        @TestTarget(
-          methodName = "getAction",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test ACTION_WEB_SEARCH when url is invalid, it should be taken as plain text",
+            method = "getAction",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getData",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test ACTION_WEB_SEARCH when url is invalid, it should be taken as plain text",
+            method = "getData",
+            args = {}
         )
     })
     public void testWebSearchPlainText() {
@@ -283,10 +303,10 @@ public class AvailableIntentsTest
 
         assertFalse(isRunningTargetActivity(targetActivity));
         mActivity.startActivity(intent);
-        // check whether start target activty.
+        // check whether start target activity.
         assertStartedTargetActivity(5000, targetActivity);
 
-        // FIXME: we can not check what is searched by Google search, because we can not get
+        // FIXME: we can not check what is searched by Google search, because we can not get   308
         // target activity in our test codes. issue 1552866.
     }
 }

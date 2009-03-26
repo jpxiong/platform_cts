@@ -40,13 +40,13 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of PathMeasure.",
             method = "PathMeasure",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of PathMeasure.",
             method = "PathMeasure",
             args = {android.graphics.Path.class, boolean.class}
@@ -67,7 +67,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getPosTan(float distance, float[] pos, float[] tan).",
         method = "getPosTan",
         args = {float.class, float[].class, float[].class}
@@ -95,7 +95,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test nextContour().",
         method = "nextContour",
         args = {}
@@ -108,7 +108,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test finalize().",
         method = "finalize",
         args = {}
@@ -123,7 +123,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getLength().",
         method = "getLength",
         args = {}
@@ -136,7 +136,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isClosed().",
         method = "isClosed",
         args = {}
@@ -150,7 +150,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setPath(Path path, boolean forceClosed).",
         method = "setPath",
         args = {android.graphics.Path.class, boolean.class}
@@ -161,7 +161,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getSegment(float startD, float stopD, Path dst,boolean startWithMoveTo).",
         method = "getSegment",
         args = {float.class, float.class, android.graphics.Path.class, boolean.class}
@@ -174,7 +174,7 @@ public class PathMeasureTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getMatrix(float distance, Matrix matrix, int flags).",
         method = "getMatrix",
         args = {float.class, android.graphics.Matrix.class, int.class}

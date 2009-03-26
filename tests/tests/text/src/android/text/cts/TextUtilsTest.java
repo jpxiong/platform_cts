@@ -42,6 +42,7 @@ import android.text.style.URLSpan;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+
 /**
  * Test {@link TextUtils}.
  */
@@ -76,7 +77,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test commaEllipsize method",
         method = "commaEllipsize",
         args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class,
@@ -138,7 +139,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test concat method",
         method = "concat",
         args = {java.lang.CharSequence[].class}
@@ -188,7 +189,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test copySpansFrom method",
         method = "copySpansFrom",
         args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class,
@@ -314,7 +315,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test copySpansFrom method's NullPointerException",
         method = "copySpansFrom",
         args = {android.text.Spanned.class, int.class, int.class, java.lang.Class.class,
@@ -343,7 +344,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test ellipsize method",
         method = "ellipsize",
         args = {java.lang.CharSequence.class, android.text.TextPaint.class, float.class,
@@ -392,7 +393,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test ellipsize method which can set callback class and can enable"
             + "or disable to preserve length",
         method = "ellipsize",
@@ -510,7 +511,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test equals method",
         method = "equals",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class}
@@ -537,7 +538,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test expandTemplate method",
         method = "expandTemplate",
         args = {java.lang.CharSequence.class, java.lang.CharSequence[].class}
@@ -624,7 +625,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChars method",
         method = "getChars",
         args = {java.lang.CharSequence.class, int.class, int.class, char[].class, int.class}
@@ -706,7 +707,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChars method's NullPointerException",
         method = "getChars",
         args = {java.lang.CharSequence.class, int.class, int.class, char[].class, int.class}
@@ -788,7 +789,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOffsetAfter method",
         method = "getOffsetAfter",
         args = {java.lang.CharSequence.class, int.class}
@@ -821,7 +822,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOffsetAfter method's NullPointerException",
         method = "getOffsetAfter",
         args = {java.lang.CharSequence.class, int.class}
@@ -837,7 +838,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOffsetBefore method",
         method = "getOffsetBefore",
         args = {java.lang.CharSequence.class, int.class}
@@ -869,7 +870,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOffsetBefore method's NullPointerException",
         method = "getOffsetBefore",
         args = {java.lang.CharSequence.class, int.class}
@@ -885,7 +886,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getReverse method",
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -919,7 +920,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getReverse method's InternalError",
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -936,7 +937,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getReverse method's NegativeArraySizeException",
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -953,7 +954,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getReverse method's NullPointerException",
         method = "getReverse",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -969,7 +970,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTrimmedLength method",
         method = "getTrimmedLength",
         args = {java.lang.CharSequence.class}
@@ -998,7 +999,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test htmlEncode method",
         method = "htmlEncode",
         args = {java.lang.String.class}
@@ -1017,7 +1018,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, char ch)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, char.class}
@@ -1049,7 +1050,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, char ch, int start)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, char.class, int.class}
@@ -1077,7 +1078,8 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(-1, TextUtils.indexOf(stringBuffer, 'r', Integer.MAX_VALUE));
 
         StringBuilder stringBuilder = new StringBuilder(searchString);
-        assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuilder, 'r', INDEX_OF_FIRST_R + 1));
+        assertEquals(INDEX_OF_SECOND_R, 
+                TextUtils.indexOf(stringBuilder, 'r', INDEX_OF_FIRST_R + 1));
 
         MockGetChars mockGetChars = new MockGetChars();
         TextUtils.indexOf(mockGetChars, 'r', INDEX_OF_FIRST_R + 1);
@@ -1089,7 +1091,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, char ch, int start, int end)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, char.class, int.class, int.class}
@@ -1141,7 +1143,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, CharSequence needle)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class}
@@ -1170,7 +1172,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, CharSequence needle, int start)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class, int.class}
@@ -1221,7 +1223,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOf(CharSequence s, CharSequence needle, int start, int end)",
         method = "indexOf",
         args = {java.lang.CharSequence.class, java.lang.CharSequence.class, int.class, int.class}
@@ -1278,7 +1280,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isDigitsOnly method",
         method = "isDigitsOnly",
         args = {java.lang.CharSequence.class}
@@ -1298,7 +1300,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isEmpty method",
         method = "isEmpty",
         args = {java.lang.CharSequence.class}
@@ -1311,7 +1313,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isGraphic(char c)",
         method = "isGraphic",
         args = {char.class}
@@ -1340,7 +1342,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isGraphic(CharSequence str)",
         method = "isGraphic",
         args = {java.lang.CharSequence.class}
@@ -1363,7 +1365,7 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @SuppressWarnings("unchecked")
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test join(CharSequence delimiter, Iterable tokens)",
         method = "join",
         args = {java.lang.CharSequence.class, java.lang.Iterable.class}
@@ -1393,7 +1395,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test join(CharSequence delimiter, Object[] tokens)",
         method = "join",
         args = {java.lang.CharSequence.class, java.lang.Object[].class}
@@ -1420,7 +1422,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test lastIndexOf(CharSequence s, char ch)",
         method = "lastIndexOf",
         args = {java.lang.CharSequence.class, char.class}
@@ -1451,7 +1453,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test lastIndexOf(CharSequence s, char ch)",
         method = "lastIndexOf",
         args = {java.lang.CharSequence.class, char.class, int.class}
@@ -1491,7 +1493,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test lastIndexOf(CharSequence s, char ch, int start, int last)",
         method = "lastIndexOf",
         args = {java.lang.CharSequence.class, char.class, int.class, int.class}
@@ -1538,10 +1540,11 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test regionMatches method",
         method = "regionMatches",
-        args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class, int.class, int.class}
+        args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class,
+                int.class, int.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "StringIndexOutOfBoundsException issue")
     public void testRegionMatches() {
@@ -1608,10 +1611,11 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test regionMatches method's NullPointerException",
         method = "regionMatches",
-        args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class, int.class, int.class}
+        args = {java.lang.CharSequence.class, int.class, java.lang.CharSequence.class,
+                int.class, int.class}
     )
     @ToBeFixed(bug = "1371108", explanation = "NullPointerException issue")
     public void testRegionMatchesNullPointerException() {
@@ -1633,7 +1637,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test replace method",
         method = "replace",
         args = {java.lang.CharSequence.class, java.lang.String[].class,
@@ -1693,7 +1697,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test split(String text, Pattern pattern)",
         method = "split",
         args = {java.lang.String.class, java.util.regex.Pattern.class}
@@ -1723,7 +1727,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test split(String text, String expression)",
         method = "split",
         args = {java.lang.String.class, java.lang.String.class}
@@ -1752,7 +1756,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test stringOrSpannedString method",
         method = "stringOrSpannedString",
         args = {java.lang.CharSequence.class}
@@ -1777,7 +1781,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test substring method",
         method = "substring",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -1834,7 +1838,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {java.lang.CharSequence.class, android.os.Parcel.class, int.class}
@@ -1907,7 +1911,7 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {java.lang.CharSequence.class, android.os.Parcel.class, int.class}

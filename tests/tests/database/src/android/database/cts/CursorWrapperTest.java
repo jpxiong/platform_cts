@@ -33,9 +33,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(android.database.CursorWrapper.class)
@@ -71,25 +72,30 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         super.tearDown();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test close() and isClosed() and the constructor method.",
-      targets = {
-        @TestTarget(
-          methodName = "close",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test close() and isClosed() and the constructor method.",
+            method = "close",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isClosed",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test close() and isClosed() and the constructor method.",
+            method = "isClosed",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "requery",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test close() and isClosed() and the constructor method.",
+            method = "requery",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "CursorWrapper",
-          methodArgs = {Cursor.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test close() and isClosed() and the constructor method.",
+            method = "CursorWrapper",
+            args = {android.database.Cursor.class}
         )
     })
     public void testConstrucotorAndClose() {
@@ -112,17 +118,18 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         return cursor;
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "getCount",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getCount",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "requery",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "requery",
+            args = {}
         )
     })
     public void testGetCount() {
@@ -159,21 +166,24 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         rebuildDatabase();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test deactivate(), registerDataSetObserver and unregisterDataSetObserver methods.",
-      targets = {
-        @TestTarget(
-          methodName = "deactivate",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "deactivate",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "registerDataSetObserver",
-          methodArgs = {DataSetObserver.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "registerDataSetObserver",
+            args = {android.database.DataSetObserver.class}
         ),
-        @TestTarget(
-          methodName = "unregisterDataSetObserver",
-          methodArgs = {DataSetObserver.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "unregisterDataSetObserver",
+            args = {android.database.DataSetObserver.class}
         )
     })
     public void testDeactivate() throws IllegalStateException {
@@ -232,30 +242,36 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getColumnCount(), getColumnIndex(String), getColumnIndexOrThrow()String and "
-          + "getColumnName(int), getColumnNames().",
-      targets = {
-        @TestTarget(
-          methodName = "getColumnCount",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getColumnCount()",
+            method = "getColumnCount",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getColumnIndex",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getColumnIndex(String)",
+            method = "getColumnIndex",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "getColumnIndexOrThrow",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getColumnIndexOrThrow(String)",
+            method = "getColumnIndexOrThrow",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "getColumnName",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getColumnName(int).",
+            method = "getColumnName",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getColumnNames",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getColumnNames().",
+            method = "getColumnNames",
+            args = {}
         )
     })
     public void testGettingColumnInfos() {
@@ -287,53 +303,72 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertEquals("number", columnNames[1]);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test cursor positioning related fuctions.",
-      targets = {
-        @TestTarget(
-          methodName = "moveToFirst",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "moveToFirst",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isAfterLast",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "isAfterLast",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isBeforeFirst",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "isBeforeFirst",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isFirst",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "isFirst",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isLast",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "isLast",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "moveToLast",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "moveToLast",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "move",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "move",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "moveToPosition",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "moveToPosition",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "moveToNext",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "moveToNext",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getPosition",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "getPosition",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "moveToPrevious",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test cursor positioning related fuctions.",
+            method = "moveToPrevious",
+            args = {}
         )
     })
     public void testPositioning() {
@@ -412,45 +447,60 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertTrue(cursorWrapper.isFirst());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test value getting methods.",
-      targets = {
-        @TestTarget(
-          methodName = "getDouble",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getDouble",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getFloat",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getFloat",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getInt",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getInt",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getLong",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getLong",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getShort",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getShort",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getString",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getString",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getBlob",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getBlob",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getColumnCount",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "getColumnCount",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isNull",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test value getting methods.",
+            method = "isNull",
+            args = {int.class}
         )
     })
     public void testGettingValues() {
@@ -529,30 +579,24 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         mDatabase.execSQL("DROP TABLE test2");
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Tets getExtras().",
-      targets = {
-        @TestTarget(
-          methodName = "getExtras",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Tets getExtras().",
+        method = "getExtras",
+        args = {}
+    )
     public void testGetExtras() {
         CursorWrapper cursor = new CursorWrapper(getCursor());
         Bundle bundle = cursor.getExtras();
         assertSame(Bundle.EMPTY, bundle);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test copyStringToBuffer(int, CharArrayBuffer).",
-      targets = {
-        @TestTarget(
-          methodName = "copyStringToBuffer",
-          methodArgs = {int.class, CharArrayBuffer.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test copyStringToBuffer(int, CharArrayBuffer).",
+        method = "copyStringToBuffer",
+        args = {int.class, android.database.CharArrayBuffer.class}
+    )
     public void testCopyStringToBuffer() {
         CharArrayBuffer charArrayBuffer = new CharArrayBuffer(1000);
         Cursor cursor = getCursor();
@@ -578,15 +622,12 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertEquals(SECOND_NUMBER, string.substring(0, charArrayBuffer.sizeCopied));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test respond(Bundle).",
-      targets = {
-        @TestTarget(
-          methodName = "respond",
-          methodArgs = {Bundle.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test respond(Bundle).",
+        method = "respond",
+        args = {android.os.Bundle.class}
+    )
     public void testRespond() {
         Bundle b = new Bundle();
         CursorWrapper cursorWrapper = new CursorWrapper(getCursor());
@@ -594,31 +635,29 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertSame(Bundle.EMPTY, bundle);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getWantsAllOnMoveCalls()",
-      targets = {
-        @TestTarget(
-          methodName = "getWantsAllOnMoveCalls",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getWantsAllOnMoveCalls()",
+        method = "getWantsAllOnMoveCalls",
+        args = {}
+    )
     public void testGetWantsAllOnMoveCalls() {
         CursorWrapper cursorWrapper = new CursorWrapper(getCursor());
         assertFalse(cursorWrapper.getWantsAllOnMoveCalls());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test registerContentObserver and unregisterContentObserver.",
-      targets = {
-        @TestTarget(
-           methodName = "registerContentObserver",
-           methodArgs = {ContentObserver.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test registerContentObserver and unregisterContentObserver.",
+            method = "registerContentObserver",
+            args = {android.database.ContentObserver.class}
         ),
-        @TestTarget(
-          methodName = "unregisterContentObserver",
-          methodArgs = {ContentObserver.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test registerContentObserver and unregisterContentObserver.",
+            method = "unregisterContentObserver",
+            args = {android.database.ContentObserver.class}
         )
     })
     public void testContentObsererOperations() throws IllegalStateException {
@@ -655,15 +694,12 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setNotificationUri().",
-      targets = {
-        @TestTarget(
-          methodName = "setNotificationUri",
-          methodArgs = {ContentResolver.class, Uri.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setNotificationUri().",
+        method = "setNotificationUri",
+        args = {android.content.ContentResolver.class, android.net.Uri.class}
+    )
     public void testSetNotificationUri() {
         String MOCK_URI = "content://cursorwrappertest/testtable";
         CursorWrapper cursorWrapper = new CursorWrapper(getCursor());

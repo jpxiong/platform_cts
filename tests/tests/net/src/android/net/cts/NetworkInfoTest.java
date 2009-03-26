@@ -16,10 +16,6 @@
 
 package android.net.cts;
 
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
-import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
@@ -29,6 +25,11 @@ import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.TestStatus;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(NetworkInfo.class)
 public class NetworkInfoTest extends AndroidTestCase {
@@ -41,65 +42,90 @@ public class NetworkInfoTest extends AndroidTestCase {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test isConnectedOrConnecting().",
-      targets = {
-        @TestTarget(
-          methodName = "isConnectedOrConnecting",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "isConnectedOrConnecting",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setFailover",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "setFailover",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "isFailover",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "isFailover",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getType",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getType",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getTypeName",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getTypeName",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setIsAvailable",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "setIsAvailable",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "isAvailable",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "isAvailable",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "isConnected",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "isConnected",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "describeContents",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "describeContents",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getDetailedState",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getDetailedState",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getState",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getState",
+            args = {}
         ),
-       @TestTarget(
-          methodName = "getReason",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getReason",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getExtraInfo",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "getExtraInfo",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "toString",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test isConnectedOrConnecting().",
+            method = "toString",
+            args = {}
         )
     })
     public void testAccessNetworkInfoProperties() {
@@ -137,17 +163,13 @@ public class NetworkInfoTest extends AndroidTestCase {
         assertNotNull(ni[ConnectivityManager.TYPE_WIFI].toString());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test writeToParcel(Parcel dest, int flags).",
-      targets = {
-        @TestTarget(
-          methodName = "writeToParcel",
-          methodArgs = {Parcel.class, Integer.class}
-        )
-    })
-    @ToBeFixed(bug = "1703933", explanation = "Cannot test if the data was written correctly,"
-        + " if build CTS against SDK.")
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test writeToParcel(Parcel dest, int flags).",
+        method = "writeToParcel",
+        args = {android.os.Parcel.class, java.lang.Integer.class}
+    )
+    //@ToBeFixed(bug = "1703933", explanation = "Cannot test if the data was written correctly,"
     public void testWriteToParcel() {
         NetworkInfo[] networkInfos = mConnectivityManager.getAllNetworkInfo();
         NetworkInfo mobileInfo = networkInfos[ConnectivityManager.TYPE_MOBILE];

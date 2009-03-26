@@ -53,9 +53,10 @@ import android.test.AndroidTestCase;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -98,15 +99,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test the constructor ContextWrapper(Context)",
-      targets = {
-        @TestTarget(
-          methodName = "ContextWrapper",
-          methodArgs = {Context.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test the constructor ContextWrapper(Context)",
+        method = "ContextWrapper",
+        args = {android.content.Context.class}
+    )
     public void testConstructor() {
         // new the ContextWrapper instance
         new ContextWrapper(mContext);
@@ -115,15 +113,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         new ContextWrapper(null);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceCallingPermission(String, String)}",
-      targets = {
-        @TestTarget(
-          methodName = "enforceCallingPermission",
-          methodArgs = {String.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceCallingPermission(String, String)}",
+        method = "enforceCallingPermission",
+        args = {java.lang.String.class, java.lang.String.class}
+    )
     public void testEnforceCallingPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
         try {
@@ -137,15 +132,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#sendOrderedBroadcast(Intent, String)}",
-      targets = {
-        @TestTarget(
-          methodName = "sendOrderedBroadcast",
-          methodArgs = {Intent.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#sendOrderedBroadcast(Intent, String)}",
+        method = "sendOrderedBroadcast",
+        args = {android.content.Intent.class, java.lang.String.class}
+    )
     @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
     public void testSendOrderedBroadcast1() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -158,18 +150,15 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue("Receiver did not respond.", ResultReceiver.hadReceivedBroadCast());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "{@link ContextWrapper#sendOrderedBroadcast(Intent, String, BroadcastReceiver, "
-          +     "Handler, int, String, Bundle)}.",
-      targets = {
-        @TestTarget(
-          methodName = "sendOrderedBroadcast",
-          methodArgs = {
-            Intent.class, String.class, BroadcastReceiver.class, Handler.class, int.class,
-                String.class, Bundle.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "{@link ContextWrapper#sendOrderedBroadcast(Intent, String, BroadcastReceiver, "
+                + "Handler, int, String, Bundle)}.",
+        method = "sendOrderedBroadcast",
+        args = {android.content.Intent.class, java.lang.String.class, 
+                android.content.BroadcastReceiver.class, android.os.Handler.class, int.class, 
+                java.lang.String.class, android.os.Bundle.class}
+    )
     public void testSendOrderedBroadcast2() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
         final TestBroadcastReceiver broadcastReceiver = new TestBroadcastReceiver();
@@ -198,17 +187,20 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNull(resultExtras.getString(KEY_REMOVED));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#setTheme(int)} and {@link ContextWrapper#getTheme()}",
-      targets = {
-        @TestTarget(
-          methodName = "getTheme",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#setTheme(int)} and "
+                    + "{@link ContextWrapper#getTheme()}",
+            method = "getTheme",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setTheme",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#setTheme(int)} and "
+                    + "{@link ContextWrapper#getTheme()}",
+            method = "setTheme",
+            args = {int.class}
         )
     })
     public void testAccessTheme() {
@@ -226,18 +218,20 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(hashCode, contextWrapper.getTheme().hashCode());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#registerReceiver(BroadcastReceiver, IntentFilter)}"
-            + " and {@link ContextWrapper#unregisterReceiver(BroadcastReceiver)}.",
-      targets = {
-        @TestTarget(
-          methodName = "registerReceiver",
-          methodArgs = {BroadcastReceiver.class, IntentFilter.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#registerReceiver(BroadcastReceiver, IntentFilter)} "
+                    + "and {@link ContextWrapper#unregisterReceiver(BroadcastReceiver)}.",
+            method = "registerReceiver",
+            args = {android.content.BroadcastReceiver.class, android.content.IntentFilter.class}
         ),
-        @TestTarget(
-          methodName = "unregisterReceiver",
-          methodArgs = {BroadcastReceiver.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#registerReceiver(BroadcastReceiver, IntentFilter)} "
+                    + "and {@link ContextWrapper#unregisterReceiver(BroadcastReceiver)}.",
+            method = "unregisterReceiver",
+            args = {android.content.BroadcastReceiver.class}
         )
     })
     public void testRegisterReceiver1() throws InterruptedException {
@@ -281,16 +275,14 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertFalse(broadcastReceiver2.hadReceivedBroadCast2());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#registerReceiver(BroadcastReceiver, IntentFilter,"
-            + "String, Handler)}",
-      targets = {
-        @TestTarget(
-          methodName = "registerReceiver",
-          methodArgs = {BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#registerReceiver(BroadcastReceiver, "
+                + "IntentFilter,String, Handler)}",
+        method = "registerReceiver",
+        args = {android.content.BroadcastReceiver.class, android.content.IntentFilter.class, 
+                java.lang.String.class, android.os.Handler.class}
+    )
     public void testRegisterReceiver2() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
         FilteredReceiver broadcastReceiver = new FilteredReceiver();
@@ -315,32 +307,36 @@ public class ContextWrapperTest extends AndroidTestCase {
         contextWrapper.unregisterReceiver(broadcastReceiver);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#fileList()} and {@link ContextWrapper#getFilesDir()} and"
-            + " {@link ContextWrapper#openFileOutput(String, int)} and"
-            + " {@link ContextWrapper#deleteFile(String)} and "
-            + " {@link ContextWrapper#openFileInput(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "fileList",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#fileList()}",
+            method = "fileList",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getFilesDir",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#getFilesDir()}",
+            method = "getFilesDir",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "openFileOutput",
-          methodArgs = {String.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#openFileOutput(String, int)}",
+            method = "openFileOutput",
+            args = {java.lang.String.class, int.class}
         ),
-        @TestTarget(
-          methodName = "deleteFile",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#deleteFile(String)}",
+            method = "deleteFile",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "openFileInput",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#openFileInput(String)}.",
+            method = "openFileInput",
+            args = {java.lang.String.class}
         )
     })
     public void testAccessOfFiles() throws IOException {
@@ -426,15 +422,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         clearFilesPath(contextWrapper, filePath);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceCallingOrSelfPermission(String, String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "enforceCallingOrSelfPermission",
-          methodArgs = {String.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceCallingOrSelfPermission(String, String)}.",
+        method = "enforceCallingOrSelfPermission",
+        args = {java.lang.String.class, java.lang.String.class}
+    )
     public void testEnforceCallingOrSelfPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
         try {
@@ -447,33 +440,36 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = " Test {@link contextWrapper#setWallpaper(InputStream)} and"
-            + " {@link contextWrapper#setWallpaper(Bitmap)} and"
-            + " {@link contextWrapper#clearWallpaper()} and"
-            + " {@link contextWrapper#getWallpaper()} and"
-            + " {@link contextWrapper#peekWallpaper()} ",
-      targets = {
-        @TestTarget(
-          methodName = "setWallpaper",
-          methodArgs = {Bitmap.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link contextWrapper#setWallpaper(Bitmap)}",
+            method = "setWallpaper",
+            args = {android.graphics.Bitmap.class}
         ),
-        @TestTarget(
-          methodName = "setWallpaper",
-          methodArgs = {InputStream.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test and {@link contextWrapper#setWallpaper(InputStream)}",
+            method = "setWallpaper",
+            args = {java.io.InputStream.class}
         ),
-        @TestTarget(
-          methodName = "clearWallpaper",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link contextWrapper#clearWallpaper()}",
+            method = "clearWallpaper",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getWallpaper",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link contextWrapper#getWallpaper()}",
+            method = "getWallpaper",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "peekWallpaper",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link contextWrapper#peekWallpaper()} ",
+            method = "peekWallpaper",
+            args = {}
         )
     })
     public void testAccessWallpaper() throws IOException, InterruptedException {
@@ -510,32 +506,31 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNotSame(testDrawable, contextWrapper.peekWallpaper());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#openOrCreateDatabase(String, int, CursorFactory)} and"
-        + " {@link ContextWrapper#getDatabasePath(String)} and"
-        + " {@link ContextWrapper#databaseList()} and"
-        + " {@link ContextWrapper#deleteDatabase(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "openOrCreateDatabase",
-          methodArgs = {String.class, int.class, CursorFactory.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#openOrCreateDatabase(String, int, CursorFactory)}",
+            method = "openOrCreateDatabase",
+            args = {java.lang.String.class, int.class, 
+                    android.database.sqlite.SQLiteDatabase.CursorFactory.class}
         ),
-        @TestTarget(
-          methodName = "getDatabasePath",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#getDatabasePath(String)}",
+            method = "getDatabasePath",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "openOrCreateDatabase",
-          methodArgs = {String.class, int.class, CursorFactory.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#databaseList()}",
+            method = "databaseList",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "databaseList",
-          methodArgs = {}
-        ),
-        @TestTarget(
-          methodName = "deleteDatabase",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#deleteDatabase(String)}.",
+            method = "deleteDatabase",
+            args = {java.lang.String.class}
         )
     })
     public void testAccessDatabase() {
@@ -616,15 +611,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceUriPermission(Uri, int, int, int, String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "enforceUriPermission",
-          methodArgs = {Uri.class, int.class, int.class, int.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceUriPermission(Uri, int, int, int, String)}.",
+        method = "enforceUriPermission",
+        args = {android.net.Uri.class, int.class, int.class, int.class, java.lang.String.class}
+    )
     public void testEnforceUriPermission1() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -640,17 +632,14 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceUriPermission(Uri, String, String, int, int, int,"
-            + "String)}",
-      targets = {
-        @TestTarget(
-          methodName = "enforceUriPermission",
-          methodArgs = {Uri.class, String.class, String.class, int.class, int.class,
-                  int.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceUriPermission(Uri, String, String, int, int,"
+                + " int,String)}",
+        method = "enforceUriPermission",
+        args = {android.net.Uri.class, java.lang.String.class, java.lang.String.class, int.class, 
+                int.class, int.class, java.lang.String.class}
+    )
     public void testEnforceUriPermission2() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -667,30 +656,24 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getPackageResourcePath()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPackageResourcePath",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getPackageResourcePath()}.",
+        method = "getPackageResourcePath",
+        args = {}
+    )
     public void testGetPackageResourcePath() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertNotNull(contextWrapper.getPackageResourcePath());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#startActivity(Intent)}.",
-      targets = {
-        @TestTarget(
-          methodName = "startActivity",
-          methodArgs = {Intent.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#startActivity(Intent)}.",
+        method = "startActivity",
+        args = {android.content.Intent.class}
+    )
     public void testStartActivity() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -706,15 +689,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#createPackageContext(String, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "createPackageContext",
-          methodArgs = {String.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#createPackageContext(String, int)}.",
+        method = "createPackageContext",
+        args = {java.lang.String.class, int.class}
+    )
     public void testCreatePackageContext() throws PackageManager.NameNotFoundException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -724,45 +704,36 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNotNull(actualContext);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getMainLooper()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getMainLooper",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getMainLooper()}.",
+        method = "getMainLooper",
+        args = {}
+    )
     public void testGetMainLooper() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertNotNull(contextWrapper.getMainLooper());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getApplicationContext()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getApplicationContext",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getApplicationContext()}.",
+        method = "getApplicationContext",
+        args = {}
+    )
     public void testGetApplicationContext() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getApplicationContext(), contextWrapper.getApplicationContext());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getSharedPreferences(String, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getSharedPreferences",
-          methodArgs = {String.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getSharedPreferences(String, int)}.",
+        method = "getSharedPreferences",
+        args = {java.lang.String.class, int.class}
+    )
     public void testGetSharedPreferences() {
         SharedPreferences sp;
         SharedPreferences localSP;
@@ -775,15 +746,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertSame(sp, localSP);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#revokeUriPermission(Uri, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "revokeUriPermission",
-          methodArgs = {Uri.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#revokeUriPermission(Uri, int)}.",
+        method = "revokeUriPermission",
+        args = {android.net.Uri.class, int.class}
+    )
     @ToBeFixed(bug = "1400249", explanation = "Can't test the effect of this function, should be"
         + "tested by functional test.")
     public void testRevokeUriPermission() {
@@ -792,28 +760,31 @@ public class ContextWrapperTest extends AndroidTestCase {
         contextWrapper.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#startService(Intent)} and"
-            + " {@link ContextWrapper#bindService(Intent, ServiceConnection, int)} and"
-            + " {@link ContextWrapper#stopService(Intent)} and"
-            + " {@link ContextWrapper#unbindService(ServiceConnection)}.",
-      targets = {
-        @TestTarget(
-          methodName = "startService",
-          methodArgs = {Intent.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#startService(Intent)}.",
+            method = "startService",
+            args = {android.content.Intent.class}
         ),
-        @TestTarget(
-          methodName = "bindService",
-          methodArgs = {Intent.class, ServiceConnection.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#bindService(Intent, ServiceConnection, int)}.",
+            method = "bindService",
+            args = {android.content.Intent.class, android.content.ServiceConnection.class, 
+                    int.class}
         ),
-        @TestTarget(
-          methodName = "stopService",
-          methodArgs = {Intent.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#stopService(Intent)}.",
+            method = "stopService",
+            args = {android.content.Intent.class}
         ),
-        @TestTarget(
-          methodName = "unbindService",
-          methodArgs = {ServiceConnection.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#unbindService(ServiceConnection)}.",
+            method = "unbindService",
+            args = {android.content.ServiceConnection.class}
         )
     })
     public void testAccessService() throws InterruptedException {
@@ -832,78 +803,66 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue(MockContextWrapperService.hadCalledOnUnbind());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getPackageCodePath()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPackageCodePath",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getPackageCodePath()}.",
+        method = "getPackageCodePath",
+        args = {}
+    )
     public void testGetPackageCodePath() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertNotNull(contextWrapper.getPackageCodePath());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getPackageName()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPackageName",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getPackageName()}.",
+        method = "getPackageName",
+        args = {}
+    )
     public void testGetPackageName() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertEquals("com.android.cts.stub", contextWrapper.getPackageName());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getCacheDir()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getCacheDir",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getCacheDir()}.",
+        method = "getCacheDir",
+        args = {}
+    )
     public void testGetCacheDir() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
-        assertNotNull(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            contextWrapper.getCacheDir());
+        assertNotNull(contextWrapper.getCacheDir());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getContentResolver()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getContentResolver",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getContentResolver()}.",
+        method = "getContentResolver",
+        args = {}
+    )
     public void testGetContentResolver() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getContentResolver(), contextWrapper.getContentResolver());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#attachBaseContext(Context)} and"
-            + " {@link ContextWrapper#getBaseContext(Context)}.",
-      targets = {
-        @TestTarget(
-          methodName = "attachBaseContext",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#attachBaseContext(Context)}",
+            method = "attachBaseContext",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "getBaseContext",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#getBaseContext(Context)}.",
+            method = "getBaseContext",
+            args = {}
         )
     })
     public void testAccessBaseContext() throws PackageManager.NameNotFoundException {
@@ -924,15 +883,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getFileStreamPath(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getFileStreamPath",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getFileStreamPath(String)}.",
+        method = "getFileStreamPath",
+        args = {java.lang.String.class}
+    )
     public void testGetFileStreamPath() {
         String TEST_FILENAME = "TestGetFileStreamPath";
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -942,33 +898,30 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue(fileStreamPath.indexOf(TEST_FILENAME) >= 0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getClassLoader()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getClassLoader",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getClassLoader()}.",
+        method = "getClassLoader",
+        args = {}
+    )
     public void testGetClassLoader() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getClassLoader(), contextWrapper.getClassLoader());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getWallpaperDesiredMinimumHeight()} and"
-            + " {@link ContextWrapper#getWallpaperDesiredMinimumWidth()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getWallpaperDesiredMinimumHeight",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#getWallpaperDesiredMinimumHeight()}.",
+            method = "getWallpaperDesiredMinimumHeight",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getWallpaperDesiredMinimumWidth",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#getWallpaperDesiredMinimumWidth()}.",
+            method = "getWallpaperDesiredMinimumWidth",
+            args = {}
         )
     })
     public void testGetWallpaperDesiredMinimumHeightAndWidth() {
@@ -984,18 +937,18 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue((height > 0 && width > 0) || (height <= 0 && width <= 0));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#sendStickyBroadcast(Intent)} and"
-            + " {@link ContextWrapper#removeStickyBroadcast(Intent)}.",
-      targets = {
-        @TestTarget(
-          methodName = "sendStickyBroadcast",
-          methodArgs = {Intent.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#sendStickyBroadcast(Intent)}",
+            method = "sendStickyBroadcast",
+            args = {android.content.Intent.class}
         ),
-        @TestTarget(
-          methodName = "removeStickyBroadcast",
-          methodArgs = {Intent.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ContextWrapper#removeStickyBroadcast(Intent)}.",
+            method = "removeStickyBroadcast",
+            args = {android.content.Intent.class}
         )
     })
     public void testAccessStickyBroadcast() throws InterruptedException {
@@ -1020,15 +973,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         contextWrapper.unregisterReceiver(stickyReceiver);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = " Test {@link ContextWrapper#checkCallingOrSelfUriPermission(Uri, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkCallingOrSelfUriPermission",
-          methodArgs = {Uri.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = " Test {@link ContextWrapper#checkCallingOrSelfUriPermission(Uri, int)}.",
+        method = "checkCallingOrSelfUriPermission",
+        args = {android.net.Uri.class, int.class}
+    )
     public void testCheckCallingOrSelfUriPermission() {
         Uri uri = Uri.parse("content://ctstest");
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1038,15 +988,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#grantUriPermission(String, Uri, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "grantUriPermission",
-          methodArgs = {String.class, Uri.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#grantUriPermission(String, Uri, int)}.",
+        method = "grantUriPermission",
+        args = {java.lang.String.class, android.net.Uri.class, int.class}
+    )
     @ToBeFixed(bug = "1400249", explanation = "Can't test the effect of this function,"
             + " should be tested by functional test.")
     public void testGrantUriPermission() {
@@ -1056,15 +1003,12 @@ public class ContextWrapperTest extends AndroidTestCase {
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforcePermission(String, int, int, String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "enforcePermission",
-          methodArgs = {String.class, int.class, int.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforcePermission(String, int, int, String)}.",
+        method = "enforcePermission",
+        args = {java.lang.String.class, int.class, int.class, java.lang.String.class}
+    )
     public void testEnforcePermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1080,15 +1024,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkUriPermission(Uri, int, int, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkUriPermission",
-          methodArgs = {Uri.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkUriPermission(Uri, int, int, int)}.",
+        method = "checkUriPermission",
+        args = {android.net.Uri.class, int.class, int.class, int.class}
+    )
     public void testCheckUriPermission1() {
         Uri uri = Uri.parse("content://ctstest");
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1102,16 +1043,14 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkUriPermission(Uri, String, String, int, int,"
-            + " int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkUriPermission",
-          methodArgs = {Uri.class, String.class, String.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkUriPermission(Uri, String, String, int, int, "
+                + "int)}.",
+        method = "checkUriPermission",
+        args = {android.net.Uri.class, java.lang.String.class, java.lang.String.class, int.class,
+                int.class, int.class}
+    )
     public void testCheckUriPermission2() {
         Uri uri = Uri.parse("content://ctstest");
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1127,15 +1066,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkCallingPermission(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkCallingPermission",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkCallingPermission(String)}.",
+        method = "checkCallingPermission",
+        args = {java.lang.String.class}
+    )
     public void testCheckCallingPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1143,15 +1079,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkCallingUriPermission(Uri, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkCallingUriPermission",
-          methodArgs = {Uri.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkCallingUriPermission(Uri, int)}.",
+        method = "checkCallingUriPermission",
+        args = {android.net.Uri.class, int.class}
+    )
     public void testCheckCallingUriPermission() {
         Uri uri = Uri.parse("content://ctstest");
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1161,15 +1094,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceCallingUriPermission(Uri, int, String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "enforceCallingUriPermission",
-          methodArgs = {Uri.class, int.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceCallingUriPermission(Uri, int, String)}.",
+        method = "enforceCallingUriPermission",
+        args = {android.net.Uri.class, int.class, java.lang.String.class}
+    )
     public void testEnforceCallingUriPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1184,15 +1114,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getDir(String, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getDir",
-          methodArgs = {String.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getDir(String, int)}.",
+        method = "getDir",
+        args = {java.lang.String.class, int.class}
+    )
     public void testGetDir() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1202,30 +1129,24 @@ public class ContextWrapperTest extends AndroidTestCase {
         clearFilesPath(contextWrapper, dirString);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getPackageManager()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getPackageManager",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getPackageManager()}.",
+        method = "getPackageManager",
+        args = {}
+    )
     public void testGetPackageManager() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getPackageManager(), contextWrapper.getPackageManager());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkCallingOrSelfPermission(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkCallingOrSelfPermission",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkCallingOrSelfPermission(String)}.",
+        method = "checkCallingOrSelfPermission",
+        args = {java.lang.String.class}
+    )
     public void testCheckCallingOrSelfPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1233,15 +1154,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_GRANTED, retValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#sendBroadcast(Intent)}.",
-      targets = {
-        @TestTarget(
-          methodName = "sendBroadcast",
-          methodArgs = {Intent.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#sendBroadcast(Intent)}.",
+        method = "sendBroadcast",
+        args = {android.content.Intent.class}
+    )
     @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
     public void testSendBroadcast1() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1254,15 +1172,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue("Receiver did not respond.", ResultReceiver.hadReceivedBroadCast());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#sendBroadcast(Intent, String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "sendBroadcast",
-          methodArgs = {Intent.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#sendBroadcast(Intent, String)}.",
+        method = "sendBroadcast",
+        args = {android.content.Intent.class, java.lang.String.class}
+    )
     @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
     public void testSendBroadcast2() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1275,15 +1190,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue("Receiver did not respond.", ResultReceiver.hadReceivedBroadCast());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#enforceCallingOrSelfUriPermission(Uri, int, String)}",
-      targets = {
-        @TestTarget(
-          methodName = "enforceCallingOrSelfUriPermission",
-          methodArgs = {Uri.class, int.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#enforceCallingOrSelfUriPermission(Uri, int, String)}",
+        method = "enforceCallingOrSelfUriPermission",
+        args = {android.net.Uri.class, int.class, java.lang.String.class}
+    )
     public void testEnforceCallingOrSelfUriPermission() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1299,15 +1211,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#checkPermission(String, int, int)}.",
-      targets = {
-        @TestTarget(
-          methodName = "checkPermission",
-          methodArgs = {String.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#checkPermission(String, int, int)}.",
+        method = "checkPermission",
+        args = {java.lang.String.class, int.class, int.class}
+    )
     public void testCheckPermission() {
 
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
@@ -1332,15 +1241,12 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, returnValue);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getSystemService(String)}.",
-      targets = {
-        @TestTarget(
-          methodName = "getSystemService",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getSystemService(String)}.",
+        method = "getSystemService",
+        args = {java.lang.String.class}
+    )
     public void testGetSystemService() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1351,45 +1257,37 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNotNull(contextWrapper.getSystemService("window"));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getAssets()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getAssets",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getAssets()}.",
+        method = "getAssets",
+        args = {}
+    )
     public void testGetAssets() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getAssets(), contextWrapper.getAssets());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ContextWrapper#getResources()}.",
-      targets = {
-        @TestTarget(
-          methodName = "getResources",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ContextWrapper#getResources()}.",
+        method = "getResources",
+        args = {}
+    )
     public void testGetResources() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
         assertSame(mContext.getResources(), contextWrapper.getResources());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "{@link ContextWrapper#startInstrumentation(ComponentName, String, Bundle)}.",
-      targets = {
-        @TestTarget(
-          methodName = "startInstrumentation",
-          methodArgs = {ComponentName.class, String.class, Bundle.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "{@link ContextWrapper#startInstrumentation(ComponentName, String, Bundle)}.",
+        method = "startInstrumentation",
+        args = {android.content.ComponentName.class, java.lang.String.class, 
+                android.os.Bundle.class}
+    )
     public void testStartInstrumentation() {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 

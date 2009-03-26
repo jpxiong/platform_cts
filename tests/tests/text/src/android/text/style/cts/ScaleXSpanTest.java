@@ -28,7 +28,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(ScaleXSpan.class)
 public class ScaleXSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of ScaleXSpan.",
         method = "ScaleXSpan",
         args = {float.class}
@@ -40,7 +40,7 @@ public class ScaleXSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}
@@ -69,7 +69,7 @@ public class ScaleXSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint ds).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -98,7 +98,7 @@ public class ScaleXSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getScaleX().",
         method = "getScaleX",
         args = {}

@@ -43,7 +43,7 @@ public class PrintWriterPrinterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of PrintWriterPrinter.",
         method = "PrintWriterPrinter",
         args = {java.io.PrintWriter.class}
@@ -61,7 +61,7 @@ public class PrintWriterPrinterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test println(String x).",
         method = "println",
         args = {java.lang.String.class}

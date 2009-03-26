@@ -45,19 +45,19 @@ import dalvik.annotation.ToBeFixed;
 public class DatePickerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of DatePicker.",
             method = "DatePicker",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of DatePicker.",
             method = "DatePicker",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of DatePicker.",
             method = "DatePicker",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -85,7 +85,7 @@ public class DatePickerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DatePicker#setEnabled(boolean)}.",
         method = "setEnabled",
         args = {boolean.class}
@@ -112,10 +112,11 @@ public class DatePickerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DatePicker#init()}.",
         method = "init",
-        args = {int.class, int.class, int.class, android.widget.DatePicker.OnDateChangedListener.class}
+        args = {int.class, int.class, int.class, 
+                android.widget.DatePicker.OnDateChangedListener.class}
     )
     public void testInit() {
         MockOnDateChangedListener onDateChangedListener = new MockOnDateChangedListener();
@@ -144,26 +145,22 @@ public class DatePickerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#updateDate(int, int, int)} and {@link DatePicker#getYear()} and {@link DatePicker#getMonth()} and {@link DatePicker#getDayOfMonth()}.",
+            level = TestLevel.COMPLETE,
             method = "updateDate",
             args = {int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#updateDate(int, int, int)} and {@link DatePicker#getYear()} and {@link DatePicker#getMonth()} and {@link DatePicker#getDayOfMonth()}.",
+            level = TestLevel.COMPLETE,
             method = "getYear",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#updateDate(int, int, int)} and {@link DatePicker#getYear()} and {@link DatePicker#getMonth()} and {@link DatePicker#getDayOfMonth()}.",
+            level = TestLevel.COMPLETE,
             method = "getMonth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#updateDate(int, int, int)} and {@link DatePicker#getYear()} and {@link DatePicker#getMonth()} and {@link DatePicker#getDayOfMonth()}.",
+            level = TestLevel.COMPLETE,
             method = "getDayOfMonth",
             args = {}
         )
@@ -193,7 +190,7 @@ public class DatePickerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DatePicker#updateDate(int, int, int)}.",
         method = "updateDate",
         args = {int.class, int.class, int.class}
@@ -224,20 +221,17 @@ public class DatePickerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#onSaveInstanceState()} and {@link DatePicker#dispatchRestoreInstanceState(SparseArray)} and {@link DatePicker#onRestoreInstanceState(Parcelable)}.",
+            level = TestLevel.COMPLETE,
             method = "onSaveInstanceState",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#onSaveInstanceState()} and {@link DatePicker#dispatchRestoreInstanceState(SparseArray)} and {@link DatePicker#onRestoreInstanceState(Parcelable)}.",
+            level = TestLevel.COMPLETE,
             method = "dispatchRestoreInstanceState",
             args = {android.util.SparseArray.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link DatePicker#onSaveInstanceState()} and {@link DatePicker#dispatchRestoreInstanceState(SparseArray)} and {@link DatePicker#onRestoreInstanceState(Parcelable)}.",
+            level = TestLevel.COMPLETE,
             method = "onRestoreInstanceState",
             args = {android.os.Parcelable.class}
         )

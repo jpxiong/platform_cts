@@ -49,13 +49,13 @@ public class ContextTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getString(int, Object...) and getString(int).",
             method = "getString",
             args = {int.class, java.lang.Object[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getString(int, Object...) and getString(int).",
             method = "getString",
             args = {int.class}
@@ -88,7 +88,7 @@ public class ContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getText(int).",
         method = "getText",
         args = {int.class}
@@ -108,25 +108,25 @@ public class ContextTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "obtainStyledAttributes",
             args = {int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "obtainStyledAttributes",
             args = {int.class, int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "obtainStyledAttributes",
             args = {android.util.AttributeSet.class, int[].class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "obtainStyledAttributes",
             args = {android.util.AttributeSet.class, int[].class}

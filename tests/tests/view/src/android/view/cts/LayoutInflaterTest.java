@@ -39,9 +39,10 @@ import com.android.cts.stub.R;
 
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(LayoutInflater.class)
@@ -75,21 +76,24 @@ public class LayoutInflaterTest extends AndroidTestCase {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "from",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "from",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "LayoutInflater",
-          methodArgs = {Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "LayoutInflater",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "LayoutInflater",
-          methodArgs = {LayoutInflater.class, Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "LayoutInflater",
+            args = {android.view.LayoutInflater.class, android.content.Context.class}
         )
     })
     public void testFrom() {
@@ -105,33 +109,42 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertNotNull(layoutInflater);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "setFilter",
-          methodArgs = {Filter.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setFilter",
+            args = {android.view.LayoutInflater.Filter.class}
         ),
-        @TestTarget(
-          methodName = "getFilter",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getFilter",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setFactory",
-          methodArgs = {Factory.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setFactory",
+            args = {android.view.LayoutInflater.Factory.class}
         ),
-        @TestTarget(
-          methodName = "getFactory",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getFactory",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getContext",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getContext",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "cloneInContext",
-          methodArgs = {Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "cloneInContext",
+            args = {android.content.Context.class}
         )
     })
     public void testAccessLayoutInflaterProperties() {
@@ -180,15 +193,12 @@ public class LayoutInflaterTest extends AndroidTestCase {
         return attrs;
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "createView",
-          methodArgs = {String.class, String.class, AttributeSet.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "",
+        method = "createView",
+        args = {java.lang.String.class, java.lang.String.class, android.util.AttributeSet.class}
+    )
     public void testCreateView() {
 
         AttributeSet attrs = getAttrs();
@@ -265,17 +275,18 @@ public class LayoutInflaterTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "inflate",
-          methodArgs = {int.class, ViewGroup.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "inflate",
+            args = {int.class, android.view.ViewGroup.class}
         ),
-        @TestTarget(
-          methodName = "onCreateView",
-          methodArgs = {String.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "onCreateView",
+            args = {java.lang.String.class, android.util.AttributeSet.class}
         )
     })
     public void testInflate() {
@@ -303,17 +314,18 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(1, mLayout.getChildCount());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "inflate",
-          methodArgs = {int.class, ViewGroup.class, boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "inflate",
+            args = {int.class, android.view.ViewGroup.class, boolean.class}
         ),
-        @TestTarget(
-          methodName = "onCreateView",
-          methodArgs = {String.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "onCreateView",
+            args = {java.lang.String.class, android.util.AttributeSet.class}
         )
     })
     public void testInflate2() {
@@ -347,19 +359,19 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(1, mLayout.getChildCount());
     }
 
-   @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "inflate",
-          methodArgs = {XmlPullParser.class, ViewGroup.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "inflate",
+            args = {org.xmlpull.v1.XmlPullParser.class, android.view.ViewGroup.class}
         ),
-        @TestTarget(
-          methodName = "onCreateView",
-          methodArgs = {String.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "onCreateView",
+            args = {java.lang.String.class, android.util.AttributeSet.class}
         )
-
     })
     public void testInflate3() {
         XmlResourceParser parser = getContext().getResources().getLayout(
@@ -406,17 +418,18 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(3, mLayout.getChildCount());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "inflate",
-          methodArgs = {XmlPullParser.class, ViewGroup.class, boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "inflate",
+            args = {org.xmlpull.v1.XmlPullParser.class, android.view.ViewGroup.class, boolean.class}
         ),
-        @TestTarget(
-          methodName = "onCreateView",
-          methodArgs = {String.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "onCreateView",
+            args = {java.lang.String.class, android.util.AttributeSet.class}
         )
     })
     public void testInflate4() {

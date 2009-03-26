@@ -38,10 +38,10 @@ public class LoginFilterTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend).",
+        level = TestLevel.COMPLETE,
         method = "filter",
-        args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class, int.class, int.class}
+        args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class, 
+                int.class, int.class}
     )
     @ToBeFixed(bug="1417734", explanation="should add @throws clause into javadoc " +
         " of LoginFilter#filter(CharSequence, int, int, Spanned, int, int) when" +
@@ -136,33 +136,36 @@ public class LoginFilterTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test onInvalidCharacter(char c). This method does nothing. we only test onInvalidCharacter function here, the callback should be tested in testFilter()",
+        level = TestLevel.COMPLETE,
         method = "onInvalidCharacter",
         args = {char.class}
     )
+    // This method does nothing. we only test onInvalidCharacter function here, 
+    // the callback should be tested in testFilter()
     public void testOnInvalidCharacter() {
         LoginFilter loginFilter = new MockLoginFilter();
         loginFilter.onInvalidCharacter('a');
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test onStop(). This method does nothing. we only test onStop function here, the callback should be tested in testFilter()",
+        level = TestLevel.COMPLETE,
         method = "onStop",
         args = {}
     )
+    // This method does nothing. we only test onStop function here, 
+    // the callback should be tested in testFilter()
     public void testOnStop() {
         LoginFilter loginFilter = new MockLoginFilter();
         loginFilter.onStop();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test onStart(). This method does nothing. we only test onStart function here, the callback should be tested in testFilter()",
+        level = TestLevel.COMPLETE,
         method = "onStart",
         args = {}
     )
+    // This method does nothing. we only test onStart function here, 
+    // the callback should be tested in testFilter()
     public void testOnStart() {
         LoginFilter loginFilter = new LoginFilter.UsernameFilterGeneric();
         loginFilter.onStart();

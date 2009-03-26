@@ -135,13 +135,13 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CursorTreeAdapter}",
             method = "CursorTreeAdapter",
             args = {android.database.Cursor.class, android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CursorTreeAdapter}",
             method = "CursorTreeAdapter",
             args = {android.database.Cursor.class, android.content.Context.class, boolean.class}
@@ -158,7 +158,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getCursor()}",
         method = "getCursor",
         args = {}
@@ -175,7 +175,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#setGroupCursor(Cursor)}",
         method = "setGroupCursor",
         args = {android.database.Cursor.class}
@@ -192,7 +192,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#setChildrenCursor(int, Cursor)}",
         method = "setChildrenCursor",
         args = {int.class, android.database.Cursor.class}
@@ -207,7 +207,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#changeCursor(Cursor)}",
         method = "changeCursor",
         args = {android.database.Cursor.class}
@@ -224,7 +224,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#notifyDataSetChanged(boolean)}",
         method = "notifyDataSetChanged",
         args = {boolean.class}
@@ -268,7 +268,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#notifyDataSetChanged()}",
         method = "notifyDataSetChanged",
         args = {}
@@ -299,7 +299,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#notifyDataSetInvalidated()}",
         method = "notifyDataSetInvalidated",
         args = {}
@@ -330,7 +330,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#onGroupCollapsed(int)}",
         method = "onGroupCollapsed",
         args = {int.class}
@@ -376,7 +376,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#hasStableIds()}, this method always return true",
         method = "hasStableIds",
         args = {}
@@ -390,7 +390,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#isChildSelectable(int, int)}",
         method = "isChildSelectable",
         args = {int.class, int.class}
@@ -405,7 +405,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#convertToString(Cursor)}",
         method = "convertToString",
         args = {android.database.Cursor.class}
@@ -418,7 +418,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getFilter()}",
         method = "getFilter",
         args = {}
@@ -436,14 +436,12 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CursorTreeAdapter#getFilterQueryProvider()} and {@link CursorTreeAdapter#setFilterQueryProvider(FilterQueryProvider)}",
+            level = TestLevel.COMPLETE,
             method = "getFilterQueryProvider",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CursorTreeAdapter#getFilterQueryProvider()} and {@link CursorTreeAdapter#setFilterQueryProvider(FilterQueryProvider)}",
+            level = TestLevel.COMPLETE,
             method = "setFilterQueryProvider",
             args = {android.widget.FilterQueryProvider.class}
         )
@@ -460,7 +458,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#runQueryOnBackgroundThread(CharSequence)}",
         method = "runQueryOnBackgroundThread",
         args = {java.lang.CharSequence.class}
@@ -479,7 +477,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getGroup(int)}",
         method = "getGroup",
         args = {int.class}
@@ -504,7 +502,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getGroupCount()}",
         method = "getGroupCount",
         args = {}
@@ -518,7 +516,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getGroupId(int)}",
         method = "getGroupId",
         args = {int.class}
@@ -539,7 +537,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getGroupView(int, boolean, View, ViewGroup)}",
         method = "getGroupView",
         args = {int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
@@ -580,7 +578,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getChild(int, int)}",
         method = "getChild",
         args = {int.class, int.class}
@@ -616,7 +614,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getChildId(int, int)}",
         method = "getChildId",
         args = {int.class, int.class}
@@ -653,7 +651,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorTreeAdapter#getChildrenCount(int)}",
         method = "getChildrenCount",
         args = {int.class}
@@ -677,10 +675,11 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
             " should check whether the return value from" +
             " CursorTreeAdapter#getChildrenCursorHelper(int, boolean) is null")
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getChildView(int, int, boolean, View, ViewGroup)}",
         method = "getChildView",
-        args = {int.class, int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
+        args = {int.class, int.class, boolean.class, android.view.View.class, 
+                android.view.ViewGroup.class}
     )
     public void testGetChildView() {
         final String expectedStr = "getChildView test";

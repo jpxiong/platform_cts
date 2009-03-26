@@ -35,9 +35,10 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -58,17 +59,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         mContext = getInstrumentation().getContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link TableLayout}",
-      targets = {
-        @TestTarget(
-          methodName = "TableLayout",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout}",
+            method = "TableLayout",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "TableLayout",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableLayout}",
+            method = "TableLayout",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         )
     })
     @UiThreadTest
@@ -79,7 +81,8 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
 
         TableStubActivity activity = getActivity();
         activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
-        TableLayout tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table1);
+        TableLayout tableLayout = (TableLayout) activity
+                .findViewById(com.android.cts.stub.R.id.table1);
         assertTrue(tableLayout.isColumnCollapsed(0));
         assertTrue(tableLayout.isColumnStretchable(2));
 
@@ -88,15 +91,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertTrue(tableLayout.isColumnShrinkable(1));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setOnHierarchyChangeListener(OnHierarchyChangeListener listener)",
-      targets = {
-        @TestTarget(
-          methodName = "setOnHierarchyChangeListener",
-          methodArgs = {OnHierarchyChangeListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setOnHierarchyChangeListener(OnHierarchyChangeListener listener)",
+        method = "setOnHierarchyChangeListener",
+        args = {android.view.ViewGroup.OnHierarchyChangeListener.class}
+    )
     public void testSetOnHierarchyChangeListener() {
         TableLayout tableLayout = new TableLayout(mContext);
 
@@ -117,15 +117,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertFalse(listener.hasCalledOnChildViewRemoved());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test requestLayout()",
-      targets = {
-        @TestTarget(
-          methodName = "requestLayout",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test requestLayout()",
+        method = "requestLayout",
+        args = {}
+    )
     public void testRequestLayout() {
         TableLayout tableLayout = new TableLayout(mContext);
         tableLayout.addView(new TextView(mContext));
@@ -141,17 +138,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertTrue(tableLayout.getChildAt(1).isLayoutRequested());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which access ShrinkAllColumns",
-      targets = {
-        @TestTarget(
-          methodName = "isShrinkAllColumns",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ShrinkAllColumns",
+            method = "isShrinkAllColumns",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setShrinkAllColumns",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ShrinkAllColumns",
+            method = "setShrinkAllColumns",
+            args = {boolean.class}
         )
     })
     public void testAccessShrinkAllColumns() {
@@ -164,17 +162,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertFalse(tableLayout.isShrinkAllColumns());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which access StretchAllColumns",
-      targets = {
-        @TestTarget(
-          methodName = "isStretchAllColumns",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access StretchAllColumns",
+            method = "isStretchAllColumns",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setStretchAllColumns",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access StretchAllColumns",
+            method = "setStretchAllColumns",
+            args = {boolean.class}
         )
     })
     public void testAccessStretchAllColumns() {
@@ -187,17 +186,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertFalse(tableLayout.isStretchAllColumns());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which access ColumnCollapsed",
-      targets = {
-        @TestTarget(
-          methodName = "isColumnCollapsed",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnCollapsed",
+            method = "isColumnCollapsed",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "setColumnCollapsed",
-          methodArgs = {int.class, boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnCollapsed",
+            method = "setColumnCollapsed",
+            args = {int.class, boolean.class}
         )
     })
     public void testAccessColumnCollapsed() {
@@ -238,17 +238,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertTrue(tableLayout.getChildAt(1).isLayoutRequested());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which access ColumnStretchable",
-      targets = {
-        @TestTarget(
-          methodName = "isColumnStretchable",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnStretchable",
+            method = "isColumnStretchable",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "setColumnStretchable",
-          methodArgs = {int.class, boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnStretchable",
+            method = "setColumnStretchable",
+            args = {int.class, boolean.class}
         )
     })
     public void testAccessColumnStretchable() {
@@ -290,17 +291,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
 
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test whether columns are actually stretched",
-      targets = {
-        @TestTarget(
-          methodName = "setColumnStretchable",
-          methodArgs = {Integer.class, Boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test whether columns are actually stretched",
+            method = "setColumnStretchable",
+            args = {java.lang.Integer.class, java.lang.Boolean.class}
         ),
-        @TestTarget(
-          methodName = "setStretchAllColumns",
-          methodArgs = {Boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test whether columns are actually stretched",
+            method = "setStretchAllColumns",
+            args = {java.lang.Boolean.class}
         )
     })
     @ToBeFixed( bug = "", explanation = "After set a column unable to be stretched," +
@@ -438,17 +440,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertEquals(orignalWidth2, column2.getWidth());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which access ColumnShrinkable",
-      targets = {
-        @TestTarget(
-          methodName = "isColumnShrinkable",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnShrinkable",
+            method = "isColumnShrinkable",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "setColumnShrinkable",
-          methodArgs = {int.class, boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which access ColumnShrinkable",
+            method = "setColumnShrinkable",
+            args = {int.class, boolean.class}
         )
     })
     public void testAccessColumnShrinkable() {
@@ -489,17 +492,18 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertTrue(tableLayout.getChildAt(1).isLayoutRequested());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test whether columns are actually shrunk",
-      targets = {
-        @TestTarget(
-          methodName = "setColumnShrinkable",
-          methodArgs = {Integer.class, Boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test whether columns are actually shrunk",
+            method = "setColumnShrinkable",
+            args = {java.lang.Integer.class, java.lang.Boolean.class}
         ),
-        @TestTarget(
-          methodName = "setShrinkAllColumns",
-          methodArgs = {Boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test whether columns are actually shrunk",
+            method = "setShrinkAllColumns",
+            args = {java.lang.Boolean.class}
         )
     })
     @ToBeFixed( bug = "", explanation = "After set a column unable to be shrunk," +
@@ -650,15 +654,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertEquals(orignalWidth2 + extraSpace, child2.getWidth());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test addView(View child)",
-      targets = {
-        @TestTarget(
-          methodName = "addView",
-          methodArgs = {View.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test addView(View child)",
+        method = "addView",
+        args = {android.view.View.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testAddView1() {
         TableLayout tableLayout = new TableLayout(mContext);
@@ -696,15 +697,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test addView(View child, int index)",
-      targets = {
-        @TestTarget(
-          methodName = "addView",
-          methodArgs = {View.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test addView(View child, int index)",
+        method = "addView",
+        args = {android.view.View.class, int.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException and " +
             "NullPointerException issue")
     public void testAddView2() {
@@ -748,15 +746,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test addView(View child, ViewGroup.LayoutParams params)",
-      targets = {
-        @TestTarget(
-          methodName = "addView",
-          methodArgs = {View.class, ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test addView(View child, ViewGroup.LayoutParams params)",
+        method = "addView",
+        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testAddView3() {
         TableLayout tableLayout = new TableLayout(mContext);
@@ -796,15 +791,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test addView(View child, int index, ViewGroup.LayoutParams params)",
-      targets = {
-        @TestTarget(
-          methodName = "addView",
-          methodArgs = {View.class, int.class, ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test addView(View child, int index, ViewGroup.LayoutParams params)",
+        method = "addView",
+        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "IndexOutOfBoundsException and " +
             "NullPointerException issue")
     public void testAddView4() {
@@ -870,15 +862,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateLayoutParams(AttributeSet attrs)",
-      targets = {
-        @TestTarget(
-          methodName = "generateLayoutParams",
-          methodArgs = {AttributeSet.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateLayoutParams(AttributeSet attrs)",
+        method = "generateLayoutParams",
+        args = {android.util.AttributeSet.class}
+    )
     public void testGenerateLayoutParams1() {
         TableLayout tableLayout = new TableLayout(mContext);
 
@@ -891,15 +880,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertNotNull(tableLayout.generateLayoutParams((AttributeSet) null));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test checkLayoutParams(ViewGroup.LayoutParams p)",
-      targets = {
-        @TestTarget(
-          methodName = "checkLayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test checkLayoutParams(ViewGroup.LayoutParams p)",
+        method = "checkLayoutParams",
+        args = {android.view.ViewGroup.LayoutParams.class}
+    )
     public void testCheckLayoutParams() {
         MockTableLayout mockTableLayout = new MockTableLayout(mContext);
 
@@ -912,15 +898,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertFalse(mockTableLayout.checkLayoutParams(null));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateDefaultLayoutParams()",
-      targets = {
-        @TestTarget(
-          methodName = "generateDefaultLayoutParams",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateDefaultLayoutParams()",
+        method = "generateDefaultLayoutParams",
+        args = {}
+    )
     public void testGenerateDefaultLayoutParams() {
         MockTableLayout mockTableLayout = new MockTableLayout(mContext);
 
@@ -929,15 +912,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         assertTrue(layoutParams instanceof TableLayout.LayoutParams);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateLayoutParams(ViewGroup.LayoutParams p)",
-      targets = {
-        @TestTarget(
-          methodName = "generateLayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateLayoutParams(ViewGroup.LayoutParams p)",
+        method = "generateLayoutParams",
+        args = {android.view.ViewGroup.LayoutParams.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testGenerateLayoutParams2() {
         MockTableLayout mockTableLayout = new MockTableLayout(mContext);
@@ -956,15 +936,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onLayout(boolean changed, int l, int t, int r, int b)",
-      targets = {
-        @TestTarget(
-          methodName = "onLayout",
-          methodArgs = {boolean.class, int.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onLayout(boolean changed, int l, int t, int r, int b)",
+        method = "onLayout",
+        args = {boolean.class, int.class, int.class, int.class, int.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to do unit test," +
             " will be tested by functional test.")
     public void testOnLayout() {
@@ -973,15 +950,12 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
         mockTableLayout.onLayout(false, 0, 0, 20, 20);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
-      targets = {
-        @TestTarget(
-          methodName = "onMeasure",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
+        method = "onMeasure",
+        args = {int.class, int.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to do unit test," +
             " will be tested by functional test.")
     public void testOnMeasure() {

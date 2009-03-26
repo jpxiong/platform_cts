@@ -52,19 +52,19 @@ public class EditTextTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link EditText}",
             method = "EditText",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link EditText}",
             method = "EditText",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link EditText}",
             method = "EditText",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -106,14 +106,12 @@ public class EditTextTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link EditText#getText()} and {@link EditText#setText(CharSequence, BufferType)}, setText() ignores parameter BufferType, this function always use BufferType.EDITABLE",
+            level = TestLevel.COMPLETE,
             method = "getText",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link EditText#getText()} and {@link EditText#setText(CharSequence, BufferType)}, setText() ignores parameter BufferType, this function always use BufferType.EDITABLE",
+            level = TestLevel.COMPLETE,
             method = "setText",
             args = {java.lang.CharSequence.class, android.widget.TextView.BufferType.class}
         )
@@ -132,7 +130,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link EditText#setSelection(int)}",
         method = "setSelection",
         args = {int.class}
@@ -168,7 +166,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link EditText#setSelection(int, int)}",
         method = "setSelection",
         args = {int.class, int.class}
@@ -212,7 +210,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link EditText#selectAll()}",
         method = "selectAll",
         args = {}
@@ -238,7 +236,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link EditText#extendSelection(int)}",
         method = "extendSelection",
         args = {int.class}
@@ -275,7 +273,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link EditText#getDefaultEditable()}, this function always returns true",
         method = "getDefaultEditable",
         args = {}
@@ -287,7 +285,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "{@link EditText#getDefaultMovementMethod()}",
         method = "getDefaultMovementMethod",
         args = {}
@@ -304,7 +302,7 @@ public class EditTextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test {@link EditText#setEllipsize(TextUtils.TruncateAt)}",
         method = "setEllipsize",
         args = {android.text.TextUtils.TruncateAt.class}

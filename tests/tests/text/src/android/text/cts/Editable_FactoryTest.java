@@ -31,7 +31,7 @@ public class Editable_FactoryTest extends AndroidTestCase {
     Factory mFactory;
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test newEditable(CharSequence source)",
         method = "newEditable",
         args = {java.lang.CharSequence.class}
@@ -50,7 +50,7 @@ public class Editable_FactoryTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getInstance()",
         method = "getInstance",
         args = {}

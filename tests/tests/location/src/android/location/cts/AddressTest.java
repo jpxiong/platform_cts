@@ -35,7 +35,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(Address.class)
 public class AddressTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "Address",
         args = {java.util.Locale.class}
@@ -49,7 +49,7 @@ public class AddressTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents()",
         method = "describeContents",
         args = {}
@@ -68,13 +68,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setAdminArea(String) and getAdminArea()",
             method = "setAdminArea",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setAdminArea(String) and getAdminArea()",
             method = "getAdminArea",
             args = {}
@@ -93,13 +93,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setCountryCode(String) and getCountryCode()",
             method = "setCountryCode",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setCountryCode(String) and getCountryCode()",
             method = "getCountryCode",
             args = {}
@@ -118,13 +118,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setCountryName(String) and getCountryName()",
             method = "setCountryName",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setCountryName(String) and getCountryName()",
             method = "getCountryName",
             args = {}
@@ -143,13 +143,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setExtras(Bundle) and getExtras()",
             method = "setExtras",
             args = {android.os.Bundle.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setExtras(Bundle) and getExtras()",
             method = "getExtras",
             args = {}
@@ -174,13 +174,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFeatureName(String) and getFeatureName()",
             method = "setFeatureName",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFeatureName(String) and getFeatureName()",
             method = "getFeatureName",
             args = {}
@@ -199,25 +199,25 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
             method = "setLatitude",
             args = {double.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
             method = "getLatitude",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
             method = "clearLatitude",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
             method = "hasLatitude",
             args = {}
@@ -243,26 +243,26 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setLongitude(double) and getLongitude(), clearLongitude(), hasLongitude()",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setLongitude",
             args = {double.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setLongitude(double) and getLongitude(), clearLongitude(), hasLongitude()",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getLongitude",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setLongitude(double) and getLongitude(), clearLongitude(), hasLongitude()",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "clearLongitude",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setLongitude(double) and getLongitude(), clearLongitude(), hasLongitude()",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "hasLongitude",
             args = {}
         )
@@ -287,13 +287,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPhone(String) and getPhone()",
             method = "setPhone",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPhone(String) and getPhone()",
             method = "getPhone",
             args = {}
@@ -314,13 +314,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPostalCode(String) and getPostalCode()",
             method = "setPostalCode",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setPostalCode(String) and getPostalCode()",
             method = "getPostalCode",
             args = {}
@@ -339,13 +339,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setThoroughfare(String) and getThoroughfare()",
             method = "setThoroughfare",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setThoroughfare(String) and getThoroughfare()",
             method = "getThoroughfare",
             args = {}
@@ -364,13 +364,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setUrl(String) and getUrl()",
             method = "setUrl",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setUrl(String) and getUrl()",
             method = "getUrl",
             args = {}
@@ -389,13 +389,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setSubAdminArea(String) and getSubAdminArea()",
             method = "setSubAdminArea",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setSubAdminArea(String) and getSubAdminArea()",
             method = "getSubAdminArea",
             args = {}
@@ -413,7 +413,7 @@ public class AddressTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString()",
         method = "toString",
         args = {}
@@ -432,20 +432,20 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setAddressLine(int, String) and getMaxAddressLineIndex(), getAddressLine(int)",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setAddressLine",
             args = {int.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setAddressLine(int, String) and getMaxAddressLineIndex(), getAddressLine(int)",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getMaxAddressLineIndex",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test setAddressLine(int, String) and getMaxAddressLineIndex(), getAddressLine(int)",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getAddressLine",
             args = {int.class}
         )
@@ -485,7 +485,7 @@ public class AddressTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getLocale()",
         method = "getLocale",
         args = {}
@@ -505,13 +505,13 @@ public class AddressTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLocality(String) and getLocality()",
             method = "setLocality",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLocality(String) and getLocality()",
             method = "getLocality",
             args = {}
@@ -529,7 +529,7 @@ public class AddressTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(Parcel, int), this function ignores the parameter 'flag'.",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}

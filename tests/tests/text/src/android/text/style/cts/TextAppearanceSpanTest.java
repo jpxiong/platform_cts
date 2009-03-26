@@ -32,22 +32,24 @@ import dalvik.annotation.ToBeFixed;
 public class TextAppearanceSpanTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
             args = {android.content.Context.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
             args = {android.content.Context.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
-            args = {java.lang.String.class, int.class, int.class, android.content.res.ColorStateList.class, android.content.res.ColorStateList.class}
+            args = {java.lang.String.class, int.class, int.class, 
+                    android.content.res.ColorStateList.class, 
+                    android.content.res.ColorStateList.class}
         )
     })
     @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
@@ -82,7 +84,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFamily().",
         method = "getFamily",
         args = {}
@@ -103,7 +105,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint ds).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -133,7 +135,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextColor().",
         method = "getTextColor",
         args = {}
@@ -151,7 +153,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextSize().",
         method = "getTextSize",
         args = {}
@@ -172,7 +174,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextStyle().",
         method = "getTextStyle",
         args = {}
@@ -193,7 +195,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getLinkTextColor().",
         method = "getLinkTextColor",
         args = {}
@@ -211,7 +213,7 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

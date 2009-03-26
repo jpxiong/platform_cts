@@ -36,18 +36,17 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "ActivityManager.RecentTaskInfo",
         args = {}
     )
     public void testConstructor() {
-        ActivityManager.RecentTaskInfo recentTaskInfo = new
-            ActivityManager.RecentTaskInfo();
+        new ActivityManager.RecentTaskInfo();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents method",
         method = "describeContents",
         args = {}
@@ -57,7 +56,7 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -97,7 +96,7 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test readFromParcel method",
         method = "readFromParcel",
         args = {android.os.Parcel.class}

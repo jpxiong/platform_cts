@@ -48,13 +48,13 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
             method = "SpannableStringBuilder",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
             method = "SpannableStringBuilder",
             args = {java.lang.CharSequence.class}
@@ -73,7 +73,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
         method = "SpannableStringBuilder",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -104,7 +104,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#getSpanFlags(Object)}.",
         method = "getSpanFlags",
         args = {java.lang.Object.class}
@@ -123,7 +123,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#nextSpanTransition(int, int, Class)}.",
         method = "nextSpanTransition",
         args = {int.class, int.class, java.lang.Class.class}
@@ -144,7 +144,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#setSpan(Object, int, int, int)}.",
         method = "setSpan",
         args = {java.lang.Object.class, int.class, int.class, int.class}
@@ -177,7 +177,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#valueOf(CharSequence)}.",
         method = "valueOf",
         args = {java.lang.CharSequence.class}
@@ -203,7 +203,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#replace(int, int, CharSequence)}.",
         method = "replace",
         args = {int.class, int.class, java.lang.CharSequence.class}
@@ -239,7 +239,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#replace(int, int, CharSequence, int, int)}.",
         method = "replace",
         args = {int.class, int.class, java.lang.CharSequence.class, int.class, int.class}
@@ -292,7 +292,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#subSequence(int, int)}.",
         method = "subSequence",
         args = {int.class, int.class}
@@ -313,7 +313,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#getChars(int, int, char[], int)}.",
         method = "getChars",
         args = {int.class, int.class, char[].class, int.class}
@@ -350,7 +350,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#append(CharSequence)}.",
         method = "append",
         args = {java.lang.CharSequence.class}
@@ -368,7 +368,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#append(CharSequence, int, int)}.",
         method = "append",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -403,7 +403,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#append(char)}.",
         method = "append",
         args = {char.class}
@@ -424,7 +424,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#clearSpans()}.",
         method = "clearSpans",
         args = {}
@@ -444,7 +444,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#getSpanStart(Object)}.",
         method = "getSpanStart",
         args = {java.lang.Object.class}
@@ -459,13 +459,13 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Filters.",
             method = "getFilters",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Filters.",
             method = "setFilters",
             args = {android.text.InputFilter[].class}
@@ -486,7 +486,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#removeSpan(Object)}.",
         method = "removeSpan",
         args = {java.lang.Object.class}
@@ -514,7 +514,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#toString()}.",
         method = "toString",
         args = {}
@@ -528,7 +528,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = " Test {@link SpannableStringBuilder#getSpanEnd(Object)}.",
         method = "getSpanEnd",
         args = {java.lang.Object.class}
@@ -542,7 +542,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#charAt(int)}.",
         method = "charAt",
         args = {int.class}
@@ -566,7 +566,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#insert(int, CharSequence, int, int)}.",
         method = "insert",
         args = {int.class, java.lang.CharSequence.class, int.class, int.class}
@@ -613,7 +613,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#insert(int, CharSequence)}.",
         method = "insert",
         args = {int.class, java.lang.CharSequence.class}
@@ -648,7 +648,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#clear()}.",
         method = "clear",
         args = {}
@@ -661,7 +661,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#getSpans(int, int, Class<T>)}.",
         method = "getSpans",
         args = {int.class, int.class, java.lang.Class.class}
@@ -686,7 +686,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#length()}.",
         method = "length",
         args = {}
@@ -699,7 +699,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannableStringBuilder#delete(int, int)}.",
         method = "delete",
         args = {int.class, int.class}

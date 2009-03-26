@@ -59,19 +59,19 @@ public class AbsSeekBarTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -87,13 +87,13 @@ public class AbsSeekBarTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThumbOffset() and setThumbOffset(int) function",
             method = "setThumbOffset",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThumbOffset() and setThumbOffset(int) function",
             method = "getThumbOffset",
             args = {}
@@ -116,7 +116,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setThumb(Drawable) function.",
         method = "setThumb",
         args = {android.graphics.drawable.Drawable.class}
@@ -139,7 +139,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onTouchEvent(MotionEvent) function.",
         method = "onTouchEvent",
         args = {android.view.MotionEvent.class}
@@ -171,7 +171,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test drawableStateChanged() function.",
         method = "drawableStateChanged",
         args = {}
@@ -191,7 +191,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onDraw(Canvas)",
         method = "onDraw",
         args = {android.graphics.Canvas.class}
@@ -215,7 +215,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onMeasure(int, int) function.",
         method = "onMeasure",
         args = {int.class, int.class}
@@ -282,13 +282,13 @@ public class AbsSeekBarTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test verifyDrawable(Drawable) and setThumb(Drawable) function.",
             method = "setThumb",
             args = {android.graphics.drawable.Drawable.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test verifyDrawable(Drawable) and setThumb(Drawable) function.",
             method = "verifyDrawable",
             args = {android.graphics.drawable.Drawable.class}
@@ -333,7 +333,7 @@ public class AbsSeekBarTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onSizeChanged(int, int, int, int) function.",
         method = "onSizeChanged",
         args = {int.class, int.class, int.class, int.class}

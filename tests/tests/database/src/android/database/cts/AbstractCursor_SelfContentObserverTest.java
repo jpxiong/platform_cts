@@ -27,7 +27,7 @@ import dalvik.annotation.TestTargetClass;
 public class AbstractCursor_SelfContentObserverTest extends AndroidTestCase{
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor of SelfContentObserver",
         method = "SelfContentObserver",
         args = {}
@@ -38,7 +38,7 @@ public class AbstractCursor_SelfContentObserverTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test deliverSelfNotifications of SelfContentObserver",
         method = "deliverSelfNotifications",
         args = {}
@@ -50,7 +50,7 @@ public class AbstractCursor_SelfContentObserverTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onChange of SelfContentObserver",
         method = "onChange",
         args = {boolean.class}

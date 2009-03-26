@@ -33,7 +33,7 @@ public class LogPrinterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of LogPrinter.",
         method = "LogPrinter",
         args = {int.class, java.lang.String.class}
@@ -51,7 +51,7 @@ public class LogPrinterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test println(String x).",
         method = "println",
         args = {java.lang.String.class}

@@ -28,7 +28,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(StrikethroughSpan.class)
 public class StrikethroughSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link StrikethroughSpan#updateDrawState(TextPaint)}",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

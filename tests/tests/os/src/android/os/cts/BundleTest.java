@@ -48,25 +48,25 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test all constructors",
             method = "Bundle",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test all constructors",
             method = "Bundle",
             args = {android.os.Bundle.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test all constructors",
             method = "Bundle",
             args = {java.lang.ClassLoader.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test all constructors",
             method = "Bundle",
             args = {int.class}
@@ -87,14 +87,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "first put sth into tested Bundle, it shouldn't be empty,"
                 + " then clear it and it should be empty",
             method = "clear",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "first put sth into tested Bundle, it shouldn't be empty,"
                 + " then clear it and it should be empty",
             method = "isEmpty",
@@ -110,7 +110,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "fisst clone the tested Bundle, then compare the original"
             + " Bundle with the cloned Bundle, they should equal",
         method = "clone",
@@ -121,7 +121,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "containsKey would return false if nothing has been put into the Bundle,"
             + " else containsKey would return true if any putXXX has been called before",
         method = "containsKey",
@@ -134,7 +134,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "get would return null if nothing has been put into the Bundle,"
             + " else get would return the value set by putXXX",
         method = "get",
@@ -148,13 +148,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBoolean should only return the Boolean set by putBoolean",
             method = "getBoolean",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBoolean should only return the Boolean set by putBoolean",
             method = "putBoolean",
             args = {java.lang.String.class, boolean.class}
@@ -168,13 +168,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBoolean should only return the Boolean set by putBoolean",
             method = "getBoolean",
             args = {java.lang.String.class, boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBoolean should only return the Boolean set by putBoolean",
             method = "putBoolean",
             args = {java.lang.String.class, boolean.class}
@@ -188,13 +188,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBooleanArray should only return the BooleanArray set by putBooleanArray",
             method = "getBooleanArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBooleanArray should only return the BooleanArray set by putBooleanArray",
             method = "putBooleanArray",
             args = {java.lang.String.class, boolean[].class}
@@ -215,13 +215,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBundle should only return the Bundle set by putBundle",
             method = "getBundle",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getBundle should only return the Bundle set by putBundle",
             method = "putBundle",
             args = {java.lang.String.class, android.os.Bundle.class}
@@ -236,13 +236,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByte should only return the Byte set by putByte",
             method = "getByte",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByte should only return the Byte set by putByte",
             method = "putByte",
             args = {java.lang.String.class, byte.class}
@@ -258,13 +258,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByte should only return the Byte set by putByte",
             method = "getByte",
             args = {java.lang.String.class, byte.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByte should only return the Byte set by putByte",
             method = "putByte",
             args = {java.lang.String.class, byte.class}
@@ -281,13 +281,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByteArray should only return the ByteArray set by putByteArray",
             method = "getByteArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getByteArray should only return the ByteArray set by putByteArray",
             method = "putByteArray",
             args = {java.lang.String.class, byte[].class}
@@ -308,13 +308,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getChar should only return the Char set by putChar",
             method = "getChar",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getChar should only return the Char set by putChar",
             method = "putChar",
             args = {java.lang.String.class, char.class}
@@ -330,13 +330,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getChar should only return the Char set by putChar",
             method = "getChar",
             args = {java.lang.String.class, char.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getChar should only return the Char set by putChar",
             method = "putChar",
             args = {java.lang.String.class, char.class}
@@ -353,13 +353,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getCharArray should only return the CharArray set by putCharArray",
             method = "getCharArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getCharArray should only return the CharArray set by putCharArray",
             method = "putCharArray",
             args = {java.lang.String.class, char[].class}
@@ -377,13 +377,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getCharSequence should only return the CharSequence set by putCharSequence",
             method = "getCharSequence",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getCharSequence should only return the CharSequence set by putCharSequence",
             method = "putCharSequence",
             args = {java.lang.String.class, java.lang.CharSequence.class}
@@ -399,13 +399,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDouble should return the Double set by putDouble",
             method = "getDouble",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDouble should return the Double set by putDouble",
             method = "putDouble",
             args = {java.lang.String.class, double.class}
@@ -421,13 +421,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDouble should return the Double set by putDouble",
             method = "getDouble",
             args = {java.lang.String.class, double.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDouble should return the Double set by putDouble",
             method = "putDouble",
             args = {java.lang.String.class, double.class}
@@ -444,13 +444,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDoubleArray should only return the DoubleArray set by putDoubleArray",
             method = "getDoubleArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getDoubleArray should only return the DoubleArray set by putDoubleArray",
             method = "putDoubleArray",
             args = {java.lang.String.class, double[].class}
@@ -468,13 +468,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloat should only return the Float set by putFloat",
             method = "getFloat",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloat should only return the Float set by putFloat",
             method = "putFloat",
             args = {java.lang.String.class, float.class}
@@ -490,13 +490,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloat should only return the Float set by putFloat",
             method = "getFloat",
             args = {java.lang.String.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloat should only return the Float set by putFloat",
             method = "putFloat",
             args = {java.lang.String.class, float.class}
@@ -513,13 +513,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloatArray should only return the FloatArray set by putFloatArray",
             method = "getFloatArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getFloatArray should only return the FloatArray set by putFloatArray",
             method = "putFloatArray",
             args = {java.lang.String.class, float[].class}
@@ -537,13 +537,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getInt should only return the Int set by putInt",
             method = "getInt",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getInt should only return the Int set by putInt",
             method = "putInt",
             args = {java.lang.String.class, int.class}
@@ -559,13 +559,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getInt should only return the Int set by putInt",
             method = "getInt",
             args = {java.lang.String.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getInt should only return the Int set by putInt",
             method = "putInt",
             args = {java.lang.String.class, int.class}
@@ -582,13 +582,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getIntArray should only return the IntArray set by putIntArray",
             method = "getIntArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getIntArray should only return the IntArray set by putIntArray",
             method = "putIntArray",
             args = {java.lang.String.class, int[].class}
@@ -606,14 +606,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getIntegerArrayList should only return the IntegerArrayList,"
                 + " which set by putIntegerArrayList",
             method = "getIntegerArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getIntegerArrayList should only return the IntegerArrayList,"
                 + " which set by putIntegerArrayList",
             method = "putIntegerArrayList",
@@ -638,13 +638,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLong should only return the Long set by putLong",
             method = "getLong",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLong should only return the Long set by putLong",
             method = "putLong",
             args = {java.lang.String.class, long.class}
@@ -660,13 +660,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLong should only return the Long set by putLong",
             method = "getLong",
             args = {java.lang.String.class, long.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLong should only return the Long set by putLong",
             method = "putLong",
             args = {java.lang.String.class, long.class}
@@ -683,13 +683,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLongArray should only return the LongArray set by putLongArray",
             method = "getLongArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getLongArray should only return the LongArray set by putLongArray",
             method = "putLongArray",
             args = {java.lang.String.class, long[].class}
@@ -707,13 +707,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelable should only return the Parcelable set by putParcelable",
             method = "getParcelable",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelable should only return the Parcelable set by putParcelable",
             method = "putParcelable",
             args = {java.lang.String.class, android.os.Parcelable.class}
@@ -728,14 +728,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelableArray should only return the ParcelableArray,"
                 + " which set by putParcelableArray",
             method = "getParcelableArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelableArray should only return the ParcelableArray,"
                 + " which set by putParcelableArray",
             method = "putParcelableArray",
@@ -757,14 +757,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelableArrayList should only return the parcelableArrayList,"
                 + " which set by putParcelableArrayList",
             method = "getParcelableArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getParcelableArrayList should only return the parcelableArrayList,"
                 + " which set by putParcelableArrayList",
             method = "putParcelableArrayList",
@@ -787,13 +787,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getSerializable should only return the Serializable set by putSerializable",
             method = "getSerializable",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getSerializable should only return the Serializable set by putSerializable",
             method = "putSerializable",
             args = {java.lang.String.class, java.io.Serializable.class}
@@ -807,13 +807,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShort should only return the Short set by putShort",
             method = "getShort",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShort should only return the Short set by putShort",
             method = "putShort",
             args = {java.lang.String.class, short.class}
@@ -829,13 +829,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShort should only return the Short set by putShort",
             method = "getShort",
             args = {java.lang.String.class, short.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShort should only return the Short set by putShort",
             method = "putShort",
             args = {java.lang.String.class, short.class}
@@ -852,13 +852,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShortArray should only return the ShortArray set by putShortArray",
             method = "getShortArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getShortArray should only return the ShortArray set by putShortArray",
             method = "putShortArray",
             args = {java.lang.String.class, short[].class}
@@ -879,14 +879,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getSparseParcelableArray should only return the SparseArray<Parcelable>,"
                 + " which set by putSparseParcelableArray",
             method = "getSparseParcelableArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getSparseParcelableArray should only return the SparseArray<Parcelable>m,"
                 + " which set by putSparseParcelableArray",
             method = "putSparseParcelableArray",
@@ -910,13 +910,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getString should only return the String set by putString",
             method = "getString",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getString should only return the String set by putString",
             method = "putString",
             args = {java.lang.String.class, java.lang.String.class}
@@ -930,13 +930,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getStringArray should only return the StringArray set by putStringArray",
             method = "getStringArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getStringArray should only return the StringArray set by putStringArray",
             method = "putStringArray",
             args = {java.lang.String.class, java.lang.String[].class}
@@ -955,14 +955,14 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getStringArrayList should only return the StringArrayList,"
                 + " which set by putStringArrayList",
             method = "getStringArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "getStringArrayList should only return the StringArrayList,"
                 + " which set by putStringArrayList",
             method = "putStringArrayList",
@@ -984,7 +984,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "keySet should contains all keys that have been set",
         method = "keySet",
         args = {}
@@ -1003,7 +1003,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "same as hasFileDescriptors, the only difference is that describeContents returns"
             + " CONTENTS_FILE_DESCRIPTOR if the tested Bundle has FileDescriptor, else returns 0.",
         method = "describeContents",
@@ -1023,7 +1023,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "case 1: The default bundle doesn't has FileDescriptor."
             + "case 2: The tested Bundle should has FileDescriptor"
             + " if it read data from a Parcel object, which is created with a FileDescriptor."
@@ -1048,7 +1048,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "No way to verify that the class loader setter can work.",
         method = "setClassLoader",
         args = {java.lang.ClassLoader.class}
@@ -1060,7 +1060,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Write the bundle(A) to a parcel(B), and then create a bundle(C) from B."
             + "C should be same as A.",
         method = "writeToParcel",
@@ -1079,13 +1079,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test the size should be right after add/remove key-value pair of the Bundle.",
             method = "size",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test the size should be right after add/remove key-value pair of the Bundle.",
             method = "remove",
             args = {java.lang.String.class}
@@ -1124,13 +1124,13 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "The return value of toString() should not be null.",
             method = "toString",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "The return value of toString() should not be null.",
             method = "readFromParcel",
             args = {android.os.Parcel.class}
@@ -1144,7 +1144,7 @@ public class BundleTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "The tested Bundle should hold mappings from the given after putAll be invoked.",
         method = "putAll",
         args = {android.os.Bundle.class}

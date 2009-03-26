@@ -91,13 +91,13 @@ public class CursorAdapterTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CursorAdapter}",
             method = "CursorAdapter",
             args = {android.content.Context.class, android.database.Cursor.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CursorAdapter}",
             method = "CursorAdapter",
             args = {android.content.Context.class, android.database.Cursor.class, boolean.class}
@@ -114,7 +114,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#init(Context, Cursor, boolean)}",
         method = "init",
         args = {android.content.Context.class, android.database.Cursor.class, boolean.class}
@@ -164,7 +164,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getCount()}",
         method = "getCount",
         args = {}
@@ -179,13 +179,13 @@ public class CursorAdapterTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link CursorAdapter#changeCursor(Cursor)}",
             method = "changeCursor",
             args = {android.database.Cursor.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link CursorAdapter#changeCursor(Cursor)}",
             method = "getCursor",
             args = {}
@@ -203,7 +203,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#convertToString(Cursor)}",
         method = "convertToString",
         args = {android.database.Cursor.class}
@@ -216,7 +216,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#hasStableIds()}, this method always return true",
         method = "hasStableIds",
         args = {}
@@ -230,7 +230,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getView(int, View, ViewGroup)}",
         method = "getView",
         args = {int.class, android.view.View.class, android.view.ViewGroup.class}
@@ -267,10 +267,11 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#newDropDownView(Context, Cursor, ViewGroup)}",
         method = "newDropDownView",
-        args = {android.content.Context.class, android.database.Cursor.class, android.view.ViewGroup.class}
+        args = {android.content.Context.class, android.database.Cursor.class, 
+                android.view.ViewGroup.class}
     )
     public void testNewDropDownView() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
@@ -282,7 +283,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getDropDownView(int, View, ViewGroup)}",
         method = "getDropDownView",
         args = {int.class, android.view.View.class, android.view.ViewGroup.class}
@@ -309,7 +310,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getFilter()}",
         method = "getFilter",
         args = {}
@@ -321,7 +322,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getItem(int)}",
         method = "getItem",
         args = {int.class}
@@ -344,7 +345,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getItemId(int)}",
         method = "getItemId",
         args = {int.class}
@@ -365,14 +366,12 @@ public class CursorAdapterTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CursorAdapter#getFilterQueryProvider()} and {@link CursorAdapter#setFilterQueryProvider(FilterQueryProvider)}",
+            level = TestLevel.COMPLETE,
             method = "getFilterQueryProvider",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CursorAdapter#getFilterQueryProvider()} and {@link CursorAdapter#setFilterQueryProvider(FilterQueryProvider)}",
+            level = TestLevel.COMPLETE,
             method = "setFilterQueryProvider",
             args = {android.widget.FilterQueryProvider.class}
         )
@@ -389,7 +388,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#runQueryOnBackgroundThread(CharSequence)}",
         method = "runQueryOnBackgroundThread",
         args = {java.lang.CharSequence.class}

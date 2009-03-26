@@ -34,7 +34,7 @@ public class SoundEffectConstantsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getContantForFocusDirection.",
         method = "getContantForFocusDirection",
         args = {int.class}

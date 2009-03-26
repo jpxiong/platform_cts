@@ -57,19 +57,19 @@ public class CompoundButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CompoundButton}",
             method = "CompoundButton",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CompoundButton}",
             method = "CompoundButton",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link CompoundButton}",
             method = "CompoundButton",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -109,14 +109,12 @@ public class CompoundButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CompoundButton#setChecked(boolean)} and Test {@link CompoundButton#isChecked()}",
+            level = TestLevel.COMPLETE,
             method = "setChecked",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CompoundButton#setChecked(boolean)} and Test {@link CompoundButton#isChecked()}",
+            level = TestLevel.COMPLETE,
             method = "isChecked",
             args = {}
         )
@@ -147,7 +145,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#setOnCheckedChangeListener(OnCheckedChangeListener)}",
         method = "setOnCheckedChangeListener",
         args = {android.widget.CompoundButton.OnCheckedChangeListener.class}
@@ -170,7 +168,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#toggle()}",
         method = "toggle",
         args = {}
@@ -191,7 +189,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#performClick()}",
         method = "performClick",
         args = {}
@@ -220,7 +218,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#drawableStateChanged()}",
         method = "drawableStateChanged",
         args = {}
@@ -243,7 +241,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#setButtonDrawable(Drawable)}",
         method = "setButtonDrawable",
         args = {android.graphics.drawable.Drawable.class}
@@ -278,7 +276,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#setButtonDrawable(int)}",
         method = "setButtonDrawable",
         args = {int.class}
@@ -303,7 +301,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#onCreateDrawableState(int)}",
         method = "onCreateDrawableState",
         args = {int.class}
@@ -330,7 +328,7 @@ public class CompoundButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link CompoundButton#onDraw(Canvas)}",
         method = "onDraw",
         args = {android.graphics.Canvas.class}
@@ -384,14 +382,12 @@ public class CompoundButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CompoundButton#onSaveInstanceState()} and  Test {@link CompoundButton#onRestoreInstanceState(Parcelable)}",
+            level = TestLevel.COMPLETE,
             method = "onSaveInstanceState",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link CompoundButton#onSaveInstanceState()} and  Test {@link CompoundButton#onRestoreInstanceState(Parcelable)}",
+            level = TestLevel.COMPLETE,
             method = "onRestoreInstanceState",
             args = {android.os.Parcelable.class}
         )

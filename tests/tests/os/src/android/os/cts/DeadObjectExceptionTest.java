@@ -17,22 +17,20 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.DeadObjectException;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(DeadObjectException.class)
 public class DeadObjectExceptionTest extends TestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test method: DeadObjectException",
-      targets = {
-        @TestTarget(
-          methodName = "DeadObjectException",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "test method: DeadObjectException",
+        method = "DeadObjectException",
+        args = {}
+    )
     public void testDeadObjectException(){
         DeadObjectException ne = null;
         boolean isThrowed = false;

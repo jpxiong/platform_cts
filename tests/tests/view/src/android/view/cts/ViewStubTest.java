@@ -60,25 +60,25 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewStub}",
             method = "ViewStub",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewStub}",
             method = "ViewStub",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewStub}",
             method = "ViewStub",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewStub}",
             method = "ViewStub",
             args = {android.content.Context.class, int.class}
@@ -119,7 +119,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#draw(Canvas)}",
         method = "draw",
         args = {android.graphics.Canvas.class}
@@ -132,7 +132,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#dispatchDraw(Canvas)}",
         method = "dispatchDraw",
         args = {android.graphics.Canvas.class}
@@ -144,7 +144,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#setVisibility(int)}",
         method = "setVisibility",
         args = {int.class}
@@ -184,14 +184,12 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ViewStub#getLayoutResource()} and {@link ViewStub#setLayoutResource(int)}",
+            level = TestLevel.COMPLETE,
             method = "getLayoutResource",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ViewStub#getLayoutResource()} and {@link ViewStub#setLayoutResource(int)}",
+            level = TestLevel.COMPLETE,
             method = "setLayoutResource",
             args = {int.class}
         )
@@ -210,7 +208,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#onMeasure(int, int)}",
         method = "onMeasure",
         args = {int.class, int.class}
@@ -229,7 +227,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#setOnInflateListener(OnInflateListener)}",
         method = "setOnInflateListener",
         args = {android.view.ViewStub.OnInflateListener.class}
@@ -246,8 +244,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test abnormal condition of {@link ViewStub#setOnInflateListener(OnInflateListener)}",
+        level = TestLevel.COMPLETE,
         method = "setOnInflateListener",
         args = {android.view.ViewStub.OnInflateListener.class}
     )
@@ -265,13 +262,13 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link ViewStub#getInflatedId()} and {@link ViewStub#setInflatedId(int)}",
             method = "getInflatedId",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link ViewStub#getInflatedId()} and {@link ViewStub#setInflatedId(int)}",
             method = "setInflatedId",
             args = {int.class}
@@ -289,7 +286,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#inflate()}",
         method = "inflate",
         args = {}
@@ -316,7 +313,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test abnormal condition of {@link ViewStub#inflate()}",
         method = "inflate",
         args = {}

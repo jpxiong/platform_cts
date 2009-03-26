@@ -32,7 +32,7 @@ public class LocalSocketAddress_NamespaceTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -44,7 +44,7 @@ public class LocalSocketAddress_NamespaceTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test values().",
         method = "values",
         args = {}
@@ -56,4 +56,3 @@ public class LocalSocketAddress_NamespaceTest extends AndroidTestCase {
         assertEquals(Namespace.FILESYSTEM, expected[2]);
     }
 }
-

@@ -28,7 +28,7 @@ import android.graphics.Paint;
 public class Paint_JoinTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -41,20 +41,20 @@ public class Paint_JoinTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setStrokeJoin",
             args = {android.graphics.Paint.Join.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getStrokeJoin",
             args = {}
         )
@@ -79,4 +79,3 @@ public class Paint_JoinTest extends TestCase {
         assertEquals(Join.BEVEL, p.getStrokeJoin());
     }
 }
-

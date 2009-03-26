@@ -19,7 +19,6 @@ package android.graphics.cts;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import android.util.Log;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
@@ -27,9 +26,6 @@ import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(Rect.class)
 public class RectTest extends AndroidTestCase {
-
-    private final static String TAG = "RectTest";
-
     private Rect mRect;
 
     @Override
@@ -40,19 +36,19 @@ public class RectTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Rect.",
             method = "Rect",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Rect.",
             method = "Rect",
             args = {int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Rect.",
             method = "Rect",
             args = {android.graphics.Rect.class}
@@ -76,7 +72,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test set(int left, int top, int right, int bottom).",
         method = "set",
         args = {int.class, int.class, int.class, int.class}
@@ -93,7 +89,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test set(Rect src).",
         method = "set",
         args = {android.graphics.Rect.class}
@@ -111,7 +107,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test intersects(int left, int top, int right, int bottom).",
         method = "intersects",
         args = {int.class, int.class, int.class, int.class}
@@ -135,7 +131,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test intersects(Rect a, Rect b).",
         method = "intersects",
         args = {android.graphics.Rect.class, android.graphics.Rect.class}
@@ -156,7 +152,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test height().",
         method = "height",
         args = {}
@@ -167,7 +163,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test offsetTo(int newLeft, int newTop).",
         method = "offsetTo",
         args = {int.class, int.class}
@@ -184,7 +180,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setIntersect(Rect a, Rect b).",
         method = "setIntersect",
         args = {android.graphics.Rect.class, android.graphics.Rect.class}
@@ -213,7 +209,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test union(int left, int top, int right, int bottom).",
         method = "union",
         args = {int.class, int.class, int.class, int.class}
@@ -269,7 +265,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test union(Rect r).",
         method = "union",
         args = {android.graphics.Rect.class}
@@ -332,7 +328,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test union(int x, int y).",
         method = "union",
         args = {int.class, int.class}
@@ -374,7 +370,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test contains(int x, int y).",
         method = "contains",
         args = {int.class, int.class}
@@ -390,7 +386,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test contains(int left, int top, int right, int bottom).",
         method = "contains",
         args = {int.class, int.class, int.class, int.class}
@@ -406,7 +402,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test contains(Rect r).",
         method = "contains",
         args = {android.graphics.Rect.class}
@@ -427,7 +423,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test width().",
         method = "width",
         args = {}
@@ -438,7 +434,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isEmpty().",
         method = "isEmpty",
         args = {}
@@ -457,7 +453,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test intersect(int left, int top, int right, int bottom).",
         method = "intersect",
         args = {int.class, int.class, int.class, int.class}
@@ -481,7 +477,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test intersect(Rect r).",
         method = "intersect",
         args = {android.graphics.Rect.class}
@@ -509,7 +505,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test centerY().",
         method = "centerY",
         args = {}
@@ -525,30 +521,36 @@ public class RectTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test toString().",
-        method = "toString",
-        args = {}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test toString().",
+            method = "toString",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test toString().",
+            method = "toShortString",
+            args = {}
+        )
+    })
     public void testToString() {
 
         String expected;
 
         mRect = new Rect();
-        Log.d(TAG, "toString() = " + mRect.toString());
         expected = "Rect(0, 0 - 0, 0)";
         assertEquals(expected, mRect.toString());
 
         mRect = new Rect(1, 2, 3, 4);
-        Log.d(TAG, "toString() = " + mRect.toString());
         expected = "Rect(1, 2 - 3, 4)";
         assertEquals(expected, mRect.toString());
 
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test sort().",
         method = "sort",
         args = {}
@@ -570,7 +572,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test centerX().",
         method = "centerX",
         args = {}
@@ -587,7 +589,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test equals(Object obj).",
         method = "equals",
         args = {java.lang.Object.class}
@@ -603,7 +605,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test offset(int dx, int dy).",
         method = "offset",
         args = {int.class, int.class}
@@ -620,7 +622,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test inset(int dx, int dy).",
         method = "inset",
         args = {int.class, int.class}
@@ -644,7 +646,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setEmpty().",
         method = "setEmpty",
         args = {}
@@ -668,7 +670,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test exactCenterX().",
         method = "exactCenterX",
         args = {}
@@ -679,7 +681,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test exactCenterY().",
         method = "exactCenterY",
         args = {}
@@ -691,13 +693,13 @@ public class RectTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test readFromParcel(Parcel in) and writeToParcel(Parcel out, int flags).",
             method = "readFromParcel",
             args = {android.os.Parcel.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test readFromParcel(Parcel in) and writeToParcel(Parcel out, int flags).",
             method = "writeToParcel",
             args = {android.os.Parcel.class, int.class}
@@ -721,7 +723,7 @@ public class RectTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents().",
         method = "describeContents",
         args = {}

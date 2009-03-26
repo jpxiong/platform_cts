@@ -17,9 +17,10 @@
 package android.net.cts;
 
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import android.net.NetworkInfo.State;
 
@@ -31,15 +32,12 @@ public class NetworkInfo_StateTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test valueOf(String name).",
-      targets = {
-        @TestTarget(
-          methodName = "valueOf",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test valueOf(String name).",
+        method = "valueOf",
+        args = {java.lang.String.class}
+    )
     public void testValueOf() {
         assertEquals(State.CONNECTED, State.valueOf("CONNECTED"));
         assertEquals(State.CONNECTING, State.valueOf("CONNECTING"));
@@ -49,15 +47,12 @@ public class NetworkInfo_StateTest extends AndroidTestCase {
         assertEquals(State.UNKNOWN, State.valueOf("UNKNOWN"));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test values().",
-      targets = {
-        @TestTarget(
-          methodName = "values",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test values().",
+        method = "values",
+        args = {}
+    )
     public void testValues() {
         State[] expected = State.values();
         assertEquals(6, expected.length);

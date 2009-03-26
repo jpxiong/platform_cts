@@ -33,7 +33,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(ExpandableListContextMenuInfo.class)
 public class ExpandableListView_ExpandableListContextMenuInfoTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link ExpandableListContextMenuInfo}",
         method = "ExpandableListView.ExpandableListContextMenuInfo",
         args = {android.view.View.class, long.class, long.class}
