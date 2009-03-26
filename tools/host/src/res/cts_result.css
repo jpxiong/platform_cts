@@ -206,6 +206,17 @@ td.testcase {
     font-weight:bold;
 }
 
+td.testcasespacer {
+    border-width: 1px;
+    border-color: #A5C639;
+    border-style: outset;
+    text-align: left;
+    vertical-align: top;
+    padding:1;
+    overflow:hidden;
+    font-weight:bold;
+}
+
 td.testsuite {
     border-width: 1px;
     border-color: #A5C639;
