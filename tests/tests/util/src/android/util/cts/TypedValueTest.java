@@ -29,7 +29,7 @@ import android.util.TypedValue;
 public class TypedValueTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link TypedValue}",
         method = "TypedValue",
         args = {}
@@ -39,7 +39,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFloat().",
         method = "getFloat",
         args = {}
@@ -53,13 +53,13 @@ public class TypedValueTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test complexToDimension().",
             method = "getFloat",
             args = {int.class, DisplayMetrics.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test complexToDimensionPixelOffset().",
             method = "complexToDimensionPixelOffset",
             args = {int.class, DisplayMetrics.class}
@@ -81,7 +81,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setTo().",
         method = "setTo",
         args = {TypedValue.class}
@@ -107,7 +107,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFraction().",
         method = "getFraction",
         args = {float.class, float.class}
@@ -121,7 +121,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test complexToDimensionPixelSize().",
         method = "complexToDimensionPixelSize",
         args = {int.class, DisplayMetrics.class}
@@ -147,7 +147,7 @@ public class TypedValueTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test complexToFraction().",
             method = "complexToFraction",
             args = {int.class, float.class, float.class}
@@ -169,7 +169,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString().",
         method = "toString",
         args = {}
@@ -191,7 +191,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test applyDimension().",
         method = "applyDimension",
         args = {int.class, float.class, DisplayMetrics.class}
@@ -219,7 +219,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test coerceToString().",
         method = "coerceToString",
         args = {}
@@ -240,7 +240,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test coerceToString().",
         method = "coerceToString",
         args = {int.class, int.class}
@@ -263,7 +263,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test complexToFloat().",
         method = "complexToFloat",
         args = {int.class}
@@ -282,7 +282,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getDimension().",
         method = "getDimension",
         args = {DisplayMetrics.class}
@@ -303,7 +303,7 @@ public class TypedValueTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test complexToDimensionNoisy().",
         method = "complexToDimensionNoisy",
         args = {int.class, DisplayMetrics.class}

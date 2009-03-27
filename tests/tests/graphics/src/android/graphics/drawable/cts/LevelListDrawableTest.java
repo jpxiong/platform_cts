@@ -57,7 +57,7 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor.",
         method = "LevelListDrawable",
         args = {}
@@ -70,7 +70,7 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LevelListDrawable#addLevel(int, int, Drawable)}.",
         method = "addLevel",
         args = {int.class, int.class, android.graphics.drawable.Drawable.class}
@@ -97,7 +97,7 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LevelListDrawable#onLevelChange(int)}.",
         method = "onLevelChange",
         args = {int.class}
@@ -135,10 +135,11 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LevelListDrawable#inflate(Resources, XmlPullParser, AttributeSet)}.",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
         XmlResourceParser parser = getResourceParser(R.xml.level_list_correct);
@@ -174,10 +175,11 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link LevelListDrawable#inflate(Resources, XmlPullParser, AttributeSet)} with null parameters.",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "LevelListDrawable#inflate(Resources, XmlPullParser, AttributeSet) when param r,"

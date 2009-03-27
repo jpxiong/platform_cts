@@ -59,13 +59,13 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "DigitalClock",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "DigitalClock",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -81,7 +81,7 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
         // new the DigitalClock instance with real AttributeSet
         new DigitalClock(mContext, getAttributeSet(R.layout.digitalclock_layout));
 
-        // Test constructor with null Context, in fact, DigitalClock(mContext) function will 
+        // Test constructor with null Context, in fact, DigitalClock(mContext) function will
         //finally invoke this version.
         try {
             // Test with null Context
@@ -92,7 +92,7 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DigitalClock#onDetachedFromWindow()}.",
         method = "onDetachedFromWindow",
         args = {}
@@ -112,7 +112,7 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DigitalClock#onAttachedToWindow()}.",
         method = "onAttachedToWindow",
         args = {}

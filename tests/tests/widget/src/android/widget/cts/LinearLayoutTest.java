@@ -59,13 +59,13 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link LinearLayout}",
             method = "LinearLayout",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link LinearLayout}",
             method = "LinearLayout",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -91,14 +91,12 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#isBaselineAligned()} and {@link LinearLayout#setBaselineAligned(boolean)}",
+            level = TestLevel.COMPLETE,
             method = "isBaselineAligned",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#isBaselineAligned()} and {@link LinearLayout#setBaselineAligned(boolean)}",
+            level = TestLevel.COMPLETE,
             method = "setBaselineAligned",
             args = {boolean.class}
         )
@@ -126,7 +124,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LinearLayout#getBaseline()}",
         method = "getBaseline",
         args = {}
@@ -159,14 +157,12 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#getBaselineAlignedChildIndex()} and {@link LinearLayout#setBaselineAlignedChildIndex(int)}",
+            level = TestLevel.COMPLETE,
             method = "getBaselineAlignedChildIndex",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#getBaselineAlignedChildIndex()} and {@link LinearLayout#setBaselineAlignedChildIndex(int)}",
+            level = TestLevel.COMPLETE,
             method = "setBaselineAlignedChildIndex",
             args = {int.class}
         )
@@ -203,14 +199,12 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#setWeightSum(float)} and {@link LinearLayout#getWeightSum()}",
+            level = TestLevel.COMPLETE,
             method = "setWeightSum",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#setWeightSum(float)} and {@link LinearLayout#getWeightSum()}",
+            level = TestLevel.COMPLETE,
             method = "getWeightSum",
             args = {}
         )
@@ -247,14 +241,12 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#generateLayoutParams(AttributeSet)} and {@link LinearLayout#generateLayoutParams(ViewGroup.LayoutParams)}",
+            level = TestLevel.COMPLETE,
             method = "generateLayoutParams",
             args = {android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link LinearLayout#generateLayoutParams(AttributeSet)} and {@link LinearLayout#generateLayoutParams(ViewGroup.LayoutParams)}",
+            level = TestLevel.COMPLETE,
             method = "generateLayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
         )
@@ -280,7 +272,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LinearLayout#checkLayoutParams(ViewGroup.LayoutParams)}",
         method = "checkLayoutParams",
         args = {android.view.ViewGroup.LayoutParams.class}
@@ -296,7 +288,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link LinearLayout#generateDefaultLayoutParams()}",
         method = "generateDefaultLayoutParams",
         args = {}
@@ -324,37 +316,37 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "setGravity",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "setVerticalGravity",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "setOrientation",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "getOrientation",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "onMeasure",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three horizontal children",
             method = "onLayout",
             args = {boolean.class, int.class, int.class, int.class, int.class}
@@ -414,37 +406,37 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "setGravity",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "setHorizontalGravity",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "setOrientation",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "getOrientation",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "onMeasure",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test layout three vertical children",
             method = "onLayout",
             args = {boolean.class, int.class, int.class, int.class, int.class}

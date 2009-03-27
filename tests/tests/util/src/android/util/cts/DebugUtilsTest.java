@@ -17,22 +17,20 @@ package android.util.cts;
 
 import junit.framework.TestCase;
 import android.util.DebugUtils;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(DebugUtils.class)
 public class DebugUtilsTest extends TestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test method: isObjectSelected",
-      targets = {
-        @TestTarget(
-          methodName = "isObjectSelected",
-          methodArgs = {Object.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "test method: isObjectSelected",
+        method = "isObjectSelected",
+        args = {java.lang.Object.class}
+    )
     public void testIsObjectSelected(){
         // note: because System.getenv("ANDROID_OBJECT_FILTER") always return null, can't test
         // the case that the method isObjectSelected return true

@@ -32,13 +32,13 @@ public class HandlerThreadTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "HandlerThread",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "HandlerThread",
             args = {java.lang.String.class, int.class}
@@ -46,32 +46,32 @@ public class HandlerThreadTest extends TestCase {
     })
     public void testConstructor() {
         // new the HandlerThread instance
-        HandlerThread handlerThread = new HandlerThread("test");
+        new HandlerThread("test");
         // new the HandlerThread instance
-        handlerThread = new HandlerThread("test", Thread.MAX_PRIORITY);
+        new HandlerThread("test", Thread.MAX_PRIORITY);
     }
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThreadId, onLooperPrepared, ",
             method = "getThreadId",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThreadId, onLooperPrepared, ",
             method = "onLooperPrepared",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThreadId, onLooperPrepared, ",
             method = "getLooper",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getThreadId, onLooperPrepared, ",
             method = "run",
             args = {}

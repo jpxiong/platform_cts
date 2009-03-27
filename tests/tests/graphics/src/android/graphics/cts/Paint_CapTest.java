@@ -28,7 +28,7 @@ import android.graphics.Paint.Cap;
 public class Paint_CapTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -42,20 +42,20 @@ public class Paint_CapTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setStrokeCap",
             args = {android.graphics.Paint.Cap.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getStrokeCap",
             args = {}
         )
@@ -80,4 +80,3 @@ public class Paint_CapTest extends TestCase {
         assertEquals(Cap.SQUARE, p.getStrokeCap());
     }
 }
-

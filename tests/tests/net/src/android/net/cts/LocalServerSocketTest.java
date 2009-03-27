@@ -25,41 +25,51 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(LocalServerSocket.class)
 public class LocalServerSocketTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test LocalServerSocket",
-      targets = {
-        @TestTarget(
-          methodName = "accept",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "accept",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "close",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "close",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getFileDescriptor",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "getFileDescriptor",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getLocalSocketAddress",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "getLocalSocketAddress",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "LocalServerSocket",
-          methodArgs = {FileDescriptor.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "LocalServerSocket",
+            args = {java.io.FileDescriptor.class}
         ),
-        @TestTarget(
-          methodName = "LocalServerSocket",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test LocalServerSocket",
+            method = "LocalServerSocket",
+            args = {java.lang.String.class}
         )
     })
     @ToBeFixed(bug = "1520987", explanation = "Cannot find a proper FileDescriptor for " +

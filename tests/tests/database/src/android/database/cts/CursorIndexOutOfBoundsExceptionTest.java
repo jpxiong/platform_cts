@@ -28,13 +28,13 @@ public class CursorIndexOutOfBoundsExceptionTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of CursorIndexOutOfBoundsException.",
             method = "CursorIndexOutOfBoundsException",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of CursorIndexOutOfBoundsException.",
             method = "CursorIndexOutOfBoundsException",
             args = {int.class, int.class}

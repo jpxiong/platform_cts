@@ -27,7 +27,7 @@ import dalvik.annotation.TestTargetClass;
 public class Bitmap_ConfigTest extends AndroidTestCase{
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -41,18 +41,20 @@ public class Bitmap_ConfigTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "createBitmap",
             args = {int.class, int.class, android.graphics.Bitmap.Config.class}
         )
     })
+    // test method: values and tests for the behavior of the methods where this enumeration 
+    // is used as an argument
     public void testValues(){
         Config[] config = Config.values();
 

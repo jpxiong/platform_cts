@@ -36,73 +36,73 @@ public class LocalSocketTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "LocalSocket",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "close",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "connect",
             args = {android.net.LocalSocketAddress.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "getAncillaryFileDescriptors",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "getFileDescriptor",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "getInputStream",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "getOutputStream",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "getPeerCredentials",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "isConnected",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "setFileDescriptorsForSend",
             args = {java.io.FileDescriptor[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "shutdownInput",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test core functions of LocalSocket",
             method = "shutdownOutput",
             args = {}
@@ -192,91 +192,91 @@ public class LocalSocketTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "bind",
             args = {android.net.LocalSocketAddress.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "connect",
             args = {android.net.LocalSocketAddress.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "getLocalSocketAddress",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "getReceiveBufferSize",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "getRemoteSocketAddress",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "getSendBufferSize",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "getSoTimeout",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "isBound",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "isClosed",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "isInputShutdown",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "isOutputShutdown",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "setReceiveBufferSize",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "setSendBufferSize",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "setSoTimeout",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test secondary functions of LocalSocket",
             method = "toString",
             args = {}
@@ -285,7 +285,7 @@ public class LocalSocketTest extends AndroidTestCase{
     public void testAccessors() throws IOException{
         LocalSocket socket = new LocalSocket();
         LocalSocketAddress addr = new LocalSocketAddress("secondary");
-        
+
         assertFalse(socket.isBound());
         socket.bind(addr);
         assertTrue(socket.isBound());

@@ -38,19 +38,19 @@ public class DisplayMetricsTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link DisplayMetrics}",
             method = "DisplayMetrics",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: setTo",
             method = "setTo",
             args = {DisplayMetrics.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: setToDefaults",
             method = "setToDefaults",
             args = {}

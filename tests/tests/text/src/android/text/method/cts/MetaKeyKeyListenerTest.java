@@ -29,6 +29,8 @@ import android.widget.ImageView;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -38,10 +40,11 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(MetaKeyKeyListener.class)
 public class MetaKeyKeyListenerTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#onKeyDown(View, Editable, int, KeyEvent)}",
         method = "onKeyDown",
-        args = {android.view.View.class, android.text.Editable.class, int.class, android.view.KeyEvent.class}
+        args = {android.view.View.class, android.text.Editable.class, int.class, 
+                android.view.KeyEvent.class}
     )
     public void testPressKey() {
         final CharSequence str = "123456";
@@ -75,10 +78,11 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#onKeyUp(View, Editable, int, KeyEvent)}",
         method = "onKeyUp",
-        args = {android.view.View.class, android.text.Editable.class, int.class, android.view.KeyEvent.class}
+        args = {android.view.View.class, android.text.Editable.class, int.class, 
+                android.view.KeyEvent.class}
     )
     public void testReleaseKey() {
         final CharSequence str = "123456";
@@ -112,7 +116,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#adjustMetaAfterKeypress(Spannable)}",
         method = "adjustMetaAfterKeypress",
         args = {android.text.Spannable.class}
@@ -147,7 +151,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#resetMetaState(Spannable)}",
         method = "resetMetaState",
         args = {android.text.Spannable.class}
@@ -180,14 +184,12 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link MetaKeyKeyListener#getMetaState(CharSequence)} and {@link MetaKeyKeyListener#getMetaState(CharSequence, int)}",
+            level = TestLevel.COMPLETE,
             method = "getMetaState",
             args = {java.lang.CharSequence.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link MetaKeyKeyListener#getMetaState(CharSequence)} and {@link MetaKeyKeyListener#getMetaState(CharSequence, int)}",
+            level = TestLevel.COMPLETE,
             method = "getMetaState",
             args = {java.lang.CharSequence.class, int.class}
         )
@@ -219,7 +221,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#isMetaTracker(CharSequence, Object)}",
         method = "isMetaTracker",
         args = {java.lang.CharSequence.class, java.lang.Object.class}
@@ -231,7 +233,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MetaKeyKeyListener#resetLockedMeta(Spannable)}",
         method = "resetLockedMeta",
         args = {android.text.Spannable.class}
@@ -265,8 +267,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test clearMetaKeyState(View, Editable, int), this function ignores 'View' parameter",
+        level = TestLevel.COMPLETE,
         method = "clearMetaKeyState",
         args = {android.view.View.class, android.text.Editable.class, int.class}
     )

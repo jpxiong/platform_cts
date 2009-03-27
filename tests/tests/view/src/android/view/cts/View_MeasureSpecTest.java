@@ -47,7 +47,7 @@ public class View_MeasureSpecTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "This is a foo test, just add annotation for constructor, to make nooser pass",
         method = "View.MeasureSpec",
         args = {}
@@ -56,7 +56,7 @@ public class View_MeasureSpecTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test View.MeasureSpec#getSize(int)",
         method = "getSize",
         args = {int.class}
@@ -71,7 +71,7 @@ public class View_MeasureSpecTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test View.MeasureSpec#toString(int)",
         method = "toString",
         args = {int.class}
@@ -86,7 +86,7 @@ public class View_MeasureSpecTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test View.MeasureSpec#getMode(int)",
         method = "getMode",
         args = {int.class}
@@ -101,7 +101,7 @@ public class View_MeasureSpecTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test View.MeasureSpec#makeMeasureSpec(int, int)",
         method = "makeMeasureSpec",
         args = {int.class, int.class}

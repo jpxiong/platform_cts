@@ -40,7 +40,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
 import android.view.View.BaseSavedState;
 import android.view.View.MeasureSpec;
@@ -83,32 +82,32 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor",
             method = "ViewGroup",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor",
             method = "ViewGroup",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor",
             method = "ViewGroup",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
     public void testConstructor() {
-        MockViewGroup vg = new MockViewGroup(mContext);
-        vg = new MockViewGroup(mContext, null);
-        vg = new MockViewGroup(mContext, null, 0);
+        new MockViewGroup(mContext);
+        new MockViewGroup(mContext, null);
+        new MockViewGroup(mContext, null, 0);
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addFocusables",
         method = "addFocusables",
         args = {java.util.ArrayList.class, int.class}
@@ -135,13 +134,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addStatesFromChildren",
             method = "addStatesFromChildren",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addStatesFromChildren",
             method = "setAddStatesFromChildren",
             args = {boolean.class}
@@ -161,13 +160,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addTouchables function",
             method = "addTouchables",
             args = {java.util.ArrayList.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addTouchables function",
             method = "getChildAt",
             args = {int.class}
@@ -206,7 +205,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView function",
         method = "addView",
         args = {android.view.View.class}
@@ -222,7 +221,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView function",
         method = "addView",
         args = {android.view.View.class, int.class}
@@ -238,7 +237,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView function",
         method = "addView",
         args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
@@ -255,7 +254,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView function",
         method = "addView",
         args = {android.view.View.class, int.class, int.class}
@@ -276,7 +275,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView function",
         method = "addView",
         args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
@@ -293,7 +292,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addViewInLayout function",
         method = "addViewInLayout",
         args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
@@ -314,10 +313,11 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test attachLayoutAnimationParameters function",
         method = "attachLayoutAnimationParameters",
-        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, int.class}
+        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, 
+                int.class}
     )
     public void testAttachLayoutAnimationParameters() {
         MockViewGroup vg = new MockViewGroup(mContext);
@@ -329,7 +329,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test attachViewToParent function",
         method = "attachViewToParent",
         args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
@@ -350,10 +350,11 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addViewInLayout function",
         method = "addViewInLayout",
-        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class, boolean.class}
+        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class, 
+                boolean.class}
     )
     public void testAddViewInLayoutWithParamViewIntLayB() {
         MockViewGroup vg = new MockViewGroup(mContext);
@@ -372,7 +373,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test bringChildToFront function",
         method = "bringChildToFront",
         args = {android.view.View.class}
@@ -402,7 +403,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test canAnimate function",
         method = "canAnimate",
         args = {}
@@ -419,7 +420,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test checkLayoutParams function",
         method = "checkLayoutParams",
         args = {android.view.ViewGroup.LayoutParams.class}
@@ -432,7 +433,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test childDrawableStateChanged function",
         method = "childDrawableStateChanged",
         args = {android.view.View.class}
@@ -446,7 +447,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test cleanupLayoutState function",
         method = "cleanupLayoutState",
         args = {android.view.View.class}
@@ -463,13 +464,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test clearChildFocus and getFocusedChild function",
             method = "clearChildFocus",
             args = {android.view.View.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test clearChildFocus and getFocusedChild function",
             method = "getFocusedChild",
             args = {}
@@ -490,7 +491,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clearDisappearingChildren function",
         method = "clearDisappearingChildren",
         args = {}
@@ -524,7 +525,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clearFocus",
         method = "clearFocus",
         args = {}
@@ -540,7 +541,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test detachAllViewsFromParent function",
         method = "detachAllViewsFromParent",
         args = {}
@@ -558,7 +559,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test detachViewFromParent function",
         method = "detachViewFromParent",
         args = {int.class}
@@ -577,7 +578,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test detachViewFromParent function",
         method = "detachViewFromParent",
         args = {android.view.View.class}
@@ -597,7 +598,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test detachViewsFromParent function",
         method = "detachViewsFromParent",
         args = {int.class, int.class}
@@ -621,7 +622,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchDraw function",
         method = "dispatchDraw",
         args = {android.graphics.Canvas.class}
@@ -636,7 +637,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchFreezeSelfOnly function",
         method = "dispatchFreezeSelfOnly",
         args = {android.util.SparseArray.class}
@@ -654,7 +655,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchKeyEvent function",
         method = "dispatchKeyEvent",
         args = {android.view.KeyEvent.class}
@@ -674,14 +675,12 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test dispatchRestoreInstanceState function and dispatchSaveInstanceState function",
+            level = TestLevel.COMPLETE,
             method = "dispatchRestoreInstanceState",
             args = {android.util.SparseArray.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test dispatchRestoreInstanceState function and dispatchSaveInstanceState function",
+            level = TestLevel.COMPLETE,
             method = "dispatchSaveInstanceState",
             args = {android.util.SparseArray.class}
         )
@@ -708,7 +707,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchSetPressed function",
         method = "dispatchSetPressed",
         args = {boolean.class}
@@ -726,7 +725,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchSetSelected function",
         method = "dispatchSetSelected",
         args = {boolean.class}
@@ -744,7 +743,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchSetSelected function",
         method = "dispatchThawSelfOnly",
         args = {android.util.SparseArray.class}
@@ -762,7 +761,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchTouchEvent function",
         method = "dispatchTouchEvent",
         args = {android.view.MotionEvent.class}
@@ -808,7 +807,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchTrackballEvent function",
         method = "dispatchTrackballEvent",
         args = {android.view.MotionEvent.class}
@@ -828,7 +827,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchUnhandledMove function",
         method = "dispatchUnhandledMove",
         args = {android.view.View.class, int.class}
@@ -845,7 +844,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchWindowFocusChanged function",
         method = "dispatchWindowFocusChanged",
         args = {boolean.class}
@@ -863,7 +862,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchWindowVisibilityChanged function",
         method = "dispatchWindowVisibilityChanged",
         args = {int.class}
@@ -879,7 +878,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test drawableStateChanged function",
         method = "drawableStateChanged",
         args = {}
@@ -896,7 +895,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test drawChild function",
         method = "drawChild",
         args = {android.graphics.Canvas.class, android.view.View.class, long.class}
@@ -919,7 +918,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test findFocus function",
         method = "findFocus",
         args = {}
@@ -938,7 +937,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test fitSystemWindows function",
         method = "fitSystemWindows",
         args = {android.graphics.Rect.class}
@@ -983,7 +982,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test focusableViewAvailable function",
         method = "focusableViewAvailable",
         args = {android.view.View.class}
@@ -1000,7 +999,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test focusSearch function",
         method = "focusSearch",
         args = {android.view.View.class, int.class}
@@ -1016,7 +1015,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test gatherTransparentRegion function",
         method = "gatherTransparentRegion",
         args = {android.graphics.Region.class}
@@ -1036,7 +1035,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test generateDefaultLayoutParams function",
         method = "generateDefaultLayoutParams",
         args = {}
@@ -1050,7 +1049,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test generateLayoutParams function",
         method = "generateLayoutParams",
         args = {android.util.AttributeSet.class}
@@ -1070,7 +1069,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test generateLayoutParams function",
         method = "generateLayoutParams",
         args = {android.view.ViewGroup.LayoutParams.class}
@@ -1083,7 +1082,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChildDrawingOrder function",
         method = "getChildDrawingOrder",
         args = {int.class, int.class}
@@ -1095,7 +1094,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChildMeasureSpec function",
         method = "getChildMeasureSpec",
         args = {int.class, int.class, int.class}
@@ -1114,7 +1113,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChildStaticTransformation function",
         method = "getChildStaticTransformation",
         args = {android.view.View.class, android.view.animation.Transformation.class}
@@ -1125,7 +1124,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getChildVisibleRect function",
         method = "getChildVisibleRect",
         args = {android.view.View.class, android.graphics.Rect.class, android.graphics.Point.class}
@@ -1147,7 +1146,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getDescendantFocusability function",
         method = "getDescendantFocusability",
         args = {}
@@ -1162,7 +1161,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getLayoutAnimation function",
         method = "getLayoutAnimation",
         args = {}
@@ -1180,13 +1179,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getLayoutAnimationListener and setLayoutAnimationListener",
             method = "getLayoutAnimationListener",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getLayoutAnimationListener and setLayoutAnimationListener",
             method = "setLayoutAnimationListener",
             args = {android.view.animation.Animation.AnimationListener.class}
@@ -1213,7 +1212,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getPersistentDrawingCache function",
         method = "getPersistentDrawingCache",
         args = {}
@@ -1229,7 +1228,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasFocus function",
         method = "hasFocus",
         args = {}
@@ -1247,7 +1246,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hasFocusable function",
         method = "hasFocusable",
         args = {}
@@ -1262,7 +1261,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test indexOfChild function",
         method = "indexOfChild",
         args = {android.view.View.class}
@@ -1288,13 +1287,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test invalidateChild function",
             method = "invalidateChild",
             args = {android.view.View.class, android.graphics.Rect.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test invalidateChild function",
             method = "invalidateChildInParent",
             args = {int[].class, android.graphics.Rect.class}
@@ -1325,13 +1324,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isAlwaysDrawnWithCacheEnabled function",
             method = "isAlwaysDrawnWithCacheEnabled",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isAlwaysDrawnWithCacheEnabled function",
             method = "setAlwaysDrawnWithCacheEnabled",
             args = {boolean.class}
@@ -1350,13 +1349,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isAnimationCacheEnabled function",
             method = "isAnimationCacheEnabled",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isAnimationCacheEnabled function",
             method = "setAnimationCacheEnabled",
             args = {boolean.class}
@@ -1374,7 +1373,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isChildrenDrawnWithCacheEnabled function",
         method = "isChildrenDrawnWithCacheEnabled",
         args = {}
@@ -1389,7 +1388,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureChild function",
         method = "measureChild",
         args = {android.view.View.class, int.class, int.class}
@@ -1413,7 +1412,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureChildren function",
         method = "measureChildren",
         args = {int.class, int.class}
@@ -1439,7 +1438,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureChildWithMargins function",
         method = "measureChildWithMargins",
         args = {android.view.View.class, int.class, int.class, int.class, int.class}
@@ -1473,7 +1472,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test offsetDescendantRectToMyCoords function",
         method = "offsetDescendantRectToMyCoords",
         args = {android.view.View.class, android.graphics.Rect.class}
@@ -1499,7 +1498,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test offsetRectIntoDescendantCoords function",
         method = "offsetRectIntoDescendantCoords",
         args = {android.view.View.class, android.graphics.Rect.class}
@@ -1527,7 +1526,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onAnimationStart function",
         method = "onAnimationEnd",
         args = {}
@@ -1566,7 +1565,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onAnimationStart function",
         method = "onAnimationStart",
         args = {}
@@ -1594,7 +1593,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onCreateDrawableState function",
         method = "onCreateDrawableState",
         args = {int.class}
@@ -1608,7 +1607,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onInterceptTouchEvent function",
         method = "onInterceptTouchEvent",
         args = {android.view.MotionEvent.class}
@@ -1624,7 +1623,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onLayout function",
         method = "onLayout",
         args = {boolean.class, int.class, int.class, int.class, int.class}
@@ -1643,7 +1642,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onRequestFocusInDescendants function",
         method = "onRequestFocusInDescendants",
         args = {int.class, android.graphics.Rect.class}
@@ -1656,7 +1655,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test recomputeViewAttributes function",
         method = "recomputeViewAttributes",
         args = {android.view.View.class}
@@ -1672,13 +1671,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test removeAllViews function",
             method = "removeAllViews",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test removeAllViews function",
             method = "getChildCount",
             args = {}
@@ -1698,7 +1697,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeAllViewsInLayout function",
         method = "removeAllViewsInLayout",
         args = {}
@@ -1722,7 +1721,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeDetachedView function",
         method = "removeDetachedView",
         args = {android.view.View.class, boolean.class}
@@ -1756,7 +1755,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeView function",
         method = "removeView",
         args = {android.view.View.class}
@@ -1776,7 +1775,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeViewAt function",
         method = "removeViewAt",
         args = {int.class}
@@ -1803,7 +1802,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeViewInLayout function",
         method = "removeViewInLayout",
         args = {android.view.View.class}
@@ -1823,7 +1822,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeViews function",
         method = "removeViews",
         args = {int.class, int.class}
@@ -1849,7 +1848,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeViewsInLayout function",
         method = "removeViewsInLayout",
         args = {int.class, int.class}
@@ -1875,7 +1874,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestChildFocus function",
         method = "requestChildFocus",
         args = {android.view.View.class, android.view.View.class}
@@ -1894,7 +1893,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestChildRectangleOnScreen function",
         method = "requestChildRectangleOnScreen",
         args = {android.view.View.class, android.graphics.Rect.class, boolean.class}
@@ -1905,7 +1904,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestDisallowInterceptTouchEvent function",
         method = "requestDisallowInterceptTouchEvent",
         args = {boolean.class}
@@ -1921,7 +1920,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestFocus function",
         method = "requestFocus",
         args = {int.class, android.graphics.Rect.class}
@@ -1934,7 +1933,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestTransparentRegion function",
         method = "requestTransparentRegion",
         args = {android.view.View.class}
@@ -1950,7 +1949,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test scheduleLayoutAnimation function",
         method = "scheduleLayoutAnimation",
         args = {}
@@ -1982,7 +1981,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setAddStatesFromChildren function",
         method = "setAddStatesFromChildren",
         args = {boolean.class}
@@ -1997,7 +1996,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setChildrenDrawingCacheEnabled function",
         method = "setChildrenDrawingCacheEnabled",
         args = {boolean.class}
@@ -2015,7 +2014,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setChildrenDrawnWithCacheEnabled function",
         method = "setChildrenDrawnWithCacheEnabled",
         args = {boolean.class}
@@ -2033,7 +2032,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setClipChildren function",
         method = "setClipChildren",
         args = {boolean.class}
@@ -2095,7 +2094,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setClipToPadding function",
         method = "setClipToPadding",
         args = {boolean.class}
@@ -2134,7 +2133,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setDescendantFocusability function",
         method = "setDescendantFocusability",
         args = {int.class}
@@ -2154,7 +2153,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setOnHierarchyChangeListener function",
         method = "setOnHierarchyChangeListener",
         args = {android.view.ViewGroup.OnHierarchyChangeListener.class}
@@ -2172,7 +2171,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setPadding function",
         method = "setPadding",
         args = {int.class, int.class, int.class, int.class}
@@ -2196,7 +2195,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setPersistentDrawingCache function",
         method = "setPersistentDrawingCache",
         args = {int.class}
@@ -2209,7 +2208,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test showContextMenuForChild function",
         method = "showContextMenuForChild",
         args = {android.view.View.class}
@@ -2225,13 +2224,13 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test startLayoutAnimation and setLayoutAnimation",
             method = "startLayoutAnimation",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test startLayoutAnimation and setLayoutAnimation",
             method = "setLayoutAnimation",
             args = {android.view.animation.LayoutAnimationController.class}
@@ -2250,7 +2249,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateViewLayout function",
         method = "updateViewLayout",
         args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
@@ -2267,7 +2266,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test debug function",
         method = "debug",
         args = {int.class}
@@ -2687,4 +2686,3 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         }
     }
 }
-

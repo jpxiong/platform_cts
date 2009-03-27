@@ -18,9 +18,10 @@ package android.net.cts;
 
 import android.net.NetworkInfo.DetailedState;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(DetailedState.class)
@@ -31,15 +32,12 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test valueOf(String name).",
-      targets = {
-        @TestTarget(
-          methodName = "valueOf",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test valueOf(String name).",
+        method = "valueOf",
+        args = {java.lang.String.class}
+    )
     public void testValueOf() {
         assertEquals(DetailedState.AUTHENTICATING, DetailedState
                 .valueOf("AUTHENTICATING"));
@@ -60,15 +58,12 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
                 .valueOf("SUSPENDED"));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test values().",
-      targets = {
-        @TestTarget(
-          methodName = "values",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test values().",
+        method = "values",
+        args = {}
+    )
     public void testValues() {
         DetailedState[] expected = DetailedState.values();
         assertEquals(10, expected.length);

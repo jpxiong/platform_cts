@@ -41,29 +41,33 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(ExpandableListView.class)
 public class ExpandableListViewTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link ExpandableListView}",
-      targets = {
-        @TestTarget(
-          methodName = "ExpandableListView",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link ExpandableListView}",
+            method = "ExpandableListView",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "ExpandableListView",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link ExpandableListView}",
+            method = "ExpandableListView",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
-        @TestTarget(
-          methodName = "ExpandableListView",
-          methodArgs = {Context.class, AttributeSet.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link ExpandableListView}",
+            method = "ExpandableListView",
+            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
     @ToBeFixed(bug = "1417734", explanation = "ExpandableListView#ExpandableListView(Context), " +
@@ -102,15 +106,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setChildDivider(Drawable)}",
-      targets = {
-        @TestTarget(
-          methodName = "setChildDivider",
-          methodArgs = {Drawable.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setChildDivider(Drawable)}",
+        method = "setChildDivider",
+        args = {android.graphics.drawable.Drawable.class}
+    )
     @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly")
     public void testSetChildDivider() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
@@ -118,16 +119,11 @@ public class ExpandableListViewTest extends AndroidTestCase {
         expandableListView.setChildDivider(drawable);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setAdapter(ListAdapter)}, " +
-            "this function always throws a RuntimeException.",
-      targets = {
-        @TestTarget(
-          methodName = "setAdapter",
-          methodArgs = {ListAdapter.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setAdapter",
+        args = {android.widget.ListAdapter.class}
+    )
     public void testSetAdapter() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         try {
@@ -137,15 +133,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getAdapter()}",
-      targets = {
-        @TestTarget(
-          methodName = "getAdapter",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getAdapter()}",
+        method = "getAdapter",
+        args = {}
+    )
     public void testGetAdapter() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         assertNull(expandableListView.getAdapter());
@@ -155,18 +148,16 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertNotNull(expandableListView.getAdapter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setAdapter(ExpandableListAdapter)} " +
-            "and {@link ExpandableListView#getExpandableListAdapter()}",
-      targets = {
-        @TestTarget(
-          methodName = "setAdapter",
-          methodArgs = {ExpandableListAdapter.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAdapter",
+            args = {android.widget.ExpandableListAdapter.class}
         ),
-        @TestTarget(
-          methodName = "getExpandableListAdapter",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getExpandableListAdapter",
+            args = {}
         )
     })
     public void testAccessExpandableListAdapter() {
@@ -178,15 +169,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertSame(expandableAdapter, expandableListView.getExpandableListAdapter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#performItemClick(View, int, long)}",
-      targets = {
-        @TestTarget(
-          methodName = "performItemClick",
-          methodArgs = {View.class, int.class, long.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#performItemClick(View, int, long)}",
+        method = "performItemClick",
+        args = {android.view.View.class, int.class, long.class}
+    )
     public void testPerformItemClick() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
 
@@ -197,15 +185,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertTrue(expandableListView.performItemClick(null, 100, 99));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setOnItemClickListener(OnItemClickListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "setOnItemClickListener",
-          methodArgs = {OnItemClickListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setOnItemClickListener(OnItemClickListener)}",
+        method = "setOnItemClickListener",
+        args = {android.widget.AdapterView.OnItemClickListener.class}
+    )
     @ToBeFixed(bug = "1486189", explanation = "It is a redundant override method")
     public void testSetOnItemClickListener() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
@@ -216,18 +201,16 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertSame(listener, expandableListView.getOnItemClickListener());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#expandGroup(int)} and " +
-            "{@link ExpandableListView#setOnGroupExpandListener(OnGroupExpandListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "expandGroup",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "expandGroup",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "setOnGroupExpandListener",
-          methodArgs = {OnGroupExpandListener.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOnGroupExpandListener",
+            args = {android.widget.ExpandableListView.OnGroupExpandListener.class}
         )
     })
     @ToBeFixed(bug = "1371108", explanation = "unexpected NullPointerException")
@@ -261,18 +244,16 @@ public class ExpandableListViewTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#collapseGroup(int)} and " +
-            "{@link ExpandableListView#setOnGroupCollapseListener(OnGroupCollapseListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "collapseGroup",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "collapseGroup",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "setOnGroupCollapseListener",
-          methodArgs = {OnGroupCollapseListener.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOnGroupCollapseListener",
+            args = {android.widget.ExpandableListView.OnGroupCollapseListener.class}
         )
     })
     @ToBeFixed(bug = "1371108", explanation = "unexpected NullPointerException")
@@ -306,15 +287,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setOnGroupClickListener(OnGroupClickListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "setOnGroupClickListener",
-          methodArgs = {OnGroupClickListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setOnGroupClickListener(OnGroupClickListener)}",
+        method = "setOnGroupClickListener",
+        args = {android.widget.ExpandableListView.OnGroupClickListener.class}
+    )
     public void testSetOnGroupClickListener() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -326,15 +304,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertTrue(listener.hasCalledOnGroupClick());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setOnChildClickListener(OnChildClickListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "setOnChildClickListener",
-          methodArgs = {OnChildClickListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setOnChildClickListener(OnChildClickListener)}",
+        method = "setOnChildClickListener",
+        args = {android.widget.ExpandableListView.OnChildClickListener.class}
+    )
     public void testSetOnChildClickListener() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -349,15 +324,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertTrue(listener.hasCalledOnChildClick());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getExpandableListPosition(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "getExpandableListPosition",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getExpandableListPosition(int)}",
+        method = "getExpandableListPosition",
+        args = {int.class}
+    )
     public void testGetExpandableListPosition() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -368,15 +340,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(3L<<32, expandableListView.getExpandableListPosition(3));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getFlatListPosition(long)}",
-      targets = {
-        @TestTarget(
-          methodName = "getFlatListPosition",
-          methodArgs = {long.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getFlatListPosition(long)}",
+        method = "getFlatListPosition",
+        args = {long.class}
+    )
     @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
     public void testGetFlatListPosition() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
@@ -392,15 +361,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(1, expandableListView.getFlatListPosition(0x8000000100000000L));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getSelectedPosition()}",
-      targets = {
-        @TestTarget(
-          methodName = "getSelectedPosition",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getSelectedPosition()}",
+        method = "getSelectedPosition",
+        args = {}
+    )
     public void testGetSelectedPosition() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
 
@@ -416,15 +382,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(0, expandableListView.getSelectedPosition());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getSelectedId()}",
-      targets = {
-        @TestTarget(
-          methodName = "getSelectedId",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getSelectedId()}",
+        method = "getSelectedId",
+        args = {}
+    )
     public void testGetSelectedId() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
 
@@ -438,15 +401,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(0, expandableListView.getSelectedId());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setSelectedGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setSelectedGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setSelectedGroup(int)}",
+        method = "setSelectedGroup",
+        args = {int.class}
+    )
     public void testSetSelectedGroup() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -458,15 +418,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(0, expandableListView.getSelectedPosition());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setSelectedChild(int, int, boolean)}",
-      targets = {
-        @TestTarget(
-          methodName = "setSelectedChild",
-          methodArgs = {int.class, int.class, boolean.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setSelectedChild(int, int, boolean)}",
+        method = "setSelectedChild",
+        args = {int.class, int.class, boolean.class}
+    )
     public void testSetSelectedChild() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -475,15 +432,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertTrue(expandableListView.setSelectedChild(0, 1, true));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#isGroupExpanded(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "isGroupExpanded",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#isGroupExpanded(int)}",
+        method = "isGroupExpanded",
+        args = {int.class}
+    )
     public void testIsGroupExpanded() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setAdapter(new MockExpandableListAdapter());
@@ -493,15 +447,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertTrue(expandableListView.isGroupExpanded(1));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getPackedPositionType(long)}",
-      targets = {
-        @TestTarget(
-          methodName = "getPackedPositionType",
-          methodArgs = {long.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getPackedPositionType(long)}",
+        method = "getPackedPositionType",
+        args = {long.class}
+    )
     public void testGetPackedPositionType() {
         assertEquals(ExpandableListView.PACKED_POSITION_TYPE_NULL,
                 ExpandableListView.getPackedPositionType(
@@ -516,15 +467,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
                 ExpandableListView.getPackedPositionType(0x8000000000000000L));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getPackedPositionGroup(long)}",
-      targets = {
-        @TestTarget(
-          methodName = "getPackedPositionGroup",
-          methodArgs = {long.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getPackedPositionGroup(long)}",
+        method = "getPackedPositionGroup",
+        args = {long.class}
+    )
     public void testGetPackedPositionGroup() {
         assertEquals(-1, ExpandableListView.getPackedPositionGroup(
                 ExpandableListView.PACKED_POSITION_VALUE_NULL));
@@ -538,15 +486,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(0x7FFFFFFF, ExpandableListView.getPackedPositionGroup(0x7FFFFFFF00000000L));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getPackedPositionChild(long)}",
-      targets = {
-        @TestTarget(
-          methodName = "getPackedPositionChild",
-          methodArgs = {long.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getPackedPositionChild(long)}",
+        method = "getPackedPositionChild",
+        args = {long.class}
+    )
     public void testGetPackedPositionChild() {
         assertEquals(-1, ExpandableListView.getPackedPositionChild(
                 ExpandableListView.PACKED_POSITION_VALUE_NULL));
@@ -560,15 +505,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertEquals(0xffffffff, ExpandableListView.getPackedPositionChild(0x80000000ffffffffL));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getPackedPositionForChild(int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "getPackedPositionForChild",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getPackedPositionForChild(int, int)}",
+        method = "getPackedPositionForChild",
+        args = {int.class, int.class}
+    )
     public void testGetPackedPositionForChild() {
         assertEquals((long) 0x8000000000000000L,
                 ExpandableListView.getPackedPositionForChild(0, 0));
@@ -577,15 +519,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
                 ExpandableListView.getPackedPositionForChild(Integer.MAX_VALUE, 0xffffffff));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#getPackedPositionForGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "getPackedPositionForGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#getPackedPositionForGroup(int)}",
+        method = "getPackedPositionForGroup",
+        args = {int.class}
+    )
     public void testGetPackedPositionForGroup() {
         assertEquals(0, ExpandableListView.getPackedPositionForGroup(0));
 
@@ -593,45 +532,36 @@ public class ExpandableListViewTest extends AndroidTestCase {
                 ExpandableListView.getPackedPositionForGroup(Integer.MAX_VALUE));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setChildIndicator(Drawable)}",
-      targets = {
-        @TestTarget(
-          methodName = "setChildIndicator",
-          methodArgs = {Drawable.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setChildIndicator(Drawable)}",
+        method = "setChildIndicator",
+        args = {android.graphics.drawable.Drawable.class}
+    )
     @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly")
     public void testSetChildIndicator() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setChildIndicator(null);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setChildIndicatorBounds(int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setChildIndicatorBounds",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setChildIndicatorBounds(int, int)}",
+        method = "setChildIndicatorBounds",
+        args = {int.class, int.class}
+    )
     @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly")
     public void testSetChildIndicatorBounds() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setChildIndicatorBounds(10, 10);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setGroupIndicator(Drawable)}",
-      targets = {
-        @TestTarget(
-          methodName = "setGroupIndicator",
-          methodArgs = {Drawable.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setGroupIndicator(Drawable)}",
+        method = "setGroupIndicator",
+        args = {android.graphics.drawable.Drawable.class}
+    )
     @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly")
     public void testSetGroupIndicator() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
@@ -639,33 +569,28 @@ public class ExpandableListViewTest extends AndroidTestCase {
         expandableListView.setGroupIndicator(drawable);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#setIndicatorBounds(int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setIndicatorBounds",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#setIndicatorBounds(int, int)}",
+        method = "setIndicatorBounds",
+        args = {int.class, int.class}
+    )
     @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly")
     public void testSetIndicatorBounds() {
         ExpandableListView expandableListView = new ExpandableListView(mContext);
         expandableListView.setIndicatorBounds(10,10);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#onSaveInstanceState()} and" +
-            "{@link ExpandableListView#onRestoreInstanceState(Parcelable)}",
-      targets = {
-        @TestTarget(
-          methodName = "onSaveInstanceState",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "onSaveInstanceState",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "onRestoreInstanceState",
-          methodArgs = {Parcelable.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "onRestoreInstanceState",
+            args = {android.os.Parcelable.class}
         )
     })
     @ToBeFixed(bug = "", explanation = "can't use SaveState which is package protected")
@@ -681,15 +606,12 @@ public class ExpandableListViewTest extends AndroidTestCase {
         assertNotNull(p2);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#dispatchDraw(Canvas)}",
-      targets = {
-        @TestTarget(
-          methodName = "dispatchDraw",
-          methodArgs = {Canvas.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#dispatchDraw(Canvas)}",
+        method = "dispatchDraw",
+        args = {android.graphics.Canvas.class}
+    )
     public void testDispatchDraw() {
         MockExpandableListView expandableListView = new MockExpandableListView(mContext);
         expandableListView.dispatchDraw(null);

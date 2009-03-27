@@ -28,7 +28,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(RelativeSizeSpan.class)
 public class RelativeSizeSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of RelativeSizeSpan.",
         method = "RelativeSizeSpan",
         args = {float.class}
@@ -40,7 +40,7 @@ public class RelativeSizeSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getSizeChange().",
         method = "getSizeChange",
         args = {}
@@ -54,7 +54,7 @@ public class RelativeSizeSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint ds).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -86,7 +86,7 @@ public class RelativeSizeSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

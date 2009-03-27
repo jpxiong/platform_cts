@@ -52,7 +52,7 @@ public class UriMatcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of UriMatcher.",
         method = "UriMatcher",
         args = {int.class}
@@ -62,7 +62,7 @@ public class UriMatcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test match(Uri uri).",
         method = "match",
         args = {android.net.Uri.class}
@@ -84,7 +84,7 @@ public class UriMatcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test match(Uri uri).",
         method = "match",
         args = {android.net.Uri.class}
@@ -100,7 +100,7 @@ public class UriMatcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addURI(String authority, String path, int code).",
         method = "addURI",
         args = {java.lang.String.class, java.lang.String.class, int.class}
@@ -123,7 +123,7 @@ public class UriMatcherTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addURI(String authority, String path, int code).",
         method = "addURI",
         args = {java.lang.String.class, java.lang.String.class, int.class}

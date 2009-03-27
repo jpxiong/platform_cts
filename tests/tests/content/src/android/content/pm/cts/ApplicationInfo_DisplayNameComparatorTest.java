@@ -41,7 +41,7 @@ public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link ApplicationInfo.DisplayNameComparator}",
         method = "ApplicationInfo.DisplayNameComparator",
         args = {android.content.pm.PackageManager.class}
@@ -54,7 +54,7 @@ public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test compare(ApplicationInfo, ApplicationInfo)",
         method = "compare",
         args = {android.content.pm.ApplicationInfo.class, android.content.pm.ApplicationInfo.class}

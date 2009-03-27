@@ -29,13 +29,13 @@ public class DataSetObservableTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test notifyChanged and notifyInvalidated.",
             method = "notifyChanged",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test notifyChanged and notifyInvalidated.",
             method = "notifyInvalidated",
             args = {}

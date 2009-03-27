@@ -27,7 +27,7 @@ import dalvik.annotation.TestTargetClass;
 public class DhcpInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test DhcpInfo's constructor.",
         method = "DhcpInfo",
         args = {}
@@ -37,7 +37,7 @@ public class DhcpInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString function.",
         method = "toString",
         args = {}

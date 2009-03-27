@@ -25,7 +25,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
 
-
 @TestTargetClass(AbsSavedState.class)
 public class AbsSavedStateTest extends InstrumentationTestCase {
 
@@ -34,19 +33,19 @@ public class AbsSavedStateTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor and describeContents of AbsSavedState",
             method = "AbsSavedState",
             args = {android.os.Parcelable.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor and describeContents of AbsSavedState",
             method = "AbsSavedState",
             args = {android.os.Parcel.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor and describeContents of AbsSavedState",
             method = "describeContents",
             args = {}
@@ -65,7 +64,7 @@ public class AbsSavedStateTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getSuperState function",
         method = "getSuperState",
         args = {}
@@ -79,7 +78,7 @@ public class AbsSavedStateTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel function",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}

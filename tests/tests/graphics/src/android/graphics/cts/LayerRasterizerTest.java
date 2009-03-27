@@ -33,7 +33,7 @@ public class LayerRasterizerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of LayerRasterizer.",
         method = "LayerRasterizer",
         args = {}
@@ -45,7 +45,7 @@ public class LayerRasterizerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addLayer(Paint paint, float dx, float dy).",
         method = "addLayer",
         args = {android.graphics.Paint.class, float.class, float.class}
@@ -60,7 +60,7 @@ public class LayerRasterizerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addLayer(Paint paint).",
         method = "addLayer",
         args = {android.graphics.Paint.class}

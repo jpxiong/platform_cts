@@ -55,19 +55,19 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link RatingBar}",
             method = "RatingBar",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link RatingBar}",
             method = "RatingBar",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link RatingBar}",
             method = "RatingBar",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -90,13 +90,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access OnRatingBarChangeListener",
             method = "getOnRatingBarChangeListener",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access OnRatingBarChangeListener",
             method = "setOnRatingBarChangeListener",
             args = {android.widget.RatingBar.OnRatingBarChangeListener.class}
@@ -125,13 +125,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access isIndicator",
             method = "isIndicator",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access isIndicator",
             method = "setIsIndicator",
             args = {boolean.class}
@@ -149,13 +149,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access NumStars",
             method = "setNumStars",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access NumStars",
             method = "getNumStars",
             args = {}
@@ -185,13 +185,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access Rating",
             method = "getRating",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access Rating",
             method = "setRating",
             args = {float.class}
@@ -214,7 +214,7 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setMax(int max)",
         method = "setMax",
         args = {int.class}
@@ -239,13 +239,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access StepSize",
             method = "getStepSize",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test methods which access StepSize",
             method = "setStepSize",
             args = {float.class}
@@ -289,7 +289,7 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
         method = "onMeasure",
         args = {int.class, int.class}
@@ -382,4 +382,3 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
         }
     }
 }
-

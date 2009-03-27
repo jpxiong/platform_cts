@@ -42,19 +42,19 @@ public class ContentValuesTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of ContentValues.",
             method = "ContentValues",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of ContentValues.",
             method = "ContentValues",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of ContentValues.",
             method = "ContentValues",
             args = {android.content.ContentValues.class}
@@ -83,7 +83,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueSet().",
         method = "valueSet",
         args = {}
@@ -102,7 +102,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test putNull(String key).",
         method = "putNull",
         args = {java.lang.String.class}
@@ -122,7 +122,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsLong(String key).",
         method = "getAsLong",
         args = {java.lang.String.class}
@@ -141,7 +141,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsByte(String key).",
         method = "getAsByte",
         args = {java.lang.String.class}
@@ -160,7 +160,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsInteger(String key).",
         method = "getAsInteger",
         args = {java.lang.String.class}
@@ -179,7 +179,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test size().",
         method = "size",
         args = {}
@@ -200,7 +200,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsShort(String key).",
         method = "getAsShort",
         args = {java.lang.String.class}
@@ -219,7 +219,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hashCode().",
         method = "hashCode",
         args = {}
@@ -243,7 +243,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsFloat(String key).",
         method = "getAsFloat",
         args = {java.lang.String.class}
@@ -262,7 +262,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsBoolean(String key).",
         method = "getAsBoolean",
         args = {java.lang.String.class}
@@ -279,7 +279,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString().",
         method = "toString",
         args = {}
@@ -296,7 +296,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test get(String key).",
         method = "get",
         args = {java.lang.String.class}
@@ -315,7 +315,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test equals(Object object).",
         method = "equals",
         args = {java.lang.Object.class}
@@ -332,7 +332,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test equals(Object object).",
         method = "equals",
         args = {java.lang.Object.class}
@@ -353,7 +353,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsDouble(String key).",
         method = "getAsDouble",
         args = {java.lang.String.class}
@@ -372,7 +372,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, String value).",
         method = "put",
         args = {java.lang.String.class, java.lang.String.class}
@@ -391,7 +391,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Byte value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Byte.class}
@@ -410,7 +410,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Short value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Short.class}
@@ -429,7 +429,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Integer value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Integer.class}
@@ -448,7 +448,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Long value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Long.class}
@@ -467,7 +467,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Float value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Float.class}
@@ -486,7 +486,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Double value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Double.class}
@@ -505,7 +505,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, Boolean value).",
         method = "put",
         args = {java.lang.String.class, java.lang.Boolean.class}
@@ -523,7 +523,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test put(String key, byte[] value).",
         method = "put",
         args = {java.lang.String.class, byte[].class}
@@ -538,7 +538,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test containsKey(String key).",
         method = "containsKey",
         args = {java.lang.String.class}
@@ -558,7 +558,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clear().",
         method = "clear",
         args = {}
@@ -576,14 +576,16 @@ public class ContentValuesTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test putStringArrayList(String key, ArrayList<String> value) and getStringArrayList(String key).",
+            level = TestLevel.COMPLETE,
+            notes = "Test putStringArrayList(String key, ArrayList<String> value) and "
+                    + "getStringArrayList(String key).",
             method = "putStringArrayList",
             args = {java.lang.String.class, java.util.ArrayList.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test putStringArrayList(String key, ArrayList<String> value) and getStringArrayList(String key).",
+            level = TestLevel.COMPLETE,
+            notes = "Test putStringArrayList(String key, ArrayList<String> value) and "
+                    + "getStringArrayList(String key).",
             method = "getStringArrayList",
             args = {java.lang.String.class}
         )
@@ -604,7 +606,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test remove(String key).",
         method = "remove",
         args = {java.lang.String.class}
@@ -635,7 +637,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsString(String key).",
         method = "getAsString",
         args = {java.lang.String.class}
@@ -654,7 +656,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAsByteArray(String key).",
         method = "getAsByteArray",
         args = {java.lang.String.class}
@@ -669,7 +671,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(Parcel parcel, int flags).",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -695,7 +697,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(Parcel parcel, int flags).",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -711,7 +713,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents(). This method does nothing, and always return 0",
         method = "describeContents",
         args = {}
@@ -721,7 +723,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test putAll(ContentValues other).",
         method = "putAll",
         args = {android.content.ContentValues.class}
@@ -742,7 +744,7 @@ public class ContentValuesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test putAll(ContentValues other).",
         method = "putAll",
         args = {android.content.ContentValues.class}

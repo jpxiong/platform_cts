@@ -35,9 +35,10 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -60,17 +61,18 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         mTargetContext = getInstrumentation().getTargetContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link TableRow}.",
-      targets = {
-        @TestTarget(
-          methodName = "TableRow",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow}.",
+            method = "TableRow",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "TableRow",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow}.",
+            method = "TableRow",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         )
     })
     public void testConstructor() {
@@ -79,15 +81,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         new TableRow(mContext, null);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setOnHierarchyChangeListener(OnHierarchyChangeListener listener)",
-      targets = {
-        @TestTarget(
-          methodName = "setOnHierarchyChangeListener",
-          methodArgs = {OnHierarchyChangeListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setOnHierarchyChangeListener(OnHierarchyChangeListener listener)",
+        method = "setOnHierarchyChangeListener",
+        args = {android.view.ViewGroup.OnHierarchyChangeListener.class}
+    )
     public void testSetOnHierarchyChangeListener() {
         TableRow tableRow = new TableRow(mContext);
 
@@ -108,20 +107,18 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertFalse(listener.hasCalledOnChildViewRemoved());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getVirtualChildAt(int i)",
-      targets = {
-        @TestTarget(
-          methodName = "getVirtualChildAt",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getVirtualChildAt(int i)",
+        method = "getVirtualChildAt",
+        args = {int.class}
+    )
     @UiThreadTest
     public void testGetVirtualChildAt() {
         TableStubActivity activity = getActivity();
         activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
-        TableLayout tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table1);
+        TableLayout tableLayout = (TableLayout) activity
+                .findViewById(com.android.cts.stub.R.id.table1);
 
         TableRow tableRow = (TableRow) tableLayout.getChildAt(0);
         Resources resources = activity.getResources();
@@ -147,20 +144,18 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
                 ((TextView) tableRow.getVirtualChildAt(4)).getText().toString());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getVirtualChildCount()",
-      targets = {
-        @TestTarget(
-          methodName = "getVirtualChildCount",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getVirtualChildCount()",
+        method = "getVirtualChildCount",
+        args = {}
+    )
     @UiThreadTest
     public void testGetVirtualChildCount() {
         TableStubActivity activity = getActivity();
         activity.setContentView(com.android.cts.stub.R.layout.table_layout_1);
-        TableLayout tableLayout = (TableLayout) activity.findViewById(com.android.cts.stub.R.id.table1);
+        TableLayout tableLayout = (TableLayout) activity
+                .findViewById(com.android.cts.stub.R.id.table1);
 
         TableRow tableRow = (TableRow) tableLayout.getChildAt(0);
         assertEquals(3, tableRow.getVirtualChildCount());
@@ -172,15 +167,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertEquals(5, tableRow.getVirtualChildCount());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateLayoutParams(AttributeSet attrs)",
-      targets = {
-        @TestTarget(
-          methodName = "generateLayoutParams",
-          methodArgs = {AttributeSet.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateLayoutParams(AttributeSet attrs)",
+        method = "generateLayoutParams",
+        args = {android.util.AttributeSet.class}
+    )
     public void testGenerateLayoutParams() {
         TableRow tableRow = new TableRow(mContext);
 
@@ -193,15 +185,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertNotNull(tableRow.generateLayoutParams((AttributeSet) null));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test checkLayoutParams(ViewGroup.LayoutParams p)",
-      targets = {
-        @TestTarget(
-          methodName = "checkLayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test checkLayoutParams(ViewGroup.LayoutParams p)",
+        method = "checkLayoutParams",
+        args = {android.view.ViewGroup.LayoutParams.class}
+    )
     public void testCheckLayoutParams() {
         MockTableRow mockTableRow = new MockTableRow(mContext);
 
@@ -214,15 +203,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertFalse(mockTableRow.checkLayoutParams(null));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateDefaultLayoutParams()",
-      targets = {
-        @TestTarget(
-          methodName = "generateDefaultLayoutParams",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateDefaultLayoutParams()",
+        method = "generateDefaultLayoutParams",
+        args = {}
+    )
     public void testGenerateDefaultLayoutParams() {
         MockTableRow mockTableRow = new MockTableRow(mContext);
 
@@ -231,15 +217,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         assertTrue(layoutParams instanceof TableRow.LayoutParams);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test generateLayoutParams(ViewGroup.LayoutParams p)",
-      targets = {
-        @TestTarget(
-          methodName = "generateLayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test generateLayoutParams(ViewGroup.LayoutParams p)",
+        method = "generateLayoutParams",
+        args = {android.view.ViewGroup.LayoutParams.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testGenerateLayoutParams2() {
         MockTableRow mockTableRow = new MockTableRow(mContext);
@@ -258,15 +241,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onLayout(boolean changed, int l, int t, int r, int b)",
-      targets = {
-        @TestTarget(
-          methodName = "onLayout",
-          methodArgs = {boolean.class, int.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onLayout(boolean changed, int l, int t, int r, int b)",
+        method = "onLayout",
+        args = {boolean.class, int.class, int.class, int.class, int.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to do unit test," +
             " will be tested by functional test.")
     public void testOnLayout() {
@@ -275,15 +255,12 @@ public class TableRowTest extends ActivityInstrumentationTestCase2<TableStubActi
         mockTableRow.onLayout(false, 0, 0, 200, 300);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
-      targets = {
-        @TestTarget(
-          methodName = "onMeasure",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
+        method = "onMeasure",
+        args = {int.class, int.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to do unit test," +
             " will be tested by functional test.")
     public void testOnMeasure() {

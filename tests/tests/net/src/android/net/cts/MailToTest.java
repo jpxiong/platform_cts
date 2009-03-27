@@ -28,7 +28,8 @@ import dalvik.annotation.TestTargetClass;
 public class MailToTest extends AndroidTestCase {
     private static final String MAILTOURI_1 = "mailto:chris@example.com";
     private static final String MAILTOURI_2 = "mailto:infobot@example.com?subject=current-issue";
-    private static final String MAILTOURI_3 = "mailto:infobot@example.com?body=send%20current-issue";
+    private static final String MAILTOURI_3 = 
+            "mailto:infobot@example.com?body=send%20current-issue";
     private static final String MAILTOURI_4 = "mailto:infobot@example.com?body=send%20current-" +
                                               "issue%0D%0Asend%20index";
     private static final String MAILTOURI_5 = "mailto:joe@example.com?" +
@@ -43,49 +44,49 @@ public class MailToTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "parse",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "isMailTo",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "getTo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "getSubject",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "getBody",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "getCc",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "toString",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test parse mailto URI.",
             method = "getHeaders",
             args = {}
@@ -136,7 +137,8 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("send current-issue\r\nsend index", mailTo_4.getBody());
         assertNull(mailTo_4.getCc());
         assertNull(mailTo_4.getSubject());
-        assertEquals("mailto:?body=send%20current-issue%0D%0Asend%20index&to=infobot%40example.com&",
+        assertEquals(
+                "mailto:?body=send%20current-issue%0D%0Asend%20index&to=infobot%40example.com&",
                 mailTo_4.toString());
 
         assertTrue(MailTo.isMailTo(MAILTOURI_5));
@@ -164,4 +166,3 @@ public class MailToTest extends AndroidTestCase {
                 mailTo_6.toString());
     }
 }
-

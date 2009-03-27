@@ -27,7 +27,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(Standard.class)
 public class TabStopSpan_StandardTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of Standard.",
         method = "TabStopSpan.Standard",
         args = {int.class}
@@ -39,7 +39,7 @@ public class TabStopSpan_StandardTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTabStop().",
         method = "getTabStop",
         args = {}

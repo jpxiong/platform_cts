@@ -28,13 +28,13 @@ public class RasterizerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test finalize function",
             method = "finalize",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test finalize function",
             method = "Rasterizer",
             args = {}

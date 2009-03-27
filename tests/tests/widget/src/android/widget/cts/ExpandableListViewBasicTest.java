@@ -27,9 +27,10 @@ import android.widget.ExpandableListView;
 import android.widget.cts.util.ExpandableListScenario;
 import android.widget.cts.util.ListUtil;
 import android.widget.cts.util.ExpandableListScenario.MyGroup;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(ExpandableListView.class)
@@ -74,29 +75,23 @@ public class ExpandableListViewBasicTest extends
         return groupPos;
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#expandGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "expandGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#expandGroup(int)}",
+        method = "expandGroup",
+        args = {int.class}
+    )
     @MediumTest
     public void testExpandGroup() {
         expandGroup(-1, true);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#collapseGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "collapseGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#collapseGroup(int)}",
+        method = "collapseGroup",
+        args = {int.class}
+    )
     @MediumTest
     public void testCollapseGroup() {
         final int groupPos = expandGroup(-1, true);
@@ -106,17 +101,18 @@ public class ExpandableListViewBasicTest extends
         assertFalse("Group did not collapse", mListView.isGroupExpanded(groupPos));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#expandGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "expandGroup",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ExpandableListView#expandGroup(int)}",
+            method = "expandGroup",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "isGroupExpanded",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link ExpandableListView#expandGroup(int)}",
+            method = "isGroupExpanded",
+            args = {int.class}
         )
     })
     @MediumTest

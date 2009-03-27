@@ -17,24 +17,26 @@ package android.view.cts;
 
 import junit.framework.TestCase;
 import android.view.SurfaceHolder.BadSurfaceTypeException;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(BadSurfaceTypeException.class)
 public class SurfaceHolder_BadSurfaceTypeExceptionTest extends TestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test BadSurfaceTypeException",
-      targets = {
-        @TestTarget(
-          methodName = "SurfaceHolder.BadSurfaceTypeException",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test BadSurfaceTypeException",
+            method = "SurfaceHolder.BadSurfaceTypeException",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "SurfaceHolder.BadSurfaceTypeException",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test BadSurfaceTypeException",
+            method = "SurfaceHolder.BadSurfaceTypeException",
+            args = {java.lang.String.class}
         )
     })
     public void testBadSurfaceTypeException(){

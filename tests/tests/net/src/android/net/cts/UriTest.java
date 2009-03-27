@@ -30,7 +30,7 @@ import java.util.Arrays;
 @TestTargetClass(Uri.class)
 public class UriTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test write to and read frome parcel.",
         method = "writeToParcel",
         args = {android.os.Parcel.class, android.net.Uri.class}
@@ -61,7 +61,7 @@ public class UriTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test buildUpon",
         method = "buildUpon",
         args = {}
@@ -94,73 +94,73 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getSchemeSpecificPart",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getEncodedSchemeSpecificPart",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getEncodedPath",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getPath",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getEncodedQuery",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getQuery",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getEncodedFragment",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getHost",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getPort",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getUserInfo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "getEncodedUserInfo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test string uri.",
             method = "parse",
             args = {java.lang.String.class}
@@ -203,7 +203,7 @@ public class UriTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test compareTo",
         method = "compareTo",
         args = {android.net.Uri.class}
@@ -220,13 +220,13 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test equals and hashCode.",
             method = "equals",
             args = {java.lang.Object.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test equals and hashCode.",
             method = "hashCode",
             args = {}
@@ -262,19 +262,19 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test encode and decode.",
             method = "encode",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test encode and decode.",
             method = "encode",
             args = {java.lang.String.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test encode and decode.",
             method = "decode",
             args = {java.lang.String.class}
@@ -301,7 +301,7 @@ public class UriTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test fromFile.",
         method = "fromFile",
         args = {java.io.File.class}
@@ -318,13 +318,13 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test get query parameters.",
             method = "getQueryParameter",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test get query parameters.",
             method = "getQueryParameters",
             args = {java.lang.String.class}
@@ -347,19 +347,19 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "getPathSegments",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "getLastPathSegment",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "withAppendedPath",
             args = {android.net.Uri.class, java.lang.String.class}
@@ -404,55 +404,55 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "isAbsolute",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "isOpaque",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "isRelative",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "getHost",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "getPort",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "getScheme",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "getSchemeSpecificPart",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "fromParts",
             args = {java.lang.String.class, java.lang.String.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test opaque uri.",
             method = "toString",
             args = {}
@@ -514,91 +514,91 @@ public class UriTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getAuthority",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getScheme",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getEncodedAuthority",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getPath",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getEncodedPath",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getQuery",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getEncodedQuery",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getFragment",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getEncodedFragment",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "getSchemeSpecificPart",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "isAbsolute",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "isHierarchical",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "isOpaque",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "isRelative",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test hierarchical uris.",
             method = "toString",
             args = {}

@@ -17,32 +17,38 @@ package android.view.cts;
 
 import junit.framework.TestCase;
 import android.view.InflateException;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(InflateException.class)
 public class InflateExceptionTest extends TestCase {
-   @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test InflateException",
-      targets = {
-        @TestTarget(
-          methodName = "InflateException",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test InflateException",
+            method = "InflateException",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "InflateException",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test InflateException",
+            method = "InflateException",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "InflateException",
-          methodArgs = {String.class, Throwable.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test InflateException",
+            method = "InflateException",
+            args = {java.lang.String.class, java.lang.Throwable.class}
         ),
-        @TestTarget(
-          methodName = "InflateException",
-          methodArgs = {Throwable.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test InflateException",
+            method = "InflateException",
+            args = {java.lang.Throwable.class}
         )
     })
    public void testInflateException(){

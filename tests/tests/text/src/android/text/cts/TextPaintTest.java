@@ -36,19 +36,19 @@ public class TextPaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link TextPaint}",
             method = "TextPaint",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link TextPaint}",
             method = "TextPaint",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link TextPaint}",
             method = "TextPaint",
             args = {android.graphics.Paint.class}
@@ -85,7 +85,7 @@ public class TextPaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link TextPaint#set(TextPaint)}",
         method = "set",
         args = {android.text.TextPaint.class}

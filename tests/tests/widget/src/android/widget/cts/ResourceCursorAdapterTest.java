@@ -59,7 +59,7 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "ResourceCursorAdapter",
         args = {android.content.Context.class, int.class, android.database.Cursor.class}
@@ -78,7 +78,7 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ResourceCursorAdapter#setDropDownViewResource(int)}",
         method = "setDropDownViewResource",
         args = {int.class}
@@ -107,11 +107,12 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link ResourceCursorAdapter#newDropDownView(Context, Cursor, android.view.ViewGroup)}.The parameters Context and Cursor are never readin the method",
+        level = TestLevel.COMPLETE,
         method = "newDropDownView",
-        args = {android.content.Context.class, android.database.Cursor.class, android.view.ViewGroup.class}
+        args = {android.content.Context.class, android.database.Cursor.class, 
+                android.view.ViewGroup.class}
     )
+    // parameters Context and Cursor are never readin the method
     public void testNewDropDownView() {
         mResourceCursorAdapter = new MockResourceCursorAdapter(mContext,
                 R.layout.cursoradapter_item0, mCursor);
@@ -127,11 +128,12 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link ResourceCursorAdapter#newView(Context, Cursor, android.view.ViewGroup)}The parameters Context and Cursor are never read in the method",
+        level = TestLevel.COMPLETE,
         method = "newView",
-        args = {android.content.Context.class, android.database.Cursor.class, android.view.ViewGroup.class}
+        args = {android.content.Context.class, android.database.Cursor.class, 
+                android.view.ViewGroup.class}
     )
+    // The parameters Context and Cursor are never read in the method
     public void testNewView() {
         mResourceCursorAdapter = new MockResourceCursorAdapter(mContext,
                 R.layout.cursoradapter_item0, mCursor);

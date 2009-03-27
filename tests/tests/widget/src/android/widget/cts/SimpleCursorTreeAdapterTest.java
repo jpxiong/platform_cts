@@ -79,22 +79,28 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, int.class, java.lang.String[].class, int[].class, int.class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    int.class, java.lang.String[].class, int[].class, int.class, int.class, 
+                    java.lang.String[].class, int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, int.class, java.lang.String[].class, int[].class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    int.class, java.lang.String[].class, int[].class, int.class, 
+                    java.lang.String[].class, int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleCursorTreeAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, int.class, java.lang.String[].class, int[].class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, android.database.Cursor.class, int.class, 
+                    java.lang.String[].class, int[].class, int.class, java.lang.String[].class, 
+                    int[].class}
         )
     })
     public void testConstructor() {
@@ -113,10 +119,10 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleCursorTreeAdapter#bindChildView(View, Context, Cursor, boolean)}The param context and islastChild is never readed.",
+        level = TestLevel.COMPLETE,
         method = "bindChildView",
-        args = {android.view.View.class, android.content.Context.class, android.database.Cursor.class, boolean.class}
+        args = {android.view.View.class, android.content.Context.class, 
+                android.database.Cursor.class, boolean.class}
     )
     public void testBindChildView() {
         mGroupCursor = createTestCursor(2, 20, "group");
@@ -137,11 +143,12 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleCursorTreeAdapter#bindGroupView(View, Context, Cursor, boolean)}The param context and isExpanded is never readed.",
+        level = TestLevel.COMPLETE,
         method = "bindGroupView",
-        args = {android.view.View.class, android.content.Context.class, android.database.Cursor.class, boolean.class}
+        args = {android.view.View.class, android.content.Context.class, 
+                android.database.Cursor.class, boolean.class}
     )
+    // The param context and isExpanded is never readed.
     public void testBindGroupView() {
         mGroupCursor = createTestCursor(2, 20, "group");
         mGroupCursor.moveToFirst();
@@ -159,7 +166,7 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleCursorTreeAdapter#setViewImage(ImageView, String)}",
         method = "setViewImage",
         args = {android.widget.ImageView.class, java.lang.String.class}
@@ -175,7 +182,8 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
         // color drawable
         ImageView view = new ImageView(mContext);
         assertNull(view.getDrawable());
-        mSimpleCursorTreeAdapter.setViewImage(view, String.valueOf(com.android.cts.stub.R.drawable.scenery));
+        mSimpleCursorTreeAdapter.setViewImage(view, 
+                String.valueOf(com.android.cts.stub.R.drawable.scenery));
         BitmapDrawable d = (BitmapDrawable) mContext.getResources().getDrawable(
                 com.android.cts.stub.R.drawable.scenery);
         WidgetTestUtils.assertEquals(d.getBitmap(),

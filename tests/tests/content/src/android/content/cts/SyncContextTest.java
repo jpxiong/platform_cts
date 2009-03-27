@@ -42,7 +42,7 @@ public class SyncContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor of SyncContext",
         method = "SyncContext",
         args = {ISyncContext.class}
@@ -53,7 +53,7 @@ public class SyncContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getISyncContext function",
         method = "getISyncContext",
         args = {}
@@ -65,7 +65,7 @@ public class SyncContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateHeartbeat",
         method = "updateHeartbeat",
         args = {}
@@ -79,7 +79,7 @@ public class SyncContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setStatusText function. The param is never read.",
         method = "setStatusText",
         args = {java.lang.String.class}
@@ -93,7 +93,7 @@ public class SyncContextTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onFinished function",
         method = "onFinished",
         args = {android.content.SyncResult.class}

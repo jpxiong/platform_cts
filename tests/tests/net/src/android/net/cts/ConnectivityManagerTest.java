@@ -41,7 +41,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getNetworkInfo(int networkType).",
         method = "getNetworkInfo",
         args = {int.class}
@@ -73,13 +73,13 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isNetworkTypeValid(int networkType).",
             method = "isNetworkTypeValid",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isNetworkTypeValid(int networkType).",
             method = "getAllNetworkInfo",
             args = {}
@@ -97,13 +97,13 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "getNetworkPreference",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "setNetworkPreference",
             args = {int.class}
@@ -133,7 +133,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getAllNetworkInfo().",
         method = "getAllNetworkInfo",
         args = {}
@@ -149,14 +149,14 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test startUsingNetworkFeature(int networkType, String feature)."
                     + "Only test failure case.",
             method = "startUsingNetworkFeature",
             args = {int.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test stopUsingNetworkFeature(int networkType, String feature)."
                     + "Only test failure case.",
             method = "stopUsingNetworkFeature",
@@ -176,12 +176,14 @@ public class ConnectivityManagerTest extends AndroidTestCase {
                 invalidateFeature));
 
         // Should return failure(-1) because MMS is not supported on WIFI.
-        assertEquals(failureCode, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
-        assertEquals(failureCode, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
+        assertEquals(failureCode, 
+                mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
+        assertEquals(failureCode, 
+                mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test requestRouteToHost(int networkType, int hostAddress).",
         method = "requestRouteToHost",
         args = {int.class, int.class}
@@ -197,7 +199,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getActiveNetworkInfo().",
         method = "getActiveNetworkInfo",
         args = {}

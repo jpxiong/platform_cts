@@ -50,18 +50,17 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor of this class",
         method = "ActivityManager.RunningServiceInfo",
         args = {}
     )
     public void testConstructor() {
-        ActivityManager.RunningServiceInfo runningServiceInfo =
-            new ActivityManager.RunningServiceInfo();
+        new ActivityManager.RunningServiceInfo();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents method",
         method = "describeContents",
         args = {}
@@ -71,7 +70,7 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -96,7 +95,7 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test readFromParcel method",
         method = "readFromParcel",
         args = {android.os.Parcel.class}

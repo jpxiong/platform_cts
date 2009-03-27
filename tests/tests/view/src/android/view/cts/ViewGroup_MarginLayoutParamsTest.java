@@ -45,25 +45,25 @@ public class ViewGroup_MarginLayoutParamsTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test MarginLayoutParams constructor",
             method = "ViewGroup.MarginLayoutParams",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test MarginLayoutParams constructor",
             method = "ViewGroup.MarginLayoutParams",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test MarginLayoutParams constructor",
             method = "ViewGroup.MarginLayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test MarginLayoutParams constructor",
             method = "ViewGroup.MarginLayoutParams",
             args = {android.view.ViewGroup.MarginLayoutParams.class}
@@ -102,7 +102,7 @@ public class ViewGroup_MarginLayoutParamsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setMargins function",
         method = "setMargins",
         args = {int.class, int.class, int.class, int.class}

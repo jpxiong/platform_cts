@@ -49,19 +49,19 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -77,13 +77,13 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getBase() and setBase(long)",
             method = "getBase",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getBase() and setBase(long)",
             method = "setBase",
             args = {long.class}
@@ -120,13 +120,13 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getFormat() and setFormat(string)",
             method = "getFormat",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getFormat() and setFormat(string)",
             method = "setFormat",
             args = {java.lang.String.class}
@@ -147,7 +147,7 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onDetachedFromWindow()",
         method = "onDetachedFromWindow",
         args = {}
@@ -175,7 +175,7 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onWindowVisibilityChanged(int)",
         method = "onWindowVisibilityChanged",
         args = {int.class}
@@ -202,13 +202,13 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test start() and stop()",
             method = "start",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test start() and stop()",
             method = "stop",
             args = {}

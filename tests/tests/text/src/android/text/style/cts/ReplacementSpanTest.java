@@ -30,7 +30,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(ReplacementSpan.class)
 public class ReplacementSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint p). this method does nothing",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -41,7 +41,7 @@ public class ReplacementSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint ds). this method does nothing",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

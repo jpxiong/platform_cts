@@ -39,38 +39,35 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Path.",
             method = "Path",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Path.",
             method = "Path",
             args = {android.graphics.Path.class}
         )
     })
     public void testConstructor() {
-
-        Path path = null;
         // new the Path instance
-        path = new Path();
+        new Path();
 
-        path = null;
         // another the Path instance with different params
-        path = new Path(new Path());
+        new Path(new Path());
     }
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRect(RectF rect, Direction dir).",
             method = "addRect",
             args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRect(RectF rect, Direction dir).",
             method = "isEmpty",
             args = {}
@@ -88,13 +85,14 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRect(float left, float top, float right, float bottom,Direction dir).",
             method = "addRect",
-            args = {float.class, float.class, float.class, float.class, android.graphics.Path.Direction.class}
+            args = {float.class, float.class, float.class, float.class, 
+                    android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRect(float left, float top, float right, float bottom,Direction dir).",
             method = "isEmpty",
             args = {}
@@ -110,8 +108,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test moveTo(float x, float y). When this method called, thecurrent point will move to the appointed coordinate, but thereis no more way to get known about whether current point is justin that coordinate correctly",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "moveTo",
         args = {float.class, float.class}
     )
@@ -128,13 +126,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set(Path src).",
             method = "set",
             args = {android.graphics.Path.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set(Path src).",
             method = "isEmpty",
             args = {}
@@ -152,13 +150,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get FillType.",
             method = "setFillType",
             args = {android.graphics.Path.FillType.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get FillType.",
             method = "getFillType",
             args = {}
@@ -186,13 +184,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rQuadTo(float dx1, float dy1, float dx2, float dy2).",
             method = "rQuadTo",
             args = {float.class, float.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rQuadTo(float dx1, float dy1, float dx2, float dy2).",
             method = "isEmpty",
             args = {}
@@ -208,13 +206,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test transform(Matrix matrix, Path dst).",
             method = "transform",
             args = {android.graphics.Matrix.class, android.graphics.Path.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test transform(Matrix matrix, Path dst).",
             method = "isEmpty",
             args = {}
@@ -231,8 +229,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test transform(Matrix matrix). The function of this method isalmost the same as transform(Matrix matrix, Path dst) but no dstto show if it works when called, and we can't get any informationin this method when called",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "transform",
         args = {android.graphics.Matrix.class}
     )
@@ -247,13 +245,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test lineTo(float x, float y).",
             method = "lineTo",
             args = {float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test lineTo(float x, float y).",
             method = "isEmpty",
             args = {}
@@ -268,8 +266,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test close(). What does 'close' mean, clear the contour orothers? If clear, why the path is not empty when there is justone path.",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "close",
         args = {}
     )
@@ -287,13 +285,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test quadTo(float x1, float y1, float x2, float y2).",
             method = "quadTo",
             args = {float.class, float.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test quadTo(float x1, float y1, float x2, float y2).",
             method = "isEmpty",
             args = {}
@@ -309,13 +307,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addCircle(float x, float y, float radius, Direction dir).",
             method = "addCircle",
             args = {float.class, float.class, float.class, android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addCircle(float x, float y, float radius, Direction dir).",
             method = "isEmpty",
             args = {}
@@ -331,14 +329,14 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test arcTo(RectF oval, float startAngle, float sweepAngle,boolean forceMoveTo).",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "arcTo",
             args = {android.graphics.RectF.class, float.class, float.class, boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test arcTo(RectF oval, float startAngle, float sweepAngle,boolean forceMoveTo).",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "isEmpty",
             args = {}
         )
@@ -354,13 +352,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test arcTo(RectF oval, float startAngle, float sweepAngle).",
             method = "arcTo",
             args = {android.graphics.RectF.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test arcTo(RectF oval, float startAngle, float sweepAngle).",
             method = "isEmpty",
             args = {}
@@ -376,7 +374,7 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test computeBounds(RectF bounds, boolean exact).",
         method = "computeBounds",
         args = {android.graphics.RectF.class, boolean.class}
@@ -398,13 +396,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test computeBounds(RectF bounds, boolean exact).",
             method = "computeBounds",
             args = {android.graphics.RectF.class, boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test computeBounds(RectF bounds, boolean exact).",
             method = "addRect",
             args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
@@ -427,8 +425,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test rMoveTo(float dx, float dy). When called, the current pointwill move to the appointed coordinate, but there is no more wayto get known about whether current point is just in thatcoordinate correctly",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "rMoveTo",
         args = {float.class, float.class}
     )
@@ -442,8 +440,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test setLastPoint(float dx, float dy). When called, we can'tget any useful information to make sure the point has beencorrectly set",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "setLastPoint",
         args = {float.class, float.class}
     )
@@ -458,13 +456,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rLineTo(float dx, float dy).",
             method = "rLineTo",
             args = {float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rLineTo(float dx, float dy).",
             method = "isEmpty",
             args = {}
@@ -479,7 +477,7 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isEmpty().",
         method = "isEmpty",
         args = {}
@@ -495,13 +493,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rewind().",
             method = "rewind",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rewind().",
             method = "isEmpty",
             args = {}
@@ -523,7 +521,7 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOval(RectF oval, Direction dir).",
         method = "addOval",
         args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
@@ -538,8 +536,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test isRect(RectF rect). But what does 'specify' in the note of this method mean? The return always is false?",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "isRect",
         args = {android.graphics.RectF.class}
     )
@@ -556,8 +554,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test incReserve(int extraPtCount). Maybe this method has littleobvious behavior to test",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "incReserve",
         args = {int.class}
     )
@@ -570,13 +568,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src, float dx, float dy).",
             method = "addPath",
             args = {android.graphics.Path.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src, float dx, float dy).",
             method = "isEmpty",
             args = {}
@@ -594,13 +592,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src).",
             method = "addPath",
             args = {android.graphics.Path.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src).",
             method = "isEmpty",
             args = {}
@@ -618,13 +616,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src, Matrix matrix).",
             method = "addPath",
             args = {android.graphics.Path.class, android.graphics.Matrix.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addPath(Path src, Matrix matrix).",
             method = "isEmpty",
             args = {}
@@ -643,13 +641,14 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRoundRect(RectF rect, float rx, float ry, Direction dir).",
             method = "addRoundRect",
-            args = {android.graphics.RectF.class, float.class, float.class, android.graphics.Path.Direction.class}
+            args = {android.graphics.RectF.class, float.class, float.class, 
+                    android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRoundRect(RectF rect, float rx, float ry, Direction dir).",
             method = "isEmpty",
             args = {}
@@ -666,13 +665,14 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRoundRect(RectF rect, float[] radii, Direction dir).",
             method = "addRoundRect",
-            args = {android.graphics.RectF.class, float[].class, android.graphics.Path.Direction.class}
+            args = {android.graphics.RectF.class, float[].class, 
+                    android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addRoundRect(RectF rect, float[] radii, Direction dir).",
             method = "isEmpty",
             args = {}
@@ -693,13 +693,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isInverseFillType().",
             method = "isInverseFillType",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isInverseFillType().",
             method = "setFillType",
             args = {android.graphics.Path.FillType.class}
@@ -715,7 +715,7 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test offset(float dx, float dy, Path dst).",
         method = "offset",
         args = {float.class, float.class, android.graphics.Path.class}
@@ -731,8 +731,8 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test offset(float dx, float dy). The function of this method isalmost the same as offset(float dx, float dy, Path dst) but no dstto show if it works when called, and we can't get any informationin this method when called",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "offset",
         args = {float.class, float.class}
     )
@@ -747,13 +747,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test cubicTo(float x1, float y1, float x2, float y2,float x3, float y3).",
             method = "cubicTo",
             args = {float.class, float.class, float.class, float.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test cubicTo(float x1, float y1, float x2, float y2,float x3, float y3).",
             method = "isEmpty",
             args = {}
@@ -769,25 +769,25 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset().",
             method = "reset",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset().",
             method = "addRect",
             args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset().",
             method = "set",
             args = {android.graphics.Path.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test reset().",
             method = "isEmpty",
             args = {}
@@ -807,13 +807,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test toggleInverseFillType().",
             method = "toggleInverseFillType",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test toggleInverseFillType().",
             method = "isInverseFillType",
             args = {}
@@ -828,7 +828,7 @@ public class PathTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test finalize().",
         method = "finalize",
         args = {}
@@ -847,13 +847,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addArc(RectF oval, float startAngle, float sweepAngle).",
             method = "addArc",
             args = {android.graphics.RectF.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test addArc(RectF oval, float startAngle, float sweepAngle).",
             method = "isEmpty",
             args = {}
@@ -870,13 +870,13 @@ public class PathTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rCubicTo(float x1, float y1, float x2, float y2, float x3,float y3).",
             method = "rCubicTo",
             args = {float.class, float.class, float.class, float.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test rCubicTo(float x1, float y1, float x2, float y2, float x3,float y3).",
             method = "isEmpty",
             args = {}
@@ -904,4 +904,3 @@ public class PathTest extends TestCase {
         }
     }
 }
-

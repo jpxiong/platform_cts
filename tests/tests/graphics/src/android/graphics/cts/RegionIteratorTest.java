@@ -20,36 +20,31 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.RegionIterator;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(RegionIterator.class)
 public class RegionIteratorTest extends AndroidTestCase {
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of RegionIterator.",
-      targets = {
-        @TestTarget(
-          methodName = "RegionIterator",
-          methodArgs = {Region.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test constructor(s) of RegionIterator.",
+        method = "RegionIterator",
+        args = {android.graphics.Region.class}
+    )
     public void testConstructor() {
         new RegionIterator(new Region());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test next(Rect r).",
-      targets = {
-        @TestTarget(
-          methodName = "next",
-          methodArgs = {Rect.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test next(Rect r).",
+        method = "next",
+        args = {android.graphics.Rect.class}
+    )
     public void testNext() {
         Region region = new Region();
         region.set(1, 1, 10, 10);

@@ -95,8 +95,8 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         super.setUp();
         mContext = getInstrumentation().getTargetContext();
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mAdapterHost = (LinearLayout) mInflater.inflate(com.android.cts.stub.R.layout.cursoradapter_host,
-                null);
+        mAdapterHost = (LinearLayout) mInflater.inflate(
+                com.android.cts.stub.R.layout.cursoradapter_host, null);
 
         // new the SimpleAdapter instance
         mSimpleAdapter = new SimpleAdapter(mContext,
@@ -105,10 +105,11 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "SimpleAdapter",
-        args = {android.content.Context.class, java.util.List.class, int.class, java.lang.String[].class, int[].class}
+        args = {android.content.Context.class, java.util.List.class, int.class, 
+                java.lang.String[].class, int[].class}
     )
     public void testConstructor() {
         new SimpleAdapter(mContext, createTestList(DEFAULT_COLUMN_COUNT, DEFAULT_ROW_COUNT),
@@ -116,7 +117,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getCount()}",
         method = "getCount",
         args = {}
@@ -133,7 +134,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getItem(int)}",
         method = "getItem",
         args = {int.class}
@@ -158,7 +159,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getItemId(int)}",
         method = "getItemId",
         args = {int.class}
@@ -177,7 +178,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getView(int, View, ViewGroup)}",
         method = "getView",
         args = {int.class, android.view.View.class, android.view.ViewGroup.class}
@@ -235,7 +236,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#setDropDownViewResource(int)}",
         method = "setDropDownViewResource",
         args = {int.class}
@@ -261,7 +262,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getDropDownView(int, View, ViewGroup)}",
         method = "getDropDownView",
         args = {int.class, android.view.View.class, android.view.ViewGroup.class}
@@ -320,14 +321,12 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleAdapter#getViewBinder()} and {@link SimpleAdapter#setViewBinder(ViewBinder)}",
+            level = TestLevel.COMPLETE,
             method = "setViewBinder",
             args = {android.widget.SimpleAdapter.ViewBinder.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleAdapter#getViewBinder()} and {@link SimpleAdapter#setViewBinder(ViewBinder)}",
+            level = TestLevel.COMPLETE,
             method = "getViewBinder",
             args = {}
         )
@@ -352,13 +351,13 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link SimpleAdapter#setViewImage(ImageView, String)",
             method = "setViewImage",
             args = {android.widget.ImageView.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link SimpleAdapter#setViewImage(ImageView, String)",
             method = "setViewImage",
             args = {android.widget.ImageView.class, int.class}
@@ -396,7 +395,8 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         view = new ImageView(mContext);
         assertNull(view.getDrawable());
         mSimpleAdapter.setViewImage(view, com.android.cts.stub.R.drawable.scenery);
-        d = (BitmapDrawable) mContext.getResources().getDrawable(com.android.cts.stub.R.drawable.scenery);
+        d = (BitmapDrawable) mContext.getResources()
+                .getDrawable(com.android.cts.stub.R.drawable.scenery);
         WidgetTestUtils.assertEquals(d.getBitmap(),
                 ((BitmapDrawable) view.getDrawable()).getBitmap());
 
@@ -413,7 +413,8 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
             mSimpleAdapter.setViewImage(view, SimpleCursorAdapterTest.createTestImage(mContext,
                     "testimage", com.android.cts.stub.R.raw.testimage));
             assertNotNull(view.getDrawable());
-            d = (BitmapDrawable) mContext.getResources().getDrawable(com.android.cts.stub.R.raw.testimage);
+            d = (BitmapDrawable) mContext.getResources()
+                    .getDrawable(com.android.cts.stub.R.raw.testimage);
             WidgetTestUtils.assertEquals(d.getBitmap(),
                     ((BitmapDrawable) view.getDrawable()).getBitmap());
         } finally {
@@ -422,7 +423,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#setViewText(TextView, String)}",
         method = "setViewText",
         args = {android.widget.TextView.class, java.lang.String.class}
@@ -437,7 +438,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleAdapter#getFilter()}",
         method = "getFilter",
         args = {}

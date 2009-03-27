@@ -18,9 +18,9 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -41,17 +41,18 @@ import java.io.IOException;
 
 @TestTargetClass(android.graphics.drawable.ColorDrawable.class)
 public class ColorDrawableTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test Constructors",
-      targets = {
-        @TestTarget(
-          methodName = "ColorDrawable",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test Constructors",
+            method = "ColorDrawable",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "ColorDrawable",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test Constructors",
+            method = "ColorDrawable",
+            args = {int.class}
         )
     })
     public void testConstructors() {
@@ -60,30 +61,28 @@ public class ColorDrawableTest extends AndroidTestCase {
         new ColorDrawable(1);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test draw(Canvas)",
-      targets = {
-        @TestTarget(
-          methodName = "draw",
-          methodArgs = {Canvas.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test draw(Canvas)",
+        method = "draw",
+        args = {android.graphics.Canvas.class}
+    )
     @ToBeFixed(bug = "1400249", explanation = "It will be tested by functional test.")
     public void testDraw() {
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getAlpha() and setAlpha(int)",
-      targets = {
-        @TestTarget(
-          methodName = "getAlpha",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getAlpha() and setAlpha(int)",
+            method = "getAlpha",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setAlpha",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getAlpha() and setAlpha(int)",
+            method = "setAlpha",
+            args = {int.class}
         )
     })
     public void testAccessAlpha() {
@@ -103,15 +102,12 @@ public class ColorDrawableTest extends AndroidTestCase {
         assertEquals(1, colorDrawable.getAlpha());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getChangingConfigurations()",
-      targets = {
-        @TestTarget(
-          methodName = "getChangingConfigurations",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getChangingConfigurations()",
+        method = "getChangingConfigurations",
+        args = {}
+    )
     public void testGetChangingConfigurations() {
         final ColorDrawable colorDrawable = new ColorDrawable();
         assertEquals(0, colorDrawable.getChangingConfigurations());
@@ -126,15 +122,12 @@ public class ColorDrawableTest extends AndroidTestCase {
         assertEquals(Integer.MAX_VALUE, colorDrawable.getChangingConfigurations());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getConstantState()",
-      targets = {
-        @TestTarget(
-          methodName = "getConstantState",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getConstantState()",
+        method = "getConstantState",
+        args = {}
+    )
     public void testGetConstantState() {
         final ColorDrawable colorDrawable = new ColorDrawable();
         assertNotNull(colorDrawable.getConstantState());
@@ -142,15 +135,12 @@ public class ColorDrawableTest extends AndroidTestCase {
                 colorDrawable.getConstantState().getChangingConfigurations());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getOpacity()",
-      targets = {
-        @TestTarget(
-          methodName = "getOpacity",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getOpacity()",
+        method = "getOpacity",
+        args = {}
+    )
     public void testGetOpacity() {
         ColorDrawable colorDrawable = new ColorDrawable();
         assertEquals(PixelFormat.TRANSPARENT, colorDrawable.getOpacity());
@@ -162,15 +152,13 @@ public class ColorDrawableTest extends AndroidTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, colorDrawable.getOpacity());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
-      targets = {
-        @TestTarget(
-          methodName = "inflate",
-          methodArgs = {Resources.class, XmlPullParser.class, AttributeSet.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
+        method = "inflate",
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
+    )
     public void testInflate() throws XmlPullParserException, IOException {
         int eventType = -1;
         final ColorDrawable colorDrawable = new ColorDrawable();
@@ -197,15 +185,12 @@ public class ColorDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setColorFilter(ColorFilter)",
-      targets = {
-        @TestTarget(
-          methodName = "setColorFilter",
-          methodArgs = {ColorFilter.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setColorFilter(ColorFilter)",
+        method = "setColorFilter",
+        args = {android.graphics.ColorFilter.class}
+    )
     public void testSetColorFilter() {
         final ColorDrawable colorDrawable = new ColorDrawable();
 

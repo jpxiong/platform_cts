@@ -19,9 +19,10 @@ package android.content.cts;
 import android.content.SyncStats;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -30,17 +31,18 @@ import dalvik.annotation.ToBeFixed;
  */
 @TestTargetClass(SyncStats.class)
 public class SyncStatsTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link SyncStats}.",
-      targets = {
-        @TestTarget(
-          methodName = "SyncStats",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link SyncStats}.",
+            method = "SyncStats",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "SyncStats",
-          methodArgs = {Parcel.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link SyncStats}.",
+            method = "SyncStats",
+            args = {android.os.Parcel.class}
         )
     })
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
@@ -90,15 +92,12 @@ public class SyncStatsTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test writeToParcel(Parcel, int)",
-      targets = {
-        @TestTarget(
-          methodName = "writeToParcel",
-          methodArgs = {Parcel.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test writeToParcel(Parcel, int)",
+        method = "writeToParcel",
+        args = {android.os.Parcel.class, int.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testWriteToParcel() {
         SyncStats syncStats = new SyncStats();
@@ -136,15 +135,12 @@ public class SyncStatsTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test clear()",
-      targets = {
-        @TestTarget(
-          methodName = "clear",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test clear()",
+        method = "clear",
+        args = {}
+    )
     public void testClear() {
         SyncStats syncStats = new SyncStats();
 
@@ -170,30 +166,24 @@ public class SyncStatsTest extends AndroidTestCase {
         assertEquals(0, syncStats.numSkippedEntries);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test toString()",
-      targets = {
-        @TestTarget(
-          methodName = "toString",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test toString()",
+        method = "toString",
+        args = {}
+    )
     public void testToString() {
         SyncStats syncStats = new SyncStats();
 
         assertNotNull(syncStats.toString());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test describeContents(), it always return 0",
-      targets = {
-        @TestTarget(
-          methodName = "describeContents",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test describeContents(), it always return 0",
+        method = "describeContents",
+        args = {}
+    )
     public void testDescribeContents() {
         SyncStats syncStats = new SyncStats();
         assertEquals(0, syncStats.describeContents());

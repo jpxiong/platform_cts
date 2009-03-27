@@ -19,22 +19,20 @@ package android.provider.cts;
 import android.content.Context;
 import android.provider.Contacts.Phones;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(android.provider.Contacts.Phones.class)
 public class Contacts_PhonesTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getDisplayLabel(Context context, int type,  CharSequence label)",
-      targets = {
-        @TestTarget(
-          methodName = "getDisplayLabel",
-          methodArgs = {Context.class, int.class, CharSequence.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getDisplayLabel(Context context, int type,  CharSequence label)",
+        method = "getDisplayLabel",
+        args = {android.content.Context.class, int.class, java.lang.CharSequence.class}
+    )
     public void testGetDisplayLabel() {
         CharSequence label = "label";
         String display = Phones.getDisplayLabel(getContext(),
@@ -72,15 +70,13 @@ public class Contacts_PhonesTest extends AndroidTestCase {
         assertEquals(labels[Phones.TYPE_OTHER - 1], display);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getDisplayLabel which need specify a labelArray",
-      targets = {
-        @TestTarget(
-          methodName = "getDisplayLabel",
-          methodArgs = {Context.class, int.class, CharSequence.class, CharSequence[].class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getDisplayLabel which need specify a labelArray",
+        method = "getDisplayLabel",
+        args = {android.content.Context.class, int.class, java.lang.CharSequence.class, 
+                java.lang.CharSequence[].class}
+    )
     public void testGetDisplayLabelCharSequenceArray() {
         CharSequence label = "label";
         CharSequence[] labelArray = new CharSequence[] {

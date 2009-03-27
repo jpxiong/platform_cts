@@ -28,7 +28,7 @@ import dalvik.annotation.TestTargetClass;
 public class Region_OpTest extends AndroidTestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -46,7 +46,7 @@ public class Region_OpTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test values().",
         method = "values",
         args = {}
@@ -71,4 +71,3 @@ public class Region_OpTest extends AndroidTestCase {
     }
 
 }
-

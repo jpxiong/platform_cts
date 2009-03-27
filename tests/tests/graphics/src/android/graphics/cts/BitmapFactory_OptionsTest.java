@@ -25,7 +25,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(BitmapFactory.Options.class)
 public class BitmapFactory_OptionsTest extends AndroidTestCase{
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: BitmapFactory.Options",
         method = "BitmapFactory.Options",
         args = {}
@@ -35,7 +35,7 @@ public class BitmapFactory_OptionsTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: requestCancelDecode",
         method = "requestCancelDecode",
         args = {}

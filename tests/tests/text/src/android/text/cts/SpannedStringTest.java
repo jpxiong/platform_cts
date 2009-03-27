@@ -27,7 +27,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(SpannedString.class)
 public class SpannedStringTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link SpannedString}",
         method = "SpannedString",
         args = {java.lang.CharSequence.class}
@@ -45,7 +45,7 @@ public class SpannedStringTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannedString#valueOf(CharSequence)}",
         method = "valueOf",
         args = {java.lang.CharSequence.class}
@@ -68,7 +68,7 @@ public class SpannedStringTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SpannedString#subSequence(int, int)}",
         method = "subSequence",
         args = {int.class, int.class}

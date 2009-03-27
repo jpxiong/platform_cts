@@ -80,19 +80,19 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link GridView}",
             method = "GridView",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link GridView}",
             method = "GridView",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link GridView}",
             method = "GridView",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -135,14 +135,12 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link GridView#getAdapter()} and {@link GridView#setAdapter(ListAdapter)}",
+            level = TestLevel.COMPLETE,
             method = "setAdapter",
             args = {android.widget.ListAdapter.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link GridView#getAdapter()} and {@link GridView#setAdapter(ListAdapter)}",
+            level = TestLevel.COMPLETE,
             method = "getAdapter",
             args = {}
         )
@@ -159,7 +157,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setSelection(int)}",
         method = "setSelection",
         args = {int.class}
@@ -178,19 +176,19 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#onKeyDown(int, KeyEvent)}",
             method = "onKeyDown",
             args = {int.class, android.view.KeyEvent.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#onKeyDown(int, KeyEvent)}",
             method = "onKeyUp",
             args = {int.class, android.view.KeyEvent.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#onKeyDown(int, KeyEvent)}",
             method = "onKeyMultiple",
             args = {int.class, int.class, android.view.KeyEvent.class}
@@ -246,7 +244,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setGravity(int)}",
         method = "setGravity",
         args = {int.class}
@@ -305,7 +303,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setHorizontalSpacing(int)}",
         method = "setHorizontalSpacing",
         args = {int.class}
@@ -342,7 +340,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setVerticalSpacing(int)}",
         method = "setVerticalSpacing",
         args = {int.class}
@@ -377,14 +375,12 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link GridView#setStretchMode(int)} and {@link GridView#getStretchMode()}",
+            level = TestLevel.COMPLETE,
             method = "setStretchMode",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link GridView#setStretchMode(int)} and {@link GridView#getStretchMode()}",
+            level = TestLevel.COMPLETE,
             method = "getStretchMode",
             args = {}
         )
@@ -488,7 +484,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setNumColumns(int)}",
         method = "setNumColumns",
         args = {int.class}
@@ -537,10 +533,10 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link GridView#attachLayoutAnimationParameters(View, ViewGroup.LayoutParams, int, int)}",
+        level = TestLevel.COMPLETE,
         method = "attachLayoutAnimationParameters",
-        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, int.class}
+        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, 
+                int.class}
     )
     public void testAttachLayoutAnimationParameters() {
         MockGridView mockGridView = new MockGridView(mActivity);
@@ -552,7 +548,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#layoutChildren()}",
         method = "layoutChildren",
         args = {}
@@ -564,7 +560,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#onFocusChanged(boolean, int, Rect)}",
         method = "onFocusChanged",
         args = {boolean.class, int.class, android.graphics.Rect.class}
@@ -588,7 +584,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#onMeasure(int, int)}",
         method = "onMeasure",
         args = {int.class, int.class}
@@ -607,7 +603,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#setColumnWidth(int)}",
         method = "setColumnWidth",
         args = {int.class}
@@ -650,19 +646,19 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#computeVerticalScrollExtent()}",
             method = "computeVerticalScrollExtent",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#computeVerticalScrollExtent()}",
             method = "computeVerticalScrollOffset",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link GridView#computeVerticalScrollExtent()}",
             method = "computeVerticalScrollRange",
             args = {}
@@ -981,4 +977,3 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
         }
     }
 }
-

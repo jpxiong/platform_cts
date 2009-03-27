@@ -28,7 +28,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(SuperscriptSpan.class)
 public class SuperscriptSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint tp).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -56,7 +56,7 @@ public class SuperscriptSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint tp).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

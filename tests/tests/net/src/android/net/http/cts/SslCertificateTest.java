@@ -46,13 +46,14 @@ public class SslCertificateTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of SslCertificate.",
             method = "SslCertificate",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class}
+            args = {java.lang.String.class, java.lang.String.class, java.lang.String.class, 
+                    java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of SslCertificate.",
             method = "SslCertificate",
             args = {java.security.cert.X509Certificate.class}
@@ -205,13 +206,13 @@ public class SslCertificateTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test saveState and restoreState(SslCertificate certificate).",
             method = "saveState",
             args = {android.net.http.SslCertificate.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test saveState and restoreState(SslCertificate certificate).",
             method = "restoreState",
             args = {android.os.Bundle.class}
@@ -240,31 +241,31 @@ public class SslCertificateTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
             method = "getIssuedTo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
             method = "getIssuedBy",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
             method = "getValidNotAfter",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
             method = "getValidNotBefore",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
             method = "toString",
             args = {}

@@ -32,7 +32,7 @@ public class Interpolator_ResultTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -43,7 +43,7 @@ public class Interpolator_ResultTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test values().",
         method = "values",
         args = {}

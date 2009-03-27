@@ -22,9 +22,10 @@ import java.io.OutputStream;
 
 import junit.framework.TestCase;
 import android.os.MemoryFile;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -38,17 +39,18 @@ public class MemoryFileTest extends TestCase {
         mMemoryFile = null;
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor",
-      targets = {
-        @TestTarget(
-          methodName = "MemoryFile",
-          methodArgs = {String.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor",
+            method = "MemoryFile",
+            args = {java.lang.String.class, int.class}
         ),
-        @TestTarget(
-          methodName = "finalize",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor",
+            method = "finalize",
+            args = {}
         )
     })
     public void testConstructor() {
@@ -56,15 +58,12 @@ public class MemoryFileTest extends TestCase {
         new MemoryFile("Test File", 1024);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test writeBytes",
-      targets = {
-        @TestTarget(
-          methodName = "writeBytes",
-          methodArgs = {byte[].class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test writeBytes",
+        method = "writeBytes",
+        args = {byte[].class, int.class, int.class, int.class}
+    )
     public void testWriteBytes() {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
@@ -100,17 +99,18 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getOutputStream and getInputStream function",
-      targets = {
-        @TestTarget(
-          methodName = "getOutputStream",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getOutputStream and getInputStream function",
+            method = "getOutputStream",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getInputStream",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getOutputStream and getInputStream function",
+            method = "getInputStream",
+            args = {}
         )
     })
     public void testGetOutputStream() {
@@ -136,17 +136,18 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test allowPurging and isPurgingAllowed",
-      targets = {
-        @TestTarget(
-          methodName = "allowPurging",
-          methodArgs = {boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test allowPurging and isPurgingAllowed",
+            method = "allowPurging",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "isPurgingAllowed",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test allowPurging and isPurgingAllowed",
+            method = "isPurgingAllowed",
+            args = {}
         )
     })
     @ToBeFixed(bug = "1537041", explanation = "When set mAllowPurging to true, writeBytes"
@@ -178,15 +179,12 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test length",
-      targets = {
-        @TestTarget(
-          methodName = "length",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test length",
+        method = "length",
+        args = {}
+    )
     public void testLength() {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
@@ -202,15 +200,12 @@ public class MemoryFileTest extends TestCase {
         assertEquals(Integer.MIN_VALUE, mMemoryFile.length());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test readBytes",
-      targets = {
-        @TestTarget(
-          methodName = "readBytes",
-          methodArgs = {byte[].class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test readBytes",
+        method = "readBytes",
+        args = {byte[].class, int.class, int.class, int.class}
+    )
     public void testReadBytes() {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
@@ -251,15 +246,12 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test close function",
-      targets = {
-        @TestTarget(
-          methodName = "close",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test close function",
+        method = "close",
+        args = {}
+    )
     @ToBeFixed(bug="1398215", explanation="the file still can be read even after it closes.")
     public void testClose() {
         // new the MemoryFile instance

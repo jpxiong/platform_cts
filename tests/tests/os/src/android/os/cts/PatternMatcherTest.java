@@ -38,13 +38,13 @@ public class PatternMatcherTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor",
             method = "PatternMatcher",
             args = {android.os.Parcel.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor",
             method = "PatternMatcher",
             args = {java.lang.String.class, int.class}
@@ -67,7 +67,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getType",
         method = "getType",
         args = {}
@@ -85,7 +85,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getPath",
         method = "getPath",
         args = {}
@@ -105,7 +105,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString",
         method = "toString",
         args = {}
@@ -130,7 +130,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -149,7 +149,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents",
         method = "describeContents",
         args = {}
@@ -162,7 +162,7 @@ public class PatternMatcherTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test match",
         method = "match",
         args = {java.lang.String.class}

@@ -29,7 +29,7 @@ import dalvik.annotation.TestTargetClass;
 public class Canvas_EdgeTypeTest extends AndroidTestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -41,28 +41,33 @@ public class Canvas_EdgeTypeTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this"
+                    + "enumeration is used as an argument",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this"
+                    + "enumeration is used as an argument",
             method = "quickReject",
             args = {android.graphics.Path.class, android.graphics.Canvas.EdgeType.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this"
+                    + "enumeration is used as an argument",
             method = "quickReject",
             args = {android.graphics.RectF.class, android.graphics.Canvas.EdgeType.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this"
+                    + "enumeration is used as an argument",
             method = "quickReject",
-            args = {int.class, int.class, int.class, int.class, android.graphics.Canvas.EdgeType.class}
+            args = {int.class, int.class, int.class, int.class, 
+                    android.graphics.Canvas.EdgeType.class}
         )
     })
     public void testValues(){
