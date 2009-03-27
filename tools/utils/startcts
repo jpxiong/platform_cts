@@ -14,13 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if [-z "${ANDROID_ROOT}"]; then
 # CONFIGURATION
 # Set this variable to the out/host/<platform> directory of your Android tree.
-ANDROID_ROOT=out/host/linux-x86
+ANDROID_ROOT=/.../out/host/linux-x86
+fi;
 
+if [-z "${CTS_ROOT}"]; then
 # CONFIGURATION
 # Set this variable to the root of unzipped CTS directory
 CTS_ROOT=
+fi;
+
+# ----------------------------------------------------------------------------
+# END OF CONFIGURATION SECTION
+# ----------------------------------------------------------------------------
 
 # If ANDROID_ROOT does not exist, complain and exit
 if [ ! -d ${ANDROID_ROOT} ]; then
@@ -38,4 +46,4 @@ if [ ! -d ${CTS_ROOT} ]; then
     exit
 fi
 
-ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CTS_ROOT}/repository/host_config.xml
+ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CTS_ROOT}/repository/host_config.xml "$@"
