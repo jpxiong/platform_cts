@@ -60,12 +60,32 @@ public class HostConfig extends XMLResourceHandler {
     static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
                                                   "logo.gif", "newrule-green.png"};
 
+    /** Default number of tests executed between reboots. */
+    private static final long MAX_TEST_COUNT_DEFAULT = 500;
+    /** Name of environment variable that can override MAX_TEST_COUNT_DEFAULT. */ 
+    private static final String MAX_TEST_ENV_VAR = "CTS_RESTART_AFTER";
+    /** Number of tests executed between reboots. A value <= 0 disables reboots. */
+    private static final long MAX_TEST_COUNT; // set in static initializer
+    
     private String mConfigRoot;
     private CaseRepository mCaseRepos;
     private Repository mResultRepos;
     private PlanRepository mPlanRepos;
     private HashMap<String, TestPackage> mTestPackageMap;
 
+    static {
+        long maxTestCount = MAX_TEST_COUNT_DEFAULT;
+        String prop = System.getenv(MAX_TEST_ENV_VAR);
+        if (prop != null) {
+            try {
+                maxTestCount = Long.parseLong(prop);
+            } catch (NumberFormatException ignored) {
+                // just use default value
+            }
+        }
+        MAX_TEST_COUNT = maxTestCount;
+    }
+    
     private final static HostConfig sInstance = new HostConfig();
 
     private HostConfig() {
@@ -74,6 +94,14 @@ public class HostConfig extends XMLResourceHandler {
 
     public static HostConfig getInstance() {
         return sInstance;
+    }
+    
+    /**
+     * Returns the max number of tests to run between reboots. A value of 0 or smaller indicates
+     * that reboots should not be used.
+     */
+    public static long getMaxTestCount() {
+        return MAX_TEST_COUNT;
     }
 
     /**
