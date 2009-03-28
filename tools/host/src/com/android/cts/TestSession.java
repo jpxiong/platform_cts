@@ -45,7 +45,7 @@ public class TestSession {
     private boolean mNeedRestartAdbServer;
     private static boolean mADBServerRestartedMode;
 
-    private static final long MAX_TEST_COUNT = 500;
+    /** Running count of tests executed since last reboot. */
     private static long mTestCount;
 
     public TestSession(final TestSessionLog sessionLog,
@@ -109,12 +109,14 @@ public class TestSession {
     }
 
     /**
-     * Check if the test count exceeds the max test count.
+     * Check if the test count exceeds the max test count. If the max test count is disabled
+     * (HostConfig.getMaxTestCount() <= 0), this method always returns false.
      *
-     * @return If reached, return true; else, return false.
+     * @return true, if the max count is enabled and exceeded.
      */
     public static boolean exceedsMaxCount() {
-        return mTestCount >= MAX_TEST_COUNT;
+        final long maxTestCount = HostConfig.getMaxTestCount();
+        return (maxTestCount > 0) && (mTestCount >= maxTestCount);
     }
 
     /**
@@ -214,7 +216,7 @@ public class TestSession {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (mNeedRestartAdbServer) {
+        if (mNeedRestartAdbServer && HostConfig.getMaxTestCount() > 0) {
             throw new ADBServerNeedRestartException("Need restart ADB server");
         }
     }
