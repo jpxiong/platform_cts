@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [-z "${ANDROID_ROOT}"]; then
+if [ -z "${ANDROID_ROOT}" ]; then
 # CONFIGURATION
 # Set this variable to the out/host/<platform> directory of your Android tree.
 ANDROID_ROOT=/.../out/host/linux-x86
 fi;
 
-if [-z "${CTS_ROOT}"]; then
+if [ -z "${CTS_ROOT}" ]; then
 # CONFIGURATION
 # Set this variable to the root of unzipped CTS directory
 CTS_ROOT=
@@ -38,7 +38,7 @@ fi
 
 # If CTS_ROOT not set, assume it's under ANDROID_ROOT
 if [ -z "${CTS_ROOT}" ]; then
-    CTS_ROOT=${ANDROID_ROOT}/cts/android-cts_linux-x86
+    CTS_ROOT=${ANDROID_ROOT}/cts/android-cts
 fi
 
 if [ ! -d ${CTS_ROOT} ]; then
@@ -46,4 +46,27 @@ if [ ! -d ${CTS_ROOT} ]; then
     exit
 fi
 
-ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CTS_ROOT}/repository/host_config.xml "$@"
+# configuration supplied as single argument
+CONFIG=
+# configuration supplied with --config option
+DDCONFIG=
+
+if [ $# -eq 1 ]; then
+    # single argument specifies configuration file
+    :
+else
+    if [[ "$*" =~ "--config" ]]; then
+        # --config supplied on command line
+        :
+    else
+        if [ $# -eq 0 ]; then
+            # no arguments; supply config as single argument
+            CONFIG=${CTS_ROOT}/repository/host_config.xml
+        else
+            # no config; append --config to existing command line
+            DDCONFIG="--config ${CTS_ROOT}/repository/host_config.xml"
+        fi;
+    fi;
+fi;
+
+ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CONFIG} "$@" ${DDCONFIG}
