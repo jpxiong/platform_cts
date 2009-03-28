@@ -53,13 +53,13 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewFlipper}",
             method = "ViewFlipper",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ViewFlipper}",
             method = "ViewFlipper",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -84,7 +84,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewFlipper#setFlipInterval(int)}",
         method = "setFlipInterval",
         args = {int.class}
@@ -98,20 +98,17 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ViewFlipper#stopFlipping()}, {@link ViewFlipper#startFlipping()} and {@link ViewFlipper#isFlipping()}",
+            level = TestLevel.COMPLETE,
             method = "startFlipping",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ViewFlipper#stopFlipping()}, {@link ViewFlipper#startFlipping()} and {@link ViewFlipper#isFlipping()}",
+            level = TestLevel.COMPLETE,
             method = "stopFlipping",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ViewFlipper#stopFlipping()}, {@link ViewFlipper#startFlipping()} and {@link ViewFlipper#isFlipping()}",
+            level = TestLevel.COMPLETE,
             method = "isFlipping",
             args = {}
         )

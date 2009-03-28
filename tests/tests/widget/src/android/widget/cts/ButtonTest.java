@@ -36,19 +36,19 @@ import dalvik.annotation.ToBeFixed;
 public class ButtonTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link Button}",
             method = "Button",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link Button}",
             method = "Button",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link Button}",
             method = "Button",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}

@@ -31,9 +31,10 @@ import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 /**
@@ -230,39 +231,53 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * Test case 1: Take a picture and verify all the callback
      * functions are called properly.
      */
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test taking picture. There is some problems in testing autoFocus, setErrorCallback",
-      targets = {
-        @TestTarget(
-          methodName = "startPreview",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "startPreview",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewDisplay",
-          methodArgs = {SurfaceHolder.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPreviewDisplay",
+            args = {android.view.SurfaceHolder.class}
         ),
-        @TestTarget(
-          methodName = "open",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "open",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "release",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "release",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "takePicture",
-          methodArgs = {ShutterCallback.class, PictureCallback.class, PictureCallback.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "takePicture",
+            args = {android.hardware.Camera.ShutterCallback.class, 
+                    android.hardware.Camera.PictureCallback.class, 
+                    android.hardware.Camera.PictureCallback.class}
         ),
-        @TestTarget(
-          methodName = "setErrorCallback",
-          methodArgs = {ErrorCallback.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setErrorCallback",
+            args = {android.hardware.Camera.ErrorCallback.class}
         ),
-        @TestTarget(
-          methodName = "autoFocus",
-          methodArgs = {AutoFocusCallback.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "autoFocus",
+            args = {android.hardware.Camera.AutoFocusCallback.class}
         )
     })
+    // There is some problems in testing autoFocus, setErrorCallback
     public void testTakePicture() throws Exception {
         initializeMessageLooper();
         syncLock();
@@ -281,37 +296,48 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * Test case 2: Set the preview and
      * verify the RawPreviewCallback is called
      */
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Preview test",
-      targets = {
-        @TestTarget(
-          methodName = "stopPreview",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "stopPreview",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewCallback",
-          methodArgs = {PreviewCallback.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "setPreviewCallback",
+            args = {android.hardware.Camera.PreviewCallback.class}
         ),
-        @TestTarget(
-          methodName = "open",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "open",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "release",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "release",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "startPreview",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "startPreview",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewDisplay",
-          methodArgs = {SurfaceHolder.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "setPreviewDisplay",
+            args = {android.view.SurfaceHolder.class}
         ),
-        @TestTarget(
-          methodName = "setErrorCallback",
-          methodArgs = {ErrorCallback.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Preview test",
+            method = "setErrorCallback",
+            args = {android.hardware.Camera.ErrorCallback.class}
         )
     })
     public void testCheckPreview() throws Exception {
@@ -324,17 +350,18 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(mRawPreviewCallbackResult);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test AccessParameters",
-      targets = {
-        @TestTarget(
-          methodName = "getParameters",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test AccessParameters",
+            method = "getParameters",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setParameters",
-          methodArgs = {Parameters.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test AccessParameters",
+            method = "setParameters",
+            args = {android.hardware.Camera.Parameters.class}
         )
     })
     public void testAccessParameters() {

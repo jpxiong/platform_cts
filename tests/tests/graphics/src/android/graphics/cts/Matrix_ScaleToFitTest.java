@@ -32,7 +32,7 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "",
         method = "values",
         args = {}
@@ -46,7 +46,7 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -59,7 +59,7 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "",
         method = "valueOf",
         args = {android.graphics.Matrix.ScaleToFit.class, java.lang.String.class}

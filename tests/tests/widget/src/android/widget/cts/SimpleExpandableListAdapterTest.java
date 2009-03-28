@@ -109,22 +109,28 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, int.class, java.lang.String[].class, int[].class, java.util.List.class, int.class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, java.util.List.class, int.class, int.class, 
+                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
+                    int.class, java.lang.String[].class, int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, int.class, java.lang.String[].class, int[].class, java.util.List.class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, java.util.List.class, int.class, int.class, 
+                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
+                    java.lang.String[].class, int[].class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, java.lang.String[].class, int[].class, java.util.List.class, int.class, java.lang.String[].class, int[].class}
+            args = {android.content.Context.class, java.util.List.class, int.class, 
+                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
+                    java.lang.String[].class, int[].class}
         )
     })
     public void testConstructor() {
@@ -145,7 +151,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getChild(int, int)}",
         method = "getChild",
         args = {int.class, int.class}
@@ -188,7 +194,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getChildId(int, int)}",
         method = "getChildId",
         args = {int.class, int.class}
@@ -207,10 +213,10 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleExpandableListAdapter#getChildView(int, int, boolean, View, ViewGroup)}",
+        level = TestLevel.COMPLETE,
         method = "getChildView",
-        args = {int.class, int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
+        args = {int.class, int.class, boolean.class, android.view.View.class, 
+                android.view.ViewGroup.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "SimpleExpandableListAdapter#getChildView(int, int, boolean, View, ViewGroup if "
@@ -280,7 +286,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#newChildView(boolean, ViewGroup)}",
         method = "newChildView",
         args = {boolean.class, android.view.ViewGroup.class}
@@ -312,7 +318,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getChildrenCount(int)}",
         method = "getChildrenCount",
         args = {int.class}
@@ -340,7 +346,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getGroup(int)}",
         method = "getGroup",
         args = {int.class}
@@ -371,7 +377,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getGroupCount()}",
         method = "getGroupCount",
         args = {}
@@ -386,7 +392,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#getGroupId(int)}",
         method = "getGroupId",
         args = {int.class}
@@ -403,8 +409,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleExpandableListAdapter#getGroupView(int, boolean, View, ViewGroup)}",
+        level = TestLevel.COMPLETE,
         method = "getGroupView",
         args = {int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
     )
@@ -464,7 +469,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleExpandableListAdapter#newGroupView(boolean, ViewGroup)}",
         method = "newGroupView",
         args = {boolean.class, android.view.ViewGroup.class}
@@ -496,8 +501,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleExpandableListAdapter#isChildSelectable(int, int)}This method always return true",
+        level = TestLevel.COMPLETE,
         method = "isChildSelectable",
         args = {int.class, int.class}
     )
@@ -515,8 +519,7 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleExpandableListAdapter#hasStableIds()}This method always returns true",
+        level = TestLevel.COMPLETE,
         method = "hasStableIds",
         args = {}
     )

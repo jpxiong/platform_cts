@@ -52,48 +52,36 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {android.graphics.Paint.class}
         )
     })
     public void testConstructor() {
-        try {
-            new Paint();
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
-        }
+        new Paint();
 
-        try {
-            new Paint(1);
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
-        }
+        new Paint(1);
 
-        try {
-            Paint p = new Paint();
-            Paint p2 = new Paint(p);
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
-        }
+        Paint p = new Paint();
+        new Paint(p);
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test breakText(char[] text, int index, int count, float maxWidth, float[] measuredWidth).",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "breakText",
         args = {char[].class, int.class, int.class, float.class, float[].class}
     )
@@ -157,10 +145,11 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test breakText(CharSequence text, int start, int end, boolean measureForwards, float maxWidth, float[] measuredWidth).",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "breakText",
-        args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class, float[].class}
+        args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class, 
+                float[].class}
     )
     public void testBreakText2() {
         Paint p = new Paint();
@@ -237,8 +226,8 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test breakText(String text, boolean measureForwards, float maxWidth, float[] measuredWidth).",
+        level = TestLevel.COMPLETE,
+        notes = "",
         method = "breakText",
         args = {java.lang.String.class, boolean.class, float.class, float[].class}
     )
@@ -305,7 +294,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test set(Paint src).",
         method = "set",
         args = {android.graphics.Paint.class}
@@ -374,13 +363,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeCap.",
             method = "setStrokeCap",
             args = {android.graphics.Paint.Cap.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeCap.",
             method = "getStrokeCap",
             args = {}
@@ -407,13 +396,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Xfermode.",
             method = "setXfermode",
             args = {android.graphics.Xfermode.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Xfermode.",
             method = "getXfermode",
             args = {}
@@ -432,13 +421,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Shader.",
             method = "setShader",
             args = {android.graphics.Shader.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Shader.",
             method = "getShader",
             args = {}
@@ -457,13 +446,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setAntiAlias(boolean aa) & isAntiAlias().",
             method = "setAntiAlias",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setAntiAlias(boolean aa) & isAntiAlias().",
             method = "isAntiAlias",
             args = {}
@@ -482,13 +471,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Typeface.",
             method = "setTypeface",
             args = {android.graphics.Typeface.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Typeface.",
             method = "getTypeface",
             args = {}
@@ -513,13 +502,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get PathEffect.",
             method = "setPathEffect",
             args = {android.graphics.PathEffect.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get PathEffect.",
             method = "getPathEffect",
             args = {}
@@ -538,13 +527,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFakeBoldText(boolean fakeBoldText) & isFakeBoldText().",
             method = "setFakeBoldText",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFakeBoldText(boolean fakeBoldText) & isFakeBoldText().",
             method = "isFakeBoldText",
             args = {}
@@ -562,13 +551,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeJoin.",
             method = "setStrokeJoin",
             args = {android.graphics.Paint.Join.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeJoin.",
             method = "getStrokeJoin",
             args = {}
@@ -595,13 +584,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Style.",
             method = "setStyle",
             args = {android.graphics.Paint.Style.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Style.",
             method = "getStyle",
             args = {}
@@ -627,14 +616,13 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFontSpacing().",
         method = "getFontSpacing",
         args = {}
     )
     public void testGetFontSpacing() {
         Paint p = new Paint();
-        Paint.FontMetrics fm = new Paint.FontMetrics();
 
         assertEquals(13.96875f, p.getFontSpacing());
 
@@ -647,13 +635,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setSubpixelText() and isSubpixelText().",
             method = "isSubpixelText",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setSubpixelText() and isSubpixelText().",
             method = "setSubpixelText",
             args = {boolean.class}
@@ -671,13 +659,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextScaleX.",
             method = "setTextScaleX",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextScaleX.",
             method = "getTextScaleX",
             args = {}
@@ -699,13 +687,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get MaskFilter.",
             method = "setMaskFilter",
             args = {android.graphics.MaskFilter.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get MaskFilter.",
             method = "getMaskFilter",
             args = {}
@@ -724,13 +712,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get ColorFilter.",
             method = "setColorFilter",
             args = {android.graphics.ColorFilter.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get ColorFilter.",
             method = "getColorFilter",
             args = {}
@@ -749,13 +737,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Rasterizer.",
             method = "setRasterizer",
             args = {android.graphics.Rasterizer.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Rasterizer.",
             method = "getRasterizer",
             args = {}
@@ -773,7 +761,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setARGB(int a, int r, int g, int b).",
         method = "setARGB",
         args = {int.class, int.class, int.class, int.class}
@@ -790,7 +778,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test ascent().",
         method = "ascent",
         args = {}
@@ -821,13 +809,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextSkewX.",
             method = "setTextSkewX",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextSkewX.",
             method = "getTextSkewX",
             args = {}
@@ -848,13 +836,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextSize.",
             method = "setTextSize",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get TextSize.",
             method = "getTextSize",
             args = {}
@@ -880,7 +868,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextWidths(char[] text, int index, int count, float[] widths).",
         method = "getTextWidths",
         args = {char[].class, int.class, int.class, float[].class}
@@ -940,7 +928,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextWidths(CharSequence text, int start, int end, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.CharSequence.class, int.class, int.class, float[].class}
@@ -1239,7 +1227,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextWidths(String text, int start, int end, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.String.class, int.class, int.class, float[].class}
@@ -1307,7 +1295,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextWidths(String text, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.String.class, float[].class}
@@ -1343,13 +1331,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setStrikeThruText & isStrikeThruText().",
             method = "isStrikeThruText",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setStrikeThruText & isStrikeThruText().",
             method = "setStrikeThruText",
             args = {boolean.class}
@@ -1367,13 +1355,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "setTextAlign",
             args = {android.graphics.Paint.Align.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "getTextAlign",
             args = {}
@@ -1393,7 +1381,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFillPath(Path src, Path dst).",
         method = "getFillPath",
         args = {android.graphics.Path.class, android.graphics.Path.class}
@@ -1415,13 +1403,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Alpha.",
             method = "setAlpha",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Alpha.",
             method = "getAlpha",
             args = {}
@@ -1447,13 +1435,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFilterBitmap(boolean) & isFilterBitmap().",
             method = "isFilterBitmap",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setFilterBitmap(boolean) & isFilterBitmap().",
             method = "setFilterBitmap",
             args = {boolean.class}
@@ -1471,13 +1459,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Color.",
             method = "setColor",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Color.",
             method = "getColor",
             args = {}
@@ -1503,7 +1491,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextBounds(String text, int start, int end, Rect bounds).",
         method = "getTextBounds",
         args = {java.lang.String.class, int.class, int.class, android.graphics.Rect.class}
@@ -1574,7 +1562,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextBounds(char[] text, int index, int count, Rect bounds).",
         method = "getTextBounds",
         args = {char[].class, int.class, int.class, android.graphics.Rect.class}
@@ -1645,7 +1633,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setShadowLayer(float radius, float dx, float dy, int color).",
         method = "setShadowLayer",
         args = {float.class, float.class, float.class, int.class}
@@ -1656,7 +1644,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFontMetrics(FontMetrics metrics).",
         method = "getFontMetrics",
         args = {android.graphics.Paint.FontMetrics.class}
@@ -1698,7 +1686,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFontMetrics().",
         method = "getFontMetrics",
         args = {}
@@ -1735,13 +1723,13 @@ public class PaintTest extends AndroidTestCase {
     }
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeMiter.",
             method = "setStrokeMiter",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeMiter.",
             method = "getStrokeMiter",
             args = {}
@@ -1762,7 +1750,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clearShadowLayer().",
         method = "clearShadowLayer",
         args = {}
@@ -1774,13 +1762,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setUnderlineText(boolean underlineText) & isUnderlineText().",
             method = "setUnderlineText",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setUnderlineText(boolean underlineText) & isUnderlineText().",
             method = "isUnderlineText",
             args = {}
@@ -1798,13 +1786,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDither(boolean dither) & isDither.",
             method = "setDither",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDither(boolean dither) & isDither.",
             method = "isDither",
             args = {}
@@ -1821,7 +1809,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test descent().",
         method = "descent",
         args = {}
@@ -1852,13 +1840,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Flags.",
             method = "setFlags",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get Flags.",
             method = "getFlags",
             args = {}
@@ -1876,13 +1864,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeWidth.",
             method = "setStrokeWidth",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test set and get StrokeWidth.",
             method = "getStrokeWidth",
             args = {}
@@ -1903,7 +1891,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test reset().",
         method = "reset",
         args = {}
@@ -1950,13 +1938,13 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLinearText(boolean) & isLinearText().",
             method = "isLinearText",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setLinearText(boolean) & isLinearText().",
             method = "setLinearText",
             args = {boolean.class}
@@ -1973,7 +1961,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test finalize().",
         method = "finalize",
         args = {}
@@ -1991,7 +1979,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFontMetricsInt(FontMetricsInt fmi).",
         method = "getFontMetricsInt",
         args = {android.graphics.Paint.FontMetricsInt.class}
@@ -2033,7 +2021,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getFontMetricsInt().",
         method = "getFontMetricsInt",
         args = {}
@@ -2068,7 +2056,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureText(char[] text, int index, int count).",
         method = "measureText",
         args = {char[].class, int.class, int.class}
@@ -2124,7 +2112,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureText(String text, int start, int end).",
         method = "measureText",
         args = {java.lang.String.class, int.class, int.class}
@@ -2184,7 +2172,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureText(String text).",
         method = "measureText",
         args = {java.lang.String.class}
@@ -2237,7 +2225,7 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test measureText(CharSequence text, int start, int end).",
         method = "measureText",
         args = {java.lang.CharSequence.class, int.class, int.class}
@@ -2499,10 +2487,11 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextPath(char[] text, int index, int count, float x, float y, Path path).",
         method = "getTextPath",
-        args = {char[].class, int.class, int.class, float.class, float.class, android.graphics.Path.class}
+        args = {char[].class, int.class, int.class, float.class, float.class, 
+                android.graphics.Path.class}
     )
     public void testGetTextPath1() {
         Paint p = new Paint();
@@ -2534,10 +2523,11 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTextPath(String text, int start, int end, float x, float y, Path path).",
         method = "getTextPath",
-        args = {java.lang.String.class, int.class, int.class, float.class, float.class, android.graphics.Path.class}
+        args = {java.lang.String.class, int.class, int.class, float.class, float.class, 
+                android.graphics.Path.class}
     )
     public void testGetTextPath2() {
         Paint p = new Paint();
@@ -2587,4 +2577,3 @@ public class PaintTest extends AndroidTestCase {
     }
 
 }
-

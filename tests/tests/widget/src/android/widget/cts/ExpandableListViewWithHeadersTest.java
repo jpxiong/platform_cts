@@ -22,9 +22,10 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.view.KeyEvent;
 import android.widget.ExpandableListView;
 import android.widget.cts.util.ListUtil;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(ExpandableListView.class)
@@ -50,15 +51,12 @@ public class ExpandableListViewWithHeadersTest extends
         assertNotNull(mExpandableListView);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#expandGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "expandGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#expandGroup(int)}",
+        method = "expandGroup",
+        args = {int.class}
+    )
     @MediumTest
     public void testExpandOnFirstPosition() {
         // Should be a header, and hence the first group should NOT have expanded
@@ -68,15 +66,12 @@ public class ExpandableListViewWithHeadersTest extends
         assertFalse(mExpandableListView.isGroupExpanded(0));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link ExpandableListView#expandGroup(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "expandGroup",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link ExpandableListView#expandGroup(int)}",
+        method = "expandGroup",
+        args = {int.class}
+    )
     @LargeTest
     public void testExpandOnFirstGroup() {
         mListUtil.arrowScrollToSelectedPosition(getActivity().getNumOfHeadersAndFooters());

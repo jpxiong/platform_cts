@@ -74,7 +74,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOnGlobalFocusChangeListener(OnGlobalFocusChangeListener)",
         method = "addOnGlobalFocusChangeListener",
         args = {android.view.ViewTreeObserver.OnGlobalFocusChangeListener.class}
@@ -100,7 +100,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOnGlobalLayoutListener(OnGlobalLayoutListener)",
         method = "addOnGlobalLayoutListener",
         args = {android.view.ViewTreeObserver.OnGlobalLayoutListener.class}
@@ -118,7 +118,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOnPreDrawListener(OnPreDrawListener)",
         method = "addOnPreDrawListener",
         args = {android.view.ViewTreeObserver.OnPreDrawListener.class}
@@ -135,7 +135,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOnTouchModeChangeListener(OnTouchModeChangeListener)",
         method = "addOnTouchModeChangeListener",
         args = {android.view.ViewTreeObserver.OnTouchModeChangeListener.class}
@@ -162,7 +162,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addOnComputeInternalInsetsListener(OnComputeInternalInsetsListener)",
         method = "addOnComputeInternalInsetsListener",
         args = {android.view.ViewTreeObserver.OnComputeInternalInsetsListener.class}
@@ -176,7 +176,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeOnComputeInternalInsetsListener(OnComputeInternalInsetsListener)",
         method = "removeOnComputeInternalInsetsListener",
         args = {android.view.ViewTreeObserver.OnComputeInternalInsetsListener.class}
@@ -190,7 +190,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchOnGlobalLayout()",
         method = "dispatchOnGlobalLayout",
         args = {}
@@ -207,7 +207,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test dispatchOnPreDraw()",
         method = "dispatchOnPreDraw",
         args = {}
@@ -224,7 +224,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isAlive()",
         method = "isAlive",
         args = {}
@@ -237,7 +237,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeGlobalOnLayoutListener(OnGlobalLayoutListener)",
         method = "removeGlobalOnLayoutListener",
         args = {android.view.ViewTreeObserver.OnGlobalLayoutListener.class}
@@ -260,7 +260,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeOnGlobalFocusChangeListener(OnGlobalFocusChangeListener)",
         method = "removeOnGlobalFocusChangeListener",
         args = {android.view.ViewTreeObserver.OnGlobalFocusChangeListener.class}
@@ -295,7 +295,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeOnPreDrawListener(OnPreDrawListener)",
         method = "removeOnPreDrawListener",
         args = {android.view.ViewTreeObserver.OnPreDrawListener.class}
@@ -318,7 +318,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeOnTouchModeChangeListener(OnTouchModeChangeListener)",
         method = "removeOnTouchModeChangeListener",
         args = {android.view.ViewTreeObserver.OnTouchModeChangeListener.class}

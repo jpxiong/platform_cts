@@ -55,7 +55,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: compress",
         method = "compress",
         args = {android.graphics.Bitmap.CompressFormat.class, int.class, java.io.OutputStream.class}
@@ -98,7 +98,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: copy",
         method = "copy",
         args = {android.graphics.Bitmap.Config.class, boolean.class}
@@ -120,7 +120,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: copyPixelsToBuffer",
         method = "copyPixelsToBuffer",
         args = {java.nio.Buffer.class}
@@ -176,13 +176,13 @@ public class BitmapTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: createBitmap",
             method = "createBitmap",
             args = {android.graphics.Bitmap.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: createBitmap",
             method = "createBitmap",
             args = {int[].class, int.class, int.class, android.graphics.Bitmap.Config.class}
@@ -199,7 +199,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: createBitmap",
         method = "createBitmap",
         args = {android.graphics.Bitmap.class, int.class, int.class, int.class, int.class}
@@ -226,10 +226,11 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: createBitmap",
         method = "createBitmap",
-        args = {android.graphics.Bitmap.class, int.class, int.class, int.class, int.class, android.graphics.Matrix.class, boolean.class}
+        args = {android.graphics.Bitmap.class, int.class, int.class, int.class, int.class, 
+                android.graphics.Matrix.class, boolean.class}
     )
     public void testCreateBitmap3(){
         mBitmap = Bitmap.createBitmap(100, 100, Config.ARGB_8888);
@@ -276,7 +277,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: createBitmap",
         method = "createBitmap",
         args = {int.class, int.class, android.graphics.Bitmap.Config.class}
@@ -290,10 +291,11 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: createBitmap",
         method = "createBitmap",
-        args = {int[].class, int.class, int.class, int.class, int.class, android.graphics.Bitmap.Config.class}
+        args = {int[].class, int.class, int.class, int.class, int.class, 
+                android.graphics.Bitmap.Config.class}
     )
     public void testCreateBitmap6(){
         int[] colors = createColors(100);
@@ -342,7 +344,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: createScaledBitmap",
         method = "createScaledBitmap",
         args = {android.graphics.Bitmap.class, int.class, int.class, boolean.class}
@@ -356,7 +358,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: describeContents",
         method = "describeContents",
         args = {}
@@ -366,7 +368,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: eraseColor",
         method = "eraseColor",
         args = {int.class}
@@ -398,7 +400,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: extractAlpha",
         method = "extractAlpha",
         args = {}
@@ -422,7 +424,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: extractAlpha",
         method = "extractAlpha",
         args = {android.graphics.Paint.class, int[].class}
@@ -446,7 +448,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: finalize",
         method = "finalize",
         args = {}
@@ -457,7 +459,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getConfig",
         method = "getConfig",
         args = {}
@@ -475,7 +477,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getHeight",
         method = "getHeight",
         args = {}
@@ -487,7 +489,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getNinePatchChunk",
         method = "getNinePatchChunk",
         args = {}
@@ -497,7 +499,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getPixel",
         method = "getPixel",
         args = {int.class, int.class}
@@ -534,7 +536,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getRowBytes",
         method = "getRowBytes",
         args = {}
@@ -552,7 +554,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getWidth",
         method = "getWidth",
         args = {}
@@ -564,7 +566,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: hasAlpha",
         method = "hasAlpha",
         args = {}
@@ -576,7 +578,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: isMutable",
         method = "isMutable",
         args = {}
@@ -589,13 +591,13 @@ public class BitmapTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: isRecycled and recycle",
             method = "isRecycled",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: isRecycled and recycle",
             method = "recycle",
             args = {}
@@ -608,7 +610,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: setPixel",
         method = "setPixel",
         args = {int.class, int.class, int.class}
@@ -657,13 +659,13 @@ public class BitmapTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: setPixels",
             method = "setPixels",
             args = {int[].class, int.class, int.class, int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: setPixels",
             method = "getPixels",
             args = {int[].class, int.class, int.class, int.class, int.class, int.class, int.class}
@@ -767,7 +769,7 @@ public class BitmapTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: writeToParcel",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}

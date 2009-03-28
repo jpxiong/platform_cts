@@ -111,19 +111,19 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ImageView}",
             method = "ImageView",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ImageView}",
             method = "ImageView",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ImageView}",
             method = "ImageView",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
@@ -158,7 +158,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#invalidateDrawable(Drawable)}",
         method = "invalidateDrawable",
         args = {android.graphics.drawable.Drawable.class}
@@ -170,7 +170,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setAdjustViewBounds(boolean)}",
         method = "setAdjustViewBounds",
         args = {boolean.class}
@@ -187,7 +187,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setMaxWidth(int)}",
         method = "setMaxWidth",
         args = {int.class}
@@ -200,7 +200,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setMaxHeight(int)}",
         method = "setMaxHeight",
         args = {int.class}
@@ -213,7 +213,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#getDrawable()}",
         method = "getDrawable",
         args = {}
@@ -231,7 +231,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageResource(int)}",
         method = "setImageResource",
         args = {int.class}
@@ -253,7 +253,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageURI(Uri)}",
         method = "setImageURI",
         args = {android.net.Uri.class}
@@ -264,7 +264,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         mImageView.setImageURI(null);
         assertNull(mImageView.getDrawable());
 
-        // because I can not write file in /data/data/com.android.cts.stub, it will throw IOException.
+        // because I can not write file in /data/data/com.android, it will throw IOException.
         // I just write the image file into database test path.
         File imagefile = new File("/sqlite_stmt_journals", "tempimage.jpg");
         if (imagefile.exists()) {
@@ -283,7 +283,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageDrawable(Drawable)}",
         method = "setImageDrawable",
         args = {android.graphics.drawable.Drawable.class}
@@ -306,7 +306,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageBitmap(Bitmap)}",
         method = "setImageBitmap",
         args = {android.graphics.Bitmap.class}
@@ -330,7 +330,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageState(int[], boolean)}",
         method = "setImageState",
         args = {int[].class, boolean.class}
@@ -343,7 +343,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setSelected(boolean)}",
         method = "setSelected",
         args = {boolean.class}
@@ -360,7 +360,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setImageLevel(int)}",
         method = "setImageLevel",
         args = {int.class}
@@ -377,14 +377,12 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ImageView#setScaleType(ScaleType)} and {@link ImageView#getScaleType()}",
+            level = TestLevel.COMPLETE,
             method = "setScaleType",
             args = {android.widget.ImageView.ScaleType.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ImageView#setScaleType(ScaleType)} and {@link ImageView#getScaleType()}",
+            level = TestLevel.COMPLETE,
             method = "getScaleType",
             args = {}
         )
@@ -420,14 +418,12 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ImageView#setImageMatrix(Matrix)} and {@link ImageView#getImageMatrix()}",
+            level = TestLevel.COMPLETE,
             method = "setImageMatrix",
             args = {android.graphics.Matrix.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link ImageView#setImageMatrix(Matrix)} and {@link ImageView#getImageMatrix()}",
+            level = TestLevel.COMPLETE,
             method = "getImageMatrix",
             args = {}
         )
@@ -444,7 +440,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#getBaseline()}",
         method = "getBaseline",
         args = {}
@@ -455,7 +451,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setColorFilter(int, Mode)}",
         method = "setColorFilter",
         args = {int.class, android.graphics.PorterDuff.Mode.class}
@@ -473,7 +469,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#clearColorFilter()}",
         method = "clearColorFilter",
         args = {}
@@ -491,7 +487,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setColorFilter(ColorFilter)}",
         method = "setColorFilter",
         args = {android.graphics.ColorFilter.class}
@@ -510,7 +506,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setAlpha(int)}",
         method = "setAlpha",
         args = {int.class}
@@ -528,7 +524,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#drawableStateChanged()}",
         method = "drawableStateChanged",
         args = {}
@@ -544,7 +540,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#onCreateDrawableState(int)}",
         method = "onCreateDrawableState",
         args = {int.class}
@@ -568,7 +564,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#onDraw(Canvas)}",
         method = "onDraw",
         args = {android.graphics.Canvas.class}
@@ -582,7 +578,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#onMeasure(int, int)}",
         method = "onMeasure",
         args = {int.class, int.class}
@@ -595,7 +591,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#onSetAlpha(int)}",
         method = "onSetAlpha",
         args = {int.class}
@@ -609,7 +605,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#setFrame(int, int, int, int)}",
         method = "setFrame",
         args = {int.class, int.class, int.class, int.class}
@@ -630,7 +626,7 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ImageView#verifyDrawable(Drawable)}",
         method = "verifyDrawable",
         args = {android.graphics.drawable.Drawable.class}

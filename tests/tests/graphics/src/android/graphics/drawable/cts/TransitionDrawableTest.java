@@ -61,13 +61,13 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#startTransition(int)}.",
             method = "startTransition",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#startTransition(int)}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
@@ -104,13 +104,13 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#resetTransition()}.",
             method = "resetTransition",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#resetTransition()}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
@@ -144,13 +144,13 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#reverseTransition()}.",
             method = "reverseTransition",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test {@link TransitionDrawable#reverseTransition()}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
@@ -194,8 +194,9 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link TransitionDrawable#draw(Canvas)}.Test the method with null canvas. This method is tested in directly with real canvas in other tests of this case.",
+        level = TestLevel.COMPLETE,
+        notes = "Test the method with null canvas. This method is tested in directly with real "
+                + "canvas in other tests of this case.",
         method = "draw",
         args = {android.graphics.Canvas.class}
     )
@@ -211,18 +212,19 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link TransitionDrawable#setCrossFadeEnabled(boolean)} and {@link TransitionDrawable#isCrossFadeEnabled()}. This boolean takes effect when the drawable is drawn and the effect can not be tested.",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setCrossFadeEnabled",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link TransitionDrawable#setCrossFadeEnabled(boolean)} and {@link TransitionDrawable#isCrossFadeEnabled()}. This boolean takes effect when the drawable is drawn and the effect can not be tested.",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "isCrossFadeEnabled",
             args = {}
         )
     })
+    //  This boolean takes effect when the drawable is drawn and the effect can not be tested.
     public void testAccessCrossFadeEnabled() {
         assertFalse(mTransitionDrawable.isCrossFadeEnabled());
 

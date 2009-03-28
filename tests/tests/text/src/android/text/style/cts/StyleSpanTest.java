@@ -29,7 +29,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(StyleSpan.class)
 public class StyleSpanTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of StyleSpan.",
         method = "StyleSpan",
         args = {int.class}
@@ -41,7 +41,7 @@ public class StyleSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getStyle().",
         method = "getStyle",
         args = {}
@@ -55,7 +55,7 @@ public class StyleSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateMeasureState(TextPaint paint).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
@@ -86,7 +86,7 @@ public class StyleSpanTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}

@@ -18,87 +18,120 @@ package android.hardware.cts;
 
 import junit.framework.TestCase;
 import android.hardware.Camera.Parameters;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(Parameters.class)
 public class Camera_ParametersTest extends TestCase {
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "We test Camera.Parameters related methods in CameraTest with testAccessParameters()",
-      targets = {
-        @TestTarget(
-          methodName = "get",
-          methodArgs = {String.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "get",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "set",
-          methodArgs = {String.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "set",
+            args = {java.lang.String.class, int.class}
         ),
-        @TestTarget(
-          methodName = "getInt",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getInt",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "set",
-          methodArgs = {String.class, String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "set",
+            args = {java.lang.String.class, java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "getPictureFormat",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getPictureFormat",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPictureFormat",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPictureFormat",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getPictureSize",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getPictureSize",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPictureSize",
-          methodArgs = {int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPictureSize",
+            args = {int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "getPreviewFormat",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getPreviewFormat",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewFormat",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPreviewFormat",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getPreviewFrameRate",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getPreviewFrameRate",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewFrameRate",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPreviewFrameRate",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getPreviewSize",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "getPreviewSize",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setPreviewSize",
-          methodArgs = {int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "setPreviewSize",
+            args = {int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "flatten",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "flatten",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "unflatten",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "unflatten",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "remove",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "",
+            method = "remove",
+            args = {java.lang.String.class}
         )
     })
+    // We test Camera.Parameters related methods in CameraTest with testAccessParameters()
     public void testAccessMethods() {
         // We test Camera.Parameters related methods in android.hardware.cts.CameraTest
         // #testAccessParameters().

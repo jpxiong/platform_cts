@@ -71,13 +71,13 @@ public class ViewAnimatorTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of ViewAnimator.",
             method = "ViewAnimator",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of ViewAnimator.",
             method = "ViewAnimator",
             args = {android.content.Context.class, android.util.AttributeSet.class}
@@ -99,19 +99,19 @@ public class ViewAnimatorTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setInAnimation(Animation inAnimation) and getInAnimation().",
             method = "setInAnimation",
             args = {android.view.animation.Animation.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setInAnimation(Animation inAnimation) and getInAnimation().",
             method = "setInAnimation",
             args = {android.content.Context.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setInAnimation(Animation inAnimation) and getInAnimation().",
             method = "getInAnimation",
             args = {}
@@ -135,7 +135,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test showNext().",
         method = "showNext",
         args = {}
@@ -179,7 +179,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setAnimateFirstView(boolean animate).",
         method = "setAnimateFirstView",
         args = {boolean.class}
@@ -192,13 +192,13 @@ public class ViewAnimatorTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDisplayedChild(int whichChild) and getDisplayedChild().",
             method = "setDisplayedChild",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDisplayedChild(int whichChild) and getDisplayedChild().",
             method = "getDisplayedChild",
             args = {}
@@ -240,13 +240,13 @@ public class ViewAnimatorTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDisplayedChild(int whichChild) and getDisplayedChild().",
             method = "setDisplayedChild",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setDisplayedChild(int whichChild) and getDisplayedChild().",
             method = "getDisplayedChild",
             args = {}
@@ -281,7 +281,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getBaseline().",
         method = "getBaseline",
         args = {}
@@ -313,7 +313,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test showPrevious().",
         method = "showPrevious",
         args = {}
@@ -358,7 +358,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getCurrentView().",
         method = "getCurrentView",
         args = {}
@@ -383,7 +383,7 @@ public class ViewAnimatorTest extends
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test addView(View child, int index, LayoutParams params).",
         method = "addView",
         args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
@@ -414,19 +414,19 @@ public class ViewAnimatorTest extends
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setOutAnimation(Animation outAnimation) and getOutAnimation().",
             method = "setOutAnimation",
             args = {android.view.animation.Animation.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setOutAnimation(Animation outAnimation) and getOutAnimation().",
             method = "setOutAnimation",
             args = {android.content.Context.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setOutAnimation(Animation outAnimation) and getOutAnimation().",
             method = "getOutAnimation",
             args = {}
@@ -448,4 +448,3 @@ public class ViewAnimatorTest extends
         assertEquals(500, animation.getDuration());
     }
 }
-

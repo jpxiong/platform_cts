@@ -16,11 +16,6 @@
 
 package android.util.cts;
 
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
-import dalvik.annotation.TestTargetClass;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -34,6 +29,12 @@ import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.util.Xml.Encoding;
+
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.TestStatus;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -89,28 +90,22 @@ public class XmlTest extends AndroidTestCase {
     final String sourceStr = "<" + TAG_TEST + "><" + TAG_SON + " " + ATT_NAME + "=\"" + STR_ABC
             + "\"/></" + TAG_TEST + ">";
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of Xml.",
-      targets = {
-        @TestTarget(
-          methodName = "Xml",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test constructor(s) of Xml.",
+        method = "Xml",
+        args = {}
+    )
     public void testConstructor() {
         new Xml();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test parse(String xml, ContentHandler contentHandler).",
-      targets = {
-        @TestTarget(
-          methodName = "parse",
-          methodArgs = {String.class, ContentHandler.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test parse(String xml, ContentHandler contentHandler).",
+        method = "parse",
+        args = {java.lang.String.class, org.xml.sax.ContentHandler.class}
+    )
     public void testParseStringContentHandler() {
         final String xmlStr = "<Test><Son name=\"abc\"/></Test>";
         DefaultContentHandler dc = new DefaultContentHandler();
@@ -210,15 +205,12 @@ public class XmlTest extends AndroidTestCase {
 
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test parse(Reader in, ContentHandler contentHandler).",
-      targets = {
-        @TestTarget(
-          methodName = "parse",
-          methodArgs = {Reader.class, ContentHandler.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test parse(Reader in, ContentHandler contentHandler).",
+        method = "parse",
+        args = {java.io.Reader.class, org.xml.sax.ContentHandler.class}
+    )
     public void testParseReaderContentHander() {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(bout);
@@ -267,15 +259,13 @@ public class XmlTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test parse(InputStream in, Encoding encoding, ContentHandler contentHandler).",
-      targets = {
-        @TestTarget(
-          methodName = "parse",
-          methodArgs = {InputStream.class, Encoding.class, ContentHandler.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test parse(InputStream in, Encoding encoding, ContentHandler contentHandler).",
+        method = "parse",
+        args = {java.io.InputStream.class, android.util.Xml.Encoding.class, 
+                org.xml.sax.ContentHandler.class}
+    )
     public void testParseInputStreamEncodingContentHandler() {
 
         // test US-ASCII
@@ -407,17 +397,18 @@ public class XmlTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test newSerializer() and newPullParser().",
-      targets = {
-        @TestTarget(
-          methodName = "newSerializer",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test newSerializer() and newPullParser().",
+            method = "newSerializer",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "newPullParser",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test newSerializer() and newPullParser().",
+            method = "newPullParser",
+            args = {}
         )
     })
     public void testNewSerializer() {
@@ -428,15 +419,12 @@ public class XmlTest extends AndroidTestCase {
         assertNotNull(xp);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test findEncodingByName(String encodingName).",
-      targets = {
-        @TestTarget(
-          methodName = "findEncodingByName",
-          methodArgs = {String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test findEncodingByName(String encodingName).",
+        method = "findEncodingByName",
+        args = {java.lang.String.class}
+    )
     public void testFindEncodingByName() {
 
         try {
@@ -456,15 +444,12 @@ public class XmlTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test asAttributeSet(XmlPullParser parser).",
-      targets = {
-        @TestTarget(
-          methodName = "asAttributeSet",
-          methodArgs = {XmlPullParser.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test asAttributeSet(XmlPullParser parser).",
+        method = "asAttributeSet",
+        args = {org.xmlpull.v1.XmlPullParser.class}
+    )
     public void testAsAttributeSet() {
         XmlResourceParser xp = getContext().getResources().getLayout(
                 com.android.cts.stub.R.layout.xml_test);

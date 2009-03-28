@@ -31,7 +31,7 @@ import dalvik.annotation.TestTargetClass;
 public class Bitmap_CompressFormatTest extends AndroidTestCase{
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -43,16 +43,19 @@ public class Bitmap_CompressFormatTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this "
+                    + "enumeration is used as an argument",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "test method: values and tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "test method: values and tests for the behavior of the methods where this "
+                    + "enumeration is used as an argument",
             method = "compress",
-            args = {android.graphics.Bitmap.CompressFormat.class, int.class, java.io.OutputStream.class}
+            args = {android.graphics.Bitmap.CompressFormat.class, int.class, 
+                    java.io.OutputStream.class}
         )
     })
     public void testValues(){

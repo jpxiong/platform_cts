@@ -16,9 +16,10 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 import android.content.Context;
@@ -43,17 +44,18 @@ public class ScrollerTest extends InstrumentationTestCase {
         mScroller = new Scroller(mTargetContext);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructors",
-      targets = {
-        @TestTarget(
-          methodName = "Scroller",
-          methodArgs = {Context.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructors",
+            method = "Scroller",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "Scroller",
-          methodArgs = {Context.class, Interpolator.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructors",
+            method = "Scroller",
+            args = {android.content.Context.class, android.view.animation.Interpolator.class}
         )
     })
     public void testConstructor() {
@@ -62,17 +64,16 @@ public class ScrollerTest extends InstrumentationTestCase {
         new Scroller(mTargetContext, new LinearInterpolator());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#forceFinished(boolean)} and {@link Scroller#isFinished()}",
-      targets = {
-        @TestTarget(
-          methodName = "forceFinished",
-          methodArgs = {boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "forceFinished",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "isFinished",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isFinished",
+            args = {}
         )
     })
     public void testIsFinished() {
@@ -83,15 +84,12 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.isFinished());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#getDuration()}",
-      targets = {
-        @TestTarget(
-          methodName = "getDuration",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link Scroller#getDuration()}",
+        method = "getDuration",
+        args = {}
+    )
     public void testGetDuration() {
         assertEquals(0, mScroller.getDuration());
 
@@ -111,17 +109,18 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertTrue(mScroller.getDuration() > 0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#getFinalX()} and {@link Scroller#setFinalX(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setFinalX",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link Scroller#getFinalX()} and {@link Scroller#setFinalX(int)}",
+            method = "setFinalX",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getFinalX",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link Scroller#getFinalX()} and {@link Scroller#setFinalX(int)}",
+            method = "getFinalX",
+            args = {}
         )
     })
     public void testAccessFinalX() {
@@ -138,17 +137,18 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.isFinished());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#setFinalY(int)} and {@link Scroller#getFinalY()}",
-      targets = {
-        @TestTarget(
-          methodName = "setFinalY",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link Scroller#setFinalY(int)} and {@link Scroller#getFinalY()}",
+            method = "setFinalY",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getFinalY",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link Scroller#setFinalY(int)} and {@link Scroller#getFinalY()}",
+            method = "getFinalY",
+            args = {}
         )
     })
     public void testAccessFinalY() {
@@ -165,30 +165,29 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.isFinished());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#startScroll(int, int, int, int, int)}, "
-            + "{@link Scroller#computeScrollOffset()}, "
-            + "{@link Scroller#getCurrX()} and {@link Scroller#getCurrY()}"
-            + "We can not get the precise currX and currY when scrolling",
-      targets = {
-        @TestTarget(
-          methodName = "startScroll",
-          methodArgs = {int.class, int.class, int.class, int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "startScroll",
+            args = {int.class, int.class, int.class, int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "computeScrollOffset",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "computeScrollOffset",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrX",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrX",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrY",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrY",
+            args = {}
         )
     })
+    // We can not get the precise currX and currY when scrolling
     public void testScrollMode() {
         assertEquals(0, mScroller.getFinalX());
         assertEquals(0, mScroller.getFinalY());
@@ -251,30 +250,29 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.computeScrollOffset());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#startScroll(int, int, int, int)}, "
-            + "{@link Scroller#computeScrollOffset()}, "
-            + "{@link Scroller#getCurrX()} and {@link Scroller#getCurrY()}"
-            + "We can not get the precise currX and currY when scrolling",
-      targets = {
-        @TestTarget(
-          methodName = "startScroll",
-          methodArgs = {int.class, int.class, int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "startScroll",
+            args = {int.class, int.class, int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "computeScrollOffset",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "computeScrollOffset",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrX",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrX",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrY",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrY",
+            args = {}
         )
     })
+    // We can not get the precise currX and currY when scrolling
     public void testScrollModeWithDefaultDuration() {
         assertEquals(0, mScroller.getFinalX());
         assertEquals(0, mScroller.getFinalY());
@@ -307,31 +305,30 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.computeScrollOffset());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#fling(int, int, int, int, int, int, int, int)}, "
-            + "{@link Scroller#computeScrollOffset()}, "
-            + "{@link Scroller#getCurrX()} and {@link Scroller#getCurrY()}"
-            + "We can not get the precise currX and currY when scrolling",
-      targets = {
-        @TestTarget(
-          methodName = "fling",
-          methodArgs = {int.class, int.class, int.class, int.class, int.class, int.class,
-                  int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "fling",
+            args = {int.class, int.class, int.class, int.class, int.class, int.class, int.class, 
+                    int.class}
         ),
-        @TestTarget(
-          methodName = "computeScrollOffset",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "computeScrollOffset",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrX",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrX",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getCurrY",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCurrY",
+            args = {}
         )
     })
+    // We can not get the precise currX and currY when scrolling
     public void testFlingMode() {
         assertEquals(0, mScroller.getFinalX());
         assertEquals(0, mScroller.getFinalY());
@@ -403,15 +400,12 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertFalse(mScroller.computeScrollOffset());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#abortAnimation()}",
-      targets = {
-        @TestTarget(
-          methodName = "abortAnimation",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link Scroller#abortAnimation()}",
+        method = "abortAnimation",
+        args = {}
+    )
     public void testAbortAnimation() {
         mScroller.startScroll(0, 0, 2000, -2000, 5000);
         mScroller.computeScrollOffset();
@@ -435,16 +429,12 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertTrue(mScroller.isFinished());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#extendDuration(int)}" +
-            "We can not get the precise duration after it is extended",
-      targets = {
-        @TestTarget(
-          methodName = "extendDuration",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "extendDuration",
+        args = {int.class}
+    )
+    // We can not get the precise duration after it is extended
     public void testExtendDuration() {
         mScroller.startScroll(0, 0, 0, 0, 5000);
         assertEquals(5000, mScroller.getDuration());
@@ -490,16 +480,12 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertTrue(mScroller.getCurrY() - curY < curY - 0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link Scroller#timePassed()}"
-            + "We can not get the precise time passed.",
-      targets = {
-        @TestTarget(
-          methodName = "timePassed",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link Scroller#timePassed()}We can not get the precise time passed.",
+        method = "timePassed",
+        args = {}
+    )
     public void testTimePassed() {
         try {
             Thread.sleep(1000);

@@ -78,19 +78,23 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "TimePickerDialog",
-            args = {android.content.Context.class, android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, boolean.class}
+            args = {android.content.Context.class, 
+                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, 
+                    boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "TimePickerDialog",
-            args = {android.content.Context.class, int.class, android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, boolean.class}
+            args = {android.content.Context.class, int.class, 
+                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, 
+                    boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "onSaveInstanceState",
             args = {}
@@ -126,7 +130,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: onClick",
         method = "onClick",
         args = {android.content.DialogInterface.class, int.class}
@@ -139,7 +143,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: onTimeChanged",
         method = "onTimeChanged",
         args = {android.widget.TimePicker.class, int.class, int.class}
@@ -167,7 +171,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: updateTime",
         method = "updateTime",
         args = {int.class, int.class}
@@ -184,7 +188,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test methods onRestoreInstanceState",
         method = "onRestoreInstanceState",
         args = {android.os.Bundle.class}

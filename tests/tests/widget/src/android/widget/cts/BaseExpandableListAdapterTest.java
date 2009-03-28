@@ -21,9 +21,10 @@ import android.test.InstrumentationTestCase;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -32,31 +33,29 @@ import dalvik.annotation.ToBeFixed;
  */
 @TestTargetClass(BaseExpandableListAdapter.class)
 public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test areAllItemsEnabled(), this function always returns true.",
-      targets = {
-        @TestTarget(
-          methodName = "areAllItemsEnabled",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test areAllItemsEnabled(), this function always returns true.",
+        method = "areAllItemsEnabled",
+        args = {}
+    )
     public void testAreAllItemsEnabled() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         assertTrue(adapter.areAllItemsEnabled());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getCombinedChildId(long, long) function.",
-      targets = {
-        @TestTarget(
-          methodName = "getCombinedChildId",
-          methodArgs = {long.class, long.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getCombinedChildId(long, long) function.",
+            method = "getCombinedChildId",
+            args = {long.class, long.class}
         ),
-        @TestTarget(
-          methodName = "getCombinedGroupId",
-          methodArgs = {long.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getCombinedChildId(long, long) function.",
+            method = "getCombinedGroupId",
+            args = {long.class}
         )
     })
     @ToBeFixed(bug = "1502158", explanation = "getCombinedChildId() always returns a group id, " +
@@ -76,15 +75,12 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(childID != groupID);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test isEmpty() function.",
-      targets = {
-        @TestTarget(
-          methodName = "isEmpty",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test isEmpty() function.",
+        method = "isEmpty",
+        args = {}
+    )
     public void testIsEmpty() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         assertTrue(adapter.isEmpty());
@@ -92,15 +88,12 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertFalse(adapter.isEmpty());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test notifyDataSetChanged() function.",
-      targets = {
-        @TestTarget(
-          methodName = "notifyDataSetChanged",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test notifyDataSetChanged() function.",
+        method = "notifyDataSetChanged",
+        args = {}
+    )
     public void testNotifyDataSetChanged() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -111,15 +104,12 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(dataSetObserver.hasCalledOnChanged());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test notifyDataSetInvalidated() function.",
-      targets = {
-        @TestTarget(
-          methodName = "notifyDataSetInvalidated",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test notifyDataSetInvalidated() function.",
+        method = "notifyDataSetInvalidated",
+        args = {}
+    )
     public void testNotifyDataSetInvalidated() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -130,48 +120,40 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(dataSetObserver.hasCalledOnInvalidated());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onGroupCollapsed(int), this function is non-operation.",
-      targets = {
-        @TestTarget(
-          methodName = "onGroupCollapsed",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onGroupCollapsed(int), this function is non-operation.",
+        method = "onGroupCollapsed",
+        args = {int.class}
+    )
     public void testOnGroupCollapsed() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         // this function is non-operation.
         adapter.onGroupCollapsed(0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onGroupExpanded(int), this function is non-operation.",
-      targets = {
-        @TestTarget(
-          methodName = "onGroupExpanded",
-          methodArgs = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onGroupExpanded(int), this function is non-operation.",
+        method = "onGroupExpanded",
+        args = {int.class}
+    )
     public void testOnGroupExpanded() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         // this function is non-operation.
         adapter.onGroupExpanded(0);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test registerDataSetObserver(DataSetObserver) "
-              + "and unregisterDataSetObserver(DataSetObserver) functions.",
-      targets = {
-        @TestTarget(
-          methodName = "registerDataSetObserver",
-          methodArgs = {DataSetObserver.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "registerDataSetObserver",
+            args = {android.database.DataSetObserver.class}
         ),
-        @TestTarget(
-          methodName = "unregisterDataSetObserver",
-          methodArgs = {DataSetObserver.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "unregisterDataSetObserver",
+            args = {android.database.DataSetObserver.class}
         )
     })
     public void testDataSetObserver() {

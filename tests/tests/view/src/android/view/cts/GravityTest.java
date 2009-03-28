@@ -40,7 +40,7 @@ public class GravityTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link Gravity}",
         method = "Gravity",
         args = {}
@@ -51,16 +51,16 @@ public class GravityTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link Gravity#apply(int, int, int, Rect, Rect)} and {@link Gravity#apply(int, int, int, Rect, int, int, Rect)}",
+            level = TestLevel.COMPLETE,
             method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class, android.graphics.Rect.class}
+            args = {int.class, int.class, int.class, android.graphics.Rect.class, 
+                    android.graphics.Rect.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link Gravity#apply(int, int, int, Rect, Rect)} and {@link Gravity#apply(int, int, int, Rect, int, int, Rect)}",
+            level = TestLevel.COMPLETE,
             method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class, int.class, int.class, android.graphics.Rect.class}
+            args = {int.class, int.class, int.class, android.graphics.Rect.class, int.class, 
+                    int.class, android.graphics.Rect.class}
         )
     })
     public void testApply() {
@@ -155,7 +155,7 @@ public class GravityTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Gravity#isVertical(int)}",
         method = "isVertical",
         args = {int.class}
@@ -167,7 +167,7 @@ public class GravityTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Gravity#isHorizontal(int)}",
         method = "isHorizontal",
         args = {int.class}

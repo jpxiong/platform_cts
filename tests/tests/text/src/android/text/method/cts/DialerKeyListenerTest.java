@@ -34,7 +34,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(DialerKeyListener.class)
 public class DialerKeyListenerTest extends TestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of {@link DialerKeyListener}",
         method = "DialerKeyListener",
         args = {}
@@ -44,7 +44,7 @@ public class DialerKeyListenerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DialerKeyListener#lookup(KeyEvent, Spannable)}",
         method = "lookup",
         args = {android.view.KeyEvent.class, android.text.Spannable.class}
@@ -68,7 +68,7 @@ public class DialerKeyListenerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DialerKeyListener#getInstance()}",
         method = "getInstance",
         args = {}
@@ -85,7 +85,7 @@ public class DialerKeyListenerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link DialerKeyListener#getAcceptedChars()}",
         method = "getAcceptedChars",
         args = {}
@@ -98,9 +98,9 @@ public class DialerKeyListenerTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link DialerKeyListener#getContentType()}",
-        method = "getContentType",
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link DialerKeyListener#getInputType()}",
+        method = "getInputType",
         args = {}
     )
     public void testGetInputType() {

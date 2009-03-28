@@ -80,19 +80,23 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: DatePickerDialog and onSaveInstanceState",
             method = "DatePickerDialog",
-            args = {android.content.Context.class, android.app.DatePickerDialog.OnDateSetListener.class, int.class, int.class, int.class}
+            args = {android.content.Context.class, 
+                    android.app.DatePickerDialog.OnDateSetListener.class, int.class, int.class, 
+                    int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: DatePickerDialog and onSaveInstanceState",
             method = "DatePickerDialog",
-            args = {android.content.Context.class, int.class, android.app.DatePickerDialog.OnDateSetListener.class, int.class, int.class, int.class}
+            args = {android.content.Context.class, int.class, 
+                    android.app.DatePickerDialog.OnDateSetListener.class, int.class, int.class, 
+                    int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: DatePickerDialog and onSaveInstanceState",
             method = "onSaveInstanceState",
             args = {}
@@ -127,7 +131,7 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: show",
         method = "show",
         args = {}
@@ -143,7 +147,7 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: onClick",
         method = "onClick",
         args = {android.content.DialogInterface.class, int.class}
@@ -157,7 +161,7 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: onDateChanged",
         method = "onDateChanged",
         args = {android.widget.DatePicker.class, int.class, int.class, int.class}
@@ -191,13 +195,13 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: updateDate ",
             method = "updateDate",
             args = {int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test method: updateDate ",
             method = "onSaveInstanceState",
             args = {}
@@ -219,13 +223,13 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: onRestoreInstanceState and onSaveInstanceState",
             method = "onRestoreInstanceState",
             args = {android.os.Bundle.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: onRestoreInstanceState and onSaveInstanceState",
             method = "onSaveInstanceState",
             args = {}

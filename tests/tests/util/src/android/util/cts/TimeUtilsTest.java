@@ -29,7 +29,7 @@ import dalvik.annotation.TestTargets;
 public class TimeUtilsTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZone",
             method = "getTimeZone",
             args = {int.class, boolean.class, long.class, String.class}
@@ -62,7 +62,7 @@ public class TimeUtilsTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZone",
             method = "getTimeZone",
             args = {int.class, boolean.class, long.class, String.class}
@@ -87,7 +87,7 @@ public class TimeUtilsTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZone",
             method = "getTimeZone",
             args = {int.class, boolean.class, long.class, String.class}
@@ -111,7 +111,7 @@ public class TimeUtilsTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZone",
             method = "getTimeZone",
             args = {int.class, boolean.class, long.class, String.class}
@@ -437,7 +437,7 @@ public class TimeUtilsTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZone",
             method = "getTimeZone",
             args = {int.class, boolean.class, long.class, String.class}
@@ -465,7 +465,7 @@ public class TimeUtilsTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test method: getTimeZoneDatabaseVersion",
             method = "getTimeZoneDatabaseVersion",
             args = {}

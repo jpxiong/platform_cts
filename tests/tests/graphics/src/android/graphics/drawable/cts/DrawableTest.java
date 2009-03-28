@@ -53,7 +53,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(Drawable.class)
 public class DrawableTest extends AndroidTestCase{
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test clearColorFilter()",
         method = "clearColorFilter",
         args = {}
@@ -73,13 +73,13 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test copyBounds() and copyBounds(Rect)",
             method = "copyBounds",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test copyBounds() and copyBounds(Rect)",
             method = "copyBounds",
             args = {android.graphics.Rect.class}
@@ -134,7 +134,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test createFromPath(String)",
         method = "createFromPath",
         args = {java.lang.String.class}
@@ -187,7 +187,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test createFromStream(InputStream, String)",
         method = "createFromStream",
         args = {java.io.InputStream.class, java.lang.String.class}
@@ -219,7 +219,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test createFromXml(Resources, XmlPullParser)",
         method = "createFromXml",
         args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class}
@@ -230,10 +230,11 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test createFromXmlInner(Resources, XmlPullParser, AttributeSet)",
         method = "createFromXmlInner",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     public void testCreateFromXmlInner() throws XmlPullParserException, IOException {
         XmlPullParser parser = mContext.getResources().getXml(R.drawable.shapedrawable_test);
@@ -255,7 +256,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test draw(Canvas)",
         method = "draw",
         args = {android.graphics.Canvas.class}
@@ -266,19 +267,19 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "getBounds",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "setBounds",
             args = {int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "setBounds",
             args = {android.graphics.Rect.class}
@@ -310,13 +311,13 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setChangingConfigurations(int) and getChangingConfigurations()",
             method = "getChangingConfigurations",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test setChangingConfigurations(int) and getChangingConfigurations()",
             method = "setChangingConfigurations",
             args = {int.class}
@@ -337,7 +338,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getConstantState(), this function always returns null.",
         method = "getConstantState",
         args = {}
@@ -348,7 +349,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getCurrent(), this function just returns the object itself.",
         method = "getCurrent",
         args = {}
@@ -359,7 +360,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getIntrinsicHeight(), this function always returns -1.",
         method = "getIntrinsicHeight",
         args = {}
@@ -370,7 +371,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getIntrinsicWidth(), this function always returns -1.",
         method = "getIntrinsicWidth",
         args = {}
@@ -382,13 +383,13 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getLevel() and setLevel(int)",
             method = "getLevel",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getLevel() and setLevel(int)",
             method = "setLevel",
             args = {int.class}
@@ -412,7 +413,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getMinimumHeight()",
         method = "getMinimumHeight",
         args = {}
@@ -423,7 +424,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getMinimumWidth()",
         method = "getMinimumWidth",
         args = {}
@@ -434,7 +435,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getOpacity()",
         method = "getOpacity",
         args = {}
@@ -444,7 +445,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getPadding(Rect)",
         method = "getPadding",
         args = {android.graphics.Rect.class}
@@ -468,13 +469,13 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getState() and setState(int[])",
             method = "getState",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getState() and setState(int[])",
             method = "setState",
             args = {java.lang.Integer[].class}
@@ -492,7 +493,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getTransparentRegion(), this function always returns null.",
         method = "getTransparentRegion",
         args = {}
@@ -503,10 +504,11 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+                android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "", explanation = "the attribute visible has been set to false " +
             "in drawable_test.xml, but isVisible() still returns true")
@@ -521,7 +523,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test invalidateSelf()",
         method = "invalidateSelf",
         args = {}
@@ -539,7 +541,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isStateful(), this function always returns false.",
         method = "isStateful",
         args = {}
@@ -551,13 +553,13 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isVisible()",
             method = "isVisible",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test isVisible()",
             method = "setVisible",
             args = {boolean.class, boolean.class}
@@ -578,7 +580,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onBoundsChange(Rect)",
         method = "onBoundsChange",
         args = {android.graphics.Rect.class}
@@ -591,7 +593,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onLevelChange(int), this function always returns false.",
         method = "onLevelChange",
         args = {int.class}
@@ -602,7 +604,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test onStateChange(int[]), this function always returns false.",
         method = "onStateChange",
         args = {java.lang.Integer[].class}
@@ -613,7 +615,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test resolveOpacity(int, int)",
         method = "resolveOpacity",
         args = {int.class, int.class}
@@ -632,7 +634,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test scheduleSelf(Runnable, long)",
         method = "scheduleSelf",
         args = {java.lang.Runnable.class, long.class}
@@ -648,7 +650,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setAlpha(int)",
         method = "setAlpha",
         args = {int.class}
@@ -658,7 +660,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setCallback(Callback)",
         method = "setCallback",
         args = {android.graphics.drawable.Drawable.Callback.class}
@@ -675,7 +677,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setColorFilter(int, PorterDuff.Mode)",
         method = "setColorFilter",
         args = {int.class, android.graphics.PorterDuff.Mode.class}
@@ -688,7 +690,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setDither(boolean)",
         method = "setDither",
         args = {boolean.class}
@@ -701,7 +703,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setFilterBitmap(boolean)",
         method = "setFilterBitmap",
         args = {boolean.class}
@@ -714,7 +716,7 @@ public class DrawableTest extends AndroidTestCase{
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test unscheduleSelf(Runnable)",
         method = "unscheduleSelf",
         args = {java.lang.Runnable.class}

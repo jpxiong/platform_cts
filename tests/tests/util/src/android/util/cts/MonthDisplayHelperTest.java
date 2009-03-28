@@ -35,13 +35,13 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of MonthDisplayHelper.",
             method = "MonthDisplayHelper",
             args = {int.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of MonthDisplayHelper.",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
@@ -86,13 +86,13 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getNumberOfDaysInMonth().",
             method = "getNumberOfDaysInMonth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getNumberOfDaysInMonth().",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
@@ -109,19 +109,19 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test nextMonth().",
             method = "nextMonth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test nextMonth().",
             method = "getDigitsForRow",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test nextMonth().",
             method = "getMonth",
             args = {}
@@ -142,13 +142,13 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getRowOf(int day).",
             method = "getRowOf",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getRowOf(int day).",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
@@ -167,25 +167,25 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getWeekStartDay().",
             method = "getWeekStartDay",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getWeekStartDay().",
             method = "getOffset",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getWeekStartDay().",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getWeekStartDay().",
             method = "MonthDisplayHelper",
             args = {int.class, int.class, int.class}
@@ -203,19 +203,19 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getDigitsForRow(int row).",
             method = "getDigitsForRow",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getDigitsForRow(int row).",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getDigitsForRow(int row).",
             method = "MonthDisplayHelper",
             args = {int.class, int.class, int.class}
@@ -246,13 +246,13 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getFirstDayOfMonth().",
             method = "getFirstDayOfMonth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getFirstDayOfMonth().",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
@@ -270,13 +270,13 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getColumnOf(int day).",
             method = "getColumnOf",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test getColumnOf(int day).",
             method = "MonthDisplayHelper",
             args = {int.class, int.class}
@@ -294,7 +294,7 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getDayAt(int row, int column).",
         method = "getDayAt",
         args = {int.class, int.class}
@@ -308,25 +308,25 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test previousMonth().",
             method = "previousMonth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test previousMonth().",
             method = "getDigitsForRow",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test previousMonth().",
             method = "getYear",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test previousMonth().",
             method = "getMonth",
             args = {}
@@ -354,7 +354,7 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test isWithinCurrentMonth(int row, int column).",
         method = "isWithinCurrentMonth",
         args = {int.class, int.class}

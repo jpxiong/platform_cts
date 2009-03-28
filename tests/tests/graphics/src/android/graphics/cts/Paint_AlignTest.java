@@ -28,7 +28,7 @@ import android.graphics.Paint;
 public class Paint_AlignTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -41,20 +41,20 @@ public class Paint_AlignTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setTextAlign",
             args = {android.graphics.Paint.Align.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getTextAlign",
             args = {}
         )
@@ -79,4 +79,3 @@ public class Paint_AlignTest extends TestCase {
         assertEquals(Align.RIGHT, p.getTextAlign());
     }
 }
-

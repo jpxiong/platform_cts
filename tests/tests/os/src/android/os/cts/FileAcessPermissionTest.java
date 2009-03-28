@@ -26,14 +26,13 @@ import java.io.IOException;
 
 /**
  * This is testing for file access permissions.
- * 
+ *
  * <LI><B>/system should be mounted read-only</B><BR> <LI><B>applications should
  * be able to read/write to their own data directory (and only this directory,
  * except for external storage -- see below)</B><BR> <LI><B>applications should
  * not be able to read/write data in another applications /data/data space</B>
  * <BR> <LI><B>external storage directory (/sdcard on G1) should be world
  * read/write</B>
- * 
  * Pay attention that if run test test on emulator. You must using mksdcard to
  * create a sdcard image file then start emulator with command emulator -sdcard <filepath>
  * If run this on device, must insert a sdcard into device. 

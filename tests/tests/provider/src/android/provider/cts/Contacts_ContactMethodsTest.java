@@ -23,43 +23,44 @@ import android.test.AndroidTestCase;
 
 import com.android.internal.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(android.provider.Contacts.ContactMethods.class)
 public class Contacts_ContactMethodsTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test addPostalLocation function",
-      targets = {
-        @TestTarget(
-          methodName = "addPostalLocation",
-          methodArgs = {Context.class, long.class, double.class, double.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test addPostalLocation function",
+        method = "addPostalLocation",
+        args = {android.content.Context.class, long.class, double.class, double.class}
+    )
     @ToBeFixed(explanation = "This function is not static, but we can't new a" +
             " instance to call it because the constructor is private.")
     public void testAddPostalLocation() {
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test methods which encode or decode protocol",
-      targets = {
-        @TestTarget(
-          methodName = "encodePredefinedImProtocol",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which encode or decode protocol",
+            method = "encodePredefinedImProtocol",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "encodeCustomImProtocol",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which encode or decode protocol",
+            method = "encodeCustomImProtocol",
+            args = {java.lang.String.class}
         ),
-        @TestTarget(
-          methodName = "decodeImProtocol",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test methods which encode or decode protocol",
+            method = "decodeImProtocol",
+            args = {java.lang.String.class}
         )
     })
     public void testEncodeAndDecodeProtocol() {
@@ -85,15 +86,12 @@ public class Contacts_ContactMethodsTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getDisplayLabel(Context context, int kind, int type, CharSequence label)",
-      targets = {
-        @TestTarget(
-          methodName = "getDisplayLabel",
-          methodArgs = {Context.class, int.class, int.class, CharSequence.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getDisplayLabel(Context context, int kind, int type, CharSequence label)",
+        method = "getDisplayLabel",
+        args = {android.content.Context.class, int.class, int.class, java.lang.CharSequence.class}
+    )
     public void test() {
         String label = "label";
         String display = ContactMethods.getDisplayLabel(getContext(), Contacts.KIND_EMAIL,

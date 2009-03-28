@@ -32,9 +32,10 @@ import android.widget.TableRow;
 import com.android.internal.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -58,37 +59,48 @@ public class TableRow_LayoutParamsTest
         mTargetContext = getInstrumentation().getTargetContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
-      targets = {
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {int.class, int.class, float.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {int.class, int.class, float.class}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {ViewGroup.LayoutParams.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {android.view.ViewGroup.LayoutParams.class}
         ),
-        @TestTarget(
-          methodName = "TableRow.LayoutParams",
-          methodArgs = {MarginLayoutParams.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link TableRow.LayoutParams}",
+            method = "TableRow.LayoutParams",
+            args = {android.view.ViewGroup.MarginLayoutParams.class}
         )
     })
     @UiThreadTest
@@ -149,15 +161,12 @@ public class TableRow_LayoutParamsTest
      * setBaseAttributes(android.content.res.TypedArray, int, int)}
      * .
      */
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test setBaseAttributes(TypedArray a, int widthAttr, int heightAttr)",
-      targets = {
-        @TestTarget(
-          methodName = "setBaseAttributes",
-          methodArgs = {TypedArray.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test setBaseAttributes(TypedArray a, int widthAttr, int heightAttr)",
+        method = "setBaseAttributes",
+        args = {android.content.res.TypedArray.class, int.class, int.class}
+    )
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException and " +
             "ArrayIndexOutOfBoundsException issue")
     public void testSetBaseAttributes() {
@@ -235,7 +244,8 @@ public class TableRow_LayoutParamsTest
         XmlResourceParser parser = null;
         AttributeSet attrs = null;
         try {
-            parser = mTargetContext.getResources().getXml(com.android.cts.stub.R.xml.base_attributes);
+            parser = mTargetContext.getResources()
+                    .getXml(com.android.cts.stub.R.xml.base_attributes);
 
             int type;
             while ((type = parser.next()) != XmlPullParser.END_DOCUMENT

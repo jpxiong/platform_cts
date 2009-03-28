@@ -50,10 +50,11 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test draw method",
         method = "draw",
-        args = {android.graphics.Canvas.class, float.class, float.class, android.graphics.Paint.class}
+        args = {android.graphics.Canvas.class, float.class, float.class, 
+                android.graphics.Paint.class}
     )
     @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
     public void testDraw1() {
@@ -63,7 +64,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test draw method",
         method = "draw",
         args = {android.graphics.Canvas.class, float.class, float.class}
@@ -75,7 +76,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test decodeFile method",
         method = "decodeFile",
         args = {java.lang.String.class}
@@ -139,7 +140,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test decodeByteArray",
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class}
@@ -160,7 +161,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test decodeStream method",
         method = "decodeStream",
         args = {java.io.InputStream.class}
@@ -181,7 +182,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test setTime method",
         method = "setTime",
         args = {int.class}
@@ -196,25 +197,25 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test get movie properties",
             method = "duration",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test get movie properties",
             method = "isOpaque",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test get movie properties",
             method = "height",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test get movie properties",
             method = "width",
             args = {}

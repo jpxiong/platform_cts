@@ -90,7 +90,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: Canvas",
         method = "Canvas",
         args = {}
@@ -101,7 +101,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: Canvas",
         method = "Canvas",
         args = {android.graphics.Bitmap.class}
@@ -130,13 +130,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: Canvas and getGL",
             method = "Canvas",
             args = {javax.microedition.khronos.opengles.GL.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: Canvas and getGL",
             method = "getGL",
             args = {}
@@ -151,7 +151,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: freeGlCaches",
         method = "freeGlCaches",
         args = {}
@@ -162,7 +162,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: setBitmap",
         method = "setBitmap",
         args = {android.graphics.Bitmap.class}
@@ -202,19 +202,19 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: setViewport, getWidth and getHeight",
             method = "setViewport",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: setViewport, getWidth and getHeight",
             method = "getWidth",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: setViewport, getWidth and getHeight",
             method = "getHeight",
             args = {}
@@ -237,7 +237,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: isOpaque",
         method = "isOpaque",
         args = {}
@@ -247,7 +247,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: restore",
         method = "restore",
         args = {}
@@ -267,13 +267,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore",
             method = "save",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore",
             method = "restore",
             args = {}
@@ -309,13 +309,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore",
             method = "save",
             args = {int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore",
             method = "restore",
             args = {}
@@ -407,13 +407,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayer and restore",
             method = "saveLayer",
             args = {android.graphics.RectF.class, android.graphics.Paint.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayer and restore",
             method = "restore",
             args = {}
@@ -508,14 +508,14 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayer and restore",
             method = "saveLayer",
             args = {float.class, float.class, float.class, float.class,
                     android.graphics.Paint.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayer and restore",
             method = "restore",
             args = {}
@@ -609,13 +609,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayerAlpha and restore",
             method = "saveLayerAlpha",
             args = {android.graphics.RectF.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayerAlpha and restore",
             method = "restore",
             args = {}
@@ -709,13 +709,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayerAlpha and restore",
             method = "saveLayerAlpha",
             args = {float.class, float.class, float.class, float.class, int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: saveLayerAlpha and restore",
             method = "restore",
             args = {}
@@ -806,7 +806,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getSaveCount",
         method = "getSaveCount",
         args = {}
@@ -825,7 +825,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: restoreToCount",
         method = "restoreToCount",
         args = {int.class}
@@ -869,13 +869,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getMatrix abd setMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getMatrix abd setMatrix",
             method = "setMatrix",
             args = {android.graphics.Matrix.class}
@@ -904,13 +904,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getMatrix abd setMatrix",
             method = "getMatrix",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getMatrix abd setMatrix",
             method = "setMatrix",
             args = {android.graphics.Matrix.class}
@@ -937,7 +937,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: translate",
         method = "translate",
         args = {float.class, float.class}
@@ -961,7 +961,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: scale",
         method = "scale",
         args = {float.class, float.class}
@@ -985,7 +985,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: scale",
         method = "scale",
         args = {float.class, float.class, float.class, float.class}
@@ -1009,7 +1009,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: rotate",
         method = "rotate",
         args = {float.class}
@@ -1033,7 +1033,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: rotate",
         method = "rotate",
         args = {float.class, float.class, float.class}
@@ -1057,7 +1057,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: skew",
         method = "skew",
         args = {float.class, float.class}
@@ -1081,7 +1081,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: concat",
         method = "concat",
         args = {android.graphics.Matrix.class}
@@ -1108,7 +1108,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.RectF.class, android.graphics.Region.Op.class}
@@ -1123,7 +1123,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.Rect.class, android.graphics.Region.Op.class}
@@ -1138,7 +1138,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.RectF.class}
@@ -1148,7 +1148,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.Rect.class}
@@ -1158,10 +1158,11 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
-        args = {float.class, float.class, float.class, float.class, android.graphics.Region.Op.class}
+        args = {float.class, float.class, float.class, float.class, 
+                android.graphics.Region.Op.class}
     )
     public void testClipRect5() {
         assertFalse(mCanvas.clipRect(0, 0, 10, 31, Op.DIFFERENCE));
@@ -1173,7 +1174,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {float.class, float.class, float.class, float.class}
@@ -1183,7 +1184,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRect",
         method = "clipRect",
         args = {int.class, int.class, int.class, int.class}
@@ -1193,7 +1194,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipPath",
         method = "clipPath",
         args = {android.graphics.Path.class}
@@ -1205,7 +1206,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipPath",
         method = "clipPath",
         args = {android.graphics.Path.class, android.graphics.Region.Op.class}
@@ -1223,7 +1224,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRegion",
         method = "clipRegion",
         args = {android.graphics.Region.class}
@@ -1233,7 +1234,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: clipRegion",
         method = "clipRegion",
         args = {android.graphics.Region.class, android.graphics.Region.Op.class}
@@ -1251,13 +1252,13 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getDrawFilter and setDrawFilter",
             method = "getDrawFilter",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: getDrawFilter and setDrawFilter",
             method = "setDrawFilter",
             args = {android.graphics.DrawFilter.class}
@@ -1272,7 +1273,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: quickReject",
         method = "quickReject",
         args = {android.graphics.RectF.class, android.graphics.Canvas.EdgeType.class}
@@ -1283,7 +1284,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: quickReject",
         method = "quickReject",
         args = {android.graphics.Path.class, android.graphics.Canvas.EdgeType.class}
@@ -1297,7 +1298,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: quickReject",
         method = "quickReject",
         args = {float.class, float.class, float.class, float.class,
@@ -1309,7 +1310,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getClipBounds",
         method = "getClipBounds",
         args = {android.graphics.Rect.class}
@@ -1324,7 +1325,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: getClipBounds",
         method = "getClipBounds",
         args = {}
@@ -1344,7 +1345,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawRGB",
         method = "drawRGB",
         args = {int.class, int.class, int.class}
@@ -1362,7 +1363,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawARGB",
         method = "drawARGB",
         args = {int.class, int.class, int.class, int.class}
@@ -1379,7 +1380,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawColor",
         method = "drawColor",
         args = {int.class}
@@ -1392,7 +1393,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawColor",
         method = "drawColor",
         args = {int.class, android.graphics.PorterDuff.Mode.class}
@@ -1417,7 +1418,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPaint",
         method = "drawPaint",
         args = {android.graphics.Paint.class}
@@ -1429,7 +1430,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPoints",
         method = "drawPoints",
         args = {float[].class, int.class, int.class, android.graphics.Paint.class}
@@ -1464,7 +1465,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPoints",
         method = "drawPoints",
         args = {float[].class, android.graphics.Paint.class}
@@ -1476,7 +1477,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPoint",
         method = "drawPoint",
         args = {float.class, float.class, android.graphics.Paint.class}
@@ -1488,7 +1489,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawLine",
         method = "drawLine",
         args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
@@ -1500,7 +1501,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawLines",
         method = "drawLines",
         args = {float[].class, int.class, int.class, android.graphics.Paint.class}
@@ -1535,7 +1536,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawLines",
         method = "drawLines",
         args = {float[].class, android.graphics.Paint.class}
@@ -1555,7 +1556,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawRect",
         method = "drawRect",
         args = {android.graphics.RectF.class, android.graphics.Paint.class}
@@ -1567,7 +1568,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawRect",
         method = "drawRect",
         args = {android.graphics.Rect.class, android.graphics.Paint.class}
@@ -1579,7 +1580,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawRect",
         method = "drawRect",
         args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
@@ -1591,7 +1592,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawOval",
         method = "drawOval",
         args = {android.graphics.RectF.class, android.graphics.Paint.class}
@@ -1610,7 +1611,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawCircle",
         method = "drawCircle",
         args = {float.class, float.class, float.class, android.graphics.Paint.class}
@@ -1626,7 +1627,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawArc",
         method = "drawArc",
         args = {android.graphics.RectF.class, float.class, float.class, boolean.class,
@@ -1647,10 +1648,11 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawRoundRect",
         method = "drawRoundRect",
-        args = {android.graphics.RectF.class, float.class, float.class, android.graphics.Paint.class}
+        args = {android.graphics.RectF.class, float.class, float.class, 
+                android.graphics.Paint.class}
     )
     public void testDrawRoundRect() {
         // abnormal case: RoundRect is null
@@ -1665,7 +1667,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPath",
         method = "drawPath",
         args = {android.graphics.Path.class, android.graphics.Paint.class}
@@ -1675,7 +1677,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, float.class, float.class,
@@ -1699,7 +1701,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
@@ -1723,7 +1725,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
@@ -1747,7 +1749,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {int[].class, int.class, int.class, int.class, int.class, int.class,
@@ -1808,7 +1810,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Matrix.class,
@@ -1821,7 +1823,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawBitmapMesh",
         method = "drawBitmapMesh",
         args = {android.graphics.Bitmap.class, int.class, int.class, float[].class,
@@ -1896,7 +1898,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawVertices",
         method = "drawVertices",
         args = {android.graphics.Canvas.VertexMode.class, int.class, float[].class,
@@ -1970,7 +1972,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawText",
         method = "drawText",
         args = {char[].class, int.class, int.class, float.class, float.class,
@@ -2010,7 +2012,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.String.class, float.class, float.class, android.graphics.Paint.class}
@@ -2020,7 +2022,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.String.class, int.class, int.class, float.class, float.class,
@@ -2066,7 +2068,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.CharSequence.class, int.class, int.class, float.class, float.class,
@@ -2090,7 +2092,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPosText",
         method = "drawPosText",
         args = {char[].class, int.class, int.class, float[].class, android.graphics.Paint.class}
@@ -2135,7 +2137,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPosText",
         method = "drawPosText",
         args = {java.lang.String.class, float[].class, android.graphics.Paint.class}
@@ -2162,7 +2164,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawTextOnPath",
         method = "drawTextOnPath",
         args = {char[].class, int.class, int.class, android.graphics.Path.class,
@@ -2195,7 +2197,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawTextOnPath",
         method = "drawTextOnPath",
         args = {java.lang.String.class, android.graphics.Path.class, float.class,
@@ -2214,7 +2216,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class}
@@ -2224,7 +2226,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class, android.graphics.RectF.class}
@@ -2241,7 +2243,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class, android.graphics.Rect.class}
@@ -2258,7 +2260,7 @@ public class CanvasTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: finalize",
         method = "finalize",
         args = {}

@@ -46,13 +46,13 @@ public class ActivityInfoTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ActivityInfo}",
             method = "ActivityInfo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ActivityInfo}",
             method = "ActivityInfo",
             args = {android.content.pm.ActivityInfo.class}
@@ -74,7 +74,7 @@ public class ActivityInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ActivityInfo#writeToParcel(Parcel, int)}",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -108,7 +108,7 @@ public class ActivityInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ActivityInfo#getThemeResource()}",
         method = "getThemeResource",
         args = {}
@@ -125,7 +125,7 @@ public class ActivityInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ActivityInfo#toString()}",
         method = "toString",
         args = {}
@@ -151,7 +151,7 @@ public class ActivityInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ActivityInfo#describeContents()}",
         method = "describeContents",
         args = {}
@@ -169,7 +169,7 @@ public class ActivityInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ActivityInfo#dump(Printer, String)}",
         method = "dump",
         args = {android.util.Printer.class, java.lang.String.class}

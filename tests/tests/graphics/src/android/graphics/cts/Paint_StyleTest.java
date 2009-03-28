@@ -28,7 +28,7 @@ import android.graphics.Paint.Style;
 public class Paint_StyleTest extends TestCase {
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
@@ -41,20 +41,20 @@ public class Paint_StyleTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "setStyle",
             args = {android.graphics.Paint.Style.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test values().tests for the behavior of the methods where this enumeration is used as an argument",
+            level = TestLevel.COMPLETE,
+            notes = "",
             method = "getStyle",
             args = {}
         )
@@ -79,5 +79,3 @@ public class Paint_StyleTest extends TestCase {
         assertEquals(Style.FILL_AND_STROKE, p.getStyle());
     }
 }
-
-

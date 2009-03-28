@@ -109,10 +109,11 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "SimpleCursorAdapter",
-        args = {android.content.Context.class, int.class, android.database.Cursor.class, java.lang.String[].class, int[].class}
+        args = {android.content.Context.class, int.class, android.database.Cursor.class, 
+                java.lang.String[].class, int[].class}
     )
     public void testConstructor() {
         new SimpleCursorAdapter(mContext, R.layout.simple_list_item_1,
@@ -121,10 +122,10 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link SimpleCursorAdapter#bindView(View, Context, Cursor)}. The paramcontext is never readed in the method.",
+        level = TestLevel.COMPLETE,
         method = "bindView",
-        args = {android.view.View.class, android.content.Context.class, android.database.Cursor.class}
+        args = {android.view.View.class, android.content.Context.class, 
+                android.database.Cursor.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "SimpleCursorAdapter#bindView(View, Context, Cursor) if the param view is "
@@ -171,14 +172,12 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#getViewBinder()} and {@link SimpleCursorAdapter#setViewBinder(ViewBinder)} ",
+            level = TestLevel.COMPLETE,
             method = "getViewBinder",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#getViewBinder()} and {@link SimpleCursorAdapter#setViewBinder(ViewBinder)} ",
+            level = TestLevel.COMPLETE,
             method = "setViewBinder",
             args = {android.widget.SimpleCursorAdapter.ViewBinder.class}
         )
@@ -199,7 +198,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleCursorAdapter#setViewText(TextView, String)}",
         method = "setViewText",
         args = {android.widget.TextView.class, java.lang.String.class}
@@ -214,7 +213,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleCursorAdapter#setViewImage(ImageView, String)}",
         method = "setViewImage",
         args = {android.widget.ImageView.class, java.lang.String.class}
@@ -225,7 +224,8 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
         // resId
         ImageView view = new ImageView(mContext);
         assertNull(view.getDrawable());
-        mSimpleCursorAdapter.setViewImage(view, String.valueOf(com.android.cts.stub.R.drawable.scenery));
+        mSimpleCursorAdapter.setViewImage(view, 
+                String.valueOf(com.android.cts.stub.R.drawable.scenery));
         assertNotNull(view.getDrawable());
         BitmapDrawable d = (BitmapDrawable) mContext.getResources().getDrawable(
                 com.android.cts.stub.R.drawable.scenery);
@@ -252,10 +252,11 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
         view = new ImageView(mContext);
         assertNull(view.getDrawable());
         try {
-            mSimpleCursorAdapter.setViewImage(view,
-                    createTestImage(mContext, SAMPLE_IMAGE_NAME, com.android.cts.stub.R.raw.testimage));
+            mSimpleCursorAdapter.setViewImage(view, createTestImage(mContext, SAMPLE_IMAGE_NAME,
+                    com.android.cts.stub.R.raw.testimage));
             assertNotNull(view.getDrawable());
-            d = (BitmapDrawable) mContext.getResources().getDrawable(com.android.cts.stub.R.raw.testimage);
+            d = (BitmapDrawable) mContext.getResources()
+                    .getDrawable(com.android.cts.stub.R.raw.testimage);
             WidgetTestUtils.assertEquals(d.getBitmap(),
                     ((BitmapDrawable) view.getDrawable()).getBitmap());
         } finally {
@@ -265,14 +266,12 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#getStringConversionColumn()} and {@link SimpleCursorAdapter#setStringConversionColumn(int)}",
+            level = TestLevel.COMPLETE,
             method = "getStringConversionColumn",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#getStringConversionColumn()} and {@link SimpleCursorAdapter#setStringConversionColumn(int)}",
+            level = TestLevel.COMPLETE,
             method = "setStringConversionColumn",
             args = {int.class}
         )
@@ -297,14 +296,12 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#setCursorToStringConverter(CursorToStringConverter)} and {@link SimpleCursorAdapter#getCursorToStringConverter()}",
+            level = TestLevel.COMPLETE,
             method = "getCursorToStringConverter",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test {@link SimpleCursorAdapter#setCursorToStringConverter(CursorToStringConverter)} and {@link SimpleCursorAdapter#getCursorToStringConverter()}",
+            level = TestLevel.COMPLETE,
             method = "setCursorToStringConverter",
             args = {android.widget.SimpleCursorAdapter.CursorToStringConverter.class}
         )
@@ -322,7 +319,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleCursorAdapter#changeCursor(Cursor)}",
         method = "changeCursor",
         args = {android.database.Cursor.class}
@@ -347,7 +344,7 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link SimpleCursorAdapter#convertToString(Cursor)}",
         method = "convertToString",
         args = {android.database.Cursor.class}

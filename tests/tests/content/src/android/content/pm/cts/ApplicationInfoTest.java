@@ -47,13 +47,13 @@ public class ApplicationInfoTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ApplicationInfo}",
             method = "ApplicationInfo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ApplicationInfo}",
             method = "ApplicationInfo",
             args = {android.content.pm.ApplicationInfo.class}
@@ -74,7 +74,7 @@ public class ApplicationInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ApplicationInfo#writeToParcel(Parcel, int)}",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -110,7 +110,7 @@ public class ApplicationInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ApplicationInfo#toString()}",
         method = "toString",
         args = {}
@@ -126,7 +126,7 @@ public class ApplicationInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ApplicationInfo#describeContents()}",
         method = "describeContents",
         args = {}
@@ -143,7 +143,7 @@ public class ApplicationInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ApplicationInfo#dump(Printer, String)}",
         method = "dump",
         args = {android.util.Printer.class, java.lang.String.class}
@@ -184,7 +184,7 @@ public class ApplicationInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ApplicationInfo#loadDescription(PackageManager)}",
         method = "loadDescription",
         args = {android.content.pm.PackageManager.class}

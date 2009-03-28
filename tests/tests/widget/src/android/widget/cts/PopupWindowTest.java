@@ -40,9 +40,10 @@ import android.widget.PopupWindow.OnDismissListener;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -73,40 +74,54 @@ public class PopupWindowTest extends
         mActivity = getActivity();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of {@link PopupWindow}",
-      targets = {
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.content.Context.class}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {Context.class, AttributeSet.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {Context.class, AttributeSet.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {View.class}
-        ),@TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {View.class, int.class, int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.view.View.class}
         ),
-        @TestTarget(
-          methodName = "PopupWindow",
-          methodArgs = {View.class, int.class, int.class, boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.view.View.class, int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link PopupWindow}",
+            method = "PopupWindow",
+            args = {android.view.View.class, int.class, int.class, boolean.class}
         )
     })
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
@@ -179,18 +194,16 @@ public class PopupWindowTest extends
         assertTrue(mPopupWindow.isFocusable());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getBackground()} and " +
-            "{@link PopupWindow#setBackgroundDrawable(Drawable)}",
-      targets = {
-        @TestTarget(
-          methodName = "getBackground",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getBackground",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setBackgroundDrawable",
-          methodArgs = {Drawable.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setBackgroundDrawable",
+            args = {android.graphics.drawable.Drawable.class}
         )
     })
     public void testAccessBackground() {
@@ -204,18 +217,16 @@ public class PopupWindowTest extends
         assertNull(mPopupWindow.getBackground());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getAnimationStyle()} and " +
-            "{@link PopupWindow#setAnimationStyle(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "getAnimationStyle",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getAnimationStyle",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setAnimationStyle",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAnimationStyle",
+            args = {int.class}
         )
     })
     public void testAccessAnimationStyle() {
@@ -236,18 +247,16 @@ public class PopupWindowTest extends
         assertEquals(-100, mPopupWindow.getAnimationStyle());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getContentView()} and " +
-            "{@link PopupWindow#setContentView(View)}",
-      targets = {
-        @TestTarget(
-          methodName = "setContentView",
-          methodArgs = {View.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setContentView",
+            args = {android.view.View.class}
         ),
-        @TestTarget(
-          methodName = "getContentView",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getContentView",
+            args = {}
         )
     })
     public void testAccessContentView() {
@@ -272,18 +281,16 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#setFocusable(boolean)} and " +
-            "{@link PopupWindow#isFocusable()}",
-      targets = {
-        @TestTarget(
-          methodName = "setFocusable",
-          methodArgs = {boolean.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setFocusable",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "isFocusable",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isFocusable",
+            args = {}
         )
     })
     public void testAccessFocusable() {
@@ -297,18 +304,18 @@ public class PopupWindowTest extends
         assertFalse(mPopupWindow.isFocusable());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getHeight()} and " +
-            "{@link PopupWindow#setHeight(int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setHeight",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#getHeight()} and {@link PopupWindow#setHeight(int)}",
+            method = "setHeight",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getHeight",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#getHeight()} and {@link PopupWindow#setHeight(int)}",
+            method = "getHeight",
+            args = {}
         )
     })
     public void testAccessHeight() {
@@ -346,17 +353,18 @@ public class PopupWindowTest extends
         return wm.getDefaultDisplay();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#setWidth(int)} and {@link PopupWindow#getWidth()}",
-      targets = {
-        @TestTarget(
-          methodName = "setWidth",
-          methodArgs = {int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#setWidth(int)} and {@link PopupWindow#getWidth()}",
+            method = "setWidth",
+            args = {int.class}
         ),
-        @TestTarget(
-          methodName = "getWidth",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#setWidth(int)} and {@link PopupWindow#getWidth()}",
+            method = "getWidth",
+            args = {}
         )
     })
     public void testAccessWidth() {
@@ -383,15 +391,12 @@ public class PopupWindowTest extends
         assertEquals(width, mPopupWindow.getWidth());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#showAsDropDown(View)}",
-      targets = {
-        @TestTarget(
-          methodName = "showAsDropDown",
-          methodArgs = {View.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#showAsDropDown(View)}",
+        method = "showAsDropDown",
+        args = {android.view.View.class}
+    )
     public void testShowAsDropDown() {
         int[] anchorXY = new int[2];
         int[] viewOnScreenXY = new int[2];
@@ -418,15 +423,12 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#showAtLocation(View, int, int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "showAtLocation",
-          methodArgs = {View.class, int.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#showAtLocation(View, int, int, int)}",
+        method = "showAtLocation",
+        args = {android.view.View.class, int.class, int.class, int.class}
+    )
     public void testShowAtLocation() {
         int[] viewInWindowXY = new int[2];
         int[] viewOnScreenXY = new int[2];
@@ -459,15 +461,12 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#showAsDropDown(View, int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "showAsDropDown",
-          methodArgs = {View.class, int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#showAsDropDown(View, int, int)}",
+        method = "showAsDropDown",
+        args = {android.view.View.class, int.class, int.class}
+    )
     public void testShowAsDropDownWithOffsets() {
         int[] anchorXY = new int[2];
         int[] viewOnScreenXY = new int[2];
@@ -496,15 +495,12 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getMaxAvailableHeight(View)}",
-      targets = {
-        @TestTarget(
-          methodName = "getMaxAvailableHeight",
-          methodArgs = {View.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#getMaxAvailableHeight(View)}",
+        method = "getMaxAvailableHeight",
+        args = {android.view.View.class}
+    )
     public void testGetMaxAvailableHeight() {
         mPopupWindow = createPopupWindow(createPopupContent());
 
@@ -528,15 +524,12 @@ public class PopupWindowTest extends
         assertTrue(maxAvailableHeight <= avaliable);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#dismiss()}",
-      targets = {
-        @TestTarget(
-          methodName = "dismiss",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#dismiss()}",
+        method = "dismiss",
+        args = {}
+    )
     public void testDismiss() {
         mPopupWindow = createPopupWindow(createPopupContent());
         assertFalse(mPopupWindow.isShowing());
@@ -550,15 +543,12 @@ public class PopupWindowTest extends
         assertFalse(mPopupWindow.isShowing());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#setOnDismissListener(OnDismissListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "setOnDismissListener",
-          methodArgs = {OnDismissListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#setOnDismissListener(OnDismissListener)}",
+        method = "setOnDismissListener",
+        args = {android.widget.PopupWindow.OnDismissListener.class}
+    )
     public void testSetOnDismissListener() {
         mPopupWindow = new PopupWindow(new TextView(mActivity));
         mPopupWindow.setOnDismissListener(null);
@@ -579,23 +569,21 @@ public class PopupWindowTest extends
         assertEquals(2, onDismissListener.getOnDismissCalledCount());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#update()} and " +
-              "{@link PopupWindow#setClippingEnabled(boolean)} and" +
-              "{@link PopupWindow#setIgnoreCheekPress()}",
-      targets = {
-        @TestTarget(
-          methodName = "update",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "update",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setClippingEnabled",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setClippingEnabled",
+            args = {boolean.class}
         ),
-        @TestTarget(
-          methodName = "setIgnoreCheekPress",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setIgnoreCheekPress",
+            args = {}
         )
     })
     public void testUpdate() {
@@ -640,18 +628,16 @@ public class PopupWindowTest extends
                 WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM & p.flags);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#update(int, int, int, int)} and " +
-              "PopupWindow#isShowing()}",
-      targets = {
-        @TestTarget(
-          methodName = "update",
-          methodArgs = {int.class, int.class, int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "update",
+            args = {int.class, int.class, int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "isShowing",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isShowing",
+            args = {}
         )
     })
     public void testUpdatePositionAndDimension() {
@@ -703,18 +689,18 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#update(View, int, int)} and " +
-              "PopupWindow#isShowing()}",
-      targets = {
-        @TestTarget(
-          methodName = "update",
-          methodArgs = {View.class, int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#update(View, int, int)} and PopupWindow#isShowing()}",
+            method = "update",
+            args = {android.view.View.class, int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "isShowing",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test {@link PopupWindow#update(View, int, int)} and PopupWindow#isShowing()}",
+            method = "isShowing",
+            args = {}
         )
     })
     public void testUpdateDimentionAndAlignAnchorView() {
@@ -744,18 +730,16 @@ public class PopupWindowTest extends
         mPopupWindow.dismiss();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#update(View, int, int, int, int)} and " +
-              "PopupWindow#isShowing()}",
-      targets = {
-        @TestTarget(
-          methodName = "update",
-          methodArgs = {View.class, int.class, int.class, int.class, int.class}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "update",
+            args = {android.view.View.class, int.class, int.class, int.class, int.class}
         ),
-        @TestTarget(
-          methodName = "isShowing",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isShowing",
+            args = {}
         )
     })
     @ToBeFixed(bug="", explanation="can not update the position of popup window" +
@@ -833,18 +817,16 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#getInputMethodMode()} and " +
-              "{@link PopupWindow#setInputMethodMode(boolean)} ",
-      targets = {
-        @TestTarget(
-          methodName = "getInputMethodMode",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getInputMethodMode",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setInputMethodMode",
-          methodArgs = {int.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setInputMethodMode",
+            args = {int.class}
         )
     })
     public void testAccessInputMethodMode() {
@@ -864,18 +846,16 @@ public class PopupWindowTest extends
         assertEquals(-1, mPopupWindow.getInputMethodMode());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#isClippingEnabled()} and " +
-              "{@link PopupWindow#setClippingEnabled(boolean)} ",
-      targets = {
-        @TestTarget(
-          methodName = "isClippingEnabled",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isClippingEnabled",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setClippingEnabled",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setClippingEnabled",
+            args = {boolean.class}
         )
     })
     public void testAccessClippingEnabled() {
@@ -886,18 +866,16 @@ public class PopupWindowTest extends
         assertFalse(mPopupWindow.isClippingEnabled());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#isOutsideTouchable()} and " +
-              "{@link PopupWindow#setOutsideTouchable(boolean)} ",
-      targets = {
-        @TestTarget(
-          methodName = "isOutsideTouchable",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isOutsideTouchable",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setOutsideTouchable",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOutsideTouchable",
+            args = {boolean.class}
         )
     })
     public void testAccessOutsideTouchable() {
@@ -908,18 +886,16 @@ public class PopupWindowTest extends
         assertTrue(mPopupWindow.isOutsideTouchable());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#isTouchable()} and " +
-              "{@link PopupWindow#setTouchable(boolean)} ",
-      targets = {
-        @TestTarget(
-          methodName = "isTouchable",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "isTouchable",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setTouchable",
-          methodArgs = {boolean.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setTouchable",
+            args = {boolean.class}
         )
     })
     public void testAccessTouchable() {
@@ -930,15 +906,12 @@ public class PopupWindowTest extends
         assertFalse(mPopupWindow.isTouchable());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#isAboveAnchor()}",
-      targets = {
-        @TestTarget(
-          methodName = "isAboveAnchor",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#isAboveAnchor()}",
+        method = "isAboveAnchor",
+        args = {}
+    )
     public void testIsAboveAnchor() {
         mPopupWindow = createPopupWindow(createPopupContent());
         final View upperAnchor = mActivity.findViewById(R.id.anchor_upper);
@@ -965,15 +938,12 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#setTouchInterceptor(OnTouchListener)}",
-      targets = {
-        @TestTarget(
-          methodName = "setTouchInterceptor",
-          methodArgs = {OnTouchListener.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#setTouchInterceptor(OnTouchListener)}",
+        method = "setTouchInterceptor",
+        args = {android.view.View.OnTouchListener.class}
+    )
     public void testSetTouchInterceptor() {
         mPopupWindow = new PopupWindow(new TextView(mActivity));
 
@@ -997,15 +967,12 @@ public class PopupWindowTest extends
         assertEquals(2, onTouchListener.getOnTouchCalledCount());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test {@link PopupWindow#setWindowLayoutMode(int, int)}",
-      targets = {
-        @TestTarget(
-          methodName = "setWindowLayoutMode",
-          methodArgs = {int.class, int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link PopupWindow#setWindowLayoutMode(int, int)}",
+        method = "setWindowLayoutMode",
+        args = {int.class, int.class}
+    )
     public void testSetWindowLayoutMode() {
         mPopupWindow = new PopupWindow(new TextView(mActivity));
         showPopup();

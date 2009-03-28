@@ -57,19 +57,19 @@ public class ToggleButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test constructors",
             method = "ToggleButton",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test constructors",
             method = "ToggleButton",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test constructors",
             method = "ToggleButton",
             args = {android.content.Context.class}
@@ -106,13 +106,13 @@ public class ToggleButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test setTextOff and getTextOff",
             method = "setTextOff",
             args = {java.lang.CharSequence.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test setTextOff and getTextOff",
             method = "getTextOff",
             args = {}
@@ -131,7 +131,7 @@ public class ToggleButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test drawableStateChanged",
         method = "drawableStateChanged",
         args = {}
@@ -155,7 +155,7 @@ public class ToggleButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test onFinishInflate",
         method = "onFinishInflate",
         args = {}
@@ -168,7 +168,7 @@ public class ToggleButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test setChecked",
         method = "setChecked",
         args = {boolean.class}
@@ -185,19 +185,19 @@ public class ToggleButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Check the text of button when change button status",
             method = "setChecked",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Check the text of button when change button status",
             method = "setTextOff",
             args = {java.lang.CharSequence.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Check the text of button when change button status",
             method = "setTextOn",
             args = {java.lang.CharSequence.class}
@@ -231,7 +231,7 @@ public class ToggleButtonTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test setBackgroundDrawable",
         method = "setBackgroundDrawable",
         args = {android.graphics.drawable.Drawable.class}
@@ -249,13 +249,13 @@ public class ToggleButtonTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test setTextOn and getTextOn",
             method = "setTextOn",
             args = {java.lang.CharSequence.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test setTextOn and getTextOn",
             method = "getTextOn",
             args = {}

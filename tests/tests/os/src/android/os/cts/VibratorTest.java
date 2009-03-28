@@ -37,7 +37,7 @@ public class VibratorTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test cancel()",
         method = "cancel",
         args = {}
@@ -58,13 +58,13 @@ public class VibratorTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test vibrate",
             method = "vibrate",
             args = {long[].class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test vibrate",
             method = "vibrate",
             args = {long.class}
@@ -86,7 +86,7 @@ public class VibratorTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test vibrator with multi thread.",
         method = "vibrate",
         args = {long.class}

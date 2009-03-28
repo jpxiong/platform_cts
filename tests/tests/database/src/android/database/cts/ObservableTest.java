@@ -27,13 +27,13 @@ import dalvik.annotation.TestTargetClass;
 public class ObservableTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test registerObserver(Object.class) and unregisterObserver(Object.class).",
             method = "registerObserver",
             args = {java.lang.Object.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test registerObserver(Object.class) and unregisterObserver(Object.class).",
             method = "unregisterObserver",
             args = {java.lang.Object.class}
@@ -87,7 +87,7 @@ public class ObservableTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test unregisterAll method.",
         method = "unregisterAll",
         args = {}

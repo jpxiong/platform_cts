@@ -43,18 +43,17 @@ public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "ActivityManager.RunningTaskInfo",
         args = {}
     )
     public void testConstructor() {
-        ActivityManager.RunningTaskInfo runningTaskInfo =
-            new ActivityManager.RunningTaskInfo();
+        new ActivityManager.RunningTaskInfo();
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents method",
         method = "describeContents",
         args = {}
@@ -64,7 +63,7 @@ public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
@@ -98,7 +97,7 @@ public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test readFromParcel method",
         method = "readFromParcel",
         args = {android.os.Parcel.class}

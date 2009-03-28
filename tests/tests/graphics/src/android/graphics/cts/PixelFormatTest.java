@@ -35,7 +35,7 @@ public class PixelFormatTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of PixelFormat.",
         method = "PixelFormat",
         args = {}
@@ -47,8 +47,8 @@ public class PixelFormatTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test getPixelFormatInfo(int format, PixelFormat info).There are 13 kinds of valid format in PixelFormat.",
+        level = TestLevel.COMPLETE,
+        notes = "There are 13 kinds of valid format in PixelFormat.",
         method = "getPixelFormatInfo",
         args = {int.class, android.graphics.PixelFormat.class}
     )
@@ -137,7 +137,7 @@ public class PixelFormatTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test formatHasAlpha(int format).",
         method = "formatHasAlpha",
         args = {int.class}

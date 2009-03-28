@@ -32,7 +32,7 @@ public class DrawFilterTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of DrawFilter.",
         method = "DrawFilter",
         args = {}

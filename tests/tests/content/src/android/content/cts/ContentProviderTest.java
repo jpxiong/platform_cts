@@ -22,14 +22,15 @@ import android.content.Context;
 import android.content.IContentProvider;
 import android.content.ISyncAdapter;
 import android.content.pm.ProviderInfo;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.CursorWindow;
 import android.database.IBulkCursor;
 import android.database.IContentObserver;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
 
@@ -37,9 +38,10 @@ import com.google.android.collect.Lists;
 
 import com.android.internal.database.ArrayListCursor;
 
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
@@ -53,15 +55,12 @@ import java.util.ArrayList;
  */
 @TestTargetClass(ContentProvider.class)
 public class ContentProviderTest extends AndroidTestCase {
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test attachInfo(Context, android.content.pm.ProviderInfo)",
-      targets = {
-        @TestTarget(
-          methodName = "attachInfo",
-          methodArgs = {Context.class, ProviderInfo.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test attachInfo(Context, android.content.pm.ProviderInfo)",
+        method = "attachInfo",
+        args = {android.content.Context.class, android.content.pm.ProviderInfo.class}
+    )
     public void testAttachInfo() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 
@@ -98,15 +97,12 @@ public class ContentProviderTest extends AndroidTestCase {
         assertEquals(info1.writePermission, mockContentProvider.getWritePermission());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test bulkInsert(Uri, ContentValues[])",
-      targets = {
-        @TestTarget(
-          methodName = "bulkInsert",
-          methodArgs = {Uri.class, ContentValues[].class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test bulkInsert(Uri, ContentValues[])",
+        method = "bulkInsert",
+        args = {android.net.Uri.class, android.content.ContentValues[].class}
+    )
     public void testBulkInsert() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 
@@ -127,15 +123,12 @@ public class ContentProviderTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getContext()",
-      targets = {
-        @TestTarget(
-          methodName = "getContext",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getContext()",
+        method = "getContext",
+        args = {}
+    )
     public void testGetContext() {
         MockContentProvider mockContentProvider = new MockContentProvider();
         assertNull(mockContentProvider.getContext());
@@ -146,17 +139,18 @@ public class ContentProviderTest extends AndroidTestCase {
         assertSame(getContext(), mockContentProvider.getContext());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getReadPermission() and setReadPermission(String)",
-      targets = {
-        @TestTarget(
-          methodName = "getReadPermission",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getReadPermission() and setReadPermission(String)",
+            method = "getReadPermission",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setReadPermission",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getReadPermission() and setReadPermission(String)",
+            method = "setReadPermission",
+            args = {java.lang.String.class}
         )
     })
     public void testAccessReadPermission() {
@@ -175,17 +169,18 @@ public class ContentProviderTest extends AndroidTestCase {
         assertNull(mockContentProvider.getReadPermission());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getWritePermission() and setWritePermission(String)",
-      targets = {
-        @TestTarget(
-          methodName = "getWritePermission",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getWritePermission() and setWritePermission(String)",
+            method = "getWritePermission",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "setWritePermission",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test getWritePermission() and setWritePermission(String)",
+            method = "setWritePermission",
+            args = {java.lang.String.class}
         )
     })
     public void testAccessWritePermission() {
@@ -204,43 +199,34 @@ public class ContentProviderTest extends AndroidTestCase {
         assertNull(mockContentProvider.getWritePermission());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getSyncAdapter()",
-      targets = {
-        @TestTarget(
-          methodName = "getSyncAdapter",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getSyncAdapter()",
+        method = "getSyncAdapter",
+        args = {}
+    )
     public void testGetSyncAdapter() {
         MockContentProvider mockContentProvider = new MockContentProvider();
         assertNull(mockContentProvider.getSyncAdapter());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test isTemporary()",
-      targets = {
-        @TestTarget(
-          methodName = "isTemporary",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test isTemporary()",
+        method = "isTemporary",
+        args = {}
+    )
     public void testIsTemporary() {
         MockContentProvider mockContentProvider = new MockContentProvider();
         assertFalse(mockContentProvider.isTemporary());
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test openFile(Uri, String)",
-      targets = {
-        @TestTarget(
-          methodName = "openFile",
-          methodArgs = {Uri.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test openFile(Uri, String)",
+        method = "openFile",
+        args = {android.net.Uri.class, java.lang.String.class}
+    )
     public void testOpenFile() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 
@@ -258,15 +244,12 @@ public class ContentProviderTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test openFileHelper(Uri, String)",
-      targets = {
-        @TestTarget(
-          methodName = "openFileHelper",
-          methodArgs = {Uri.class, String.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test openFileHelper(Uri, String)",
+        method = "openFileHelper",
+        args = {android.net.Uri.class, java.lang.String.class}
+    )
     public void testOpenFileHelper() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 
@@ -311,15 +294,12 @@ public class ContentProviderTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onConfigurationChanged(android.content.res.Configuration)",
-      targets = {
-        @TestTarget(
-          methodName = "onConfigurationChanged",
-          methodArgs = {Configuration.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onConfigurationChanged(android.content.res.Configuration)",
+        method = "onConfigurationChanged",
+        args = {android.content.res.Configuration.class}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to test call back in unit test," +
             " will be tested by functional test.")
     public void testOnConfigurationChanged() {
@@ -328,15 +308,12 @@ public class ContentProviderTest extends AndroidTestCase {
         mockContentProvider.onConfigurationChanged(null);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test onLowMemory()",
-      targets = {
-        @TestTarget(
-          methodName = "onLowMemory",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onLowMemory()",
+        method = "onLowMemory",
+        args = {}
+    )
     @ToBeFixed( bug = "1400249", explanation = "hard to test call back in unit test," +
             " will be tested by functional test.")
     public void testOnLowMemory() {
@@ -345,15 +322,12 @@ public class ContentProviderTest extends AndroidTestCase {
         mockContentProvider.onLowMemory();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test coerceToLocalContentProvider(IContentProvider abstractInterface)",
-      targets = {
-        @TestTarget(
-          methodName = "coerceToLocalContentProvider",
-          methodArgs = {IContentProvider.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test coerceToLocalContentProvider(IContentProvider abstractInterface)",
+        method = "coerceToLocalContentProvider",
+        args = {android.content.IContentProvider.class}
+    )
     public void testCoerceToLocalContentProvider() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 
@@ -391,10 +365,10 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
-            public AssetFileDescriptor openAssetFile(Uri uri, String mode) {
+            public AssetFileDescriptor openAssetFile(Uri url, String mode) {
                 return null;
             }
-            
+
             public Cursor query(Uri url, String[] projection, String selection,
                     String[] selectionArgs, String sortOrder) {
                 return null;
@@ -412,15 +386,12 @@ public class ContentProviderTest extends AndroidTestCase {
         assertNull(ContentProvider.coerceToLocalContentProvider(iContentProvider));
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getIContentProvider()",
-      targets = {
-        @TestTarget(
-          methodName = "getIContentProvider",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getIContentProvider()",
+        method = "getIContentProvider",
+        args = {}
+    )
     public void testGetIContentProvider() {
         MockContentProvider mockContentProvider = new MockContentProvider();
 

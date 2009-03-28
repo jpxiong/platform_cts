@@ -32,7 +32,7 @@ public class MaskFilterTest extends TestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor(s) of MaskFilter.",
         method = "MaskFilter",
         args = {}

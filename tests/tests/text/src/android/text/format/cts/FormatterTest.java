@@ -30,7 +30,7 @@ import dalvik.annotation.TestTargetClass;
 @TestTargetClass(Formatter.class)
 public class FormatterTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link Formatter#formatFileSize(Context, long).",
         method = "formatFileSize",
         args = {android.content.Context.class, long.class}

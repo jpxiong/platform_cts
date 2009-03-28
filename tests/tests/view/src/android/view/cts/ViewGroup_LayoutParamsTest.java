@@ -35,7 +35,6 @@ import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(ViewGroup.LayoutParams.class)
 public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
@@ -43,19 +42,19 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
@@ -75,7 +74,7 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setBaseAttributes(TypedArray, int, int)",
         method = "setBaseAttributes",
         args = {android.content.res.TypedArray.class, int.class, int.class}

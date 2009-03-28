@@ -17,24 +17,26 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.ParcelFormatException;
-import dalvik.annotation.TestInfo;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(ParcelFormatException.class)
 public class ParcelFormatExceptionTest extends TestCase{
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "test method: ParcelFormatException",
-      targets = {
-        @TestTarget(
-          methodName = "ParcelFormatException",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test method: ParcelFormatException",
+            method = "ParcelFormatException",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "ParcelFormatException",
-          methodArgs = {String.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test method: ParcelFormatException",
+            method = "ParcelFormatException",
+            args = {java.lang.String.class}
         )
     })
     public void testParcelFormatException(){

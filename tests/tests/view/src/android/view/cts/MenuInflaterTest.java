@@ -58,7 +58,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test constructor.",
         method = "MenuInflater",
         args = {android.content.Context.class}
@@ -68,7 +68,7 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link MenuInflater#inflate(int, Menu)}",
         method = "inflate",
         args = {int.class, android.view.Menu.class}
@@ -97,11 +97,11 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link MenuInflater#inflate(int, Menu)}.Check wheher the objects are created correctly from xml files",
+        level = TestLevel.COMPLETE,
         method = "inflate",
         args = {int.class, android.view.Menu.class}
     )
+    // Check wheher the objects are created correctly from xml files
     public void testInflateFromXml(){
         // the visibility and shortcut
         Menu menu = new MenuBuilder(mActivity);

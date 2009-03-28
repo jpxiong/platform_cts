@@ -41,31 +41,31 @@ import dalvik.annotation.TestTargetClass;
 public class LinearLayout_LayoutParamsTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "LinearLayout.LayoutParams",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "LinearLayout.LayoutParams",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "LinearLayout.LayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "LinearLayout.LayoutParams",
             args = {int.class, int.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "LinearLayout.LayoutParams",
             args = {android.view.ViewGroup.MarginLayoutParams.class}

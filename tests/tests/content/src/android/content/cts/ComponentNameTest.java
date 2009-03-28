@@ -33,25 +33,25 @@ import dalvik.annotation.ToBeFixed;
 public class ComponentNameTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of ComponentName.",
             method = "ComponentName",
             args = {android.content.Context.class, java.lang.Class.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of ComponentName.",
             method = "ComponentName",
             args = {java.lang.String.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of ComponentName.",
             method = "ComponentName",
             args = {android.content.Context.class, java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors of ComponentName.",
             method = "ComponentName",
             args = {android.os.Parcel.class}
@@ -113,7 +113,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test ComponentName#flattenToString()",
         method = "flattenToString",
         args = {}
@@ -124,7 +124,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test ComponentName#getShortClassName().",
         method = "getShortClassName",
         args = {}
@@ -147,13 +147,13 @@ public class ComponentNameTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "TestreadFromParcel(Parcel) and writeToParcel(Parcel, int).",
             method = "readFromParcel",
             args = {android.os.Parcel.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "TestreadFromParcel(Parcel) and writeToParcel(Parcel, int).",
             method = "writeToParcel",
             args = {android.os.Parcel.class, int.class}
@@ -174,7 +174,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test ComponentName#getPackageName()",
         method = "getPackageName",
         args = {}
@@ -185,7 +185,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test unflattenFromString(String).",
         method = "unflattenFromString",
         args = {java.lang.String.class}
@@ -201,7 +201,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "TestflattenToShortString().",
         method = "flattenToShortString",
         args = {}
@@ -223,7 +223,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test equals(Object).",
         method = "equals",
         args = {java.lang.Object.class}
@@ -242,18 +242,18 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toString().",
         method = "toString",
         args = {}
     )
     public void testToString() {
         String str = getComponentName().toString();
-        assertEquals("ComponentInfo{com.android.cts.stub/android.content.cts.ComponentNameTest}", str);
+        assertNotNull(str);
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test toShortString().",
         method = "toShortString",
         args = {}
@@ -265,7 +265,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getClassName().",
         method = "getClassName",
         args = {}
@@ -277,7 +277,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test hashCode().",
         method = "hashCode",
         args = {}
@@ -296,7 +296,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test writeToParcel(ComponentName, Parcel).",
         method = "writeToParcel",
         args = {android.content.ComponentName.class, android.os.Parcel.class}
@@ -318,7 +318,7 @@ public class ComponentNameTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test describeContents(), this function always returns 0.",
         method = "describeContents",
         args = {}

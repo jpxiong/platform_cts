@@ -55,31 +55,31 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "RadioGroup.LayoutParams",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "RadioGroup.LayoutParams",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "RadioGroup.LayoutParams",
             args = {int.class, int.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "RadioGroup.LayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructors",
             method = "RadioGroup.LayoutParams",
             args = {android.view.ViewGroup.MarginLayoutParams.class}
@@ -158,7 +158,8 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
         } catch (NullPointerException e) {
         }
 
-        mLayoutParams = new LayoutParams(getContext(), getAttributeSet(com.android.cts.stub.R.layout.radiogroup_1));
+        mLayoutParams = new LayoutParams(getContext(), 
+                getAttributeSet(com.android.cts.stub.R.layout.radiogroup_1));
         assertNotNull(mLayoutParams);
         assertEquals(0.5, mLayoutParams.weight, 0);
         assertEquals(Gravity.BOTTOM, mLayoutParams.gravity);
@@ -174,15 +175,15 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
         assertEquals(RadioGroup.LayoutParams.WRAP_CONTENT, mLayoutParams.height);
 
         try {
-            new RadioGroup.LayoutParams(null, getAttributeSet(com.android.cts.stub.R.layout.radiogroup_1));
+            new RadioGroup.LayoutParams(null, 
+                    getAttributeSet(com.android.cts.stub.R.layout.radiogroup_1));
             fail("The constructor should throw NullPointerException when param Context is null.");
         } catch (NullPointerException e) {
         }
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link LayoutParams#setBaseAttributes(android.content.res.TypedArray, int, int)}",
+        level = TestLevel.COMPLETE,
         method = "setBaseAttributes",
         args = {android.content.res.TypedArray.class, int.class, int.class}
     )

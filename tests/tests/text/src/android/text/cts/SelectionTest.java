@@ -32,7 +32,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(Selection.class)
 public class SelectionTest extends AndroidTestCase {
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getSelectionStart(CharSequence text).",
         method = "getSelectionStart",
         args = {java.lang.CharSequence.class}
@@ -55,7 +55,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test getSelectionEnd(CharSequence text).",
         method = "getSelectionEnd",
         args = {java.lang.CharSequence.class}
@@ -78,7 +78,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setSelection(Spannable text, int start, int stop).",
         method = "setSelection",
         args = {android.text.Spannable.class, int.class, int.class}
@@ -121,7 +121,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setSelection(Spannable text, int index).",
         method = "setSelection",
         args = {android.text.Spannable.class, int.class}
@@ -161,7 +161,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test removeSelection(Spannable text).",
         method = "removeSelection",
         args = {android.text.Spannable.class}
@@ -193,7 +193,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test selectAll(Spannable text).",
         method = "selectAll",
         args = {android.text.Spannable.class}
@@ -232,7 +232,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveLeft(Spannable text, Layout layout).",
         method = "moveLeft",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -291,7 +291,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveRight(Spannable text, Layout layout).",
         method = "moveRight",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -354,7 +354,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveUp(Spannable text, Layout layout).",
         method = "moveUp",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -403,7 +403,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveDown(Spannable text, Layout layout).",
         method = "moveDown",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -461,7 +461,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendSelection(Spannable text, int index).",
         method = "extendSelection",
         args = {android.text.Spannable.class, int.class}
@@ -515,7 +515,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendLeft(Spannable text, Layout layout).",
         method = "extendLeft",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -573,7 +573,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendRight(Spannable text, Layout layout).",
         method = "extendRight",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -627,7 +627,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendUp(Spannable text, Layout layout).",
         method = "extendUp",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -676,7 +676,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendDown(Spannable text, Layout layout).",
         method = "extendDown",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -729,7 +729,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendToLeftEdge(Spannable text, Layout layout).",
         method = "extendToLeftEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -783,7 +783,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test extendToRightEdge(Spannable text, Layout layout).",
         method = "extendToRightEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -835,7 +835,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveToLeftEdge(Spannable text, Layout layout).",
         method = "moveToLeftEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
@@ -885,7 +885,7 @@ public class SelectionTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test moveToRightEdge(Spannable text, Layout layout).",
         method = "moveToRightEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}

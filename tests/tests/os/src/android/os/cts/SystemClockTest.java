@@ -37,7 +37,7 @@ public class SystemClockTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test currentThreadTimeMillis(), the sleep() will not affect the thread",
         method = "currentThreadTimeMillis",
         args = {}
@@ -52,7 +52,7 @@ public class SystemClockTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test elapsedRealtime()",
         method = "elapsedRealtime",
         args = {}
@@ -67,7 +67,7 @@ public class SystemClockTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test setCurrentTimeMillis(long).",
         method = "setCurrentTimeMillis",
         args = {long.class}
@@ -82,7 +82,7 @@ public class SystemClockTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test sleep(long), it is similar to Thread.sleep().",
         method = "sleep",
         args = {long.class}
@@ -107,7 +107,7 @@ public class SystemClockTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test uptimeMillis()",
         method = "uptimeMillis",
         args = {}

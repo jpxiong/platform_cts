@@ -51,19 +51,19 @@ public class ComponentInfoTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {android.content.pm.ComponentInfo.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {android.os.Parcel.class}
@@ -98,7 +98,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#loadIcon(PackageManager)}",
         method = "loadIcon",
         args = {android.content.pm.PackageManager.class}
@@ -134,7 +134,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#dumpBack(Printer, String)}",
         method = "dumpBack",
         args = {android.util.Printer.class, java.lang.String.class}
@@ -185,7 +185,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#getIconResource()}",
         method = "getIconResource",
         args = {}
@@ -203,7 +203,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#dumpFront(Printer, String)}",
         method = "dumpFront",
         args = {android.util.Printer.class, java.lang.String.class}
@@ -243,7 +243,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#loadLabel(PackageManager)}",
         method = "loadLabel",
         args = {android.content.pm.PackageManager.class}
@@ -284,7 +284,7 @@ public class ComponentInfoTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "Test {@link ComponentInfo#writeToParcel(Parcel, int)}",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}

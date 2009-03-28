@@ -36,7 +36,7 @@ public class CameraTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: Camera",
         method = "Camera",
         args = {}
@@ -47,13 +47,13 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore, save must be called before restore",
             method = "save",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: save and restore, save must be called before restore",
             method = "restore",
             args = {}
@@ -67,13 +67,13 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: translate and getMatrix",
             method = "translate",
             args = {float.class, float.class, float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: translate and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
@@ -103,13 +103,13 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateX and getMatrix",
             method = "rotateX",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateX and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
@@ -139,13 +139,13 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateY and getMatrix",
             method = "rotateY",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateY and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
@@ -175,13 +175,13 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateZ and getMatrix",
             method = "rotateZ",
             args = {float.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
+            level = TestLevel.COMPLETE,
             notes = "test methods: rotateZ and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
@@ -210,7 +210,7 @@ public class CameraTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: applyToCanvas",
         method = "applyToCanvas",
         args = {android.graphics.Canvas.class}
@@ -228,7 +228,7 @@ public class CameraTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: dotWithNormal",
         method = "dotWithNormal",
         args = {float.class, float.class, float.class}
@@ -238,7 +238,7 @@ public class CameraTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.TODO,
+        level = TestLevel.COMPLETE,
         notes = "test method: finalize",
         method = "finalize",
         args = {}
