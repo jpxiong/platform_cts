@@ -256,21 +256,27 @@
                     <TABLE>
                         <TR>
                             <TH width="25%">Test</TH>
-                            <TH width="5%">Result</TH>
-                            <TH width="70%">Failure Details</TH>
+                            <TH width="7%">Result</TH>
+                            <TH width="68%">Failure Details</TH>
                         </TR>
 
-                        <TR>
-                            <TD class="testsuite">Suite: <xsl:for-each select=".//TestSuite"><xsl:value-of select="@name"/>.</xsl:for-each></TD>
-                            <TD></TD>
-                            <TD></TD>
-                        </TR>
                         <!-- test case -->
                         <xsl:for-each select="TestSuite//TestCase">
+
+                            <!-- emit a blank row before every test suite name -->
+                            <xsl:if test="position()!=1">
+                                <TR> <TD class="testcasespacer" colspan="3"></TD> </TR>
+                            </xsl:if>
+
                             <TR>
-                                <TD class="testcase"> - <xsl:value-of select="@name"/></TD>
-                                <TD></TD>
-                                <TD></TD>
+                                <TD class="testcase" colspan="3">
+                                    <xsl:for-each select="ancestor::TestSuite">
+                                        <xsl:if test="position()!=1">.</xsl:if>
+                                        <xsl:value-of select="@name"/>
+                                    </xsl:for-each>
+                                    <xsl:text>.</xsl:text>
+                                    <xsl:value-of select="@name"/>
+                                </TD>
                             </TR>
                             <!-- test -->
                             <xsl:for-each select="Test">
@@ -278,44 +284,54 @@
                                     <TD class="testname"> -- <xsl:value-of select="@name"/></TD>
 
                                     <!-- test results -->
-                                    <xsl:if test="@result='pass'">
-                                        <TD class="pass">
-                                            <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                <xsl:value-of select="@result"/>
-                                            </div>
-                                        </TD>
-                                    </xsl:if>
+                                    <xsl:choose>
+                                        <xsl:when test="string(@KnownFailure)">
+                                            <TD class="pass">
+                                                <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                    known failure
+                                                </div>
+                                            </TD>
+                                        </xsl:when>
 
-                                    <xsl:if test="@result='fail'">
-                                        <TD class="failed">
-                                            <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                <xsl:value-of select="@result"/>
-                                            </div>
-                                        </TD>
-                                    </xsl:if>
+                                        <xsl:otherwise>
+                                            <xsl:if test="@result='pass'">
+                                                <TD class="pass">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                            </xsl:if>
 
-                                    <xsl:if test="@result='timeout'">
-                                        <TD class="timeout">
-                                            <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                <xsl:value-of select="@result"/>
-                                            </div>
-                                        </TD>
-                                    </xsl:if>
+                                            <xsl:if test="@result='fail'">
+                                                <TD class="failed">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                            </xsl:if>
 
-                                    <xsl:if test="@result='notExecuted'">
-                                        <TD class="notExecuted">
-                                            <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                <xsl:value-of select="@result"/>
-                                            </div>
-                                        </TD>
-                                    </xsl:if>
+                                            <xsl:if test="@result='timeout'">
+                                                <TD class="timeout">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                            </xsl:if>
+
+                                            <xsl:if test="@result='notExecuted'">
+                                                <TD class="notExecuted">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                            </xsl:if>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
 
                                     <TD class="failuredetails">
-                                        <xsl:if test="@result='fail'">
-                                            <div id="details">
-                                                <xsl:value-of select="FailedScene/@message"/>
-                                            </div>
-                                        </xsl:if>
+                                         <div id="details">
+                                             <xsl:value-of select="FailedScene/@message"/>
+                                         </div>
                                     </TD>
                                 </TR>
                             </xsl:for-each> <!-- end test -->
