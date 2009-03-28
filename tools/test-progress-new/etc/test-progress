@@ -353,7 +353,7 @@ elif [ ${testType} == "android" ]; then
     SOURCE_PATH="${ANDROID_SOURCE_PATH} ${ANDROID_PACKAGE}"
 fi
 
-javadoc -J-Xmx512m -docletpath $CLASSES -doclet testprogress2.TestCoverageDoclet -f $TESTCOVERAGE_FLAGS -d $OUTPUT -sourcepath $SOURCE_PATH
+javadoc -J-Xmx1024M -docletpath $CLASSES -doclet testprogress2.TestCoverageDoclet -f $TESTCOVERAGE_FLAGS -d $OUTPUT -sourcepath $SOURCE_PATH
 
 # left out on purpose:
 # org.w3c.dom packages: the tests in the xml module are superseded by the
