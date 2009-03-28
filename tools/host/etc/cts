@@ -67,8 +67,15 @@ CTS_LIBS=${CTS_LIBS}:${CTS_DIR}/${CTS_LIB}
 CTS_REPO=${CTS_DIR}/../cts/android-cts/repository
 
 # Try to locate CTS repository
-if [ -z "$@" ] && [ -z "${CTS_HOST_CFG}" ] && \
-   [ -d "${CTS_REPO}" ]; then
-    CTS_HOST_CFG=${CTS_REPO}/host_config.xml
+if [ $# -eq 1 ] || [[ "$*" =~ "--config" ]];
+then
+    # single parameter or --config argument specifies config file
+    :
+else
+    # config file not specified, try to locate if not already defined
+    if [ -z "${CTS_HOST_CFG}" ] && [ -d "${CTS_REPO}" ]; then
+       CTS_HOST_CFG=${CTS_REPO}/host_config.xml
+    fi;
 fi;
+
 java -cp ${CTS_LIBS} -DHOST_CONFIG=${CTS_HOST_CFG} com.android.cts.TestHost "$@"
