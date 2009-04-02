@@ -286,11 +286,29 @@
                                     <!-- test results -->
                                     <xsl:choose>
                                         <xsl:when test="string(@KnownFailure)">
-                                            <TD class="pass">
-                                                <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                    known failure
-                                                </div>
-                                            </TD>
+                                            <!-- "pass" indicates the that test actually passed (resulta have been inverted already) -->
+                                            <xsl:if test="@result='pass'">
+                                                <TD class="pass">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        known failure
+                                                    </div>
+                                                </TD>
+                                                <TD class="failuredetails"></TD>
+                                            </xsl:if>
+
+                                            <!-- "fail" indicates that a known failure actually passed (resulta have been inverted already) -->
+                                            <xsl:if test="@result='fail'">
+                                                <TD class="failed">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                               <TD class="failuredetails">
+                                                    <div id="details">
+                                                        A test that was a known failure actually passed. Please check.
+                                                    </div>
+                                               </TD>
+                                            </xsl:if>
                                         </xsl:when>
 
                                         <xsl:otherwise>
@@ -300,12 +318,18 @@
                                                         <xsl:value-of select="@result"/>
                                                     </div>
                                                 </TD>
+                                                <TD class="failuredetails"></TD>
                                             </xsl:if>
 
                                             <xsl:if test="@result='fail'">
                                                 <TD class="failed">
                                                     <div style="text-align: center; margin-left:auto; margin-right:auto;">
                                                         <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                                <TD class="failuredetails">
+                                                    <div id="details">
+                                                        <xsl:value-of select="FailedScene/@message"/>
                                                     </div>
                                                 </TD>
                                             </xsl:if>
@@ -315,6 +339,7 @@
                                                     <div style="text-align: center; margin-left:auto; margin-right:auto;">
                                                         <xsl:value-of select="@result"/>
                                                     </div>
+                                                <TD class="failuredetails"></TD>
                                                 </TD>
                                             </xsl:if>
 
@@ -324,16 +349,11 @@
                                                         <xsl:value-of select="@result"/>
                                                     </div>
                                                 </TD>
+                                                <TD class="failuredetails"></TD>
                                             </xsl:if>
                                         </xsl:otherwise>
                                     </xsl:choose>
-
-                                    <TD class="failuredetails">
-                                         <div id="details">
-                                             <xsl:value-of select="FailedScene/@message"/>
-                                         </div>
-                                    </TD>
-                                </TR>
+                                </TR> <!-- finished with a row -->
                             </xsl:for-each> <!-- end test -->
                         </xsl:for-each> <!-- end test case -->
                     </TABLE>
