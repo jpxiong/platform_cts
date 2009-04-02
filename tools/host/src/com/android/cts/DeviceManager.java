@@ -16,19 +16,14 @@
 
 package com.android.cts;
 
-import com.android.cts.TestDevice.StdOutObserver;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.Device;
+import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Initializing and managing devices.
@@ -37,6 +32,7 @@ public class DeviceManager implements IDeviceChangeListener {
 
     private static final int SHORT_DELAY = 1000 * 15; // 15 seconds
     private static final int LONG_DELAY = 1000 * 60 * 10; // 10 minutes
+    private static final int MAX_ADB_RESTART_ATTEMPTS = 10;
     ArrayList<TestDevice> mDevices;
     /** This is used during device restart for blocking until the device has been reconnected. */
     private Semaphore mSemaphore = new Semaphore(0);
@@ -129,10 +125,10 @@ public class DeviceManager implements IDeviceChangeListener {
     /**
      * Append the device to the device list.
      *
-     * @param device The devie to be appended to the device list.
+     * @param device The device to be appended to the device list.
      */
     private void appendDevice(final Device device) {
-        if (-1 == searchDevice(device)) {
+        if (-1 == getDeviceIndex(device)) {
             TestDevice td = new TestDevice(device);
             mDevices.add(td);
         }
@@ -144,7 +140,7 @@ public class DeviceManager implements IDeviceChangeListener {
      * @param device The device to be removed from the device list.
      */
     private void removeDevice(final Device device) {
-        int index = searchDevice(device);
+        int index = getDeviceIndex(device);
         if (index == -1) {
             Log.d("Can't find " + device + " in device list of DeviceManager");
             return;
@@ -154,12 +150,12 @@ public class DeviceManager implements IDeviceChangeListener {
     }
 
     /**
-     * Search a specific device.
+     * Get the index of the specified device in the device array.
      *
      * @param device The device to be found.
-     * @return The index of the specific device if exits; else -1.
+     * @return The index of the device if it exists; else -1.
      */
-    private int searchDevice(final Device device) {
+    private int getDeviceIndex(final Device device) {
         TestDevice td;
 
         for (int index = 0; index < mDevices.size(); index++) {
@@ -170,12 +166,12 @@ public class DeviceManager implements IDeviceChangeListener {
         }
         return -1;
     }
-
+    
     /**
-     * Search a specific device.
+     * Search a <code>TestDevice</code> by serial number.
      *
-     * @param deviceSerialNumber The device to be found.
-     * @return The the specific test device if exits; else null.
+     * @param deviceSerialNumber The serial number of the device to be found.
+     * @return The test device, if it exists, otherwise null.
      */
     private TestDevice searchTestDevice(final String deviceSerialNumber) {
         for (TestDevice td : mDevices) {
@@ -291,42 +287,44 @@ public class DeviceManager implements IDeviceChangeListener {
 
         String deviceSerialNumber = ts.getDeviceId();
         if (!deviceSerialNumber.toLowerCase().startsWith("emulator")) {
-            AndroidDebugBridge.disconnectBridge();
-            executeCommand("adb shell reboot");
-            // kill the server while the device is rebooting
-            executeCommand("adb kill-server");
-            
-            // Reset the device counter semaphore. We will wait below until at least one device
-            // has come online. This can happen any time during or after the call to
-            // createBridge(). The counter gets increased by the DeviceServiceMonitor when a
-            // device is added.
-            mSemaphore.drainPermits();
-            AndroidDebugBridge.createBridge(getAdbLocation(), true);
-            
-            // wait until at least one device has been added
-            mSemaphore.tryAcquire(LONG_DELAY, TimeUnit.MILLISECONDS);
-
-            // wait until the device has started up
-            // TODO: Can we use 'adb shell getprop dev.bootcomplete' instead?
-            boolean started = false;
-            while (!started) {
-                Thread.sleep(SHORT_DELAY);
-                // dump log and exit
-                RestartADBServerObserver ro = executeCommand("adb logcat -d");
-                started = ro.hasStarted();
+            try {
+                Device dev = searchTestDevice(deviceSerialNumber).getDevice();
+                dev.executeShellCommand("reboot", new NullOutputReceiver());
+            } catch (Exception e) {
+                Log.d("Could not issue reboot command through ddmlib: " + e);
+                // try to reboot the device using the command line adb
+                executeCommand("adb -s " + deviceSerialNumber + " shell reboot");
             }
+            int attempts = 0;
+            boolean deviceConnected = false;
+            while (!deviceConnected && (attempts < MAX_ADB_RESTART_ATTEMPTS)) {
+                AndroidDebugBridge.disconnectBridge();
 
-            TestDevice device = searchTestDevice(deviceSerialNumber);
-            if (device != null) {
-                ts.setTestDevice(device);
-                ts.getSessionLog().setDeviceInfo(device.getDeviceInfo());
-                Thread.sleep(SHORT_DELAY);
-                device.probeDeviceStatus();
-                Thread.sleep(SHORT_DELAY * 2);
+                // kill the server while the device is rebooting
+                executeCommand("adb kill-server");
+                
+                // Reset the device counter semaphore. We will wait below until at least one device
+                // has come online. This can happen any time during or after the call to
+                // createBridge(). The counter gets increased by the DeviceServiceMonitor when a
+                // device is added.
+                mSemaphore.drainPermits();
+                AndroidDebugBridge.createBridge(getAdbLocation(), true);
+                
+                boolean deviceFound = false;
+                while (!deviceFound) {
+                    // wait until at least one device has been added
+                    mSemaphore.tryAcquire(LONG_DELAY, TimeUnit.MILLISECONDS);
+                    TestDevice device = searchTestDevice(deviceSerialNumber);
+                    if (device != null) {
+                        ts.setTestDevice(device);
+                        deviceFound = true;
+                        deviceConnected = device.waitForBootComplete();
+                    }
+                }
+                attempts += 1;
             }
-            
             // dismiss the screen lock by sending a MENU key event
-            executeCommand("adb shell input keyevent 82");
+            executeCommand("adb -s " + deviceSerialNumber + " shell input keyevent 82");
         }
     }
     
@@ -334,92 +332,41 @@ public class DeviceManager implements IDeviceChangeListener {
      * Execute the given command and wait for its completion.
      *
      * @param command The command to be executed.
+     * @return True if the command was executed successfully, otherwise false.
      */
-    private RestartADBServerObserver executeCommand(String command) {
-        Log.d("restartADBServer(): cmd=" + command);
-        RestartADBServerObserver ro = new RestartADBServerObserver();
+    private boolean executeCommand(String command) {
+        Log.d("executeCommand(): cmd=" + command);
         try {
             Process proc = Runtime.getRuntime().exec(command);
-            ro.setInputStream(proc.getInputStream());
-            ro.waitToFinish();
-        } catch (IOException e) {
-            e.printStackTrace();
+            TimeoutThread tt = new TimeoutThread(proc, SHORT_DELAY);
+            tt.start();
+            proc.waitFor(); // ignore exit value
+            tt.interrupt(); // wake timeout thread
+        } catch (Exception e) {
+            return false;
         }
-        return ro;
+        return true; 
     }
-
-
-    /**
-     * The observer of restarting ADB server.
-     * TODO: This is a workaround to reset the device after a certain number of tests have been run.
-     * This should be removed as soon as the ADB stability problems have been fixed.
-     */
-    final class RestartADBServerObserver implements StdOutObserver, Runnable {
-
-        private BufferedReader mReader;
-        private final Pattern mPattern = 
-            Pattern.compile("I/SurfaceFlinger.*Boot is finished.*");
-        private boolean mFoundPattern;
-        private Thread mThread;
-        private boolean mKillThread;
+    
+    class TimeoutThread extends Thread {
+        Process mProcess;
+        long mTimeout;
         
-        /**
-         * Wait for the observer to process all lines.
-         * @return True if the observer finished normally, false if a timeout occurred.
-         */
-        public boolean waitToFinish() {
-            // wait for thread to terminate first
-            try {
-                mThread.join(LONG_DELAY);
-                // set the kill flag, just in case we timed out
-                mKillThread = true;
-                return true;
-            } catch (InterruptedException e) {
-                mKillThread = true;
-                return false;
-            }
+        TimeoutThread(Process process, long timeout) {
+            mProcess = process;
+            mTimeout = timeout;
         }
         
-        public boolean hasStarted() {
-            waitToFinish();
-            return mFoundPattern;
-        }
-        
-        /** {@inheritDoc} */
+        @Override
         public void run() {
             try {
-                processLines();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    mReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Thread.sleep(mTimeout);
+            } catch (InterruptedException e) {
+                // process has already completed
+                return;
             }
-        }
-
-        /**
-         * Parse the standard out.
-         */
-        public void processLines() throws IOException {
-            String line = mReader.readLine();
-            
-            while (line != null && !mKillThread) {
-                Log.d("line=" + line);
-                if (!mFoundPattern) {
-                    mFoundPattern = mPattern.matcher(line.trim()).matches();
-                }
-                line = mReader.readLine();
-            }
-        }
-
-        /** {@inheritDoc} */
-        public void setInputStream(InputStream is) {
-            mReader = new BufferedReader(new InputStreamReader(is));
-            mThread = new Thread(this);
-            mThread.start();
+            // destroy process and wake up thread waiting for its completion
+            mProcess.destroy();
         }
     }
 }
