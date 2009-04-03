@@ -61,8 +61,12 @@ public class MethodOriginator implements Originator {
                         + (String)annot.elementValues()[0].value().value();
             } else if (annot.annotationType().qualifiedName().equals(
                     "dalvik.annotation.ToBeFixed")) {
-                toBeFixed = "<b>@ToBeFixed:</b>"
-                        + (String)annot.elementValues()[0].value().value();
+                String info = "N/A";
+                if (annot.elementValues().length > 0) {
+                    info = (String)annot.elementValues()[0].value().value();
+                }
+
+                toBeFixed = "<b>@ToBeFixed:</b>" + info;
             }
             // else some other annotation - ignore
         }
