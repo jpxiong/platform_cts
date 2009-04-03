@@ -61,6 +61,13 @@ public class TestDevice implements DeviceObserver {
     private static final String STATUS_STR_IDLE = "idle";
     private static final String STATUS_STR_IN_USE = "in use";
     private static final String STATUS_STR_OFFLINE = "offline";
+    
+    /** Interval [ms] for polling a device until boot is completed. */
+    private static final int REBOOT_POLL_INTERVAL = 5000;
+    /** Number of times a booting device should be polled before we give up. */
+    private static final int REBOOT_POLL_COUNT = 10 * 60 * 1000 / REBOOT_POLL_INTERVAL;
+    /** Max time [ms] to wait for <code>adb shell getprop</code> to return a result. */
+    private static final int GETPROP_TIMEOUT = 5000;
 
     public static final Pattern INSTRUMENT_RESULT_PATTERN;
 
@@ -80,7 +87,6 @@ public class TestDevice implements DeviceObserver {
     private PackageActionTimer mPackageActionTimer;
 
     private ObjectSync mObjectSync;
-    private int mPackageActionResultCode;
 
     static {
         INSTRUMENT_RESULT_PATTERN = Pattern.compile(sInstrumentResultExpr);
@@ -120,46 +126,91 @@ public class TestDevice implements DeviceObserver {
         }
         return mDeviceInfo;
     }
-
+    
     /**
-     * Probe device status by pushing apk to device.
+     * Return the Device instance associated with this TestDevice.
      */
-    public void probeDeviceStatus() throws DeviceDisconnectedException {
-        String apkName = "DeviceInfoCollector";
+    public Device getDevice() {
+        return mDevice;
+    }
+
+    class RestartPropReceiver extends MultiLineReceiver {
+        private boolean mRestarted;
+        private boolean mCancelled;
+        private boolean mDone;
+        
+        @Override
+        public void processNewLines(String[] lines) {
+            for (String line : lines) {
+                if (line.trim().equals("1")) {
+                    mRestarted = true;
+                }
+            }
+        }
+        @Override
+        public void done() {
+            synchronized(this) {
+                mDone = true;
+                this.notifyAll();
+            }
+        }
+        
+        public boolean isCancelled() {
+            return mCancelled;
+        }
+        
+        boolean hasRestarted(long timeout) {
+            try {
+                synchronized (this) {
+                    if (!mDone) {
+                        this.wait(timeout);
+                    }
+                }
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            mCancelled = true;
+            return mRestarted;
+        }
+    }
+    
+    /**
+     * Wait until device indicates that boot is complete.
+     * 
+     * @return true if the device has completed the boot process, false if it does not, or the
+     * device does not respond.
+     */
+    public boolean waitForBootComplete() throws DeviceDisconnectedException {
         Log.d("probe device status...");
 
-        String apkPath = HostConfig.getInstance().getCaseRepository().getApkPath(apkName);
-        if (!HostUtils.isFileExist(apkPath)) {
-            Log.e("File doesn't exist: " + apkPath, null);
-            return;
-        }
-
         mDeviceInfo.set(DeviceParameterCollector.SERIAL_NUMBER, getSerialNumber());
-        Log.d("installing " + apkName + " apk");
         mObjectSync = new ObjectSync();
 
         // reset device observer
         DeviceObserver tmpDeviceObserver = mDeviceObserver;
         mDeviceObserver = this;
 
+        int retries = 0;
         boolean success = false;
-        while (!success) {
-            Log.d("install get info ...");
-            mPackageActionResultCode = 0;
-            installAPK(apkPath);
-            waitForCommandFinish();
-            if (mPackageActionResultCode == DeviceObserver.SUCCESS) {
-                success = true;
-                break;
-            }
-
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
+        while (!success && (retries < REBOOT_POLL_COUNT)) {
+            Log.d("Waiting for device to complete boot");
+            RestartPropReceiver rpr = new RestartPropReceiver();
+            this.executeShellCommand("getprop dev.bootcomplete", rpr);
+            success = rpr.hasRestarted(GETPROP_TIMEOUT);
+            if (!success) {
+                try {
+                    Thread.sleep(REBOOT_POLL_INTERVAL);
+                } catch (InterruptedException e) {
+                    // ignore and retry
+                }
+                retries += 1;
             }
         }
         mDeviceObserver = tmpDeviceObserver;
-        Log.d("probe device status succeds.");
+        if (success) {
+            Log.d("Device boot complete");
+        }
+        return success;
     }
 
     /**
@@ -1546,7 +1597,6 @@ public class TestDevice implements DeviceObserver {
      * Notify install complete.
      */
     public void notifyInstallingComplete(int resultCode) {
-        mPackageActionResultCode = resultCode;
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
             mPackageActionTimer.stop();
@@ -1555,7 +1605,6 @@ public class TestDevice implements DeviceObserver {
 
     /** {@inheritDoc} */
     public void notifyInstallingTimeout(TestDevice testDevice) {
-        mPackageActionResultCode = DeviceObserver.FAIL;
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
         }
