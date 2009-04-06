@@ -91,3 +91,6 @@ $(generated_res_stamp): $(copied_res_stamp) $(android_api_description)
 	$(hide) touch $@
 
 $(R_file_stamp): $(generated_res_stamp) $(copied_res_stamp)
+
+# Use the folloing include to make our test apk.
+include $(call all-makefiles-under,$(LOCAL_PATH))
