@@ -67,16 +67,13 @@ public class SignatureTest {
 
     private HashSet<String> mKeyTagSet;
 
-    private JDiffMethod mCurrentJdiffMethod;
-
     private ArrayList<ResultObserver> mReportObserverList;
 
-    private JDiffClassDescription mCurrentClass;
+    private ResultObserver resultObserver;
 
-    public SignatureTest() {
-
+    public SignatureTest(ResultObserver resultObserver) {
+        this.resultObserver = resultObserver;
         mReportObserverList = new ArrayList<ResultObserver>();
-        mCurrentClass = new JDiffClassDescription();
         mKeyTagSet = new HashSet<String>();
         mKeyTagSet.addAll(Arrays.asList(new String[] {
                 TAG_PACKAGE, TAG_CLASS, TAG_INTERFACE, TAG_IMPLEMENTS, TAG_CONSTRUCTOR,
@@ -87,6 +84,10 @@ public class SignatureTest {
      * Signature test entry point.
      */
     public void start(XmlPullParser parser) throws XmlPullParserException, IOException {
+        JDiffClassDescription currentClass = null;
+        String currentPackage = "";
+        JDiffMethod currentMethod = null;
+
         XmlUtils.beginDocument(parser, TAG_ROOT);
         int type;
         while (true) {
@@ -100,7 +101,9 @@ public class SignatureTest {
             if (type == XmlPullParser.END_TAG) {
                 if (TAG_CLASS.equals(parser.getName())
                         || TAG_INTERFACE.equals(parser.getName())) {
-                    mCurrentClass.checkSignatureCompliance();
+                    currentClass.checkSignatureCompliance();
+                } else if (TAG_PACKAGE.equals(parser.getName())) {
+                    currentPackage = "";
                 }
                 continue;
             }
@@ -114,25 +117,29 @@ public class SignatureTest {
                 continue;
             }
 
-            if (tagname.equals(TAG_PACKAGE)) {
-                mCurrentClass.setPackageName(parser.getAttributeValue(null,
-                        ATTRIBUTE_NAME));
+            if (type == XmlPullParser.START_TAG && tagname.equals(TAG_PACKAGE)) {
+                SignatureTestLog.d("saw package: " + parser.getAttributeValue(null, ATTRIBUTE_NAME));
+                currentPackage = parser.getAttributeValue(null, ATTRIBUTE_NAME);
             } else if (tagname.equals(TAG_CLASS)) {
-                loadClassInfo(parser, false);
+                currentClass = loadClassInfo(parser, false, currentPackage);
             } else if (tagname.equals(TAG_INTERFACE)) {
-                loadClassInfo(parser, true);
+                currentClass = loadClassInfo(parser, true, currentPackage);
             } else if (tagname.equals(TAG_IMPLEMENTS)) {
-                loadImplementationInfo(parser);
+                currentClass.addImplInterface(parser.getAttributeValue(null, ATTRIBUTE_NAME));
             } else if (tagname.equals(TAG_CONSTRUCTOR)) {
-                loadConstructorInfo(parser);
+                JDiffConstructor constructor = loadConstructorInfo(parser, currentClass);
+                currentClass.addConstructor(constructor);
+                currentMethod = (JDiffMethod) constructor;
             } else if (tagname.equals(TAG_METHOD)) {
-                loadMethodInfo(parser);
+                currentMethod = loadMethodInfo(parser);
+                currentClass.addMethod(currentMethod);
             } else if (tagname.equals(TAG_PARAM)) {
-                loadParamInfo(parser);
+                currentMethod.addParam(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
             } else if (tagname.equals(TAG_EXCEPTION)) {
-                loadExceptionInfo(parser);
+                currentMethod.addException(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
             } else if (tagname.equals(TAG_FIELD)) {
-                loadFieldInfo(parser);
+                JDiffField field = loadFieldInfo(parser);
+                currentClass.addField(field);
             } else {
                 throw new RuntimeException(
                         "unknow tag exception:" + tagname);
@@ -142,10 +149,6 @@ public class SignatureTest {
 
     public static void log(final String msg) {
         mDebugArray.add(msg);
-    }
-
-    public void registerResultObserver(ResultObserver resultObserver) {
-        mCurrentClass.registerResultObserver(resultObserver);
     }
 
     public void addReportObserver(ResultObserver observer) {
@@ -162,57 +165,42 @@ public class SignatureTest {
 
     /**
      * Load field information from xml to memory.
+     *
+     * @return the new field
      */
-    private void loadFieldInfo(XmlPullParser parser) {
+    private JDiffField loadFieldInfo(XmlPullParser parser) {
         String fieldName = parser.getAttributeValue(null, ATTRIBUTE_NAME);
         String fieldType = parser.getAttributeValue(null, ATTRIBUTE_TYPE);
         int modifier = jdiffModifierToReflectionFormat(parser);
-        mCurrentClass.addField(new JDiffField(fieldName, fieldType, modifier));
-    }
-
-    /**
-     * Load exception information from xml to memory.
-     *
-     * @param parser The XmlPullParser which carries the xml information.
-     */
-    private void loadExceptionInfo(XmlPullParser parser) {
-        mCurrentJdiffMethod.addException(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
-    }
-
-    /**
-     * Load parameter information from xml to memory.
-     *
-     * @param parser The XmlPullParser which carries the xml information.
-     */
-    private void loadParamInfo(XmlPullParser parser) {
-        mCurrentJdiffMethod.addParam(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
+        return new JDiffField(fieldName, fieldType, modifier);
     }
 
     /**
      * Load method information from xml to memory.
      *
      * @param parser The XmlPullParser which carries the xml information.
+     * @return the newly loaded method.
      */
-    private void loadMethodInfo(XmlPullParser parser) {
+    private JDiffMethod loadMethodInfo(XmlPullParser parser) {
         String methodName = parser.getAttributeValue(null, ATTRIBUTE_NAME);
         String returnType = parser.getAttributeValue(null, ATTRIBUTE_RETURN);
         int modifier = jdiffModifierToReflectionFormat(parser);
-        mCurrentJdiffMethod = new JDiffMethod(methodName, modifier, returnType);
-        mCurrentClass.addMethod(mCurrentJdiffMethod);
+        return new JDiffMethod(methodName, modifier, returnType);
     }
 
     /**
      * Load constructor information from xml to memory.
      *
      * @param parser The XmlPullParser which carries the xml information.
+     * @param currentClass the current class being loaded.
+     * @return the new constructor
      */
-    private void loadConstructorInfo(XmlPullParser parser) {
-//      SignatureTestLog.d("load constructor info >>> ");
+    private JDiffConstructor loadConstructorInfo(XmlPullParser parser,
+                                                 JDiffClassDescription currentClass) {
         int modifier = jdiffModifierToReflectionFormat(parser);
+        JDiffConstructor constructor = new JDiffConstructor(currentClass.getClassName(), modifier);
 
-        mCurrentJdiffMethod = new JDiffConstructor(mCurrentClass.getClassName(), modifier);
-
-        mCurrentClass.addConstructor((JDiffConstructor) mCurrentJdiffMethod);
+        return constructor;
     }
 
     /**
@@ -221,7 +209,7 @@ public class SignatureTest {
      * @param parser The XmlPullParser which carries the xml information.
      */
     private void loadImplementationInfo(XmlPullParser parser) {
-        mCurrentClass.addImplInterface(parser.getAttributeValue(null, ATTRIBUTE_NAME));
+
     }
 
     /**
@@ -229,14 +217,21 @@ public class SignatureTest {
      *
      * @param parser The XmlPullParser which carries the xml information.
      * @param isInterface true if the current class is an interface, otherwise is false.
+     * @param pkg the name of the java package this class can be found in.
+     * @return the new class description.
      */
-    private void loadClassInfo(XmlPullParser parser, boolean isInterface) {
+    private JDiffClassDescription loadClassInfo(XmlPullParser parser,
+                                                boolean isInterface,
+                                                String pkg) {
         String className = parser.getAttributeValue(null, ATTRIBUTE_NAME);
-        mCurrentClass.setClassName(className);
-        mCurrentClass.setModifier(jdiffModifierToReflectionFormat(parser));
-        mCurrentClass.setType(isInterface ? JDiffClassDescription.JDiffType.INTERFACE :
-            JDiffClassDescription.JDiffType.CLASS);
-        mCurrentClass.setExtendsClass(parser.getAttributeValue(null, ATTRIBUTE_EXTENDS));
+        JDiffClassDescription currentClass = new JDiffClassDescription(pkg,
+                                                                       className,
+                                                                       resultObserver);
+        currentClass.setModifier(jdiffModifierToReflectionFormat(parser));
+        currentClass.setType(isInterface ? JDiffClassDescription.JDiffType.INTERFACE :
+                             JDiffClassDescription.JDiffType.CLASS);
+        currentClass.setExtendsClass(parser.getAttributeValue(null, ATTRIBUTE_EXTENDS));
+        return currentClass;
     }
 
     /**
