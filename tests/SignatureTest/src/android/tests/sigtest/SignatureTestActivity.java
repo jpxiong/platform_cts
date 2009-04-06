@@ -62,7 +62,7 @@ public class SignatureTestActivity extends Activity {
     /**
      * Define the type of the signature check failures.
      */
-    static enum FAILURE_TYPE {
+    public static enum FAILURE_TYPE {
         MISSING_CLASS,
         MISSING_INTERFACE,
         MISSING_METHOD,
@@ -102,8 +102,7 @@ public class SignatureTestActivity extends Activity {
      */
     @SuppressWarnings("unchecked")
     private void start() {
-        SignatureTest sigTest = new SignatureTest();
-        sigTest.registerResultObserver(mResultObserver);
+        SignatureTest sigTest = new SignatureTest(mResultObserver);
 
         HashSet<String> excludeSet = getExcludedSet();
 
