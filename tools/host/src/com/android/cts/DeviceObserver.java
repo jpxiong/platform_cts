@@ -18,26 +18,15 @@ package com.android.cts;
 
 public interface DeviceObserver {
 
+    /**
+     * Indicate the status of installing/uninstalling action:
+     * <ul>
+     *     <li>FAIL: indicate that the action is failed.
+     *     <li>SUCCESS: indicates that the action is success.
+     * </ul>
+     */
     public static final int FAIL = -1;
     public static final int SUCCESS = 1;
-
-    /**
-     * Update Test running status when running in batch mode.
-     *
-     * @param test The Test to update.
-     * @param status The status to be updated.
-     */
-    void notifyTestStatus(final Test test, final String status);
-
-    /**
-     * Update result code and failed message.
-     *
-     * @param resCode test result code value.
-     * @param failedMessage failed message content.
-     * @param stackTrace stack trace information.
-     */
-    void notifyUpdateResult(final int resCode, final String failedMessage,
-            final String stackTrace);
 
     /**
      * Notify after installing apk complete on the {@link TestDevice}

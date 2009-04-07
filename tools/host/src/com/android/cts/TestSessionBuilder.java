@@ -371,12 +371,12 @@ public class TestSessionBuilder extends XMLResourceHandler {
                                 if (pkg.isHostSideOnly()) {
                                     test = new HostSideOnlyTest(testCase, name, cType,
                                             knownFailure,
-                                            TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED);
+                                            CtsTestResult.CODE_NOT_EXECUTED);
                                     description = test.getFullName();
                                 } else {
                                     test = new Test(testCase, name, cType,
                                             knownFailure,
-                                            TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED);
+                                            CtsTestResult.CODE_NOT_EXECUTED);
                                 }
 
                                 TestController controller =

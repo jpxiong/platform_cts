@@ -459,16 +459,42 @@ public class TestPackage implements DeviceObserver {
     }
 
     /**
+     * Notify that the batch mode finished.
+     */
+    public void notifyBatchModeFinish() {
+        Log.d("TestPackage.notifyBatchModeFinish() is called, mTestStop=" + mTestStop);
+        if (mTestStop) {
+            return;
+        }
+
+        if (mIsInBatchMode) {
+            if (mCurrentTest != null) {
+                handleMissingFinishEvent();
+            }
+            synchronized (mTimeOutTimer) {
+                mTimeOutTimer.sendNotify();
+            }
+        }
+    }
+
+    /**
      * Handle the missing FINISH event.
      */
     private void handleMissingFinishEvent() {
         mProgressObserver.stop();
-        mTimeOutTimer.cancel(false);
-        mCurrentTest.setResult(TestSessionLog.CTS_RESULT_CODE_FAIL, null, null);
+        synchronized (mTimeOutTimer) {
+            mTimeOutTimer.cancel(false);
+        }
+        mCurrentTest.setResult(new CtsTestResult(CtsTestResult.CODE_FAIL, null, null));
         mCurrentTest = null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Update Test running status when running in batch mode.
+     *
+     * @param test The Test to update.
+     * @param status The status to be updated.
+     */
     public void notifyTestStatus(final Test test, final String status) {
         if (mTestStop) {
             return;
@@ -476,9 +502,7 @@ public class TestPackage implements DeviceObserver {
 
         if (mIsInBatchMode) {
             if (status.equals(START)) {
-                if ((mCurrentTest != null)
-                        && (mCurrentTest.getResultCode()
-                                == TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED)) {
+                if ((mCurrentTest != null) && (mCurrentTest.getResult().isNotExecuted())) {
                     Log.d("Err: not received FINISH msg for test " + mCurrentTest.getFullName());
                     handleMissingFinishEvent();
                 }
@@ -491,26 +515,6 @@ public class TestPackage implements DeviceObserver {
                 mTimeOutTimer.cancel(false);
                 mCurrentTest = null;
             }
-        }
-    }
-
-    /** {@inheritDoc} */
-    public void notifyUpdateResult(final int resCode,
-            final String failedMessage, final String stackTrace) {
-        Log.d("notifyUpdateResult() is called, mTestStop=" + mTestStop);
-        if (mTestStop) {
-            return;
-        }
-
-        if (mIsInBatchMode) {
-            if (mCurrentTest != null) {
-                handleMissingFinishEvent();
-            }
-            synchronized (mTimeOutTimer) {
-                mTimeOutTimer.sendNotify();
-            }
-        } else {
-            mCurrentTestSuite.notifyUpdateResult(resCode, failedMessage, stackTrace);
         }
     }
 
@@ -767,7 +771,7 @@ public class TestPackage implements DeviceObserver {
      */
     private boolean isInBatchMode() {
         for (Test test : getTests()) {
-            if (test.getResultCode() != TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED) {
+            if (!test.getResult().isNotExecuted()) {
                 // if any test has been run, use individual mode
                 return false;
             }
@@ -889,7 +893,8 @@ public class TestPackage implements DeviceObserver {
             }
 
             if ((mIsInBatchMode) && (mCurrentTest != null)) {
-                mCurrentTest.setResult(TestSessionLog.CTS_RESULT_CODE_TIMEOUT, null, null);
+                mCurrentTest.setResult(
+                        new CtsTestResult(CtsTestResult.CODE_TIMEOUT, null, null));
             }
 
             Log.d("mTimeOutTimer timed out");
@@ -913,7 +918,7 @@ public class TestPackage implements DeviceObserver {
      */
     protected boolean isAllTestsRun(){
         for (Test test : getTests()) {
-            if (test.getResultCode() == TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED) {
+            if (test.getResult().isNotExecuted()) {
                 return false;
             }
         }
@@ -927,7 +932,7 @@ public class TestPackage implements DeviceObserver {
      */
     protected boolean noTestsExecuted() {
         for (Test test : getTests()) {
-            if (test.getResultCode() != TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED) {
+            if (!test.getResult().isNotExecuted()) {
                 return false;
             }
         }

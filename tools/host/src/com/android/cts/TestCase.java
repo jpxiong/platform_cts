@@ -166,7 +166,7 @@ public class TestCase implements DeviceObserver {
         Iterator<Test> tests = getTests().iterator();
         while (tests.hasNext() && (!mTestStop)) {
             mCurrentTest = tests.next();
-            if (mCurrentTest.getResultCode() == TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED) {
+            if (mCurrentTest.getResult().isNotExecuted()) {
                 mCurrentTest.run(device);
             }
         }
@@ -183,14 +183,6 @@ public class TestCase implements DeviceObserver {
         mTestStop = false;
         mCurrentTest = test;
         mCurrentTest.run(device);
-    }
-
-    /** {@inheritDoc} */
-    public void notifyUpdateResult(final int resCode,
-            final String failedMessage, final String stackTrace) {
-        if (mCurrentTest != null) {
-            mCurrentTest.notifyUpdateResult(resCode, failedMessage, stackTrace);
-        }
     }
 
     /** {@inheritDoc} */
@@ -226,10 +218,5 @@ public class TestCase implements DeviceObserver {
         if (mCurrentTest != null) {
             mCurrentTest.notifyTestingDeviceDisconnected();
         }
-    }
-
-    /** {@inheritDoc} */
-    public void notifyTestStatus(final Test test, final String status) {
-
     }
 }

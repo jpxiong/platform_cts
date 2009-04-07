@@ -74,17 +74,17 @@ public class SignatureCheckPackage extends TestPackage {
     public void run(final TestDevice device, final String javaPkgName)
                 throws DeviceDisconnectedException {
         Test test = getTests().iterator().next();
-        if ((test != null)
-                && (test.getResultCode() == TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED)) {
+        if ((test != null) && (test.getResult().isNotExecuted())) {
 
             ArrayList<String> result = startSignatureTest(device);
             if (result != null) {
                 StringBuffer formattedResult = new StringBuffer();
                 int resultCode = processSignatureResult(result, formattedResult);
-                if (resultCode == TestSessionLog.CTS_RESULT_CODE_PASS) {
-                    test.setResult(resultCode, null, null);
+                if (resultCode == CtsTestResult.CODE_PASS) {
+                    test.setResult(new CtsTestResult(resultCode, null, null));
                 } else {
-                    test.setResult(resultCode, formattedResult.toString(), null);
+                    test.setResult(new CtsTestResult(resultCode,
+                            formattedResult.toString(), null));
                 }
             }
         }
@@ -196,7 +196,7 @@ public class SignatureCheckPackage extends TestPackage {
         String result = resMap.get("result");
         if ((result != null) && (result.equals("true"))) {
             CUIOutputStream.println("API Check PASS.");
-            return TestSessionLog.CTS_RESULT_CODE_PASS;
+            return CtsTestResult.CODE_PASS;
         } else {
             CUIOutputStream.println("API Check FAIL!");
             if (result != null) {
@@ -238,7 +238,7 @@ public class SignatureCheckPackage extends TestPackage {
                     }
                 }
             }
-            return TestSessionLog.CTS_RESULT_CODE_FAIL;
+            return CtsTestResult.CODE_FAIL;
         }
     }
 }

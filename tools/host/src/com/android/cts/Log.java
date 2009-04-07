@@ -42,6 +42,16 @@ public class Log {
     private static String mLogFileName;
 
     /**
+     * Print the message to the information stream without adding prefix.
+     *
+     * @param msg The message to be printed.
+     */
+    public static void println(final String msg) {
+        log(INFO_PREFIX + msg);
+        mOut.println(msg);
+    }
+
+    /**
      * Add the message to the information stream.
      *
      * @param msg the message to be added to the information stream.
