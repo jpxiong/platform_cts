@@ -40,13 +40,16 @@ public class ReferenceAppTestPackage extends TestPackage {
      * @param jarPath The host controller's jar path and file.
      * @param appNameSpace The package name space used to uninstall the TestPackage.
      * @param appPackageName The Java package name of the test package.
-     * @param apkToTestName the apk pacakge that contains the ReferenceApp to be tested.
+     * @param apkToTestName the apk package that contains the ReferenceApp to be tested.
      * @param packageUnderTest the Java package name of the ReferenceApp to be tested.
      * @throws NoSuchAlgorithmException
      */
-    public ReferenceAppTestPackage(String instrumentationRunner, String testPkgBinaryName, String targetNameSpace,
-            String targetBinaryName, String version, String androidVersion, String jarPath,
-            String appNameSpace, String appPackageName, String apkToTestName, String packageUnderTest) throws NoSuchAlgorithmException {
+    public ReferenceAppTestPackage(String instrumentationRunner,
+            String testPkgBinaryName, String targetNameSpace,
+            String targetBinaryName, String version,
+            String androidVersion, String jarPath,
+            String appNameSpace, String appPackageName,
+            String apkToTestName, String packageUnderTest) throws NoSuchAlgorithmException {
         super(instrumentationRunner, testPkgBinaryName, targetNameSpace, targetBinaryName, version,
                 androidVersion, jarPath, appNameSpace, appPackageName);
         this.apkToTestName = apkToTestName;
@@ -61,10 +64,10 @@ public class ReferenceAppTestPackage extends TestPackage {
      * @throws DeviceDisconnectedException if the device disconnects during the test
      */
     @Override
-    public void run(final TestDevice device, final String javaPkgName) throws DeviceDisconnectedException {
+    public void run(final TestDevice device, final String javaPkgName)
+                throws DeviceDisconnectedException {
         Test test = getTests().iterator().next();
-        if ((test != null)
-                && (test.getResultCode() == TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED)) {
+        if ((test != null) && (test.getResult().isNotExecuted())) {
 
             String appToTestApkPath =
                 HostConfig.getInstance().getCaseRepository().getApkPath(apkToTestName);
@@ -77,7 +80,8 @@ public class ReferenceAppTestPackage extends TestPackage {
             device.waitForCommandFinish();
 
             // Install the Reference App Tests
-            String testApkPath = HostConfig.getInstance().getCaseRepository().getApkPath(getAppBinaryName());
+            String testApkPath =
+                HostConfig.getInstance().getCaseRepository().getApkPath(getAppBinaryName());
             device.installAPK(testApkPath);
             device.waitForCommandFinish();
 
@@ -109,9 +113,10 @@ public class ReferenceAppTestPackage extends TestPackage {
             }
         }
         if (!testRanOk) {
-            test.setResult(TestSessionLog.CTS_RESULT_CODE_FAIL, null, null);
+            test.setResult(new CtsTestResult(CtsTestResult.CODE_FAIL, null, null));
         } else {
-            test.setResult(TestSessionLog.CTS_RESULT_CODE_PASS, numberOfTestsRan + " tests passed", null);
+            test.setResult(new CtsTestResult(CtsTestResult.CODE_PASS,
+                            numberOfTestsRan + " tests passed", null));
         }
     }
 

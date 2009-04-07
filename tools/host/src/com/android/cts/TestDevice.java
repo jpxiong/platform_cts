@@ -71,7 +71,6 @@ public class TestDevice implements DeviceObserver {
 
     public static final Pattern INSTRUMENT_RESULT_PATTERN;
 
-    private IndividualModeResultParser mIndividualModeResultParser;
     private BatchModeResultParser mBatchModeResultParser;
 
     private DeviceObserver mDeviceObserver;
@@ -105,7 +104,6 @@ public class TestDevice implements DeviceObserver {
     public TestDevice(Device device) {
         mDevice = device;
         mSyncService = mDevice.getSyncService();
-        mIndividualModeResultParser = null;
         mBatchModeResultParser = null;
         mUninstallObserver = new PackageActionObserver(ACTION_UNINSTALL);
         mStatus = STATUS_IDLE;
@@ -700,13 +698,11 @@ public class TestDevice implements DeviceObserver {
         // need to doubly escape any '$' chars in the name since this string is
         // passed through two shells \\\$ -> \$ -> $
         final String testName = test.getFullName().replaceAll("\\$", "\\\\\\$");
-        
+
         final String commandStr = "am instrument -w -r -e class "
                 + testName + " " + appNameSpace + "/" + runner;
         Log.d(commandStr);
-
-        mIndividualModeResultParser = new IndividualModeResultParser(test);
-        executeShellCommand(commandStr, mIndividualModeResultParser);
+        executeShellCommand(commandStr, new IndividualModeResultParser(test));
     }
 
     /**
@@ -1071,7 +1067,7 @@ public class TestDevice implements DeviceObserver {
             mResultLines = new ArrayList<String>();
             mStackTrace = null;
             mFailedMsg = null;
-            mResultCode = TestSessionLog.CTS_RESULT_CODE_PASS;
+            mResultCode = CtsTestResult.CODE_PASS;
         }
 
         /** {@inheritDoc} */
@@ -1260,12 +1256,12 @@ public class TestDevice implements DeviceObserver {
                 break;
 
             case STATUS_PASS:
-                mResultCode = TestSessionLog.CTS_RESULT_CODE_PASS;
+                mResultCode = CtsTestResult.CODE_PASS;
                 break;
 
             case STATUS_FAIL:
             case STATUS_ERROR:
-                mResultCode = TestSessionLog.CTS_RESULT_CODE_FAIL;
+                mResultCode = CtsTestResult.CODE_FAIL;
                 break;
             }
         }
@@ -1273,8 +1269,8 @@ public class TestDevice implements DeviceObserver {
         /** {@inheritDoc} */
         @Override
         public void done() {
+            mTest.notifyResult(new CtsTestResult(mResultCode, mFailedMsg, mStackTrace));
             super.done();
-            mDeviceObserver.notifyUpdateResult(mResultCode, mFailedMsg, mStackTrace);
         }
     }
 
@@ -1326,11 +1322,11 @@ public class TestDevice implements DeviceObserver {
 
                 case STATUS_FAIL:
                 case STATUS_ERROR:
-                    mResultCode = TestSessionLog.CTS_RESULT_CODE_FAIL;
+                    mResultCode = CtsTestResult.CODE_FAIL;
                     break;
 
                 case STATUS_PASS:
-                    mResultCode = TestSessionLog.CTS_RESULT_CODE_PASS;
+                    mResultCode = CtsTestResult.CODE_PASS;
                     break;
                 }
                 resultLines.removeAll(resultLines);
@@ -1374,15 +1370,17 @@ public class TestDevice implements DeviceObserver {
                     break;
 
                 case STATUS_PASS:
-                    mTest.setResult(TestSessionLog.CTS_RESULT_CODE_PASS, null, null);
+                    mTest.setResult(new CtsTestResult(
+                            CtsTestResult.CODE_PASS, null, null));
                     break;
 
                 case STATUS_ERROR:
                 case STATUS_FAIL:
-                    mTest.setResult(TestSessionLog.CTS_RESULT_CODE_FAIL, mFailedMsg, mStackTrace);
+                    mTest.setResult(new CtsTestResult(
+                            CtsTestResult.CODE_FAIL, mFailedMsg, mStackTrace));
                     break;
                 }
-                mDeviceObserver.notifyTestStatus(mTest, status);
+                mTestPackage.notifyTestStatus(mTest, status);
             }
         }
 
@@ -1404,8 +1402,8 @@ public class TestDevice implements DeviceObserver {
         /** {@inheritDoc} */
         @Override
         public void done() {
+            mTestPackage.notifyBatchModeFinish();
             super.done();
-            mDeviceObserver.notifyUpdateResult(mResultCode, null, null);
         }
     }
 
@@ -1621,10 +1619,6 @@ public class TestDevice implements DeviceObserver {
     }
 
     /** {@inheritDoc} */
-    public void notifyTestStatus(final Test test, final String status) {
-    }
-
-    /** {@inheritDoc} */
     public void notifyUninstallingComplete(int resultCode) {
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
@@ -1637,10 +1631,6 @@ public class TestDevice implements DeviceObserver {
         synchronized (mObjectSync) {
             mObjectSync.sendNotify();
         }
-    }
-
-    /** {@inheritDoc} */
-    public void notifyUpdateResult(int resCode, String failedMessage, String stackTrace) {
     }
 
     /**
