@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,38 +43,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_DIGEST = "digest";
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
-    public static final int CTS_RESULT_CODE_INIT = -1;
-    public static final int CTS_RESULT_CODE_NOT_EXECUTED = 0;
-    public static final int CTS_RESULT_CODE_PASS = 1;
-    public static final int CTS_RESULT_CODE_FAIL = 2;
-    public static final int CTS_RESULT_CODE_ERROR = 3;
-    public static final int CTS_RESULT_CODE_TIMEOUT = 4;
-    public static final int CTS_RESULT_CODE_FIRST = CTS_RESULT_CODE_INIT;
-    public static final int CTS_RESULT_CODE_LAST = CTS_RESULT_CODE_TIMEOUT;
-
-    class TestResult {
-        public static final String CTS_RESULT_STR_ERROR = "error";
-        public static final String CTS_RESULT_STR_TIMEOUT = "timeout";
-        public static final String CTS_RESULT_STR_NOT_EXECUTED = "notExecuted";
-        public static final String CTS_RESULT_STR_FAIL = "fail";
-        public static final String CTS_RESULT_STR_PASS = "pass";
-    }
-
     private static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static HashMap<Integer, String> sCodeToResultMap;
-    static {
-        sCodeToResultMap = new HashMap<Integer, String>();
-        sCodeToResultMap.put(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED,
-                             TestResult.CTS_RESULT_STR_NOT_EXECUTED);
-        sCodeToResultMap.put(TestSessionLog.CTS_RESULT_CODE_PASS,
-                             TestResult.CTS_RESULT_STR_PASS);
-        sCodeToResultMap.put(TestSessionLog.CTS_RESULT_CODE_FAIL,
-                             TestResult.CTS_RESULT_STR_FAIL);
-        sCodeToResultMap.put(TestSessionLog.CTS_RESULT_CODE_ERROR,
-                             TestResult.CTS_RESULT_STR_ERROR);
-        sCodeToResultMap.put(TestSessionLog.CTS_RESULT_CODE_TIMEOUT,
-                             TestResult.CTS_RESULT_STR_TIMEOUT);
-    }
 
     // define the possible format of the result file format
     public static final int CTS_RESULT_FORMAT_INVALID = 100;
@@ -172,18 +140,19 @@ public class TestSessionLog extends XMLResourceHandler {
      * @return The list of {@link Test}.
      */
     public Collection<Test> getTestList(int resCode) {
-        if (resCode < CTS_RESULT_CODE_FIRST || resCode > CTS_RESULT_CODE_LAST) {
+        if ((resCode < CtsTestResult.CODE_FIRST)
+                || (resCode > CtsTestResult.CODE_LAST)) {
             return null;
         }
 
-        ArrayList<Test> results = new ArrayList<Test>();
-        for (Test res : getAllResults()) {
-            if (resCode == res.getResultCode()) {
-                results.add(res);
+        ArrayList<Test> tests = new ArrayList<Test>();
+        for (Test test : getAllResults()) {
+            if (resCode == test.getResult().getResultCode()) {
+                tests.add(test);
             }
         }
 
-        return results;
+        return tests;
     }
 
     /**
@@ -332,10 +301,10 @@ public class TestSessionLog extends XMLResourceHandler {
                 deviceSettingNode.appendChild(devInfoNode);
             }
 
-            int passNum = getTestList(CTS_RESULT_CODE_PASS).size();
-            int failNum = getTestList(CTS_RESULT_CODE_FAIL).size();
-            int notExecutedNum = getTestList(CTS_RESULT_CODE_NOT_EXECUTED).size();
-            int timeOutNum = getTestList(CTS_RESULT_CODE_TIMEOUT).size();
+            int passNum = getTestList(CtsTestResult.CODE_PASS).size();
+            int failNum = getTestList(CtsTestResult.CODE_FAIL).size();
+            int notExecutedNum = getTestList(CtsTestResult.CODE_NOT_EXECUTED).size();
+            int timeOutNum = getTestList(CtsTestResult.CODE_TIMEOUT).size();
             Node summaryNode = doc.createElement(TAG_SUMMARY);
             root.appendChild(summaryNode);
             setAttribute(doc, summaryNode, ATTRIBUTE_PASS, passNum);
@@ -399,21 +368,23 @@ public class TestSessionLog extends XMLResourceHandler {
                 if (test.isKnownFailure()) {
                     setAttribute(doc, testNode, ATTRIBUTE_KNOWN_FAILURE, test.getKnownFailure());
                 }
+
+                CtsTestResult result = test.getResult();
                 setAttribute(doc, testNode, ATTRIBUTE_NAME, test.getName());
-                setAttribute(doc, testNode, ATTRIBUTE_RESULT, test.getResultStr());
+                setAttribute(doc, testNode, ATTRIBUTE_RESULT, result.getResultString());
                 setAttribute(doc, testNode, ATTRIBUTE_STARTTIME,
                              new Date(test.getStartTime()).toString());
                 setAttribute(doc, testNode, ATTRIBUTE_ENDTIME,
                              new Date(test.getEndTime()).toString());
 
-                String failedMessage = test.getFailedMessage();
+                String failedMessage = result.getFailedMessage();
 
                 if (failedMessage != null) {
                     Node failedMessageNode = doc.createElement(TAG_FAILED_SCENE);
                     testNode.appendChild(failedMessageNode);
                     setAttribute(doc, failedMessageNode,TAG_FAILED_MESSAGE, failedMessage);
 
-                    String stackTrace = test.getStackTrace();
+                    String stackTrace = result.getStackTrace();
                     if (stackTrace != null) {
                         Node stackTraceNode = doc.createElement(TAG_STACK_TRACE);
                         failedMessageNode.appendChild(stackTraceNode);
@@ -451,15 +422,14 @@ public class TestSessionLog extends XMLResourceHandler {
      * @param dInfo The device information.
      */
     public void setDeviceInfo(final TestDevice.DeviceParameterCollector dInfo) {
+        for (DeviceParameterCollector collector : mDeviceParameterBase) {
+            if (collector.getSerialNumber().equals(dInfo.getSerialNumber())) {
+                //if there has information for the device with given serial number,
+                //replace it with the new information.
+                mDeviceParameterBase.remove(collector);
+                break;
+            }
+        }
         mDeviceParameterBase.add(dInfo);
-    }
-
-    /**
-     * Get the test result as string. Just translate result code to readable string.
-     * @param resultCode The result code.
-     * @return The readable result string.
-     */
-    public static String getResultString(final int resultCode) {
-        return sCodeToResultMap.get(resultCode);
     }
 }

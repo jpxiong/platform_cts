@@ -17,9 +17,6 @@
 package com.android.cts;
 
 import java.net.MalformedURLException;
-import java.util.Enumeration;
-
-import junit.framework.TestFailure;
 import junit.framework.TestResult;
 
 /**
@@ -41,55 +38,32 @@ public class HostSideOnlyTest extends Test {
     class HostSideTestRunner extends Thread {
 
         private Test mTest;
-        private TestResult mTestResult;
 
         public HostSideTestRunner(final Test test) {
             mTest = test;
-            mTestResult = null;
-        }
-
-        /**
-         * Get the result of host side unit test.
-         *
-         * @return The result of host side unit test.
-         */
-        public Result getTestResult() {
-            Result result = new Result();
-            result.addResult(TestSessionLog.CTS_RESULT_CODE_PASS);
-
-            if (mTestResult.failureCount() > 0) {
-                result.addResult(TestSessionLog.CTS_RESULT_CODE_FAIL);
-                Enumeration<TestFailure> falures = mTestResult.failures();
-                TestFailure failure = null;
-                while ((failure = falures.nextElement()) != null) {
-                    result.setFailedMessage(failure.exceptionMessage());
-                    result.setStackTrace(failure.trace());
-                }
-            }
-
-            return result;
         }
 
         @Override
         public void run() {
             HostUnitTestRunner runner = new HostUnitTestRunner();
             TestController controller = mTest.getTestController();
+            TestResult testResult = null;
             try {
-                mTestResult = runner.runTest(controller.getJarPath(),
+                testResult = runner.runTest(controller.getJarPath(),
                         controller.getPackageName(), controller.getClassName(),
                         controller.getMethodName());
             } catch (MalformedURLException e) {
-                mTestResult = null;
                 Log.e("The host controller jar file is invalid. Please choose a correct one.",
                         null);
             } catch (ClassNotFoundException e) {
-                mTestResult = null;
                 Log.e("The host controller JAR file doesn't contain class: "
                         + controller.getPackageName() + "."
                         + controller.getClassName(), null);
             }
 
             synchronized (mTimeOutTimer) {
+                mResult.setResult(testResult);
+
                 if (!mTimeOutTimer.isTimeOut()) {
                     Log.d("HostSideTestRunnerThread() detects that it needs to "
                             + "cancel mTimeOutTimer");
@@ -97,12 +71,6 @@ public class HostSideOnlyTest extends Test {
                 }
             }
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected Result getTestResult() {
-        return mHostSideTestRunner.getTestResult();
     }
 
     /** {@inheritDoc} */

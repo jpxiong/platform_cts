@@ -24,8 +24,6 @@ import java.util.Collection;
  * plan and the setup&tear-downs.
  */
 public class TestSession {
-    static final String SIGNATURE_TEST_PACKAGE = "SignatureTestPackage";
-
     private SessionObserver mSessionObserver;
     private TestSessionLog mSessionLog;
     private TestDevice mDevice;
@@ -458,12 +456,11 @@ public class TestSession {
          * Display the summary of test result.
          */
         private void displayTestResultSummary() {
-            int passNum = mSessionLog.getTestList(TestSessionLog.CTS_RESULT_CODE_PASS).size();
-            int failNum = mSessionLog.getTestList(TestSessionLog.CTS_RESULT_CODE_FAIL).size();
+            int passNum = mSessionLog.getTestList(CtsTestResult.CODE_PASS).size();
+            int failNum = mSessionLog.getTestList(CtsTestResult.CODE_FAIL).size();
             int notExecutedNum =
-                mSessionLog.getTestList(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED).size();
-            int timeOutNum = mSessionLog.getTestList(
-                             TestSessionLog.CTS_RESULT_CODE_TIMEOUT).size();
+                mSessionLog.getTestList(CtsTestResult.CODE_NOT_EXECUTED).size();
+            int timeOutNum = mSessionLog.getTestList(CtsTestResult.CODE_TIMEOUT).size();
             int total = passNum + failNum + notExecutedNum + timeOutNum;
 
             println("Test summary:   pass=" + passNum

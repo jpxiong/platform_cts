@@ -16,7 +16,6 @@
 
 package com.android.cts;
 
-import java.util.ArrayList;
 import java.util.TimerTask;
 
 import com.android.cts.TestSession.ResultObserver;
@@ -33,17 +32,14 @@ public class Test implements DeviceObserver {
     private String mName;
     private String mType;
     private String mKnownFailure;
-    private int mResCode;
-    private String mFailedMessage;
     private long mStartTime;
     private long mEndTime;
-    private String mStackTrace;
 
     protected boolean mTestStop;
     protected TestDevice mDevice;
     protected HostTimer mTimeOutTimer;
     protected ProgressObserver mProgressObserver;
-    protected Result mResult;
+    protected CtsTestResult mResult;
 
     public Test(final TestCase parentCase, final String name,
             final String type, final String knownFailure, final int resCode) {
@@ -51,13 +47,11 @@ public class Test implements DeviceObserver {
         mName = name;
         mType = type;
         mKnownFailure = knownFailure;
-        mResCode = resCode;
+        mResult = new CtsTestResult(resCode);
 
         mTestController = null;
-
         mProgressObserver = null;
         mTestStop = false;
-        mResult = null;
     }
 
     /**
@@ -104,32 +98,6 @@ public class Test implements DeviceObserver {
     public String getInstrumentationRunner() {
         TestPackage pkg = mParentCase.getParent().getParent();
         return pkg.getInstrumentationRunner();
-    }
-
-    /**
-     * Get result code of the test.
-     *
-     * @return The result code of the test.
-     *         The following is the possible result codes:
-     * <ul>
-     *    <li> notExecuted
-     *    <li> pass
-     *    <li> fail
-     *    <li> error
-     *    <li> timeout
-     * </ul>
-     */
-    public int getResultCode() {
-        return mResCode;
-    }
-
-    /**
-     * Get the result string of this test.
-     *
-     * @return The result string of this test.
-     */
-    public String getResultStr() {
-        return TestSessionLog.getResultString(mResCode);
     }
 
     /**
@@ -201,31 +169,22 @@ public class Test implements DeviceObserver {
     /**
      * Set test result.
      *
-     * @param resCode test result code.
-     * @param failedMessage The failed message string.
-     * @param stackTrace stack trace content.
+     * @param result The result.
      */
-    public void setResult(final int resCode,
-            final String failedMessage, final String stackTrace) {
-
-        mResCode = resCode;
+    public void setResult(CtsTestResult result) {
         if (isKnownFailure()) {
-            if (mResCode == TestSessionLog.CTS_RESULT_CODE_PASS) {
-                mResCode = TestSessionLog.CTS_RESULT_CODE_FAIL;
-            } else if (mResCode == TestSessionLog.CTS_RESULT_CODE_FAIL){
-                mResCode = TestSessionLog.CTS_RESULT_CODE_PASS;
-            }
+            result.reverse();
         }
-
-        CUIOutputStream.println("(" + TestSessionLog.getResultString(mResCode) + ")");
-        mFailedMessage = failedMessage;
-        mStackTrace = stackTrace;
-        if (mResCode != TestSessionLog.CTS_RESULT_CODE_PASS) {
+        mResult = result;
+        CUIOutputStream.println("(" + mResult.getResultString() + ")");
+        if (!mResult.isPass()) {
+            String failedMessage = result.getFailedMessage();
+            String stackTrace = result.getStackTrace();
             if (failedMessage != null) {
-                CUIOutputStream.println(mFailedMessage);
+                CUIOutputStream.println(failedMessage);
             }
             if (stackTrace != null) {
-                CUIOutputStream.println(mStackTrace);
+                CUIOutputStream.println(stackTrace);
             }
         }
         setEndTime(System.currentTimeMillis());
@@ -234,13 +193,12 @@ public class Test implements DeviceObserver {
     }
 
     /**
-     * Get failed message when output test result to XML file. And Record failed
-     * information
+     * Get the result.
      *
-     * @return failed message
+     * @return the result.
      */
-    public String getFailedMessage() {
-        return mFailedMessage;
+    public CtsTestResult getResult() {
+        return mResult;
     }
 
     /**
@@ -277,15 +235,6 @@ public class Test implements DeviceObserver {
      */
     public long getEndTime() {
         return mEndTime;
-    }
-
-    /**
-     * Get stack trace.
-     *
-     * @return   stack trace.
-     */
-    public String getStackTrace() {
-        return mStackTrace;
     }
 
     /**
@@ -327,7 +276,8 @@ public class Test implements DeviceObserver {
             Log.d("mTimeOutTimer timed out");
 
             if (!mTestStop) {
-                mTest.setResult(TestSessionLog.CTS_RESULT_CODE_TIMEOUT, null, null);
+                mTest.setResult(
+                        new CtsTestResult(CtsTestResult.CODE_TIMEOUT, null, null));
             }
 
             killDeviceProcess(mTest.getAppNameSpace());
@@ -402,97 +352,29 @@ public class Test implements DeviceObserver {
             }
         }
 
-        mResult = getTestResult();
-        processTestResult();
-    }
-
-    /**
-     * Get the test result.
-     *
-     * @return The test result.
-     */
-    protected Result getTestResult() {
-        return mResult;
+        setResult(mResult);
     }
 
     /**
      * Implementation of running test.
      */
     protected void runImpl() throws DeviceDisconnectedException {
-        mResult = new Result();
         mDevice.runTest(this);
     }
 
     /**
-     * Process the test result of the test.
-     */
-    protected void processTestResult() {
-        int resultCode = TestSessionLog.CTS_RESULT_CODE_PASS;
-        String failedMsg = mResult.mFailureMsg;
-        String stackTrace = mResult.mStackTrc;
-
-        if (mResult.mResults.contains(TestSessionLog.CTS_RESULT_CODE_FAIL)) {
-            resultCode = TestSessionLog.CTS_RESULT_CODE_FAIL;
-        }
-
-        setResult(resultCode, failedMsg, stackTrace);
-    }
-
-    /**
-     * Store the runtime result.
+     * Notify the result.
      *
+     * @param result The result.
      */
-    final class Result {
+    public void notifyResult(CtsTestResult result) {
 
-        ArrayList<Integer> mResults = new ArrayList<Integer>();
-
-        String mFailureMsg;
-        String mStackTrc;
-
-        /**
-         * Add result code.
-         *
-         * @param resCode The result type code.
-         */
-        public void addResult(final int resCode) {
-            mResults.add(resCode);
-        }
-
-        /**
-         * Set failed message.
-         *
-         * @param message The failed message.
-         */
-        public void setFailedMessage(final String message) {
-            if (message != null) {
-                mFailureMsg = message;
-            }
-        }
-
-        /**
-         * Set stack trace.
-         *
-         * @param stackTrace The stack trace.
-         */
-        public void setStackTrace(final String stackTrace) {
-            if (stackTrace != null) {
-                mStackTrc = stackTrace;
-            }
-        }
-    }
-
-    /** {@inheritDoc} */
-    public void notifyUpdateResult(final int resCode,
-            final String failedMessage, final String stackTrace) {
-
-        Log.d("Test.notifyUpdateResult() is called");
-        synchronized (mResult) {
-            mResult.addResult(resCode);
-            mResult.setFailedMessage(failedMessage);
-            mResult.setStackTrace(stackTrace);
+        Log.d("Test.notifyResult() is called. (Test.getFullName()=" + getFullName());
+        synchronized (mTimeOutTimer) {
+            mResult = result;
 
             Log.d("notifyUpdateResult() detects that it needs to cancel mTimeOutTimer");
-            synchronized (mTimeOutTimer) {
+            if (mTimeOutTimer != null) {
                 mTimeOutTimer.sendNotify();
             }
         }
@@ -525,15 +407,6 @@ public class Test implements DeviceObserver {
             mTimeOutTimer.cancel(false);
             mTimeOutTimer.sendNotify();
         }
-    }
-
-    /**
-     * Inherited API which is used for batch mode only. No need to
-     * implement it here since this is running in individual mode.
-     */
-    /** {@inheritDoc} */
-    public void notifyTestStatus(final Test test, final String status) {
-
     }
 }
 

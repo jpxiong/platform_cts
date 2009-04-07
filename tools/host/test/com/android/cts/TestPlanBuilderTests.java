@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -94,7 +95,7 @@ public class TestPlanBuilderTests extends CtsTestBase {
         TestCase cazz = testPackage.getTestCaseByName(caseFullName);
         assertEquals(caseFullName, cazz.getFullName());
 
-        ArrayList<String> testNames = testPackage.getAllTestNames(caseFullName);
+        List<String> testNames = testPackage.getAllTestNames(caseFullName);
         String testFullName = "com.google.CtsTestHello#testHello";
         assertEquals(1, testNames.size());
         assertEquals(testFullName, testNames.get(0));
