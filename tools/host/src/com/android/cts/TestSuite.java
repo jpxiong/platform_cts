@@ -270,19 +270,6 @@ public class TestSuite implements DeviceObserver {
     }
 
     /** {@inheritDoc} */
-    public void notifyUpdateResult(final int resCode,
-            final String failedMessage, final String stackTrace) {
-
-        if (mCurrentTestCase != null) {
-            mCurrentTestCase.notifyUpdateResult(resCode, failedMessage, stackTrace);
-        }
-
-        if (mCurrentSubSuite != null) {
-            mCurrentSubSuite.notifyUpdateResult(resCode, failedMessage, stackTrace);
-        }
-    }
-
-    /** {@inheritDoc} */
     public void notifyInstallingComplete(final int resultCode) {
         if (mCurrentTestCase != null) {
             mCurrentTestCase.notifyInstallingComplete(resultCode);
@@ -335,10 +322,5 @@ public class TestSuite implements DeviceObserver {
         if (mCurrentSubSuite != null) {
             mCurrentSubSuite.notifyTestingDeviceDisconnected();
         }
-    }
-
-    /** {@inheritDoc} */
-    public void notifyTestStatus(final Test test, final String status) {
-
     }
 }

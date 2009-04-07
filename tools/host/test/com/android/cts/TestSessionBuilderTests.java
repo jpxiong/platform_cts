@@ -131,7 +131,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
 
         Test test = testCase.getTests().iterator().next();
         assertEquals("automatic", test.getType());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
         assertEquals(runner, test.getInstrumentationRunner());
 
         // test build information
@@ -312,7 +312,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
 
         Test test = testCase.getTests().iterator().next();
         assertEquals("automatic", test.getType());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
         assertEquals(runner, test.getInstrumentationRunner());
 
         deleteTestPackage(mTestPackageBinaryName);
@@ -396,7 +396,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         testSuite = testSuite.getSubSuites().iterator().next();
         assertEquals(0, testSuite.getSubSuites().size());
@@ -412,7 +412,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.TestSuiteName.TestCaseName#testName", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals("testName", test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -500,7 +500,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -584,7 +584,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -733,7 +733,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -875,7 +875,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -1024,7 +1024,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String testName = suiteName2 + "." + caseName2 + Test.METHOD_SEPARATOR + testName3;
         assertEquals(testName, test.getFullName());
         assertEquals("automatic", test.getType());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -1126,7 +1126,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
                           + Test.METHOD_SEPARATOR + testName3;
         assertEquals(testName, test.getFullName());
         assertEquals("automatic", test.getType());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -1192,7 +1192,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         Test test = testCase.getTests().iterator().next();
         assertEquals("testHello", test.getName());
         assertEquals("automatic", test.getType());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }
@@ -1312,7 +1312,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.CtsTestHello#testHello", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals(testName, test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         TestSuite subTestSuite;
         subTestSuite = testSuite.getSubSuites().iterator().next();
@@ -1328,7 +1328,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         assertEquals("com.google.TestSuiteName.TestCaseName#testName1", test.getFullName());
         assertEquals("automatic", test.getType());
         assertEquals("testName1", test.getName());
-        assertEquals(TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED, test.getResultCode());
+        assertEquals(CtsTestResult.CODE_NOT_EXECUTED, test.getResult().getResultCode());
 
         deleteTestPackage(mTestPackageBinaryName);
     }

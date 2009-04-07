@@ -71,16 +71,11 @@ public class ConsoleUi {
 
     static {
         mResultCodeMap = new HashMap<String, Integer>();
-        mResultCodeMap.put(TestSessionLog.TestResult.CTS_RESULT_STR_PASS,
-                TestSessionLog.CTS_RESULT_CODE_PASS);
-        mResultCodeMap.put(TestSessionLog.TestResult.CTS_RESULT_STR_FAIL,
-                TestSessionLog.CTS_RESULT_CODE_FAIL);
-        mResultCodeMap.put(TestSessionLog.TestResult.CTS_RESULT_STR_ERROR,
-                TestSessionLog.CTS_RESULT_CODE_ERROR);
-        mResultCodeMap.put(TestSessionLog.TestResult.CTS_RESULT_STR_NOT_EXECUTED,
-                TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED);
-        mResultCodeMap.put(TestSessionLog.TestResult.CTS_RESULT_STR_TIMEOUT,
-                TestSessionLog.CTS_RESULT_CODE_TIMEOUT);
+        mResultCodeMap.put(CtsTestResult.STR_PASS, CtsTestResult.CODE_PASS);
+        mResultCodeMap.put(CtsTestResult.STR_FAIL, CtsTestResult.CODE_FAIL);
+        mResultCodeMap.put(CtsTestResult.STR_ERROR, CtsTestResult.CODE_ERROR);
+        mResultCodeMap.put(CtsTestResult.STR_NOT_EXECUTED, CtsTestResult.CODE_NOT_EXECUTED);
+        mResultCodeMap.put(CtsTestResult.STR_TIMEOUT, CtsTestResult.CODE_TIMEOUT);
     }
 
     public ConsoleUi(TestHost host) {
@@ -180,10 +175,10 @@ public class ConsoleUi {
         final String cmdStr = CTSCommand.LIST + " " + CTSCommand.OPTION_R
                 + "/" + CTSCommand.OPTION_RESULT;
         final String sessionStr = CTSCommand.OPTION_S + "/" + CTSCommand.OPTION_SESSION;
-        final String resultsStr =" [" + TestSessionLog.TestResult.CTS_RESULT_STR_PASS
-                       + "/" + TestSessionLog.TestResult.CTS_RESULT_STR_FAIL
-                       + "/" + TestSessionLog.TestResult.CTS_RESULT_STR_NOT_EXECUTED
-                       + "/" + TestSessionLog.TestResult.CTS_RESULT_STR_TIMEOUT
+        final String resultsStr = " [" + CtsTestResult.STR_PASS
+                       + "/" + CtsTestResult.STR_FAIL
+                       + "/" + CtsTestResult.STR_NOT_EXECUTED
+                       + "/" + CtsTestResult.STR_TIMEOUT
                        + "] ";
 
         CUIOutputStream.println(CMD_TYPE_LEADING_SPACE + "Result:");
@@ -452,7 +447,7 @@ public class ConsoleUi {
                 if (deviceIdList.length > 1) {
                     Log.e("Just allow choosing one device ID.", null);
                     return;
-                }                
+                }
             }
 
             ActionType actionType = ActionType.START_NEW_SESSION;
@@ -487,7 +482,7 @@ public class ConsoleUi {
                     }
                 }
             }
-            
+
             if (deviceId == null) {
                 TestDevice td = mHost.getFirstAvailableDevice();
                 if (td == null) {
@@ -501,7 +496,7 @@ public class ConsoleUi {
             if (!checkDeviceExists(mHost.getDeviceList(), deviceId)) {
                 CUIOutputStream.println("Can't find specified device id.  Is it attached?");
                 return;
-            }            
+            }
 
             if (ts == null) {
                 ts = TestHost.createSession(testPlanName);
@@ -1013,11 +1008,11 @@ public class ConsoleUi {
         CUIOutputStream
                 .println("==============================================================");
         for (Test test : log.getAllResults()) {
-            if (resultType != null
-                    && test.getResultCode() != resultType.intValue()) {
+            CtsTestResult result = test.getResult();
+            if ((resultType != null) && (result.getResultCode() != resultType.intValue())) {
                 continue;
             }
-            CUIOutputStream.println(test.getResultStr() + "\t\t"
+            CUIOutputStream.println(result.getResultString() + "\t\t"
                     + test.getFullName());
         }
     }
@@ -1038,13 +1033,13 @@ public class ConsoleUi {
             for (TestSession session : sessions) {
                 TestSessionLog log = session.getSessionLog();
                 int passNum = log.getTestList(
-                        TestSessionLog.CTS_RESULT_CODE_PASS).size();
+                        CtsTestResult.CODE_PASS).size();
                 int failNum = log.getTestList(
-                        TestSessionLog.CTS_RESULT_CODE_FAIL).size();
+                        CtsTestResult.CODE_FAIL).size();
                 int notExecutedNum = log.getTestList(
-                        TestSessionLog.CTS_RESULT_CODE_NOT_EXECUTED).size();
+                        CtsTestResult.CODE_NOT_EXECUTED).size();
                 int timeOutNum = log.getTestList(
-                        TestSessionLog.CTS_RESULT_CODE_TIMEOUT).size();
+                        CtsTestResult.CODE_TIMEOUT).size();
 
                 String resStr = Long.toString(passNum) + "\t" + failNum;
                 resStr += "\t" + timeOutNum;
@@ -1064,7 +1059,7 @@ public class ConsoleUi {
     /**
      * Add a package by the path and package name.
      *
-     * @param cp Command container. 
+     * @param cp Command container.
      */
     private void addPackage(final CommandParser cp) throws IOException,
             IndexOutOfBoundsException, NoSuchAlgorithmException {
