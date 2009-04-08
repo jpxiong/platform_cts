@@ -283,6 +283,28 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.text.style.cts.URLSpanStubActivity"
+            android:label="URLSpanStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.text.style.cts.MockURLSpanTestActivity"
+            android:label="MockURLSpanTestActivity"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:configChanges="orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+                <data android:scheme="ctstest" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
