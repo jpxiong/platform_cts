@@ -177,6 +177,22 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.RelativeLayoutStubActivity"
+            android:label="RelativeLayoutStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.widget.cts.FrameLayoutStubActivity"
+            android:label="FrameLayoutStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <service android:name="android.content.cts.MockContextWrapperService" />
         <activity android:name=".content.ContextWrapperStubActivity"
             android:label="ContextWrapperStubActivity">
