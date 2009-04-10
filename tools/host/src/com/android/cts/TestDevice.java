@@ -1505,7 +1505,6 @@ public class TestDevice implements DeviceObserver {
      */
     public void disconnected() {
         CUIOutputStream.println("Device(" + getSerialNumber() + ") disconnected");
-        mStatus = STATUS_OFFLINE;
         mDevice = null;
         mSyncService = null;
 
@@ -1515,12 +1514,14 @@ public class TestDevice implements DeviceObserver {
         }
 
         if (mStatus == STATUS_BUSY) {
+            Log.d("TestDevice.disconnected calls notifyTestingDeviceDisconnected");
             mDeviceObserver.notifyTestingDeviceDisconnected();
         } else {
             if (!TestSession.isADBServerRestartedMode()) {
                 CUIOutputStream.printPrompt();
             }
         }
+        mStatus = STATUS_OFFLINE;
     }
 
     /**

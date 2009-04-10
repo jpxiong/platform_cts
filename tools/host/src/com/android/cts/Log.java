@@ -90,7 +90,7 @@ public class Log {
      * @param msg The message to be added to the debugging stream.
      */
     public static void d(final String msg) {
-        log(DEBUG_PREFIX + msg);
+        log(DEBUG_PREFIX + System.currentTimeMillis() + " " + msg);
 
         if (HostConfig.DEBUG) {
             mOut.println(DEBUG_PREFIX + msg);
