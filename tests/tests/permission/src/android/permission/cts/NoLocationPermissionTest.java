@@ -45,6 +45,8 @@ public class NoLocationPermissionTest extends AndroidTestCase {
         mLocationManager = (LocationManager) getContext().getSystemService(
                 Context.LOCATION_SERVICE);
         mAllProviders = mLocationManager.getAllProviders();
+
+        assertNotNull(mLocationManager);
         assertNotNull(mAllProviders);
     }
 
@@ -53,7 +55,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that listening to cell location requires permissions.
+     * Verify that listen or get cell location requires permissions.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_COARSE_LOCATION.}
      */
@@ -68,16 +70,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
         } catch (SecurityException e) {
             // expected
         }
-    }
 
-    /**
-     * Verify that getting cell location requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}.
-     */
-    public void testGetCellLocation() {
-        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
-                Context.TELEPHONY_SERVICE);
         try {
             telephonyManager.getCellLocation();
             fail("TelephonyManager.getCellLocation did not throw SecurityException as expected");
@@ -100,7 +93,6 @@ public class NoLocationPermissionTest extends AndroidTestCase {
 
         LocationListener mockListener = new MockLocationListener();
         Looper looper = Looper.myLooper();
-
         try {
             mLocationManager.requestLocationUpdates(provider, 0, 0, mockListener);
             fail("LocationManager.requestLocationUpdates did not" +
@@ -384,7 +376,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
         }
     }
 
-    private final class MockLocationListener implements LocationListener {
+    private static class MockLocationListener implements LocationListener {
         public void onLocationChanged(Location location) {
             // ignore
         }
