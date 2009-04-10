@@ -30,7 +30,7 @@
     <TextView android:id="@+id/hint_string"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="This is a hint!"/>
+        android:hint="@string/text_view_simple_hint"/>
 
     <TextView android:id="@+id/hint_resid"
         android:layout_width="fill_parent"
