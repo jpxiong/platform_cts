@@ -365,12 +365,16 @@ public class TestCoverageDoclet {
     }
 
     private ColorStat processTestPackage(PackageDoc packageDoc) {
+        ColorStat stats = new ColorStat(packageDoc.name(),
+                getPackageBaseLink(packageDoc) + "/package.html");
+        if (hasHideFlag(packageDoc)) {
+            stats.ignored = true;
+            return stats;
+        }
         String file = getPackageDir("testcoverage", packageDoc)
                 + "/package.html";
         PrintWriter pr = openFile(file, "Test package " + packageDoc.name());
         TablePrinter printer = new TablePrinter(pr);
-        ColorStat stats = new ColorStat(packageDoc.name(),
-                getPackageBaseLink(packageDoc) + "/package.html");
         printer.printTableStart();
         printer.printRow("Class", "Extra", "Meth", "Unt", "Part", "Compl",
                 "Disab", "Broken", "ToBeFixed", "KnownFail");
@@ -418,11 +422,15 @@ public class TestCoverageDoclet {
     }
 
     private ColorStat processPackage(PackageDoc packageDoc) {
+        ColorStat stats = new ColorStat(packageDoc.name(),
+                getPackageBaseLink(packageDoc) + "/package.html");
+        if (hasHideFlag(packageDoc)) {
+            stats.ignored = true;
+            return stats;
+        }
         String file = getPackageDir("", packageDoc) + "/package.html";
         PrintWriter pr = openFile(file, "Package " + packageDoc.name());
         TablePrinter printer = new TablePrinter(pr);
-        ColorStat stats = new ColorStat(packageDoc.name(),
-                getPackageBaseLink(packageDoc) + "/package.html");
         printer.printTableStart();
         printer.printRow("Class", "Extra", "Meth", "Unt", "Part", "Compl",
                 "Disab", "Broken", "ToBeFixed", "KnownFail");
@@ -477,8 +485,14 @@ public class TestCoverageDoclet {
     }
 
     private boolean hasHideFlag(Doc doc) {
-        Tag[] hideTags = doc.tags("hide");
-        return hideTags.length > 0;
+        // workaround for the non-recognized @hide tag in package.html
+        if (doc instanceof PackageDoc) {
+            String comment = doc.getRawCommentText();
+            return comment != null && comment.contains("@hide");
+        } else {
+            Tag[] hideTags = doc.tags("hide");
+            return hideTags.length > 0;
+        }
     }
 
     private ColorStat processTestClass(ClassDoc clazz) {
