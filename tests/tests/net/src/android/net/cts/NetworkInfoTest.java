@@ -35,16 +35,6 @@ public class NetworkInfoTest extends AndroidTestCase {
     public static final String MOBILE_TYPE_NAME = "MOBILE";
     public static final String WIFI_TYPE_NAME = "WIFI";
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of NetworkInfo.",
-        method = "NetworkInfo",
-        args = {int.class}
-    )
-    public void testConstructor() {
-        new NetworkInfo(ConnectivityManager.TYPE_MOBILE);
-    }
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
