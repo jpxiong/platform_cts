@@ -32,6 +32,11 @@ public class DeviceManager implements IDeviceChangeListener {
 
     private static final int SHORT_DELAY = 1000 * 15; // 15 seconds
     private static final int LONG_DELAY = 1000 * 60 * 10; // 10 minutes
+    /** Time to wait after issuing reboot command through ddmlib. */
+    private static final int DDMLIB_REBOOT_DELAY = 5000; // 5 seconds
+    /** Time to wait after device reports that boot is complete. */
+    private static final int POST_BOOT_DELAY = 1000 * 60; // 1 minute
+    /** Maximal number of attempts to restart ADB connection. */
     private static final int MAX_ADB_RESTART_ATTEMPTS = 10;
     ArrayList<TestDevice> mDevices;
     /** This is used during device restart for blocking until the device has been reconnected. */
@@ -288,8 +293,11 @@ public class DeviceManager implements IDeviceChangeListener {
         String deviceSerialNumber = ts.getDeviceId();
         if (!deviceSerialNumber.toLowerCase().startsWith("emulator")) {
             try {
+                // send reboot command through ddmlib
                 Device dev = searchTestDevice(deviceSerialNumber).getDevice();
                 dev.executeShellCommand("reboot", new NullOutputReceiver());
+                // wait to make sure the reboot gets through before we tear down the connection
+                Thread.sleep(DDMLIB_REBOOT_DELAY);
             } catch (Exception e) {
                 Log.d("Could not issue reboot command through ddmlib: " + e);
                 // try to reboot the device using the command line adb
@@ -319,6 +327,27 @@ public class DeviceManager implements IDeviceChangeListener {
                         ts.setTestDevice(device);
                         deviceFound = true;
                         deviceConnected = device.waitForBootComplete();
+                        // After boot is complete, the ADB connection sometimes drops
+                        // for a short time. Wait for things to stabilize.
+                        try {
+                            Thread.sleep(POST_BOOT_DELAY);
+                        } catch (InterruptedException ignored) {
+                            // ignore
+                        }
+                        // If the connection dropped during the sleep above, the TestDevice
+                        // instance is no longer valid.
+                        TestDevice newDevice = searchTestDevice(deviceSerialNumber);
+                        if (newDevice != null) {
+                            ts.setTestDevice(newDevice);
+                            if (newDevice != device) {
+                                // the connection was dropped or a second reboot occurred
+                                executeCommand("adb -s " + deviceSerialNumber + " shell " +
+                                        "bugreport -o /sdcard/bugreports/doubleReboot");
+                            }
+                        } else {
+                            // connection dropped and has not come back up
+                            deviceFound = false; // go wait for next semaphore permit
+                        }
                     }
                 }
                 attempts += 1;

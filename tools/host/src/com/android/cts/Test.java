@@ -370,12 +370,15 @@ public class Test implements DeviceObserver {
     public void notifyResult(CtsTestResult result) {
 
         Log.d("Test.notifyResult() is called. (Test.getFullName()=" + getFullName());
-        synchronized (mTimeOutTimer) {
-            mResult = result;
-
-            Log.d("notifyUpdateResult() detects that it needs to cancel mTimeOutTimer");
-            if (mTimeOutTimer != null) {
-                mTimeOutTimer.sendNotify();
+        mResult = result;
+        if (mTimeOutTimer != null) {
+            synchronized (mTimeOutTimer) {
+                // set result again in case timeout just happened
+                mResult = result;
+                Log.d("notifyUpdateResult() detects that it needs to cancel mTimeOutTimer");
+                if (mTimeOutTimer != null) {
+                    mTimeOutTimer.sendNotify();
+                }
             }
         }
     }
@@ -403,9 +406,11 @@ public class Test implements DeviceObserver {
             mProgressObserver.stop();
         }
 
-        synchronized (mTimeOutTimer) {
-            mTimeOutTimer.cancel(false);
-            mTimeOutTimer.sendNotify();
+        if (mTimeOutTimer != null) {
+            synchronized (mTimeOutTimer) {
+                mTimeOutTimer.cancel(false);
+                mTimeOutTimer.sendNotify();
+            }
         }
     }
 }
