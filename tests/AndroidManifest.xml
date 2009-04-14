@@ -55,7 +55,9 @@
     <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
     <uses-permission android:name="com.android.browser.permission.WRITE_HISTORY_BOOKMARKS" />
 
-    <application>
+    <application android:label="Android TestCase"
+                android:icon="@drawable/size_48x48" android:name="android.app.cts.MockApplication">
+
         <activity android:name="android.widget.cts.TwoLineListItemStubActivity"
             android:label="TwoLineListItemStubActivity">
             <intent-filter>
@@ -330,6 +332,14 @@
 
         <activity android:name="android.view.cts.SurfaceViewStubActivity"
             android:label="SurfaceViewStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.app.cts.MockApplicationActivity"
+            android:label="MockApplicationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
