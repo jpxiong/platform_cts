@@ -278,6 +278,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.AdapterViewStubActivity"
+            android:label="AdapterViewStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.hardware.cts.CameraStubActivity"
             android:label="CameraStubActivity"
             android:screenOrientation="landscape">
