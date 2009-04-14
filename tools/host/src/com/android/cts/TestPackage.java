@@ -600,7 +600,7 @@ public class TestPackage implements DeviceObserver {
         cleanUp();
 
         try {
-            CUIOutputStream.println("Test stoped.");
+            CUIOutputStream.println("Test stopped.");
             mTestThread.join();
         } catch (InterruptedException e) {
             Log.e("", e);
