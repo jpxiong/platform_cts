@@ -19,7 +19,6 @@ package android.hardware.cts;
 import junit.framework.TestCase;
 import android.hardware.Camera.Parameters;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;

@@ -28,7 +28,6 @@ import android.widget.cts.util.ExpandableListScenario;
 import android.widget.cts.util.ListUtil;
 import android.widget.cts.util.ExpandableListScenario.MyGroup;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
