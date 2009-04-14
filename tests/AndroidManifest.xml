@@ -300,6 +300,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.text.method.cts.KeyListenerStubActivity"
+            android:label="KeyListenerStubActivity"/>
+
         <activity android:name="android.text.method.cts.StubActivity"
             android:label="StubActivity">
             <intent-filter>

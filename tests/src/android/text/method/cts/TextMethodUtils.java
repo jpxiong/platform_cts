@@ -16,52 +16,40 @@
 
 package android.text.method.cts;
 
-import java.lang.reflect.Field;
+import android.view.KeyEvent;
 
 import junit.framework.Assert;
 
-/**
- * The useful methods for TestCases.
- */
 public class TextMethodUtils {
     /**
      * Assert that two char arrays are equal.
      *
-     * @param char[] expected the expected
-     * @param char[] result the result
+     * @param expected the expected char array.
+     * @param actual the actual char array.
      */
-    public static void assertEquals(char[] expected, char[] result) {
-        if (expected != result) {
-            if (expected == null || result == null) {
+    public static void assertEquals(char[] expected, char[] actual) {
+        if (expected != actual) {
+            if (expected == null || actual == null) {
                 Assert.fail("the char arrays are not equal");
             }
 
-            Assert.assertEquals(String.valueOf(expected), String.valueOf(result));
+            Assert.assertEquals(String.valueOf(expected), String.valueOf(actual));
         }
     }
 
     /**
-     * Set singleton instance with specific name in the specific class to null.
+     * Get an unaccepted key code.
      *
-     * @param String fieldName the name of the field
-     *
-     * @param Class<?> cls the specific class
+     * @param acceptedChars accepted chars array.
+     * @return return key code if we find unaccepted one, or return -1.
      */
-    public static void clearSingleton(Class<?> cls, String fieldName) {
-        try {
-            Assert.assertNotNull(cls);
-            Field f = cls.getDeclaredField(fieldName);
-            f.setAccessible(true);
-            f.set(null, null);
-            Assert.assertNull(f.get(null));
-        } catch (SecurityException e) {
-            Assert.fail(e.getMessage());
-        } catch (NoSuchFieldException e) {
-            Assert.fail(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            Assert.fail(e.getMessage());
-        } catch (IllegalAccessException e) {
-            Assert.fail(e.getMessage());
+    public static int getUnacceptedKeyCode(char[] acceptedChars) {
+        for (int keyCode = KeyEvent.KEYCODE_A; keyCode <= KeyEvent.KEYCODE_Z; keyCode++) {
+            KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+            if ('\0' == event.getMatch(acceptedChars)) {
+                return keyCode;
+            }
         }
+        return -1;
     }
 }
