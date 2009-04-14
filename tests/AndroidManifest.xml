@@ -346,6 +346,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.app.cts.InstrumentationTestActivity"
+            android:label="InstrumentationTestActivity">
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="vnd.android.cursor.dir/person" />
+        </activity>
+
     </application>
 
 </manifest>
