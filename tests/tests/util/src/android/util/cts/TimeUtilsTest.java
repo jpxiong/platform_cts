@@ -183,7 +183,7 @@ public class TimeUtilsTest extends TestCase {
             "cl", "America/Santiago",
             "cl", "Pacific/Easter",
             "cm", "Africa/Douala",
-            "cn", "Asia/Chongqing",
+            "cn", "Asia/Shanghai",
             "co", "America/Bogota",
             "cr", "America/Costa_Rica",
             "cu", "America/Havana",
@@ -427,7 +427,7 @@ public class TimeUtilsTest extends TestCase {
 
             c.set(2009, Calendar.JULY, 20, 12, 00, 00);
             guess = guessTimeZone(c, country);
-            assertEquals(name, guess.getID());
+            assertEquals(name, guess.getID());  // this would failed on emulator for "Shanghai" 
 
             c.set(2009, Calendar.JANUARY, 20, 12, 00, 00);
             guess = guessTimeZone(c, country);
