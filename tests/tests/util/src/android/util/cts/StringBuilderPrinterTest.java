@@ -18,7 +18,6 @@ package android.util.cts;
 import android.test.AndroidTestCase;
 import android.util.StringBuilderPrinter;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;

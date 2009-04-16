@@ -20,9 +20,9 @@ import android.content.Context;
 import android.net.Proxy;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(Proxy.class)
@@ -33,15 +33,11 @@ public class ProxyTest extends AndroidTestCase {
 
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test constructor(s) of Proxy.",
-      targets = {
-        @TestTarget(
-          methodName = "Proxy",
-          methodArgs = {}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "Proxy",
+        args = {}
+    )
     public void testConstructor() {
 
         try {
@@ -51,29 +47,26 @@ public class ProxyTest extends AndroidTestCase {
         }
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "Test getDefaultPort().",
-      targets = {
-        @TestTarget(
-          methodName = "getDefaultPort",
-          methodArgs = {}
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getDefaultPort",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getDefaultHost",
-          methodArgs = {}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getDefaultHost",
+            args = {}
         ),
-        @TestTarget(
-          methodName = "getHost",
-          methodArgs = {Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getHost",
+            args = {Context.class}
         ),
-        @TestTarget(
-          methodName = "getHost",
-          methodArgs = {Context.class}
-        ),
-        @TestTarget(
-          methodName = "getPort",
-          methodArgs = {Context.class}
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getPort",
+            args = {Context.class}
         )
     })
     public void testAccessProperties() {

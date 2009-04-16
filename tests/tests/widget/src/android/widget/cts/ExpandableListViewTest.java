@@ -42,7 +42,6 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 import com.android.cts.stub.R;
 
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
