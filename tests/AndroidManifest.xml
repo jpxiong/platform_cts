@@ -288,6 +288,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.CheckedTextViewStubActivity"
+            android:label="CheckedTextViewStubActivity"/>
+
         <activity android:name="android.hardware.cts.CameraStubActivity"
             android:label="CameraStubActivity"
             android:screenOrientation="landscape">
