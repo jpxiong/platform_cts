@@ -61,7 +61,7 @@ public class HostConfig extends XMLResourceHandler {
                                                   "logo.gif", "newrule-green.png"};
 
     /** Default number of tests executed between reboots. */
-    private static final long MAX_TEST_COUNT_DEFAULT = 500;
+    private static final long MAX_TEST_COUNT_DEFAULT = 200;
     /** Name of environment variable that can override MAX_TEST_COUNT_DEFAULT. */ 
     private static final String MAX_TEST_ENV_VAR = "CTS_RESTART_AFTER";
     /** Number of tests executed between reboots. A value <= 0 disables reboots. */
