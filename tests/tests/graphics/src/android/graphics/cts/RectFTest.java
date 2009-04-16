@@ -22,7 +22,6 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
