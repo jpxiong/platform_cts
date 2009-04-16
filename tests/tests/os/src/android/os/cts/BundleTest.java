@@ -35,6 +35,14 @@ import java.util.Set;
 
 @TestTargetClass(Bundle.class)
 public class BundleTest extends AndroidTestCase {
+    private static final boolean BOOLEANKEYVALUE = false;
+
+    private static final int INTKEYVALUE = 20;
+
+    private static final String INTKEY = "intkey";
+
+    private static final String BOOLEANKEY = "booleankey";
+
     public static final String KEY = "Bruce Lee";
 
     private Bundle mBundle;
@@ -85,18 +93,15 @@ public class BundleTest extends AndroidTestCase {
         new Bundle(getClass().getClassLoader());
     }
 
+    // first put sth into tested Bundle, it shouldn't be empty, then clear it and it should be empty
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "first put sth into tested Bundle, it shouldn't be empty,"
-                + " then clear it and it should be empty",
             method = "clear",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "first put sth into tested Bundle, it shouldn't be empty,"
-                + " then clear it and it should be empty",
             method = "isEmpty",
             args = {}
         )
@@ -109,21 +114,26 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(mBundle.isEmpty());
     }
 
+    // first clone the tested Bundle, then compare the original Bundle with the
+    // cloned Bundle, they should equal
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "fisst clone the tested Bundle, then compare the original"
-            + " Bundle with the cloned Bundle, they should equal",
         method = "clone",
         args = {}
     )
     public void testClone() {
-        mBundle.equals(mBundle.clone());
+        mBundle.putBoolean(BOOLEANKEY, BOOLEANKEYVALUE);
+        mBundle.putInt(INTKEY, INTKEYVALUE);
+        Bundle cloneBundle = (Bundle) mBundle.clone();
+        assertEquals(mBundle.size(), cloneBundle.size());
+        assertEquals(mBundle.getBoolean(BOOLEANKEY), cloneBundle.getBoolean(BOOLEANKEY));
+        assertEquals(mBundle.getInt(INTKEY), cloneBundle.getInt(INTKEY));
     }
 
+    // containsKey would return false if nothing has been put into the Bundle,
+    // else containsKey would return true if any putXXX has been called before
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "containsKey would return false if nothing has been put into the Bundle,"
-            + " else containsKey would return true if any putXXX has been called before",
         method = "containsKey",
         args = {java.lang.String.class}
     )
@@ -133,10 +143,10 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(mBundle.containsKey(KEY));
     }
 
+    // get would return null if nothing has been put into the Bundle,else get
+    // would return the value set by putXXX
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "get would return null if nothing has been put into the Bundle,"
-            + " else get would return the value set by putXXX",
         method = "get",
         args = {java.lang.String.class}
     )
@@ -604,18 +614,15 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(1007, intArray[1]);
     }
 
+    // getIntegerArrayList should only return the IntegerArrayList set by putIntegerArrayLis
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getIntegerArrayList should only return the IntegerArrayList,"
-                + " which set by putIntegerArrayList",
             method = "getIntegerArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getIntegerArrayList should only return the IntegerArrayList,"
-                + " which set by putIntegerArrayList",
             method = "putIntegerArrayList",
             args = {java.lang.String.class, java.util.ArrayList.class}
         )
@@ -726,18 +733,15 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(bundle.equals(mBundle.getParcelable(KEY)));
     }
 
+    // getParcelableArray should only return the ParcelableArray set by putParcelableArray
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getParcelableArray should only return the ParcelableArray,"
-                + " which set by putParcelableArray",
             method = "getParcelableArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getParcelableArray should only return the ParcelableArray,"
-                + " which set by putParcelableArray",
             method = "putParcelableArray",
             args = {java.lang.String.class, android.os.Parcelable[].class}
         )
@@ -755,18 +759,15 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(bundle2.equals(parcelableArray[1]));
     }
 
+    // getParcelableArrayList should only return the parcelableArrayList set by putParcelableArrayList
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getParcelableArrayList should only return the parcelableArrayList,"
-                + " which set by putParcelableArrayList",
             method = "getParcelableArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getParcelableArrayList should only return the parcelableArrayList,"
-                + " which set by putParcelableArrayList",
             method = "putParcelableArrayList",
             args = {java.lang.String.class, java.util.ArrayList.class}
         )
@@ -877,18 +878,16 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(s2, shortArray[1]);
     }
 
+    // getSparseParcelableArray should only return the SparseArray<Parcelable>
+    // set by putSparseParcelableArray
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getSparseParcelableArray should only return the SparseArray<Parcelable>,"
-                + " which set by putSparseParcelableArray",
             method = "getSparseParcelableArray",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getSparseParcelableArray should only return the SparseArray<Parcelable>m,"
-                + " which set by putSparseParcelableArray",
             method = "putSparseParcelableArray",
             args = {java.lang.String.class, android.util.SparseArray.class}
         )
@@ -953,18 +952,15 @@ public class BundleTest extends AndroidTestCase {
         assertEquals("three", ret[2]);
     }
 
+    // getStringArrayList should only return the StringArrayList set by putStringArrayList
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getStringArrayList should only return the StringArrayList,"
-                + " which set by putStringArrayList",
             method = "getStringArrayList",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "getStringArrayList should only return the StringArrayList,"
-                + " which set by putStringArrayList",
             method = "putStringArrayList",
             args = {java.lang.String.class, java.util.ArrayList.class}
         )
@@ -1002,13 +998,14 @@ public class BundleTest extends AndroidTestCase {
         assertFalse(setKey.contains("three"));
     }
 
+    // same as hasFileDescriptors, the only difference is that describeContents
+    // return 0 if no fd and return 1 if has fd for the tested Bundle
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "same as hasFileDescriptors, the only difference is that describeContents returns"
-            + " CONTENTS_FILE_DESCRIPTOR if the tested Bundle has FileDescriptor, else returns 0.",
         method = "describeContents",
         args = {}
     )
+
     public void testDescribeContents() {
         assertEquals(0, mBundle.describeContents());
         final Parcel parcel = Parcel.obtain();
@@ -1022,13 +1019,13 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(Parcelable.CONTENTS_FILE_DESCRIPTOR, mBundle.describeContents());
     }
 
+    // case 1: The default bundle doesn't has FileDescriptor.
+    // case 2: The tested Bundle should has FileDescriptor
+    //  if it read data from a Parcel object, which is created with a FileDescriptor.
+    // case 3: The tested Bundle should has FileDescriptor
+    //  if put a Parcelable object, which is created with a FileDescriptor, into it.
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "case 1: The default bundle doesn't has FileDescriptor."
-            + "case 2: The tested Bundle should has FileDescriptor"
-            + " if it read data from a Parcel object, which is created with a FileDescriptor."
-            + "case 3: The tested Bundle should has FileDescriptor"
-            + " if put a Parcelable object, which is created with a FileDescriptor, into it.",
         method = "hasFileDescriptors",
         args = {}
     )
@@ -1049,7 +1046,6 @@ public class BundleTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "No way to verify that the class loader setter can work.",
         method = "setClassLoader",
         args = {java.lang.ClassLoader.class}
     )
@@ -1059,10 +1055,10 @@ public class BundleTest extends AndroidTestCase {
         mBundle.setClassLoader(new MockClassLoader());
     }
 
+    // Write the bundle(A) to a parcel(B), and then create a bundle(C) from B.
+    // C should be same as A.
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Write the bundle(A) to a parcel(B), and then create a bundle(C) from B."
-            + "C should be same as A.",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -1077,16 +1073,15 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(li, bundle.getString(KEY));
     }
 
+    // test the size should be right after add/remove key-value pair of the Bundle.
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test the size should be right after add/remove key-value pair of the Bundle.",
             method = "size",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test the size should be right after add/remove key-value pair of the Bundle.",
             method = "remove",
             args = {java.lang.String.class}
         )
@@ -1122,16 +1117,15 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(0, mBundle.size());
     }
 
+    // The return value of toString() should not be null.
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "The return value of toString() should not be null.",
             method = "toString",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "The return value of toString() should not be null.",
             method = "readFromParcel",
             args = {android.os.Parcel.class}
         )
@@ -1143,9 +1137,9 @@ public class BundleTest extends AndroidTestCase {
         assertNotNull(mBundle.toString());
     }
 
+    // The tested Bundle should hold mappings from the given after putAll be invoked.
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "The tested Bundle should hold mappings from the given after putAll be invoked.",
         method = "putAll",
         args = {android.os.Bundle.class}
     )
