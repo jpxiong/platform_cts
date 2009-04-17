@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.BufferedReader;
-import java.io.FileReader;
-
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,16 +35,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+import junit.textui.ResultPrinter;
 import junit.textui.TestRunner;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.lang.annotation.Annotation;
-import java.lang.ClassNotFoundException;
-import java.lang.NoSuchMethodException;
 
 public class CollectAllTests extends DescriptionGenerator {
 
@@ -115,7 +111,7 @@ public class CollectAllTests extends DescriptionGenerator {
         } else {
             System.out.println("usage: \n" +
                 "\t... CollectAllTests <output-file> <manifest-file> <testsuite-class-name> <makefile-file>");
-            return;
+            System.exit(1);
         }
 
         if (ANDROID_MAKE_FILE.length() > 0) {
@@ -128,7 +124,7 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (Exception e) {
             System.err.println("cannot open manifest");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         }
 
         Element documentElement = manifest.getDocumentElement();
@@ -146,7 +142,7 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (ClassNotFoundException e) {
             System.err.println("test class not found");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         }
 
         Method method = null;
@@ -155,11 +151,11 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (SecurityException e) {
             System.err.println("failed to get suite method");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         } catch (NoSuchMethodException e) {
             System.err.println("failed to get suite method");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         }
 
         try {
@@ -167,21 +163,22 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (IllegalArgumentException e) {
             System.err.println("failed to get suite method");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         } catch (IllegalAccessException e) {
             System.err.println("failed to get suite method");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         } catch (InvocationTargetException e) {
             System.err.println("failed to get suite method");
             e.printStackTrace();
-            return;
+            System.exit(1);;
         }
 
         try {
             xmlGenerator = new MyXMLGenerator(OUTPUTFILE + ".xml");
         } catch (ParserConfigurationException e) {
             System.err.println("Can't initialize XML Generator");
+            System.exit(1);
         }
 
         testCases = new LinkedHashMap<String, TestClass>();
@@ -194,6 +191,7 @@ public class CollectAllTests extends DescriptionGenerator {
                 String type = iterator.next();
                 System.err.println(type);
             }
+            System.exit(1);
         }
 
         for (Iterator<TestClass> iterator = testCases.values().iterator(); iterator.hasNext();) {
@@ -206,6 +204,7 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (Exception e) {
             System.err.println("cannot dump xml");
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -249,8 +248,7 @@ public class CollectAllTests extends DescriptionGenerator {
     }
 
     public void compose() {
-        System.out.println("Collecting all junit tests...");
-        new TestRunner() {
+        TestRunner runner = new TestRunner() {
             @Override
             protected TestResult createTestResult() {
                 return new TestResult() {
@@ -265,22 +263,47 @@ public class CollectAllTests extends DescriptionGenerator {
             public TestResult doRun(Test test) {
                 return super.doRun(test);
             }
-        }.doRun(TESTSUITE);
+            
+            
+            
+        };
+        
+        runner.setPrinter(new ResultPrinter(System.out) {
+            @Override
+            protected void printFooter(TestResult result) {
+            }
+            
+            @Override
+            protected void printHeader(long runTime) {
+            }
+        });
+        runner.doRun(TESTSUITE);
     }
-
-    private String getKnownFailure(final String testClassName, final String testName) {
+    
+    private String getKnownFailure(final Class<? extends TestCase> testClass,
+            final String testName) {
+        return getAnnotation(testClass, testName, KNOWN_FAILURE);
+    }
+    
+    private boolean isBrokenTest(final Class<? extends TestCase> testClass,
+            final String testName)  {
+        return getAnnotation(testClass, testName, BROKEN_TEST) != null;
+    }
+    
+    private String getAnnotation(final Class<? extends TestCase> testClass,
+            final String testName, final String annotationName) {
         try {
-            Class<?> testClass = Class.forName(testClassName);
-            Method testMethod = testClass.getMethod(testName, null);
+            Method testMethod = testClass.getMethod(testName, (Class[])null);
             Annotation[] annotations = testMethod.getAnnotations();
             for (Annotation annot : annotations) {
 
-                if (annot.annotationType().getName().equals(KNOWN_FAILURE)) {
+                if (annot.annotationType().getName().equals(annotationName)) {
                     String annotStr = annot.toString();
                     String knownFailure = null;
                     if (annotStr.contains("(value=")) {
                         knownFailure =
-                            annotStr.substring(annotStr.indexOf("=") + 1, annotStr.length() - 1);
+                            annotStr.substring(annotStr.indexOf("=") + 1,
+                                    annotStr.length() - 1);
 
                     }
 
@@ -293,22 +316,23 @@ public class CollectAllTests extends DescriptionGenerator {
 
             }
 
-        } catch (java.lang.ClassNotFoundException e) {
         } catch (java.lang.NoSuchMethodException e) {
         }
 
         return null;
     }
 
-    private void println(final String message) {
-        System.out.println(message);
-    }
-
     private void addToTests(TestCase test) {
 
         String testClassName = test.getClass().getName();
         String testName = test.getName();
-        String knownFailure = getKnownFailure(testClassName, testName);
+        String knownFailure = getKnownFailure(test.getClass(), testName);
+        
+        if (isBrokenTest(test.getClass(), testName)) {
+            System.out.println("ignoring broken test: " + test);
+            return;
+        }
+            
 
         if (!testName.startsWith("test")) {
             try {
