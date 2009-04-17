@@ -271,7 +271,7 @@ SIGNATURE_TEST_NAME="SignatureTest"
 SIGNATURE_TESTS="android.tests.sigtest"
 SIGNATURE_CHECK_PATH="${CASE_REPOSITORY}/${SIGNATURE_TEST_NAME}.xml"
 
-ANDROID_CORE_TESTS="android.core.tests"
+ANDROID_CORE_TESTS="android.core.tests.annotation android.core.tests.archive android.core.tests.concurrent android.core.tests.crypto android.core.tests.dom android.core.tests.logging android.core.tests.luni android.core.tests.luni.io android.core.tests.luni.lang android.core.tests.luni.net android.core.tests.luni.util android.core.tests.math android.core.tests.nio android.core.tests.nio_char android.core.tests.prefs android.core.tests.regex android.core.tests.security android.core.tests.sql android.core.tests.text android.core.tests.xml android.core.tests.xnet"
 ANDROID_CORE_VM_TESTS="android.core.vm-tests"
 
 #Creating Signature check description xml file, if not existed.
