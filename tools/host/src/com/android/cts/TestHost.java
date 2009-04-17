@@ -167,11 +167,11 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         TestSession ts = startSession(TEMP_PLAN_NAME, getFirstAvailableDevice().getSerialNumber(),
                 null);
 
-        // step 4: copy the result xml file
+        // step 4: copy the resulting zip file
         String resultName = pathName.substring(0, pathName.lastIndexOf("."))
-                + "_result.xml";
+                + ".zip";
         TestSessionLog log = ts.getSessionLog();
-        copyFile(log.getResultPath(), resultName);
+        copyFile(log.getResultPath() + ".zip", resultName);
 
         // step 5: clear the temporary working environment
         removePlans(TEMP_PLAN_NAME);
@@ -519,7 +519,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         synchronized (sTestSessionSync) {
             sTestSessionSync.notify();
         }
-        ts.getSessionLog().dumpToFile();
+        ts.getSessionLog().sessionComplete();
     }
 
     /**
@@ -642,7 +642,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             runTest(ts, deviceId, null, javaPkgName, ActionType.START_NEW_SESSION);
         }
 
-        ts.getSessionLog().dumpToFile();
+        ts.getSessionLog().sessionComplete();
         return ts;
     }
 
@@ -662,7 +662,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             DeviceDisconnectedException {
 
         runTest(ts, deviceId, testFullName, javaPkgName, type);
-        ts.getSessionLog().dumpToFile();
+        ts.getSessionLog().sessionComplete();
         return ts;
     }
 

@@ -69,10 +69,12 @@ public class SignatureCheckPackage extends TestPackage {
      *
      * @param device The device to run the package.
      * @param javaPkgName The java package name.
+     * @param testSesssionLog the TestSessionLog for this TestSession.
      */
     @Override
-    public void run(final TestDevice device, final String javaPkgName)
-                throws DeviceDisconnectedException {
+    public void run(final TestDevice device, final String javaPkgName,
+            TestSessionLog testSesssionLog)
+    throws DeviceDisconnectedException {
         Test test = getTests().iterator().next();
         if ((test != null) && (test.getResult().isNotExecuted())) {
 

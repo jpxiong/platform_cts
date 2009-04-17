@@ -379,12 +379,12 @@ public class TestSession {
                     pkg.runTest(mDevice, mTest);
                 } else if (mTestPackage != null) {
                     mTestPackage.setSessionThread(this);
-                    mTestPackage.run(mDevice, mJavaPackageName);
+                    mTestPackage.run(mDevice, mJavaPackageName, mSessionLog);
                 } else {
                     for (TestPackage pkg : mSessionLog.getTestPackages()) {
                         if (!pkg.isAllTestsRun()) {
                             pkg.setSessionThread(this);
-                            pkg.run(mDevice, null);
+                            pkg.run(mDevice, null, mSessionLog);
                             if (!isAllTestsRun()) {
                                 markNeedRestartADBServer();
                                 return;
@@ -580,7 +580,7 @@ public class TestSession {
                         }
 
                         if (mNeedUpdate && (mSessionLog != null)) {
-                            mSessionLog.dumpToFile();
+                            mSessionLog.sessionComplete();
                         }
                     } catch (InterruptedException e) {
                     }
