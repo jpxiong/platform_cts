@@ -359,6 +359,14 @@
             <data android:mimeType="vnd.android.cursor.dir/person" />
         </activity>
 
+       <activity android:name="android.app.cts.AliasActivityStub">
+             <meta-data android:name="android.app.alias"
+                android:resource="@xml/alias" />
+       </activity>
+
+       <activity android:name="android.app.cts.ChildActivity"
+                        android:label="ChildActivity" />
+ 
     </application>
 
 </manifest>
