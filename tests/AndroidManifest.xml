@@ -288,9 +288,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.widget.cts.CheckedTextViewStubActivity"
-            android:label="CheckedTextViewStubActivity"/>
-
         <activity android:name="android.hardware.cts.CameraStubActivity"
             android:label="CameraStubActivity"
             android:screenOrientation="landscape">
@@ -359,14 +356,6 @@
             <data android:mimeType="vnd.android.cursor.dir/person" />
         </activity>
 
-       <activity android:name="android.app.cts.AliasActivityStub">
-             <meta-data android:name="android.app.alias"
-                android:resource="@xml/alias" />
-       </activity>
-
-       <activity android:name="android.app.cts.ChildActivity"
-                        android:label="ChildActivity" />
- 
     </application>
 
 </manifest>
