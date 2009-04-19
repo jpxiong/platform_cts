@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2009 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,49 @@ package android.net.cts;
 
 import android.content.Context;
 import android.net.Proxy;
-import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.test.AndroidTestCase;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Proxy.class)
 public class ProxyTest extends AndroidTestCase {
+
+    private Context mContext;
+    private String mOriginHost;
+    private int mOriginPort;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
+        mContext = getContext();
+        mOriginHost = Proxy.getHost(mContext);
+        mOriginPort = Proxy.getPort(mContext);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        // Secure.putString should run only on device
+        Secure.putString(mContext.getContentResolver(),
+                         Secure.HTTP_PROXY,
+                         mOriginHost + ":" + mOriginPort);
+
+        super.tearDown();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        notes = "Test constructor(s) of Proxy.",
         method = "Proxy",
         args = {}
     )
     public void testConstructor() {
-
-        try {
-            Proxy proxy = new Proxy();
-        } catch (Exception e) {
-            fail("shouldn't throw exception");
-        }
+        new Proxy();
     }
 
     @TestTargets({
@@ -60,30 +76,31 @@ public class ProxyTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getHost",
+            method = "getPort",
             args = {Context.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getPort",
+            method = "getHost",
             args = {Context.class}
         )
     })
     public void testAccessProperties() {
-        String mHost = "www.google.com";
-        int mPort = 8080;
-        String mHttpProxy = mHost + ":" + mPort;
+        final int minValidPort = 0;
+        final int maxValidPort = 65535;
+        int defaultPort = Proxy.getDefaultPort();
+        if(null == Proxy.getDefaultHost()) {
+            assertEquals(-1, defaultPort);
+        } else {
+            assertTrue(defaultPort >= minValidPort && defaultPort <= maxValidPort);
+        }
 
-        Settings.System.putString(mContext.getContentResolver(),
-                Settings.System.HTTP_PROXY, null);
-        assertNull(Proxy.getHost(mContext));
-        assertEquals(-1,Proxy.getPort(mContext));
+        final String host = "proxy.example.com";
+        final int port = 2008;
 
-        Settings.System.putString(mContext.getContentResolver(),
-                Settings.System.HTTP_PROXY, mHttpProxy);
-        assertEquals(mHost,Proxy.getHost(mContext));
-        assertEquals(mPort,Proxy.getPort(mContext));
+        // Secure.putString should run only on device
+        Secure.putString(mContext.getContentResolver(), Secure.HTTP_PROXY, host + ":" + port);
+        assertEquals(host, Proxy.getHost(mContext));
+        assertEquals(port, Proxy.getPort(mContext));
     }
-
 }
-
