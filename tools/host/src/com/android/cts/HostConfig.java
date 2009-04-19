@@ -62,11 +62,11 @@ public class HostConfig extends XMLResourceHandler {
 
     /** Default number of tests executed between reboots. */
     private static final long MAX_TEST_COUNT_DEFAULT = 200;
-    /** Name of environment variable that can override MAX_TEST_COUNT_DEFAULT. */ 
+    /** Name of environment variable that can override MAX_TEST_COUNT_DEFAULT. */
     private static final String MAX_TEST_ENV_VAR = "CTS_RESTART_AFTER";
     /** Number of tests executed between reboots. A value <= 0 disables reboots. */
     private static final long MAX_TEST_COUNT; // set in static initializer
-    
+
     private String mConfigRoot;
     private CaseRepository mCaseRepos;
     private Repository mResultRepos;
@@ -85,7 +85,7 @@ public class HostConfig extends XMLResourceHandler {
         }
         MAX_TEST_COUNT = maxTestCount;
     }
-    
+
     private final static HostConfig sInstance = new HostConfig();
 
     private HostConfig() {
@@ -95,7 +95,7 @@ public class HostConfig extends XMLResourceHandler {
     public static HostConfig getInstance() {
         return sInstance;
     }
-    
+
     /**
      * Returns the max number of tests to run between reboots. A value of 0 or smaller indicates
      * that reboots should not be used.
@@ -163,9 +163,7 @@ public class HostConfig extends XMLResourceHandler {
             validRes = new File(resRoot).mkdirs();
         }
         if (validRes) {
-            for (String res: CTS_RESULT_RESOURCES) {
-                extractResource(res, resRoot);
-            }
+            extractResultResources(resRoot);
         }
         boolean validPlan = true;
         if (!validateDirectory(planRoot)) {
@@ -182,6 +180,17 @@ public class HostConfig extends XMLResourceHandler {
         }
 
         return validConfig;
+    }
+
+    /**
+     * Extract the result resources into the specified diretory.
+     *
+     * @param resRoot the directory to extract the resources into.
+     */
+    public void extractResultResources(String resRoot) {
+        for (String res: CTS_RESULT_RESOURCES) {
+            extractResource(res, resRoot);
+        }
     }
 
     /**
@@ -204,7 +213,7 @@ public class HostConfig extends XMLResourceHandler {
     }
 
     /**
-     * Load all of the test packages. 
+     * Load all of the test packages.
      */
     public void loadTestPackages() throws NoSuchAlgorithmException {
         if (mTestPackageMap.size() == 0) {
@@ -569,7 +578,7 @@ public class HostConfig extends XMLResourceHandler {
          * Load the package from the package description XML file.
          *
          * @param xmlFileName The package description XML file.
-         * @return The TestPackage. 
+         * @return The TestPackage.
          */
         private TestPackage loadPackage(String xmlFileName) throws NoSuchAlgorithmException {
             if ((xmlFileName == null) || (xmlFileName.length() == 0)) {

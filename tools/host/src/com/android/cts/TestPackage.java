@@ -943,8 +943,10 @@ public class TestPackage implements DeviceObserver {
      * Run the java package contained within this package over device.
      *
      * @param device The device to run this package.getName
+     * @param sessionLog the TestSession log for this TestSession.
      */
-    public void run(final TestDevice device, final String javaPkgName)
+    public void run(final TestDevice device, final String javaPkgName,
+                    TestSessionLog sessionLog)
             throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
         if (isAllTestsRun()) {
             return;
