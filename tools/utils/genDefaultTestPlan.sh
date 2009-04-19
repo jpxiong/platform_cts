@@ -48,6 +48,38 @@ generateSignatureCheckDescription() {
      echo "</TestPackage>" >> ${SIGNATURE_CHECK_PATH}
 }
 
+generateReferenceAppDescription() {
+     PACKAGE_NAME=${1}
+     PACKAGE_PATH=${2}
+     JAVA_PACKAGE=${3}
+     CLASS_NAME=${4}
+     METHOD_NAME=${5}
+     APK_TO_TEST_NAME=${6}
+     PACKAGE_TO_TEST=${7}
+     # Convert the dotted package name into a list so we can loop though it.
+     JAVA_PACKAGE_LIST=`echo $JAVA_PACKAGE | sed 's/\./ /g'`
+
+     echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ${PACKAGE_PATH}
+     echo "<TestPackage AndroidFramework=\"Android 1.0\" jarPath=\"\" "\
+          "name=\"${PACKAGE_NAME}\" runner=\"android.test.InstrumentationTestRunner\" "\
+          "targetNameSpace=\"\" targetBinaryName=\"\" version=\"1.0\" "\
+          "signatureCheck=\"false\" referenceAppTest=\"true\""\
+          "apkToTestName=\"${APK_TO_TEST_NAME}\""\
+          "packageToTest=\"${PACKAGE_TO_TEST}\""\
+          "appPackageName=\"${JAVA_PACKAGE}\">"  >> ${PACKAGE_PATH}
+     for pack_part in ${JAVA_PACKAGE_LIST}; do
+       echo "<TestSuite name=\"${pack_part}\">"       >> ${PACKAGE_PATH}
+     done
+     echo "<TestCase name=\"${CLASS_NAME}\">"  >> ${PACKAGE_PATH}
+     echo "<Test method=\"${METHOD_NAME}\">"    >> ${PACKAGE_PATH}
+     echo "</Test>"        >> ${PACKAGE_PATH}
+     echo "</TestCase>"    >> ${PACKAGE_PATH}
+     for pack_part in ${JAVA_PACKAGE_LIST}; do
+       echo "</TestSuite>"   >> ${PACKAGE_PATH}
+     done
+     echo "</TestPackage>" >> ${PACKAGE_PATH}
+}
+
 # Genrate the header of the test plan XML file.
 genTestPlanHeader() {
     TEST_PLAN=${1}
@@ -144,6 +176,11 @@ generateAllTestPlans() {
 
     TEST_PLAN=${PLAN_PATH}/Signature.xml
     LIST="${SIGNATURE_TESTS}"
+    TYPE="inclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/RefApp.xml
+    LIST="${REFERENCE_APP_TESTS}"
     TYPE="inclusive"
     genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
 }
@@ -276,6 +313,19 @@ ANDROID_CORE_VM_TESTS="android.core.vm-tests"
 
 #Creating Signature check description xml file, if not existed.
 generateSignatureCheckDescription
+
+REFERENCE_APP_TESTS="android.apidemos.cts"
+
+API_DEMOS_REFERENCE_NAME="ApiDemosReferenceTest"
+API_DEMOS_REFERENCE_PATH="${CASE_REPOSITORY}/${API_DEMOS_REFERENCE_NAME}.xml"
+
+generateReferenceAppDescription "ApiDemosReferenceTest"\
+  ${API_DEMOS_REFERENCE_PATH}\
+  "android.apidemos.cts"\
+  "ApiDemosTest"\
+  "testNumberOfItemsInListView"\
+  "ApiDemos"\
+  "com.example.android.apis"
 
 # Every test case package ends with "cts"
 for CASE_SOURCE in $(find ${TESTCASES_SOURCE} -type d | grep "cts$" | sed 's/\/\//\//'); do
