@@ -64,6 +64,7 @@ import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 public class DescriptionGenerator extends Doclet {
     static final String HOST_CONTROLLER = "dalvik.annotation.HostController";
     static final String KNOWN_FAILURE = "dalvik.annotation.KnownFailure";
+    static final String BROKEN_TEST = "dalvik.annotation.BrokenTest";
 
     static final String JUNIT_TEST_CASE_CLASS_NAME = "junit.framework.testcase";
     static final String TAG_PACKAGE = "TestPackage";

@@ -14,6 +14,19 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-BUILD_CTSCORE_PACKAGE:=$(LOCAL_PATH)/ctscore.mk
+ifeq ($(BUILD_CTSCORE_PACKAGE),)
+    $(error BUILD_CTSCORE_PACKAGE must be defined)
+endif
 
-include $(call all-makefiles-under,$(LOCAL_PATH))
+#
+# DOM Tests
+##########################################################
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/dom/src/test/java) \
+	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
+	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
+
+LOCAL_PACKAGE_NAME := android.core.tests.dom
+
+include $(BUILD_CTSCORE_PACKAGE)
