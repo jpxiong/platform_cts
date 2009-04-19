@@ -16,20 +16,24 @@
 
 package com.android.cts;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.android.cts.TestDevice.DeviceParameterCollector;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 
-import com.android.cts.TestDevice.DeviceParameterCollector;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Store the information of a test plan.
@@ -44,10 +48,6 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     private static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-
-    // define the possible format of the result file format
-    public static final int CTS_RESULT_FORMAT_INVALID = 100;
-    public static final int CTS_RESULT_FORMAT_XML = 101;
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -90,7 +90,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private Date mSessionStartTime;
     private Date mSessionEndTime;
     private String mResultPath;
-    private int mResultFormat;
+    private String mResultDir;
     private String mTestPlanName;
 
     private ArrayList<DeviceParameterCollector> mDeviceParameterBase;
@@ -98,7 +98,6 @@ public class TestSessionLog extends XMLResourceHandler {
     public TestSessionLog(final Collection<TestPackage> packages, final String testPlanName) {
         mTestPackages = packages;
 
-        mResultFormat = CTS_RESULT_FORMAT_XML;
         mDeviceParameterBase = new ArrayList<TestDevice.DeviceParameterCollector>();
         mTestPlanName = testPlanName;
 
@@ -183,12 +182,20 @@ public class TestSessionLog extends XMLResourceHandler {
     }
 
     /**
-     * Get the result path.
+     * Get the path to the XML result file.
      *
      * @return The result path.
      */
     public String getResultPath() {
         return mResultPath;
+    }
+
+    /**
+     * Get the result directory.  This is the directory that all result files
+     * should go into.
+     */
+    public String getResultDir() {
+        return mResultDir;
     }
 
     /**
@@ -200,8 +207,11 @@ public class TestSessionLog extends XMLResourceHandler {
         mSessionStartTime.setTime(time);
 
         String startTimeStr = HostUtils.getFormattedTimeString(time, "_", ".", ".");
-        mResultPath = HostConfig.getInstance().getResultRepository().getRoot()
-                + File.separator + startTimeStr + "_" + CTS_RESULT_FILE_NAME;
+        mResultDir = HostConfig.getInstance().getResultRepository().getRoot()
+            + File.separator + startTimeStr;
+        mResultPath =  mResultDir + File.separator + CTS_RESULT_FILE_NAME;
+        // Make sure the result directory exists
+        new File(mResultDir).mkdirs();
     }
 
     /**
@@ -214,22 +224,29 @@ public class TestSessionLog extends XMLResourceHandler {
     }
 
     /**
-     * Dump result to file.
+     * Calling this functions indicates that the TestSession is complete.  This
+     * indicates to the TestSessionLog that it is time to store the results
+     * to the filesystem.
      */
-    public void dumpToFile() {
-        switch (mResultFormat) {
-        case CTS_RESULT_FORMAT_XML:
-            try {
-                writeToFile(new File(mResultPath), createResultDoc());
-            } catch (Exception e) {
-                Log.e("Got exception when trying to write to result file", e);
-            }
-            break;
-
-        default:
-            Log.e("Unrecognized result format" + mResultFormat, null);
-            break;
+    public void sessionComplete() {
+        try {
+            writeToFile(new File(mResultPath), createResultDoc());
+            // Now zip up the results directory so we have something nice
+            // that people can upload.
+            HostUtils.zipUpDirectory(mResultDir,
+                    mResultDir + ".zip",
+                    new HostUtils.ZipFilenameTransformer() {
+                        public String transform(String filename) {
+                            if (filename.startsWith(mResultDir)) {
+                                return filename.substring(mResultDir.length() + 1);
+                            }
+                            return filename;
+                        }
+            });
+        } catch (Exception e) {
+            Log.e("Got exception when trying to write to result file", e);
         }
+        HostConfig.getInstance().extractResultResources(mResultDir);
     }
 
     /**
