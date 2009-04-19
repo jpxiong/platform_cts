@@ -21,9 +21,12 @@ import com.android.ddmlib.ClientData;
 import com.android.ddmlib.Device;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
+import com.android.ddmlib.RawImage;
 import com.android.ddmlib.SyncService;
 import com.android.ddmlib.SyncService.ISyncProgressMonitor;
 import com.android.ddmlib.SyncService.SyncResult;
+import com.android.ddmlib.log.LogReceiver;
+import com.android.ddmlib.log.LogReceiver.ILogListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +64,7 @@ public class TestDevice implements DeviceObserver {
     private static final String STATUS_STR_IDLE = "idle";
     private static final String STATUS_STR_IN_USE = "in use";
     private static final String STATUS_STR_OFFLINE = "offline";
-    
+
     /** Interval [ms] for polling a device until boot is completed. */
     private static final int REBOOT_POLL_INTERVAL = 5000;
     /** Number of times a booting device should be polled before we give up. */
@@ -86,6 +89,30 @@ public class TestDevice implements DeviceObserver {
     private PackageActionTimer mPackageActionTimer;
 
     private ObjectSync mObjectSync;
+
+    private MultiplexingLogListener logListener = new MultiplexingLogListener();
+    private LogReceiver logReceiver = new LogReceiver(logListener);
+
+    private class LogServiceThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                mDevice.runLogService("main", logReceiver);
+            } catch (IOException e) {
+            }
+        }
+
+        /**
+         * Cancel logging and exit this thread.
+         */
+        public void cancelLogService() {
+            // this will cause the loop in our run method to
+            // exit, terminating this thread.
+            logReceiver.cancel();
+        }
+    }
+
+    private LogServiceThread logServiceThread;
 
     static {
         INSTRUMENT_RESULT_PATTERN = Pattern.compile(sInstrumentResultExpr);
@@ -120,11 +147,13 @@ public class TestDevice implements DeviceObserver {
     public DeviceParameterCollector getDeviceInfo()
                 throws DeviceDisconnectedException {
         if (mDeviceInfo.size() == 0) {
+            logServiceThread = new LogServiceThread();
+            logServiceThread.start();
             genDeviceInfo();
         }
         return mDeviceInfo;
     }
-    
+
     /**
      * Return the Device instance associated with this TestDevice.
      */
@@ -136,7 +165,7 @@ public class TestDevice implements DeviceObserver {
         private boolean mRestarted;
         private boolean mCancelled;
         private boolean mDone;
-        
+
         @Override
         public void processNewLines(String[] lines) {
             for (String line : lines) {
@@ -152,11 +181,11 @@ public class TestDevice implements DeviceObserver {
                 this.notifyAll();
             }
         }
-        
+
         public boolean isCancelled() {
             return mCancelled;
         }
-        
+
         boolean hasRestarted(long timeout) {
             try {
                 synchronized (this) {
@@ -171,10 +200,10 @@ public class TestDevice implements DeviceObserver {
             return mRestarted;
         }
     }
-    
+
     /**
      * Wait until device indicates that boot is complete.
-     * 
+     *
      * @return true if the device has completed the boot process, false if it does not, or the
      * device does not respond.
      */
@@ -1454,12 +1483,48 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
+     * Add a new log listener.
+     *
+     * @param listener the listener
+     */
+    public void addMainLogListener(ILogListener listener) {
+        logListener.addListener(listener);
+    }
+
+    /**
+     * Remove an existing log listener.
+     *
+     * @param listener the listener to remove.
+     */
+    public void removeMainLogListener(ILogListener listener) {
+        logListener.removeListener(listener);
+    }
+
+    /**
      * Execute Adb shell command on {@link Device}
      *
      * @param cmd the string of command.
      * @param receiver {@link IShellOutputReceiver}
+     * @throws DeviceDisconnectedException if the device disconnects during the command
      */
-    public void executeShellCommand(final String cmd, final IShellOutputReceiver receiver)
+    public void executeShellCommand(final String cmd,
+            final IShellOutputReceiver receiver) throws DeviceDisconnectedException {
+        executeShellCommand(cmd, receiver, null);
+    }
+
+    /**
+     * Execute Adb shell command on {@link Device}
+     *
+     * Note that the receivers run in a different thread than the caller.
+     *
+     * @param cmd the string of command.
+     * @param receiver {@link IShellOutputReceiver}
+     * @param logReceiver {@link LogReceiver}
+     * @throws DeviceDisconnectedException if the device disconnects during the command
+     */
+    public void executeShellCommand(final String cmd,
+            final IShellOutputReceiver receiver,
+            final LogReceiver logReceiver)
             throws DeviceDisconnectedException {
         if (mStatus == STATUS_OFFLINE) {
             throw new DeviceDisconnectedException(getSerialNumber());
@@ -1522,6 +1587,7 @@ public class TestDevice implements DeviceObserver {
             }
         }
         mStatus = STATUS_OFFLINE;
+        logServiceThread.cancelLogService();
     }
 
     /**
@@ -1669,5 +1735,15 @@ public class TestDevice implements DeviceObserver {
         public boolean isNotified() {
             return mNotifySent;
         }
+    }
+
+    /**
+     * Take a screenshot of the device under test.
+     *
+     * @return the screenshot
+     * @throws IOException
+     */
+    public RawImage getScreenshot() throws IOException {
+        return mDevice.getScreenshot();
     }
 }
