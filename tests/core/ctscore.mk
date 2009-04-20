@@ -41,7 +41,7 @@ $(PACKAGE_RESOURCES): $(LOCAL_BUILT_MODULE) $(CORETESTS_INTERMEDIATES)/javalib.j
 	$(call unzip-jar-files,$(PRIVATE_CORETESTS_INTERMEDIATES_COMMON)/javalib.jar,\
 		$(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses)
 	@find $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses -type f -name "*.class" -delete
-	@rm $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses/classes.dex
+	@rm -f $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses/classes.dex
 	@cp $< $@
 	@jar uf $@ -C $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses .
 	$(sign-package)
