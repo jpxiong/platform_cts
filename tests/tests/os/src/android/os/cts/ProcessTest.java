@@ -109,7 +109,7 @@ public class ProcessTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.PARTIAL,
             notes = "The documentation states that this will throw a  SecurityException" +
-            		" if the process does not have permission to set the requested priority " +
+                    " if the process does not have permission to set the requested priority " +
                     "for the given thread. However, setting the current Thread's priority " +
                     "does not throw a SecurityException, regardless of the priority value.",
             method = "setThreadPriority",
