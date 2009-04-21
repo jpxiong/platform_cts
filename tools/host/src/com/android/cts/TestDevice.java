@@ -1587,7 +1587,9 @@ public class TestDevice implements DeviceObserver {
             }
         }
         mStatus = STATUS_OFFLINE;
-        logServiceThread.cancelLogService();
+        if (logServiceThread != null) {
+            logServiceThread.cancelLogService();
+        }
     }
 
     /**
