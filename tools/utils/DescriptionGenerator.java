@@ -250,8 +250,11 @@ public class DescriptionGenerator extends Doclet {
             t.setOutputProperty("indent", "yes");
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount","4");
 
+            File file = new File(mOutputPath);
+            file.getParentFile().mkdirs();
+            
             t.transform(new DOMSource(mDoc),
-                    new StreamResult(new FileOutputStream(new File(mOutputPath))));
+                    new StreamResult(new FileOutputStream(file)));
         }
 
         /**
