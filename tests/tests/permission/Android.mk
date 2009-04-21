@@ -17,7 +17,7 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := ctstests_permission
+LOCAL_MODULE_TAGS := tests
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 

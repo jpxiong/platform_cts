@@ -14,7 +14,7 @@
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := ctstests_hardware
+LOCAL_MODULE_TAGS := tests
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
