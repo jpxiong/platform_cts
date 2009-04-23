@@ -183,6 +183,11 @@ generateAllTestPlans() {
     LIST="${REFERENCE_APP_TESTS}"
     TYPE="inclusive"
     genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
+
+    TEST_PLAN=${PLAN_PATH}/Performance.xml
+    LIST="${PERFORMANCE_TESTS}"
+    TYPE="inclusive"
+    genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
 }
 
 # Build the DescriptionGenerator as the Doclet
@@ -282,6 +287,11 @@ ${TOP_DIR}/cts/tests/tests/text/src:\
 ${TOP_DIR}/cts/tests/tests/util/src:\
 ${TOP_DIR}/cts/tests/tests/view/src:\
 ${TOP_DIR}/cts/tests/tests/widget/src:\
+${TOP_DIR}/cts/tests/tests/performance/src:\
+${TOP_DIR}/cts/tests/tests/performance2/src:\
+${TOP_DIR}/cts/tests/tests/performance3/src:\
+${TOP_DIR}/cts/tests/tests/performance4/src:\
+${TOP_DIR}/cts/tests/tests/performance5/src:\
 ${TOP_DIR}/dalvik/libcore/dalvik/src/main/java:\
 ${TOP_DIR}/dalvik/libcore/junit/src/main/java \
 ${SOURCES}  1>/dev/null 2>/dev/null
@@ -318,6 +328,8 @@ REFERENCE_APP_TESTS="android.apidemos.cts"
 
 API_DEMOS_REFERENCE_NAME="ApiDemosReferenceTest"
 API_DEMOS_REFERENCE_PATH="${CASE_REPOSITORY}/${API_DEMOS_REFERENCE_NAME}.xml"
+
+PERFORMANCE_TESTS="android.performance android.performance2 android.performance3 android.performance4 android.performance5"
 
 generateReferenceAppDescription "ApiDemosReferenceTest"\
   ${API_DEMOS_REFERENCE_PATH}\

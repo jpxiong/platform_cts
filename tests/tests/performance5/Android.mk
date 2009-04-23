@@ -22,7 +22,7 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsPerformanceTestCases5
+LOCAL_PACKAGE_NAME := CtsPerformance5TestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
