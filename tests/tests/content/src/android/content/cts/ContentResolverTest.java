@@ -34,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
+import android.accounts.Account;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -729,7 +730,7 @@ public class ContentResolverTest extends AndroidTestCase {
         Bundle extras = new Bundle();
 
         extras.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-        extras.putString(ContentResolver.SYNC_EXTRAS_ACCOUNT, "cts");
+        extras.putParcelable(ContentResolver.SYNC_EXTRAS_ACCOUNT, new Account("cts", "cts"));
 
         mContentResolver.startSync(TABLE1_URI, extras);
         //FIXME: how to get the result to assert.

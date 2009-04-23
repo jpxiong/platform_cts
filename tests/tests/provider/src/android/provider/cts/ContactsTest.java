@@ -67,25 +67,27 @@ public class ContactsTest extends InstrumentationTestCase {
      */
     public void testPeopleTable() {
         final String[] PEOPLE_PROJECTION = new String[] {
-                People._ID, People._SYNC_ACCOUNT, People._SYNC_ID, People._SYNC_TIME,
+                People._ID, People._SYNC_ACCOUNT, People._SYNC_ACCOUNT_TYPE, People._SYNC_ID,
+                People._SYNC_TIME,
                 People._SYNC_VERSION, People._SYNC_LOCAL_ID, People._SYNC_DIRTY,
                 People.NAME, People.NOTES, People.TIMES_CONTACTED,
                 People.LAST_TIME_CONTACTED, People.STARRED,
                 People.CUSTOM_RINGTONE, People.SEND_TO_VOICEMAIL,};
         final int ID_INDEX = 0;
-        final int SYNC_ACCOUNT_INDEX = 1;
-        final int SYNC_ID_INDEX = 2;
-        final int SYNC_TIME_INDEX = 3;
-        final int SYNC_VERSION_INDEX = 4;
-        final int SYNC_LOCAL_ID_INDEX = 5;
-        final int SYNC_DIRTY_INDEX = 6;
-        final int NAME_INDEX = 7;
-        final int NOTES_INDEX = 8;
-        final int TIMES_CONTACTED_INDEX = 9;
-        final int LAST_TIME_CONTACTED_INDEX = 10;
-        final int STARRED_INDEX = 11;
-        final int CUSTOM_RINGTONE_INDEX = 12;
-        final int SEND_TO_VOICEMAIL_INDEX = 13;
+        final int SYNC_ACCOUNT_NAME_INDEX = 1;
+        final int SYNC_ACCOUNT_TYPE_INDEX = 2;
+        final int SYNC_ID_INDEX = 3;
+        final int SYNC_TIME_INDEX = 4;
+        final int SYNC_VERSION_INDEX = 5;
+        final int SYNC_LOCAL_ID_INDEX = 6;
+        final int SYNC_DIRTY_INDEX = 7;
+        final int NAME_INDEX = 8;
+        final int NOTES_INDEX = 9;
+        final int TIMES_CONTACTED_INDEX = 10;
+        final int LAST_TIME_CONTACTED_INDEX = 11;
+        final int STARRED_INDEX = 12;
+        final int CUSTOM_RINGTONE_INDEX = 13;
+        final int SEND_TO_VOICEMAIL_INDEX = 14;
 
         String insertPeopleName = "name_insert";
         String insertPeopleNotes = "notes_insert";
@@ -115,7 +117,8 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(1, cursor.getInt(SEND_TO_VOICEMAIL_INDEX));
             assertEquals(0, cursor.getInt(TIMES_CONTACTED_INDEX));
             assertEquals(0, cursor.getInt(STARRED_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -142,7 +145,8 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(1, cursor.getInt(SEND_TO_VOICEMAIL_INDEX));
             assertEquals(1, cursor.getInt(TIMES_CONTACTED_INDEX));
             assertEquals(0, cursor.getInt(STARRED_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -167,7 +171,7 @@ public class ContactsTest extends InstrumentationTestCase {
     public void testGroupsTable() {
         final String[] GROUPS_PROJECTION = new String[] {
                 Groups._ID, Groups.NAME, Groups.NOTES, Groups.SHOULD_SYNC,
-                Groups.SYSTEM_ID, Groups._SYNC_ACCOUNT, Groups._SYNC_ID,
+                Groups.SYSTEM_ID, Groups._SYNC_ACCOUNT, Groups._SYNC_ACCOUNT_TYPE, Groups._SYNC_ID,
                 Groups._SYNC_TIME, Groups._SYNC_VERSION, Groups._SYNC_LOCAL_ID,
                 Groups._SYNC_DIRTY};
         final int ID_INDEX = 0;
@@ -175,12 +179,13 @@ public class ContactsTest extends InstrumentationTestCase {
         final int NOTES_INDEX = 2;
         final int SHOULD_SYNC_INDEX = 3;
         final int SYSTEM_ID_INDEX = 4;
-        final int SYNC_ACCOUNT_INDEX = 5;
-        final int SYNC_ID_INDEX = 6;
-        final int SYNC_TIME_INDEX = 7;
-        final int SYNC_VERSION_INDEX = 8;
-        final int SYNC_LOCAL_ID_INDEX = 9;
-        final int SYNC_DIRTY_INDEX = 10;
+        final int SYNC_ACCOUNT_NAME_INDEX = 5;
+        final int SYNC_ACCOUNT_TYPE_INDEX = 6;
+        final int SYNC_ID_INDEX = 7;
+        final int SYNC_TIME_INDEX = 8;
+        final int SYNC_VERSION_INDEX = 9;
+        final int SYNC_LOCAL_ID_INDEX = 10;
+        final int SYNC_DIRTY_INDEX = 11;
 
         String insertGroupsName = "name_insert";
         String insertGroupsNotes = "notes_insert";
@@ -204,7 +209,8 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(insertGroupsNotes, cursor.getString(NOTES_INDEX));
             assertEquals(0, cursor.getInt(SHOULD_SYNC_INDEX));
             assertEquals(Groups.GROUP_MY_CONTACTS, cursor.getString(SYSTEM_ID_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -228,7 +234,8 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(updateGroupsNotes, cursor.getString(NOTES_INDEX));
             assertEquals(1, cursor.getInt(SHOULD_SYNC_INDEX));
             assertEquals(updateGroupsSystemId, cursor.getString(SYSTEM_ID_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -253,7 +260,7 @@ public class ContactsTest extends InstrumentationTestCase {
     public void testPhotosTable() {
         final String[] PHOTOS_PROJECTION = new String[] {
                 Photos._ID, Photos.EXISTS_ON_SERVER, Photos.PERSON_ID,
-                Photos.LOCAL_VERSION, Photos.DATA, Photos._SYNC_ACCOUNT,
+                Photos.LOCAL_VERSION, Photos.DATA, Photos._SYNC_ACCOUNT, Photos._SYNC_ACCOUNT_TYPE,
                 Photos._SYNC_ID, Photos._SYNC_TIME, Photos._SYNC_VERSION,
                 Photos._SYNC_LOCAL_ID, Photos._SYNC_DIRTY,
                 Photos.SYNC_ERROR};
@@ -262,13 +269,14 @@ public class ContactsTest extends InstrumentationTestCase {
         final int PERSON_ID_INDEX = 2;
         final int LOCAL_VERSION_INDEX = 3;
         final int DATA_INDEX = 4;
-        final int SYNC_ACCOUNT_INDEX = 5;
-        final int SYNC_ID_INDEX = 6;
-        final int SYNC_TIME_INDEX = 7;
-        final int SYNC_VERSION_INDEX = 8;
-        final int SYNC_LOCAL_ID_INDEX = 9;
-        final int SYNC_DIRTY_INDEX = 10;
-        final int SYNC_ERROR_INDEX = 11;
+        final int SYNC_ACCOUNT_NAME_INDEX = 5;
+        final int SYNC_ACCOUNT_TYPE_INDEX = 6;
+        final int SYNC_ID_INDEX = 7;
+        final int SYNC_TIME_INDEX = 8;
+        final int SYNC_VERSION_INDEX = 9;
+        final int SYNC_LOCAL_ID_INDEX = 10;
+        final int SYNC_DIRTY_INDEX = 11;
+        final int SYNC_ERROR_INDEX = 12;
 
         String updatePhotosLocalVersion = "local_version1";
 
@@ -307,7 +315,8 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
             assertNull(cursor.getString(LOCAL_VERSION_INDEX));
             assertNull(cursor.getString(DATA_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -336,7 +345,8 @@ public class ContactsTest extends InstrumentationTestCase {
             Bitmap bitmap = BitmapFactory.decodeStream(resultInputStream, null, null);
             assertEquals(sourceDrawable.getIntrinsicWidth(), bitmap.getWidth());
             assertEquals(sourceDrawable.getIntrinsicHeight(), bitmap.getHeight());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertNull(cursor.getString(SYNC_ID_INDEX));
             assertNull(cursor.getString(SYNC_TIME_INDEX));
             assertNull(cursor.getString(SYNC_VERSION_INDEX));
@@ -712,11 +722,13 @@ public class ContactsTest extends InstrumentationTestCase {
      */
     public void testSettingsTable() {
         final String[] SETTINGS_PROJECTION = new String[] {
-                Settings._ID, Settings._SYNC_ACCOUNT, Settings.KEY, Settings.VALUE};
+                Settings._ID, Settings._SYNC_ACCOUNT, Settings._SYNC_ACCOUNT_TYPE,
+                Settings.KEY, Settings.VALUE};
         final int ID_INDEX = 0;
-        final int SYNC_ACCOUNT_INDEX = 1;
-        final int KEY_INDEX = 2;
-        final int VALUE_INDEX = 3;
+        final int SYNC_ACCOUNT_NAME_INDEX = 1;
+        final int SYNC_ACCOUNT_TYPE_INDEX = 2;
+        final int KEY_INDEX = 3;
+        final int VALUE_INDEX = 4;
 
         String insertKey = "key_insert";
         String insertValue = "value_insert";
@@ -744,7 +756,8 @@ public class ContactsTest extends InstrumentationTestCase {
                     Settings.KEY + " = ?",
                     new String[] {insertKey}, null);
             assertTrue(cursor.moveToNext());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertEquals(insertKey, cursor.getString(KEY_INDEX));
             assertEquals(insertValue, cursor.getString(VALUE_INDEX));
             int id = cursor.getInt(ID_INDEX);
@@ -762,7 +775,8 @@ public class ContactsTest extends InstrumentationTestCase {
                     Settings.KEY + " = ?",
                     new String[] {updateKey}, null);
             assertTrue(cursor.moveToNext());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertEquals(updateKey, cursor.getString(KEY_INDEX));
             assertEquals(updateValue, cursor.getString(VALUE_INDEX));
             cursor.close();
@@ -771,7 +785,8 @@ public class ContactsTest extends InstrumentationTestCase {
                     Settings.KEY + " = ?",
                     new String[] {insertKey}, null);
             assertTrue(cursor.moveToNext());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertEquals(insertKey, cursor.getString(KEY_INDEX));
             assertEquals(insertValue, cursor.getString(VALUE_INDEX));
             cursor.close();
@@ -788,7 +803,8 @@ public class ContactsTest extends InstrumentationTestCase {
                     Settings.KEY + " = ?",
                     new String[] {insertKey}, null);
             assertTrue(cursor.moveToNext());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertEquals(insertKey, cursor.getString(KEY_INDEX));
             assertEquals(updateValue, cursor.getString(VALUE_INDEX));
             cursor.close();
@@ -797,7 +813,8 @@ public class ContactsTest extends InstrumentationTestCase {
                     Settings.KEY + " = ?",
                     new String[] {updateKey}, null);
             assertTrue(cursor.moveToNext());
-            assertNull(cursor.getString(SYNC_ACCOUNT_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
+            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
             assertEquals(updateKey, cursor.getString(KEY_INDEX));
             assertEquals(updateValue, cursor.getString(VALUE_INDEX));
             cursor.close();
