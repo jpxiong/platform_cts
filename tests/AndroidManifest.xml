@@ -199,6 +199,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.VideoViewStubActivity"
+            android:label="VideoViewStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.AutoCompleteStubActivity"
             android:label="AutoCompleteStubActivity">
             <intent-filter>
