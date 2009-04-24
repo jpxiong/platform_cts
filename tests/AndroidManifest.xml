@@ -649,6 +649,10 @@
             </intent-filter>
         </service>
 
+        <service android:name="android.os.cts.MessengerService"
+                android:process=":messengerService">
+        </service>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
