@@ -492,7 +492,8 @@ public class TestPackage implements DeviceObserver {
     /**
      * Update Test running status when running in batch mode.
      *
-     * @param test The Test to update.
+     * @param test The Test to update. May be null if a status gets reported on a test that is not
+     * in the test plan.
      * @param status The status to be updated.
      */
     public void notifyTestStatus(final Test test, final String status) {
@@ -503,18 +504,20 @@ public class TestPackage implements DeviceObserver {
         if (mIsInBatchMode) {
             if (status.equals(START)) {
                 if ((mCurrentTest != null) && (mCurrentTest.getResult().isNotExecuted())) {
-                    Log.d("Err: not received FINISH msg for test " + mCurrentTest.getFullName());
+                    Log.d("Err: Missing FINISH msg for test " + mCurrentTest.getFullName());
                     handleMissingFinishEvent();
                 }
                 mCurrentTest = test;
-                print(mCurrentTest.getFullName() + "...");
-                mProgressObserver.start();
-                mTimeOutTimer.restart(new TimeOutTask(this), TimeOutTask.DELAY);
-            } else{
+                if (test != null) {
+                    print(mCurrentTest.getFullName() + "...");
+                    mProgressObserver.start();
+                }
+            } else {
                 mProgressObserver.stop();
-                mTimeOutTimer.cancel(false);
                 mCurrentTest = null;
             }
+            // restart the timer even for unexpected tests
+            mTimeOutTimer.restart(new TimeOutTask(this), TimeOutTask.DELAY);
         }
     }
 
