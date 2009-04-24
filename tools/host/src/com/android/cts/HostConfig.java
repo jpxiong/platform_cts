@@ -36,6 +36,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,13 +62,11 @@ public class HostConfig extends XMLResourceHandler {
     static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
                                                   "logo.gif", "newrule-green.png"};
 
-    /** Default number of tests executed between reboots. */
-    private static final long MAX_TEST_COUNT_DEFAULT = 200;
-    /** Name of environment variable that can override MAX_TEST_COUNT_DEFAULT. */
-    private static final String MAX_TEST_ENV_VAR = "CTS_RESTART_AFTER";
-    /** Number of tests executed between reboots. A value <= 0 disables reboots. */
-    private static final long MAX_TEST_COUNT; // set in static initializer
-
+    static final String MAX_TEST_COUNT_NAME = "maxTestCount";
+    static final String TEST_STATUS_TIMEOUT_MS = "testStatusTimeoutMs";
+    static final String BATCH_START_TIMEOUT_MS = "batchStartTimeoutMs";
+    static final String INDIVIDUAL_START_TIMEOUT_MS = "individualStartTimeoutMs";
+    
     private String mConfigRoot;
     private CaseRepository mCaseRepos;
     private Repository mResultRepos;
@@ -75,24 +75,26 @@ public class HostConfig extends XMLResourceHandler {
     // key: app package name
     // value: TestPackage
     private HashMap<String, TestPackage> mTestPackageMap;
+    private HashMap<String, Integer> mIntValues;
 
-    static {
-        long maxTestCount = MAX_TEST_COUNT_DEFAULT;
-        String prop = System.getenv(MAX_TEST_ENV_VAR);
-        if (prop != null) {
-            try {
-                maxTestCount = Long.parseLong(prop);
-            } catch (NumberFormatException ignored) {
-                // just use default value
-            }
-        }
-        MAX_TEST_COUNT = maxTestCount;
+    private void setDefaultConfigValues() {
+        mIntValues = new HashMap<String, Integer>();
+        
+        // Number of tests executed between reboots. A value <= 0 disables reboots.
+        mIntValues.put(MAX_TEST_COUNT_NAME, 200);
+        // Max time [ms] between test status updates for both individual and batch mode.
+        mIntValues.put(TEST_STATUS_TIMEOUT_MS, 60 * 1000);
+        // Max time [ms] from start of package in batch mode and the first test status update.
+        mIntValues.put(BATCH_START_TIMEOUT_MS, 30 * 60 * 1000);
+        // Max time [ms] from start of test in individual mode to the first test status update.
+        mIntValues.put(INDIVIDUAL_START_TIMEOUT_MS, 5 * 60 * 1000);
     }
-
+    
     private final static HostConfig sInstance = new HostConfig();
 
     private HostConfig() {
         mTestPackageMap = new HashMap<String, TestPackage>();
+        setDefaultConfigValues();
     }
 
     public static HostConfig getInstance() {
@@ -103,8 +105,23 @@ public class HostConfig extends XMLResourceHandler {
      * Returns the max number of tests to run between reboots. A value of 0 or smaller indicates
      * that reboots should not be used.
      */
-    public static long getMaxTestCount() {
-        return MAX_TEST_COUNT;
+    public static int getMaxTestCount() {
+        return sInstance.mIntValues.get(MAX_TEST_COUNT_NAME);
+    }
+    
+    /**
+     * Get the integer configuration value with the given name.
+     * 
+     * @param name The name of the value to read.
+     * @return The value, if it exists, otherwise 0.
+     */
+    public static int getIntValue(String name) {
+        Integer value = sInstance.mIntValues.get(name);
+        if (value == null) {
+            Log.e("Unknown config value read: " + name, null);
+            return 0;
+        }
+        return value;
     }
 
     /**
@@ -153,6 +170,8 @@ public class HostConfig extends XMLResourceHandler {
             return false;
         }
 
+        getConfigValues(doc);
+        
         String caseRoot = repositoryRoot + File.separator + caseCfg;
         String planRoot = repositoryRoot + File.separator + planCfg;
         String resRoot = repositoryRoot + File.separator + resCfg;
@@ -287,6 +306,26 @@ public class HostConfig extends XMLResourceHandler {
         }
 
         return cfgStr;
+    }
+    
+    /**
+     * Load configuration values from config file.
+     * 
+     * @param doc The document from which to load the values.
+     */
+    private void getConfigValues(final Document doc) {
+        NodeList intValues = doc.getElementsByTagName("IntValue");
+        for (int i = 0; i < intValues.getLength(); i++) {
+            Node n = intValues.item(i);
+            String name = getStringAttributeValue(n, "name");
+            String value = getStringAttributeValue(n, "value");
+            try {
+                Integer v = Integer.parseInt(value);
+                mIntValues.put(name, v);
+            } catch (NumberFormatException e) {
+                Log.e("Configuration error. Illegal value for " + name, e);
+            }
+        }
     }
 
     /**
