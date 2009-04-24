@@ -898,6 +898,7 @@ public class TestPackage implements DeviceObserver {
             if ((mIsInBatchMode) && (mCurrentTest != null)) {
                 mCurrentTest.setResult(
                         new CtsTestResult(CtsTestResult.CODE_TIMEOUT, null, null));
+                mCurrentTest = null;
             }
 
             Log.d("mTimeOutTimer timed out");
