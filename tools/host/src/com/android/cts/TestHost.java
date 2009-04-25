@@ -146,7 +146,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
                        TestPlanNotFoundException,
                        IllegalTestNameException,
                        InterruptedException, DeviceDisconnectedException,
-                       NoSuchAlgorithmException {
+                       NoSuchAlgorithmException, InvalidNameSpaceException,
+                       InvalidApkPathException {
 
         // step 1: add package
         if (!addPackage(pathName)) {
@@ -443,7 +444,9 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
     static private void runTest(final TestSession ts, final String deviceId,
             final String testFullName, final String javaPkgName, ActionType type) throws
             DeviceNotAvailableException, TestNotFoundException, IllegalTestNameException,
-            DeviceDisconnectedException {
+            DeviceDisconnectedException, InvalidNameSpaceException,
+            InvalidApkPathException {
+
         if (ts == null) {
             return;
         }
@@ -633,7 +636,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             throws IOException, DeviceNotAvailableException,
             TestNotFoundException, SAXException, ParserConfigurationException,
             TestPlanNotFoundException, IllegalTestNameException,
-            DeviceDisconnectedException, NoSuchAlgorithmException {
+            DeviceDisconnectedException, NoSuchAlgorithmException,
+            InvalidNameSpaceException, InvalidApkPathException {
 
         TestSession ts = createSession(testPlanName);
         if ((javaPkgName != null) && (javaPkgName.length() != 0)) {
@@ -659,7 +663,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             final String testFullName, final String javaPkgName, ActionType type)
             throws DeviceNotAvailableException,
             TestNotFoundException, IllegalTestNameException,
-            DeviceDisconnectedException {
+            DeviceDisconnectedException, InvalidNameSpaceException,
+            InvalidApkPathException {
 
         runTest(ts, deviceId, testFullName, javaPkgName, type);
         ts.getSessionLog().sessionComplete();
