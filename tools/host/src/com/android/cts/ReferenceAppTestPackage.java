@@ -77,10 +77,10 @@ public class ReferenceAppTestPackage extends TestPackage {
      */
     @Override
     public void run(final TestDevice device, final String javaPkgName,
-                    TestSessionLog testSessionLog) throws DeviceDisconnectedException,
-                    InvalidApkPathException, InvalidNameSpaceException {
+                    TestSessionLog testSessionLog) throws DeviceDisconnectedException {
         Test test = getTests().iterator().next();
         if ((test != null) && (test.getResult().isNotExecuted())) {
+
             String appToTestApkPath =
                 HostConfig.getInstance().getCaseRepository().getApkPath(apkToTestName);
 
@@ -92,8 +92,8 @@ public class ReferenceAppTestPackage extends TestPackage {
             device.waitForCommandFinish();
 
             // Install the Reference App Tests
-            String testApkPath = HostConfig.getInstance().getCaseRepository()
-                    .getApkPath(getAppBinaryName());
+            String testApkPath =
+                HostConfig.getInstance().getCaseRepository().getApkPath(getAppBinaryName());
             device.installAPK(testApkPath);
             device.waitForCommandFinish();
 
