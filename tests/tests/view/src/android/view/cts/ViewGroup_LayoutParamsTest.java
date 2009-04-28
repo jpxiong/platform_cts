@@ -92,8 +92,8 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
                 com.android.internal.R.styleable.ViewGroup_Layout_layout_width,
                 com.android.internal.R.styleable.ViewGroup_Layout_layout_height);
         array.recycle();
-        assertEquals(213, mockLayoutParams.width);
-        assertEquals(319, mockLayoutParams.height);
+        assertEquals(200, mockLayoutParams.width);
+        assertEquals(300, mockLayoutParams.height);
 
         try {
             mockLayoutParams.setBaseAttributes(null,
