@@ -19,8 +19,9 @@ package com.android.cts;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Interact with user to select from optional items.
@@ -55,7 +56,7 @@ abstract public class Selector {
         ACCEPT, REJECT, MORE
     }
 
-    public Collection<String> mRecords;
+    public List<String> mRecords;
 
     public String mHdr;
     public String mTail;
@@ -63,8 +64,9 @@ abstract public class Selector {
 
     public BufferedReader mBufferedReader;
 
-    public Selector(String type, Collection<String> records) {
+    public Selector(String type, List<String> records) {
         mRecords = records;
+        Collections.sort(mRecords);
         mBufferedReader = null;
         mType = type;
 
@@ -172,7 +174,7 @@ abstract public class Selector {
 class PlanBuilder extends Selector{
     private SuiteSelector mSuiteSelector;
 
-    public PlanBuilder(Collection<String> records) {
+    public PlanBuilder(List<String> records) {
         super(PACKAGE_SELECTOR, records);
     }
 
@@ -190,7 +192,7 @@ class PlanBuilder extends Selector{
             if (select == Selection.ACCEPT) {
                 packages.put(javaPkgName, null);
             } else if (select == Selection.MORE) {
-                Collection<String> suiteNames = testPackage.getAllTestSuiteNames();
+                List<String> suiteNames = testPackage.getAllTestSuiteNames();
                 mSuiteSelector = new SuiteSelector(suiteNames, testPackage);
 
                 if (mBufferedReader != null) {
@@ -220,11 +222,11 @@ class PlanBuilder extends Selector{
      * Suite selector.
      *
      */
-    class SuiteSelector extends Selector{
+    class SuiteSelector extends Selector {
         private TestCaseSelector mCaseSelector;
         private TestPackage mTestPackage;
 
-        public SuiteSelector(Collection<String> suites, TestPackage testPackage) {
+        public SuiteSelector(List<String> suites, TestPackage testPackage) {
             super(SUITE_SELECTOR, suites);
             mTestPackage = testPackage;
         }
@@ -244,7 +246,7 @@ class PlanBuilder extends Selector{
                     if (select == Selection.REJECT) {
                         excludedTestSuites.add(suiteName);
                     } else if (select == Selection.MORE) {
-                        Collection<String> testCaseNames =
+                        List<String> testCaseNames =
                             mTestPackage.getAllTestCaseNames(suiteName);
                         mCaseSelector = new TestCaseSelector(testCaseNames, mTestPackage);
 
@@ -272,11 +274,11 @@ class PlanBuilder extends Selector{
     /**
      * TestCase selector.
      */
-    class TestCaseSelector extends Selector{
+    class TestCaseSelector extends Selector {
         private TestSelector mTestSelector;
         private TestPackage mTestPackage;
 
-        public TestCaseSelector(Collection<String> testCases, TestPackage testPackage) {
+        public TestCaseSelector(List<String> testCases, TestPackage testPackage) {
             super(CASE_SELECTOR, testCases);
             mTestPackage = testPackage;
         }
@@ -296,7 +298,7 @@ class PlanBuilder extends Selector{
                     if (select == Selection.REJECT) {
                         excludedTestCases.add(testCaseName);
                     } else if (select == Selection.MORE) {
-                        Collection<String> testNames = mTestPackage.getAllTestNames(testCaseName);
+                        List<String> testNames = mTestPackage.getAllTestNames(testCaseName);
                         mTestSelector = new TestSelector(testNames);
 
                         if (mBufferedReader != null) {
@@ -321,8 +323,8 @@ class PlanBuilder extends Selector{
      * Test selector.
      *
      */
-    class TestSelector extends Selector{
-        public TestSelector(Collection<String> records) {
+    class TestSelector extends Selector {
+        public TestSelector(List<String> records) {
             super(TEST_SELECTOR, records);
         }
 
