@@ -30,6 +30,7 @@ public class InvalidApkPathException extends Exception {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getMessage() {
         return "Invalid APK path: " + mPath;
     }

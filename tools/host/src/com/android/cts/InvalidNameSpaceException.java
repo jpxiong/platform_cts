@@ -30,6 +30,7 @@ public class InvalidNameSpaceException extends Exception {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getMessage() {
         return "Invalid namespace: " + mNamespace;
     }

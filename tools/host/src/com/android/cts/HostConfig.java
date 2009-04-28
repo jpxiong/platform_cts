@@ -62,11 +62,6 @@ public class HostConfig extends XMLResourceHandler {
     static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
                                                   "logo.gif", "newrule-green.png"};
 
-    static final String MAX_TEST_COUNT_NAME = "maxTestCount";
-    static final String TEST_STATUS_TIMEOUT_MS = "testStatusTimeoutMs";
-    static final String BATCH_START_TIMEOUT_MS = "batchStartTimeoutMs";
-    static final String INDIVIDUAL_START_TIMEOUT_MS = "individualStartTimeoutMs";
-    
     private String mConfigRoot;
     private CaseRepository mCaseRepos;
     private Repository mResultRepos;
@@ -75,26 +70,40 @@ public class HostConfig extends XMLResourceHandler {
     // key: app package name
     // value: TestPackage
     private HashMap<String, TestPackage> mTestPackageMap;
-    private HashMap<String, Integer> mIntValues;
-
-    private void setDefaultConfigValues() {
-        mIntValues = new HashMap<String, Integer>();
-        
-        // Number of tests executed between reboots. A value <= 0 disables reboots.
-        mIntValues.put(MAX_TEST_COUNT_NAME, 200);
-        // Max time [ms] between test status updates for both individual and batch mode.
-        mIntValues.put(TEST_STATUS_TIMEOUT_MS, 5 * 60 * 1000);
-        // Max time [ms] from start of package in batch mode and the first test status update.
-        mIntValues.put(BATCH_START_TIMEOUT_MS, 30 * 60 * 1000);
-        // Max time [ms] from start of test in individual mode to the first test status update.
-        mIntValues.put(INDIVIDUAL_START_TIMEOUT_MS, 5 * 60 * 1000);
-    }
     
+    enum Ints {
+        // Number of tests executed between reboots. A value <= 0 disables reboots.
+        maxTestCount (200),
+        // Max time [ms] between test status updates for both individual and batch mode.
+        testStatusTimeoutMs (5 * 60 * 1000),
+        // Max time [ms] from start of package in batch mode and the first test status update.
+        batchStartTimeoutMs (30 * 60 * 1000),
+        // Max time [ms] from start of test in individual mode to the first test status update.
+        individualStartTimeoutMs (5 * 60 * 1000),
+        // Timeout [ms] for the signature check
+        signatureTestTimeoutMs (10 * 60 * 1000),
+        // Timeout [ms] for package installations
+        packageInstallTimeoutMs (2 * 60 * 1000);
+        
+        private int value;
+        
+        Ints(int value) {
+            this.value = value;
+        }
+        
+        int value() {
+            return value;
+        }
+        
+        void setValue(int value) {
+            this.value = value;
+        }
+    }
+
     private final static HostConfig sInstance = new HostConfig();
 
     private HostConfig() {
         mTestPackageMap = new HashMap<String, TestPackage>();
-        setDefaultConfigValues();
     }
 
     public static HostConfig getInstance() {
@@ -106,24 +115,9 @@ public class HostConfig extends XMLResourceHandler {
      * that reboots should not be used.
      */
     public static int getMaxTestCount() {
-        return sInstance.mIntValues.get(MAX_TEST_COUNT_NAME);
+        return Ints.maxTestCount.value();
     }
     
-    /**
-     * Get the integer configuration value with the given name.
-     * 
-     * @param name The name of the value to read.
-     * @return The value, if it exists, otherwise 0.
-     */
-    public static int getIntValue(String name) {
-        Integer value = sInstance.mIntValues.get(name);
-        if (value == null) {
-            Log.e("Unknown config value read: " + name, null);
-            return 0;
-        }
-        return value;
-    }
-
     /**
      * Load configuration.
      *
@@ -321,9 +315,11 @@ public class HostConfig extends XMLResourceHandler {
             String value = getStringAttributeValue(n, "value");
             try {
                 Integer v = Integer.parseInt(value);
-                mIntValues.put(name, v);
+                Ints.valueOf(name).setValue(v);
             } catch (NumberFormatException e) {
                 Log.e("Configuration error. Illegal value for " + name, e);
+            } catch (IllegalArgumentException e) {
+                Log.e("Unknown configuration value " + name, e);
             }
         }
     }

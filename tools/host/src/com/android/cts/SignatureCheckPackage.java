@@ -83,12 +83,13 @@ public class SignatureCheckPackage extends TestPackage {
             if (result != null) {
                 StringBuffer formattedResult = new StringBuffer();
                 int resultCode = processSignatureResult(result, formattedResult);
+
+                String resultStr = formattedResult.toString();
                 if (resultCode == CtsTestResult.CODE_PASS) {
-                    test.setResult(new CtsTestResult(resultCode, null, null));
-                } else {
-                    test.setResult(new CtsTestResult(resultCode,
-                            formattedResult.toString(), null));
+                    resultStr = null;
                 }
+
+                test.setResult(new CtsTestResult(resultCode, resultStr, null));
             }
         }
     }
@@ -143,7 +144,8 @@ public class SignatureCheckPackage extends TestPackage {
             + getAppPackageName() + "/" + getInstrumentationRunner();
         Log.d(commandStr);
 
-        device.startActionTimer(ACTION_CHECKAPI);
+        device.startActionTimer(ACTION_CHECKAPI,
+                HostConfig.Ints.signatureTestTimeoutMs.value());
         device.executeShellCommand(commandStr, new SignatureTestResultObserver(device));
     }
 
@@ -198,52 +200,56 @@ public class SignatureCheckPackage extends TestPackage {
         }
 
         String result = resMap.get("result");
-        if ((result != null) && (result.equals("true"))) {
+        if (result == null) {
+            CUIOutputStream.println("API Check TIMEOUT.");
+            return CtsTestResult.CODE_TIMEOUT;
+        }
+
+        if (result.equals("true")) {
             CUIOutputStream.println("API Check PASS.");
             return CtsTestResult.CODE_PASS;
-        } else {
-            CUIOutputStream.println("API Check FAIL!");
-            if (result != null) {
-                for (String key : resMap.keySet()) {
-                    if (key.equals("result")) {
-                        // ignore the result string
-                        continue;
-                    }
+        }
 
-                    String resStr = resMap.get(key);
-                    String leadingSpace = "      ";
-                    if ((resStr != null) && (resStr.length() > 2)) {
-                        formattedResult.append(key +":\n");
-                        if (MISMATCH_CLASS_SIGNATURE.equals(key)
-                                || MISMATCH_INTERFACE_SIGNATURE.equals(key)
-                                || MISMATCH_FIELD_SIGNATURE.equals(key)
-                                || MISSING_FIELD.equals(key)
-                                || MISSING_METHOD.equals(key)
-                                || MISMATCH_METHOD_SIGNATURE.equals(key)) {
-                            resStr = resStr.substring(1, resStr.length() - 1);
-                            String[] details = resStr.split("\\), ");
-                            for (String detail : details) {
-                                formattedResult.append(leadingSpace + detail + ")\n");
-                            }
-                            formattedResult.append("\n");
-                        } else if (MISSING_INTERFACE.equals(key)
-                                || MISSING_CLASS.equals(key)) {
-                            resStr = resStr.substring(1, resStr.length() - 1);
-                            String[] details = resStr.split(", ");
-                            for (String detail : details) {
-                                formattedResult.append(leadingSpace + detail + "\n");
-                            }
-                            formattedResult.append("\n");
-                        } else if (CAUGHT_EXCEPTION.equals(key)) {
-                            resStr = resStr.substring(1, resStr.length() - 1);
-                            formattedResult.append(resStr);
-                            formattedResult.append("\n");
-                        }
+        CUIOutputStream.println("API Check FAIL!");
+        final String leadingSpace = "      ";
+        for (String key : resMap.keySet()) {
+            if (key.equals("result")) {
+                // ignore the result string
+                continue;
+            }
+
+            String resStr = resMap.get(key);
+            if ((resStr != null) && (resStr.length() > 2)) {
+                formattedResult.append(key +":\n");
+                if (MISMATCH_CLASS_SIGNATURE.equals(key)
+                        || MISMATCH_INTERFACE_SIGNATURE.equals(key)
+                        || MISMATCH_FIELD_SIGNATURE.equals(key)
+                        || MISSING_FIELD.equals(key)
+                        || MISSING_METHOD.equals(key)
+                        || MISMATCH_METHOD_SIGNATURE.equals(key)) {
+                    resStr = resStr.substring(1, resStr.length() - 1);
+                    String[] details = resStr.split("\\), ");
+                    for (String detail : details) {
+                        formattedResult.append(leadingSpace + detail + ")\n");
                     }
+                    formattedResult.append("\n");
+                } else if (MISSING_INTERFACE.equals(key)
+                        || MISSING_CLASS.equals(key)) {
+                    resStr = resStr.substring(1, resStr.length() - 1);
+                    String[] details = resStr.split(", ");
+                    for (String detail : details) {
+                        formattedResult.append(leadingSpace + detail + "\n");
+                    }
+                    formattedResult.append("\n");
+                } else if (CAUGHT_EXCEPTION.equals(key)) {
+                    resStr = resStr.substring(1, resStr.length() - 1);
+                    formattedResult.append(resStr);
+                    formattedResult.append("\n");
                 }
             }
-            return CtsTestResult.CODE_FAIL;
         }
+
+        return CtsTestResult.CODE_FAIL;
     }
 }
 
