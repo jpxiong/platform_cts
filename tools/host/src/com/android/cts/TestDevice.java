@@ -1409,8 +1409,9 @@ public class TestDevice implements DeviceObserver {
                             CtsTestResult.CODE_FAIL, mFailedMsg, mStackTrace));
                     break;
                 }
-                mTestPackage.notifyTestStatus(mTest, status);
             }
+            // report status even if no matching test was found
+            mTestPackage.notifyTestStatus(mTest, status);
         }
 
         /**
