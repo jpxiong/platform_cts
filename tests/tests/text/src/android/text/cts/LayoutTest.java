@@ -29,9 +29,10 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.Layout.Alignment;
 import android.text.style.StrikethroughSpan;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Layout.class)
@@ -54,8 +55,7 @@ public class LayoutTest extends AndroidTestCase {
         super.setUp();
         mTextPaint = new TextPaint();
         mSpannedText = new SpannableString(LAYOUT_TEXT);
-        mSpannedText.setSpan(new StrikethroughSpan(), 0, 1,
-                Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        mSpannedText.setSpan(new StrikethroughSpan(), 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         mWidth = 11;
         mAlign = Alignment.ALIGN_CENTER;
         mSpacingmult = 1;
@@ -64,7 +64,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link Layout}",
         method = "Layout",
         args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
                 android.text.Layout.Alignment.class, float.class, float.class}
@@ -83,7 +82,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#draw(Canvas)}",
         method = "draw",
         args = {android.graphics.Canvas.class}
     )
@@ -103,7 +101,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#draw(Canvas, Path, Paint, int)}",
         method = "draw",
         args = {android.graphics.Canvas.class, android.graphics.Path.class,
                 android.graphics.Paint.class, int.class}
@@ -132,7 +129,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getText()}",
         method = "getText",
         args = {}
     )
@@ -148,7 +144,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getPaint()}",
         method = "getPaint",
         args = {}
     )
@@ -164,7 +159,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getWidth()}",
         method = "getWidth",
         args = {}
     )
@@ -179,7 +173,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getEllipsizedWidth()}",
         method = "getEllipsizedWidth",
         args = {}
     )
@@ -194,7 +187,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#increaseWidthTo(int)}",
         method = "increaseWidthTo",
         args = {int.class}
     )
@@ -220,7 +212,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getHeight}",
         method = "getHeight",
         args = {}
     )
@@ -232,7 +223,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getAlignment}",
         method = "getAlignment",
         args = {}
     )
@@ -247,7 +237,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getSpacingMultiplier}",
         method = "getSpacingMultiplier",
         args = {}
     )
@@ -261,7 +250,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getSpacingAdd}",
         method = "getSpacingAdd",
         args = {}
     )
@@ -275,7 +263,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineBounds(int, Rect)}",
         method = "getLineBounds",
         args = {int.class, android.graphics.Rect.class}
     )
@@ -293,7 +280,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getPrimaryHorizontal(int)}",
         method = "getPrimaryHorizontal",
         args = {int.class}
     )
@@ -311,7 +297,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getSecondaryHorizontal(int)}",
         method = "getSecondaryHorizontal",
         args = {int.class}
     )
@@ -329,7 +314,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineLeft(int)}",
         method = "getLineLeft",
         args = {int.class}
     )
@@ -343,7 +327,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineRight(int)}",
         method = "getLineRight",
         args = {int.class}
     )
@@ -357,7 +340,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineMax(int)}",
         method = "getLineMax",
         args = {int.class}
     )
@@ -371,7 +353,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineWidth(int)}",
         method = "getLineWidth",
         args = {int.class}
     )
@@ -385,7 +366,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineForVertical(int)}",
         method = "getLineForVertical",
         args = {int.class}
     )
@@ -400,7 +380,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineForOffset(int)}",
         method = "getLineForOffset",
         args = {int.class}
     )
@@ -415,7 +394,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getOffsetForHorizontal(int, float)}",
         method = "getOffsetForHorizontal",
         args = {int.class, float.class}
     )
@@ -433,7 +411,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineEnd(int)}",
         method = "getLineEnd",
         args = {int.class}
     )
@@ -445,7 +422,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineVisibleEnd(int)}",
         method = "getLineVisibleEnd",
         args = {int.class}
     )
@@ -467,7 +443,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineBottom(int)}",
         method = "getLineBottom",
         args = {int.class}
     )
@@ -479,7 +454,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineBaseline(int)}",
         method = "getLineBaseline",
         args = {int.class}
     )
@@ -491,7 +465,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getLineAscent(int)}",
         method = "getLineAscent",
         args = {int.class}
     )
@@ -503,7 +476,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getOffsetToLeftOf(int)}",
         method = "getOffsetToLeftOf",
         args = {int.class}
     )
@@ -521,7 +493,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getOffsetToRightOf(int)}",
         method = "getOffsetToRightOf",
         args = {int.class}
     )
@@ -539,7 +510,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getCursorPath(int, Path, CharSequence)}",
         method = "getCursorPath",
         args = {int.class, android.graphics.Path.class, java.lang.CharSequence.class}
     )
@@ -557,7 +527,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getSelectionPath(int, int, Path)}",
         method = "getSelectionPath",
         args = {int.class, int.class, android.graphics.Path.class}
     )
@@ -585,7 +554,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getParagraphAlignment(int)}",
         method = "getParagraphAlignment",
         args = {int.class}
     )
@@ -602,7 +570,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getParagraphLeft(int)}",
         method = "getParagraphLeft",
         args = {int.class}
     )
@@ -614,7 +581,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#getParagraphRight(int)}",
         method = "getParagraphRight",
         args = {int.class}
     )
@@ -626,7 +592,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Layout#isSpanned}",
         method = "isSpanned",
         args = {}
     )
@@ -640,6 +605,44 @@ public class LayoutTest extends AndroidTestCase {
         layout = new MockLayout(mSpannedText, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertTrue(layout.mockIsSpanned());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getDesiredWidth",
+        args = {java.lang.CharSequence.class, int.class, int.class, android.text.TextPaint.class}
+    )
+    public void testGetDesiredWidthRange() {
+        CharSequence textShort = "test";
+        CharSequence textLonger = "test\ngetDesiredWidth";
+        CharSequence textLongest = "test getDesiredWidth";
+        TextPaint paint = new TextPaint();
+        float widthShort = Layout.getDesiredWidth(textShort, 0, textShort.length(), paint);
+        float widthLonger = Layout.getDesiredWidth(textLonger, 0, textLonger.length(), paint);
+        float widthLongest = Layout.getDesiredWidth(textLongest, 0, textLongest.length(), paint);
+        float widthPartShort = Layout.getDesiredWidth(textShort, 2, textShort.length(), paint);
+        float widthZero = Layout.getDesiredWidth(textLonger, 5, textShort.length() - 3, paint);
+        assertTrue(widthLonger > widthShort);
+        assertTrue(widthLongest > widthLonger);
+        assertEquals(0f, widthZero);
+        assertTrue(widthShort > widthPartShort);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getDesiredWidth",
+        args = {java.lang.CharSequence.class, android.text.TextPaint.class}
+    )
+    public void testGetDesiredWidth() {
+        CharSequence textShort = "test";
+        CharSequence textLonger = "test\ngetDesiredWidth";
+        CharSequence textLongest = "test getDesiredWidth";
+        TextPaint paint = new TextPaint();
+        float widthShort = Layout.getDesiredWidth(textShort, paint);
+        float widthLonger = Layout.getDesiredWidth(textLonger, paint);
+        float widthLongest = Layout.getDesiredWidth(textLongest, paint);
+        assertTrue(widthLonger > widthShort);
+        assertTrue(widthLongest > widthLonger);
     }
 
     private final class MockLayout extends Layout {
