@@ -256,8 +256,6 @@ public class Test implements DeviceObserver {
      * running test.
      */
     class TimeOutTask extends TimerTask {
-        protected final static int DELAY = 60000;
-
         private Test mTest;
 
         public TimeOutTask(final Test testResult) {
@@ -322,7 +320,8 @@ public class Test implements DeviceObserver {
 
         mTestStop = false;
         mDevice = device;
-        mTimeOutTimer = new HostTimer(new TimeOutTask(this), TimeOutTask.DELAY);
+        mTimeOutTimer = new HostTimer(new TimeOutTask(this),
+                HostConfig.getIntValue(HostConfig.INDIVIDUAL_START_TIMEOUT_MS));
         mTimeOutTimer.start();
         mProgressObserver = new ProgressObserver();
         mProgressObserver.start();

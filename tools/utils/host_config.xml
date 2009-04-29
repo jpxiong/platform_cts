@@ -23,4 +23,14 @@
         <!-- Specific OEM test result directory (optional) -->
         <TestResult path="results" />
     </Repository>
+
+    <!-- Number of tests executed between reboots. A value <= 0 disables reboots. -->
+    <IntValue name="maxTestCount" value="200" />
+
+    <!-- Max time [ms] between test status updates. -->
+    <IntValue name="testStatusTimeoutMs" value="60000" />
+    <!-- Max time [ms] from start of package in batch mode and the first test status update. -->
+    <IntValue name="batchStartTimeoutMs" value="1800000" />
+    <!-- Max time [ms] from start of test in individual mode to the first test status update. -->
+    <IntValue name="individualStartTimeoutMs" value="300000" />
 </HostConfiguration>
