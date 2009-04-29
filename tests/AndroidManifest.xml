@@ -639,6 +639,16 @@
             </intent-filter>
         </activity>
 
+        <service android:name="android.os.cts.EmptyService"
+            android:process=":remote">
+            <intent-filter>
+                <action
+                    android:name="android.os.cts.IEmptyService" />
+                <action
+                    android:name="android.os.REMOTESERVICE" />
+            </intent-filter>
+        </service>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
