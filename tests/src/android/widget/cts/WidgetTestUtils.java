@@ -16,7 +16,12 @@
 
 package android.widget.cts;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import android.graphics.Bitmap;
+
+import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -57,6 +62,31 @@ public class WidgetTestUtils {
             if (pixels1[i] != pixels2[i]) {
                 Assert.fail("the bitmaps are not equal");
             }
+        }
+    }
+
+    /**
+     * Find beginning of the special element.
+     * @param parser XmlPullParser will be parsed.
+     * @param firstElementName the target element name.
+     *
+     * @throws XmlPullParserException if XML Pull Parser related faults occur.
+     * @throws IOException if I/O-related error occur when parsing.
+     */
+    public static final void beginDocument(XmlPullParser parser, String firstElementName)
+            throws XmlPullParserException, IOException {
+        Assert.assertNotNull(parser);
+        Assert.assertNotNull(firstElementName);
+
+        int type;
+        while ((type = parser.next()) != XmlPullParser.START_TAG
+                && type != XmlPullParser.END_DOCUMENT) {
+            ;
+        }
+
+        if (!parser.getName().equals(firstElementName)) {
+            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName()
+                    + ", expected " + firstElementName);
         }
     }
 }
