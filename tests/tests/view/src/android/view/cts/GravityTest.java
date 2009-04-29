@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link Gravity}.
@@ -63,6 +64,8 @@ public class GravityTest extends AndroidTestCase {
                     int.class, android.graphics.Rect.class}
         )
     })
+    @ToBeFixed(bug = "1695243", explanation = "Incorrect javadoc for apply. FILL gravities also" +
+            "respect the adjustment parameters.")
     public void testApply() {
         mInRect = new Rect(10, 20, 30, 40);
         Gravity.apply(Gravity.TOP, 2, 3, mInRect, mOutRect);
@@ -128,8 +131,8 @@ public class GravityTest extends AndroidTestCase {
         Gravity.apply(Gravity.FILL_VERTICAL, 2, 10, mInRect, 5, 5, mOutRect);
         assertEquals(24, mOutRect.left);
         assertEquals(26, mOutRect.right);
-        assertEquals(20, mOutRect.top);
-        assertEquals(40, mOutRect.bottom);
+        assertEquals(25, mOutRect.top);
+        assertEquals(45, mOutRect.bottom);
 
         Gravity.apply(Gravity.CENTER_HORIZONTAL, 2, 10, mInRect, mOutRect);
         assertEquals(19, mOutRect.left);
@@ -148,8 +151,8 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
         Gravity.apply(Gravity.FILL_HORIZONTAL, 2, 10, mInRect, 5, 5, mOutRect);
-        assertEquals(10, mOutRect.left);
-        assertEquals(30, mOutRect.right);
+        assertEquals(15, mOutRect.left);
+        assertEquals(35, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
     }
