@@ -142,10 +142,11 @@ public class TestDevice implements DeviceObserver {
     /**
      * get the information of this device
      *
-     * @return information of this device
+     * @return information of this device.
      */
     public DeviceParameterCollector getDeviceInfo()
-                throws DeviceDisconnectedException {
+                throws DeviceDisconnectedException, InvalidNameSpaceException,
+                InvalidApkPathException {
         if (mDeviceInfo.size() == 0) {
             logServiceThread = new LogServiceThread();
             logServiceThread.start();
@@ -243,7 +244,8 @@ public class TestDevice implements DeviceObserver {
     /**
      * Run device information collector apk to got the device info.
      */
-    private void genDeviceInfo() throws DeviceDisconnectedException {
+    private void genDeviceInfo() throws DeviceDisconnectedException,
+                InvalidNameSpaceException, InvalidApkPathException {
         String apkName = "DeviceInfoCollector";
 
         String apkPath = HostConfig.getInstance().getCaseRepository().getApkPath(apkName);
@@ -273,7 +275,6 @@ public class TestDevice implements DeviceObserver {
         uninstallAPK(GET_INFO_APP_PACKAGE_NAME);
         waitForCommandFinish();
         Log.d("uninstall device information collector successfully");
-
         mDeviceObserver = tmpDeviceObserver;
     }
 
@@ -816,9 +817,10 @@ public class TestDevice implements DeviceObserver {
      *
      * @param apkPath Name of the package to be installed.
      */
-    public void installAPK(final String apkPath) throws DeviceDisconnectedException {
+    public void installAPK(final String apkPath) throws DeviceDisconnectedException,
+                InvalidApkPathException {
         if ((apkPath == null) || (apkPath.length() == 0) || (!HostUtils.isFileExist(apkPath))) {
-            return;
+            throw new InvalidApkPathException(apkPath);
         }
 
         // Use re-install directly
@@ -874,9 +876,10 @@ public class TestDevice implements DeviceObserver {
      *
      * @param packageName The package to be un-installed.
      */
-    public void uninstallAPK(String packageName) throws DeviceDisconnectedException {
-        if (packageName == null) {
-            return;
+    public void uninstallAPK(String packageName) throws DeviceDisconnectedException,
+                InvalidNameSpaceException {
+        if ((packageName == null) || (packageName.length() == 0)) {
+            throw new InvalidNameSpaceException(packageName);
         }
 
         uninstallAPKImpl(packageName, mUninstallObserver);
