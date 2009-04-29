@@ -631,6 +631,14 @@
         <activity android:name="android.app.cts.ListActivityTestHelper"
             android:label="ListActivityTestHelper" />
 
+        <activity android:name="android.app.cts.KeyguardManagerActivity"
+            android:label="KeyguardManagerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
