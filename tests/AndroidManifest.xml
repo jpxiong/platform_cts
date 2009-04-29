@@ -618,6 +618,16 @@
             </intent-filter>
         </activity>
 
+        <service android:name="android.app.cts.StubRemoteService"
+            android:process=":remote">
+            <intent-filter>
+                <action
+                    android:name="android.app.cts.ISecondary" />
+                <action
+                    android:name="android.app.REMOTESERVICE" />
+            </intent-filter>
+        </service>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
