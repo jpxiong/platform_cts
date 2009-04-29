@@ -583,6 +583,41 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.app.cts.ActivityManagerStubFooActivity"
+            android:label="ActivityManagerStubFooActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.app.cts.ActivityManagerRecentOneActivity"
+            android:label="ActivityManagerRecentOneActivity"
+            android:allowTaskReparenting="true"
+            android:taskAffinity="android.app.cts.recentOne">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.app.cts.ActivityManagerRecentTwoActivity"
+            android:label="ActivityManagerRecentTwoActivity"
+            android:allowTaskReparenting="true"
+            android:taskAffinity="android.app.cts.recentTwo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.app.cts.ActivityManagerStubCrashActivity"
+            android:label="ActivityManagerStubCrashActivity"
+            android:multiprocess="true"
+            android:process=":ActivityManagerStubCrashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
