@@ -477,6 +477,22 @@
         <activity android:name="android.app.cts.LocalActivityManagerTestHelper"
             android:label="LocalActivityManagerTestHelper" />
 
+        <activity android:name="android.app.cts.LaunchpadTabActivity" android:multiprocess="true">
+        </activity>
+
+        <activity android:name="android.app.cts.LocalActivity" android:multiprocess="true">
+            <meta-data android:name="android.app.cts.string" android:value="foo" />
+            <meta-data android:name="android.app.cts.boolean" android:value="true" />
+            <meta-data android:name="android.app.cts.integer" android:value="100" />
+            <meta-data android:name="android.app.cts.color" android:value="#ff000000" />
+            <meta-data android:name="android.app.cts.float" android:value="100.1" />
+            <meta-data android:name="android.app.cts.reference" android:resource="@xml/metadata" />
+        </activity>
+
+        <activity android:name="android.app.cts.TestedActivity"
+                android:process=":remoteActivity">
+        </activity>
+
     </application>
 
 </manifest>
