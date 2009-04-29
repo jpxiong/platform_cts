@@ -67,7 +67,6 @@ public class TestPackage implements DeviceObserver {
 
     protected boolean mTestStop;
     private TestSessionThread mTestThread;
-    private boolean mEnableBatchMode = true;
 
     private HostTimer mTimeOutTimer;
     private ProgressObserver mProgressObserver;
@@ -763,8 +762,15 @@ public class TestPackage implements DeviceObserver {
      * @return If each test under this package doesn't depend on any host controller, return true;
      *         else, return false;
      */
-    private boolean isInBatchMode() {
-        for (Test test : getTests()) {
+    private boolean supportsBatchMode() {
+        Collection<Test> tests = getTests();
+        
+        // check whether the package is small enough for batch mode
+        if (tests.size() > HostConfig.Ints.maxTestsInBatchMode.value()) {
+            return false;
+        }
+        
+        for (Test test : tests) {
             if (!test.getResult().isNotExecuted()) {
                 // if any test has been run, use individual mode
                 return false;
@@ -971,7 +977,7 @@ public class TestPackage implements DeviceObserver {
                 setMessageDigest(genMessageDigest(HostConfig.getInstance()
                         .getCaseRepository().getApkPath(getAppBinaryName())));
 
-                if ((mEnableBatchMode) && isInBatchMode()) {
+                if (supportsBatchMode()) {
                     mIsInBatchMode = true;
                     Log.d("run in batch mode...");
                     runInBatchMode(javaPkgName);
