@@ -28,44 +28,33 @@ import android.graphics.Typeface;
 import android.graphics.Xfermode;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Cap;
-import android.graphics.Paint.FontMetrics;
-import android.graphics.Paint.FontMetricsInt;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Paint.class)
 public class PaintTest extends AndroidTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Paint.",
             method = "Paint",
             args = {android.graphics.Paint.class}
         )
@@ -81,7 +70,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "breakText",
         args = {char[].class, int.class, int.class, float.class, float[].class}
     )
@@ -135,20 +123,21 @@ public class PaintTest extends AndroidTestCase {
             p.breakText(chars, 0, 8, 60.0f, null);
             fail("Should throw an ArrayIndexOutOfboundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
+            //except here
         }
         try {
             p.breakText(chars, -1, 7, 50.0f, null);
             fail("Should throw an ArrayIndexOutOfboundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
+            //except here
         }
 
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "breakText",
-        args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class, 
+        args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class,
                 float[].class}
     )
     public void testBreakText2() {
@@ -206,28 +195,31 @@ public class PaintTest extends AndroidTestCase {
             p.breakText(string, 0, 8, true, 60.0f, null);
             fail("Should throw an StringIndexOutOfboundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            //except here
         }
         try {
             p.breakText(string, -1, 7, true, 50.0f, null);
             fail("Should throw an StringIndexOutOfboundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            //except here
         }
         try {
             p.breakText(string, 1, -7, true, 50.0f, null);
             fail("Should throw an StringIndexOutOfboundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            //except here
         }
         try {
             p.breakText(string, 7, 1, true, 50.0f, null);
             fail("Should throw an StringIndexOutOfboundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            //except here
         }
 
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "breakText",
         args = {java.lang.String.class, boolean.class, float.class, float[].class}
     )
@@ -295,7 +287,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test set(Paint src).",
         method = "set",
         args = {android.graphics.Paint.class}
     )
@@ -364,13 +355,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeCap.",
             method = "setStrokeCap",
             args = {android.graphics.Paint.Cap.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeCap.",
             method = "getStrokeCap",
             args = {}
         )
@@ -391,19 +380,18 @@ public class PaintTest extends AndroidTestCase {
             p.setStrokeCap(null);
             fail("Should throw an Exception");
         } catch (RuntimeException e) {
+            //except here
         }
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Xfermode.",
             method = "setXfermode",
             args = {android.graphics.Xfermode.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Xfermode.",
             method = "getXfermode",
             args = {}
         )
@@ -422,13 +410,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Shader.",
             method = "setShader",
             args = {android.graphics.Shader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Shader.",
             method = "getShader",
             args = {}
         )
@@ -447,13 +433,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setAntiAlias(boolean aa) & isAntiAlias().",
             method = "setAntiAlias",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setAntiAlias(boolean aa) & isAntiAlias().",
             method = "isAntiAlias",
             args = {}
         )
@@ -472,13 +456,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Typeface.",
             method = "setTypeface",
             args = {android.graphics.Typeface.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Typeface.",
             method = "getTypeface",
             args = {}
         )
@@ -503,13 +485,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get PathEffect.",
             method = "setPathEffect",
             args = {android.graphics.PathEffect.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get PathEffect.",
             method = "getPathEffect",
             args = {}
         )
@@ -528,13 +508,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setFakeBoldText(boolean fakeBoldText) & isFakeBoldText().",
             method = "setFakeBoldText",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setFakeBoldText(boolean fakeBoldText) & isFakeBoldText().",
             method = "isFakeBoldText",
             args = {}
         )
@@ -552,13 +530,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeJoin.",
             method = "setStrokeJoin",
             args = {android.graphics.Paint.Join.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeJoin.",
             method = "getStrokeJoin",
             args = {}
         )
@@ -579,19 +555,18 @@ public class PaintTest extends AndroidTestCase {
             p.setStrokeJoin(null);
             fail("Should throw an Exception");
         } catch (RuntimeException e) {
+            //except here
         }
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Style.",
             method = "setStyle",
             args = {android.graphics.Paint.Style.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Style.",
             method = "getStyle",
             args = {}
         )
@@ -612,12 +587,12 @@ public class PaintTest extends AndroidTestCase {
             p.setStyle(null);
             fail("Should throw an Exception");
         } catch (RuntimeException e) {
+            //except here
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFontSpacing().",
         method = "getFontSpacing",
         args = {}
     )
@@ -636,13 +611,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setSubpixelText() and isSubpixelText().",
             method = "isSubpixelText",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setSubpixelText() and isSubpixelText().",
             method = "setSubpixelText",
             args = {boolean.class}
         )
@@ -660,13 +633,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextScaleX.",
             method = "setTextScaleX",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextScaleX.",
             method = "getTextScaleX",
             args = {}
         )
@@ -688,13 +659,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get MaskFilter.",
             method = "setMaskFilter",
             args = {android.graphics.MaskFilter.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get MaskFilter.",
             method = "getMaskFilter",
             args = {}
         )
@@ -713,13 +682,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get ColorFilter.",
             method = "setColorFilter",
             args = {android.graphics.ColorFilter.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get ColorFilter.",
             method = "getColorFilter",
             args = {}
         )
@@ -738,13 +705,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Rasterizer.",
             method = "setRasterizer",
             args = {android.graphics.Rasterizer.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Rasterizer.",
             method = "getRasterizer",
             args = {}
         )
@@ -762,7 +727,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setARGB(int a, int r, int g, int b).",
         method = "setARGB",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -779,7 +743,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test ascent().",
         method = "ascent",
         args = {}
     )
@@ -810,13 +773,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextSkewX.",
             method = "setTextSkewX",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextSkewX.",
             method = "getTextSkewX",
             args = {}
         )
@@ -837,13 +798,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextSize.",
             method = "setTextSize",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get TextSize.",
             method = "getTextSize",
             args = {}
         )
@@ -869,11 +828,10 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextWidths(char[] text, int index, int count, float[] widths).",
         method = "getTextWidths",
         args = {char[].class, int.class, int.class, float[].class}
     )
-    public void testGetTextWidths1() {
+    public void testGetTextWidths1() throws Exception {
         Paint p = new Paint();
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
         float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
@@ -897,24 +855,21 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(chars, -1, 6, f);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(chars, 0, -1, f);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(chars, 1, 8, f);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         float[] f2 = new float[3];
@@ -922,18 +877,16 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(chars, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextWidths(CharSequence text, int start, int end, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.CharSequence.class, int.class, int.class, float[].class}
     )
-    public void testGetTextWidths2() {
+    public void testGetTextWidths2() throws Exception {
         Paint p = new Paint();
 
         // CharSequence of String
@@ -959,32 +912,27 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths((CharSequence) string, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
-
         try {
             p.getTextWidths((CharSequence) string, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths((CharSequence) string, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths((CharSequence) string, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         float[] f2 = new float[3];
@@ -992,10 +940,8 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths((CharSequence) string, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
-
         // CharSequence of SpannedString
         SpannedString spannedString = new SpannedString("HIJKLMN");
 
@@ -1017,40 +963,35 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(spannedString, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannedString, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannedString, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannedString, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannedString, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         // CharSequence of SpannableString
@@ -1074,40 +1015,35 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(spannableString, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableString, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableString, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableString, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableString, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         // CharSequence of SpannableStringBuilder (GraphicsOperations)
@@ -1131,40 +1067,35 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(spannableStringBuilder, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableStringBuilder, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableStringBuilder, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableStringBuilder, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(spannableStringBuilder, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         // CharSequence of StringBuilder
@@ -1188,47 +1119,41 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(stringBuilder, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(stringBuilder, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(stringBuilder, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(stringBuilder, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(stringBuilder, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextWidths(String text, int start, int end, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.String.class, int.class, int.class, float[].class}
     )
@@ -1256,51 +1181,44 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(string, -1, 6, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(string, 0, -1, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(string, 4, 3, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
 
         try {
             p.getTextWidths(string, 1, 8, f);
             fail("Should throw an IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
-
         float[] f2 = new float[3];
         try {
             p.getTextWidths(string, 0, 6, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextWidths(String text, float[] widths).",
         method = "getTextWidths",
         args = {java.lang.String.class, float[].class}
     )
-    public void testGetTextWidths4() {
+    public void testGetTextWidths4() throws Exception {
         Paint p = new Paint();
         String string = "HIJKLMN";
         float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
@@ -1324,21 +1242,18 @@ public class PaintTest extends AndroidTestCase {
             p.getTextWidths(string, f2);
             fail("Should throw an ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (Exception e) {
-            fail("Should throw an Exception");
+            //except here
         }
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setStrikeThruText & isStrikeThruText().",
             method = "isStrikeThruText",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setStrikeThruText & isStrikeThruText().",
             method = "setStrikeThruText",
             args = {boolean.class}
         )
@@ -1356,13 +1271,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setTextAlign",
             args = {android.graphics.Paint.Align.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getTextAlign",
             args = {}
         )
@@ -1382,7 +1295,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFillPath(Path src, Path dst).",
         method = "getFillPath",
         args = {android.graphics.Path.class, android.graphics.Path.class}
     )
@@ -1404,13 +1316,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Alpha.",
             method = "setAlpha",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Alpha.",
             method = "getAlpha",
             args = {}
         )
@@ -1436,13 +1346,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setFilterBitmap(boolean) & isFilterBitmap().",
             method = "isFilterBitmap",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setFilterBitmap(boolean) & isFilterBitmap().",
             method = "setFilterBitmap",
             args = {boolean.class}
         )
@@ -1460,13 +1368,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Color.",
             method = "setColor",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Color.",
             method = "getColor",
             args = {}
         )
@@ -1492,11 +1398,10 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextBounds(String text, int start, int end, Rect bounds).",
         method = "getTextBounds",
         args = {java.lang.String.class, int.class, int.class, android.graphics.Rect.class}
     )
-    public void testGetTextBounds1() {
+    public void testGetTextBounds1() throws Exception {
         Paint p = new Paint();
         Rect r = new Rect();
         String s = "HIJKLMN";
@@ -1511,29 +1416,25 @@ public class PaintTest extends AndroidTestCase {
         try {
             p.getTextBounds(s, 0, -2, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(s, 4, 3, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(s, 0, 8, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(s, 0, 2, null);
         } catch (NullPointerException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         p.getTextBounds(s, 0, 0, r);
@@ -1563,11 +1464,10 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextBounds(char[] text, int index, int count, Rect bounds).",
         method = "getTextBounds",
         args = {char[].class, int.class, int.class, android.graphics.Rect.class}
     )
-    public void testGetTextBounds2() {
+    public void testGetTextBounds2() throws Exception {
         Paint p = new Paint();
         Rect r = new Rect();
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
@@ -1575,43 +1475,37 @@ public class PaintTest extends AndroidTestCase {
         try {
             p.getTextBounds(chars, -1, 2, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(chars, 0, -2, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(chars, 4, 3, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         try {
             p.getTextBounds(chars, 0, 8, r);
         } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
-
         try {
             p.getTextBounds(chars, 0, 2, null);
         } catch (NullPointerException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
+            //except here
         }
 
         p.getTextBounds(chars, 0, 0, r);
         assertEquals(0, r.bottom);
         assertEquals(-1, r.left);
         assertEquals(0, r.right);
-        assertEquals(-1, r.top);
+        assertEquals(0, r.top);
 
         p.getTextBounds(chars, 0, 1, r);
         assertEquals(0, r.bottom);
@@ -1634,18 +1528,15 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setShadowLayer(float radius, float dx, float dy, int color).",
         method = "setShadowLayer",
         args = {float.class, float.class, float.class, int.class}
     )
-    @ToBeFixed(bug="", explanation="No getter")
     public void testSetShadowLayer() {
-        // No getter
+        new Paint().setShadowLayer(10, 1, 1, 0);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFontMetrics(FontMetrics metrics).",
         method = "getFontMetrics",
         args = {android.graphics.Paint.FontMetrics.class}
     )
@@ -1687,7 +1578,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFontMetrics().",
         method = "getFontMetrics",
         args = {}
     )
@@ -1724,13 +1614,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeMiter.",
             method = "setStrokeMiter",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeMiter.",
             method = "getStrokeMiter",
             args = {}
         )
@@ -1751,25 +1639,21 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test clearShadowLayer().",
         method = "clearShadowLayer",
         args = {}
     )
-    @ToBeFixed(bug="", explanation="No getter")
     public void testClearShadowLayer() {
-        // No getter
+        new Paint().clearShadowLayer();
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setUnderlineText(boolean underlineText) & isUnderlineText().",
             method = "setUnderlineText",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setUnderlineText(boolean underlineText) & isUnderlineText().",
             method = "isUnderlineText",
             args = {}
         )
@@ -1787,13 +1671,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setDither(boolean dither) & isDither.",
             method = "setDither",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setDither(boolean dither) & isDither.",
             method = "isDither",
             args = {}
         )
@@ -1810,7 +1692,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test descent().",
         method = "descent",
         args = {}
     )
@@ -1841,13 +1722,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Flags.",
             method = "setFlags",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Flags.",
             method = "getFlags",
             args = {}
         )
@@ -1865,13 +1744,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeWidth.",
             method = "setStrokeWidth",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get StrokeWidth.",
             method = "getStrokeWidth",
             args = {}
         )
@@ -1892,7 +1769,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test reset().",
         method = "reset",
         args = {}
     )
@@ -1939,13 +1815,11 @@ public class PaintTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setLinearText(boolean) & isLinearText().",
             method = "isLinearText",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setLinearText(boolean) & isLinearText().",
             method = "setLinearText",
             args = {boolean.class}
         )
@@ -1962,30 +1836,11 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test finalize().",
-        method = "finalize",
-        args = {}
-    )
-    public void testFinalize() throws Throwable {
-        MockPaint mp = new MockPaint();
-
-        try {
-            assertFalse(mp.mIsCalled);
-            mp.finalize();
-            assertTrue(mp.mIsCalled);
-        } catch (RuntimeException e) {
-            fail("Should not throw an Exception");
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getFontMetricsInt(FontMetricsInt fmi).",
         method = "getFontMetricsInt",
         args = {android.graphics.Paint.FontMetricsInt.class}
     )
     public void testGetFontMetricsInt1() {
-                Paint p = new Paint();
+        Paint p = new Paint();
         Paint.FontMetricsInt fmi = new Paint.FontMetricsInt();
 
         assertEquals(14, p.getFontMetricsInt(fmi));
@@ -2022,7 +1877,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFontMetricsInt().",
         method = "getFontMetricsInt",
         args = {}
     )
@@ -2057,7 +1911,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test measureText(char[] text, int index, int count).",
         method = "measureText",
         args = {char[].class, int.class, int.class}
     )
@@ -2113,7 +1966,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test measureText(String text, int start, int end).",
         method = "measureText",
         args = {java.lang.String.class, int.class, int.class}
     )
@@ -2173,7 +2025,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test measureText(String text).",
         method = "measureText",
         args = {java.lang.String.class}
     )
@@ -2226,7 +2077,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test measureText(CharSequence text, int start, int end).",
         method = "measureText",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
@@ -2488,9 +2338,8 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextPath(char[] text, int index, int count, float x, float y, Path path).",
         method = "getTextPath",
-        args = {char[].class, int.class, int.class, float.class, float.class, 
+        args = {char[].class, int.class, int.class, float.class, float.class,
                 android.graphics.Path.class}
     )
     public void testGetTextPath1() {
@@ -2524,9 +2373,8 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextPath(String text, int start, int end, float x, float y, Path path).",
         method = "getTextPath",
-        args = {java.lang.String.class, int.class, int.class, float.class, float.class, 
+        args = {java.lang.String.class, int.class, int.class, float.class, float.class,
                 android.graphics.Path.class}
     )
     public void testGetTextPath2() {
@@ -2560,19 +2408,6 @@ public class PaintTest extends AndroidTestCase {
             p.getTextPath(string, 3, 9, 0, 0, path);
             fail("Should throw an exception here");
         } catch (RuntimeException e) {
-        }
-    }
-
-    private class MockPaint extends Paint {
-        public boolean mIsCalled;
-        public MockPaint() {
-            super();
-            mIsCalled = false;
-        }
-
-        public void finalize() throws Throwable {
-            super.finalize();
-            mIsCalled = true;
         }
     }
 
