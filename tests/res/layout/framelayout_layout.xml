@@ -14,16 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/framelayout_container"
+                android:background="@drawable/red"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"
+                android:orientation="vertical">
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/content">
+    <FrameLayout
+        android:layout_width="200dip"
+        android:layout_height="200dip"
+        android:background="@drawable/yellow"
+        android:id="@+id/framelayout">
+    </FrameLayout>
 
-    <TextView android:id="@+id/view1"
-        android:background="@drawable/blue"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="@string/tabs_1"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/yellow"
+        android:id="@+id/framelayout_measureall">
 
-</FrameLayout>
+        <TextView android:id="@+id/framelayout_textview"
+            android:background="@drawable/blue"
+            android:layout_width="100dip"
+            android:layout_height="30dip"
+            android:text="@string/hello_world"/>
+
+        <Button android:id="@+id/framelayout_button"
+            android:layout_width="50dip"
+            android:layout_height="15dip"
+            android:text="@string/go"/>
+
+    </FrameLayout>
+
+</LinearLayout>
