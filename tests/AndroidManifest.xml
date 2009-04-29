@@ -63,8 +63,31 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
+    <!-- Used for PackageManager test, don't delete this INTERNET permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
     <uses-permission android:name="com.android.browser.permission.WRITE_HISTORY_BOOKMARKS" />
+
+    <!-- Used for PackageManager test, don't delete this permission-tree -->
+    <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
+                    android:label="Test Tree"/>
+
+    <!-- Used for PackageManager test, don't delete this permission-group -->
+    <permission-group android:name="android.permission-group.COST_MONEY"/>
+    <!-- Used for PackageManager test, don't delete! -->
+    <uses-configuration/>
 
     <application android:label="Android TestCase"
                 android:icon="@drawable/size_48x48" android:name="android.app.cts.MockApplication">
@@ -501,6 +524,44 @@
             </intent-filter>
         </activity>
 
+        <!--Test for PackageManager-->
+        <activity android:name="android.content.pm.cts.TestPmActivity"
+                android:icon="@drawable/start">
+            <intent-filter>
+                <action android:name="android.intent.action.PMTEST" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+            <meta-data android:name="android.content.pm.cts.xmltest" android:resource="@xml/pm_test" />
+        </activity>
+        <activity android:name="android.content.pm.cts.TestPmCompare">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.INFO" />
+            </intent-filter>
+        </activity>
+        <!--Test for PackageManager-->
+        <service android:name="android.content.pm.cts.TestPmService">
+            <intent-filter>
+                <action android:name="android.content.pm.cts.activity.PMTEST_SERVICE" />
+            </intent-filter>
+        </service>
+        <!--Test for PackageManager-->
+        <receiver android:name="android.content.pm.cts.PmTestReceiver">
+            <intent-filter>
+                <action android:name="android.content.pm.cts.PackageManagerTest.PMTEST_RECEIVER" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Used for PackageManager test, don't delete this MockContentProvider provider -->
+        <provider android:name="android.content.cts.MockContentProvider" android:authorities="ctstest"
+            android:multiprocess="false" />
+
     </application>
 
+    <!--Test for PackageManager, please put this at the very beginning-->
+    <instrumentation android:name="android.content.pm.cts.TestPmInstrumentation"
+        android:targetPackage="android"
+        android:label="PackageManager Instrumentation Test" />
+
 </manifest>
+
