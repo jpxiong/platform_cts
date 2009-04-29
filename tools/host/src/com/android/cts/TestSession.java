@@ -136,6 +136,15 @@ public class TestSession {
     }
 
     /**
+     * Get the test device.
+     *
+     * @return the test device.
+     */
+    public TestDevice getDevice() {
+        return mDevice;
+    }
+
+    /**
      * Get the number of required devices.
      *
      * @return The number of required devices.

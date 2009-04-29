@@ -1600,7 +1600,7 @@ public class TestDevice implements DeviceObserver {
                 CUIOutputStream.printPrompt();
             }
         }
-        mStatus = STATUS_OFFLINE;
+        setStatus(STATUS_OFFLINE);
         if (logServiceThread != null) {
             logServiceThread.cancelLogService();
         }
