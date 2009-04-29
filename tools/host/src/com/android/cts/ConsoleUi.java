@@ -518,6 +518,10 @@ public class ConsoleUi {
             Log.e("Device " + e.getMessage() + " disconnected ", null);
         } catch (NoSuchAlgorithmException e) {
             Log.e("Fail to initialise SHA-1 algorithm", e);
+        } catch (InvalidApkPathException e) {
+            Log.e(e.getMessage(), null);
+        } catch (InvalidNameSpaceException e) {
+            Log.e(e.getMessage(), null);
         }
     }
 
