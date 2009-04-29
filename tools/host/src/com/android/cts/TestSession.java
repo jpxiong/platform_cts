@@ -407,10 +407,6 @@ public class TestSession {
                     markNeedRestartADBServer();
                     return;
                 }
-            } catch (InvalidApkPathException e) {
-                Log.e(e.getMessage(), null);
-            } catch (InvalidNameSpaceException e) {
-                Log.e(e.getMessage(), null);
             }
 
             long startTime = getSessionLog().getStartTime().getTime();
