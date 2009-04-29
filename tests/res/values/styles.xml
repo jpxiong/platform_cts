@@ -21,9 +21,9 @@
         <item name="type2">false</item>
         <item name="type3">#ff0000ff</item>
         <item name="type4">#ff00ff00</item>
-        <item name="type5">0.75dip</item>
-        <item name="type6">10dip</item>
-        <item name="type7">18dip</item>
+        <item name="type5">0.75px</item>
+        <item name="type6">10px</item>
+        <item name="type7">18px</item>
         <item name="type8">@drawable/pass</item>
         <item name="type9">3.14</item>
         <item name="type10">100%</item>
