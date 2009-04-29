@@ -556,6 +556,25 @@
         <provider android:name="android.content.cts.MockContentProvider" android:authorities="ctstest"
             android:multiprocess="false" />
 
+        <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
+
+        <activity android:name="android.app.cts.LauncherActivityStub"
+                  android:label="LauncherActivityStub" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="android.app.cts.MockTabActivity" android:label="MockTabActivity" />
+
+        <activity android:name="android.app.cts.AppStubActivity" android:label="AppStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
