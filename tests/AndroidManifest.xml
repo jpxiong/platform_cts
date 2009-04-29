@@ -471,6 +471,12 @@
         <activity android:name="android.app.cts.PendingIntentStubActivity"
              android:label="PendingIntentStubActivity"/>
 
+        <activity android:name="android.app.cts.LocalActivityManagerStubActivity"
+                        android:label="LocalActivityManagerStubActivity" />
+
+        <activity android:name="android.app.cts.LocalActivityManagerTestHelper"
+            android:label="LocalActivityManagerTestHelper" />
+
     </application>
 
 </manifest>
