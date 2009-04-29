@@ -641,7 +641,7 @@ public class TestPackage implements DeviceObserver {
      *
      * @return If succeed in installing, return true; else, return false.
      */
-    private boolean install() throws DeviceDisconnectedException {
+    private boolean install() throws DeviceDisconnectedException, InvalidApkPathException {
         String packageBinaryName = getAppBinaryName();
         String targetBinaryName = getTargetBinaryName();
         String packagePath = getFullPath(packageBinaryName);
@@ -649,21 +649,9 @@ public class TestPackage implements DeviceObserver {
 
         boolean success = true;
         if (packagePath != null) {
-            if (HostUtils.isFileExist(packagePath)) {
-                installAPK(packagePath);
-                if (!mTestStop) {
-                    if (targetApkPath != null) {
-                        if (HostUtils.isFileExist(targetApkPath)) {
-                            installAPK(targetApkPath);
-                        } else {
-                            success = false;
-                            Log.e("The following APK file doesn't exist: " + targetApkPath, null);
-                        }
-                    }
-                }
-            } else {
-                success = false;
-                Log.e("The following APK file doesn't exist: " + packagePath, null);
+            installAPK(packagePath);
+            if ((!mTestStop) && (targetApkPath != null)) {
+                installAPK(targetApkPath);
             }
         } else {
             success = false;
@@ -681,7 +669,7 @@ public class TestPackage implements DeviceObserver {
     /**
      * Uninstall test package and target package(if it exists)
      */
-    private void uninstall() throws DeviceDisconnectedException {
+    private void uninstall() throws DeviceDisconnectedException, InvalidNameSpaceException {
 
         String testPkgBinaryName = getAppBinaryName();
         String appNameSpace = getAppNameSpace();
@@ -701,7 +689,8 @@ public class TestPackage implements DeviceObserver {
     /**
      * Uninstall the specified package(.apk)
      */
-    private void uninstallAPK(final String packageName) throws DeviceDisconnectedException {
+    private void uninstallAPK(final String packageName) throws DeviceDisconnectedException,
+                InvalidNameSpaceException {
         Log.d("Uninstall: " + packageName);
         mDevice.uninstallAPK(packageName);
         waitPackageActionComplete();
@@ -712,7 +701,8 @@ public class TestPackage implements DeviceObserver {
      *
      * @param apkPath The test package to be installed.
      */
-    private void installAPK(final String apkPath) throws DeviceDisconnectedException {
+    private void installAPK(final String apkPath) throws DeviceDisconnectedException,
+            InvalidApkPathException {
         Log.d("installAPK " + apkPath + " ...");
         mDevice.installAPK(apkPath);
         waitPackageActionComplete();
@@ -951,7 +941,9 @@ public class TestPackage implements DeviceObserver {
      */
     public void run(final TestDevice device, final String javaPkgName,
                     TestSessionLog sessionLog)
-            throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
+            throws IOException, DeviceDisconnectedException,
+            ADBServerNeedRestartException, InvalidApkPathException,
+            InvalidNameSpaceException {
         if (isAllTestsRun()) {
             return;
         }
@@ -966,7 +958,8 @@ public class TestPackage implements DeviceObserver {
      * @param javaPkgName The JAVA package name.
      */
     protected void runImpl(final String javaPkgName) throws IOException,
-            DeviceDisconnectedException, ADBServerNeedRestartException {
+            DeviceDisconnectedException, ADBServerNeedRestartException, InvalidApkPathException,
+            InvalidNameSpaceException {
         try {
             if (!install()) {
                 return;
@@ -1055,7 +1048,9 @@ public class TestPackage implements DeviceObserver {
      * @param test The specific test to be run.
      */
     public void runTest(final TestDevice device, final Test test)
-            throws DeviceDisconnectedException, ADBServerNeedRestartException {
+            throws DeviceDisconnectedException, ADBServerNeedRestartException,
+            InvalidApkPathException, InvalidNameSpaceException {
+
         if (test == null) {
             return;
         }
@@ -1076,7 +1071,8 @@ public class TestPackage implements DeviceObserver {
      * @param test The test to be run.
      */
     protected void runTestImpl(final Test test) throws DeviceDisconnectedException,
-            ADBServerNeedRestartException {
+            ADBServerNeedRestartException, InvalidApkPathException,
+            InvalidNameSpaceException {
         try {
             if (!install()) {
                 return;
