@@ -160,11 +160,22 @@ abstract public class Selector {
      */
     public boolean isSelected(ArrayList<String> selectedList, String name) {
         for (String str : selectedList) {
-            if (name.startsWith(str)) {
+            if (name.equals(str) || isSubName(str, name)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Check whether a package name is a sub-package name of parent name.
+     *
+     * @param parent The parent package name.
+     * @param name The package name.
+     * @return True if it's a sub-package name of parent.
+     */
+     private boolean isSubName(String parent, String name) {
+        return name.startsWith(parent + ".");
     }
 }
 
