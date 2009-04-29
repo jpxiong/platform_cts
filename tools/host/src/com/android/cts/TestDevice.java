@@ -905,7 +905,6 @@ public class TestDevice implements DeviceObserver {
      */
     class PackageActionTimeoutTask extends TimerTask {
 
-        private static final int DELAY = 120000;
         private String mAction;
         private TestDevice mTargetDevice;
 
@@ -955,15 +954,26 @@ public class TestDevice implements DeviceObserver {
          * @param device The TestDevice the action is taken over.
          */
         private void start(final String action, final TestDevice device) {
-            Log.d("start(), action=" + action + ",mTimer=" + mTimer);
+            start(action, HostConfig.Ints.packageInstallTimeoutMs.value(), device);
+        }
+
+        /**
+         * Start the timer while package install/uninstall/getDeviceInfo/checkAPI with specific
+         * timeout.
+         *
+         * @param action The action of package
+         * @param timeout The specific timeout
+         * @param device The TestDevice under operation
+         */
+        private void start(final String action, final int timeout, final TestDevice device) {
+            Log.d("start(), action=" + action + ",mTimer=" + mTimer + ",timeout=" + timeout);
             synchronized (this) {
                 if (mTimer != null) {
                     mTimer.cancel();
                 }
 
                 mTimer = new Timer();
-                mTimer.schedule(new PackageActionTimeoutTask(action, device),
-                                PackageActionTimeoutTask.DELAY);
+                mTimer.schedule(new PackageActionTimeoutTask(action, device), timeout);
             }
         }
 
@@ -1637,6 +1647,16 @@ public class TestDevice implements DeviceObserver {
             } catch (InterruptedException e) {
             }
         }
+    }
+
+    /**
+     * Start the action timer with specific timeout
+     *
+     * @param action the action to start the timer
+     * @param timeout the specific timeout
+     */
+    void startActionTimer(final String action, final int timeout) {
+        mPackageActionTimer.start(action, timeout, this);
     }
 
     /**

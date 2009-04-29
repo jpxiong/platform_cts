@@ -321,7 +321,7 @@ public class Test implements DeviceObserver {
         mTestStop = false;
         mDevice = device;
         mTimeOutTimer = new HostTimer(new TimeOutTask(this),
-                HostConfig.getIntValue(HostConfig.INDIVIDUAL_START_TIMEOUT_MS));
+                HostConfig.Ints.individualStartTimeoutMs.value());
         mTimeOutTimer.start();
         mProgressObserver = new ProgressObserver();
         mProgressObserver.start();

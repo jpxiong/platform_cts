@@ -518,7 +518,7 @@ public class TestPackage implements DeviceObserver {
             }
             // restart the timer even for unexpected tests
             mTimeOutTimer.restart(new TimeOutTask(this), 
-                    HostConfig.getIntValue(HostConfig.TEST_STATUS_TIMEOUT_MS));
+                    HostConfig.Ints.testStatusTimeoutMs.value());
         }
     }
 
@@ -809,7 +809,7 @@ public class TestPackage implements DeviceObserver {
     private void runInBatchMode(final String javaPkgName)
             throws DeviceDisconnectedException {
         mTimeOutTimer = new HostTimer(new TimeOutTask(this),
-                HostConfig.getIntValue(HostConfig.BATCH_START_TIMEOUT_MS));
+                HostConfig.Ints.batchStartTimeoutMs.value());
         mTimeOutTimer.start();
         mProgressObserver = new ProgressObserver();
 
