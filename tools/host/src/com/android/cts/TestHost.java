@@ -492,7 +492,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
         TestSession.resetADBServerRestartedMode();
         if (HostConfig.getMaxTestCount() > 0) {
-            sDeviceManager.resetTestDevice(device);
+            sDeviceManager.resetTestDevice(ts.getDevice());
         }
     }
 
