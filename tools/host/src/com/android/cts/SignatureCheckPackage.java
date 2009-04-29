@@ -74,8 +74,7 @@ public class SignatureCheckPackage extends TestPackage {
     @Override
     public void run(final TestDevice device, final String javaPkgName,
             TestSessionLog testSesssionLog)
-            throws DeviceDisconnectedException, InvalidNameSpaceException,
-            InvalidApkPathException {
+    throws DeviceDisconnectedException {
         Test test = getTests().iterator().next();
         if ((test != null) && (test.getResult().isNotExecuted())) {
 
@@ -101,8 +100,7 @@ public class SignatureCheckPackage extends TestPackage {
      * @return test result
      */
     public ArrayList<String> startSignatureTest(TestDevice device)
-                throws DeviceDisconnectedException, InvalidNameSpaceException,
-                InvalidApkPathException {
+                throws DeviceDisconnectedException {
         Log.d("installing APICheck apk");
         mAPICheckResult = new ArrayList<String>();
         // TODO: This is non-obvious and should be cleaned up
