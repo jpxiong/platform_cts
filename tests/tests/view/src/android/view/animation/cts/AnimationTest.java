@@ -780,9 +780,10 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         animation.restrictDuration(1500);
         assertEquals(500, animation.getDuration());
 
+        animation.setStartOffset(1000);
         animation.setDuration(1000);
         animation.setRepeatCount(3);
-        animation.restrictDuration(2500);
+        animation.restrictDuration(4500);
         assertEquals(1, animation.getRepeatCount());
     }
 
