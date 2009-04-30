@@ -33,18 +33,12 @@ import android.widget.EditText;
 @TestTargetClass(ReplacementTransformationMethod.class)
 public class ReplacementTransformationMethodTest extends
         ActivityInstrumentationTestCase2<StubActivity> {
-    private static final char[] ORIGINAL = new char[] { '0', '1' };
-
-    private static final char[] ORIGINAL_WITH_MORE_CHARS = new char[] { '0', '1', '2' };
-
-    private static final char[] ORIGINAL_WITH_SAME_CHARS = new char[] { '0', '0' };
-
-    private static final char[] REPLACEMENT = new char[] { '3', '4' };
-
-    private static final char[] REPLACEMENT_WITH_MORE_CHARS = new char[] { '3', '4', '5' };
-
-    private static final char[] REPLACEMENT_WITH_SAME_CHARS = new char[] { '3', '3' };
-
+    private final char[] ORIGINAL = new char[] { '0', '1' };
+    private final char[] ORIGINAL_WITH_MORE_CHARS = new char[] { '0', '1', '2' };
+    private final char[] ORIGINAL_WITH_SAME_CHARS = new char[] { '0', '0' };
+    private final char[] REPLACEMENT = new char[] { '3', '4' };
+    private final char[] REPLACEMENT_WITH_MORE_CHARS = new char[] { '3', '4', '5' };
+    private final char[] REPLACEMENT_WITH_SAME_CHARS = new char[] { '3', '3' };
     private EditText mEditText;
 
     public ReplacementTransformationMethodTest() {
@@ -162,7 +156,7 @@ public class ReplacementTransformationMethodTest extends
         method.onFocusChanged(null, null, true, 0, null);
     }
 
-    private class MyReplacementTransformationMethod extends ReplacementTransformationMethod {
+    private static class MyReplacementTransformationMethod extends ReplacementTransformationMethod {
         private char[] mOriginal;
 
         private char[] mReplacement;

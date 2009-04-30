@@ -47,6 +47,8 @@ public class StaticLayoutTest extends AndroidTestCase {
 
     private static final Alignment DEFAULT_ALIGN = Alignment.ALIGN_CENTER;
 
+    private static final int ELLIPSIZE_WIDTH = 8;
+
     private StaticLayout mDefaultLayout;
     private TextPaint mDefaultPaint;
 
@@ -66,13 +68,20 @@ public class StaticLayoutTest extends AndroidTestCase {
                 DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
     }
 
+    private StaticLayout createEllipsizeStaticLayout() {
+        return new StaticLayout(LAYOUT_TEXT, 0, LAYOUT_TEXT.length(), mDefaultPaint,
+                DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true,
+                TextUtils.TruncateAt.MIDDLE, ELLIPSIZE_WIDTH);
+    }
+
     /**
      * Constructor test
      */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "StaticLayout", args = {java.lang.CharSequence.class, int.class, int.class,
+            method = "StaticLayout",
+            args = {java.lang.CharSequence.class, int.class, int.class,
                     android.text.TextPaint.class, int.class, android.text.Layout.Alignment.class,
                     float.class, float.class, boolean.class}
         ),
@@ -353,6 +362,7 @@ public class StaticLayoutTest extends AndroidTestCase {
     @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
         + " of StaticLayout#getEllipsisCount(int) when line is out of bound")
     public void testGetEllipsisCount() {
+        mDefaultLayout = createEllipsizeStaticLayout();
         assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
         assertTrue(mDefaultLayout.getEllipsisCount(1) > 0);
 
@@ -382,6 +392,7 @@ public class StaticLayoutTest extends AndroidTestCase {
     @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
         + " of StaticLayout#getEllipsisStart(int) when line is out of bound")
     public void testGetEllipsisStart() {
+        mDefaultLayout = createEllipsizeStaticLayout();
         assertTrue(mDefaultLayout.getEllipsisStart(0) >= 0);
         assertTrue(mDefaultLayout.getEllipsisStart(1) >= 0);
 
