@@ -22,7 +22,7 @@
         <uses-library android:name="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCoreTestRunner"
                      android:targetPackage="com.android.cts.stub"
                      android:label="CTS tests of android.location"/>
 
