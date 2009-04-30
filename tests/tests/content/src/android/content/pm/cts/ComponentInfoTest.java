@@ -41,35 +41,27 @@ import dalvik.annotation.ToBeFixed;
  */
 @TestTargetClass(ComponentInfo.class)
 public class ComponentInfoTest extends AndroidTestCase {
-    ComponentInfo mComponentInfo;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mComponentInfo = null;
-    }
+    private final String PACKAGE_NAME = "com.android.cts.stub";
+    private ComponentInfo mComponentInfo;
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {android.content.pm.ComponentInfo.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ComponentInfo}",
             method = "ComponentInfo",
             args = {android.os.Parcel.class}
         )
     })
-    @ToBeFixed(bug = "1417734", explanation = "ComponentInfo#ComponentInfo(ComponentInfo), " +
+    @ToBeFixed(bug = "1695243", explanation = "ComponentInfo#ComponentInfo(ComponentInfo), " +
             "ComponentInfo#ComponentInfo(Parcel), should check whether the input is null")
     public void testConstructor() {
         Parcel p = Parcel.obtain();
@@ -78,7 +70,7 @@ public class ComponentInfoTest extends AndroidTestCase {
         componentInfo.writeToParcel(p, 0);
         p.setDataPosition(0);
 
-        new MockComponentInfo(p);
+        new MyComponentInfo(p);
 
         new ComponentInfo();
 
@@ -88,22 +80,23 @@ public class ComponentInfoTest extends AndroidTestCase {
             new ComponentInfo((ComponentInfo) null);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
+            // expected
         }
 
         try {
-            new MockComponentInfo((Parcel) null);
+            new MyComponentInfo((Parcel) null);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#loadIcon(PackageManager)}",
         method = "loadIcon",
         args = {android.content.pm.PackageManager.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testLoadIcon() {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
@@ -130,63 +123,47 @@ public class ComponentInfoTest extends AndroidTestCase {
             mComponentInfo.loadIcon(null);
             fail("ComponentInfo#loadIcon() throw NullPointerException");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#dumpBack(Printer, String)}",
         method = "dumpBack",
         args = {android.util.Printer.class, java.lang.String.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testDumpBack() {
-        MockComponentInfo ci = new MockComponentInfo();
+        MyComponentInfo ci = new MyComponentInfo();
 
         StringBuilder sb = new StringBuilder();
+        assertEquals(0, sb.length());
         StringBuilderPrinter p = new StringBuilderPrinter(sb);
-
         String prefix = "";
         ci.dumpBack(p, prefix);
 
-        String expected = "ApplicationInfo: null\n";
-        assertEquals(expected, sb.toString());
+        assertNotNull(sb.toString());
+        assertTrue(sb.length() > 0);
 
         ci.applicationInfo = new ApplicationInfo();
-
         sb = new StringBuilder();
+        assertEquals(0, sb.length());
         p = new StringBuilderPrinter(sb);
 
         ci.dumpBack(p, prefix);
-
-        expected = "ApplicationInfo:\n"
-                + "  name=null\n"
-                + "  packageName=null\n"
-                + "  labelRes=0x0 nonLocalizedLabel=null icon=0x0\n"
-                + "  className=null\n"
-                + "  permission=null uid=0\n"
-                + "  taskAffinity=null\n"
-                + "  theme=0x0\n"
-                + "  flags=0x0 processName=null\n"
-                + "  sourceDir=null\n"
-                + "  publicSourceDir=null\n"
-                + "  sharedLibraryFiles=null\n"
-                + "  dataDir=null\n"
-                + "  enabled=true\n"
-                + "  manageSpaceActivityName=null\n"
-                + "  description=0x0\n";
-        assertEquals(expected, sb.toString());
+        assertNotNull(sb.toString());
+        assertTrue(sb.length() > 0);
 
         try {
             ci.dumpBack(null, null);
             fail("ComponentInfo#dumpBack() throw NullPointerException here.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#getIconResource()}",
         method = "getIconResource",
         args = {}
     )
@@ -204,65 +181,54 @@ public class ComponentInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#dumpFront(Printer, String)}",
         method = "dumpFront",
         args = {android.util.Printer.class, java.lang.String.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testDumpFront() {
-        MockComponentInfo ci = new MockComponentInfo();
+        MyComponentInfo ci = new MyComponentInfo();
 
         StringBuilder sb = new StringBuilder();
+        assertEquals(0, sb.length());
         StringBuilderPrinter p = new StringBuilderPrinter(sb);
 
         String prefix = "";
         ci.dumpFront(p, prefix);
-
-        String expected = "name=null\npackageName=null\n"
-                + "labelRes=0x0 nonLocalizedLabel=null icon=0x0\n"
-                + "enabled=true exported=false processName=null\n";
-        assertEquals(expected, sb.toString());
+        assertNotNull(sb.toString());
+        assertTrue(sb.length() > 0);
 
         ci.applicationInfo = new ApplicationInfo();
 
         sb = new StringBuilder();
         p = new StringBuilderPrinter(sb);
+        assertEquals(0, sb.length());
 
         ci.dumpFront(p, prefix);
-
-        expected = "name=null\npackageName=null\n"
-                + "labelRes=0x0 nonLocalizedLabel=null icon=0x0\n"
-                + "enabled=true exported=false processName=null\n";
-        assertEquals(expected, sb.toString());
+        assertNotNull(sb.toString());
+        assertTrue(sb.length() > 0);
 
         try {
             ci.dumpFront(null, null);
             fail("ComponentInfo#dumpFront() throw NullPointerException here.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#loadLabel(PackageManager)}",
         method = "loadLabel",
         args = {android.content.pm.PackageManager.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
-    public void testLoadLabel() {
+    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
+    public void testLoadLabel() throws NameNotFoundException {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
-        try {
-            mComponentInfo.applicationInfo =
-                mContext.getPackageManager().getApplicationInfo("com.android.cts.stub", 0);
-        } catch (NameNotFoundException e) {
-            mComponentInfo.applicationInfo = new ApplicationInfo();
-        }
 
         final PackageManager pm = mContext.getPackageManager();
 
         assertNotNull(mComponentInfo);
-        mComponentInfo.packageName = "com.android.cts.stub";
+        mComponentInfo.packageName = PACKAGE_NAME;
         mComponentInfo.nonLocalizedLabel = "nonLocalizedLabel";
         assertEquals("nonLocalizedLabel", mComponentInfo.loadLabel(pm));
 
@@ -271,25 +237,27 @@ public class ComponentInfoTest extends AndroidTestCase {
         mComponentInfo.name = "name";
         assertEquals("name", mComponentInfo.loadLabel(pm));
 
+        mComponentInfo.applicationInfo =
+                mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
+
         mComponentInfo.nonLocalizedLabel = null;
-        mComponentInfo.labelRes = com.android.cts.stub.R.string.hello_android;
-        assertEquals(mContext.getString(mComponentInfo.labelRes),
-                mComponentInfo.loadLabel(pm));
+        mComponentInfo.labelRes = R.string.hello_android;
+        assertEquals(mContext.getString(mComponentInfo.labelRes), mComponentInfo.loadLabel(pm));
 
         try {
             mComponentInfo.loadLabel(null);
             fail("ComponentInfo#loadLabel throw NullPointerException");
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ComponentInfo#writeToParcel(Parcel, int)}",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         mComponentInfo = new ComponentInfo();
@@ -297,7 +265,7 @@ public class ComponentInfoTest extends AndroidTestCase {
         mComponentInfo.writeToParcel(p, 0);
         p.setDataPosition(0);
 
-        MockComponentInfo ci = new MockComponentInfo(p);
+        MyComponentInfo ci = new MyComponentInfo(p);
         assertEquals(mComponentInfo.processName, ci.processName);
         assertEquals(mComponentInfo.enabled, ci.enabled);
         assertEquals(mComponentInfo.exported, ci.exported);
@@ -313,19 +281,20 @@ public class ComponentInfoTest extends AndroidTestCase {
         try {
             mComponentInfo.writeToParcel(null, 0);
             fail("ComponentInfo#writeToParcel() throw NullPointerException");
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
+            // expected
         }
     }
 
-    private class MockComponentInfo extends ComponentInfo {
-        public MockComponentInfo() {
+    private static class MyComponentInfo extends ComponentInfo {
+        public MyComponentInfo() {
             super();
         }
 
-        public MockComponentInfo(ComponentInfo orig) {
+        public MyComponentInfo(ComponentInfo orig) {
             super(orig);
         }
-        public MockComponentInfo(Parcel source) {
+        public MyComponentInfo(Parcel source) {
             super(source);
         }
 

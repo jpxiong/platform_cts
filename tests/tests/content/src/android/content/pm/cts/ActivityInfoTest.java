@@ -16,6 +16,12 @@
 
 package android.content.pm.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.app.cts.MockActivity;
 import android.content.ComponentName;
 import android.content.pm.ActivityInfo;
@@ -23,13 +29,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import android.util.Printer;
 import android.util.StringBuilderPrinter;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ActivityInfo}.
@@ -38,27 +38,19 @@ import dalvik.annotation.ToBeFixed;
 public class ActivityInfoTest extends AndroidTestCase {
     ActivityInfo mActivityInfo;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivityInfo = null;
-    }
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ActivityInfo}",
             method = "ActivityInfo",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ActivityInfo}",
             method = "ActivityInfo",
             args = {android.content.pm.ActivityInfo.class}
         )
     })
-    @ToBeFixed(bug = "1417734", explanation = "ActivityInfo#ActivityInfo(ActivityInfo), " +
+    @ToBeFixed(bug = "1695243", explanation = "ActivityInfo#ActivityInfo(ActivityInfo), " +
             " should check whether the input ActivityInfo is null")
     public void testConstructor() {
         new ActivityInfo();
@@ -70,19 +62,18 @@ public class ActivityInfoTest extends AndroidTestCase {
             new ActivityInfo(null);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ActivityInfo#writeToParcel(Parcel, int)}",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NPE is not expected.")
     public void testWriteToParcel() throws NameNotFoundException {
-        ComponentName componentName = new ComponentName(mContext,
-                MockActivity.class);
+        ComponentName componentName = new ComponentName(mContext, MockActivity.class);
 
         mActivityInfo = mContext.getPackageManager().getActivityInfo(
                 componentName, PackageManager.GET_META_DATA);
@@ -104,12 +95,12 @@ public class ActivityInfoTest extends AndroidTestCase {
             mActivityInfo.writeToParcel(null, 0);
             fail("should throw NullPointerException");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ActivityInfo#getThemeResource()}",
         method = "getThemeResource",
         args = {}
     )
@@ -126,33 +117,16 @@ public class ActivityInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ActivityInfo#toString()}",
         method = "toString",
         args = {}
     )
     public void testToString() throws NameNotFoundException {
-        String expected;
-
         mActivityInfo = new ActivityInfo();
-        expected = "ActivityInfo{"
-                + Integer.toHexString(System.identityHashCode(mActivityInfo))
-                + " null}";
-        assertEquals(expected, mActivityInfo.toString());
-
-        ComponentName componentName = new ComponentName(mContext, MockActivity.class);
-
-        mActivityInfo = mContext.getPackageManager().getActivityInfo(
-                componentName, PackageManager.GET_META_DATA);
-
-        expected = "ActivityInfo{"
-                + Integer.toHexString(System.identityHashCode(mActivityInfo))
-                + " android.app.cts.MockActivity}";
-        assertEquals(expected, mActivityInfo.toString());
+        assertNotNull(mActivityInfo.toString());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ActivityInfo#describeContents()}",
         method = "describeContents",
         args = {}
     )
@@ -170,35 +144,28 @@ public class ActivityInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ActivityInfo#dump(Printer, String)}",
         method = "dump",
         args = {android.util.Printer.class, java.lang.String.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "NPE is not expected.")
     public void testDump() {
         mActivityInfo = new ActivityInfo();
 
         StringBuilder sb = new StringBuilder();
+        assertEquals(0, sb.length());
         StringBuilderPrinter p = new StringBuilderPrinter(sb);
 
         String prefix = "";
         mActivityInfo.dump(p, prefix);
 
-        String expected = "name=null\n"
-                        + "packageName=null\n"
-                        + "labelRes=0x0 nonLocalizedLabel=null icon=0x0\n"
-                        + "enabled=true exported=false processName=null\n"
-                        + "permission=null\n"
-                        + "taskAffinity=null targetActivity=null\n"
-                        + "launchMode=0 flags=0x0 theme=0x0 "
-                        + "orien=-1 configChanges=0x0\n"
-                        + "ApplicationInfo: null\n";
-        assertEquals(expected, sb.toString());
+        assertNotNull(sb.toString());
+        assertTrue(sb.length() > 0);
 
         try {
             mActivityInfo.dump(null, "");
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 }
