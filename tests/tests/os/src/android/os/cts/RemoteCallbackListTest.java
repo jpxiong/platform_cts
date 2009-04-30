@@ -114,7 +114,7 @@ public class RemoteCallbackListTest extends AndroidTestCase {
             args = {int.class}
         )
     })
-    public void testRemoteCallbackList() throws RemoteException {
+    public void testRemoteCallbackList() throws Exception {
         // Test constructor(default one).
         MockRemoteCallbackList<IInterface> rc = new MockRemoteCallbackList<IInterface>();
         mIntent = new Intent(SERVICE_ACTION);
@@ -123,11 +123,7 @@ public class RemoteCallbackListTest extends AndroidTestCase {
                 Context.BIND_AUTO_CREATE);
         synchronized (mSync) {
             if (!mSync.mIsConnected) {
-                try {
-                    mSync.wait();
-                } catch (InterruptedException e) {
-                    fail("Throw InterruptedException: " + e.getMessage());
-                }
+                mSync.wait();
             }
         }
 
@@ -164,13 +160,11 @@ public class RemoteCallbackListTest extends AndroidTestCase {
 
         synchronized (mSync) {
             if (!mSync.mIsDisConnected) {
-                try {
-                    mSync.wait();
-                } catch (InterruptedException e) {
-                    fail("Throw InterruptedException: " + e.getMessage());
-                }
+                mSync.wait();
             }
         }
+        // sleep some time to wait for onCallbackDied called.
+        Thread.sleep(1000);
         // Test onCallbackDied
         assertTrue(rc.isOnCallbackDiedCalled);
     }

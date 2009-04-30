@@ -20,9 +20,9 @@ import android.content.Context;
 import android.net.Proxy;
 import android.provider.Settings.Secure;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
@@ -31,31 +31,16 @@ import dalvik.annotation.TestTargets;
 public class ProxyTest extends AndroidTestCase {
 
     private Context mContext;
-    private String mOriginHost;
-    private int mOriginPort;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         mContext = getContext();
-        mOriginHost = Proxy.getHost(mContext);
-        mOriginPort = Proxy.getPort(mContext);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        // Secure.putString should run only on device
-        Secure.putString(mContext.getContentResolver(),
-                         Secure.HTTP_PROXY,
-                         mOriginHost + ":" + mOriginPort);
-
-        super.tearDown();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of Proxy.",
         method = "Proxy",
         args = {}
     )
@@ -85,6 +70,7 @@ public class ProxyTest extends AndroidTestCase {
             args = {Context.class}
         )
     })
+    @BrokenTest("Cannot write secure settings table")
     public void testAccessProperties() {
         final int minValidPort = 0;
         final int maxValidPort = 65535;
@@ -98,7 +84,6 @@ public class ProxyTest extends AndroidTestCase {
         final String host = "proxy.example.com";
         final int port = 2008;
 
-        // Secure.putString should run only on device
         Secure.putString(mContext.getContentResolver(), Secure.HTTP_PROXY, host + ":" + port);
         assertEquals(host, Proxy.getHost(mContext));
         assertEquals(port, Proxy.getPort(mContext));

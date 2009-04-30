@@ -34,6 +34,7 @@ import android.test.AndroidTestCase;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -1401,6 +1402,7 @@ public class PaintTest extends AndroidTestCase {
         method = "getTextBounds",
         args = {java.lang.String.class, int.class, int.class, android.graphics.Rect.class}
     )
+    @BrokenTest("Test result will be different when run in batch mode")
     public void testGetTextBounds1() throws Exception {
         Paint p = new Paint();
         Rect r = new Rect();
@@ -1467,6 +1469,7 @@ public class PaintTest extends AndroidTestCase {
         method = "getTextBounds",
         args = {char[].class, int.class, int.class, android.graphics.Rect.class}
     )
+    @BrokenTest("Test result will be different when run in batch mode")
     public void testGetTextBounds2() throws Exception {
         Paint p = new Paint();
         Rect r = new Rect();

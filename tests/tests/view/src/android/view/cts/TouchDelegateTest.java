@@ -29,6 +29,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -153,6 +154,17 @@ public class TouchDelegateTest extends ActivityInstrumentationTestCase2<MockActi
         assertFalse(touchDelegate.mOnTouchEventCalled);
         view.onTouchEvent(MotionEvent.obtain(0, 0, ACTION_DOWN, mXInside, mYInside, 0));
         assertTrue(touchDelegate.mOnTouchEventCalled);
+
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "onTouchEvent",
+        args = {MotionEvent.class}
+    )
+    @UiThreadTest
+    @BrokenTest("Will fail in batch mode but can pass if only run this TestCase")
+    public void testOn() {
 
         init();
         assertTrue(mTouchDelegate.onTouchEvent(mActionDownInside));
