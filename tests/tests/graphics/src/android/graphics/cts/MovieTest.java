@@ -27,7 +27,8 @@ import android.app.cts.MockActivity;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
-import android.test.ActivityInstrumentationTestCase;
+import android.test.ActivityInstrumentationTestCase2;
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
@@ -35,7 +36,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Movie.class)
-public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
+public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private Movie mMovie;
     private final int MOVIE = com.android.cts.stub.R.drawable.animated;
 
@@ -51,12 +52,12 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test draw method",
         method = "draw",
         args = {android.graphics.Canvas.class, float.class, float.class, 
                 android.graphics.Paint.class}
     )
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
     public void testDraw1() {
         Canvas c = new Canvas();
         Paint p = new Paint();
@@ -65,11 +66,11 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test draw method",
         method = "draw",
         args = {android.graphics.Canvas.class, float.class, float.class}
     )
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
     public void testDraw2() {
         Canvas c = new Canvas();
         mMovie.draw(c, 100, 200);
@@ -77,12 +78,12 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test decodeFile method",
         method = "decodeFile",
         args = {java.lang.String.class}
     )
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
-    public void testDecodeFile() {
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
+    public void testDecodeFile() throws Exception {
         mMovie = null;
         File imagefile = new File("/sqlite_stmt_journals", "animated.gif");
         if (imagefile.exists()) {
@@ -97,7 +98,7 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
         assertNull(mMovie);
     }
 
-    private void writeSampleImage(File imagefile) {
+    private void writeSampleImage(File imagefile) throws Exception {
         InputStream source = null;
         OutputStream target = null;
 
@@ -110,18 +111,12 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
                     .read(buffer)) {
                 target.write(buffer, 0, len);
             }
-        } catch (IOException e) {
-            fail(e.getMessage());
         } finally {
-            try {
-                if (source != null) {
-                    source.close();
-                }
-                if (target != null) {
-                    target.close();
-                }
-            } catch (IOException e) {
-                fail(e.getMessage());
+            if (source != null) {
+                source.close();
+            }
+            if (target != null) {
+                target.close();
             }
         }
     }
@@ -145,18 +140,14 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class}
     )
-    @ToBeFixed(bug="1491795", explanation="always  return null")
-    public void testDecodeByteArray() {
+    @ToBeFixed(bug="1491795", explanation="always return null")
+    @BrokenTest("mMovie is null")
+    public void testDecodeByteArray() throws Exception {
         mMovie = null;
-        try {
-            InputStream is = getActivity().getResources()
-                    .openRawResource(MOVIE);
-            byte[] bytes = inputStreamToBytes(is);
-            mMovie = Movie.decodeByteArray(bytes, 0, bytes.length);
-            is.close();
-        } catch (Exception e) {
-            fail("shouldn't throw exception");
-        }
+        InputStream is = getActivity().getResources().openRawResource(MOVIE);
+        byte[] bytes = inputStreamToBytes(is);
+        mMovie = Movie.decodeByteArray(bytes, 0, bytes.length);
+        is.close();
         assertNotNull(mMovie);
     }
 
@@ -166,7 +157,8 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
         method = "decodeStream",
         args = {java.io.InputStream.class}
     )
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
     public void testDecodeStream() {
         assertFalse(mMovie.isOpaque());
         mMovie = null;
@@ -187,7 +179,8 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
         method = "setTime",
         args = {int.class}
     )
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
     public void testSetTime() {
         assertTrue(mMovie.setTime(1000));
         assertFalse(mMovie.setTime(Integer.MAX_VALUE));
@@ -198,30 +191,27 @@ public class MovieTest extends ActivityInstrumentationTestCase<MockActivity> {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test get movie properties",
             method = "duration",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test get movie properties",
             method = "isOpaque",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test get movie properties",
             method = "height",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test get movie properties",
             method = "width",
             args = {}
         )
     })
-    @ToBeFixed(bug = "", explanation = "mMovie shouldn't be null")
+    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
+    @BrokenTest("mMovie is null")
     public void testGetMovieProperties() {
         assertEquals(1000, mMovie.duration());
         assertFalse(mMovie.isOpaque());
