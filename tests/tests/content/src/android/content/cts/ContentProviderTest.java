@@ -200,17 +200,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getSyncAdapter()",
-        method = "getSyncAdapter",
-        args = {}
-    )
-    public void testGetSyncAdapter() {
-        MockContentProvider mockContentProvider = new MockContentProvider();
-        assertNull(mockContentProvider.getSyncAdapter());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         notes = "Test isTemporary()",
         method = "isTemporary",
         args = {}
@@ -346,10 +335,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
             public int delete(Uri url, String selection, String[] selectionArgs) {
                 return 0;
-            }
-
-            public ISyncAdapter getSyncAdapter() {
-                return null;
             }
 
             public String getType(Uri url) {
