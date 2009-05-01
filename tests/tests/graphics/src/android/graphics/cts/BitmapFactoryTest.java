@@ -172,20 +172,16 @@ public class BitmapFactoryTest extends AndroidTestCase {
         args = {java.io.FileDescriptor.class, android.graphics.Rect.class, 
                 android.graphics.BitmapFactory.Options.class}
     )
-    public void testDecodeFileDescriptor1() {
-        try {
-            FileDescriptor input = obtainDiscriptor();
-            Rect r = new Rect(1, 1, 1, 1);
-            Bitmap b = BitmapFactory.decodeFileDescriptor(input, r, mOpt1);
-            assertNotNull(b);
-            // Test the bitmap size
-            assertEquals(START_HEIGHT, b.getHeight());
-            assertEquals(START_WIDTH, b.getWidth());
-            // Test if no bitmap
-            assertNull(BitmapFactory.decodeFileDescriptor(input, r, mOpt2));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+    public void testDecodeFileDescriptor1() throws IOException {
+        FileDescriptor input = obtainDescriptor();
+        Rect r = new Rect(1, 1, 1, 1);
+        Bitmap b = BitmapFactory.decodeFileDescriptor(input, r, mOpt1);
+        assertNotNull(b);
+        // Test the bitmap size
+        assertEquals(START_HEIGHT, b.getHeight());
+        assertEquals(START_WIDTH, b.getWidth());
+        // Test if no bitmap
+        assertNull(BitmapFactory.decodeFileDescriptor(input, r, mOpt2));
     }
 
     @TestTargetNew(
@@ -194,17 +190,13 @@ public class BitmapFactoryTest extends AndroidTestCase {
         method = "decodeFileDescriptor",
         args = {java.io.FileDescriptor.class}
     )
-    public void testDecodeFileDescriptor2() {
-        try {
-            FileDescriptor input = obtainDiscriptor();
-            Bitmap b = BitmapFactory.decodeFileDescriptor(input);
-            assertNotNull(b);
-            // Test the bitmap size
-            assertEquals(START_HEIGHT, b.getHeight());
-            assertEquals(START_WIDTH, b.getWidth());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+    public void testDecodeFileDescriptor2() throws IOException {
+        FileDescriptor input = obtainDescriptor();
+        Bitmap b = BitmapFactory.decodeFileDescriptor(input);
+        assertNotNull(b);
+        // Test the bitmap size
+        assertEquals(START_HEIGHT, b.getHeight());
+        assertEquals(START_WIDTH, b.getWidth());
     }
 
     @TestTargetNew(
@@ -213,18 +205,14 @@ public class BitmapFactoryTest extends AndroidTestCase {
         method = "decodeFile",
         args = {java.lang.String.class, android.graphics.BitmapFactory.Options.class}
     )
-    public void testDecodeFile1() {
-        try {
-            Bitmap b = BitmapFactory.decodeFile(obtainPath(), mOpt1);
-            assertNotNull(b);
-            // Test the bitmap size
-            assertEquals(START_HEIGHT, b.getHeight());
-            assertEquals(START_WIDTH, b.getWidth());
-            // Test if no bitmap
-            assertNull(BitmapFactory.decodeFile(obtainPath(), mOpt2));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+    public void testDecodeFile1() throws IOException {
+        Bitmap b = BitmapFactory.decodeFile(obtainPath(), mOpt1);
+        assertNotNull(b);
+        // Test the bitmap size
+        assertEquals(START_HEIGHT, b.getHeight());
+        assertEquals(START_WIDTH, b.getWidth());
+        // Test if no bitmap
+        assertNull(BitmapFactory.decodeFile(obtainPath(), mOpt2));
     }
 
     @TestTargetNew(
@@ -233,16 +221,12 @@ public class BitmapFactoryTest extends AndroidTestCase {
         method = "decodeFile",
         args = {java.lang.String.class}
     )
-    public void testDecodeFile2() {
-        try {
-            Bitmap b = BitmapFactory.decodeFile(obtainPath());
-            assertNotNull(b);
-            // Test the bitmap size
-            assertEquals(START_HEIGHT, b.getHeight());
-            assertEquals(START_WIDTH, b.getWidth());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+    public void testDecodeFile2() throws IOException {
+        Bitmap b = BitmapFactory.decodeFile(obtainPath());
+        assertNotNull(b);
+        // Test the bitmap size
+        assertEquals(START_HEIGHT, b.getHeight());
+        assertEquals(START_WIDTH, b.getWidth());
     }
 
     private byte[] obtainArray() {
@@ -256,7 +240,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
         return(getContext().getResources().openRawResource(R.drawable.start));
     }
 
-    private FileDescriptor obtainDiscriptor() throws IOException {
+    private FileDescriptor obtainDescriptor() throws IOException {
       File dir = getContext().getFilesDir();
       File file = new File(dir, "test.jpg");
       return(ParcelFileDescriptor.open(file,

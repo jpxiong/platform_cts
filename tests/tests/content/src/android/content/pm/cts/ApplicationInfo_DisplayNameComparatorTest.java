@@ -21,7 +21,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo.DisplayNameComparator;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
@@ -32,6 +31,7 @@ import dalvik.annotation.ToBeFixed;
  */
 @TestTargetClass(DisplayNameComparator.class)
 public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
+    private static final String PACKAGE_NAME = "com.android.cts.stub";
     DisplayNameComparator mDisplayNameComparator;
 
     @Override
@@ -60,38 +60,30 @@ public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
         args = {android.content.pm.ApplicationInfo.class, android.content.pm.ApplicationInfo.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
-    public void testCompare() {
+    public void testCompare() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
         mDisplayNameComparator = new ApplicationInfo.DisplayNameComparator(pm);
 
         ApplicationInfo info1 = new ApplicationInfo();
         ApplicationInfo info2 = new ApplicationInfo();
-        info1.packageName = "com.android";
-        info2.packageName = "com.android";
+        info1.packageName = PACKAGE_NAME;
+        info2.packageName = PACKAGE_NAME;
         assertEquals(0, mDisplayNameComparator.compare(info1, info2));
 
-        try {
-            info1 = mContext.getPackageManager().getApplicationInfo("com.android", 0);
-        } catch (NameNotFoundException e) {
-            fail("getApplicationInfo should not throw NameNotFoundException here.");
-        }
-        info2.packageName = "com.android.2";
+        info1 = mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
+        info2.packageName = PACKAGE_NAME + ".2";
         assertTrue((mDisplayNameComparator.compare(info1, info2) < 0));
 
         info1 = new ApplicationInfo();
-        info1.packageName = "com.android.1";
-        try {
-            info2 =
-                mContext.getPackageManager().getApplicationInfo("com.android", 0);
-        } catch (NameNotFoundException e) {
-            fail("getApplicationInfo should not throw NameNotFoundException here.");
-        }
+        info1.packageName = PACKAGE_NAME + ".1";
+        info2 = mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
         assertTrue((mDisplayNameComparator.compare(info1, info2) > 0));
 
         try {
             mDisplayNameComparator.compare(null, null);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 }

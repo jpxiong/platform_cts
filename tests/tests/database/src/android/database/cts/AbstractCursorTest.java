@@ -515,7 +515,12 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertEquals(POSITION0, mDatabaseCursor.getColumnIndexOrThrow(COLUMN_NAMES1[POSITION0]));
         assertEquals(POSITION1, mDatabaseCursor.getColumnIndexOrThrow(COLUMN_NAMES1[POSITION1]));
 
-        assertEquals(0, mDatabaseCursor.getColumnIndexOrThrow(COLUMN_FAKE));
+        try {
+            mDatabaseCursor.getColumnIndexOrThrow(COLUMN_FAKE);
+            fail("IllegalArgumentException expected, but not thrown");
+        } catch (IllegalArgumentException expected) {
+            // expected
+        }
     }
 
     @TestTargetNew(
@@ -584,7 +589,7 @@ public class AbstractCursorTest extends InstrumentationTestCase {
 
         StringBuffer sb = new StringBuffer();
         sb.append(window.getString(0, 0));
-        String str = ((TestAbstractCursor)mTestAbstractCursor).getString(0);
+        String str = mTestAbstractCursor.getString(0);
         assertEquals(str.length(), ca.sizeCopied);
         assertEquals(sb.toString(), new String(ca.data, 0, ca.sizeCopied));
     }
@@ -728,6 +733,7 @@ public class AbstractCursorTest extends InstrumentationTestCase {
             return mRows.length;
         }
 
+        @Deprecated
         @Override
         public boolean deleteRow() {
             return false;
@@ -784,18 +790,22 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         }
 
         // the following are protected methods
+        @Override
         protected void checkPosition() {
             super.checkPosition();
         }
 
+        @Override
         protected Object getUpdatedField(int columnIndex) {
             return super.getUpdatedField(columnIndex);
         }
 
+        @Override
         protected boolean isFieldUpdated(int columnIndex) {
             return super.isFieldUpdated(columnIndex);
         }
 
+        @Override
         protected void onChange(boolean selfChange) {
             super.onChange(selfChange);
             mHadCalledOnChange = true;
