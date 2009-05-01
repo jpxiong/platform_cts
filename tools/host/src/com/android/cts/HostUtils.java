@@ -274,4 +274,19 @@ public class HostUtils {
 
         return fmt.toString();
     }
+    
+    /**
+     * Convert the given byte array into a lowercase hex string.
+     * 
+     * @param arr The array to convert.
+     * @return The hex encoded string.
+     */
+    public static String toHexString(byte[] arr) {
+        StringBuffer buf = new StringBuffer(arr.length * 2);
+        for (byte b : arr) {
+            buf.append(String.format("%02x", b & 0xFF));
+        }
+        return buf.toString();
+    }
+    
 }
