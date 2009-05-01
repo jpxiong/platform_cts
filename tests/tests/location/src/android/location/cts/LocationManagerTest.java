@@ -81,9 +81,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
         mManager = (LocationManager) mContext.
                 getSystemService(Context.LOCATION_SERVICE);
 
-        assertOnlyGpsProviderAvailableOnEmu();
-        assertAllProviderDisabledOnEmu();
-
         // test that mock locations are allowed so a more descriptive error message can be logged
         if (Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.ALLOW_MOCK_LOCATION, 0) == 0) {
@@ -597,15 +594,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
         if (mManager.getProvider(name) != null) {
             mManager.removeTestProvider(name);
         }
-    }
-
-    private void assertOnlyGpsProviderAvailableOnEmu() {
-        assertNull(mManager.getProvider(LocationManager.NETWORK_PROVIDER));
-        assertNotNull( mManager.getProvider(LocationManager.GPS_PROVIDER));
-    }
-
-    private void assertAllProviderDisabledOnEmu() {
-        assertEquals(0, mManager.getProviders(true).size());
     }
 
     /**
