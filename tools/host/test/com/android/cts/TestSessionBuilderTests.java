@@ -1289,7 +1289,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
 
         ts.getSessionLog().setStartTime(System.currentTimeMillis());
         TestSessionLog tsl = ts.getSessionLog();
-        tsl.dumpToFile();
+        tsl.createResultDoc();
         assertEquals(1, tsl.getTestPackages().size());
 
         TestPackage testPackage = tsl.getTestPackages().iterator().next();

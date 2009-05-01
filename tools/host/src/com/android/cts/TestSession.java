@@ -61,6 +61,15 @@ public class TestSession {
     }
 
     /**
+     * Get the last session ID.
+     *
+     * @return The last session ID.
+     */
+    public static int getLastSessionId() {
+        return sIdCounter-1;
+    }
+
+    /**
      * Set ADB server restarted mode.
      */
     public static void setADBServerRestartedMode() {

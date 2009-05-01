@@ -44,4 +44,5 @@ public interface CTSCommand {
     static final String OPTION_S = "-s";
     static final String OPTION_SESSION = "--session";
     static final String OPTION_CFG = "--config";
+    static final String OPTION_DERIVED_PLAN = "--derivedplan";
 }

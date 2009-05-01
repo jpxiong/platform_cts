@@ -170,4 +170,14 @@ public class CtsTestResult {
     public String getResultString() {
         return sCodeToResultMap.get(mResultCode);
     }
+
+    /**
+     * Check if the given resultType is a valid result type defined..
+     *
+     * @param resultType The result type to be checked.
+     * @return If valid, return true; else, return false.
+     */
+    static public boolean isValidResultType(final String resultType) {
+        return sCodeToResultMap.containsValue(resultType);
+    }
 }
