@@ -73,7 +73,6 @@ public class NetworkInfoTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isConnectedOrConnecting().",
             method = "isConnected",
             args = {}
         ),
@@ -114,32 +113,47 @@ public class NetworkInfoTest extends AndroidTestCase {
         assertFalse(ni[TYPE_WIFI].isFailover());
 
         // test environment:connect as TYPE_MOBILE, and connect to internet.
-        assertEquals(ni[TYPE_MOBILE].getType(), TYPE_MOBILE);
-        assertEquals(ni[TYPE_WIFI].getType(), TYPE_WIFI);
+        assertEquals(TYPE_MOBILE, ni[TYPE_MOBILE].getType());
+        assertEquals(TYPE_WIFI, ni[TYPE_WIFI].getType());
 
         assertEquals(MOBILE_TYPE_NAME, ni[TYPE_MOBILE].getTypeName());
         assertEquals(WIFI_TYPE_NAME, ni[TYPE_WIFI].getTypeName());
 
-        assertTrue(ni[TYPE_MOBILE].isConnectedOrConnecting());
-        assertFalse(ni[TYPE_WIFI].isConnectedOrConnecting());
+        if(ni[TYPE_MOBILE].isConnectedOrConnecting()) {
+            assertTrue(ni[TYPE_MOBILE].isAvailable());
+            assertTrue(ni[TYPE_MOBILE].isConnected());
+            assertEquals(State.CONNECTED, ni[TYPE_MOBILE].getState());
+            assertEquals(DetailedState.CONNECTED, ni[TYPE_MOBILE].getDetailedState());
+            assertNotNull(ni[TYPE_MOBILE].getReason());
+            assertNotNull(ni[TYPE_MOBILE].getExtraInfo());
+        } else {
+            assertFalse(ni[TYPE_MOBILE].isAvailable());
+            assertFalse(ni[TYPE_MOBILE].isConnected());
 
-        assertTrue(ni[TYPE_MOBILE].isAvailable());
-        assertFalse(ni[TYPE_WIFI].isAvailable());
+            // mobile state is undefined
 
-        assertTrue(ni[TYPE_MOBILE].isConnected());
-        assertFalse(ni[TYPE_WIFI].isConnected());
+            assertEquals(DetailedState.IDLE, ni[TYPE_MOBILE].getDetailedState());
+            assertNull(ni[TYPE_MOBILE].getReason());
+            assertNull(ni[TYPE_MOBILE].getExtraInfo());
+        }
 
-        assertEquals(State.CONNECTED, ni[TYPE_MOBILE].getState());
-        assertEquals(State.UNKNOWN, ni[TYPE_WIFI].getState());
+        if(ni[TYPE_WIFI].isConnectedOrConnecting()) {
+            assertTrue(ni[TYPE_WIFI].isAvailable());
+            assertTrue(ni[TYPE_WIFI].isConnected());
+            assertEquals(State.CONNECTED, ni[TYPE_WIFI].getState());
+            assertEquals(DetailedState.CONNECTED, ni[TYPE_WIFI].getDetailedState());
+            assertNotNull(ni[TYPE_WIFI].getReason());
+            assertNotNull(ni[TYPE_WIFI].getExtraInfo());
+        } else {
+            assertFalse(ni[TYPE_WIFI].isAvailable());
+            assertFalse(ni[TYPE_WIFI].isConnected());
 
-        assertEquals(DetailedState.CONNECTED, ni[TYPE_MOBILE].getDetailedState());
-        assertEquals(DetailedState.IDLE, ni[TYPE_WIFI].getDetailedState());
+            // wifi state is undefined
 
-        assertNotNull(ni[TYPE_MOBILE].getReason());
-        assertNull(ni[TYPE_WIFI].getReason());
-
-        assertNotNull(ni[TYPE_MOBILE].getExtraInfo());
-        assertNull(ni[TYPE_WIFI].getExtraInfo());
+            assertEquals(DetailedState.IDLE, ni[TYPE_WIFI].getDetailedState());
+            assertNull(ni[TYPE_WIFI].getReason());
+            assertNull(ni[TYPE_WIFI].getExtraInfo());
+        }
 
         assertNotNull(ni[TYPE_MOBILE].toString());
         assertNotNull(ni[TYPE_WIFI].toString());

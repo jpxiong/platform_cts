@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2009 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package android.net.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -31,13 +32,15 @@ import android.test.AndroidTestCase;
 @TestTargetClass(ConnectivityManager.class)
 public class ConnectivityManagerTest extends AndroidTestCase {
 
+    public static final int TYPE_MOBILE = ConnectivityManager.TYPE_MOBILE;
+    public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
     private static final int HOST_ADDRESS = 0x7f000001;// represent ip 127.0.0.1
     private ConnectivityManager mCm;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mCm = (ConnectivityManager) getContext().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
+        mCm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @TestTargetNew(
@@ -98,17 +101,16 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getNetworkPreference",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setNetworkPreference",
             args = {int.class}
         )
     })
+    @BrokenTest("Cannot write secure settings table")
     public void testAccessNetworkPreference() {
 
         final int expected = 1;
@@ -150,15 +152,11 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test startUsingNetworkFeature(int networkType, String feature)."
-                    + "Only test failure case.",
             method = "startUsingNetworkFeature",
             args = {int.class, java.lang.String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test stopUsingNetworkFeature(int networkType, String feature)."
-                    + "Only test failure case.",
             method = "stopUsingNetworkFeature",
             args = {int.class, java.lang.String.class}
         )
@@ -166,20 +164,15 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public void testStartUsingNetworkFeature() {
 
         final String invalidateFeature = "invalidateFeature";
-        // TODO: MMS feature string is not public
         final String mmsFeature = "enableMMS";
         final int failureCode = -1;
 
-        assertEquals(failureCode, mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                invalidateFeature));
-        assertEquals(failureCode, mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                invalidateFeature));
+        assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_MOBILE, invalidateFeature));
+        assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE, invalidateFeature));
 
         // Should return failure(-1) because MMS is not supported on WIFI.
-        assertEquals(failureCode, 
-                mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
-        assertEquals(failureCode, 
-                mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_WIFI, mmsFeature));
+        assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_WIFI, mmsFeature));
+        assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_WIFI, mmsFeature));
     }
 
     @TestTargetNew(

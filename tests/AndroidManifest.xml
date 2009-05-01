@@ -653,6 +653,9 @@
                 android:process=":messengerService">
         </service>
 
+        <activity android:name="android.app.cts.LaunchpadActivity" android:multiprocess="true">
+        </activity>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
