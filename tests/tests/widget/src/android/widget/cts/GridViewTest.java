@@ -584,22 +584,13 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.NOT_NECESSARY,
         notes = "Test {@link GridView#onMeasure(int, int)}",
         method = "onMeasure",
         args = {int.class, int.class}
     )
     public void testOnMeasure() {
-        MockGridView mockGridView = new MockGridView(mActivity);
-        assertEquals(0, mockGridView.getMeasuredWidth());
-        assertEquals(0, mockGridView.getMeasuredHeight());
-
-        assertFalse(mockGridView.hasCalledOnMeasure());
-        mockGridView.measure(240, 320);
-        assertTrue(mockGridView.hasCalledOnMeasure());
-
-        assertEquals(7, mockGridView.getMeasuredWidth());
-        assertEquals(0, mockGridView.getMeasuredHeight());
+        // Do not test it. It's implementation detail.
     }
 
     @TestTargetNew(
@@ -664,56 +655,28 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             args = {}
         )
     })
-    public void testScroll() {
+    public void testScroll() throws Throwable {
         final MockGridView mockGridView= new MockGridView(mActivity);
         final ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                                                  ViewGroup.LayoutParams.FILL_PARENT,
-                                                  ViewGroup.LayoutParams.FILL_PARENT);
+                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
         // this test case can not be ran in UI thread.
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mActivity.getWindow().setContentView(mockGridView, params);
-                mockGridView.setAdapter(new MockGridViewAdapter(0));
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-
-        assertEquals(0, mockGridView.computeVerticalScrollExtent());
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mockGridView.setAdapter(new MockGridViewAdapter(3));
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-
-        assertEquals(300, mockGridView.computeVerticalScrollRange());
-        assertEquals(0, mockGridView.computeVerticalScrollOffset());
-        assertEquals(895, mockGridView.computeVerticalScrollExtent());
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
                 mockGridView.setAdapter(new ImageAdapter(mActivity));
             }
         });
         mInstrumentation.waitForIdleSync();
+        TouchUtils.scrollToTop(this, mActivity, mockGridView);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mockGridView.scrollTo(0, 50);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        int oldRange = mockGridView.computeVerticalScrollRange();
+        int oldExtent = mockGridView.computeVerticalScrollExtent();
+        int oldOffset = mockGridView.computeVerticalScrollOffset();
 
-        assertEquals(1200, mockGridView.computeVerticalScrollRange());
-        assertEquals(860, mockGridView.computeVerticalScrollExtent());
-        assertEquals(0, mockGridView.computeVerticalScrollOffset());
-
-        TouchUtils.scrollToBottom(this, mockGridView);
-
-        assertEquals(1200, mockGridView.computeVerticalScrollRange());
-        assertEquals(860, mockGridView.computeVerticalScrollExtent());
-        assertEquals(0, mockGridView.computeVerticalScrollOffset());
+        TouchUtils.scrollToBottom(this, mActivity, mockGridView);
+        assertEquals(oldRange, mockGridView.computeVerticalScrollRange());
+        assertEquals(oldExtent, mockGridView.computeVerticalScrollExtent());
+        assertTrue(oldOffset < mockGridView.computeVerticalScrollOffset());
     }
 
     private static class MockGridView extends GridView {
