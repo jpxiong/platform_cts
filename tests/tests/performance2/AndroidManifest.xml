@@ -23,6 +23,6 @@
     </application>
 
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.android.calculator2"
+                     android:targetPackage="com.android.music"
                      android:label="CTS tests of android.performance"/>
 </manifest>

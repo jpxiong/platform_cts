@@ -21,9 +21,9 @@ import android.content.Intent;
 import android.test.InstrumentationTestCase;
 
 public class AppStartup extends InstrumentationTestCase {
-    private static final long MAX_AVG_STARTUP_TIME = 1300;
-    private static final String PACKAGE_UNDER_TEST = "com.android.calculator2";
-    private static final String ACTIVITY_UNDER_TEST = "Calculator";
+    private static final long MAX_AVG_STARTUP_TIME = 500;
+    private static final String PACKAGE_UNDER_TEST = "com.android.music";
+    private static final String ACTIVITY_UNDER_TEST = "MusicBrowserActivity";
     private static final int NUMBER_OF_ITERS = 10;
 
     private Intent buildIntent(final String pkgName, String className) {
