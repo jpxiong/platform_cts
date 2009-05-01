@@ -67,7 +67,7 @@ CTS_LIBS=${CTS_LIBS}:${CTS_DIR}/${CTS_LIB}
 CTS_REPO=${CTS_DIR}/../cts/android-cts/repository
 
 # Try to locate CTS repository
-if [ $# -eq 1 ] || [[ "$*" =~ "--config" ]];
+if [ $# -eq 1 ] || [ $(echo "$*" | grep -c -e --config -) -gt 0 ];
 then
     # single parameter or --config argument specifies config file
     :
