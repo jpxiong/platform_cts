@@ -85,7 +85,9 @@ public class HostConfig extends XMLResourceHandler {
         // Timeout [ms] for the signature check
         signatureTestTimeoutMs (10 * 60 * 1000),
         // Timeout [ms] for package installations
-        packageInstallTimeoutMs (2 * 60 * 1000);
+        packageInstallTimeoutMs (2 * 60 * 1000),
+        // Time to wait [ms] after a package installation or removal
+        postInstallWaitMs (30 * 1000);
         
         private int value;
         

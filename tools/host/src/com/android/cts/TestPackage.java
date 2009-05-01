@@ -753,6 +753,11 @@ public class TestPackage implements DeviceObserver {
                 }
             }
         }
+        try {
+            Thread.sleep(HostConfig.Ints.postInstallWaitMs.value());
+        } catch (InterruptedException e) {
+            Log.e("", e);
+        }
         Log.d("Leave waitPackageActionComplete()");
     }
 
