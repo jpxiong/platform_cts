@@ -289,4 +289,12 @@ public class HostUtils {
         return buf.toString();
     }
     
+    /**
+     * Strip control characters from the given string.
+     */
+    public static String replaceControlChars(String s) {
+        // Replace any character < 0x20, except for tab, lf and cr
+        return s.replaceAll("[\\x00-\\x1f&&[^\t\n\r]]", "?");
+    }
+
 }
