@@ -48,25 +48,15 @@ import android.widget.TextView.BufferType;
 @TestTargetClass(ArrowKeyMovementMethod.class)
 public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private static final String THREE_LINES_TEXT = "first line\nsecond line\nlast line";
-
     private static final int END_OF_ALL_TEXT = THREE_LINES_TEXT.length();
-
     private static final int END_OF_1ST_LINE = THREE_LINES_TEXT.indexOf('\n');
-
     private static final int START_OF_2ND_LINE = END_OF_1ST_LINE + 1;
-
     private static final int END_OF_2ND_LINE = THREE_LINES_TEXT.indexOf('\n', START_OF_2ND_LINE);
-
     private static final int START_OF_3RD_LINE = END_OF_2ND_LINE + 1;
-
     private static final int SPACE_IN_2ND_LINE = THREE_LINES_TEXT.indexOf(' ', START_OF_2ND_LINE);
-
     private TextView mTextView;
-
     private ArrowKeyMovementMethod mArrowKeyMovementMethod;
-
     private Editable mEditable;
-
     private MyMetaKeyKeyListener mMetaListener;
 
     public ArrowKeyMovementMethodTest() {
@@ -140,7 +130,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
     )
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
             + "document about the behaviour of this method.")
-    public void testOnTakeFocus() {
+    public void testOnTakeFocus() throws Throwable {
         /*
          * The following assertions depend on whether the TextView has a layout.
          * The text view will not get layout in setContent method but in other
@@ -151,7 +141,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
          * and checking the assertion at last.
          */
         assertSelection(-1);
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_DOWN);
             }
@@ -159,7 +149,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         getInstrumentation().waitForIdleSync();
         assertSelection(END_OF_1ST_LINE);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_RIGHT);
@@ -168,7 +158,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         getInstrumentation().waitForIdleSync();
         assertSelection(END_OF_1ST_LINE);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_UP);
@@ -177,7 +167,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         getInstrumentation().waitForIdleSync();
         assertSelection(END_OF_ALL_TEXT);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_LEFT);
@@ -186,7 +176,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         getInstrumentation().waitForIdleSync();
         assertSelection(END_OF_ALL_TEXT);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setSingleLine();
             }
@@ -196,7 +186,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertNotNull(mTextView.getLayout());
         assertEquals(1, mTextView.getLayout().getLineCount());
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_DOWN);
@@ -204,7 +194,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         });
         assertSelection(END_OF_ALL_TEXT);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_RIGHT);
@@ -212,7 +202,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         });
         assertSelection(END_OF_ALL_TEXT);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_UP);
@@ -220,7 +210,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         });
         assertSelection(END_OF_ALL_TEXT);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_LEFT);
@@ -716,18 +706,17 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
     @UiThreadTest
     @ToBeFixed(bug = "1400249", explanation = "There is a side effect that the "
             + "view scroll while dragging on the screen. Should be tested in functional test.")
-    public void testOnTouchEvent() {
+    public void testOnTouchEvent() throws Throwable {
         long now = SystemClock.currentThreadTimeMillis();
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
-        assertTrue(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
+        assertFalse(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
                 MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1, 1, 0)));
-        assertSelection(0);
+        assertSelection(SPACE_IN_2ND_LINE);
 
-        Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
-        assertTrue(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
+        assertFalse(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
                 MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1, 1,
                         KeyEvent.META_SHIFT_ON)));
-        assertSelection(0);
+        assertSelection(SPACE_IN_2ND_LINE);
     }
 
     @TestTargetNew(
@@ -747,13 +736,9 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         mTextView.requestFocus();
         assertTrue(mTextView.isFocused());
 
-        try {
-            mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
-                    MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 1, 1, 0));
-            fail("The method did not throw NullPointerException when param textView is null.");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        long now = SystemClock.currentThreadTimeMillis();
+        assertFalse(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
+                    MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1, 1, 0)));
     }
 
     @TestTargetNew(
@@ -769,8 +754,9 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
     public void testOnTouchEventWithoutFocus() {
         long now = SystemClock.currentThreadTimeMillis();
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
-        assertTrue(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
+        assertFalse(mArrowKeyMovementMethod.onTouchEvent(mTextView, mEditable,
                 MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1, 1, 0)));
+        assertSelection(SPACE_IN_2ND_LINE);
     }
 
     @TestTargetNew(
