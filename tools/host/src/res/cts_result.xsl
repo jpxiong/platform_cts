@@ -226,13 +226,28 @@
                 <TABLE>
                     <TR>
                         <TH>Test Package</TH>
-                        <TH>Tests Passed</TH>
+                        <TH>Passed</TH>
+                        <TH>Failed</TH>
+                        <TH>Timed Out</TH>
+                        <TH>Total Tests</TH>
                     </TR>
                     <xsl:for-each select="TestResult/TestPackage">
                         <TR>
-                            <TD> <xsl:value-of select="@name"/> </TD>
                             <TD>
-                                <xsl:value-of select="count(TestSuite//Test[@result = 'pass'])"/> / <xsl:value-of select="count(TestSuite//Test)"/>
+                                <xsl:variable name="href"><xsl:value-of select="@name"/></xsl:variable>
+                                <a href="#{$href}"><xsl:value-of select="@name"/></a>
+                            </TD>
+                            <TD>
+                                <xsl:value-of select="count(TestSuite//Test[@result = 'pass'])"/>
+                            </TD>
+                            <TD>
+                                <xsl:value-of select="count(TestSuite//Test[@result = 'fail'])"/>
+                            </TD>
+                            <TD>
+                                <xsl:value-of select="count(TestSuite//Test[@result = 'timeout'])"/>
+                            </TD>
+                            <TD>
+                                <xsl:value-of select="count(TestSuite//Test)"/>
                             </TD>
                         </TR>
                     </xsl:for-each> <!-- end package -->
@@ -248,7 +263,10 @@
                     <DIV id="none">
                         <TABLE>
                             <TR>
-                                <TD class="none" align="left"> Compatibility Test Package: <xsl:value-of select="@name"/> </TD>
+                                <TD class="none" align="left">
+                                    <xsl:variable name="href"><xsl:value-of select="@name"/></xsl:variable>
+                                    <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@name"/></a>
+                                </TD>
                             </TR>
                         </TABLE>
                     </DIV>
@@ -286,17 +304,17 @@
                                     <!-- test results -->
                                     <xsl:choose>
                                         <xsl:when test="string(@KnownFailure)">
-                                            <!-- "pass" indicates the that test actually passed (resulta have been inverted already) -->
+                                            <!-- "pass" indicates the that test actually passed (results have been inverted already) -->
                                             <xsl:if test="@result='pass'">
                                                 <TD class="pass">
                                                     <div style="text-align: center; margin-left:auto; margin-right:auto;">
-                                                        known failure
+                                                        known problem
                                                     </div>
                                                 </TD>
                                                 <TD class="failuredetails"></TD>
                                             </xsl:if>
 
-                                            <!-- "fail" indicates that a known failure actually passed (resulta have been inverted already) -->
+                                            <!-- "fail" indicates that a known failure actually passed (results have been inverted already) -->
                                             <xsl:if test="@result='fail'">
                                                 <TD class="failed">
                                                     <div style="text-align: center; margin-left:auto; margin-right:auto;">
