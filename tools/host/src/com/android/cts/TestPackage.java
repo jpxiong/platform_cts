@@ -16,7 +16,6 @@
 
 package com.android.cts;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -26,8 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
-
-import sun.misc.BASE64Encoder;
 
 import com.android.cts.TestSession.TestSessionThread;
 
@@ -63,7 +60,6 @@ public class TestPackage implements DeviceObserver {
     protected TestSuite mCurrentTestSuite;
 
     protected TestDevice mDevice;
-    private MessageDigest mMsgDigest;
 
     protected boolean mTestStop;
     private TestSessionThread mTestThread;
@@ -89,7 +85,7 @@ public class TestPackage implements DeviceObserver {
             final String testPkgBinaryName, final String targetNameSpace,
             final String targetBinaryName, final String version,
             final String androidVersion, final String jarPath, final String appNameSpace,
-            final String appPackageName) throws NoSuchAlgorithmException {
+            final String appPackageName) {
         mInstrumentationRunner = instrumentationRunner;
         mName = testPkgBinaryName;
         mTargetNameSpace = targetNameSpace;
@@ -106,7 +102,6 @@ public class TestPackage implements DeviceObserver {
         mTestThread = null;
         mIsInBatchMode = false;
         mCurrentTest = null;
-        mMsgDigest = MessageDigest.getInstance("SHA-1");
     }
 
     /**
@@ -732,19 +727,20 @@ public class TestPackage implements DeviceObserver {
      * @return message digest string(base64 encoded).
      */
     private String genMessageDigest(final String packagePath) throws IOException {
-
-        BASE64Encoder base64Encoder = new BASE64Encoder();
+        final String algorithm = "SHA-1";
         FileInputStream fin = new FileInputStream(packagePath);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = fin.read(buffer)) != -1) {
-            bos.write(buffer, 0, len);
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = fin.read(buffer)) != -1) {
+                md.update(buffer, 0, len);
+            }
+            fin.close();
+            return HostUtils.toHexString(md.digest());
+        } catch (NoSuchAlgorithmException e) {
+            return algorithm + " not found";
         }
-        fin.close();
-
-        mMsgDigest.update(bos.toByteArray());
-        return base64Encoder.encodeBuffer(mMsgDigest.digest());
     }
 
     /**
