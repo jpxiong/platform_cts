@@ -16,8 +16,10 @@
 
 package android.hardware.cts;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
@@ -31,10 +33,10 @@ import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * This test case must run with hardware. It can't be tested in emulator
@@ -73,6 +75,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     public CameraTest() {
         super(PACKAGE, CameraStubActivity.class);
         if (LOGV) Log.v(TAG, "Camera Constructor");
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // to start CameraStubActivity.
+        getActivity();
     }
 
     /*
@@ -130,7 +139,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
             if (LOGV) Log.v(TAG, "Preview callback stop");
         }
-    };
+    }
 
     //Implement the shutterCallback
     private final class TestShutterCallback implements ShutterCallback {
@@ -138,7 +147,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mShutterCallbackResult = true;
             if (LOGV) Log.v(TAG, "onShutter called");
         }
-    };
+    }
 
     //Implement the RawPictureCallback
     private final class RawPictureCallback implements PictureCallback {
@@ -150,28 +159,38 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             }
             if (LOGV) Log.v(TAG, "RawPictureCallback callback");
         }
-    };
+    }
 
-    //Implement the JpegPictureCallback
+    // Implement the JpegPictureCallback
     private final class JpegPictureCallback implements PictureCallback {
-        public void onPictureTaken(byte [] rawData, Camera camera) {
+        public void onPictureTaken(byte[] rawData, Camera camera) {
             try {
                 if (rawData != null) {
-                    int rawDataLength = rawData.length;
-                    File rawoutput = new File("/sdcard/test.bmp");
-                    FileOutputStream outstream = new FileOutputStream(rawoutput);
-                    outstream.write(rawData);
-                    if (LOGV) Log.v(TAG, "JpegPictureCallback rawDataLength = " + rawDataLength);
                     mJpegPictureCallbackResult = true;
-                    } else {
-                        mJpegPictureCallbackResult = false;
+
+                    // try to store the picture on the SD card
+                    File rawoutput = new File("/sdcard/test.bmp");
+                    FileOutputStream outStream = new FileOutputStream(rawoutput);
+                    outStream.write(rawData);
+                    outStream.close();
+
+                    if (LOGV) {
+                        Log.v(TAG, "JpegPictureCallback rawDataLength = " + rawData.length);
                     }
-                if (LOGV) Log.v(TAG, "Jpeg Picture callback");
-                } catch (Exception e) {
-                    if (LOGV) Log.v(TAG, e.toString());
+                } else {
+                    mJpegPictureCallbackResult = false;
+                }
+                if (LOGV) {
+                    Log.v(TAG, "Jpeg Picture callback");
+                }
+            } catch (IOException e) {
+                // no need to fail here; callback worked fine
+                if (LOGV) {
+                    Log.v(TAG, "Error writing picture to sd card.");
                 }
             }
-        };
+        }
+    }
 
     // Implement the ErrorCallback
     private final class TestErrorCallback implements ErrorCallback {
@@ -189,41 +208,37 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
-    private void checkTakePicture() {
+    private void checkTakePicture() throws Exception {
         SurfaceHolder mSurfaceHolder;
-        try {
-            mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-            mCamera.setPreviewDisplay(mSurfaceHolder);
-            mCamera.startPreview();
-            mCamera.autoFocus(mAutoFocusCallback);
-            Thread.sleep(WAIT_TIME);
-            mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-            Thread.sleep(WAIT_LONG);
-        } catch (Exception e) {
-            fail(e.toString());
-        }
+
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        mCamera.autoFocus(mAutoFocusCallback);
+        Thread.sleep(WAIT_TIME);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        Thread.sleep(WAIT_LONG);
     }
 
-    private void checkPreviewCallback() {
+    private void checkPreviewCallback() throws Exception {
         SurfaceHolder mSurfaceHolder;
-        try {
-            mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-            mCamera.setPreviewDisplay(mSurfaceHolder);
-            if (LOGV) Log.v(TAG, "check preview callback");
-            mCamera.startPreview();
-            synchronized (mPreviewDone) {
-                try {
-                    mPreviewDone.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
-                    if (LOGV) Log.v(TAG, "Wait for preview callback");
-                } catch (Exception e) {
-                    if (LOGV) Log.v(TAG, "wait was interrupted.");
-                }
+
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        if (LOGV)
+            Log.v(TAG, "check preview callback");
+        mCamera.startPreview();
+        synchronized (mPreviewDone) {
+            try {
+                mPreviewDone.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
+                if (LOGV)
+                    Log.v(TAG, "Wait for preview callback");
+            } catch (Exception e) {
+                if (LOGV)
+                    Log.v(TAG, "wait was interrupted.");
             }
-            mCamera.setPreviewCallback(null);
-        } catch (Exception e) {
-            if (LOGV) Log.v(TAG, e.toString());
-            fail(e.toString());
         }
+        mCamera.setPreviewCallback(null);
     }
 
     /*
@@ -233,45 +248,38 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "startPreview",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setPreviewDisplay",
             args = {android.view.SurfaceHolder.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "open",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "release",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "takePicture",
-            args = {android.hardware.Camera.ShutterCallback.class, 
-                    android.hardware.Camera.PictureCallback.class, 
+            args = {android.hardware.Camera.ShutterCallback.class,
+                    android.hardware.Camera.PictureCallback.class,
                     android.hardware.Camera.PictureCallback.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setErrorCallback",
             args = {android.hardware.Camera.ErrorCallback.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "autoFocus",
             args = {android.hardware.Camera.AutoFocusCallback.class}
         )
@@ -286,9 +294,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(mJpegPictureCallbackResult);
         // Here system failed to call the onAutoFocus(boolean success, Camera camera),
         // while the autoFocus is available according to Log.
-//        assertTrue(autoFocusCallbackResult);
+
         // How to create an error situation with no influence on test running to test
-        // setErrorCallback
     }
 
     /*
@@ -298,43 +305,36 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "stopPreview",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "setPreviewCallback",
             args = {android.hardware.Camera.PreviewCallback.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "open",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "release",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "startPreview",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "setPreviewDisplay",
             args = {android.view.SurfaceHolder.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Preview test",
             method = "setErrorCallback",
             args = {android.hardware.Camera.ErrorCallback.class}
         )
@@ -352,18 +352,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test AccessParameters",
             method = "getParameters",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test AccessParameters",
             method = "setParameters",
             args = {android.hardware.Camera.Parameters.class}
         )
     })
-    public void testAccessParameters() {
+    public void testAccessParameters() throws Exception {
         initializeMessageLooper();
         syncLock();
         // we can get parameters just by getxxx method due to the private constructor
@@ -371,13 +369,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertParameters(pSet);
     }
 
-    private void syncLock() {
+    private void syncLock() throws Exception {
         synchronized (mLock) {
-            try {
-                mLock.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
-            } catch(Exception e) {
-                if (LOGV) Log.v(TAG, "runTestOnMethod: wait was interrupted.");
-            }
+            mLock.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
         }
     }
 
@@ -395,7 +389,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(PixelFormat.JPEG, parameters.getPictureFormat());
         assertEquals(ORIGINALPICWIDTH, parameters.getPictureSize().width);
         assertEquals(ORIGINALPICHEIGHT, parameters.getPictureSize().height);
-        assertEquals(PixelFormat.YCbCr_422_SP, parameters.getPreviewFormat());
+        assertEquals(PixelFormat.YCbCr_420_SP, parameters.getPreviewFormat());
         assertEquals(ORIGINALFPS, parameters.getPreviewFrameRate());
         assertEquals(WIDTH, parameters.getPreviewSize().width);
         assertEquals(HEIGHT, parameters.getPreviewSize().height);
