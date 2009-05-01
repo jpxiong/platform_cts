@@ -343,17 +343,21 @@ generateReferenceAppDescription "ApiDemosReferenceTest"\
 for CASE_SOURCE in $(find ${TESTCASES_SOURCE} -type d | grep "cts$" | sed 's/\/\//\//'); do
     TARGET_PACKAGE_NAME=$(echo ${CASE_SOURCE} | sed 's/^.*src\///g' | sed 's/\/cts//g' | sed 's/\//./g' | sed 's/android\..*\..*//g')
 
-    # TODO: Currently we have ignored the sub-packages, should add support for it later
     if [ x${TARGET_PACKAGE_NAME} != x ]; then
         # TODO: translate this script to python to reduce dependencies on external tools
         # darwin sed does not support \u in replacement pattern, use perl for now
-        NAME=$(echo $TARGET_PACKAGE_NAME | sed 's/android.//g' | perl -p -e 's/([a-z])([a-zA-Z0-9]*)/\u\1\2/g' | sed 's/^/Cts/g' | sed 's/$/TestCases/g')
+        NAME=$(echo $TARGET_PACKAGE_NAME | sed 's/android\.//g' | perl -p -e 's/([a-z])([a-zA-Z0-9]*)/\u\1\2/g' | sed 's/^/Cts/g' | sed 's/$/TestCases/g')
 
         if [ x${NAME} != x ]; then
-            # TODO: Currently use hardcode -f4, should find a better way to remove this harde code
+            # TODO: Currently hard coded as -f4, should find a better way to remove this hard code
             TESTCASE_DIR=$TESTCASES_SOURCE$(echo $CASE_SOURCE | cut -d"/" -f4)
 
-            generatePackageDescription ${CASE_SOURCE} ${TEMP_DIR}
+            # Since case source java packages always end in cts, we need to
+            # start the search for sources in the parent package, so that e.g.
+            # the android.content.cts test package also includes the sources in
+            # android.content.pm.cts.
+            CASE_SOURCE_PARENT=$(echo ${CASE_SOURCE} | sed 's/\/cts$//g')
+            generatePackageDescription ${CASE_SOURCE_PARENT} ${TEMP_DIR}
             addControllerInfo ${TESTCASE_DIR} ${TEMP_DIR} ${NAME} ${TARGET_PACKAGE_NAME}
             if [[ $? -ne 0 ]]; then
                 exit 1
