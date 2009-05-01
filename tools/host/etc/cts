@@ -78,4 +78,6 @@ else
     fi;
 fi;
 
-java -cp ${CTS_LIBS} -DHOST_CONFIG=${CTS_HOST_CFG} com.android.cts.TestHost "$@"
+JAVA_OPTS="-Xmx512M"
+
+java ${JAVA_OPTS} -cp ${CTS_LIBS} -DHOST_CONFIG=${CTS_HOST_CFG} com.android.cts.TestHost "$@"
