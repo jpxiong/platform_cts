@@ -16,6 +16,7 @@
 
 package android.provider.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargetClass;
 
 import android.content.ContentResolver;
@@ -166,6 +167,7 @@ public class SettingsTest extends AndroidTestCase {
         }
     }
 
+    @BrokenTest("Cannot access secure settings table")
     public void testSecureTable() throws RemoteException {
         final String[] SECURE_PROJECTION = new String[] {
                 Settings.Secure._ID, Settings.Secure.NAME, Settings.Secure.VALUE

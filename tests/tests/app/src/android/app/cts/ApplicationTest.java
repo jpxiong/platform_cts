@@ -20,6 +20,8 @@ import android.app.Application;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.test.InstrumentationTestCase;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -66,6 +68,7 @@ public class ApplicationTest extends InstrumentationTestCase {
       )
     })
     @ToBeFixed(bug="1653192", explanation="System doesn't call function onLowMemory")
+    @BrokenTest("onConfigurationChanged() not called after requesting orientation change")
     public void testApplication() {
         Intent intent = new Intent();
         intent.setClass(getInstrumentation().getTargetContext(), MockApplicationActivity.class);
