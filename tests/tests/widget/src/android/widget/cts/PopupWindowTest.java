@@ -40,6 +40,7 @@ import android.widget.PopupWindow.OnDismissListener;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -585,6 +586,7 @@ public class PopupWindowTest extends
             args = {}
         )
     })
+    @BrokenTest("showPopup() has the problem of window leakage. Disable this test.")
     public void testUpdate() {
         mPopupWindow = createPopupWindow(createPopupContent());
         mPopupWindow.setBackgroundDrawable(null);
@@ -943,6 +945,7 @@ public class PopupWindowTest extends
         method = "setTouchInterceptor",
         args = {android.view.View.OnTouchListener.class}
     )
+    @BrokenTest("showPopup() has the problem of window leakage. Disable this test.")
     public void testSetTouchInterceptor() {
         mPopupWindow = new PopupWindow(new TextView(mActivity));
 

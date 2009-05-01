@@ -412,7 +412,12 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         final TextView footerView1 = (TextView) mActivity.findViewById(R.id.footerview1);
         final TextView footerView2 = (TextView) mActivity.findViewById(R.id.footerview2);
 
-        mListView.setFooterDividersEnabled(true);
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mListView.setFooterDividersEnabled(true);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         assertEquals(0, mListView.getFooterViewsCount());
 
         mInstrumentation.runOnMainSync(new Runnable() {
@@ -488,7 +493,12 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         final TextView headerView1 = (TextView) mActivity.findViewById(R.id.headerview1);
         final TextView headerView2 = (TextView) mActivity.findViewById(R.id.headerview2);
 
-        mListView.setHeaderDividersEnabled(true);
+        mInstrumentation.runOnMainSync(new Runnable() {
+            public void run() {
+                mListView.setHeaderDividersEnabled(true);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
         assertEquals(0, mListView.getHeaderViewsCount());
 
         mInstrumentation.runOnMainSync(new Runnable() {
@@ -506,29 +516,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(2, mListView.getHeaderViewsCount());
-
-//        mInstrumentation.runOnMainSync(new Runnable() {
-//            public void run() {
-//                mListView.setAdapter(mAdapter_countries);
-//            }
-//        });
-//        mInstrumentation.waitForIdleSync();
-//
-//        mInstrumentation.runOnMainSync(new Runnable() {
-//            public void run() {
-//                mListView.removeHeaderView(headerView2);
-//            }
-//        });
-//        mInstrumentation.waitForIdleSync();
-//        assertEquals(1, mListView.getHeaderViewsCount());
-//
-//        mInstrumentation.runOnMainSync(new Runnable() {
-//            public void run() {
-//                mListView.removeHeaderView(headerView1);
-//            }
-//        });
-//        mInstrumentation.waitForIdleSync();
-//        assertEquals(0, mListView.getHeaderViewsCount());
     }
 
     @TestTargets({
@@ -992,10 +979,9 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     })
     @MediumTest
     public void testRequestLayout() throws Exception {
-        MockContext context = new MockContext2();
-        ListView listView = new ListView(context);
+        ListView listView = new ListView(mActivity);
         List<String> items = Lists.newArrayList("hello");
-        Adapter<String> adapter = new Adapter<String>(context, 0, items);
+        Adapter<String> adapter = new Adapter<String>(mActivity, 0, items);
         listView.setAdapter(adapter);
 
         int measureSpec = View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY);
@@ -1027,12 +1013,11 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     })
     @MediumTest
     public void testNoSelectableItems() throws Exception {
-        MockContext context = new MockContext2();
-        ListView listView = new ListView(context);
+        ListView listView = new ListView(mActivity);
         // We use a header as the unselectable item to remain after the selectable one is removed.
-        listView.addHeaderView(new View(context), null, false);
+        listView.addHeaderView(new View(mActivity), null, false);
         List<String> items = Lists.newArrayList("hello");
-        Adapter<String> adapter = new Adapter<String>(context, 0, items);
+        Adapter<String> adapter = new Adapter<String>(mActivity, 0, items);
         listView.setAdapter(adapter);
 
         listView.setSelection(1);
@@ -1048,27 +1033,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         adapter.notifyDataSetChanged();
         listView.measure(measureSpec, measureSpec);
         listView.layout(0, 0, 100, 100);
-    }
-
-    private class MockContext2 extends MockContext {
-
-        @Override
-        public Resources getResources() {
-            return null;
-        }
-
-        @Override
-        public Resources.Theme getTheme() {
-            return getInstrumentation().getTargetContext().getTheme();
-        }
-
-        @Override
-        public Object getSystemService(String name) {
-            if (Context.LAYOUT_INFLATER_SERVICE.equals(name)) {
-                return getInstrumentation().getTargetContext().getSystemService(name);
-            }
-            return super.getSystemService(name);
-        }
     }
 
     private class MockView extends View {
