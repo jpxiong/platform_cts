@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -190,5 +191,110 @@ public class TestPlanBuilderTests extends CtsTestBase {
                         + planName + ". The plan is not created!");
             }
         }
+    }
+
+    /**
+     * Test get excluded list.
+     */
+    public void testGetExcludedList() throws IOException,
+            TransformerFactoryConfigurationError, NoSuchAlgorithmException {
+
+        final String appPackageName = "com.google";
+        final String suiteName1 = "com.google.SuiteName1";
+        final String caseName1 = "CtsTestHello";
+        final String testName1 = "testHello";
+
+        final String cName2 = "CtsTestHello2";
+        final String testName2 = "testHello2";
+        final String testName3 = "testHello3";
+        final String testName4 = "testHello4";
+        final String testName5 = "testHello5";
+        final String nestedSuiteName1 = "com.google";
+        final String nestedSuiteName2 = "CtsTest.SuiteName2";
+
+        final String descriptionConfigStr =
+                    "<TestPackage name=\"" + mTestPackageBinaryName + "\""
+                    + " appPackageName=\"" + appPackageName + "\""
+                    + " version=\"1.0\" AndroidFramework=\"Android 1.0\""
+                    + " runner=\"android.test.InstrumentationTestRunner\" >\n"
+                    + " <Description>something extracted from java doc</Description>\n"
+                    + " <TestSuite name=\"" + suiteName1 + "\"" + ">\n"
+                    + "     <TestCase name=\"" + caseName1 + "\"" + " category=\"mandatory\">\n"
+                    + "         <Description>" + "something extracted from java doc"
+                    + "         </Description>\n"
+                    + "         <!-- Test Methods -->\n"
+                    + "         <Test method=\"" + testName1 + "\" type=\"automatic\"" + "/>\n"
+                    + "     </TestCase>\n"
+                    + " </TestSuite>\n"
+                    + " <TestSuite name=\"" + nestedSuiteName1+ "\"" + ">\n"
+                    + "     <TestSuite name=\"" + nestedSuiteName2+ "\"" + ">\n"
+                    + "         <TestCase name=\"" + cName2 + "\"" + " priority=\"mandatory\">\n"
+                    + "             <Test method=\"" + testName2 +"\" type=\"automatic\" />\n"
+                    + "             <Test method=\"" + testName3 +"\" type=\"automatic\" />\n"
+                    + "         </TestCase>\n"
+                    + "     </TestSuite>\n"
+                    + "     <TestCase name=\"" + caseName1 + "\"" + " category=\"mandatory\">\n"
+                    + "         <Description>" + "something extracted from java doc"
+                    + "         </Description>\n"
+                    + "         <!-- Test Methods -->\n"
+                    + "         <Test method=\"" + testName1 + "\" type=\"automatic\"" + "/>\n"
+                    + "     </TestCase>\n"
+                    + " </TestSuite>\n"
+                    + "</TestPackage>\n";
+
+        createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
+        HostConfig hf = HostConfig.getInstance();
+        hf.loadTestPackages();
+        TestPackage pkg = hf.getTestPackage(appPackageName);
+        assertNotNull(pkg);
+        String caseOneName = suiteName1 + "." + caseName1;
+        String caseTwoName = nestedSuiteName1 + "." + nestedSuiteName2 + "." + cName2;
+        Collection<Test> tests = pkg.getTests();
+        assertEquals(4, tests.size());
+        Iterator<Test> iterator = tests.iterator();
+        Test test1 = iterator.next();
+        Test test2 = iterator.next();
+        Test test3 = iterator.next();
+        Test test4 = iterator.next();
+        ArrayList<String> excludedList = null;
+
+        //scenario 1: all tests are not executed and get excluded list with notExecuted
+        excludedList = pkg.getExcludedList(CtsTestResult.STR_NOT_EXECUTED);
+        assertNotNull(excludedList);
+        assertEquals(0, excludedList.size());
+
+        //scenario 2: all tests are not executed and get excluded list with timeout
+        excludedList = pkg.getExcludedList(CtsTestResult.STR_TIMEOUT);
+        assertNull(excludedList);
+
+        //scenario 3: all tests are not executed and get excluded list with nothing
+        excludedList = pkg.getExcludedList(null);
+        assertNotNull(excludedList);
+        assertEquals(0, excludedList.size());
+
+        //scenario 4: not all all tests are executed and get excluded list with notExecuted
+        test2.setResult(new CtsTestResult(CtsTestResult.CODE_PASS, null, null));
+        excludedList = pkg.getExcludedList(CtsTestResult.STR_NOT_EXECUTED);
+        assertNotNull(excludedList);
+        assertEquals(1, excludedList.size());
+        assertEquals(test2.getFullName(), excludedList.get(0));
+        test2.setResult(new CtsTestResult(CtsTestResult.CODE_NOT_EXECUTED, null, null));
+
+        //scenario 5: excluded a whole suite
+        test1.setResult(new CtsTestResult(CtsTestResult.CODE_PASS, null, null));
+        excludedList = pkg.getExcludedList(CtsTestResult.STR_NOT_EXECUTED);
+        assertNotNull(excludedList);
+        assertEquals(1, excludedList.size());
+        assertEquals(suiteName1, excludedList.get(0));
+        test1.setResult(new CtsTestResult(CtsTestResult.CODE_NOT_EXECUTED, null, null));
+
+        //scenario 6: excluded the test case directly under the embedded test suite
+        String caseName = nestedSuiteName1 + "." + caseName1;
+        test4.setResult(new CtsTestResult(CtsTestResult.CODE_PASS, null, null));
+        excludedList = pkg.getExcludedList(CtsTestResult.STR_NOT_EXECUTED);
+        assertNotNull(excludedList);
+        assertEquals(1, excludedList.size());
+        assertEquals(caseName, excludedList.get(0));
+        test4.setResult(new CtsTestResult(CtsTestResult.CODE_NOT_EXECUTED, null, null));
     }
 }

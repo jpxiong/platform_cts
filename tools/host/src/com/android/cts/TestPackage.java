@@ -431,6 +431,42 @@ public class TestPackage implements DeviceObserver {
     }
 
     /**
+     * Get the excluded list according to the execution status of each test.
+     *
+     * @param resultType The result type to filter the tests.
+     * @return All excluded list. There are three scenarios to interpret the return value:
+     *      <ul>
+     *          <li> null: nothing should be added to plan;
+     *          <li> list size equals 0: the whole package should be added to plan;
+     *          <li> list size greater than 0: the given excluded list should be added to plan.
+     *      </ul>
+     */
+    public ArrayList<String> getExcludedList(final String resultType) {
+        ArrayList<String> excludedList = new ArrayList<String>();
+        ArrayList<String> fullNameList = new ArrayList<String>();
+        for (TestSuite suite : getTestSuites()) {
+            fullNameList.add(suite.getFullName());
+            ArrayList<String> list = suite.getExcludedList(resultType);
+            if ((list != null) && (list.size() > 0)) {
+                excludedList.addAll(list);
+            }
+        }
+
+        int count = 0;
+        for (String fullName : fullNameList) {
+            if (excludedList.contains(fullName)) {
+                count ++;
+            }
+        }
+        if (count == fullNameList.size()) {
+            //all suites contained have been excluded,
+            //return null to tell the caller nothing to add to the plan
+            return null;
+        }
+        return excludedList;
+    }
+
+    /**
      * Print the message by appending the new line mark.
      *
      * @param msg The message to be print.

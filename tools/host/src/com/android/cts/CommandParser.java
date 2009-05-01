@@ -54,7 +54,7 @@ public class CommandParser {
     private static Set<String> sOptionsSet = new HashSet<String>(Arrays.asList(
             CTSCommand.OPTION_CFG, CTSCommand.OPTION_PACKAGE, CTSCommand.OPTION_PLAN,
             CTSCommand.OPTION_DEVICE, CTSCommand.OPTION_RESULT, CTSCommand.OPTION_E,
-            CTSCommand.OPTION_SESSION, CTSCommand.OPTION_TEST));
+            CTSCommand.OPTION_SESSION, CTSCommand.OPTION_TEST, CTSCommand.OPTION_DERIVED_PLAN));
     private static HashMap<String, String> sOptionMap = new HashMap<String, String>();
     static {
         final String[] keys = new String[] {
@@ -70,7 +70,8 @@ public class CommandParser {
                 CTSCommand.OPTION_S,
                 CTSCommand.OPTION_SESSION,
                 CTSCommand.OPTION_T,
-                CTSCommand.OPTION_TEST};
+                CTSCommand.OPTION_TEST,
+                CTSCommand.OPTION_DERIVED_PLAN};
 
         final String[] values = new String[] {
                 CTSCommand.OPTION_CFG,
@@ -85,7 +86,8 @@ public class CommandParser {
                 CTSCommand.OPTION_SESSION,
                 CTSCommand.OPTION_SESSION,
                 CTSCommand.OPTION_TEST,
-                CTSCommand.OPTION_TEST};
+                CTSCommand.OPTION_TEST,
+                CTSCommand.OPTION_DERIVED_PLAN};
 
         for (int i = 0; i < keys.length; i++) {
             sOptionMap.put(keys[i], values[i]);

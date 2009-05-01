@@ -99,6 +99,37 @@ public class TestCase implements DeviceObserver {
     }
 
     /**
+     * Get the excluded list according to the execution status of each test.
+     *
+     * @param resultType The result type to filter the tests.
+     * @return All excluded list.
+     */
+    public ArrayList<String> getExcludedList(final String resultType) {
+        ArrayList<String> excludedList = new ArrayList<String>();
+
+        for (Test test : getTests()) {
+            if (resultType == null) {
+                //all result type except PASS will be excluded
+                if (test.getResult().isPass()) {
+                    excludedList.add(test.getFullName());
+                }
+            } else {
+                //the result type given by resultType will be excluded
+                if (!test.getResult().getResultString().equals(resultType)) {
+                    excludedList.add(test.getFullName());
+                }
+            }
+        }
+
+        if (excludedList.size() == getTests().size()) {
+            //the whole case is excluded, just need to add the full case name
+            excludedList.removeAll(excludedList);
+            excludedList.add(getFullName());
+        }
+        return excludedList;
+    }
+
+    /**
      * Get all test names contained in the test case.
      *
      * @return All test names.

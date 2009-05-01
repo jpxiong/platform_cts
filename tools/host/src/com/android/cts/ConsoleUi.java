@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 /**
  * Main console of CTS providing user with the interface to interact. <BR>
@@ -222,6 +225,7 @@ public class ConsoleUi {
         final String lsPlanStr = CTSCommand.LIST + " " + CTSCommand.OPTION_PLAN;
         final String addPlanStr = CTSCommand.ADD + " " + CTSCommand.OPTION_PLAN;
         final String rmPlanStr = CTSCommand.REMOVE + " " + CTSCommand.OPTION_PLAN;
+        final String addDerivedPlanStr = CTSCommand.ADD + " " + CTSCommand.OPTION_DERIVED_PLAN;
 
         CUIOutputStream.println(CMD_TYPE_LEADING_SPACE + "Plan:");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
@@ -230,6 +234,11 @@ public class ConsoleUi {
                 + lsPlanStr + " plan_name: list contents of the plan with specified name");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
                 + addPlanStr + " plan_name: add a new plan with specified name");
+        CUIOutputStream.println(CMD_OPT_LEADING_SPACE
+                + addDerivedPlanStr + " plan_name "
+                + CTSCommand.OPTION_S + "/" + CTSCommand.OPTION_SESSION + " session_id "
+                + CTSCommand.OPTION_R + "/" + CTSCommand.OPTION_RESULT + " result_type"
+                + ": derive a plan from the given session");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
                 + rmPlanStr + " plan_name/all: remove a plan or all plans from repository");
         showStartSessionHelp();
@@ -805,9 +814,14 @@ public class ConsoleUi {
      */
     private void processAddCommand(CommandParser cp) {
         if (cp.containsKey(CTSCommand.OPTION_PLAN)) {
-            if (cp.getArgSize() == 3 && cp.getActionValues().size() == 0
-                    && cp.getOptionSize() == 1) {
-                addPlan(cp);
+            if (isValidAddPlanArguments(cp)) {
+                createPlan(cp, CTSCommand.OPTION_PLAN);
+            } else {
+                showPlanCmdHelp();
+            }
+        } else if (cp.containsKey(CTSCommand.OPTION_DERIVED_PLAN)) {
+            if (isValidDerivedPlanArguments(cp)) {
+                createPlan(cp, CTSCommand.OPTION_DERIVED_PLAN);
             } else {
                 showPlanCmdHelp();
             }
@@ -824,6 +838,31 @@ public class ConsoleUi {
         } else {
             showHelp();
         }
+    }
+
+    /**
+     * Check if it's valid arguments for adding plan.
+     *
+     * @param cp The command processor.
+     * @return if valid, return true; else, return false.
+     */
+    private boolean isValidAddPlanArguments(CommandParser cp) {
+        return (cp.getArgSize() == 3) && (cp.getActionValues().size() == 0)
+                && (cp.getOptionSize() == 1);
+    }
+
+    /**
+     * Check if it's valid arguments for deriving plan.
+     *
+     * @param cp The command processor.
+     * @return if valid, return true; else, return false.
+     */
+    private boolean isValidDerivedPlanArguments(CommandParser cp) {
+        //argument size: it's at least 3, as "add --plan plan_name"
+        //action values: no option contains more than one value
+        //option size: it's at least 1, as "add --plan plan_name"
+        return (cp.getArgSize() >= 3) && (cp.getActionValues().size() == 0)
+                && (cp.getOptionSize() >= 1);
     }
 
     /**
@@ -921,31 +960,90 @@ public class ConsoleUi {
     }
 
     /**
+     * Create test plan via the test session and result type given.
+     *
+     * @param name The test plan name.
+     * @param ts The test session.
+     * @param resultType The result type.
+     */
+    private void createPlanFromSession(final String name, TestSession ts, final String resultType)
+            throws FileNotFoundException, ParserConfigurationException,
+            TransformerFactoryConfigurationError, TransformerException {
+
+        HashMap<String, ArrayList<String>> selectedResult =
+            new HashMap<String, ArrayList<String>>();
+        ArrayList<String> packageNames = new ArrayList<String>();
+
+        for (TestPackage pkg : ts.getSessionLog().getTestPackages()) {
+            String pkgName = pkg.getAppPackageName();
+            ArrayList<String> excludedList = pkg.getExcludedList(resultType);
+            if (excludedList != null) {
+                packageNames.add(pkgName);
+                selectedResult.put(pkgName, excludedList);
+            }
+        }
+
+        if ((selectedResult != null) && (selectedResult.size() > 0)) {
+            TestSessionBuilder.getInstance().serialize(name, packageNames, selectedResult);
+        } else {
+            if (resultType == null) {
+                Log.i("All tests of session " + ts.getId()
+                        + " have passed execution. The plan is not created!");
+            } else {
+                Log.i("No " + resultType +  " tests of session " + ts.getId()
+                        + ". The plan is not created!");
+            }
+        }
+    }
+
+    /**
+     * Add a derived plan from a given session.
+     *
+     * @param cp Command container.
+     * @param name The plan name.
+     * @param packageNames The package name list.
+     */
+    private void addDerivedPlan(final CommandParser cp, final String name,
+            ArrayList<String> packageNames) {
+
+        try {
+            String sessionId = null;
+            String resultType = null;
+            int id = TestSession.getLastSessionId();
+
+            if (cp.containsKey(CTSCommand.OPTION_SESSION)) {
+                sessionId = cp.getValue(CTSCommand.OPTION_SESSION);
+                id = Integer.parseInt(sessionId);
+            }
+            TestSession ts = mHost.getSession(id);
+            if (ts == null) {
+                Log.e("The session ID of " + id + " doesn't exist.", null);
+                return;
+            }
+
+            if (cp.containsKey(CTSCommand.OPTION_RESULT)) {
+                resultType = cp.getValue(CTSCommand.OPTION_RESULT);
+                if (!CtsTestResult.isValidResultType(resultType)) {
+                    Log.e("The following result type is invalid: " + resultType, null);
+                    return;
+                }
+            }
+            createPlanFromSession(name, ts, resultType);
+        } catch (Exception e) {
+            Log.e("Got exception while trying to add a plan!", e);
+            return;
+        }
+    }
+
+    /**
      * Add a plan by the plan name given.
      *
      * @param cp Command container.
+     * @param name The plan name.
+     * @param packageNames The package name list.
      */
-    private void addPlan(final CommandParser cp) {
-        final String name = cp.getValue(CTSCommand.OPTION_PLAN);
-        if (HostUtils.isFileExist(HostConfig.getInstance().getPlanRepository()
-                .getPlanPath(name)) == true) {
-            Log.e("Plan " + name + " already exist, please use another name!", null);
-            return;
-        }
-
-        if (!name.matches("\\w+")) {
-            CUIOutputStream.println("Only letter of the alphabet, number and '_'"
-                            + " are available for test plan name");
-            return;
-        }
-
-        ArrayList<String> packageNames =
-            HostConfig.getInstance().getCaseRepository().getPackageNames();
-        Collection<TestPackage> testPackages = HostConfig.getInstance().getTestPackages();
-        if (testPackages.size() == 0) {
-            CUIOutputStream.println("No package found in repository, please add package first!");
-            return;
-        }
+    private void addPlan(final CommandParser cp, final String name,
+            ArrayList<String> packageNames) {
 
         try {
             PlanBuilder planBuilder = new PlanBuilder(packageNames);
@@ -966,7 +1064,53 @@ public class ConsoleUi {
             Log.e("Got exception while trying to add a plan!", e);
             return;
         }
+    }
 
+    /**
+     * Create a plan.
+     *
+     * @param cp Command container.
+     * @param type the action type.
+     */
+    private void createPlan(final CommandParser cp, final String type) {
+        String name = null;
+        if (CTSCommand.OPTION_PLAN.equals(type)) {
+            name = cp.getValue(CTSCommand.OPTION_PLAN);
+        } else if (CTSCommand.OPTION_DERIVED_PLAN.equals(type)) {
+            name = cp.getValue(CTSCommand.OPTION_DERIVED_PLAN);
+        } else {
+            return;
+        }
+
+        if (HostUtils.isFileExist(HostConfig.getInstance().getPlanRepository()
+                .getPlanPath(name)) == true) {
+            Log.e("Plan " + name + " already exist, please use another name!", null);
+            return;
+        }
+
+        try {
+            if ((name != null) && (!name.matches("\\w+"))) {
+                CUIOutputStream.println("Only letter of the alphabet, number and '_'"
+                        + " are available for test plan name");
+                return;
+            }
+
+            ArrayList<String> packageNames =
+                HostConfig.getInstance().getCaseRepository().getPackageNames();
+            Collection<TestPackage> testPackages = HostConfig.getInstance().getTestPackages();
+            if (testPackages.size() == 0) {
+                CUIOutputStream.println("No package found in repository, please add package first!");
+                return;
+            }
+            if (CTSCommand.OPTION_PLAN.equals(type)) {
+                addPlan(cp, name, packageNames);
+            } else if (CTSCommand.OPTION_DERIVED_PLAN.equals(type)) {
+                addDerivedPlan(cp, name, packageNames);
+            }
+        } catch (Exception e) {
+            Log.e("Got exception while trying to add a plan!", e);
+            return;
+        }
     }
 
     /**
