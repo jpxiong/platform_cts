@@ -55,7 +55,7 @@ if [ $# -eq 1 ]; then
     # single argument specifies configuration file
     :
 else
-    if [[ "$*" =~ "--config" ]]; then
+    if [ $(echo "$*" | grep -c -e --config -) -gt 0 ]; then
         # --config supplied on command line
         :
     else
