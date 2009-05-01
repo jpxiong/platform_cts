@@ -161,6 +161,45 @@ public class TestSuite implements DeviceObserver {
     }
 
     /**
+     * Get the excluded list according to the execution status of each test.
+     *
+     * @param resultType The result type to filter the tests.
+     * @return All excluded list.
+     */
+    public ArrayList<String> getExcludedList(final String resultType) {
+        ArrayList<String> excludedList = new ArrayList<String>();
+        ArrayList<String> fullNameList = new ArrayList<String>();
+        for (TestSuite suite : mSubSuites) {
+            fullNameList.add(suite.getFullName());
+            ArrayList<String> list = suite.getExcludedList(resultType);
+            if ((list != null) && (list.size() > 0)) {
+                excludedList.addAll(list);
+            }
+        }
+
+        for (TestCase tc : mTestCases) {
+            fullNameList.add(tc.getFullName());
+            ArrayList<String> list = tc.getExcludedList(resultType);
+            if ((list != null) && (list.size() > 0)) {
+                excludedList.addAll(list);
+            }
+        }
+
+        int count = 0;
+        for (String fullName : fullNameList) {
+            if (excludedList.contains(fullName)) {
+                count ++;
+            }
+        }
+        if (count == fullNameList.size()) {
+            //the whole suite is excluded, just need to add the full suite name
+            excludedList.removeAll(excludedList);
+            excludedList.add(getFullName());
+        }
+        return excludedList;
+    }
+
+    /**
      * Get all tests of this test suite.
      *
      * @return The tests of this suite.
