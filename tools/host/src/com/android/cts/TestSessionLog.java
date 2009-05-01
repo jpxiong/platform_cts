@@ -393,6 +393,9 @@ public class TestSessionLog extends XMLResourceHandler {
                 String failedMessage = result.getFailedMessage();
 
                 if (failedMessage != null) {
+                    // failure message may contain control characters < 0x20 that get translated
+                    // into illegal XML character entities. Replace them first.
+                    failedMessage = HostUtils.replaceControlChars(failedMessage);
                     Node failedMessageNode = doc.createElement(TAG_FAILED_SCENE);
                     testNode.appendChild(failedMessageNode);
                     setAttribute(doc, failedMessageNode,TAG_FAILED_MESSAGE, failedMessage);
