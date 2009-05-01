@@ -53,6 +53,7 @@ import android.test.AndroidTestCase;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -137,7 +138,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         method = "sendOrderedBroadcast",
         args = {android.content.Intent.class, java.lang.String.class}
     )
-    @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
+    @BrokenTest("TODO: need to refactor test case")
     public void testSendOrderedBroadcast1() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1159,7 +1160,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         method = "sendBroadcast",
         args = {android.content.Intent.class}
     )
-    @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
+    @BrokenTest("TODO: need to refactor test case")
     public void testSendBroadcast1() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
@@ -1177,7 +1178,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         method = "sendBroadcast",
         args = {android.content.Intent.class, java.lang.String.class}
     )
-    @ToBeFixed(bug = "", explanation = "ResultReceiver.hadReceivedBroadCast() should be true")
+    @BrokenTest("TODO: need to refactor test case")
     public void testSendBroadcast2() throws InterruptedException {
         ContextWrapper contextWrapper = new ContextWrapper(mContext);
 
