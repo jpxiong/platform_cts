@@ -72,7 +72,7 @@ public class HostConfig extends XMLResourceHandler {
         // Number of tests executed between reboots. A value <= 0 disables reboots.
         maxTestCount (200),
         // Max size [tests] for a package to be run in batch mode
-        maxTestsInBatchMode (Integer.MAX_VALUE),
+        maxTestsInBatchMode (200),
         // Max time [ms] between test status updates for both individual and batch mode.
         testStatusTimeoutMs (5 * 60 * 1000),
         // Max time [ms] from start of package in batch mode and the first test status update.
