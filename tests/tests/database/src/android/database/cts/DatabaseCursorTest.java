@@ -396,7 +396,7 @@ public class DatabaseCursorTest extends TestCase implements PerformanceTestCase 
     public void testLoadingThread() throws Exception {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
 
-        final int count = 50000;
+        final int count = 30000;
         String sql = "INSERT INTO test (data) VALUES (?);";
         SQLiteStatement s = mDatabase.compileStatement(sql);
         for (int i = 0; i < count; i++) {

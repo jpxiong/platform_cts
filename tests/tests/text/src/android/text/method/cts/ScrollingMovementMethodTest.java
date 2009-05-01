@@ -350,25 +350,23 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 try {
                     new ScrollingMovementMethod().onTouchEvent(mTextView, mSpannable, null);
-                    fail("The method did not throw NullPointerException if the event is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 long now = SystemClock.uptimeMillis();
                 try {
                     new ScrollingMovementMethod().onTouchEvent(mTextView, null,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0, 0, 0));
-                    fail("The method did not throw NullPointerException if the spannable is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     new ScrollingMovementMethod().onTouchEvent(null, mSpannable,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 0, 0, 0));
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the layout is null.");
+                    // NPE is acceptable
                 }
 
                 new ScrollingMovementMethod().onTouchEvent(mTextView, mSpannable,
@@ -376,32 +374,29 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
                 try {
                     new ScrollingMovementMethod().onTouchEvent(null, mSpannable,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, - 10000, 0, 0));
-                    fail("The method did not throw NullPointerException if the layout is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     new ScrollingMovementMethod().onTouchEvent(mTextView, null,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, - 10000, 0, 0));
-                    fail("The method did not throw NullPointerException if the layout is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     new ScrollingMovementMethod().onTouchEvent(null, mSpannable,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, - 10000, 0, 0));
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the layout is null.");
+                    // NPE is acceptable
                 }
 
                 try {
                     new ScrollingMovementMethod().onTouchEvent(mTextView, null,
                             MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, - 10000, 0, 0));
-                    fail("Should nthrow NullPointerException if the layout is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
             }
         });
@@ -547,22 +542,21 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
                 try {
                     method.onKeyDown(null, mSpannable, KeyEvent.KEYCODE_DPAD_RIGHT,
                             new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
-                    fail("The method did not throw NullPointerException if the text view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.onKeyDown(mTextView, null, KeyEvent.KEYCODE_DPAD_RIGHT,
                             new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
 
                 try {
                     method.onKeyDown(mTextView, mSpannable, KeyEvent.KEYCODE_DPAD_RIGHT, null);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
             }
         });
@@ -652,28 +646,26 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 try {
                     method.up(null, mSpannable);
-                    fail("The method did not throw NullPointerException if the view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.up(mTextView, null);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
 
                 try {
                     method.down(null, mSpannable);
-                    fail("The method did not throw NullPointerException if the view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.down(mTextView, null);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
             }
         });
@@ -718,30 +710,26 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertNull(mTextView.getLayout());
         try {
             new MyScrollingMovementMethod().down(mTextView, mSpannable);
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
 
         try {
             new MyScrollingMovementMethod().up(mTextView, mSpannable);
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
 
         try {
             new MyScrollingMovementMethod().left(mTextView, mSpannable);
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
 
         try {
             new MyScrollingMovementMethod().right(mTextView, mSpannable);
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
 
         long now = SystemClock.uptimeMillis();
@@ -749,9 +737,8 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT);
             new ScrollingMovementMethod().onKeyDown(mTextView, mSpannable,
                     KeyEvent.KEYCODE_DPAD_RIGHT, event);
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
 
         new ScrollingMovementMethod().onTouchEvent(mTextView, mSpannable,
@@ -759,9 +746,8 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         try {
             new ScrollingMovementMethod().onTouchEvent(mTextView, mSpannable,
                     MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, - 10000, 0, 0));
-            fail("The method did not throw NullPointerException if the layout is null.");
         } catch (NullPointerException e) {
-            // expected
+            // NPE is acceptable
         }
     }
 
@@ -840,7 +826,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         try {
             method.onTakeFocus(mTextView, mSpannable, View.FOCUS_BACKWARD);
         } catch (NullPointerException e) {
-            fail("The method threw NullPointerException if the layout is null.");
+            // NPE is acceptable
         }
 
         runActionOnUiThread(new Runnable() {
@@ -875,15 +861,14 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 try {
                     method.onTakeFocus(null, mSpannable, View.FOCUS_FORWARD);
-                    fail("The method did not throw NullPointerException if the view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.onTakeFocus(mTextView, null, View.FOCUS_FORWARD);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the text is null.");
+                    // NPE is acceptable
                 }
             }
         });
@@ -966,28 +951,26 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 try {
                     method.right(null, mSpannable);
-                    fail("The method did not throw NullPointerException if the view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.right(mTextView, null);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
 
                 try {
                     method.left(null, mSpannable);
-                    fail("The method did not throw NullPointerException if the view is null.");
                 } catch (NullPointerException e) {
-                    // expected
+                    // NPE is acceptable
                 }
 
                 try {
                     method.left(mTextView, null);
                 } catch (NullPointerException e) {
-                    fail("The method threw NullPointerException if the buffer is null.");
+                    // NPE is acceptable
                 }
             }
         });
