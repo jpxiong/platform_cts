@@ -252,7 +252,7 @@ public class DescriptionGenerator extends Doclet {
 
             File file = new File(mOutputPath);
             file.getParentFile().mkdirs();
-            
+
             t.transform(new DOMSource(mDoc),
                     new StreamResult(new FileOutputStream(file)));
         }
@@ -387,6 +387,9 @@ public class DescriptionGenerator extends Doclet {
                 elem.getParentNode().removeChild(elem);
             } else {
                 for (TestMethod caze : cases) {
+                    if (caze.mIsBroken) {
+                        continue;
+                    }
                     Node caseNode = elem.appendChild(mDoc.createElement(TAG_TEST));
 
                     setAttribute(caseNode, ATTRIBUTE_METHOD, caze.mName);
@@ -508,6 +511,7 @@ public class DescriptionGenerator extends Doclet {
                 AnnotationDesc[] annotations = method.annotations();
                 String controller = "";
                 String knownFailure = null;
+                boolean isBroken = false;
                 for (AnnotationDesc cAnnot : annotations) {
 
                     AnnotationTypeDoc atype = cAnnot.annotationType();
@@ -515,11 +519,14 @@ public class DescriptionGenerator extends Doclet {
                         controller = getAnnotationDescription(cAnnot);
                     } else if (atype.toString().equals(KNOWN_FAILURE)) {
                         knownFailure = getAnnotationDescription(cAnnot);
+                    } else if (atype.toString().equals(BROKEN_TEST)) {
+                        isBroken = true;
                     }
                 }
 
                 if (name.startsWith("test")) {
-                    cases.add(new TestMethod(name, method.commentText(), controller, knownFailure));
+                    cases.add(new TestMethod(name, method.commentText(), controller, knownFailure,
+                            isBroken));
                 }
             }
 
@@ -576,6 +583,7 @@ public class DescriptionGenerator extends Doclet {
         String mDescription;
         String mController;
         String mKnownFailure;
+        boolean mIsBroken;
 
         /**
          * Construct an test case object.
@@ -584,11 +592,13 @@ public class DescriptionGenerator extends Doclet {
          * @param description The description of the test case.
          * @param knownFailure The reason of known failure.
          */
-        TestMethod(String name, String description, String controller, String knownFailure) {
+        TestMethod(String name, String description, String controller, String knownFailure,
+                boolean isBroken) {
             mName = name;
             mDescription = description;
             mController = controller;
             mKnownFailure = knownFailure;
+            mIsBroken = isBroken;
         }
     }
 }
