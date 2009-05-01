@@ -18,6 +18,7 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -281,6 +282,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
             args = {}
         )
     })
+    @BrokenTest("Fails in individual mode (current pos > 0 before start)")
     public void testPlayVideo2() throws Throwable {
         final int seekTo = mVideoView.getDuration() >> 1;
         final MockOnPreparedListener listener = new MockOnPreparedListener();

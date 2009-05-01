@@ -203,8 +203,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertEquals('\0', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_E, chars, 0));
         assertEquals('A', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_A, chars, 0));
         assertEquals('B', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_B, chars, 0));
-        assertEquals('A', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_A, chars, KeyEvent.KEYCODE_A));
-        assertEquals('\0', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_B, chars, KeyEvent.KEYCODE_B));
     }
 
     @TestTargetNew(
