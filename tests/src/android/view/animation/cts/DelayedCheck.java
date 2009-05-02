@@ -48,6 +48,6 @@ public abstract class DelayedCheck {
             timeout -= TIME_SLICE;
         }
 
-        Assert.fail("expected timeout");
+        Assert.fail("unexpected timeout");
     }
 }
