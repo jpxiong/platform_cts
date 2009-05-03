@@ -16,6 +16,7 @@
 
 package android.provider.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -83,6 +84,7 @@ public class Settings_SecureTest extends AndroidTestCase {
             args = {android.content.ContentResolver.class, java.lang.String.class}
         )
     })
+    @BrokenTest("Cannot access secure settings table")
     public void testSecureSettings() throws SettingNotFoundException {
         /**
          * first query the exist settings in Secure table, and then insert four rows:

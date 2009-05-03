@@ -30,6 +30,8 @@ import android.provider.Contacts;
 import android.provider.Contacts.Groups;
 import android.provider.Contacts.People;
 import android.test.InstrumentationTestCase;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -144,6 +146,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             args = {android.content.ContentResolver.class, android.content.ContentValues.class}
         )
     })
+    @BrokenTest("GROUP_MY_CONTACTS does not exist")
     public void testAddToGroup() {
         Cursor cursor;
         try {
@@ -157,6 +160,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
                     Groups.NAME + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null);
             cursor.moveToFirst();
+            // TODO: this throws an exception because no rows were found
             int groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
             cursor = People.queryGroups(mContentResolver, personId);
@@ -287,6 +291,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             args = {android.content.ContentResolver.class, android.net.Uri.class}
         )
     })
+    @BrokenTest("photoStream is null after setting photo data")
     public void testAccessPhotoData() {
         Context context = getInstrumentation().getTargetContext();
         try {

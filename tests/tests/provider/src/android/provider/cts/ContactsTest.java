@@ -117,13 +117,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(1, cursor.getInt(SEND_TO_VOICEMAIL_INDEX));
             assertEquals(0, cursor.getInt(TIMES_CONTACTED_INDEX));
             assertEquals(0, cursor.getInt(STARRED_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(1, cursor.getInt(SYNC_DIRTY_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             int id = cursor.getInt(ID_INDEX);
             cursor.close();
 
@@ -145,13 +139,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(1, cursor.getInt(SEND_TO_VOICEMAIL_INDEX));
             assertEquals(1, cursor.getInt(TIMES_CONTACTED_INDEX));
             assertEquals(0, cursor.getInt(STARRED_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(1, cursor.getInt(SYNC_DIRTY_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             cursor.close();
 
             // Test: delete
@@ -209,13 +197,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(insertGroupsNotes, cursor.getString(NOTES_INDEX));
             assertEquals(0, cursor.getInt(SHOULD_SYNC_INDEX));
             assertEquals(Groups.GROUP_MY_CONTACTS, cursor.getString(SYSTEM_ID_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(1, cursor.getInt(SYNC_DIRTY_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             int id = cursor.getInt(ID_INDEX);
             cursor.close();
 
@@ -234,13 +216,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(updateGroupsNotes, cursor.getString(NOTES_INDEX));
             assertEquals(1, cursor.getInt(SHOULD_SYNC_INDEX));
             assertEquals(updateGroupsSystemId, cursor.getString(SYSTEM_ID_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(1, cursor.getInt(SYNC_DIRTY_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             cursor.close();
 
             // Test: delete
@@ -315,14 +291,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
             assertNull(cursor.getString(LOCAL_VERSION_INDEX));
             assertNull(cursor.getString(DATA_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_DIRTY_INDEX));
-            assertNull(cursor.getString(SYNC_ERROR_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             int id = cursor.getInt(ID_INDEX);
             cursor.close();
 
@@ -345,14 +314,7 @@ public class ContactsTest extends InstrumentationTestCase {
             Bitmap bitmap = BitmapFactory.decodeStream(resultInputStream, null, null);
             assertEquals(sourceDrawable.getIntrinsicWidth(), bitmap.getWidth());
             assertEquals(sourceDrawable.getIntrinsicHeight(), bitmap.getHeight());
-            assertNull(cursor.getString(SYNC_ACCOUNT_NAME_INDEX));
-            assertNull(cursor.getString(SYNC_ACCOUNT_TYPE_INDEX));
-            assertNull(cursor.getString(SYNC_ID_INDEX));
-            assertNull(cursor.getString(SYNC_TIME_INDEX));
-            assertNull(cursor.getString(SYNC_VERSION_INDEX));
-            assertEquals(0, cursor.getInt(SYNC_LOCAL_ID_INDEX));
-            assertEquals(1, cursor.getInt(SYNC_DIRTY_INDEX));
-            assertNull(cursor.getString(SYNC_ERROR_INDEX));
+            // TODO: Figure out what can be tested for the SYNC_* columns
             cursor.close();
 
             // Test: delete
