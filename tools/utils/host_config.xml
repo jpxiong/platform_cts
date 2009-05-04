@@ -39,4 +39,7 @@
     <IntValue name="signatureTestTimeoutMs" value="600000" />
     <!-- Timeout [ms] for package installations. -->
     <IntValue name="packageInstallTimeoutMs" value="120000" />
+    <!-- Time to wait [ms] after a package installation or removal. -->
+    <IntValue name="postInstallWaitMs" value="30000" />
+
 </HostConfiguration>
