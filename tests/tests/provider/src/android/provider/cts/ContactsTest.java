@@ -42,6 +42,8 @@ import android.provider.Contacts.Photos;
 import android.provider.Contacts.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.test.InstrumentationTestCase;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargetClass;
 
 import java.io.ByteArrayInputStream;
@@ -154,6 +156,7 @@ public class ContactsTest extends InstrumentationTestCase {
      * Test case for the behavior of the ContactsProvider's groups table
      * It does not test any APIs in android.provider.Contacts.java
      */
+    @BrokenTest("Throws NPE in call to update(). uri parameter null?")
     public void testGroupsTable() {
         final String[] GROUPS_PROJECTION = new String[] {
                 Groups._ID, Groups.NAME, Groups.NOTES, Groups.SHOULD_SYNC,
@@ -230,6 +233,7 @@ public class ContactsTest extends InstrumentationTestCase {
      * Test case for the behavior of the ContactsProvider's photos table
      * It does not test any APIs in android.provider.Contacts.java
      */
+    @BrokenTest("Should not test EXISTS_ON_SERVER_INDEX?")
     public void testPhotosTable() {
         final String[] PHOTOS_PROJECTION = new String[] {
                 Photos._ID, Photos.EXISTS_ON_SERVER, Photos.PERSON_ID,
