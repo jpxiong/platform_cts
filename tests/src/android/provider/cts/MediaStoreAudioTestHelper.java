@@ -210,7 +210,7 @@ public class MediaStoreAudioTestHelper {
         }
     }
 
+    // These constants are not part of the public API
     public static final String EXTERNAL_VOLUME_NAME = "external";
-
     public static final String INTERNAL_VOLUME_NAME = "internal";
 }
