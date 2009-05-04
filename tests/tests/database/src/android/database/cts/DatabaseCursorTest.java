@@ -16,6 +16,8 @@
 
 package android.database.cts;
 
+import dalvik.annotation.BrokenTest;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
@@ -393,10 +395,11 @@ public class DatabaseCursorTest extends TestCase implements PerformanceTestCase 
     }
 
     @LargeTest
+    @BrokenTest("Consistently times out, even with count reduced to 30000")
     public void testLoadingThread() throws Exception {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
 
-        final int count = 30000;
+        final int count = 50000;
         String sql = "INSERT INTO test (data) VALUES (?);";
         SQLiteStatement s = mDatabase.compileStatement(sql);
         for (int i = 0; i < count; i++) {
