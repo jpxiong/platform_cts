@@ -24,8 +24,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Media;
 import android.test.InstrumentationTestCase;
@@ -37,11 +35,6 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath()) < 0) {
-            // tests for external database need sdcard
-            fail("There is no sdcard attached!");
-        }
 
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
@@ -58,8 +51,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
                 null));
 
         // can not accept any other volume names
-        String volume = "volume"
-                + FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath());
+        String volume = "fakeVolume";
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
