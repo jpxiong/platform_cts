@@ -830,9 +830,9 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
 
     private boolean isInRange(int current, int from, int to) {
         if (from < to) {
-            return current > from && current < to;
+            return current >= from && current <= to;
         }
-        return current < from && current > to;
+        return current <= from && current >= to;
     }
 
     private void delayedCheckSmoothScrolling(final int fromX, final int toX,

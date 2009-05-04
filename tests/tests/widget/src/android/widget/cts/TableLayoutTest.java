@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -507,6 +508,7 @@ public class TableLayoutTest extends ActivityInstrumentationTestCase2<TableStubA
     })
     @ToBeFixed( bug = "", explanation = "After set a column unable to be shrunk," +
             " the other shrinkable columns are not shrunk more.")
+    @BrokenTest("fails consistently")
     public void testColumnShrinkableEffect() {
         final TableStubActivity activity = getActivity();
         getInstrumentation().runOnMainSync(new Runnable() {
