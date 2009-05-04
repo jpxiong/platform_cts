@@ -464,6 +464,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     )
     @ToBeFixed(bug = "", explanation = "After pressing KEYCODE_HEADSETHOOK, "
             + "the video should be playing, but it did not until time out.")
+    @BrokenTest("Video starts playing automatically after setting the path.")
     public void testOnKeyDown() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {

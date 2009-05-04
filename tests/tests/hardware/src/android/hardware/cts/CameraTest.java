@@ -16,6 +16,7 @@
 
 package android.hardware.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -339,6 +340,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.ErrorCallback.class}
         )
     })
+    @BrokenTest("Flaky test. Occasionally fails without a stack trace.")
     public void testCheckPreview() throws Exception {
         initializeMessageLooper();
         syncLock();
