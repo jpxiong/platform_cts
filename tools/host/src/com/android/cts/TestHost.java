@@ -72,6 +72,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
     static MODE sMode = MODE.UNINITIALIZED;
 
     public static void main(final String[] mainArgs) {
+        CUIOutputStream.println("Android CTS version " + Version.asString());
+
         if (HostLock.lock() == false) {
             Log.e("Error: CTS is being used at the moment."
                     + " No more than one CTS instance is allowed simultaneously", null);

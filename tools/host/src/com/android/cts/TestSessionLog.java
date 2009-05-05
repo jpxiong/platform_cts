@@ -23,6 +23,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,6 +46,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     private static final String CTS_RESULT_FILE_NAME = "testResult.xml";
+    private static final String CTS_RESULT_FILE_VERSION = "1.1";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -64,6 +67,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_IMEI = "imei";
     static final String ATTRIBUTE_IMSI = "imsi";
     static final String ATTRIBUTE_BUILD_NAME = "buildName";
+    static final String ATTRIBUTE_ARCH = "arch";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -71,6 +75,10 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_NOT_EXECUTED = "notExecuted";
 
     static final String TAG_DEVICEINFO = "DeviceInfo";
+    static final String TAG_HOSTINFO = "HostInfo";
+    static final String TAG_OSINFO = "Os";
+    static final String TAG_JAVA = "Java";
+    static final String TAG_CTS = "Cts";
     static final String TAG_SUMMARY = "Summary";
     static final String TAG_SCREEN = "Screen";
     static final String TAG_BUILD_INFO = "BuildInfo";
@@ -261,7 +269,7 @@ public class TestSessionLog extends XMLResourceHandler {
             Node root = doc.createElement("TestResult");
             doc.appendChild(root);
 
-            setAttribute(doc, root, ATTRIBUTE_VERSION, "1.0");
+            setAttribute(doc, root, ATTRIBUTE_VERSION, CTS_RESULT_FILE_VERSION);
             setAttribute(doc, root, ATTRIBUTE_STARTTIME, mSessionStartTime.toString());
             setAttribute(doc, root, ATTRIBUTE_ENDTIME, mSessionEndTime.toString());
             setAttribute(doc, root, ATTRIBUTE_TESTPLAN, mTestPlanName);
@@ -313,6 +321,26 @@ public class TestSessionLog extends XMLResourceHandler {
 
                 deviceSettingNode.appendChild(devInfoNode);
             }
+            
+            Node hostInfo = doc.createElement(TAG_HOSTINFO);
+            root.appendChild(hostInfo);
+            String hostName = "";
+            try {
+                hostName = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException ignored) {}
+            setAttribute(doc, hostInfo, ATTRIBUTE_NAME, hostName);
+            Node osInfo = doc.createElement(TAG_OSINFO);
+            hostInfo.appendChild(osInfo);
+            setAttribute(doc, osInfo, ATTRIBUTE_NAME, System.getProperty("os.name"));
+            setAttribute(doc, osInfo, ATTRIBUTE_VERSION, System.getProperty("os.version"));
+            setAttribute(doc, osInfo, ATTRIBUTE_ARCH, System.getProperty("os.arch"));
+            Node javaInfo = doc.createElement(TAG_JAVA);
+            hostInfo.appendChild(javaInfo);
+            setAttribute(doc, javaInfo, ATTRIBUTE_NAME, System.getProperty("java.vendor"));
+            setAttribute(doc, javaInfo, ATTRIBUTE_VERSION, System.getProperty("java.version"));
+            Node ctsInfo = doc.createElement(TAG_CTS);
+            hostInfo.appendChild(ctsInfo);
+            setAttribute(doc, ctsInfo, ATTRIBUTE_VERSION, Version.asString());
 
             int passNum = getTestList(CtsTestResult.CODE_PASS).size();
             int failNum = getTestList(CtsTestResult.CODE_FAIL).size();
