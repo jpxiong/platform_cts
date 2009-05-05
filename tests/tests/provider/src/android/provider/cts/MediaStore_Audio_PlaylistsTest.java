@@ -26,8 +26,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.provider.MediaStore.Audio.Playlists;
 import android.test.InstrumentationTestCase;
 
@@ -38,11 +36,6 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath()) < 0) {
-            // tests for external database need sdcard
-            fail("There is no sdcard attached or the sdcard is not accessible!");
-        }
 
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
@@ -69,8 +62,7 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
             // expected
         }
 
-        String volume = "volume"
-                + FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath());
+        String volume = "fakeVolume";
         assertNull(mContentResolver.query(Playlists.getContentUri(volume), null, null, null,
                 null));
     }

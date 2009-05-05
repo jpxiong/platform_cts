@@ -30,8 +30,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
@@ -79,11 +77,6 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath()) < 0) {
-            // tests for external database need sdcard
-            fail("There is no sdcard attached!");
-        }
 
         mContext = getInstrumentation().getTargetContext();
         mContentResolver = mContext.getContentResolver();
@@ -248,8 +241,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
                 null));
 
         // can not accept any other volume names
-        String volume = "volume"
-                + FileUtils.getFatVolumeId(Environment.getExternalStorageDirectory().getPath());
+        String volume = "fakeVolume";
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
