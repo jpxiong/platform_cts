@@ -155,12 +155,12 @@ generateAllTestPlans() {
     PLAN_PATH=${2}
 
     TEST_PLAN=${PLAN_PATH}/CTS.xml
-    LIST=""
+    LIST="${PERFORMANCE_TESTS}"
     TYPE="exclusive"
     genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
 
     TEST_PLAN=${PLAN_PATH}/Android.xml
-    LIST="${SIGNATURE_TESTS} ${ANDROID_CORE_TESTS} ${ANDROID_CORE_VM_TESTS}"
+    LIST="${SIGNATURE_TESTS} ${ANDROID_CORE_TESTS} ${ANDROID_CORE_VM_TESTS} ${PERFORMANCE_TESTS}"
     TYPE="exclusive"
     genTestPlan ${TESTCASE_PATH} ${TEST_PLAN} ${TYPE}  "${LIST}"
 
