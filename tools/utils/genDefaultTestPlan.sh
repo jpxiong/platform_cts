@@ -39,7 +39,7 @@ generateSignatureCheckDescription() {
      echo "<TestSuite name=\"tests\">"         >> ${SIGNATURE_CHECK_PATH}
      echo "<TestSuite name=\"sigtest\">"       >> ${SIGNATURE_CHECK_PATH}
      echo "<TestCase name=\"SignatureTest\">"  >> ${SIGNATURE_CHECK_PATH}
-     echo "<Test method=\"signatureTest\">"    >> ${SIGNATURE_CHECK_PATH}
+     echo "<Test name=\"signatureTest\">"    >> ${SIGNATURE_CHECK_PATH}
      echo "</Test>"        >> ${SIGNATURE_CHECK_PATH}
      echo "</TestCase>"    >> ${SIGNATURE_CHECK_PATH}
      echo "</TestSuite>"   >> ${SIGNATURE_CHECK_PATH}
@@ -71,7 +71,7 @@ generateReferenceAppDescription() {
        echo "<TestSuite name=\"${pack_part}\">"       >> ${PACKAGE_PATH}
      done
      echo "<TestCase name=\"${CLASS_NAME}\">"  >> ${PACKAGE_PATH}
-     echo "<Test method=\"${METHOD_NAME}\">"    >> ${PACKAGE_PATH}
+     echo "<Test name=\"${METHOD_NAME}\">"    >> ${PACKAGE_PATH}
      echo "</Test>"        >> ${PACKAGE_PATH}
      echo "</TestCase>"    >> ${PACKAGE_PATH}
      for pack_part in ${JAVA_PACKAGE_LIST}; do

@@ -64,13 +64,13 @@ public class HostConfig extends XMLResourceHandler {
 
     private String mConfigRoot;
     private CaseRepository mCaseRepos;
-    private Repository mResultRepos;
+    private ResultRepository mResultRepos;
     private PlanRepository mPlanRepos;
 
     // key: app package name
     // value: TestPackage
     private HashMap<String, TestPackage> mTestPackageMap;
-    
+
     enum Ints {
         // Number of tests executed between reboots. A value <= 0 disables reboots.
         maxTestCount (200),
@@ -88,17 +88,17 @@ public class HostConfig extends XMLResourceHandler {
         packageInstallTimeoutMs (2 * 60 * 1000),
         // Time to wait [ms] after a package installation or removal
         postInstallWaitMs (30 * 1000);
-        
+
         private int value;
-        
+
         Ints(int value) {
             this.value = value;
         }
-        
+
         int value() {
             return value;
         }
-        
+
         void setValue(int value) {
             this.value = value;
         }
@@ -121,7 +121,7 @@ public class HostConfig extends XMLResourceHandler {
     public static int getMaxTestCount() {
         return Ints.maxTestCount.value();
     }
-    
+
     /**
      * Load configuration.
      *
@@ -129,7 +129,7 @@ public class HostConfig extends XMLResourceHandler {
      * @return If succeed in loading, return true; else, return false.
      */
     public boolean load(String configPath) throws SAXException, IOException,
-            ParserConfigurationException, NoSuchAlgorithmException {
+            ParserConfigurationException {
 
         String fileName = null;
         String[] subDirs = configPath.split("\\" + File.separator);
@@ -169,7 +169,7 @@ public class HostConfig extends XMLResourceHandler {
         }
 
         getConfigValues(doc);
-        
+
         String caseRoot = repositoryRoot + File.separator + caseCfg;
         String planRoot = repositoryRoot + File.separator + planCfg;
         String resRoot = repositoryRoot + File.separator + resCfg;
@@ -191,19 +191,14 @@ public class HostConfig extends XMLResourceHandler {
         }
 
         mCaseRepos = new CaseRepository(caseRoot);
-        mResultRepos = new Repository(resRoot);
+        mResultRepos = new ResultRepository(resRoot);
         mPlanRepos = new PlanRepository(planRoot);
 
-        boolean validConfig = validCase && validRes && validPlan;
-        if (validConfig) {
-            loadTestPackages();
-        }
-
-        return validConfig;
+        return validCase && validRes && validPlan;
     }
 
     /**
-     * Extract the result resources into the specified diretory.
+     * Extract the result resources into the specified directory.
      *
      * @param resRoot the directory to extract the resources into.
      */
@@ -230,6 +225,21 @@ public class HostConfig extends XMLResourceHandler {
      */
     public TestPackage getTestPackage(final String packageName) {
         return mTestPackageMap.get(packageName);
+    }
+
+    /**
+     * Load repositories.
+     */
+    public void loadRepositories() throws NoSuchAlgorithmException {
+        loadTestPackages();
+        loadTestResults();
+    }
+
+    /**
+     * Load test results to create session accordingly.
+     */
+    private void loadTestResults() {
+        getResultRepository().loadTestResults();
     }
 
     /**
@@ -305,10 +315,10 @@ public class HostConfig extends XMLResourceHandler {
 
         return cfgStr;
     }
-    
+
     /**
      * Load configuration values from config file.
-     * 
+     *
      * @param doc The document from which to load the values.
      */
     private void getConfigValues(final Document doc) {
@@ -403,7 +413,7 @@ public class HostConfig extends XMLResourceHandler {
      *
      * @return The result repository.
      */
-    public Repository getResultRepository() {
+    public ResultRepository getResultRepository() {
         return mResultRepos;
     }
 
@@ -426,11 +436,59 @@ public class HostConfig extends XMLResourceHandler {
         public String getRoot() {
             return mRoot;
         }
+
+        /**
+         * Check if the specified file is a valid XML file.
+         *
+         * @param f The file to be valid.
+         * @return If valid XML file, return true; else, return false.
+         */
+        public boolean isValidXmlFile(File f) {
+            if (f.getPath().endsWith(FILE_SUFFIX_XML)) {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     /**
+     * Storing the information of result repository.
+     */
+    class ResultRepository extends Repository {
+
+        ResultRepository(String root) {
+            super(root);
+        }
+
+        /**
+         * Load test results to create session accordingly.
+         */
+        public void loadTestResults() {
+
+            for (File f : new File(mRoot).listFiles()) {
+                if (f.isDirectory()) {
+                    String pathName = mRoot + File.separator + f.getName()
+                                + File.separator + TestSessionLog.CTS_RESULT_FILE_NAME;
+                    if (HostUtils.isFileExist(pathName)) {
+                        try {
+                            TestSessionLog log =
+                                TestSessionLogBuilder.getInstance().build(pathName);
+                            TestSession ts = TestSessionBuilder.getInstance().build(log);
+                            if (ts != null) {
+                                TestHost.getInstance().addSession(ts);
+                            }
+                        } catch (Exception e) {
+                            Log.e("Error importing existing result from " + pathName, e);
+                        }
+                    }
+                }
+            }
+        }
+     }
+
+    /**
      * Storing the information of case repository.
-     *
      */
     class CaseRepository extends Repository {
         CaseRepository(String root) {
@@ -548,21 +606,6 @@ public class HostConfig extends XMLResourceHandler {
             }
 
             return false;
-        }
-
-        /**
-         * Check if the specified file is a valid XML file.
-         *
-         * @param f The file to be valid.
-         * @return If valid XML file, return true; else, return false.
-         */
-        private boolean isValidXmlFile(File f) {
-            String filePath = f.getPath();
-            if (!filePath.endsWith(FILE_SUFFIX_XML)) {
-                return false;
-            }
-
-            return true;
         }
 
         /**

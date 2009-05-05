@@ -47,6 +47,7 @@ public class CtsTestResult {
     public static final String STR_PASS = "pass";
 
     private static HashMap<Integer, String> sCodeToResultMap;
+    private static HashMap<String, Integer> sResultToCodeMap;
     static {
         sCodeToResultMap = new HashMap<Integer, String>();
         sCodeToResultMap.put(CODE_NOT_EXECUTED, STR_NOT_EXECUTED);
@@ -54,6 +55,10 @@ public class CtsTestResult {
         sCodeToResultMap.put(CODE_FAIL, STR_FAIL);
         sCodeToResultMap.put(CODE_ERROR, STR_ERROR);
         sCodeToResultMap.put(CODE_TIMEOUT, STR_TIMEOUT);
+        sResultToCodeMap = new HashMap<String, Integer>();
+        for (int code : sCodeToResultMap.keySet()) {
+            sResultToCodeMap.put(sCodeToResultMap.get(code), code);
+        }
     }
 
     public CtsTestResult(int resCode) {
@@ -62,6 +67,17 @@ public class CtsTestResult {
 
     public CtsTestResult(int resCode, final String failedMessage, final String stackTrace) {
         mResultCode = resCode;
+        mFailedMessage = failedMessage;
+        mStackTrace = stackTrace;
+    }
+
+    public CtsTestResult(final String result, final String failedMessage,
+            final String stackTrace) throws InvalidTestResultStringException {
+        if (!sResultToCodeMap.containsKey(result)) {
+            throw new InvalidTestResultStringException(result);
+        }
+
+        mResultCode = sResultToCodeMap.get(result);
         mFailedMessage = failedMessage;
         mStackTrace = stackTrace;
     }
@@ -178,6 +194,6 @@ public class CtsTestResult {
      * @return If valid, return true; else, return false.
      */
     static public boolean isValidResultType(final String resultType) {
-        return sCodeToResultMap.containsValue(resultType);
+        return sResultToCodeMap.containsKey(resultType);
     }
 }
