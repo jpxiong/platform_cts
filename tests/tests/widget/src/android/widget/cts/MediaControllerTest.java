@@ -398,6 +398,7 @@ public class MediaControllerTest extends
     )
     @ToBeFixed(bug = "1559790", explanation = "MediaController does not appear " +
             "when the user presses a key.")
+    @BrokenTest("Fragile test. Passes only occasionally.")
     public void testDispatchKeyEvent() {
         mMediaController = new MediaController(mActivity);
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
