@@ -40,12 +40,12 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String EXPR_TEST_FAILED = ".+\\((\\S+):(\\d+)\\)";
     private static Pattern mTestFailedPattern = Pattern.compile(EXPR_TEST_FAILED);
     private static final String ATTRIBUTE_NAME = "name";
-    private static final String ATTRIBUTE_RESULT = "result";
+    static final String ATTRIBUTE_RESULT = "result";
     private static final String ATTRIBUTE_VERSION = "version";
     private static final String ATTRIBUTE_DIGEST = "digest";
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
-    private static final String CTS_RESULT_FILE_NAME = "testResult.xml";
+    public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
     private static final String CTS_RESULT_FILE_VERSION = "1.1";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
@@ -83,6 +83,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_SCREEN = "Screen";
     static final String TAG_BUILD_INFO = "BuildInfo";
     static final String TAG_PHONE_SUB_INFO = "PhoneSubInfo";
+    static final String TAG_TEST_RESULT = "TestResult";
     static final String TAG_TESTPACKAGE = "TestPackage";
     static final String TAG_TESTSUITE = "TestSuite";
     static final String TAG_TESTCASE = "TestCase";
@@ -266,7 +267,7 @@ public class TestSessionLog extends XMLResourceHandler {
             ProcessingInstruction pr = doc.createProcessingInstruction(
                     "xml-stylesheet", "type=\"text/xsl\"  href=\"cts_result.xsl\"");
             doc.appendChild(pr);
-            Node root = doc.createElement("TestResult");
+            Node root = doc.createElement(TAG_TEST_RESULT);
             doc.appendChild(root);
 
             setAttribute(doc, root, ATTRIBUTE_VERSION, CTS_RESULT_FILE_VERSION);
@@ -355,7 +356,9 @@ public class TestSessionLog extends XMLResourceHandler {
 
             for (TestPackage testPackage : mTestPackages) {
                 Node testPackageNode = doc.createElement(TAG_TESTPACKAGE);
-                setAttribute(doc, testPackageNode, ATTRIBUTE_NAME, testPackage.getAppPackageName());
+                setAttribute(doc, testPackageNode, ATTRIBUTE_NAME, testPackage.getAppBinaryName());
+                setAttribute(doc, testPackageNode, TestSessionBuilder.ATTRIBUTE_APP_PACKAGE_NAME,
+                        testPackage.getAppPackageName());
                 setAttribute(doc, testPackageNode, ATTRIBUTE_DIGEST,
                              testPackage.getMessageDigest());
 

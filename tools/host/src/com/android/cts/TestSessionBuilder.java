@@ -54,11 +54,10 @@ public class TestSessionBuilder extends XMLResourceHandler {
     private static final String ATTRIBUTE_RUNNER = "runner";
     private static final String ATTRIBUTE_JAR_PATH = "jarPath";
     private static final String ATTRIBUTE_APP_NAME_SPACE = "appNameSpace";
-    private static final String ATTRIBUTE_APP_PACKAGE_NAME = "appPackageName";
+    public static final String ATTRIBUTE_APP_PACKAGE_NAME = "appPackageName";
     private static final String ATTRIBUTE_TARGET_NAME_SPACE = "targetNameSpace";
     private static final String ATTRIBUTE_TARGET_BINARY_NAME = "targetBinaryName";
     private static final String ATTRIBUTE_TYPE = "type";
-    private static final String ATTRIBUTE_METHOD = "method";
     private static final String ATTRIBUTE_CONTROLLER = "HostController";
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
     private static final String ATTRIBUTE_HOST_SIDE_ONLY = "hostSideOnly";
@@ -84,10 +83,23 @@ public class TestSessionBuilder extends XMLResourceHandler {
     }
 
     /**
+     * Create TestSession via TestSessionLog.
+     *
+     * @param log The test session log.
+     * @return The test session.
+     */
+    public TestSession build(TestSessionLog log) {
+        if (log == null) {
+            return null;
+        }
+        return new TestSession(log, 1);
+    }
+
+    /**
      * Create TestSession via TestPlan XML configuration file.
      *
-     * @param config TestPlan XML configuration file
-     * @return TestSession 
+     * @param config TestPlan XML configuration file.
+     * @return TestSession.
      */
     public TestSession build(final String config) throws SAXException, IOException,
             TestPlanNotFoundException, TestNotFoundException, NoSuchAlgorithmException {
@@ -183,31 +195,43 @@ public class TestSessionBuilder extends XMLResourceHandler {
     public TestPackage loadPackage(final File packageConfigFile, ArrayList<String> excludedList)
                                 throws SAXException, IOException, NoSuchAlgorithmException {
         Node pNode = mDocBuilder.parse(packageConfigFile).getDocumentElement();
+        return loadPackage(pNode, excludedList);
+    }
+
+    /**
+     * Load TestPackage via Package XML configuration file.
+     *
+     * @param pkgNode the test package node in the XML file
+     * @param excludedList The list containing the excluded suites and sub types.
+     * @return loaded TestPackage from test package XML configuration file
+     */
+    public TestPackage loadPackage(final Node pkgNode, ArrayList<String> excludedList)
+                                throws NoSuchAlgorithmException {
 
         String appBinaryName, targetNameSpace, targetBinaryName, version, frameworkVersion,
                runner, jarPath, appNameSpace, appPackageName, hostSideOnly;
-        NodeList suiteList = pNode.getChildNodes();
+        NodeList suiteList = pkgNode.getChildNodes();
 
-        appBinaryName = getStringAttributeValue(pNode, ATTRIBUTE_NAME);
-        targetNameSpace = getStringAttributeValue(pNode, ATTRIBUTE_TARGET_NAME_SPACE);
-        targetBinaryName = getStringAttributeValue(pNode, ATTRIBUTE_TARGET_BINARY_NAME);
-        version = getStringAttributeValue(pNode, ATTRIBUTE_VERSION);
-        frameworkVersion = getStringAttributeValue(pNode, ATTRIBUTE_FRAMEWORK_VERSION);
-        runner = getStringAttributeValue(pNode, ATTRIBUTE_RUNNER);
-        jarPath = getStringAttributeValue(pNode, ATTRIBUTE_JAR_PATH);
-        appNameSpace = getStringAttributeValue(pNode, ATTRIBUTE_APP_NAME_SPACE);
-        appPackageName = getStringAttributeValue(pNode, ATTRIBUTE_APP_PACKAGE_NAME);
-        hostSideOnly = getStringAttributeValue(pNode, ATTRIBUTE_HOST_SIDE_ONLY);
-        String signature = getStringAttributeValue(pNode, ATTRIBUTE_SIGNATURE_CHECK);
-        String referenceAppTest = getStringAttributeValue(pNode, ATTRIBUTE_REFERENCE_APP_TEST);
+        appBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_NAME);
+        targetNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_NAME_SPACE);
+        targetBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_BINARY_NAME);
+        version = getStringAttributeValue(pkgNode, ATTRIBUTE_VERSION);
+        frameworkVersion = getStringAttributeValue(pkgNode, ATTRIBUTE_FRAMEWORK_VERSION);
+        runner = getStringAttributeValue(pkgNode, ATTRIBUTE_RUNNER);
+        jarPath = getStringAttributeValue(pkgNode, ATTRIBUTE_JAR_PATH);
+        appNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_NAME_SPACE);
+        appPackageName = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_PACKAGE_NAME);
+        hostSideOnly = getStringAttributeValue(pkgNode, ATTRIBUTE_HOST_SIDE_ONLY);
+        String signature = getStringAttributeValue(pkgNode, ATTRIBUTE_SIGNATURE_CHECK);
+        String referenceAppTest = getStringAttributeValue(pkgNode, ATTRIBUTE_REFERENCE_APP_TEST);
         TestPackage pkg = null;
 
         if ("true".equals(referenceAppTest)) {
-            String apkToTestName = getStringAttributeValue(pNode, ATTRIBUTE_APK_TO_TEST_NAME);
-            String packageUnderTest = getStringAttributeValue(pNode, ATTRIBUTE_PACKAGE_TO_TEST);
+            String apkToTestName = getStringAttributeValue(pkgNode, ATTRIBUTE_APK_TO_TEST_NAME);
+            String packageUnderTest = getStringAttributeValue(pkgNode, ATTRIBUTE_PACKAGE_TO_TEST);
             pkg = new ReferenceAppTestPackage(runner, appBinaryName, targetNameSpace,
                     targetBinaryName, version, frameworkVersion, jarPath,
-                    appNameSpace, appPackageName, 
+                    appNameSpace, appPackageName,
                     apkToTestName, packageUnderTest);
         } else if ("true".equals(signature)) {
             pkg = new SignatureCheckPackage(runner, appBinaryName, targetNameSpace,
@@ -357,31 +381,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
                             Node testNode = mNodes.item(t);
                             if ((testNode.getNodeType() == Document.ELEMENT_NODE)
                                     && (testNode.getNodeName().equals(TAG_TEST))) {
-                                String cType = getStringAttributeValue(testNode, ATTRIBUTE_TYPE);
-                                String name = getStringAttributeValue(testNode, ATTRIBUTE_METHOD);
-                                String description = getStringAttributeValue(testNode,
-                                        ATTRIBUTE_CONTROLLER);
-                                String knownFailure = getStringAttributeValue(testNode,
-                                        ATTRIBUTE_KNOWN_FAILURE);
-                                String fullJarPath =
-                                    HostConfig.getInstance().getCaseRepository().getRoot()
-                                    + File.separator + pkg.getJarPath();
-
-                                Test test = null;
-                                if (pkg.isHostSideOnly()) {
-                                    test = new HostSideOnlyTest(testCase, name, cType,
-                                            knownFailure,
-                                            CtsTestResult.CODE_NOT_EXECUTED);
-                                    description = test.getFullName();
-                                } else {
-                                    test = new Test(testCase, name, cType,
-                                            knownFailure,
-                                            CtsTestResult.CODE_NOT_EXECUTED);
-                                }
-
-                                TestController controller =
-                                    genTestControler(fullJarPath, description);
-                                test.setTestController(controller);
+                                Test test = loadTest(pkg, testCase, testNode);
                                 if (!checkFullMatch(excludedCaseList, test.getFullName())) {
                                     testCase.addTest(test);
                                 } else {
@@ -400,6 +400,91 @@ public class TestSessionBuilder extends XMLResourceHandler {
         }
 
         return suite;
+    }
+
+    /**
+     * Load test via test node.
+     *
+     * @param pkg The test package.
+     * @param testCase The test case.
+     * @param testNode The test node.
+     * @return The test loaded.
+     */
+    private Test loadTest(final TestPackage pkg, TestCase testCase,
+            Node testNode) {
+        String cType = getStringAttributeValue(testNode, ATTRIBUTE_TYPE);
+        String name = getStringAttributeValue(testNode, ATTRIBUTE_NAME);
+        String description = getStringAttributeValue(testNode,
+                ATTRIBUTE_CONTROLLER);
+        String knownFailure = getStringAttributeValue(testNode,
+                ATTRIBUTE_KNOWN_FAILURE);
+        String fullJarPath =
+            HostConfig.getInstance().getCaseRepository().getRoot()
+            + File.separator + pkg.getJarPath();
+        CtsTestResult testResult = loadTestResult(testNode);
+        Test test = null;
+        if (pkg.isHostSideOnly()) {
+            test = new HostSideOnlyTest(testCase, name, cType,
+                    knownFailure,
+                    CtsTestResult.CODE_NOT_EXECUTED);
+            description = test.getFullName();
+        } else {
+            test = new Test(testCase, name, cType,
+                    knownFailure,
+                    CtsTestResult.CODE_NOT_EXECUTED);
+        }
+
+        TestController controller =
+            genTestControler(fullJarPath, description);
+        test.setTestController(controller);
+        if (testResult != null) {
+            test.addResult(testResult);
+        }
+        return test;
+    }
+
+    /**
+     * Load the CTS test result from the test node.
+     *
+     * @param testNode The test node.
+     * @return The CTS test result.
+     */
+    private CtsTestResult loadTestResult(Node testNode) {
+        String result = getStringAttributeValue(testNode,
+                TestSessionLog.ATTRIBUTE_RESULT);
+
+        String failedMessage = null;
+        String stackTrace = null;
+        NodeList nodes = testNode.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i ++) {
+            Node rNode = nodes.item(i);
+            if ((rNode.getNodeType() == Document.ELEMENT_NODE)
+                    && (rNode.getNodeName().equals(TestSessionLog.TAG_FAILED_SCENE))) {
+                failedMessage = getStringAttributeValue(rNode, TestSessionLog.TAG_FAILED_MESSAGE);
+                stackTrace = getStringAttributeValue(rNode, TestSessionLog.TAG_STACK_TRACE);
+                if (stackTrace == null) {
+                    NodeList sNodeList = rNode.getChildNodes();
+                    for (int j = 0; j < sNodeList.getLength(); j ++) {
+                        Node sNode = sNodeList.item(i);
+                        if ((sNode.getNodeType() == Document.ELEMENT_NODE)
+                                && (sNode.getNodeName().equals(TestSessionLog.TAG_STACK_TRACE))) {
+                            stackTrace = sNode.getTextContent();
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        CtsTestResult testResult = null;
+        if (result != null) {
+            try {
+                testResult = new CtsTestResult(result, failedMessage, stackTrace);
+            } catch (InvalidTestResultStringException e) {
+            }
+        }
+
+        return testResult;
     }
 
     /**
@@ -434,7 +519,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
     private String getFullSuiteName(Node node) {
         StringBuilder buf = new StringBuilder();
         buf.append(getStringAttributeValue(node, TestPlan.Attribute.NAME));
- 
+
         Node parent = node.getParentNode();
         while (parent != null) {
             if (parent.getNodeType() == Document.ELEMENT_NODE
