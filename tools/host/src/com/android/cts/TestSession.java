@@ -406,8 +406,11 @@ public class TestSession {
                             pkg.setSessionThread(this);
                             pkg.run(mDevice, null, mSessionLog);
                             if (!isAllTestsRun()) {
-                                markNeedRestartADBServer();
-                                return;
+                                if (HostConfig.getMaxTestCount() > 0) {
+                                    // ADB server restart enabled
+                                    markNeedRestartADBServer();
+                                    return;
+                                }
                             } else {
                                 Log.d("All tests have been run.");
                                 break;
