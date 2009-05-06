@@ -18,9 +18,9 @@ package com.android.cts;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -87,6 +87,8 @@ public class TestSessionLogBuilder extends XMLResourceHandler {
         // currently, there should be just one test result tag in the result file
         Node resultNode = resultList.item(0);
         String planName = getStringAttributeValue(resultNode, TestSessionLog.ATTRIBUTE_TESTPLAN);
+        String start = getStringAttributeValue(resultNode, TestSessionLog.ATTRIBUTE_STARTTIME);
+        String end = getStringAttributeValue(resultNode, TestSessionLog.ATTRIBUTE_ENDTIME);
         String planFilePath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSession sessionFromPlan = TestSessionBuilder.getInstance().build(planFilePath);
 
@@ -122,6 +124,15 @@ public class TestSessionLogBuilder extends XMLResourceHandler {
             }
         }
 
-        return new TestSessionLog(pkgsFromPlan, planName);
+        TestSessionLog log = new TestSessionLog(pkgsFromPlan, planName);
+        try {
+            log.setStartTime(HostUtils.dateFromString(start).getTime());
+            log.setEndTime(HostUtils.dateFromString(end).getTime());
+        } catch (NullPointerException ignored) {
+            // use default time
+        } catch (ParseException ignored) {
+            // use default time
+        }
+        return log;
     }
 }
