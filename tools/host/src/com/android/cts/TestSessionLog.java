@@ -46,7 +46,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.1";
+    private static final String CTS_RESULT_FILE_VERSION = "1.2";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -68,6 +68,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_IMSI = "imsi";
     static final String ATTRIBUTE_BUILD_NAME = "buildName";
     static final String ATTRIBUTE_ARCH = "arch";
+    static final String ATTRIBUTE_VALUE = "value";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -79,6 +80,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_OSINFO = "Os";
     static final String TAG_JAVA = "Java";
     static final String TAG_CTS = "Cts";
+    static final String TAG_INTVALUE = "IntValue";
     static final String TAG_SUMMARY = "Summary";
     static final String TAG_SCREEN = "Screen";
     static final String TAG_BUILD_INFO = "BuildInfo";
@@ -342,6 +344,12 @@ public class TestSessionLog extends XMLResourceHandler {
             Node ctsInfo = doc.createElement(TAG_CTS);
             hostInfo.appendChild(ctsInfo);
             setAttribute(doc, ctsInfo, ATTRIBUTE_VERSION, Version.asString());
+            for (HostConfig.Ints i : HostConfig.Ints.values()) {
+                Node intValue = doc.createElement(TAG_INTVALUE);
+                ctsInfo.appendChild(intValue);
+                setAttribute(doc, intValue, ATTRIBUTE_NAME, i.name());
+                setAttribute(doc, intValue, ATTRIBUTE_VALUE, i.value());
+            }
 
             int passNum = getTestList(CtsTestResult.CODE_PASS).size();
             int failNum = getTestList(CtsTestResult.CODE_FAIL).size();
