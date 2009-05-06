@@ -17,6 +17,7 @@
 package com.android.cts;
 
 import com.android.cts.TestHost.ActionType;
+import com.android.cts.TestHost.MODE;
 
 import org.xml.sax.SAXException;
 
@@ -567,7 +568,9 @@ public class ConsoleUi {
      *         else return CHOOSE_SESSION.
      */
     private String chooseMode(ArrayList<TestSession> sessionList) throws IOException {
-        if ((sessionList == null) || (sessionList.size() == 0)) {
+        if (TestHost.sMode == MODE.RUN || (sessionList == null) || (sessionList.size() == 0)) {
+            // do not prompt if the test run was started from command line mode, or when
+            // there are no existing sessions
             return CREATE_SESSION;
         }
 
