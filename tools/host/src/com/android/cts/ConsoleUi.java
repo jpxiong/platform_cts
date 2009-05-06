@@ -573,8 +573,8 @@ public class ConsoleUi {
 
         String planName = sessionList.get(0).getSessionLog().getTestPlanName();
         String notification = "There are " + sessionList.size()
-            + " session(s) existed for plan " + planName + ".\n"
-            + "Please select to create a new session or choose a session from the existed ones:\n"
+            + " existing session(s) for plan " + planName + ".\n"
+            + "Create a new session or choose an existing one?\n"
             + "  Create a new session [0]\n"
             + "  Choose a session     [1]\n";
 
