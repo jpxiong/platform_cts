@@ -141,6 +141,9 @@ public class TestSession {
      * @return device ID.
      */
     public String getDeviceId() {
+        if (mDevice == null) {
+            return null;
+        }
         return mDevice.getSerialNumber();
     }
 
@@ -213,11 +216,6 @@ public class TestSession {
         }
 
         mStatus = STATUS.STARTED;
-        String resultPath = mSessionLog.getResultPath();
-        if ((resultPath == null) || (resultPath.length() == 0)) {
-            mSessionLog.setStartTime(System.currentTimeMillis());
-        }
-
         startImpl();
     }
 
@@ -225,6 +223,10 @@ public class TestSession {
      * Implement starting/resuming session.
      */
     private void startImpl() throws ADBServerNeedRestartException {
+        String resultPath = mSessionLog.getResultPath();
+        if ((resultPath == null) || (resultPath.length() == 0)) {
+            mSessionLog.setStartTime(System.currentTimeMillis());
+        }
         resetTestCount();
         mTestThread.start();
         try {

@@ -361,12 +361,13 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             if (loadConfig(filePath) == false) {
                 exit();
             }
+
+            Log.initLog(sConfig.getConfigRoot());
+            sConfig.loadRepositories();
         } catch (Exception e) {
             Log.e("Error while parsing cts config file", e);
             exit();
         }
-
-        Log.initLog(sConfig.getConfigRoot());
         return cp;
     }
 
@@ -410,7 +411,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * @return If succeed, return true; else, return false.
      */
     static boolean loadConfig(final String configPath) throws SAXException,
-            IOException, ParserConfigurationException, NoSuchAlgorithmException {
+            IOException, ParserConfigurationException {
         sConfig = HostConfig.getInstance();
 
         return sConfig.load(configPath);
@@ -453,6 +454,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             return;
         }
 
+        ts.setObserver(getInstance());
         TestDevice device = sDeviceManager.allocateFreeDeviceById(deviceId);
         TestSessionLog sessionLog = ts.getSessionLog();
         ts.setTestDevice(device);
@@ -510,7 +512,6 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
         String testPlanPath = sConfig.getPlanRepository().getPlanPath(testPlanName);
         TestSession ts = TestSessionBuilder.getInstance().build(testPlanPath);
-        ts.setObserver(getInstance());
         sSessions.add(ts);
 
         return ts;
@@ -687,5 +688,14 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             return rawPlanName.replaceAll("\"", "");
         }
         return rawPlanName;
+    }
+
+    /**
+     * Add test session.
+     *
+     * @param ts The test session.
+     */
+    public void addSession(TestSession ts) {
+        sSessions.add(ts);
     }
 }

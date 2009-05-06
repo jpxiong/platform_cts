@@ -193,6 +193,18 @@ public class Test implements DeviceObserver {
     }
 
     /**
+     * Add test result.
+     *
+     * @param result The result.
+     */
+    public void addResult(CtsTestResult result) {
+        if (isKnownFailure()) {
+            result.reverse();
+        }
+        mResult = result;
+    }
+
+    /**
      * Get the result.
      *
      * @return the result.

@@ -277,6 +277,7 @@ public class ConsoleTests extends CtsTestBase {
      * @param xmlMsg The message as the content of the package.
      * @param packageName The package name.
      */
+    @Override
     protected void createTestPackage(String xmlMsg, String packageName) throws IOException {
         String caseRoot = ROOT;
 
@@ -355,7 +356,7 @@ public class ConsoleTests extends CtsTestBase {
                 + "             <Description>" + "something extracted from java doc"
                 + "             </Description>\n"
                 + "             <!-- Test Cases -->\n"
-                + "             <Test method=\"" + testName + "\"" + " type=\"automatic\"" + ">\n"
+                + "             <Test name=\"" + testName + "\"" + " type=\"automatic\"" + ">\n"
                 + "                 <Description>Simple deadloop test</Description>"
                 + "             </Test>"
                 + "        </TestCase>"

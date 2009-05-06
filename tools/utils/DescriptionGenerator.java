@@ -79,7 +79,6 @@ public class DescriptionGenerator extends Doclet {
     static final String ATTRIBUTE_VALUE_FRAMEWORK = "Android 1.0";
 
     static final String ATTRIBUTE_NAME = "name";
-    static final String ATTRIBUTE_METHOD = "method";
     static final String ATTRIBUTE_XML_INFO = "XML_INFO";
     static final String ATTRIBUTE_HOST_CONTROLLER = "HostController";
     static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
@@ -392,7 +391,7 @@ public class DescriptionGenerator extends Doclet {
                     }
                     Node caseNode = elem.appendChild(mDoc.createElement(TAG_TEST));
 
-                    setAttribute(caseNode, ATTRIBUTE_METHOD, caze.mName);
+                    setAttribute(caseNode, ATTRIBUTE_NAME, caze.mName);
                     if ((caze.mController != null) && (caze.mController.length() != 0)) {
                         setAttribute(caseNode, ATTRIBUTE_HOST_CONTROLLER, caze.mController);
                     }
