@@ -271,8 +271,8 @@ public class TestSessionLog extends XMLResourceHandler {
             doc.appendChild(root);
 
             setAttribute(doc, root, ATTRIBUTE_VERSION, CTS_RESULT_FILE_VERSION);
-            setAttribute(doc, root, ATTRIBUTE_STARTTIME, mSessionStartTime.toString());
-            setAttribute(doc, root, ATTRIBUTE_ENDTIME, mSessionEndTime.toString());
+            setAttribute(doc, root, ATTRIBUTE_STARTTIME, HostUtils.dateToString(mSessionStartTime));
+            setAttribute(doc, root, ATTRIBUTE_ENDTIME, HostUtils.dateToString(mSessionEndTime));
             setAttribute(doc, root, ATTRIBUTE_TESTPLAN, mTestPlanName);
 
             // set device information

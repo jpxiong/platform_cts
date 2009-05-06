@@ -32,8 +32,12 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Formatter;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -42,7 +46,10 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class HostUtils {
-
+    
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy",
+            Locale.ENGLISH);
+    
     /**
      * Check if the given file exists
      *
@@ -297,4 +304,11 @@ public class HostUtils {
         return s.replaceAll("[\\x00-\\x1f&&[^\t\n\r]]", "?");
     }
 
+    public static Date dateFromString(String s) throws ParseException {
+        return dateFormat.parse(s);
+    }
+    
+    public static String dateToString(Date d) {
+        return dateFormat.format(d);
+    }
 }
