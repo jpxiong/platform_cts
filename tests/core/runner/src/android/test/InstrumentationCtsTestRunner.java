@@ -20,6 +20,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.TimeZone;
 
 import com.android.internal.util.Predicate;
 import com.android.internal.util.Predicates;
@@ -74,6 +75,8 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
         System.setProperty("javax.net.ssl.trustStore",
                 "/etc/security/cacerts.bks");
+        
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         
         if (arguments != null) {
             String classArg = arguments.getString(ARGUMENT_TEST_CLASS);
