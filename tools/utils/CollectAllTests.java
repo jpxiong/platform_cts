@@ -48,7 +48,8 @@ public class CollectAllTests extends DescriptionGenerator {
     static final String ATTRIBUTE_RUNNER = "runner";
     static final String ATTRIBUTE_PACKAGE = "appPackageName";
     static final String ATTRIBUTE_NS = "appNameSpace";
-    static final String ATTRIBUTE_TARGET = "target";
+    static final String ATTRIBUTE_TARGET = "targetNameSpace";
+    static final String ATTRIBUTE_TARGET_BINARY = "targetBinaryName";
     static final String ATTRIBUTE_HOST_SIDE_ONLY = "hostSideOnly";
     static final String ATTRIBUTE_JAR_PATH = "jarPath";
 
@@ -87,8 +88,9 @@ public class CollectAllTests extends DescriptionGenerator {
 
             if (!packageName.equals(target)) {
                 setAttribute(testPackageElem, ATTRIBUTE_TARGET, target);
-                }
+                setAttribute(testPackageElem, ATTRIBUTE_TARGET_BINARY, target);
             }
+        }
     }
 
     private static String OUTPUTFILE = "";

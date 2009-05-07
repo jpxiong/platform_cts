@@ -22,8 +22,8 @@
         <uses-library android:name="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationCoreTestRunner"
-                     android:targetPackage="android.core.tests.nio"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+                     android:targetPackage="android.core.tests.runner"
                      android:label="cts framework tests"/>
 
 </manifest>
