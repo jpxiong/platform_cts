@@ -515,7 +515,9 @@ public class TestPackage implements DeviceObserver {
         synchronized (mTimeOutTimer) {
             mTimeOutTimer.cancel(false);
         }
-        mCurrentTest.setResult(new CtsTestResult(CtsTestResult.CODE_FAIL, null, null));
+        // The currently running test did not report a result. Mark it as not executed, so that it
+        // will be run again in individual mode.
+        mCurrentTest.setResult(new CtsTestResult(CtsTestResult.CODE_NOT_EXECUTED, null, null));
         mCurrentTest = null;
     }
 
