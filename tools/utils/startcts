@@ -14,38 +14,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ -z "${ANDROID_ROOT}" ]; then
+if [ -z "${SDK_ROOT}" ]; then
 # CONFIGURATION
-# Set this variable to the out/host/<platform> directory of your Android tree.
-ANDROID_ROOT=/.../out/host/linux-x86
+# Set this variable to the root of your Android SDK installation.
+SDK_ROOT=NOT_CONFIGURED
 fi;
 
 if [ -z "${CTS_ROOT}" ]; then
 # CONFIGURATION
 # Set this variable to the root of unzipped CTS directory
-CTS_ROOT=
+# This only needs to be changed if this script has been moved
+CTS_ROOT="$(dirname $0)/.."
 fi;
 
 # ----------------------------------------------------------------------------
 # END OF CONFIGURATION SECTION
 # ----------------------------------------------------------------------------
 
-# If ANDROID_ROOT does not exist, complain and exit
-if [ ! -d ${ANDROID_ROOT} ]; then
-    echo "Error: Please set ANDROID_ROOT in $0."
-    exit
-fi
+checkDir() {
+    if [ ! -d $1 ]; then
+        echo "$2"
+        exit
+    fi;
+}
 
-# If CTS_ROOT not set, assume it's under ANDROID_ROOT
-if [ -z "${CTS_ROOT}" ]; then
-    CTS_ROOT=${ANDROID_ROOT}/cts/android-cts
-fi
 
-if [ ! -d ${CTS_ROOT} ]; then
-    echo "Error: Can't locate CTS. Have you set the CTS_ROOT in $0?"
-    exit
-fi
+checkFile() {
+    if [ ! -f "$1" ]; then
+        echo "Unable to locate $1."
+        exit
+    fi;
+}
 
+checkDir ${CTS_ROOT} "Error: Cannot locate CTS in \"${CTS_DIR}\". Please check your configuration in $0"
+checkDir ${SDK_ROOT} "Error: Cannot locate SDK installation in \"${SDK_ROOT}\". Please check your configuration in $0"
+
+DDM_LIB=${SDK_ROOT}/tools/lib/ddmlib.jar
+CTS_LIB=${CTS_ROOT}/tools/cts.jar
+ADB_PATH=${SDK_ROOT}/tools
+ADB_EXE=${ADB_PATH}/adb
+
+checkFile ${DDM_LIB}
+checkFile ${CTS_LIB}
+checkFile ${ADB_EXE}
+
+PATH=${ADB_PATH}:${PATH}
+
+# options for the JVM
+JAVA_OPTS="-Xmx512M"
 # configuration supplied as single argument
 CONFIG=
 # configuration supplied with --config option
@@ -69,4 +85,4 @@ else
     fi;
 fi;
 
-ANDROID_ROOT=${ANDROID_ROOT} bash ${CTS_ROOT}/tools/cts ${CONFIG} "$@" ${DDCONFIG}
+java ${JAVA_OPTS} -cp ${CTS_LIB}:${DDM_LIB} com.android.cts.TestHost ${CONFIG} "$@" ${DDCONFIG}
