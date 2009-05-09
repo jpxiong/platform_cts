@@ -27,7 +27,7 @@
     <!-- Number of tests executed between reboots. A value <= 0 disables reboots. -->
     <IntValue name="maxTestCount" value="200" />
     <!-- Max size [tests] for a package to be run in batch mode. -->
-    <IntValue name="maxTestsInBatchMode" value="200" />
+    <IntValue name="maxTestsInBatchMode" value="0" />
 
     <!-- Max time [ms] between test status updates. -->
     <IntValue name="testStatusTimeoutMs" value="300000" />
