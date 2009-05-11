@@ -32,7 +32,7 @@
                         <TR>
                             <TD width="40%" align="left"><img src="logo.gif"></img></TD>
                             <TD width="60%" align="left">
-                                <h1>Test Report for <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildName"/> -
+                                <h1>Test Report for <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_model"/> -
                                 <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/>
                             </h1>
                         </TD>
@@ -58,13 +58,19 @@
                             <div id="summaryinfo">
                                 <TABLE width="75%">
                                     <TR>
-                                        <TD class="rowtitle">Device Make</TD>
+                                        <TD class="rowtitle">Build Model</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_model"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Name</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildName"/>
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">Build model</TD>
+                                        <TD class="rowtitle">Device ID</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/>
                                         </TD>
@@ -79,6 +85,12 @@
                                         <TD class="rowtitle">Firmware Build Number</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildID"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Fingerprint</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_fingerprint"/>
                                         </TD>
                                     </TR>
                                     <TR>
@@ -162,6 +174,27 @@
                             <div id="summaryinfo">
                                 <TABLE width="75%">
                                     <TR>
+                                        <TD class="rowtitle">CTS version</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/HostInfo/Cts/@version"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Test timeout</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/HostInfo/Cts/IntValue[@name='testStatusTimeoutMs']/@value" /> ms
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Host Info</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/HostInfo/@name"/>
+                                            (<xsl:value-of select="TestResult/HostInfo/Os/@name"/> - 
+                                              <xsl:value-of select="TestResult/HostInfo/Os/@version"/>)
+                                        </TD>
+                                    </TR>
+                                    <TR><TD><BR></BR></TD><TD></TD></TR>
+                                    <TR>
                                         <TD class="rowtitle">Plan name</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/@testPlan"/>
@@ -179,15 +212,8 @@
                                             <xsl:value-of select="TestResult/@endtime"/>
                                         </TD>
                                     </TR>
-                                    <TR>
-                                        <TD class="rowtitle">Version</TD>
-                                        <TD>
-                                            <xsl:value-of select="TestResult/@version"/>
-                                        </TD>
-                                    </TR>
 
                                     <!-- Test Summary -->
-                                    <TR><TD><BR></BR></TD><TD></TD></TR>
                                     <TR><TD><BR></BR></TD><TD></TD></TR>
                                     <TR>
                                         <TD class="rowtitle">Tests Passed</TD>
