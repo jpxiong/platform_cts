@@ -20,6 +20,8 @@ import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.test.AndroidTestCase;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
@@ -53,16 +55,13 @@ public class PathMeasureTest extends AndroidTestCase {
         )
     })
     public void testConstructor() {
-        mPathMeasure = null;
         mPathMeasure = new PathMeasure();
 
         // new the PathMeasure instance
-        mPathMeasure = null;
         Path path = new Path();
         mPathMeasure = new PathMeasure(path, true);
 
         // new the PathMeasure instance
-        mPathMeasure = null;
         mPathMeasure = new PathMeasure(path, false);
     }
 
@@ -80,7 +79,7 @@ public class PathMeasureTest extends AndroidTestCase {
             mPathMeasure.getPosTan(distance, pos, tan);
             fail("should throw exception");
         } catch (ArrayIndexOutOfBoundsException e) {
-            assertTrue(e instanceof ArrayIndexOutOfBoundsException);
+            // expected
         }
         float[] pos2 = { 1f, 2f };
         float[] tan2 = { 1f, 3f };
@@ -109,21 +108,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test finalize().",
-        method = "finalize",
-        args = {}
-    )
-    public void testFinalize() {
-        MockPathMeasure p = new MockPathMeasure();
-        try {
-            p.finalize();
-            fail("shouldn't thow exception");
-        } catch (Throwable e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         notes = "Test getLength().",
         method = "getLength",
         args = {}
@@ -141,6 +125,7 @@ public class PathMeasureTest extends AndroidTestCase {
         method = "isClosed",
         args = {}
     )
+    @BrokenTest("Flaky test. new PathMeasure().isClosed() does not return consistent result")
     public void testIsClosed() {
         assertTrue(mPathMeasure.isClosed());
         mPathMeasure = null;
@@ -188,11 +173,5 @@ public class PathMeasureTest extends AndroidTestCase {
         mPathMeasure.setPath(mPath, true);
         assertTrue(mPathMeasure.getMatrix(0f, matrix,
                 PathMeasure.TANGENT_MATRIX_FLAG));
-    }
-
-    class MockPathMeasure extends PathMeasure {
-        public void finalize() throws Throwable {
-            super.finalize();
-        }
     }
 }
