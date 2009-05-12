@@ -51,37 +51,6 @@ public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that PackageManager.installPackage(Uri, IPackageInstallObserver, int) requires
-     *  permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#INSTALL_PACKAGES}.
-     */
-    public void testInstallPackage() {
-        try {
-            mPackageManager.installPackage(null, null, 0);
-            fail("PackageManager.installPackage(Uri, IPackageInstallObserver, int)" +
-                    " did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that PackageManager.installPackage(Uri) requires
-     *  permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#INSTALL_PACKAGES}.
-     */
-    public void testInstallPackage2() {
-        try {
-            mPackageManager.installPackage(null);
-            fail("PackageManager.installPackage(Uri) did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
      * Verify that PackageManager.addPackageToPreferred requires permission.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#SET_PREFERRED_APPLICATIONS}.

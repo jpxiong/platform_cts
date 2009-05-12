@@ -679,49 +679,6 @@ public class PackageManagerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test installPackage, installPackage(Uri packageURI," +
-                    " IPackageInstallObserver observer, int flags) is called by" +
-                    " installPackage(android.net.Uri)",
-            method = "installPackage",
-            args = {android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test installPackage(Uri packageURI, IPackageInstallObserver observer," +
-                    " int flags) which is called by installPackage(android.net.Uri)",
-            method = "installPackage",
-            args = {android.net.Uri.class, android.content.pm.IPackageInstallObserver.class,
-                    int.class}
-        )
-    })
-    @ToBeFixed(bug="1686810", explanation="Maybe we can't use the" +
-            " android.permission.INSTALL_PACKAGES which could be used only by system, so there" +
-            " is no way to installPackage in our test by this method, when running this test" +
-            " method, the error is: Neither user 10040 nor current process has" +
-            " android.permission.INSTALL_PACKAGES")
-    public void testInstallPackage() throws RuntimeException {
-        // Test error situation
-        Uri.Builder builder = new Uri.Builder();
-        builder.path("//");
-        Uri uri = builder.build();
-        try {
-            mPackageManager.installPackage(uri);
-            fail("Failed at testInstallPackage2.");
-        } catch (RuntimeException e) {
-            // expected
-        }
-
-        // Test right situation
-        Intent intent = new Intent(ACTIVITY_ACTION_NAME, People.CONTENT_URI);
-        uri = intent.getData();
-        // TODO: Bug ID 1686810.
-        // Maybe we can't use the android.permission.INSTALL_PACKAGES which could be used
-        // only by system, so there is no way to installPackage in our test by this method
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             notes = "Test getActivityIcon",
             method = "getActivityIcon",
             args = {android.content.ComponentName.class}
