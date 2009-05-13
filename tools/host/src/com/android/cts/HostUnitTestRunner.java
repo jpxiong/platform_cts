@@ -16,7 +16,8 @@
 
 package com.android.cts;
 
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -49,7 +50,7 @@ public class HostUnitTestRunner extends BaseTestRunner{
      */
     public TestResult runTest(final String jarPath, final String testPkgName,
             String testClassName, String testMethodName)
-            throws MalformedURLException, ClassNotFoundException {
+            throws ClassNotFoundException, IOException {
 
         TestResult result = new TestResult();
         loadTestCase(jarPath, testPkgName, testClassName, testMethodName);
@@ -69,8 +70,7 @@ public class HostUnitTestRunner extends BaseTestRunner{
     @SuppressWarnings("unchecked")
     public TestCase loadTestCase(final String jarPath,
             final String testPkgName, final String testClassName,
-            final String testMethodName) throws MalformedURLException,
-            ClassNotFoundException {
+            final String testMethodName) throws ClassNotFoundException, IOException {
 
         Log.d("jarPath=" + jarPath + ",testPkgName=" + testPkgName
                 + ",testClassName=" + testClassName);
@@ -100,11 +100,10 @@ public class HostUnitTestRunner extends BaseTestRunner{
     @SuppressWarnings("unchecked")
     public Class loadClass(final String jarPath,
             final String testPkgName, final String testClassName)
-            throws MalformedURLException, ClassNotFoundException {
+            throws ClassNotFoundException, IOException {
 
-        URL urls[] = {};
-        JarFileLoader cl = new JarFileLoader(urls);
-        cl.addFile(jarPath);
+        URL urls[] = { new File(jarPath).getCanonicalFile().toURI().toURL() };
+        URLClassLoader cl = new URLClassLoader(urls);
         Class testClass = cl.loadClass(testPkgName + "." + testClassName);
         Log.d("succeed in load jarred class: " + jarPath + "." + testPkgName
                 + "." + testClassName);
@@ -160,23 +159,4 @@ public class HostUnitTestRunner extends BaseTestRunner{
         throw new RuntimeException(message);
     }
 
-    /**
-     * Jar file loader.
-     *
-     */
-    class JarFileLoader extends URLClassLoader {
-        public JarFileLoader(URL[] urls) {
-            super(urls);
-        }
-
-        /**
-         * Add jar file path.
-         *
-         * @param path the path to the specified jar file.
-         */
-        public void addFile(String path) throws MalformedURLException {
-            String urlPath = "jar:file://" + path + "!/";
-            addURL(new URL(urlPath));
-        }
-    }
 }

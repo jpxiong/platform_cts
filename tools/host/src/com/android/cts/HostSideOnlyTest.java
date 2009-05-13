@@ -16,7 +16,7 @@
 
 package com.android.cts;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import junit.framework.TestResult;
 
 /**
@@ -52,13 +52,14 @@ public class HostSideOnlyTest extends Test {
                 testResult = runner.runTest(controller.getJarPath(),
                         controller.getPackageName(), controller.getClassName(),
                         controller.getMethodName());
-            } catch (MalformedURLException e) {
-                Log.e("The host controller jar file is invalid. Please choose a correct one.",
-                        null);
+            } catch (IOException e) {
+                Log.e("IOException while running test from " +
+                      controller.getJarPath(), e);
             } catch (ClassNotFoundException e) {
-                Log.e("The host controller JAR file doesn't contain class: "
+                Log.e("The host controller JAR (" + controller.getJarPath() +
+                        ") file doesn't contain class: "
                         + controller.getPackageName() + "."
-                        + controller.getClassName(), null);
+                        + controller.getClassName(), e);
             }
 
             synchronized (mTimeOutTimer) {
