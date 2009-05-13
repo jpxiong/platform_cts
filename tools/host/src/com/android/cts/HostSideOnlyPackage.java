@@ -17,7 +17,6 @@
 package com.android.cts;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * The host side only package.
@@ -35,7 +34,7 @@ public class HostSideOnlyPackage extends TestPackage {
      */
     public HostSideOnlyPackage(final String testPkgBinaryName, final String version,
             final String androidVersion, final String jarPath,
-            final String appPackageName) throws NoSuchAlgorithmException {
+            final String appPackageName) {
         super(null, testPkgBinaryName, null, null, version,
                 androidVersion, jarPath, null, appPackageName);
     }
