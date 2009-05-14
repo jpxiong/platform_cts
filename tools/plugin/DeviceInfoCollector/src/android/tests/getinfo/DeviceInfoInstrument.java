@@ -54,9 +54,6 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static final String BUILD_ID = "build_id";
     private static Bundle mResults = new Bundle();
 
-    public static boolean sIsFinishActivity = false;
-    public static Object sSync = new Object();
-
     public DeviceInfoInstrument() {
         super();
     }
@@ -98,15 +95,9 @@ public class DeviceInfoInstrument extends Instrumentation {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(this.getContext(), DeviceInfoActivity.class);
 
-        startActivitySync(intent);
-        synchronized (sSync) {
-            if (!sIsFinishActivity) {
-                try {
-                    sSync.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-        }
+        DeviceInfoActivity activity = (DeviceInfoActivity) startActivitySync(intent);
+        waitForIdleSync();
+        activity.waitForAcitityToFinish();
 
         // network
         String network = android.telephony.TelephonyManager.getDefault().getNetworkOperatorName();
