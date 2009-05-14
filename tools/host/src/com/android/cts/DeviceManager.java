@@ -21,6 +21,7 @@ import com.android.ddmlib.Device;
 import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -213,20 +214,24 @@ public class DeviceManager implements IDeviceChangeListener {
 
         @Override
         public void run() {
-            while (mDevice.getSyncService() == null || mDevice.getPropertyCount() == 0) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Log.e("", e);
+            try {
+               while (mDevice.getSyncService() == null || mDevice.getPropertyCount() == 0) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Log.e("", e);
+                    }
                 }
+                CUIOutputStream.println("Device(" + mDevice + ") connected");
+                if (!TestSession.isADBServerRestartedMode()) {
+                    CUIOutputStream.printPrompt();
+                }
+                appendDevice(mDevice);
+                // increment the counter semaphore to unblock threads waiting for devices
+                mSemaphore.release();
+            } catch (IOException e) {
+                // FIXME: handle failed connection to device.
             }
-            CUIOutputStream.println("Device(" + mDevice + ") connected");
-            if (!TestSession.isADBServerRestartedMode()) {
-                CUIOutputStream.printPrompt();
-            }
-            appendDevice(mDevice);
-            // increment the counter semaphore to unblock threads waiting for devices
-            mSemaphore.release();
         }
     }
 

@@ -130,7 +130,11 @@ public class TestDevice implements DeviceObserver {
 
     public TestDevice(Device device) {
         mDevice = device;
-        mSyncService = mDevice.getSyncService();
+        try {
+            mSyncService = mDevice.getSyncService();
+        } catch (IOException e) {
+            // FIXME: handle failed connection.
+        }
         mBatchModeResultParser = null;
         mUninstallObserver = new PackageActionObserver(ACTION_UNINSTALL);
         mStatus = STATUS_IDLE;
