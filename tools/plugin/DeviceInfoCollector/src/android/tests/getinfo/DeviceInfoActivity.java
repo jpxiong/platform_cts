@@ -29,6 +29,22 @@ import android.widget.TextView;
  * Collect device information on target device.
  */
 public class DeviceInfoActivity extends Activity {
+    private boolean isFinishActivity = false;
+    private Object sync = new Object();
+
+    /**
+     * Other classes can call this function to wait for this activity
+     * to finish. */
+    public void waitForAcitityToFinish() {
+        synchronized (sync) {
+            while (!isFinishActivity) {
+                try {
+                    sync.wait();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,9 +115,9 @@ public class DeviceInfoActivity extends Activity {
         DeviceInfoInstrument.addResult(DeviceInfoInstrument.LOCALES,
                 localeList.toString());
 
-        synchronized (DeviceInfoInstrument.sSync) {
-            DeviceInfoInstrument.sSync.notify();
-            DeviceInfoInstrument.sIsFinishActivity = true;
+        synchronized (sync) {
+            sync.notify();
+            isFinishActivity = true;
         }
     }
 }
