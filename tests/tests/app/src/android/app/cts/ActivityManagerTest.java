@@ -46,7 +46,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
     private static final int WAIT_TIME = 2000;
     private Context mContext;
     private ActivityManager mActivityManager;
-    private Activity mCurrentRunningActivity;
     private Intent mIntent;
     private List<Activity> mStartedActivityList;
     private int mErrorProcessID;
@@ -65,9 +64,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (mCurrentRunningActivity != null) {
-            mCurrentRunningActivity.finish();
-        }
         if (mIntent != null) {
             mInstrumentation.getContext().stopService(mIntent);
         }
