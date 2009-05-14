@@ -29,7 +29,7 @@ import android.widget.TextView;
  * Collect device information on target device.
  */
 public class DeviceInfoActivity extends Activity {
-    private boolean isFinishActivity = false;
+    private boolean isActivityFinished = false;
     private Object sync = new Object();
 
     /**
@@ -37,7 +37,7 @@ public class DeviceInfoActivity extends Activity {
      * to finish. */
     public void waitForAcitityToFinish() {
         synchronized (sync) {
-            while (!isFinishActivity) {
+            while (!isActivityFinished) {
                 try {
                     sync.wait();
                 } catch (InterruptedException e) {
@@ -117,7 +117,7 @@ public class DeviceInfoActivity extends Activity {
 
         synchronized (sync) {
             sync.notify();
-            isFinishActivity = true;
+            isActivityFinished = true;
         }
     }
 }
