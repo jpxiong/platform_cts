@@ -69,10 +69,8 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     private Context mContext;
     private MotionEvent mMotionEvent;
 
-    private Sync mSync = new Sync();
-    class Sync {
-        public boolean mHasNotify;
-    }
+    private Object mSync = new Object();
+    private boolean mHasNotify;
 
     @Override
     protected void setUp() throws Exception {
@@ -316,7 +314,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         level = TestLevel.COMPLETE,
         notes = "Test attachLayoutAnimationParameters function",
         method = "attachLayoutAnimationParameters",
-        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, 
+        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class,
                 int.class}
     )
     public void testAttachLayoutAnimationParameters() {
@@ -353,7 +351,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         level = TestLevel.COMPLETE,
         notes = "Test addViewInLayout function",
         method = "addViewInLayout",
-        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class, 
+        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class,
                 boolean.class}
     )
     public void testAddViewInLayoutWithParamViewIntLayB() {
@@ -1300,7 +1298,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         )
     })
     public void testInvalidateChild() {
-        mSync = new Sync();
         ViewGroupStubActivity.setResult(this);
         setupActivity(ViewGroupStubActivity.ACTION_INVALIDATE_CHILD);
         waitForResult();
@@ -1309,16 +1306,12 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     private void waitForResult() {
         synchronized (mSync) {
-            if (!mSync.mHasNotify) {
+            while (!mHasNotify) {
                 try {
                     mSync.wait();
                 } catch (InterruptedException e) {
                 }
             }
-        }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
         }
     }
 
@@ -2680,7 +2673,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
     public void setResult(int resultCode) {
         synchronized (mSync) {
-            mSync.mHasNotify = true;
+            mHasNotify = true;
             mSync.notify();
             assertEquals(CTSResult.RESULT_OK, resultCode);
         }
