@@ -64,8 +64,9 @@ public class ReferenceAppTestCase<T extends Activity> extends ActivityInstrument
         long end = System.currentTimeMillis();
 
         long startupTime = end - start;
-        assertTrue("Activity Startup took more than 5 seconds",
-                   startupTime <= 5000);
+        assertTrue("Activity Startup took more than " + maxStartupTimeMs +
+                   " ms",
+                   startupTime <= maxStartupTimeMs);
     }
 
     /**
