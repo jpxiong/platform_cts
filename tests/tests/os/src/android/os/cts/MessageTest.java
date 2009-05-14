@@ -28,7 +28,7 @@ import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Message.class)
 public class MessageTest extends AndroidTestCase {
-    public static int SLEEP_TIME = 300;
+    public static final int SLEEP_TIME = 300;
     public static final int WHAT = 1;
     public static final int ARG1 = 1;
     public static final int ARG2 = 2;
