@@ -16,6 +16,14 @@
 
 package android.tests.sigtest;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.Resources.NotFoundException;
+import android.os.Bundle;
+
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,17 +32,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.RemoteException;
 
 /**
  * This class is used for Signature Test. It will started by the Instrumentation class,
@@ -157,14 +154,14 @@ public class SignatureTestActivity extends Activity {
         return excludeSet;
     }
 
+    Bundle mBundle;
+
     /**
      * This class is an implementation of the ResultObserver. And it aims to
      * record the result in the Bundle, and send back to the Instrumentation class
      * after all results has been recorded.
      */
-    final static class DeviceResultObserver implements ResultObserver {
-        Bundle mBundle;
-
+    final class DeviceResultObserver implements ResultObserver {
         DeviceResultObserver() {
             mBundle = new Bundle();
             mBundle.putStringArrayList(BUNDLE_KEY_MISSING_FIELD, new ArrayList<String>());
@@ -213,23 +210,15 @@ public class SignatureTestActivity extends Activity {
                 SignatureTestLog.d("FAIL: " + mBundle.size());
                 mBundle.putBoolean(BUNDLE_KEY_RESULT, false);
             }
-            final IBinder binder = i.getIBinderExtra(BUNDLE_EXTRA_SIG_TEST);
-            Parcel p = Parcel.obtain();
-            p.setDataPosition(0);
-            p.writeBundle(mBundle);
-
-            try {
-                binder.transact(GET_SIG_TEST_RESULT_TRANSACTION, p, null, 0);
-            } catch (RemoteException e) {
-                SignatureTestLog.e("Got RemoteException when transact", e);
-                throw new RuntimeException(e);
-            }
         }
 
-        public void notifyFailure(FAILURE_TYPE type, String name) {
+        public void notifyFailure(FAILURE_TYPE type,
+                                  String name,
+                                  String errorMessage) {
             SignatureTestLog.d("Failure: ");
             SignatureTestLog.d("   Type: " + type);
             SignatureTestLog.d("   Name: " + name);
+            SignatureTestLog.d("   Why : " + errorMessage);
             mBundle.getStringArrayList(SignatureTestActivity.FAILURE_TYPE_TO_KEY.get(type))
                     .add(name);
         }

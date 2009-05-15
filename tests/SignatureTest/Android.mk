@@ -23,6 +23,8 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_PACKAGE_NAME := SignatureTest
 
+LOCAL_SDK_VERSION := current
+
 # To be passed in on command line
 CTS_API_VERSION ?= current
 

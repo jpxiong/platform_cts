@@ -18,9 +18,7 @@ package android.tests.sigtest;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Bundle;
-import android.os.Parcel;
 
 public class InstrumentationRunner extends Instrumentation {
     @Override
@@ -36,26 +34,10 @@ public class InstrumentationRunner extends Instrumentation {
                 "android.tests.sigtest.SignatureTestActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        final Bundle results = new Bundle();
-
-        intent.putExtra(SignatureTestActivity.BUNDLE_EXTRA_SIG_TEST, new Binder(){
-            @Override
-            public boolean onTransact(int code, Parcel data, Parcel reply, int flags) {
-                switch (code) {
-                case SignatureTestActivity.GET_SIG_TEST_RESULT_TRANSACTION:
-                    results.putAll(data.readBundle());
-
-                    return true;
-                }
-
-                return false;
-            }
-        });
-
-        startActivitySync(intent);
+        SignatureTestActivity activity = (SignatureTestActivity) startActivitySync(intent);
         waitForIdleSync();
 
-        finish(Activity.RESULT_OK, results);
+        finish(Activity.RESULT_OK, activity.mBundle);
     }
 
 }

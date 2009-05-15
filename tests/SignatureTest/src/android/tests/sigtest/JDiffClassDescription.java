@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 /**
  * Represents class descriptions loaded from a jdiff xml file.  Used
@@ -82,10 +81,12 @@ public class JDiffClassDescription {
      */
     public JDiffClassDescription(String pkg, String className) {
         this(pkg, className, new ResultObserver() {
-                public void notifyFailure(SignatureTestActivity.FAILURE_TYPE type, String name) {
-                    // This is a null result observer that doesn't do anything.
-                }
-            });
+            public void notifyFailure(SignatureTestActivity.FAILURE_TYPE type,
+                    String name,
+                    String errorMessage) {
+                // This is a null result observer that doesn't do anything.
+            }
+        });
     }
 
     /**
@@ -97,8 +98,8 @@ public class JDiffClassDescription {
      * @param resultObserver the resultObserver to get results with.
      */
     public JDiffClassDescription(String pkg,
-                                 String className,
-                                 ResultObserver resultObserver) {
+            String className,
+            ResultObserver resultObserver) {
         mPackageName = pkg;
         mShortClassName = className;
         mResultObserver = resultObserver;
@@ -140,7 +141,94 @@ public class JDiffClassDescription {
         jDiffConstructors.add(tc);
     }
 
-  public abstract static class JDiffElement {
+    static String convertModifiersToAccessLevel(int modifiers) {
+        String accessLevel = "";
+        if ((modifiers & Modifier.PUBLIC) != 0) {
+            return "public";
+        } else if ((modifiers & Modifier.PRIVATE) != 0) {
+            return "private";
+        } else if ((modifiers & Modifier.PROTECTED) != 0) {
+            return "protected";
+        } else {
+            // package protected
+            return "";
+        }
+    }
+
+    static String convertModifersToModifierString(int modifiers) {
+        StringBuffer sb = new StringBuffer();
+        boolean isFirst = true;
+
+        // order taken from Java Language Spec, sections 8.1.1, 8.3.1, and 8.4.3
+        if ((modifiers & Modifier.ABSTRACT) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("abstract");
+        }
+        if ((modifiers & Modifier.STATIC) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("static");
+        }
+        if ((modifiers & Modifier.FINAL) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("final");
+        }
+        if ((modifiers & Modifier.TRANSIENT) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("transient");
+        } 
+        if ((modifiers & Modifier.VOLATILE) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("volatile");
+        }         
+        if ((modifiers & Modifier.SYNCHRONIZED) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("synchronized");
+        }
+        if ((modifiers & Modifier.NATIVE) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("native");
+        }
+        if ((modifiers & Modifier.STRICT) != 0) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(" ");
+            }
+            sb.append("strictfp");
+        }        
+
+        return sb.toString();
+    }
+
+    public abstract static class JDiffElement {
         final String mName;
         int mModifier;
 
@@ -148,7 +236,6 @@ public class JDiffClassDescription {
             mName = name;
             mModifier = modifier;
         }
-
     }
 
     /**
@@ -171,6 +258,27 @@ public class JDiffClassDescription {
          */
         public String toReadableString(String className) {
             return className + "#" + mName + "(" + mFieldType + ")";
+        }
+
+        public String toSignatureString() {
+            StringBuffer sb = new StringBuffer();
+
+            // access level
+            String accesLevel = convertModifiersToAccessLevel(mModifier);
+            if (!"".equals(accesLevel)) {
+                sb.append(accesLevel).append(" ");
+            }            
+            
+            String modifierString = convertModifersToModifierString(mModifier);
+            if (!"".equals(modifierString)) {
+                sb.append(modifierString).append(" ");
+            }
+            
+            sb.append(mFieldType).append(" ");
+            
+            sb.append(mName);
+
+            return sb.toString();
         }
     }
 
@@ -245,6 +353,57 @@ public class JDiffClassDescription {
             return paramList.toString();
         }
 
+        public String toSignatureString() {
+            StringBuffer sb = new StringBuffer();
+
+            // access level
+            String accesLevel = convertModifiersToAccessLevel(mModifier);
+            if (!"".equals(accesLevel)) {
+                sb.append(accesLevel).append(" ");
+            }            
+            
+            String modifierString = convertModifersToModifierString(mModifier);
+            if (!"".equals(modifierString)) {
+                sb.append(modifierString).append(" ");
+            }
+            
+            String returnType = getReturnType();
+            if (!"".equals(returnType)) {
+                sb.append(returnType).append(" ");
+            }
+            
+            sb.append(mName);
+            sb.append("(");
+            for (int x = 0; x < mParamList.size(); x++) {
+                sb.append(mParamList.get(x));
+                if (x + 1 != mParamList.size()) {
+                    sb.append(", ");
+                }
+            }
+            sb.append(")");
+            
+            // does it throw?
+            if (mExceptionList.size() > 0) {
+                sb.append(" throws ");
+                for (int x = 0; x < mExceptionList.size(); x++) {
+                    sb.append(mExceptionList.get(x));
+                    if (x + 1 != mExceptionList.size()) {                    
+                        sb.append(", ");
+                    }
+                }
+            }
+
+            return sb.toString();
+        }
+
+        /**
+         * Gets the return type.
+         * 
+         * @return the return type of this method.
+         */
+        protected String getReturnType() {
+            return mReturnType;
+        }
     }
 
     /**
@@ -262,6 +421,17 @@ public class JDiffClassDescription {
                 addParam(param[i]);
             }
         }
+        
+        /**
+         * Gets the return type.
+         * 
+         * @return the return type of this method.
+         */
+        @Override
+        protected String getReturnType() {
+            // Constructors have no return type.
+            return "";
+        }        
     }
 
     /**
@@ -275,6 +445,43 @@ public class JDiffClassDescription {
             checkConstructorCompliance();
             checkMethodCompliance();
         }
+    }
+
+    /**
+     * Checks to ensure that the modifiers value for two methods are
+     * compatible.
+     *
+     * Allowable differences are:
+     *   - synchronized is allowed to be removed from an apiMethod
+     *     that has it
+     *   - the native modified is ignored
+     *
+     * @param apiMethod the method read from the api file.
+     * @param reflectedMethod the method found via reflections.
+     */
+    private boolean areMethodModifiedCompatibile(JDiffMethod apiMethod ,
+            Method reflectedMethod) {
+
+        // If the apiMethod isn't synchronized
+        if (((apiMethod.mModifier & Modifier.SYNCHRONIZED) == 0) &&
+                // but the reflected method is
+                ((reflectedMethod.getModifiers() & Modifier.SYNCHRONIZED) != 0)) {
+            // that is a problem
+            return false;
+        }
+
+        // Mask off NATIVE since it is a don't care.  Also mask off 
+        // SYNCHRONIZED since we've already handled that check.
+        int mod1 = reflectedMethod.getModifiers() & ~(Modifier.NATIVE | Modifier.SYNCHRONIZED);
+        int mod2 = apiMethod.mModifier & ~(Modifier.NATIVE | Modifier.SYNCHRONIZED);
+        
+        // We can ignore FINAL for final classes
+        if ((mModifier & Modifier.FINAL) != 0) {
+            mod1 &= ~Modifier.FINAL;
+            mod2 &= ~Modifier.FINAL;
+        }
+        
+        return mod1 == mod2;
     }
 
     /**
@@ -292,7 +499,9 @@ public class JDiffClassDescription {
                 Method m = findMatchingMethod(method);
                 if (m == null) {
                     mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_METHOD,
-                                                  method.toReadableString(mAbsoluteClassName));
+                            method.toReadableString(mAbsoluteClassName),
+                            "No method with correct signature found:" +
+                            method.toSignatureString());
                 } else {
                     if (m.isVarArgs()) {
                         method.mModifier |= METHOD_MODIFIER_VAR_ARGS;
@@ -309,15 +518,18 @@ public class JDiffClassDescription {
                         return;
                     }
 
-                    if (m.getModifiers() != method.mModifier) {
+                    if (!areMethodModifiedCompatibile(method, m)) {
                         mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD,
-                                                      method.toReadableString(mAbsoluteClassName));
+                                method.toReadableString(mAbsoluteClassName),
+                                "Non-compatible method found when looking for " +
+                                method.toSignatureString());
                     }
                 }
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking method compliance", e);
                 mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
-                                              method.toReadableString(mAbsoluteClassName));
+                        method.toReadableString(mAbsoluteClassName),
+                "Exception!");
             }
         }
     }
@@ -325,7 +537,7 @@ public class JDiffClassDescription {
     /**
      * Checks if the two types of methods are the same.
      *
-     * @param jDiffMethods the jDiffMethod to compare
+     * @param jDiffMethod the jDiffMethod to compare
      * @param method the reflected method to compare
      * @return true, if both methods are the same
      */
@@ -385,7 +597,7 @@ public class JDiffClassDescription {
      * reflection.
      *
      * @param jdiffParam param parsed from the API xml file.
-     * @param reflectionParam param goten from the Java reflection.
+     * @param reflectionParamType param gotten from the Java reflection.
      * @return True if the two params match, otherwise return false.
      */
     private static boolean compareParam(String jdiffParam, Type reflectionParamType) {
@@ -424,7 +636,9 @@ public class JDiffClassDescription {
                 Constructor<?> c = findMatchingConstructor(con);
                 if (c == null) {
                     mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_METHOD,
-                                                  con.toReadableString(mAbsoluteClassName));
+                            con.toReadableString(mAbsoluteClassName),
+                            "No method with correct signature found:" +
+                            con.toSignatureString());
                 } else {
                     if (c.isVarArgs()) {// some method's parameter are variable args
                         con.mModifier |= METHOD_MODIFIER_VAR_ARGS;
@@ -432,13 +646,16 @@ public class JDiffClassDescription {
                     if (c.getModifiers() != con.mModifier) {
                         mResultObserver.notifyFailure(
                                 SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD,
-                                con.toReadableString(mAbsoluteClassName));
+                                con.toReadableString(mAbsoluteClassName),
+                                "Non-compatible method found when looking for " +
+                                con.toSignatureString());
                     }
                 }
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking constructor compliance", e);
                 mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
-                                              con.toReadableString(mAbsoluteClassName));
+                        con.toReadableString(mAbsoluteClassName),
+                "Exception!");
             }
         }
     }
@@ -497,18 +714,23 @@ public class JDiffClassDescription {
                 Field f = findMatchingField(field);
                 if (f == null) {
                     mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_FIELD,
-                                                  field.toReadableString(mAbsoluteClassName));
+                            field.toReadableString(mAbsoluteClassName),
+                            "No field with correct signature found:" +
+                            field.toSignatureString());
                 } else {
                     if (f.getModifiers() != field.mModifier
-                        || !f.getType().getCanonicalName().equals(field.mFieldType)) {
+                            || !f.getType().getCanonicalName().equals(field.mFieldType)) {
                         mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
-                                                      field.toReadableString(mAbsoluteClassName));
+                                field.toReadableString(mAbsoluteClassName),
+                                "Non-compatible field found when looking for " +
+                                field.toSignatureString());
                     }
                 }
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking field compliance", e);
                 mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
-                                              field.toReadableString(mAbsoluteClassName));
+                        field.toReadableString(mAbsoluteClassName),
+                "Exception!");
             }
         }
     }
@@ -535,19 +757,31 @@ public class JDiffClassDescription {
      * @return true if modifiers are compliant.
      */
     private boolean checkClassModifiersCompliance() {
-        int realModifer = mClass.getModifiers();
-        if (isAnnotation()) {
-            realModifer &= ~CLASS_MODIFIER_ANNOTATION;
+        int reflectionModifier = mClass.getModifiers();
+        int apiModifier = mModifier;
+        
+        // If the api class isn't abstract
+        if (((apiModifier & Modifier.ABSTRACT) == 0) &&
+                // but the reflected class is
+                ((reflectionModifier & Modifier.ABSTRACT) != 0)) {
+            // that is a problem
+            return false;
         }
-
+        // ABSTRACT check passed, so mask off ABSTRACT
+        reflectionModifier &= ~Modifier.ABSTRACT;
+        apiModifier &= ~Modifier.ABSTRACT;
+        
+        if (isAnnotation()) {
+            reflectionModifier &= ~CLASS_MODIFIER_ANNOTATION;
+        }
         if (mClass.isInterface()) {
-            realModifer &= ~Modifier.INTERFACE;
+            reflectionModifier &= ~(Modifier.INTERFACE);
         }
         if (isEnumType() && mClass.isEnum()) {
-            realModifer &= ~CLASS_MODIFIER_ENUM;
+            reflectionModifier &= ~CLASS_MODIFIER_ENUM;
         }
-
-        return (realModifer == mModifier && (isEnumType() == mClass.isEnum()));
+        return ((reflectionModifier == apiModifier) && 
+                (isEnumType() == mClass.isEnum()));
     }
 
     /**
@@ -633,51 +867,106 @@ public class JDiffClassDescription {
                 // No class found, notify the observer according to the class type
                 if (JDiffType.INTERFACE.equals(mClassType)) {
                     mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_INTERFACE,
-                                                  mAbsoluteClassName);
+                            mAbsoluteClassName,
+                            "Classloader is unable to find " + mAbsoluteClassName);
                 } else {
                     mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_CLASS,
-                                                  mAbsoluteClassName);
+                            mAbsoluteClassName,
+                            "Classloader is unable to find " + mAbsoluteClassName);
                 }
 
                 return;
             }
             if (!checkClassModifiersCompliance()) {
-                logMismatchInterfaceSignature(mAbsoluteClassName);
+                logMismatchInterfaceSignature(mAbsoluteClassName,
+                        "Non-compatible class found when looking for " +
+                        toSignatureString());
                 return;
             }
 
             if (!checkClassAnnotationCompliace()) {
-                logMismatchInterfaceSignature(mAbsoluteClassName);
+                logMismatchInterfaceSignature(mAbsoluteClassName,
+                "Annotation mismatch");
                 return;
             }
 
             if (!mClass.isAnnotation()) {
                 // check father class
                 if (!checkClassExtendsCompliance()) {
-                    logMismatchInterfaceSignature(mAbsoluteClassName);
+                    logMismatchInterfaceSignature(mAbsoluteClassName,
+                    "Extends mismatch");
                     return;
                 }
 
                 // check implements interface
                 if (!checkClassImplementsCompliance()) {
-                    logMismatchInterfaceSignature(mAbsoluteClassName);
+                    logMismatchInterfaceSignature(mAbsoluteClassName,
+                    "Implements mismatch");
                     return;
                 }
             }
         } catch (Exception e) {
             SignatureTestLog.e("Got exception when checking field compliance", e);
             mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
-                                          mAbsoluteClassName);
+                    mAbsoluteClassName,
+            "Exception!");
         }
     }
 
-    private void logMismatchInterfaceSignature(String classFullName) {
+
+    /**
+     * Convert the class into a printable signature string.
+     * 
+     * @return the signature string
+     */
+    public String toSignatureString() {
+        StringBuffer sb = new StringBuffer();
+
+        String accessLevel = convertModifiersToAccessLevel(mModifier);
+        if (!"".equals(accessLevel)) {
+            sb.append(accessLevel).append(" ");
+        }
+        if (!JDiffType.INTERFACE.equals(mClassType)) {
+            String modifierString = convertModifersToModifierString(mModifier);
+            if (!"".equals(modifierString)) {
+                sb.append(modifierString).append(" ");
+            }
+            sb.append("class ");
+        } else {
+            sb.append("interface ");
+        }
+        // class name
+        sb.append(mShortClassName);
+
+        // does it extends something?
+        if (mExtendedClass != null) {
+            sb.append(" extends ").append(mExtendedClass).append(" ");
+        }
+
+        // implements something?
+        if (implInterfaces.size() > 0) {
+            sb.append(" implements ");
+            for (int x = 0; x < implInterfaces.size(); x++) {
+                String interf = implInterfaces.get(x);
+                sb.append(interf);
+                // if not last elements
+                if (x + 1 != implInterfaces.size()) {
+                    sb.append(", ");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private void logMismatchInterfaceSignature(String classFullName, String errorMessage) {
         if (JDiffType.INTERFACE.equals(mClassType)) {
             mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_INTERFACE,
-                    classFullName);
+                    classFullName,
+                    errorMessage);
         } else {
             mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_CLASS,
-                    classFullName);
+                    classFullName,
+                    errorMessage);
         }
     }
 
@@ -706,8 +995,8 @@ public class JDiffClassDescription {
             // Check to see if the class we're looking for is the top
             // level class.
             Class<?> clz = Class.forName(currentName,
-                                         false,
-                                         this.getClass().getClassLoader());
+                    false,
+                    this.getClass().getClassLoader());
             if (clz.getCanonicalName().equals(mAbsoluteClassName)) {
                 return clz;
             }
@@ -850,9 +1139,9 @@ public class JDiffClassDescription {
             sb.append(">");
             return sb.toString();
         } else if (type instanceof TypeVariable) {
-            return ((TypeVariable) type).getName();
+            return ((TypeVariable<?>) type).getName();
         } else if (type instanceof Class) {
-            return ((Class) type).getCanonicalName();
+            return ((Class<?>) type).getCanonicalName();
         } else if (type instanceof GenericArrayType) {
             String typeName = typeToString(((GenericArrayType) type).getGenericComponentType());
             return typeName + "[]";
@@ -870,8 +1159,8 @@ public class JDiffClassDescription {
                 }
             } else {
                 String name = concatWildcardTypes(wt.getUpperBounds()) +
-                        " super " +
-                        concatWildcardTypes(wt.getLowerBounds());
+                " super " +
+                concatWildcardTypes(wt.getLowerBounds());
                 // Another special case for ?
                 name = name.replace("java.lang.Object", "?");
                 return name;
