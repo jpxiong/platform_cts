@@ -24,5 +24,6 @@ package android.tests.sigtest.tests.data;
  * any of these methods.
  */
 public final class FinalClass {
-
+    public final void finalMethod() { }
+    public void nonFinalMethod() { }
 }

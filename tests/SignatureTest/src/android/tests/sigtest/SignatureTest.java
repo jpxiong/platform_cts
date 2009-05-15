@@ -16,20 +16,18 @@
 
 package android.tests.sigtest;
 
+import android.tests.sigtest.JDiffClassDescription.JDiffConstructor;
+import android.tests.sigtest.JDiffClassDescription.JDiffField;
+import android.tests.sigtest.JDiffClassDescription.JDiffMethod;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.tests.sigtest.JDiffClassDescription.JDiffConstructor;
-import android.tests.sigtest.JDiffClassDescription.JDiffField;
-import android.tests.sigtest.JDiffClassDescription.JDiffMethod;
-
-import com.android.internal.util.XmlUtils;
 
 /**
  * Entry class for signature test.
@@ -79,6 +77,22 @@ public class SignatureTest {
                 TAG_PACKAGE, TAG_CLASS, TAG_INTERFACE, TAG_IMPLEMENTS, TAG_CONSTRUCTOR,
                 TAG_METHOD, TAG_PARAM, TAG_EXCEPTION, TAG_FIELD }));
     }
+    
+    public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException
+    {
+        int type;
+        while ((type=parser.next()) != XmlPullParser.START_TAG
+                   && type != XmlPullParser.END_DOCUMENT) { }
+
+        if (type != XmlPullParser.START_TAG) {
+            throw new XmlPullParserException("No start tag found");
+        }
+        
+        if (!parser.getName().equals(firstElementName)) {
+            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() +
+                    ", expected " + firstElementName);
+        }
+    }
 
     /**
      * Signature test entry point.
@@ -88,14 +102,14 @@ public class SignatureTest {
         String currentPackage = "";
         JDiffMethod currentMethod = null;
 
-        XmlUtils.beginDocument(parser, TAG_ROOT);
+        SignatureTest.beginDocument(parser, TAG_ROOT);
         int type;
         while (true) {
             type = XmlPullParser.START_DOCUMENT;
             while ((type=parser.next()) != XmlPullParser.START_TAG
                        && type != XmlPullParser.END_DOCUMENT
                        && type != XmlPullParser.END_TAG) {
-                ;
+                
             }
 
             if (type == XmlPullParser.END_TAG) {
@@ -118,7 +132,6 @@ public class SignatureTest {
             }
 
             if (type == XmlPullParser.START_TAG && tagname.equals(TAG_PACKAGE)) {
-                SignatureTestLog.d("saw package: " + parser.getAttributeValue(null, ATTRIBUTE_NAME));
                 currentPackage = parser.getAttributeValue(null, ATTRIBUTE_NAME);
             } else if (tagname.equals(TAG_CLASS)) {
                 currentClass = loadClassInfo(parser, false, currentPackage);
@@ -129,7 +142,7 @@ public class SignatureTest {
             } else if (tagname.equals(TAG_CONSTRUCTOR)) {
                 JDiffConstructor constructor = loadConstructorInfo(parser, currentClass);
                 currentClass.addConstructor(constructor);
-                currentMethod = (JDiffMethod) constructor;
+                currentMethod = constructor;
             } else if (tagname.equals(TAG_METHOD)) {
                 currentMethod = loadMethodInfo(parser);
                 currentClass.addMethod(currentMethod);
@@ -201,15 +214,6 @@ public class SignatureTest {
         JDiffConstructor constructor = new JDiffConstructor(currentClass.getClassName(), modifier);
 
         return constructor;
-    }
-
-    /**
-     * Load implementation information to memory.
-     *
-     * @param parser The XmlPullParser which carries the xml information.
-     */
-    private void loadImplementationInfo(XmlPullParser parser) {
-
     }
 
     /**
