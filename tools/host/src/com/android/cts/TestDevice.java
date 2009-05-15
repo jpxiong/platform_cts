@@ -18,7 +18,7 @@ package com.android.cts;
 
 import com.android.ddmlib.Client;
 import com.android.ddmlib.ClientData;
-import com.android.ddmlib.Device;
+import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.RawImage;
@@ -77,7 +77,7 @@ public class TestDevice implements DeviceObserver {
     private BatchModeResultParser mBatchModeResultParser;
 
     private DeviceObserver mDeviceObserver;
-    private Device mDevice;
+    private IDevice mDevice;
     private DeviceParameterCollector mDeviceInfo;
 
     private SyncService mSyncService;
@@ -128,7 +128,7 @@ public class TestDevice implements DeviceObserver {
         mDeviceInfo.setSerialNumber(serialNumber);
     }
 
-    public TestDevice(Device device) {
+    public TestDevice(IDevice device) {
         mDevice = device;
         try {
             mSyncService = mDevice.getSyncService();
@@ -162,7 +162,7 @@ public class TestDevice implements DeviceObserver {
     /**
      * Return the Device instance associated with this TestDevice.
      */
-    public Device getDevice() {
+    public IDevice getDevice() {
         return mDevice;
     }
 
@@ -1519,7 +1519,7 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
-     * Execute Adb shell command on {@link Device}
+     * Execute Adb shell command on {@link IDevice}
      *
      * @param cmd the string of command.
      * @param receiver {@link IShellOutputReceiver}
@@ -1531,7 +1531,7 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
-     * Execute Adb shell command on {@link Device}
+     * Execute Adb shell command on {@link IDevice}
      *
      * Note that the receivers run in a different thread than the caller.
      *
@@ -1561,7 +1561,7 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
-     * Kill {@link Client} which running the test on the {@link Device}
+     * Kill {@link Client} which running the test on the {@link IDevice}
      *
      * @param packageName the test package name
      */
