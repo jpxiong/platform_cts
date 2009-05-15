@@ -33,11 +33,14 @@ public class NormalClass {
     // Methods to test.
     public static void staticMethod() { }
     public synchronized void syncMethod() { }
+    public void notSyncMethod() { }
     boolean packageProtectedMethod() { return false; }
     private void privateMethod() { }
     protected String protectedMethod() { return null; }
     public void throwsMethod() throws NormalException { }
     public native void nativeMethod();
+    public void notNativeMethod() { }
+    public final void finalMethod() { }
 
     // Fields to test.
     public final String FINAL_FIELD = "";
@@ -53,7 +56,7 @@ public class NormalClass {
             private String innerInnerClassData;
         }
         private String innerClassData;
-    };
+    }
 
     public interface InnerInterface {
         void doSomething();
