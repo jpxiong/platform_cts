@@ -37,6 +37,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
+import android.view.accessibility.AccessibilityEvent;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -1257,6 +1258,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         }
 
         public boolean dispatchTrackballEvent(MotionEvent event) {
+            return true;
+        }
+        
+        public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
             return true;
         }
 
