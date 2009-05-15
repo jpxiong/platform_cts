@@ -17,7 +17,7 @@
 package com.android.cts;
 
 import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.Device;
+import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
@@ -42,7 +42,7 @@ public class DeviceManager implements IDeviceChangeListener {
     ArrayList<TestDevice> mDevices;
     /** This is used during device restart for blocking until the device has been reconnected. */
     private Semaphore mSemaphore = new Semaphore(0);
-    
+
     public DeviceManager() {
         mDevices = new ArrayList<TestDevice>();
     }
@@ -59,7 +59,7 @@ public class DeviceManager implements IDeviceChangeListener {
         AndroidDebugBridge.addDeviceChangeListener(this);
         AndroidDebugBridge.createBridge(adbLocation, true);
     }
-    
+
     /**
      * Get the location of the adb command.
      *
@@ -133,7 +133,7 @@ public class DeviceManager implements IDeviceChangeListener {
      *
      * @param device The device to be appended to the device list.
      */
-    private void appendDevice(final Device device) {
+    private void appendDevice(final IDevice device) {
         if (-1 == getDeviceIndex(device)) {
             TestDevice td = new TestDevice(device);
             mDevices.add(td);
@@ -145,7 +145,7 @@ public class DeviceManager implements IDeviceChangeListener {
      *
      * @param device The device to be removed from the device list.
      */
-    private void removeDevice(final Device device) {
+    private void removeDevice(final IDevice device) {
         int index = getDeviceIndex(device);
         if (index == -1) {
             Log.d("Can't find " + device + " in device list of DeviceManager");
@@ -161,7 +161,7 @@ public class DeviceManager implements IDeviceChangeListener {
      * @param device The device to be found.
      * @return The index of the device if it exists; else -1.
      */
-    private int getDeviceIndex(final Device device) {
+    private int getDeviceIndex(final IDevice device) {
         TestDevice td;
 
         for (int index = 0; index < mDevices.size(); index++) {
@@ -172,7 +172,7 @@ public class DeviceManager implements IDeviceChangeListener {
         }
         return -1;
     }
-    
+
     /**
      * Search a <code>TestDevice</code> by serial number.
      *
@@ -189,26 +189,26 @@ public class DeviceManager implements IDeviceChangeListener {
     }
 
     /** {@inheritDoc} */
-    public void deviceChanged(Device device, int changeMask) {
+    public void deviceChanged(IDevice device, int changeMask) {
         Log.d("device " + device.getSerialNumber() + " changed with changeMask=" + changeMask);
         Log.d("Device state:" + device.getState());
     }
 
     /** {@inheritDoc} */
-    public void deviceConnected(Device device) {
+    public void deviceConnected(IDevice device) {
         new DeviceServiceMonitor(device).start();
     }
 
     /**
      * To make sure that connection between {@link AndroidDebugBridge}
-     * and {@link Device} is initialized properly. In fact, it just make sure
+     * and {@link IDevice} is initialized properly. In fact, it just make sure
      * the sync service isn't null and device's build values are collected
      * before appending device.
      */
     private class DeviceServiceMonitor extends Thread {
-        private Device mDevice;
+        private IDevice mDevice;
 
-        public DeviceServiceMonitor(Device device) {
+        public DeviceServiceMonitor(IDevice device) {
             mDevice = device;
         }
 
@@ -236,7 +236,7 @@ public class DeviceManager implements IDeviceChangeListener {
     }
 
     /** {@inheritDoc} */
-    public void deviceDisconnected(Device device) {
+    public void deviceDisconnected(IDevice device) {
         removeDevice(device);
     }
 
@@ -299,7 +299,7 @@ public class DeviceManager implements IDeviceChangeListener {
         if (!deviceSerialNumber.toLowerCase().startsWith("emulator")) {
             try {
                 // send reboot command through ddmlib
-                Device dev = searchTestDevice(deviceSerialNumber).getDevice();
+                IDevice dev = searchTestDevice(deviceSerialNumber).getDevice();
                 dev.executeShellCommand("reboot", new NullOutputReceiver());
                 // wait to make sure the reboot gets through before we tear down the connection
                 Thread.sleep(DDMLIB_REBOOT_DELAY);
@@ -315,14 +315,14 @@ public class DeviceManager implements IDeviceChangeListener {
 
                 // kill the server while the device is rebooting
                 executeCommand("adb kill-server");
-                
+
                 // Reset the device counter semaphore. We will wait below until at least one device
                 // has come online. This can happen any time during or after the call to
                 // createBridge(). The counter gets increased by the DeviceServiceMonitor when a
                 // device is added.
                 mSemaphore.drainPermits();
                 AndroidDebugBridge.createBridge(getAdbLocation(), true);
-                
+
                 boolean deviceFound = false;
                 while (!deviceFound) {
                     // wait until at least one device has been added
@@ -361,7 +361,7 @@ public class DeviceManager implements IDeviceChangeListener {
             executeCommand("adb -s " + deviceSerialNumber + " shell input keyevent 82");
         }
     }
-    
+
     /**
      * Execute the given command and wait for its completion.
      *
@@ -379,18 +379,18 @@ public class DeviceManager implements IDeviceChangeListener {
         } catch (Exception e) {
             return false;
         }
-        return true; 
+        return true;
     }
-    
+
     class TimeoutThread extends Thread {
         Process mProcess;
         long mTimeout;
-        
+
         TimeoutThread(Process process, long timeout) {
             mProcess = process;
             mTimeout = timeout;
         }
-        
+
         @Override
         public void run() {
             try {
