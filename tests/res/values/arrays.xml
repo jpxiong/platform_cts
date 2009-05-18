@@ -16,6 +16,20 @@
  -->
 
 <resources>
+    <item type="integer" name="reference" format="integer">101</item>
+
+      <string-array name="strings">
+        <item>zero</item>
+        <item>1</item>
+        <item>@string/reference</item>
+    </string-array>
+
+    <integer-array name="integers">
+        <item>0</item>
+        <item>1</item>
+        <item>@integer/reference</item>
+    </integer-array>
+
     <array name="difficultyLevel">
         <item>Easy</item>
         <item>Medium</item>
@@ -27,4 +41,17 @@
         <item>Test String 2</item>
         <item>Test String 3</item>
     </string-array>
+
+    <integer-array name="table_row_layout">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </integer-array>
 </resources>
