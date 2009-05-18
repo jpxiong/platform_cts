@@ -656,6 +656,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.os.cts.CountDownTimerTestStub"
+            android:label="CountDownTimerTestStub">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <service android:name="android.os.cts.EmptyService"
             android:process=":remote">
             <intent-filter>
