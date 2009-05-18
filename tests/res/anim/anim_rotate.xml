@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  * limitations under the License.
  -->
 
-<resources>
-    <drawable name="red">#7f00</drawable>
-    <drawable name="blue">#770000ff</drawable>
-    <drawable name="black">#77ffffff</drawable>
-    <drawable name="yellow">#77ffff00</drawable>
-    <color name="testcolor1">#ff00ff00</color>
-    <color name="testcolor2">#ffff0000</color>
-    <color name="failColor">#ff0000ff</color>
-</resources>
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:anim/decelerate_interpolator"
+    android:fromDegrees="0"
+    android:toDegrees="-45"
+    android:toYScale="0.0"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:duration="700" />

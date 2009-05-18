@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  -->
-
-<resources>
-    <drawable name="red">#7f00</drawable>
-    <drawable name="blue">#770000ff</drawable>
-    <drawable name="black">#77ffffff</drawable>
-    <drawable name="yellow">#77ffff00</drawable>
-    <color name="testcolor1">#ff00ff00</color>
-    <color name="testcolor2">#ffff0000</color>
-    <color name="failColor">#ff0000ff</color>
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:state_focused="true" android:color="@color/resource_test_color"/>
+   <item android:state_pressed="true" android:state_enabled="false" android:color="@color/resource_test_color"/>
+   <item android:state_enabled="false" android:color="@color/resource_test_color"/>
+   <item android:state_active="true" android:color="@color/resource_test_color"/>
+   <item android:color="@color/resource_test_color"/>
+ </selector>
