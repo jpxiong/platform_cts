@@ -18,7 +18,9 @@ package android.view.animation.cts;
 
 import android.app.Instrumentation;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.LayoutAnimationController;
 
 /**
  * The utility methods for animation test.
@@ -78,5 +80,29 @@ public final class AnimationTestUtils {
                 return animation.hasEnded();
             }
         }.run();
+    }
+
+    /**
+     * Assert run an AbsListView with LayoutAnimationController successfully.
+     * @param instrumentation
+     * @param view
+     * @param controller
+     * @param duration
+     * @throws InterruptedException
+     */
+    public static void assertRunController(final Instrumentation instrumentation,
+            final ViewGroup view, final LayoutAnimationController controller,
+            final long duration) throws InterruptedException {
+
+        instrumentation.runOnMainSync(new Runnable() {
+           public void run() {
+                view.setLayoutAnimation(controller);
+                view.requestLayout();
+           }
+        });
+
+        // LayoutAnimationController.isDone() always returns true, it's no use for stopping
+        // the running, so just using sleeping fixed time instead. we reported issue 1799434 for it.
+        Thread.sleep(duration + TIMEOUT_DELTA);
     }
 }
