@@ -541,6 +541,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.view.cts.FocusFinderStubActivity"
+            android:label="FocusFinderStubActivity">
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </activity>
+
+        <activity android:name="android.view.cts.GestureDetectorStubActivity"
+            android:label="GestureDetectorStubActivity"/>
+
         <!--Test for PackageManager-->
         <activity android:name="android.content.pm.cts.TestPmActivity"
                 android:icon="@drawable/start">
