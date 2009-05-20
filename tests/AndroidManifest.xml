@@ -286,6 +286,24 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name="android.content.cts.MockReceiverFirst">
+            <intent-filter android:priority="3">
+                <action android:name="android.content.cts.BroadcastReceiverTest.BROADCAST_TESTABORT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="android.content.cts.MockReceiverAbort">
+            <intent-filter android:priority="2">
+                <action android:name="android.content.cts.BroadcastReceiverTest.BROADCAST_TESTABORT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="android.content.cts.MockReceiver">
+            <intent-filter android:priority="1">
+                <action android:name="android.content.cts.BroadcastReceiverTest.BROADCAST_MOCKTEST" />
+                <action android:name="android.content.cts.BroadcastReceiverTest.BROADCAST_TESTABORT" />
+                <action android:name="android.content.cts.ContextWrapperTest.BROADCAST_TESTORDER" />
+            </intent-filter>
+        </receiver>
+
         <activity android:name="android.provider.cts.BrowserStubActivity"
             android:label="BrowserStubActivity">
             <intent-filter>
