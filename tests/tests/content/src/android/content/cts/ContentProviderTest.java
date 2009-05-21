@@ -21,6 +21,9 @@ import android.content.ContentValues;
 import android.content.IContentProvider;
 import android.content.Entity;
 import android.content.EntityIterator;
+import android.content.ContentProviderResult;
+import android.content.ContentProviderOperation;
+import android.content.OperationApplicationException;
 import android.content.pm.ProviderInfo;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
@@ -326,8 +329,8 @@ public class ContentProviderTest extends AndroidTestCase {
                 return 0;
             }
 
-            public Uri[] bulkInsertEntities(Uri uri, Entity[] entities) throws RemoteException {
-                return new Uri[0];
+            public Uri insertEntity(Uri uri, Entity entities) throws RemoteException {
+                return null;
             }
 
             public IBulkCursor bulkQuery(Uri url, String[] projection,
@@ -356,6 +359,11 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
+            public ContentProviderResult[] applyBatch(ContentProviderOperation[] operations)
+                    throws RemoteException, OperationApplicationException {
+                return null;
+            }
+
             public Cursor query(Uri url, String[] projection, String selection,
                     String[] selectionArgs, String sortOrder) {
                 return null;
@@ -371,8 +379,8 @@ public class ContentProviderTest extends AndroidTestCase {
                 return 0;
             }
 
-            public int[] bulkUpdateEntities(Uri uri, Entity[] entities) throws RemoteException {
-                return new int[0];
+            public int updateEntity(Uri uri, Entity entity) throws RemoteException {
+                return 0;
             }
 
             public IBinder asBinder() {
