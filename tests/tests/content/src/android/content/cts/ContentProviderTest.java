@@ -359,7 +359,8 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
-            public ContentProviderResult[] applyBatch(ContentProviderOperation[] operations)
+            public ContentProviderResult[] applyBatch(
+                    ArrayList<ContentProviderOperation> operations)
                     throws RemoteException, OperationApplicationException {
                 return null;
             }
