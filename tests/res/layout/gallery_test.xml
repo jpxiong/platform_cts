@@ -19,15 +19,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <Button
-        android:id="@+id/button_test"
-        android:layout_width="20dip"
-        android:layout_height="20dip"/>
-
-    <android.widget.cts.MockGallery xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.widget.cts.MyGallery xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gallery_test"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
-    </android.widget.cts.MockGallery>
+    </android.widget.cts.MyGallery>
 
 </LinearLayout>

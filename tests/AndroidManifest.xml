@@ -358,13 +358,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.widget.cts.MockPopupWindowStubActivity"
-            android:label="android.widget.cts.GalleryStubActivity">
+        <activity android:name="android.widget.cts.GalleryStubActivity"
+            android:label="GalleryStubActivity">
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
         </activity>
 
-        <activity android:name="android.widget.cts.ListViewStubActivity" android:label="ListViewStubActivity">
+        <activity android:name="android.widget.cts.MockPopupWindowStubActivity"
+            android:label="MockPopupWindowStubActivity">
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+        </activity>
+
+        <activity android:name="android.widget.cts.ListViewStubActivity"
+            android:label="ListViewStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
