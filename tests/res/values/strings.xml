@@ -66,8 +66,6 @@
     <string name="alert_dialog_negative">Negative</string>
     <string name="alert_dialog_neutral">Neutral</string>
     <string name="notify">Notify </string>
-    <string name="notify_cancel">Cancel</string>
-    <string name="notify_cancel_all">CancelAll</string>
     <string name="tabs_1">testing</string>
     <string name="table_layout_first">first</string>
     <string name="table_layout_second">second</string>
@@ -163,4 +161,7 @@
    <string name="relative_view11">view 11</string>
    <string name="relative_view12">view 12</string>
    <string name="relative_view13">view 13</string>
+   <string name="country">Country:</string>
+   <string name="symbol">Symbol:</string>
+   <string name="country_warning">No such country registered</string>
 </resources>
