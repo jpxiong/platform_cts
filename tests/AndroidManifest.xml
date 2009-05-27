@@ -125,6 +125,20 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.view.cts.UsingViewsStubActivity"
+            android:label="Using Views Test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+        <activity android:name="android.view.cts.FocusHandlingStubActivity"
+            android:label="Focus Handling Test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
         <activity android:name="android.app.cts.MockActivity" android:label="MockActivity">
             <meta-data android:name="android.app.alias"
                 android:resource="@xml/alias" />
@@ -211,6 +225,20 @@
         <activity android:name="android.view.cts.ViewGroupStubActivity" android:label="ViewGroupStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+        <activity android:name="android.view.cts.ViewTestStubActivity"
+            android:label="ViewTestStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+        <activity android:name="android.view.cts.ViewLayoutPositionTestStubActivity"
+            android:label="ViewTestStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
             </intent-filter>
         </activity>
