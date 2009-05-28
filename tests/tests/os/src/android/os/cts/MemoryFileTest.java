@@ -53,8 +53,12 @@ public class MemoryFileTest extends TestCase {
         )
     })
     public void testConstructor() {
-        // new the MemoryFile instance
-        new MemoryFile("Test File", 1024);
+        try {
+            // new the MemoryFile instance
+            new MemoryFile("Test File", 1024);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @TestTargetNew(
@@ -64,11 +68,11 @@ public class MemoryFileTest extends TestCase {
         args = {byte[].class, int.class, int.class, int.class}
     )
     public void testWriteBytes() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-
         byte[] data = new byte[512];
         try {
+            // new the MemoryFile instance
+            mMemoryFile = new MemoryFile("Test File", 1024);
+
             mMemoryFile.writeBytes(data, 0, 0, 512);
         } catch (IOException e) {
             fail(e.getMessage());
@@ -113,12 +117,12 @@ public class MemoryFileTest extends TestCase {
         )
     })
     public void testGetOutputStream() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-        OutputStream out = mMemoryFile.getOutputStream();
-        assertNotNull(out);
         byte[] bs = new byte[] { 1, 2, 3, 4 };
         try {
+            // new the MemoryFile instance
+            mMemoryFile = new MemoryFile("Test File", 1024);
+            OutputStream out = mMemoryFile.getOutputStream();
+            assertNotNull(out);
             out.write(bs);
         } catch (IOException e) {
             fail(e.getMessage());
@@ -152,10 +156,10 @@ public class MemoryFileTest extends TestCase {
     @ToBeFixed(bug = "1537041", explanation = "When set mAllowPurging to true, writeBytes"
                      + "should throw out exception")
     public void testAllowPurging() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-
         try {
+            // new the MemoryFile instance
+            mMemoryFile = new MemoryFile("Test File", 1024);
+
             assertFalse(mMemoryFile.allowPurging(true));
             byte[] data = new byte[512];
             try {
@@ -185,18 +189,33 @@ public class MemoryFileTest extends TestCase {
         args = {}
     )
     public void testLength() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-        assertEquals(1024, mMemoryFile.length());
+        try {
+            mMemoryFile = new MemoryFile("Test File", 1024);
+            assertEquals(1024, mMemoryFile.length());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
 
-        mMemoryFile = new MemoryFile("Test File", 512);
-        assertEquals(512, mMemoryFile.length());
+        try {
+            mMemoryFile = new MemoryFile("Test File", 512);
+            assertEquals(512, mMemoryFile.length());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
 
-        mMemoryFile = new MemoryFile("Test File", Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, mMemoryFile.length());
+        try {
+            mMemoryFile = new MemoryFile("Test File", Integer.MAX_VALUE);
+            assertEquals(Integer.MAX_VALUE, mMemoryFile.length());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
 
-        mMemoryFile = new MemoryFile("Test File", Integer.MIN_VALUE);
-        assertEquals(Integer.MIN_VALUE, mMemoryFile.length());
+        try {
+            mMemoryFile = new MemoryFile("Test File", Integer.MIN_VALUE);
+            assertEquals(Integer.MIN_VALUE, mMemoryFile.length());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @TestTargetNew(
@@ -206,10 +225,10 @@ public class MemoryFileTest extends TestCase {
         args = {byte[].class, int.class, int.class, int.class}
     )
     public void testReadBytes() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-
         try {
+            // new the MemoryFile instance
+            mMemoryFile = new MemoryFile("Test File", 1024);
+
             byte[] data = new byte[] { 1, 2, 3, 4 };
             mMemoryFile.writeBytes(data, 0, 0, data.length);
             byte[] gotData = new byte[4];
@@ -253,10 +272,9 @@ public class MemoryFileTest extends TestCase {
     )
     @ToBeFixed(bug="1398215", explanation="the file still can be read even after it closes.")
     public void testClose() {
-        // new the MemoryFile instance
-        mMemoryFile = new MemoryFile("Test File", 1024);
-
         try {
+            // new the MemoryFile instance
+            mMemoryFile = new MemoryFile("Test File", 1024);
             byte[] data = new byte[512];
             mMemoryFile.writeBytes(data, 0, 0, 128);
         } catch (IndexOutOfBoundsException e) {
