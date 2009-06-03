@@ -16,14 +16,15 @@
 
 package android.view.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.graphics.Rect;
 import android.test.AndroidTestCase;
 import android.view.Gravity;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link Gravity}.
@@ -54,13 +55,13 @@ public class GravityTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class, 
+            args = {int.class, int.class, int.class, android.graphics.Rect.class,
                     android.graphics.Rect.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class, int.class, 
+            args = {int.class, int.class, int.class, android.graphics.Rect.class, int.class,
                     int.class, android.graphics.Rect.class}
         )
     })
@@ -179,5 +180,28 @@ public class GravityTest extends AndroidTestCase {
         assertFalse(Gravity.isHorizontal(-1));
         assertTrue(Gravity.isHorizontal(Gravity.HORIZONTAL_GRAVITY_MASK));
         assertFalse(Gravity.isHorizontal(Gravity.NO_GRAVITY));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "applyDisplay",
+        args = {int.class, android.graphics.Rect.class, android.graphics.Rect.class}
+    )
+    public void testApplyDisplay() {
+        Rect display = new Rect(20, 30, 40, 50);
+        Rect inoutRect = new Rect(10, 10, 30, 60);
+        Gravity.applyDisplay(Gravity.DISPLAY_CLIP_VERTICAL, display, inoutRect);
+        assertEquals(20, inoutRect.left);
+        assertEquals(40, inoutRect.right);
+        assertEquals(30, inoutRect.top);
+        assertEquals(50, inoutRect.bottom);
+
+        display = new Rect(20, 30, 40, 50);
+        inoutRect = new Rect(10, 10, 30, 60);
+        Gravity.applyDisplay(Gravity.DISPLAY_CLIP_HORIZONTAL, display, inoutRect);
+        assertEquals(20, inoutRect.left);
+        assertEquals(30, inoutRect.right);
+        assertEquals(30, inoutRect.top);
+        assertEquals(50, inoutRect.bottom);
     }
 }

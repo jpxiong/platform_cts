@@ -16,6 +16,13 @@
 
 package android.view.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.app.cts.MockActivity;
@@ -28,17 +35,12 @@ import android.view.ViewTreeObserver.OnComputeInternalInsetsListener;
 import android.view.ViewTreeObserver.OnGlobalFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.ViewTreeObserver.OnTouchModeChangeListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
+import android.widget.ScrollView;
 
 /**
  * Test {@link ViewTreeObserver}.
@@ -353,6 +355,48 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
         assertFalse(listener.hasCalledOnTouchModeChanged());
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "addOnScrollChangedListener",
+            args = {android.view.ViewTreeObserver.OnScrollChangedListener.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "removeOnScrollChangedListener",
+            args = {android.view.ViewTreeObserver.OnScrollChangedListener.class}
+        )
+    })
+    public void testAccessOnScrollChangedListener() throws Throwable {
+        layout(R.layout.scrollview_layout);
+        final ScrollView scrollView = (ScrollView) mActivity.findViewById(R.id.scroll_view);
+
+        mViewTreeObserver = scrollView.getViewTreeObserver();
+
+        MockOnScrollChangedListener listener = new MockOnScrollChangedListener();
+        assertFalse(listener.hasCalledOnScrollChanged());
+        mViewTreeObserver.addOnScrollChangedListener(listener);
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                scrollView.fullScroll(View.FOCUS_DOWN);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertTrue(listener.hasCalledOnScrollChanged());
+
+        listener.reset();
+        assertFalse(listener.hasCalledOnScrollChanged());
+
+        mViewTreeObserver.removeOnScrollChangedListener(listener);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                scrollView.fullScroll(View.FOCUS_UP);
+            }
+        });
+        assertFalse(listener.hasCalledOnScrollChanged());
+    }
+
     private class MockOnGlobalFocusChangeListener implements OnGlobalFocusChangeListener {
         private boolean mCalledOnGlobalFocusChanged = false;
 
@@ -423,6 +467,22 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
 
         public boolean hasCalledOnComputeInternalInsets() {
             return mCalledOnComputeInternalInsets;
+        }
+    }
+
+    private static class MockOnScrollChangedListener implements OnScrollChangedListener {
+        private boolean mCalledOnScrollChanged = false;
+
+        public boolean hasCalledOnScrollChanged() {
+            return mCalledOnScrollChanged;
+        }
+
+        public void onScrollChanged() {
+            mCalledOnScrollChanged = true;
+        }
+
+        public void reset() {
+            mCalledOnScrollChanged = false;
         }
     }
 }
