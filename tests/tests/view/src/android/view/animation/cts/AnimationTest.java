@@ -932,6 +932,32 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(animation.willChangeTransformationMatrix());
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "clone",
+        args = {}
+    )
+    public void testClone() throws CloneNotSupportedException {
+        MyAnimation myAnimation = new MyAnimation();
+        myAnimation.setDuration(3000);
+        myAnimation.setFillAfter(true);
+        myAnimation.setFillBefore(false);
+        myAnimation.setFillEnabled(true);
+        myAnimation.setStartTime(1000);
+        myAnimation.setRepeatCount(10);
+        myAnimation.setRepeatMode(Animation.REVERSE);
+
+        Animation cloneAnimation = myAnimation.clone();
+        assertNotSame(myAnimation, cloneAnimation);
+        assertEquals(myAnimation.getDuration(), cloneAnimation.getDuration());
+        assertEquals(myAnimation.getFillAfter(), cloneAnimation.getFillAfter());
+        assertEquals(myAnimation.getFillBefore(), cloneAnimation.getFillBefore());
+        assertEquals(myAnimation.isFillEnabled(), cloneAnimation.isFillEnabled());
+        assertEquals(myAnimation.getStartOffset(), cloneAnimation.getStartOffset());
+        assertEquals(myAnimation.getRepeatCount(), cloneAnimation.getRepeatCount());
+        assertEquals(myAnimation.getRepeatMode(), cloneAnimation.getRepeatMode());
+    }
+
     private class MyAnimation extends Animation {
         @Override
         protected void ensureInterpolator() {
@@ -941,6 +967,11 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         @Override
         protected float resolveSize(int type, float value, int size, int parentSize) {
             return super.resolveSize(type, value, size, parentSize);
+        }
+
+        @Override
+        protected Animation clone() throws CloneNotSupportedException {
+            return super.clone();
         }
     }
 
