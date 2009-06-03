@@ -93,6 +93,12 @@ public class KeyEventTest extends AndroidTestCase {
             notes = "Test constructor(s) of {@link KeyEvent}",
             method = "KeyEvent",
             args = {long.class, String.class, int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test constructor(s) of {@link KeyEvent}",
+            method = "KeyEvent",
+            args = {android.view.KeyEvent.class}
         )
     })
     public void testConstructor() {
@@ -110,6 +116,7 @@ public class KeyEventTest extends AndroidTestCase {
                 KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_SOFT_KEYBOARD);
 
         KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
+        new KeyEvent(keyEvent);
         new KeyEvent(keyEvent, mEventTime, 1);
 
         new KeyEvent(mDownTime, "test", 0, KeyEvent.FLAG_SOFT_KEYBOARD);
@@ -649,6 +656,71 @@ public class KeyEventTest extends AndroidTestCase {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, scanCode);
         assertEquals(scanCode, mKeyEvent.getScanCode());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "changeAction",
+        args = {android.view.KeyEvent.class, int.class}
+    )
+    public void testChangeAction() {
+        mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
+
+        KeyEvent newEvent = KeyEvent.changeAction(mKeyEvent, KeyEvent.ACTION_UP);
+        assertEquals(KeyEvent.ACTION_UP, newEvent.getAction());
+        assertEquals(mKeyEvent.getFlags(), newEvent.getFlags());
+        assertEquals(mKeyEvent.getCharacters(), newEvent.getCharacters());
+        assertEquals(mKeyEvent.getDisplayLabel(), newEvent.getDisplayLabel());
+        assertEquals(mKeyEvent.getDeviceId(), newEvent.getDeviceId());
+        assertEquals(mKeyEvent.getDownTime(), newEvent.getDownTime());
+        assertEquals(mKeyEvent.getEventTime(), newEvent.getEventTime());
+        assertEquals(mKeyEvent.getKeyCode(), newEvent.getKeyCode());
+        assertEquals(mKeyEvent.getRepeatCount(), newEvent.getRepeatCount());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "changeFlags",
+        args = {android.view.KeyEvent.class, int.class}
+    )
+    public void testChangeFlags() {
+        mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
+
+        KeyEvent newEvent = KeyEvent.changeFlags(mKeyEvent, KeyEvent.FLAG_FROM_SYSTEM);
+        assertEquals(KeyEvent.FLAG_FROM_SYSTEM, newEvent.getFlags());
+        assertEquals(mKeyEvent.getAction(), newEvent.getAction());
+        assertEquals(mKeyEvent.getCharacters(), newEvent.getCharacters());
+        assertEquals(mKeyEvent.getDisplayLabel(), newEvent.getDisplayLabel());
+        assertEquals(mKeyEvent.getDeviceId(), newEvent.getDeviceId());
+        assertEquals(mKeyEvent.getDownTime(), newEvent.getDownTime());
+        assertEquals(mKeyEvent.getEventTime(), newEvent.getEventTime());
+        assertEquals(mKeyEvent.getKeyCode(), newEvent.getKeyCode());
+        assertEquals(mKeyEvent.getRepeatCount(), newEvent.getRepeatCount());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "changeTimeRepeat",
+        args = {android.view.KeyEvent.class, long.class, int.class}
+    )
+    public void testChangeTimeRepeat() {
+        mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
+
+        long newEventTime = SystemClock.uptimeMillis();
+        int newRepeat = mKeyEvent.getRepeatCount() + 1;
+        KeyEvent newEvent = KeyEvent.changeTimeRepeat(mKeyEvent, newEventTime, newRepeat);
+        assertEquals(newEventTime, newEvent.getEventTime());
+        assertEquals(newRepeat, newEvent.getRepeatCount());
+        assertEquals(mKeyEvent.getFlags(), newEvent.getFlags());
+        assertEquals(mKeyEvent.getAction(), newEvent.getAction());
+        assertEquals(mKeyEvent.getCharacters(), newEvent.getCharacters());
+        assertEquals(mKeyEvent.getDisplayLabel(), newEvent.getDisplayLabel());
+        assertEquals(mKeyEvent.getDeviceId(), newEvent.getDeviceId());
+        assertEquals(mKeyEvent.getDownTime(), newEvent.getDownTime());
+        assertEquals(mKeyEvent.getKeyCode(), newEvent.getKeyCode());
     }
 
     private class MockCallback implements Callback {
