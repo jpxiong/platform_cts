@@ -16,25 +16,47 @@
 
 package android.text.style.cts;
 
-import junit.framework.TestCase;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
+import android.os.Parcel;
 import android.text.TextPaint;
 import android.text.style.SuperscriptSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+
+import junit.framework.TestCase;
 
 @TestTargetClass(SuperscriptSpan.class)
 public class SuperscriptSpanTest extends TestCase {
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "SuperscriptSpan",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "SuperscriptSpan",
+            args = {android.os.Parcel.class}
+        )
+    })
+    public void testConstructor() {
+        SuperscriptSpan superscriptSpan = new SuperscriptSpan();
+
+        Parcel p = Parcel.obtain();
+        superscriptSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        new SuperscriptSpan(p);
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateMeasureState(TextPaint tp).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         // the expected result is: tp.baselineShift += (int) (tp.ascent() / 2)
         SuperscriptSpan superscriptSpan = new SuperscriptSpan();
@@ -57,12 +79,10 @@ public class SuperscriptSpanTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateDrawState(TextPaint tp).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         // the expected result is: tp.baselineShift += (int) (tp.ascent() / 2)
         SuperscriptSpan superscriptSpan = new SuperscriptSpan();
@@ -81,5 +101,39 @@ public class SuperscriptSpanTest extends TestCase {
         } catch (NullPointerException e) {
             // expected, test success.
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "describeContents",
+        args = {}
+    )
+    public void testDescribeContents() {
+        SuperscriptSpan superscriptSpan = new SuperscriptSpan();
+        superscriptSpan.describeContents();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getSpanTypeId",
+        args = {}
+    )
+    public void testGetSpanTypeId() {
+        SuperscriptSpan superscriptSpan = new SuperscriptSpan();
+        superscriptSpan.getSpanTypeId();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "writeToParcel",
+        args = {Parcel.class, int.class}
+    )
+    public void testWriteToParcel() {
+        Parcel p = Parcel.obtain();
+        SuperscriptSpan superscriptSpan = new SuperscriptSpan();
+        superscriptSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        new SuperscriptSpan(p);
+        p.recycle();
     }
 }

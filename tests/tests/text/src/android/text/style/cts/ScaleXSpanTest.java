@@ -16,37 +16,49 @@
 
 package android.text.style.cts;
 
-import junit.framework.TestCase;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
+import android.os.Parcel;
 import android.text.TextPaint;
 import android.text.style.ScaleXSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+
+import junit.framework.TestCase;
 
 @TestTargetClass(ScaleXSpan.class)
 public class ScaleXSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of ScaleXSpan.",
-        method = "ScaleXSpan",
-        args = {float.class}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "ScaleXSpan",
+            args = {float.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "ScaleXSpan",
+            args = {android.os.Parcel.class}
+        )
+    })
     public void testConstructor() {
-        new ScaleXSpan(1.5f);
+        ScaleXSpan scaleXSpan = new ScaleXSpan(1.5f);
+
+        Parcel p = Parcel.obtain();
+        scaleXSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        new ScaleXSpan(p);
 
         new ScaleXSpan(-2.5f);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         float proportion = 3.0f;
         ScaleXSpan scaleXSpan = new ScaleXSpan(proportion);
@@ -70,12 +82,10 @@ public class ScaleXSpanTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateMeasureState(TextPaint ds).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         float proportion = 3.0f;
         ScaleXSpan scaleXSpan = new ScaleXSpan(proportion);
@@ -99,15 +109,51 @@ public class ScaleXSpanTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getScaleX().",
         method = "getScaleX",
         args = {}
     )
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testGetScaleX() {
         ScaleXSpan scaleXSpan = new ScaleXSpan(5.0f);
         assertEquals(5.0f, scaleXSpan.getScaleX());
 
         scaleXSpan = new ScaleXSpan(-5.0f);
         assertEquals(-5.0f, scaleXSpan.getScaleX());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "describeContents",
+        args = {}
+    )
+    public void testDescribeContents() {
+        ScaleXSpan scaleXSpan = new ScaleXSpan(5.0f);
+        scaleXSpan.describeContents();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getSpanTypeId",
+        args = {}
+    )
+    public void testGetSpanTypeId() {
+        ScaleXSpan scaleXSpan = new ScaleXSpan(5.0f);
+        scaleXSpan.getSpanTypeId();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "writeToParcel",
+        args = {Parcel.class, int.class}
+    )
+    public void testWriteToParcel() {
+        Parcel p = Parcel.obtain();
+        float proportion = 3.0f;
+        ScaleXSpan scaleXSpan = new ScaleXSpan(proportion);
+        scaleXSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        ScaleXSpan newSpan = new ScaleXSpan(p);
+        assertEquals(proportion, newSpan.getScaleX());
+        p.recycle();
     }
 }

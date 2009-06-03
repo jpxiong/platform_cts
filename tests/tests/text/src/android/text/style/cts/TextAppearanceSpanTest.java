@@ -16,56 +16,61 @@
 
 package android.text.style.cts;
 
-import android.content.Context;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.text.TextPaint;
 import android.text.style.TextAppearanceSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(TextAppearanceSpan.class)
 public class TextAppearanceSpanTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
             args = {android.content.Context.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
             args = {android.content.Context.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of TextAppearanceSpan.",
             method = "TextAppearanceSpan",
-            args = {java.lang.String.class, int.class, int.class, 
-                    android.content.res.ColorStateList.class, 
+            args = {java.lang.String.class, int.class, int.class,
+                    android.content.res.ColorStateList.class,
                     android.content.res.ColorStateList.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "TextAppearanceSpan",
+            args = {android.os.Parcel.class}
         )
     })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
+    @ToBeFixed(bug = "1695243", explanation = "should add @throws NullPointerException clause" +
             " into javadoc when input Context is null")
     public void testConstructor() {
         new TextAppearanceSpan(mContext, 1);
-
         new TextAppearanceSpan(mContext, 1, 1);
 
         int[][] states = new int[][] { new int[0], new int[0] };
         int[] colors = new int[] { Color.rgb(0, 0, 255), Color.BLACK };
         ColorStateList csl = new ColorStateList(states, colors);
 
-        new TextAppearanceSpan("sans", 1, 6, csl, csl);
+        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan("sans", 1, 6, csl, csl);
+        Parcel p = Parcel.obtain();
+        textAppearanceSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        new TextAppearanceSpan(p);
 
-        // test constructor using null
         try {
             new TextAppearanceSpan(null, -1);
             fail("should throw NullPointerException.");
@@ -85,7 +90,6 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getFamily().",
         method = "getFamily",
         args = {}
     )
@@ -106,12 +110,10 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateMeasureState(TextPaint ds).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint is null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         int[][] states = new int[][] { new int[0], new int[0] };
         int[] colors = new int[] { Color.rgb(0, 0, 255), Color.BLACK };
@@ -136,7 +138,6 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextColor().",
         method = "getTextColor",
         args = {}
     )
@@ -154,7 +155,6 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextSize().",
         method = "getTextSize",
         args = {}
     )
@@ -175,7 +175,6 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTextStyle().",
         method = "getTextStyle",
         args = {}
     )
@@ -196,7 +195,6 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getLinkTextColor().",
         method = "getLinkTextColor",
         args = {}
     )
@@ -214,12 +212,10 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint is null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         int[][] states = new int[][] { new int[0], new int[0] };
         int[] colors = new int[] { Color.rgb(0, 0, 255), Color.BLACK };
@@ -243,5 +239,41 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
         } catch (NullPointerException e) {
             // expected, test success
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "describeContents",
+        args = {}
+    )
+    public void testDescribeContents() {
+        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(mContext, 1);
+        textAppearanceSpan.describeContents();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getSpanTypeId",
+        args = {}
+    )
+    public void testGetSpanTypeId() {
+        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(mContext, 1);
+        textAppearanceSpan.getSpanTypeId();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "writeToParcel",
+        args = {Parcel.class, int.class}
+    )
+    public void testWriteToParcel() {
+        Parcel p = Parcel.obtain();
+        String family = "sans";
+        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(family, 1, 6, null, null);
+        textAppearanceSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        TextAppearanceSpan newSpan = new TextAppearanceSpan(p);
+        assertEquals(family, newSpan.getFamily());
+        p.recycle();
     }
 }

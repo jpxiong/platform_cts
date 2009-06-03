@@ -16,33 +16,46 @@
 
 package android.text.style.cts;
 
-import junit.framework.TestCase;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.graphics.Typeface;
+import android.os.Parcel;
 import android.text.TextPaint;
 import android.text.style.StyleSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+
+import junit.framework.TestCase;
 
 @TestTargetClass(StyleSpan.class)
 public class StyleSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of StyleSpan.",
-        method = "StyleSpan",
-        args = {int.class}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "StyleSpan",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "StyleSpan",
+            args = {android.os.Parcel.class}
+        )
+    })
     public void testConstructor() {
-        new StyleSpan(2);
+        StyleSpan styleSpan = new StyleSpan(2);
+
+        Parcel p = Parcel.obtain();
+        styleSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        new StyleSpan(p);
 
         new StyleSpan(-2);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getStyle().",
         method = "getStyle",
         args = {}
     )
@@ -56,12 +69,10 @@ public class StyleSpanTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateMeasureState(TextPaint paint).",
         method = "updateMeasureState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
 
@@ -87,12 +98,10 @@ public class StyleSpanTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test updateDrawState(TextPaint ds).",
         method = "updateDrawState",
         args = {android.text.TextPaint.class}
     )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input TextPaint null")
+    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
 
@@ -114,5 +123,39 @@ public class StyleSpanTest extends TestCase {
         } catch (NullPointerException e) {
             // expected, test success.
         }
+    }
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "describeContents",
+        args = {}
+    )
+    public void testDescribeContents() {
+        StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+        styleSpan.describeContents();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getSpanTypeId",
+        args = {}
+    )
+    public void testGetSpanTypeId() {
+        StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+        styleSpan.getSpanTypeId();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "writeToParcel",
+        args = {Parcel.class, int.class}
+    )
+    public void testWriteToParcel() {
+        Parcel p = Parcel.obtain();
+        StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+        styleSpan.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        StyleSpan newSpan = new StyleSpan(p);
+        assertEquals(Typeface.BOLD, newSpan.getStyle());
+        p.recycle();
     }
 }
