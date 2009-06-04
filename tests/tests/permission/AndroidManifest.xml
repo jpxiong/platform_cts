@@ -20,10 +20,27 @@
 
     <application>
         <uses-library android:name="android.test.runner" />
+        <activity android:name="android.permission.cts.PermissionStubActivity"
+                  android:label="PermissionStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST"/>
+            </intent-filter>
+        </activity>
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-                     android:targetPackage="android.core.tests.runner"
+    <!--
+        The CTS stubs package cannot be used as the target application here,
+        since that requires many permissions to be set. Instead, specify this
+        package itself as the target and include any stub activities needed.
+
+        This test package uses the default InstrumentationTestRunner, because
+        the InstrumentationCtsTestRunner is only available in the stubs
+        package. That runner cannot be added to this package either, since it
+        relies on hidden APIs.
+    -->
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:targetPackage="com.android.cts.permission"
                      android:label="CTS tests of com.android.cts.permission"/>
 
 </manifest>
