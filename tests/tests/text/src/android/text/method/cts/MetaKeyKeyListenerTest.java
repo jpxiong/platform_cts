@@ -16,6 +16,12 @@
 
 package android.text.method.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.test.AndroidTestCase;
 import android.text.Editable;
 import android.text.Selection;
@@ -26,13 +32,6 @@ import android.text.method.MetaKeyKeyListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link MetaKeyKeyListener}.
@@ -41,9 +40,8 @@ import dalvik.annotation.ToBeFixed;
 public class MetaKeyKeyListenerTest extends AndroidTestCase {
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#onKeyDown(View, Editable, int, KeyEvent)}",
         method = "onKeyDown",
-        args = {android.view.View.class, android.text.Editable.class, int.class, 
+        args = {android.view.View.class, android.text.Editable.class, int.class,
                 android.view.KeyEvent.class}
     )
     public void testPressKey() {
@@ -54,34 +52,27 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
 
         content.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 0, 0, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyDown( view,
-                                     content,
-                                     KeyEvent.KEYCODE_0,
-                                     new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0));
+        numberKeyListener.onKeyDown(view, content, KeyEvent.KEYCODE_0,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0));
         assertEquals('0', content.charAt(0));
 
         content.setSpan(Selection.SELECTION_START, 1, 1, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 1, 1, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyDown( view,
-                                     content,
-                                     KeyEvent.KEYCODE_2,
-                                     new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_2));
+        numberKeyListener.onKeyDown(view, content, KeyEvent.KEYCODE_2,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_2));
         assertEquals('2', content.charAt(1));
 
         content.setSpan(Selection.SELECTION_START, 3, 3, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 3, 3, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyDown( view,
-                                     content,
-                                     KeyEvent.KEYCODE_3,
-                                     new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_3));
+        numberKeyListener.onKeyDown(view, content, KeyEvent.KEYCODE_3,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_3));
         assertEquals('3', content.charAt(3));
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#onKeyUp(View, Editable, int, KeyEvent)}",
         method = "onKeyUp",
-        args = {android.view.View.class, android.text.Editable.class, int.class, 
+        args = {android.view.View.class, android.text.Editable.class, int.class,
                 android.view.KeyEvent.class}
     )
     public void testReleaseKey() {
@@ -92,32 +83,25 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
 
         content.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 0, 0, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyUp( view,
-                                   content,
-                                   KeyEvent.KEYCODE_0,
-                                   new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0));
+        numberKeyListener.onKeyUp(view, content, KeyEvent.KEYCODE_0,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0));
         assertEquals(str.charAt(0), content.charAt(0));
 
         content.setSpan(Selection.SELECTION_START, 1, 1, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 1, 1, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyUp( view,
-                                   content,
-                                   KeyEvent.KEYCODE_2,
-                                   new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_2));
+        numberKeyListener.onKeyUp(view, content, KeyEvent.KEYCODE_2,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_2));
         assertEquals(str.charAt(1), content.charAt(1));
 
         content.setSpan(Selection.SELECTION_START, 3, 3, Spanned.SPAN_POINT_POINT);
         content.setSpan(Selection.SELECTION_END, 3, 3, Spanned.SPAN_POINT_POINT);
-        numberKeyListener.onKeyUp( view,
-                                   content,
-                                   KeyEvent.KEYCODE_3,
-                                   new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_3));
+        numberKeyListener.onKeyUp(view, content, KeyEvent.KEYCODE_3,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_3));
         assertEquals(str.charAt(3), content.charAt(3));
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#adjustMetaAfterKeypress(Spannable)}",
         method = "adjustMetaAfterKeypress",
         args = {android.text.Spannable.class}
     )
@@ -152,7 +136,25 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#resetMetaState(Spannable)}",
+        method = "adjustMetaAfterKeypress",
+        args = {long.class}
+    )
+    public void testAdjustMetaAfterKeypress2() {
+        long state = MetaKeyKeyListener.adjustMetaAfterKeypress(MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(MetaKeyKeyListener.META_SHIFT_ON, state);
+
+        state = MetaKeyKeyListener.adjustMetaAfterKeypress(MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(MetaKeyKeyListener.META_ALT_ON, state);
+
+        state = MetaKeyKeyListener.adjustMetaAfterKeypress(MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(MetaKeyKeyListener.META_SYM_ON, state);
+
+        state = MetaKeyKeyListener.adjustMetaAfterKeypress(0);
+        assertEquals(0, state);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "resetMetaState",
         args = {android.text.Spannable.class}
     )
@@ -199,15 +201,15 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
         assertEquals(0, MetaKeyKeyListener.getMetaState("abc"));
         assertEquals(0, MetaKeyKeyListener.getMetaState("@#$$#^$^"));
 
-        assertEquals( 0,
-                      MetaKeyKeyListener.getMetaState("123456"),
-                      MetaKeyKeyListener.META_SHIFT_ON);
-        assertEquals( 0,
-                      MetaKeyKeyListener.getMetaState("abc"),
-                      MetaKeyKeyListener.META_ALT_ON);
-        assertEquals( 0,
-                      MetaKeyKeyListener.getMetaState("@#$$#^$^"),
-                      MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(0,
+                     MetaKeyKeyListener.getMetaState("123456"),
+                     MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(0,
+                     MetaKeyKeyListener.getMetaState("abc"),
+                     MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(0,
+                     MetaKeyKeyListener.getMetaState("@#$$#^$^"),
+                     MetaKeyKeyListener.META_SYM_ON);
 
         assertEquals(0, MetaKeyKeyListener.getMetaState("123456", 0));
         assertEquals(0, MetaKeyKeyListener.getMetaState("abc", -1));
@@ -220,9 +222,34 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
                 MetaKeyKeyListener.getMetaState("@#$$#^$^", MetaKeyKeyListener.META_SYM_ON));
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getMetaState",
+            args = {long.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getMetaState",
+            args = {long.class, int.class}
+        )
+    })
+    public void testGetMetaState2() {
+        assertEquals(0, MetaKeyKeyListener.getMetaState(0));
+        assertEquals(MetaKeyKeyListener.META_SHIFT_ON,
+                MetaKeyKeyListener.getMetaState(MetaKeyKeyListener.META_SHIFT_ON));
+        assertEquals(MetaKeyKeyListener.META_CAP_LOCKED,
+                MetaKeyKeyListener.getMetaState(MetaKeyKeyListener.META_CAP_LOCKED));
+
+        assertEquals(0, MetaKeyKeyListener.getMetaState(0, MetaKeyKeyListener.META_SYM_ON));
+        assertEquals(1, MetaKeyKeyListener.getMetaState(MetaKeyKeyListener.META_SYM_ON,
+                MetaKeyKeyListener.META_SYM_ON));
+        assertEquals(2, MetaKeyKeyListener.getMetaState(MetaKeyKeyListener.META_SYM_LOCKED,
+                MetaKeyKeyListener.META_SYM_ON));
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#isMetaTracker(CharSequence, Object)}",
         method = "isMetaTracker",
         args = {java.lang.CharSequence.class, java.lang.Object.class}
     )
@@ -234,36 +261,68 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link MetaKeyKeyListener#resetLockedMeta(Spannable)}",
+        method = "isSelectingMetaTracker",
+        args = {java.lang.CharSequence.class, java.lang.Object.class}
+    )
+    public void testIsSelectingMetaTracker() {
+        assertFalse(MetaKeyKeyListener.isSelectingMetaTracker("123456", new Object()));
+        assertFalse(MetaKeyKeyListener.isSelectingMetaTracker("abc", new Object()));
+        assertFalse(MetaKeyKeyListener.isSelectingMetaTracker("@#$$#^$^", new Object()));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "resetLockedMeta",
         args = {android.text.Spannable.class}
     )
-    @ToBeFixed(bug="1371108", explanation="NPE is not expected.")
+    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
+            + "should be added into javadoc")
     public void testResetLockedMeta() {
         MockMetaKeyKeyListener mockMetaKeyKeyListener = new MockMetaKeyKeyListener();
 
-        try {
-            MockSpannable str = new MockSpannable();
-            str.setSpan(new Object(), 0, 0,
-                    Spannable.SPAN_MARK_MARK | (4 << Spannable.SPAN_USER_SHIFT));
-            assertFalse(str.hasCalledRemoveSpan());
-            mockMetaKeyKeyListener.callResetLockedMeta(str);
-            assertTrue(str.hasCalledRemoveSpan());
+        MockSpannable str = new MockSpannable();
+        str.setSpan(new Object(), 0, 0, Spannable.SPAN_MARK_MARK
+                | (4 << Spannable.SPAN_USER_SHIFT));
+        assertFalse(str.hasCalledRemoveSpan());
+        mockMetaKeyKeyListener.callResetLockedMeta(str);
+        assertTrue(str.hasCalledRemoveSpan());
 
-            str = new MockSpannable();
-            str.setSpan(new Object(), 0, 0, Spannable.SPAN_MARK_POINT);
-            assertFalse(str.hasCalledRemoveSpan());
-            mockMetaKeyKeyListener.callResetLockedMeta(str);
-            assertFalse(str.hasCalledRemoveSpan());
-        } catch (Exception e) {
-            fail("should not throw exception.");
-        }
+        str = new MockSpannable();
+        str.setSpan(new Object(), 0, 0, Spannable.SPAN_MARK_POINT);
+        assertFalse(str.hasCalledRemoveSpan());
+        mockMetaKeyKeyListener.callResetLockedMeta(str);
+        assertFalse(str.hasCalledRemoveSpan());
 
         try {
             mockMetaKeyKeyListener.callResetLockedMeta(null);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "resetLockedMeta",
+        args = {long.class}
+    )
+    public void testResetLockedMeta2() {
+        long state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_CAP_LOCKED);
+        assertEquals(0, state);
+
+        state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(MetaKeyKeyListener.META_SHIFT_ON, state);
+
+        state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_ALT_LOCKED);
+        assertEquals(0, state);
+
+        state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(MetaKeyKeyListener.META_ALT_ON, state);
+
+        state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_SYM_LOCKED);
+        assertEquals(0, state);
+
+        state = MetaKeyKeyListener.resetLockedMeta(MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(MetaKeyKeyListener.META_SYM_ON, state);
     }
 
     @TestTargetNew(
@@ -296,6 +355,93 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
         numberKeyListener.clearMetaKeyState(null, text, MetaKeyKeyListener.META_SYM_ON);
         assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_START));
         assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_END));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "clearMetaKeyState",
+        args = {android.text.Editable.class, int.class}
+    )
+    public void testClearMetaKeyState2() {
+        CharSequence str = "123456";
+        Editable text = Editable.Factory.getInstance().newEditable(str);
+        text.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
+        text.setSpan(Selection.SELECTION_END, str.length(), str.length(), Spanned.SPAN_POINT_POINT);
+        MetaKeyKeyListener.clearMetaKeyState(text, MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_START));
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_END));
+
+        str = "abc";
+        text = Editable.Factory.getInstance().newEditable(str);
+        text.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
+        text.setSpan(Selection.SELECTION_END, str.length(), str.length(), Spanned.SPAN_POINT_POINT);
+        MetaKeyKeyListener.clearMetaKeyState(text, MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_START));
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_END));
+
+        str = "#@%#$^%^";
+        text = Editable.Factory.getInstance().newEditable(str);
+        text.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
+        text.setSpan(Selection.SELECTION_END, str.length(), str.length(), Spanned.SPAN_POINT_POINT);
+        MetaKeyKeyListener.clearMetaKeyState(text, MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_START));
+        assertEquals(Spanned.SPAN_POINT_POINT, text.getSpanFlags(Selection.SELECTION_END));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "clearMetaKeyState",
+        args = {long.class, int.class}
+    )
+    public void testClearMetaKeyState3() {
+        final MetaKeyKeyListener metaKeyKeyListener = new MetaKeyKeyListener() {};
+        long state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_CAP_LOCKED,
+                MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(0, state);
+
+        state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_SHIFT_ON,
+                MetaKeyKeyListener.META_SHIFT_ON);
+        assertEquals(MetaKeyKeyListener.META_SHIFT_ON, state);
+
+        state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_ALT_LOCKED,
+                MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(0, state);
+
+        state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_ALT_ON,
+                MetaKeyKeyListener.META_ALT_ON);
+        assertEquals(MetaKeyKeyListener.META_ALT_ON, state);
+
+        state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_SYM_LOCKED,
+                MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(0, state);
+
+        state = metaKeyKeyListener.clearMetaKeyState(MetaKeyKeyListener.META_SYM_ON,
+                MetaKeyKeyListener.META_SYM_ON);
+        assertEquals(MetaKeyKeyListener.META_SYM_ON, state);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL,
+        method = "handleKeyDown",
+        args = {long.class, int.class, KeyEvent.class}
+    )
+    public void testHandleKeyDown() {
+        long state = MetaKeyKeyListener.handleKeyDown(MetaKeyKeyListener.META_CAP_LOCKED,
+                KeyEvent.KEYCODE_SHIFT_LEFT,
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT));
+        assertEquals(0, state);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL,
+        method = "handleKeyUp",
+        args = {long.class, int.class, KeyEvent.class}
+    )
+    public void testHandleKeyUp() {
+        long state = MetaKeyKeyListener.handleKeyUp(MetaKeyKeyListener.META_CAP_LOCKED,
+                KeyEvent.KEYCODE_SHIFT_LEFT,
+                new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT));
+        assertEquals(MetaKeyKeyListener.META_CAP_LOCKED, state);
     }
 
     private class MockMetaKeyKeyListener extends MetaKeyKeyListener {
