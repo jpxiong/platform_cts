@@ -16,341 +16,307 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
-import android.test.AndroidTestCase;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View.MeasureSpec;
 import android.widget.AbsSeekBar;
-import android.widget.RatingBar;
-import android.widget.AbsoluteLayout.LayoutParams;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import android.widget.SeekBar;
 
 /**
  * Test {@link AbsSeekBar}.
  */
 @TestTargetClass(AbsSeekBar.class)
-public class AbsSeekBarTest extends AndroidTestCase {
-    private Context mContext;
-    private Resources mResources;
+public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBarStubActivity> {
+    public AbsSeekBarTest() {
+        super("com.android.cts.stub", ProgressBarStubActivity.class);
+    }
 
-    private static final int DEFAULT_LEFT     = 5;
-    private static final int DEFAULT_RIGHT    = 10;
-    private static final int DEFAULT_WIDTH    = 20;
-    private static final int DEFAULT_HEIGHT   = 30;
+    private Activity mActivity;
+    private Resources mResources;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContext = getContext();
-        mResources = mContext.getResources();
+        mActivity = getActivity();
+        mResources = mActivity.getResources();
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link AbsSeekBar}.",
             method = "AbsSeekBar",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
     public void testConstructor() {
-        new MockAbsSeekBar(mContext);
+        new MyAbsSeekBar(mActivity);
 
-        new MockAbsSeekBar(mContext, null);
+        new MyAbsSeekBar(mActivity, null);
 
-        new MockAbsSeekBar(mContext, null, com.android.internal.R.attr.progressBarStyle);
+        new MyAbsSeekBar(mActivity, null, com.android.internal.R.attr.progressBarStyle);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getThumbOffset() and setThumbOffset(int) function",
             method = "setThumbOffset",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getThumbOffset() and setThumbOffset(int) function",
             method = "getThumbOffset",
             args = {}
         )
     })
     public void testAccessThumbOffset() {
-        AbsSeekBar mockAbsSeekBar = new MockAbsSeekBar(mContext);
+        AbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         final int positive = 5;
         final int negative = -5;
         final int zero = 0;
 
-        mockAbsSeekBar.setThumbOffset(positive);
-        assertEquals(positive, mockAbsSeekBar.getThumbOffset());
+        myAbsSeekBar.setThumbOffset(positive);
+        assertEquals(positive, myAbsSeekBar.getThumbOffset());
 
-        mockAbsSeekBar.setThumbOffset(zero);
-        assertEquals(zero, mockAbsSeekBar.getThumbOffset());
+        myAbsSeekBar.setThumbOffset(zero);
+        assertEquals(zero, myAbsSeekBar.getThumbOffset());
 
-        mockAbsSeekBar.setThumbOffset(negative);
-        assertEquals(negative, mockAbsSeekBar.getThumbOffset());
+        myAbsSeekBar.setThumbOffset(negative);
+        assertEquals(negative, myAbsSeekBar.getThumbOffset());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setThumb(Drawable) function.",
         method = "setThumb",
         args = {android.graphics.drawable.Drawable.class}
     )
     public void testSetThumb() {
-        MockAbsSeekBar mockAbsSeekBar = new MockAbsSeekBar(mContext);
+        MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         Drawable drawable1 = mResources.getDrawable(R.drawable.scenery);
         Drawable drawable2 = mResources.getDrawable(R.drawable.pass);
 
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable2));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable1));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable2));
 
-        mockAbsSeekBar.setThumb(drawable1);
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable2));
+        myAbsSeekBar.setThumb(drawable1);
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable1));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable2));
 
-        mockAbsSeekBar.setThumb(drawable2);
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable2));
+        myAbsSeekBar.setThumb(drawable2);
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable1));
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable2));
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onTouchEvent(MotionEvent) function.",
-        method = "onTouchEvent",
-        args = {android.view.MotionEvent.class}
-    )
-    @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
-    public void testOnTouchEvent() {
-        AbsSeekBar mockAbsSeekBar = new RatingBar(mContext);
-        MotionEvent motionEvent = MotionEvent.obtain(1000, 1000,
-                MotionEvent.ACTION_DOWN, 20, 20, 0);
-        assertEquals(0, mockAbsSeekBar.getProgress());
-
-        mockAbsSeekBar.setEnabled(false);
-        assertFalse(mockAbsSeekBar.onTouchEvent(motionEvent));
-        assertEquals(0, mockAbsSeekBar.getProgress());
-
-        mockAbsSeekBar.setEnabled(true);
-        assertTrue(mockAbsSeekBar.onTouchEvent(motionEvent));
-        assertEquals(10, mockAbsSeekBar.getProgress());
-
-        motionEvent = MotionEvent.obtain(1000, 1000, MotionEvent.ACTION_DOWN, -1, 20, 0);
-        assertTrue(mockAbsSeekBar.onTouchEvent(motionEvent));
-        assertEquals(0, mockAbsSeekBar.getProgress());
-
-        try {
-            mockAbsSeekBar.onTouchEvent(null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test drawableStateChanged() function.",
         method = "drawableStateChanged",
         args = {}
     )
     public void testDrawableStateChanged() {
-        MockAbsSeekBar mockAbsSeekBar = new MockAbsSeekBar(mContext);
+        MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         MockDrawable drawable = new MockDrawable();
-        mockAbsSeekBar.setProgressDrawable(drawable);
+        myAbsSeekBar.setProgressDrawable(drawable);
 
-        mockAbsSeekBar.setEnabled(false);
-        mockAbsSeekBar.drawableStateChanged();
+        myAbsSeekBar.setEnabled(false);
+        myAbsSeekBar.drawableStateChanged();
         assertEquals(0, drawable.getAlpha());
 
-        mockAbsSeekBar.setEnabled(true);
-        mockAbsSeekBar.drawableStateChanged();
+        myAbsSeekBar.setEnabled(true);
+        myAbsSeekBar.drawableStateChanged();
         assertEquals(0xFF, drawable.getAlpha());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onDraw(Canvas)",
-        method = "onDraw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug="1400249", explanation="it's hard to do unit test, should be tested by" +
-            " functional test, and there should not be an NullPointerException thrown out.")
-    public void testOnDraw() {
-        MockAbsSeekBar mockAbsSeekBar = new MockAbsSeekBar(mContext);
-        MockDrawable drawable = new MockDrawable();
-
-        mockAbsSeekBar.setThumb(drawable);
-        mockAbsSeekBar.onDraw(new Canvas());
-        assertTrue(drawable.hasCalledDraw());
-
-        // input null as param
-        try {
-            mockAbsSeekBar.onDraw(null);
-            fail("There should be a NullPointerException thrown out.");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onMeasure(int, int) function.",
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
-    public void testOnMeasure() {
-        AbsSeekBar mockAbsSeekBar = new RatingBar(mContext);
-        LayoutParams layoutParams = new LayoutParams(DEFAULT_WIDTH,
-                DEFAULT_HEIGHT, DEFAULT_LEFT, DEFAULT_RIGHT);
-        mockAbsSeekBar.setLayoutParams(layoutParams);
-        mockAbsSeekBar.measure(5, 5);
-        int measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.AT_MOST);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(5, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(5, mockAbsSeekBar.getMeasuredWidth());
-
-        measureSpec = MeasureSpec.makeMeasureSpec(100, MeasureSpec.EXACTLY);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(100, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(100, mockAbsSeekBar.getMeasuredWidth());
-
-        measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.UNSPECIFIED);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(57, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(285, mockAbsSeekBar.getMeasuredWidth());
-
-        mockAbsSeekBar.setPadding(10, 20, 30, 40);
-        mockAbsSeekBar.setMinimumHeight(20);
-        mockAbsSeekBar.setMinimumWidth(10);
-        mockAbsSeekBar.measure(5, 5);
-        measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.AT_MOST);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(5, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(5, mockAbsSeekBar.getMeasuredWidth());
-
-        measureSpec = MeasureSpec.makeMeasureSpec(100, MeasureSpec.EXACTLY);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(100, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(100, mockAbsSeekBar.getMeasuredWidth());
-
-        measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.UNSPECIFIED);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(117, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(285, mockAbsSeekBar.getMeasuredWidth());
-
-        mockAbsSeekBar.setThumbOffset(5);
-        Drawable drawable = mContext.getResources().getDrawable(R.drawable.pass);
-        mockAbsSeekBar.setThumb(drawable);
-
-        mockAbsSeekBar.measure(5, 5);
-        measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.AT_MOST);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(5, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(5, mockAbsSeekBar.getMeasuredWidth());
-        measureSpec = MeasureSpec.makeMeasureSpec(100, MeasureSpec.EXACTLY);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(100, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(100, mockAbsSeekBar.getMeasuredWidth());
-
-        measureSpec = MeasureSpec.makeMeasureSpec(5, MeasureSpec.UNSPECIFIED);
-        mockAbsSeekBar.measure(measureSpec, measureSpec);
-        assertEquals(117, mockAbsSeekBar.getMeasuredHeight());
-        assertEquals(285, mockAbsSeekBar.getMeasuredWidth());
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test verifyDrawable(Drawable) and setThumb(Drawable) function.",
             method = "setThumb",
             args = {android.graphics.drawable.Drawable.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test verifyDrawable(Drawable) and setThumb(Drawable) function.",
             method = "verifyDrawable",
             args = {android.graphics.drawable.Drawable.class}
         )
     })
     public void testVerifyDrawable() {
-        MockAbsSeekBar mockAbsSeekBar = new MockAbsSeekBar(mContext);
+        MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         Drawable drawable1 = mResources.getDrawable(R.drawable.scenery);
         Drawable drawable2 = mResources.getDrawable(R.drawable.pass);
         Drawable drawable3 = mResources.getDrawable(R.drawable.blue);
         Drawable drawable4 = mResources.getDrawable(R.drawable.black);
 
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable2));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable3));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable4));
-        assertTrue(mockAbsSeekBar.verifyDrawable(null));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable1));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable2));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable3));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable4));
+        assertTrue(myAbsSeekBar.verifyDrawable(null));
 
-        mockAbsSeekBar.setThumb(drawable1);
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable2));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable3));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable4));
-        assertTrue(mockAbsSeekBar.verifyDrawable(null));
+        myAbsSeekBar.setThumb(drawable1);
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable1));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable2));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable3));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable4));
+        assertTrue(myAbsSeekBar.verifyDrawable(null));
 
-        mockAbsSeekBar.setThumb(drawable2);
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable2));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable3));
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable4));
-        assertTrue(mockAbsSeekBar.verifyDrawable(null));
+        myAbsSeekBar.setThumb(drawable2);
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable1));
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable2));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable3));
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable4));
+        assertTrue(myAbsSeekBar.verifyDrawable(null));
 
-        mockAbsSeekBar.setBackgroundDrawable(drawable2);
-        mockAbsSeekBar.setProgressDrawable(drawable3);
-        mockAbsSeekBar.setIndeterminateDrawable(drawable4);
-        assertFalse(mockAbsSeekBar.verifyDrawable(drawable1));
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable2));
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable3));
-        assertTrue(mockAbsSeekBar.verifyDrawable(drawable4));
-        assertFalse(mockAbsSeekBar.verifyDrawable(null));
+        myAbsSeekBar.setBackgroundDrawable(drawable2);
+        myAbsSeekBar.setProgressDrawable(drawable3);
+        myAbsSeekBar.setIndeterminateDrawable(drawable4);
+        assertFalse(myAbsSeekBar.verifyDrawable(drawable1));
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable2));
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable3));
+        assertTrue(myAbsSeekBar.verifyDrawable(drawable4));
+        assertFalse(myAbsSeekBar.verifyDrawable(null));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getKeyProgressIncrement",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setKeyProgressIncrement",
+            args = {int.class}
+        )
+    })
+    public void testAccessKeyProgressIncrement() throws Throwable {
+        // AbsSeekBar is an abstract class, use its subclass: SeekBar to do this test.
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mActivity.setContentView(R.layout.seekbar);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        final SeekBar seekBar = (SeekBar) mActivity.findViewById(R.id.seekBar);
+        final int keyProgressIncrement = 2;
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                seekBar.setKeyProgressIncrement(keyProgressIncrement);
+                seekBar.setFocusable(true);
+                seekBar.requestFocus();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        assertEquals(keyProgressIncrement, seekBar.getKeyProgressIncrement());
+
+        int oldProgress = seekBar.getProgress();
+        KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT);
+        getInstrumentation().sendKeySync(keyEvent);
+        assertEquals(oldProgress + keyProgressIncrement, seekBar.getProgress());
+        oldProgress = seekBar.getProgress();
+        keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT);
+        getInstrumentation().sendKeySync(keyEvent);
+        assertEquals(oldProgress - keyProgressIncrement, seekBar.getProgress());
     }
 
     @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        notes = "Test onSizeChanged(int, int, int, int) function.",
-        method = "onSizeChanged",
-        args = {int.class, int.class, int.class, int.class}
+        level = TestLevel.COMPLETE,
+        method = "setMax",
+        args = {int.class}
     )
-    public void testOnSizeChanged() {
-        // Do not test it. It's implementation detail.
+    public void testSetMax() {
+        MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity, null, R.style.TestProgressBar);
+
+        int progress = 10;
+        myAbsSeekBar.setProgress(progress);
+        int max = progress + 1;
+        myAbsSeekBar.setMax(max);
+        assertEquals(max, myAbsSeekBar.getMax());
+        assertEquals(progress, myAbsSeekBar.getProgress());
+        assertEquals(1, myAbsSeekBar.getKeyProgressIncrement());
+
+        max = progress - 1;
+        myAbsSeekBar.setMax(max);
+        assertEquals(max, myAbsSeekBar.getMax());
+        assertEquals(max, myAbsSeekBar.getProgress());
+        assertEquals(1, myAbsSeekBar.getKeyProgressIncrement());
+
+        int keyProgressIncrement = 10;
+        myAbsSeekBar.setKeyProgressIncrement(keyProgressIncrement);
+        assertEquals(keyProgressIncrement, myAbsSeekBar.getKeyProgressIncrement());
+        max = (keyProgressIncrement - 1) * 20;
+        myAbsSeekBar.setMax(max);
+        assertEquals(keyProgressIncrement, myAbsSeekBar.getKeyProgressIncrement());
+        max = (keyProgressIncrement + 1) * 20;
+        myAbsSeekBar.setMax(max);
+        assertEquals(keyProgressIncrement + 1, myAbsSeekBar.getKeyProgressIncrement());
     }
 
-    private class MockAbsSeekBar extends AbsSeekBar {
-        public MockAbsSeekBar(Context context) {
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onSizeChanged",
+            args = {int.class, int.class, int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onDraw",
+            args = {Canvas.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onKeyDown",
+            args = {int.class, KeyEvent.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onMeasure",
+            args = {int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onTouchEvent",
+            args = {MotionEvent.class}
+        )
+    })
+    public void testFoo() {
+        // Do not test these APIs. They are callbacks which:
+        // 1. The callback machanism has been tested in super class
+        // 2. The functionality is implmentation details, no need to test
+    }
+
+    private static class MyAbsSeekBar extends AbsSeekBar {
+        public MyAbsSeekBar(Context context) {
             super(context);
         }
 
-        public MockAbsSeekBar(Context context, AttributeSet attrs) {
+        public MyAbsSeekBar(Context context, AttributeSet attrs) {
             super(context, attrs);
         }
 
-        public MockAbsSeekBar(Context context, AttributeSet attrs, int defStyle) {
+        public MyAbsSeekBar(Context context, AttributeSet attrs, int defStyle) {
             super(context, attrs, defStyle);
         }
 
@@ -360,27 +326,12 @@ public class AbsSeekBarTest extends AndroidTestCase {
         }
 
         @Override
-        protected synchronized void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-        }
-
-        @Override
         protected boolean verifyDrawable(Drawable who) {
             return super.verifyDrawable(who);
         }
-
-        @Override
-        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            super.onSizeChanged(w, h, oldw, oldh);
-        }
-
-        @Override
-        protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        }
     }
 
-    private class MockDrawable extends Drawable {
+    private static class MockDrawable extends Drawable {
         private int mAlpha;
         private boolean mCalledDraw = false;
 

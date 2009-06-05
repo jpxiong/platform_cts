@@ -19,10 +19,10 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.database.ArrayListCursor;
 
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -58,23 +58,53 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
         mCursor = createTestCursor(3, 3);
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "ResourceCursorAdapter",
+            args = {Context.class, int.class, Cursor.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "ResourceCursorAdapter",
+            args = {Context.class, int.class, Cursor.class, boolean.class}
+        )
+    })
+    public void testConstructor() {
+        MockResourceCursorAdapter adapter = new MockResourceCursorAdapter(mContext, -1, null);
+        // the default is true
+        assertTrue(adapter.isAutoRequery());
+        assertNull(adapter.getCursor());
+
+        adapter = new MockResourceCursorAdapter(mContext, R.layout.cursoradapter_item0, mCursor);
+        // the default is true
+        assertTrue(adapter.isAutoRequery());
+        assertSame(mCursor, adapter.getCursor());
+
+        adapter = new MockResourceCursorAdapter(mContext,
+                R.layout.cursoradapter_item0, mCursor, false);
+        assertFalse(adapter.isAutoRequery());
+        assertSame(mCursor, adapter.getCursor());
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "ResourceCursorAdapter",
-        args = {android.content.Context.class, int.class, android.database.Cursor.class}
+        method = "setViewResource",
+        args = {int.class}
     )
-    public void testConstructor() {
-        mResourceCursorAdapter = new MockResourceCursorAdapter(mContext, -1, null);
-        // the default is true
-        assertEquals(true, ((MockResourceCursorAdapter)mResourceCursorAdapter).isAutoRequery());
-        assertNull(mResourceCursorAdapter.getCursor());
-
+    public void testSetViewResource() {
         mResourceCursorAdapter = new MockResourceCursorAdapter(mContext,
                 R.layout.cursoradapter_item0, mCursor);
-        // the default is true
-        assertEquals(true, ((MockResourceCursorAdapter)mResourceCursorAdapter).isAutoRequery());
-        assertEquals(mCursor, mResourceCursorAdapter.getCursor());
+
+        View result = mResourceCursorAdapter.newView(null, null, mParent);
+        assertNotNull(result);
+        assertEquals(R.id.cursorAdapter_item0, result.getId());
+
+        // set the new view resource
+        mResourceCursorAdapter.setViewResource(R.layout.cursoradapter_item1);
+        result = mResourceCursorAdapter.newView(null, null, mParent);
+        assertNotNull(result);
+        assertEquals(R.id.cursorAdapter_item1, result.getId());
     }
 
     @TestTargetNew(
@@ -109,8 +139,7 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "newDropDownView",
-        args = {android.content.Context.class, android.database.Cursor.class, 
-                android.view.ViewGroup.class}
+        args = {Context.class, Cursor.class, ViewGroup.class}
     )
     // parameters Context and Cursor are never readin the method
     public void testNewDropDownView() {
@@ -130,8 +159,7 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "newView",
-        args = {android.content.Context.class, android.database.Cursor.class, 
-                android.view.ViewGroup.class}
+        args = {Context.class, Cursor.class, ViewGroup.class}
     )
     // The parameters Context and Cursor are never read in the method
     public void testNewView() {
@@ -174,9 +202,14 @@ public class ResourceCursorAdapterTest extends InstrumentationTestCase {
         return new ArrayListCursor(columns, list);
     }
 
-    private class MockResourceCursorAdapter extends ResourceCursorAdapter {
+    private static class MockResourceCursorAdapter extends ResourceCursorAdapter {
         public MockResourceCursorAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
+        }
+
+        public MockResourceCursorAdapter(Context context, int layout,
+                Cursor c, boolean autoRequery) {
+            super(context, layout, c, autoRequery);
         }
 
         @Override

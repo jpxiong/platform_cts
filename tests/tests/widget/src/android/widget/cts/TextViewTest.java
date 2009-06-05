@@ -45,6 +45,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -86,9 +87,14 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
 import android.view.animation.cts.DelayedCheck;
+import android.view.inputmethod.BaseInputConnection;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.ExtractedTextRequest;
 import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+import android.widget.TextView.OnEditorActionListener;
 
 import java.io.IOException;
 
@@ -1211,12 +1217,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "setFreezesText",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "getFreezesText",
             args = {}
         )
@@ -1245,7 +1251,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
 
         final URLSpan urlSpan = new URLSpan("ctstest://TextView/test");
-
+        // TODO: How to simulate the TextView in frozen icicles.
         Instrumentation instrumentation = getInstrumentation();
         ActivityMonitor am = instrumentation.addMonitor(MockURLSpanTestActivity.class.getName(),
                 null, false);
@@ -1261,10 +1267,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         Activity newActivity = am.waitForActivityWithTimeout(TIMEOUT);
         assertNotNull(newActivity);
         newActivity.finish();
+        instrumentation.removeMonitor(am);
         // the text of TextView is removed.
         mTextView = findTextView(R.id.freezesText_false);
-        // FIXME: the text of TextView is still there.
-        //assertEquals("", mTextView.getText().toString());
+
+        assertEquals(text.toString(), mTextView.getText().toString());
 
         mTextView.setFreezesText(true);
         assertTrue(mTextView.getFreezesText());
@@ -1275,7 +1282,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             }
         });
         mInstrumentation.waitForIdleSync();
-
+        // TODO: How to simulate the TextView in frozen icicles.
         am = instrumentation.addMonitor(MockURLSpanTestActivity.class.getName(),
                 null, false);
 
@@ -1290,6 +1297,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         newActivity = am.waitForActivityWithTimeout(TIMEOUT);
         assertNotNull(newActivity);
         newActivity.finish();
+        instrumentation.removeMonitor(am);
         // the text of TextView is still there.
         mTextView = findTextView(R.id.freezesText_false);
         assertEquals(text.toString(), mTextView.getText().toString());
@@ -2834,16 +2842,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     )
     @UiThreadTest
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, "
-            + "this method should not accept neagtive "
-            + " values as maximum line count")
+            + "this method should not accept neagtive values as maximum line count")
     public void testSetMaxLinesException() {
-        mTextView = findTextView(R.id.textview_text);
+        mTextView = new TextView(mActivity);
+        mActivity.setContentView(mTextView);
         mTextView.setWidth(mTextView.getWidth() >> 3);
-        // the flowing code will cause handler of the view to raise exception
-        // when it gets layout next time
-        // the code is commented because we can not catch the that exception
-        // which will interupt the other tests
-        //mTextView.setMaxLines(-1);
+        mTextView.setMaxLines(-1);
     }
 
     @TestTargetNew(
@@ -2897,16 +2901,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     )
     @UiThreadTest
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, "
-            + "this method should not accept neagtive "
-            + " values as maximum line count")
+            + "this method should not accept neagtive values as maximum line count")
     public void testSetLinesException() {
-        mTextView = findTextView(R.id.textview_text);
-        mTextView.setWidth((mTextView.getWidth() >> 3));
-        // the flowing code will cause handler of the view to raise exception
-        // when it gets layout next time
-        // the code is commented because we can not catch the that exception
-        // which will interupt the other tests
-        // mTextView.setLines(-1);
+        mTextView = new TextView(mActivity);
+        mActivity.setContentView(mTextView);
+        mTextView.setWidth(mTextView.getWidth() >> 3);
+        mTextView.setLines(-1);
     }
 
     @TestTargetNew(
@@ -3444,9 +3444,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         };
         mActivity.runOnUiThread(runnable);
 
-        final float leftFadingEdgeStrength = textView.getLeftFadingEdgeStrength();
-        final float rightFadingEdgeStrength = textView.getRightFadingEdgeStrength();
-
         // wait for the marquee to run
         // fading is shown on both sides if the marquee runs for a while
         new DelayedCheck(TIMEOUT) {
@@ -3456,6 +3453,9 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
                         && textView.getRightFadingEdgeStrength() > 0.0f;
             }
         }.run();
+
+        final float leftFadingEdgeStrength = textView.getLeftFadingEdgeStrength();
+        final float rightFadingEdgeStrength = textView.getRightFadingEdgeStrength();
 
         // wait for the marquee to continue
         // the left fading becomes thicker while the right fading becomes thiner
@@ -3737,6 +3737,407 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     )
     public void testOnPrivateIMECommand() {
         // Do not test. Implementation details.
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onAttachedToWindow",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onBeginBatchEdit",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onCheckIsTextEditor",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onCommitCompletion",
+            args = {android.view.inputmethod.CompletionInfo.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onCreateInputConnection",
+            args = {android.view.inputmethod.EditorInfo.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onEditorAction",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onEndBatchEdit",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onFinishTemporaryDetach",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onSelectionChanged",
+            args = {int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onStartTemporaryDetach",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onTextContextMenuItem",
+            args = {int.class}
+        )
+    })
+    public void testFoo() {
+        // Do not test. Implementation details.
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "verifyDrawable",
+        args = {android.graphics.drawable.Drawable.class}
+    )
+    public void testVerifyDrawable() {
+        MockTextView textView = new MockTextView(mActivity);
+
+        Drawable d = mActivity.getResources().getDrawable(R.drawable.pass);
+        assertFalse(textView.verifyDrawable(d));
+
+        textView.setCompoundDrawables(null, d, null, null);
+        assertTrue(textView.verifyDrawable(d));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setPrivateImeOptions",
+            args = {java.lang.String.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getPrivateImeOptions",
+            args = {}
+        )
+    })
+    public void testAccessPrivateImeOptions() {
+        mTextView = findTextView(R.id.textview_text);
+        assertNull(mTextView.getPrivateImeOptions());
+
+        mTextView.setPrivateImeOptions("com.example.myapp.SpecialMode=3");
+        assertEquals("com.example.myapp.SpecialMode=3", mTextView.getPrivateImeOptions());
+
+        mTextView.setPrivateImeOptions(null);
+        assertNull(mTextView.getPrivateImeOptions());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setOnEditorActionListener",
+        args = {android.widget.TextView.OnEditorActionListener.class}
+    )
+    public void testSetOnEditorActionListener() {
+        mTextView = findTextView(R.id.textview_text);
+
+        MockOnEditorActionListener listener = new MockOnEditorActionListener();
+        assertFalse(listener.isOnEditorActionCalled());
+
+        mTextView.setOnEditorActionListener(listener);
+        assertFalse(listener.isOnEditorActionCalled());
+
+        mTextView.onEditorAction(EditorInfo.IME_ACTION_DONE);
+        assertTrue(listener.isOnEditorActionCalled());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setImeOptions",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getImeOptions",
+            args = {}
+        )
+    })
+    public void testAccessImeOptions() {
+        mTextView = findTextView(R.id.textview_text);
+        assertEquals(EditorInfo.IME_NULL, mTextView.getImeOptions());
+
+        mTextView.setImeOptions(EditorInfo.IME_ACTION_GO);
+        assertEquals(EditorInfo.IME_ACTION_GO, mTextView.getImeOptions());
+
+        mTextView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        assertEquals(EditorInfo.IME_ACTION_DONE, mTextView.getImeOptions());
+
+        mTextView.setImeOptions(EditorInfo.IME_NULL);
+        assertEquals(EditorInfo.IME_NULL, mTextView.getImeOptions());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setImeActionLabel",
+            args = {java.lang.CharSequence.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getImeActionLabel",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getImeActionId",
+            args = {}
+        )
+    })
+    public void testAccessImeActionLabel() {
+        mTextView = findTextView(R.id.textview_text);
+        assertNull(mTextView.getImeActionLabel());
+        assertEquals(0, mTextView.getImeActionId());
+
+        mTextView.setImeActionLabel("pinyin", 1);
+        assertEquals("pinyin", mTextView.getImeActionLabel().toString());
+        assertEquals(1, mTextView.getImeActionId());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setExtractedText",
+        args = {android.view.inputmethod.ExtractedText.class}
+    )
+    @UiThreadTest
+    public void testSetExtractedText() {
+        mTextView = findTextView(R.id.textview_text);
+        assertEquals(mActivity.getResources().getString(R.string.text_view_hello),
+                mTextView.getText().toString());
+
+        ExtractedText et = new ExtractedText();
+        et.text = "test";
+
+        mTextView.setExtractedText(et);
+        assertEquals("test", mTextView.getText().toString());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "moveCursorToVisibleOffset",
+        args = {}
+    )
+    public void testMoveCursorToVisibleOffset() throws Throwable {
+        mTextView = findTextView(R.id.textview_text);
+
+        // not a spannable text
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertFalse(mTextView.moveCursorToVisibleOffset());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // a selection range
+        final String spannableText = "text";
+        mTextView = new TextView(mActivity);
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText(spannableText, BufferType.SPANNABLE);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        Selection.setSelection((Spannable) mTextView.getText(), 0, spannableText.length());
+
+        assertEquals(0, mTextView.getSelectionStart());
+        assertEquals(spannableText.length(), mTextView.getSelectionEnd());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertFalse(mTextView.moveCursorToVisibleOffset());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // a spannable without range
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mTextView = findTextView(R.id.textview_text);
+                mTextView.setText(spannableText, BufferType.SPANNABLE);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mTextView.moveCursorToVisibleOffset());
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "isInputMethodTarget",
+        args = {}
+    )
+    @UiThreadTest
+    public void testIsInputMethodTarget() {
+        mTextView = findTextView(R.id.textview_text);
+        assertFalse(mTextView.isInputMethodTarget());
+
+        assertFalse(mTextView.isFocused());
+        mTextView.setFocusable(true);
+        mTextView.requestFocus();
+        assertTrue(mTextView.isFocused());
+
+        assertTrue(mTextView.isInputMethodTarget());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "beginBatchEdit",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "endBatchEdit",
+            args = {}
+        )
+    })
+    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
+    public void testBeginEndBatchEdit() {
+        mTextView = findTextView(R.id.textview_text);
+
+        mTextView.beginBatchEdit();
+        mTextView.endBatchEdit();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.NOT_FEASIBLE,
+        notes = "it's hard to do unit test, should be tested by functional test",
+        method = "bringPointIntoView",
+        args = {int.class}
+    )
+    @UiThreadTest
+    public void testBringPointIntoView() throws Throwable {
+        mTextView = findTextView(R.id.textview_text);
+        assertFalse(mTextView.bringPointIntoView(1));
+
+        mTextView.layout(0, 0, 100, 100);
+        assertFalse(mTextView.bringPointIntoView(2));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.NOT_FEASIBLE,
+        notes = "it's hard to do unit test, should be tested by functional test",
+        method = "cancelLongPress",
+        args = {}
+    )
+    public void testCancelLongPress() {
+        mTextView = findTextView(R.id.textview_text);
+        TouchUtils.longClickView(this, mTextView);
+        mTextView.cancelLongPress();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "clearComposingText",
+        args = {}
+    )
+    @UiThreadTest
+    public void testClearComposingText() {
+        mTextView = findTextView(R.id.textview_text);
+        mTextView.setText("Hello world!", BufferType.SPANNABLE);
+        Spannable text = (Spannable) mTextView.getText();
+
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(text));
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(text));
+
+        BaseInputConnection.setComposingSpans((Spannable) mTextView.getText());
+        assertEquals(0, BaseInputConnection.getComposingSpanStart(text));
+        assertEquals(0, BaseInputConnection.getComposingSpanStart(text));
+
+        mTextView.clearComposingText();
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(text));
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(text));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.NOT_FEASIBLE,
+        notes = "it's hard to do unit test, should be tested by functional test",
+        method = "computeVerticalScrollExtent",
+        args = {}
+    )
+    public void testComputeVerticalScrollExtent() {
+        MockTextView textView = new MockTextView(mActivity);
+        assertEquals(0, textView.computeVerticalScrollExtent());
+
+        Drawable d = mActivity.getResources().getDrawable(R.drawable.pass);
+        textView.setCompoundDrawables(null, d, null, d);
+
+        assertEquals(0, textView.computeVerticalScrollExtent());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "didTouchFocusSelect",
+        args = {}
+    )
+    @UiThreadTest
+    public void testDidTouchFocusSelect() {
+        mTextView = new TextView(mActivity);
+        assertFalse(mTextView.didTouchFocusSelect());
+
+        mTextView.setFocusable(true);
+        mTextView.requestFocus();
+        assertTrue(mTextView.didTouchFocusSelect());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "extractText",
+        args = {android.view.inputmethod.ExtractedTextRequest.class,
+                android.view.inputmethod.ExtractedText.class}
+    )
+    @ToBeFixed(bug = "", explanation = "even the TextView did not contains editable content, " +
+            "it also returns true.")
+    public void testExtractText() {
+        mTextView = new TextView(mActivity);
+
+        ExtractedTextRequest request = new ExtractedTextRequest();
+        ExtractedText outText = new ExtractedText();
+
+        request.token = 0;
+        request.flags = 10;
+        request.hintMaxLines = 2;
+        request.hintMaxChars = 20;
+        assertTrue(mTextView.extractText(request, outText));
+
+        mTextView = findTextView(R.id.textview_text);
+        assertTrue(mTextView.extractText(request, outText));
+
+        assertEquals(mActivity.getResources().getString(R.string.text_view_hello),
+                outText.text.toString());
+    }
+
+    private static class MockOnEditorActionListener implements OnEditorActionListener {
+        private boolean isOnEditorActionCalled;
+
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            isOnEditorActionCalled = true;
+            return true;
+        }
+
+        public boolean isOnEditorActionCalled() {
+            return isOnEditorActionCalled;
+        }
     }
 
     private void layout(final TextView textView) {
@@ -4284,6 +4685,16 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         @Override
         protected boolean isPaddingOffsetRequired() {
             return super.isPaddingOffsetRequired();
+        }
+
+        @Override
+        protected boolean verifyDrawable(Drawable who) {
+            return super.verifyDrawable(who);
+        }
+
+        @Override
+        protected int computeVerticalScrollExtent() {
+            return super.computeVerticalScrollExtent();
         }
     }
 }

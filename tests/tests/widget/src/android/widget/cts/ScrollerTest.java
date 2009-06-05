@@ -16,14 +16,13 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
@@ -184,6 +183,16 @@ public class ScrollerTest extends InstrumentationTestCase {
             level = TestLevel.COMPLETE,
             method = "getCurrY",
             args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartX",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartY",
+            args = {}
         )
     })
     // We can not get the precise currX and currY when scrolling
@@ -195,6 +204,8 @@ public class ScrollerTest extends InstrumentationTestCase {
 
         mScroller.startScroll(0, 0, 2000, -2000, 5000);
 
+        assertEquals(0, mScroller.getStartX());
+        assertEquals(0, mScroller.getStartY());
         assertEquals(2000, mScroller.getFinalX());
         assertEquals(-2000, mScroller.getFinalY());
         assertEquals(5000, mScroller.getDuration());
@@ -269,6 +280,16 @@ public class ScrollerTest extends InstrumentationTestCase {
             level = TestLevel.COMPLETE,
             method = "getCurrY",
             args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartX",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartY",
+            args = {}
         )
     })
     // We can not get the precise currX and currY when scrolling
@@ -276,11 +297,13 @@ public class ScrollerTest extends InstrumentationTestCase {
         assertEquals(0, mScroller.getFinalX());
         assertEquals(0, mScroller.getFinalY());
 
-		assertEquals(0, mScroller.getDuration());
+        assertEquals(0, mScroller.getDuration());
         assertTrue(mScroller.isFinished());
 
         mScroller.startScroll(0, 0, -2000, 2000);
 
+        assertEquals(0, mScroller.getStartX());
+        assertEquals(0, mScroller.getStartY());
         assertEquals(-2000, mScroller.getFinalX());
         assertEquals(2000, mScroller.getFinalY());
         int defaultDuration = mScroller.getDuration();
@@ -308,7 +331,7 @@ public class ScrollerTest extends InstrumentationTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "fling",
-            args = {int.class, int.class, int.class, int.class, int.class, int.class, int.class, 
+            args = {int.class, int.class, int.class, int.class, int.class, int.class, int.class,
                     int.class}
         ),
         @TestTargetNew(
@@ -325,6 +348,16 @@ public class ScrollerTest extends InstrumentationTestCase {
             level = TestLevel.COMPLETE,
             method = "getCurrY",
             args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartX",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getStartY",
+            args = {}
         )
     })
     // We can not get the precise currX and currY when scrolling
@@ -337,6 +370,8 @@ public class ScrollerTest extends InstrumentationTestCase {
         mScroller.fling(0, 0, - 3000, 4000, Integer.MIN_VALUE, Integer.MAX_VALUE,
                 Integer.MIN_VALUE, Integer.MAX_VALUE);
 
+        assertEquals(0, mScroller.getStartX());
+        assertEquals(0, mScroller.getStartY());
         int duration = mScroller.getDuration();
         assertTrue(mScroller.getFinalX() < 0);
         assertTrue(mScroller.getFinalY() > 0);

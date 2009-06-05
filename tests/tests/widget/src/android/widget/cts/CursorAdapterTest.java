@@ -23,10 +23,13 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Looper;
+import android.os.cts.TestThread;
 import android.test.AndroidTestCase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.cts.DelayedCheck;
 import android.widget.CursorAdapter;
 import android.widget.Filter;
 import android.widget.FilterQueryProvider;
@@ -44,6 +47,7 @@ import dalvik.annotation.TestTargetClass;
  */
 @TestTargetClass(CursorAdapter.class)
 public class CursorAdapterTest extends AndroidTestCase {
+    private static final long TEST_TIME_OUT = 5000;
     private static final int NUMBER_INDEX = 1;
     private static final String FIRST_NUMBER = "123";
     private static final String SECOND_NUMBER = "5555";
@@ -57,6 +61,7 @@ public class CursorAdapterTest extends AndroidTestCase {
     private File mDatabaseFile;
     private Cursor mCursor;
     private ViewGroup mParent;
+    private MockCursorAdapter mMockCursorAdapter;
 
     @Override
     protected void setUp() throws Exception {
@@ -270,7 +275,7 @@ public class CursorAdapterTest extends AndroidTestCase {
         level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#newDropDownView(Context, Cursor, ViewGroup)}",
         method = "newDropDownView",
-        args = {android.content.Context.class, android.database.Cursor.class, 
+        args = {android.content.Context.class, android.database.Cursor.class,
                 android.view.ViewGroup.class}
     )
     public void testNewDropDownView() {
@@ -406,7 +411,33 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertNull(cursorAdapter.runQueryOnBackgroundThread(constraint));
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "onContentChanged",
+        args = {}
+    )
+    public void testOnContentChanged() throws Throwable {
+        TestThread testThread = new TestThread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                mMockCursorAdapter = new MockCursorAdapter(mContext, mCursor);
+            }
+        });
+        testThread.runTest(TEST_TIME_OUT);
+        assertFalse(mMockCursorAdapter.hasContentChanged());
+        // insert a new row
+        mDatabase.execSQL("INSERT INTO test (number) VALUES ('" + FIRST_NUMBER + "');");
+        new DelayedCheck(TEST_TIME_OUT) {
+            @Override
+            protected boolean check() {
+                return mMockCursorAdapter.hasContentChanged();
+            }
+        };
+    }
+
     private final class MockCursorAdapter extends CursorAdapter {
+        private boolean mContentChanged = false;
+
         public MockCursorAdapter(Context context, Cursor c) {
             super(context, c);
         }
@@ -470,6 +501,16 @@ public class CursorAdapterTest extends AndroidTestCase {
                 return textView;
             }
             return null;
+        }
+
+        @Override
+        protected void onContentChanged() {
+            super.onContentChanged();
+            mContentChanged = true;
+        }
+
+        public boolean hasContentChanged() {
+            return mContentChanged;
         }
     }
 

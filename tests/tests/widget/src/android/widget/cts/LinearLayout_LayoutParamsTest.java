@@ -16,26 +16,23 @@
 
 package android.widget.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.LinearLayout;
 
-import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
+import java.io.IOException;
 
 @TestTargetClass(LinearLayout.LayoutParams.class)
 public class LinearLayout_LayoutParamsTest extends AndroidTestCase {
@@ -86,5 +83,15 @@ public class LinearLayout_LayoutParamsTest extends AndroidTestCase {
 
         MarginLayoutParams marginLayoutParams = new MarginLayoutParams(320, 480);
         new LinearLayout.LayoutParams(marginLayoutParams);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "debug",
+        args = {java.lang.String.class}
+    )
+    public void testDebug() {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(320, 240);
+        assertNotNull(layoutParams.debug("test: "));
     }
 }

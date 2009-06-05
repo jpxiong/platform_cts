@@ -216,6 +216,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.ProgressBarStubActivity"
+            android:label="ProgressBarStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.ChronometerStubActivity"
             android:label="ChronometerStubActivity">
             <intent-filter>
