@@ -16,14 +16,14 @@
 
 package android.permission.cts;
 
-import dalvik.annotation.ToBeFixed;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.provider.Browser;
 import android.provider.Contacts;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
+
 /**
  * Verify the location access without specific permissions.
  */
@@ -175,20 +175,68 @@ public class NoReadWritePermissionTest extends AndroidTestCase {
 
         // write permission
         ContentValues values = new ContentValues();
-        values.put("title", "google");
+        values.put("title", "android");
 
         insertProvider(uri, values);
     }
 
     /**
-     * Verify that read and write of subsribedfeeds requires permissions.
+     * Verify that read and write of subscribed feeds requires permissions.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#SUBSCRIBED_FEEDS_READ}
      *   {@link android.Manifest.permission#SUBSCRIBED_FEEDS_WRITE}
      */
-    @ToBeFixed(bug = "", explanation = "access subscribedfeeds data through ContentResolver"
-            + " should check permission of android.Manifest.permission#SUBSCRIBED_FEEDS.")
     public void testReadSubscribedFeeds() {
+        Uri uri = Uri.parse("content://subscribedfeeds");
 
+        // read permission
+        queryProvider(uri);
+
+        // write permission
+        ContentValues values = new ContentValues();
+        values.put("feed", "android");
+
+        insertProvider(uri, values);
+    }
+
+    /**
+     * Verify that read and write to browser bookmarks requires permissions.
+     * <p>Requires Permission:
+     *   {@link com.android.browser.permission.READ_HISTORY_BOOKMARKS}
+         {@link com.android.browser.permission.WRITE_HISTORY_BOOKMARKS}
+     */
+    public void testReadWriteBookmarks() {
+        Uri uri = Browser.BOOKMARKS_URI;
+
+        // read permission
+        queryProvider(uri);
+
+        // write permission
+        ContentValues values = new ContentValues();
+        values.put(Browser.BookmarkColumns.TITLE, "android");
+        values.put(Browser.BookmarkColumns.URL, "http://developer.android.com");
+
+        insertProvider(uri, values);
+    }
+
+    /**
+     * Verify that read and write to browser history requires permissions.
+     * <p>Requires Permission:
+     *   {@link com.android.browser.permission.READ_HISTORY_BOOKMARKS}
+         {@link com.android.browser.permission.WRITE_HISTORY_BOOKMARKS}
+     */
+    public void testReadWriteHistory() {
+        Uri uri = Browser.SEARCHES_URI;
+
+        // read permission
+        queryProvider(uri);
+
+        // write permission
+        ContentValues values = new ContentValues();
+        values.put(Browser.SearchColumns.URL, "http://developer.android.com");
+        values.put(Browser.SearchColumns.DATE, "12/31/1999");
+
+        insertProvider(uri, values);
     }
 }
+
