@@ -127,6 +127,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.HorizontalScrollViewStubActivity"
+            android:label="HorizontalScrollViewStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.view.cts.UsingViewsStubActivity"
             android:label="Using Views Test">
             <intent-filter>
