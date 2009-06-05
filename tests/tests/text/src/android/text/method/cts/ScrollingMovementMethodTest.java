@@ -976,6 +976,42 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         });
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "onKeyOther",
+        args = {TextView.class, Spannable.class, KeyEvent.class}
+    )
+    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
+            + "document about the behaviour of this method.")
+    public void testOnKeyOther() throws Throwable {
+        runActionOnUiThread(new Runnable() {
+            public void run() {
+                getActivity().setContentView(mTextView);
+            }
+        });
+        assertNotNull(mTextView.getLayout());
+
+        assertVisibleLineInTextView(0);
+        final MyScrollingMovementMethod method = new MyScrollingMovementMethod();
+        runActionOnUiThread(new Runnable() {
+            public void run() {
+                method.onKeyOther(mTextView, null,
+                        new KeyEvent(0, 0, KeyEvent.ACTION_MULTIPLE,
+                                KeyEvent.KEYCODE_DPAD_DOWN, 2));
+            }
+        });
+        assertVisibleLineInTextView(1);
+
+        runActionOnUiThread(new Runnable() {
+            public void run() {
+                method.onKeyOther(mTextView, null,
+                        new KeyEvent(0, 0, KeyEvent.ACTION_MULTIPLE,
+                                KeyEvent.KEYCODE_DPAD_UP, 2));
+            }
+        });
+        assertVisibleLineInTextView(0);
+    }
+
     private void assertVisibleLineInTextView(int line) {
         Layout layout = mTextView.getLayout();
         int scrollY = mTextView.getScrollY();
