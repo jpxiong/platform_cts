@@ -44,6 +44,7 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ReplacementSpan;
 import android.text.style.TextAppearanceSpan;
 import android.text.style.URLSpan;
+import android.util.StringBuilderPrinter;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -83,7 +84,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test commaEllipsize method",
         method = "commaEllipsize",
         args = {CharSequence.class, TextPaint.class, float.class, String.class, String.class}
     )
@@ -151,7 +151,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test concat method",
         method = "concat",
         args = {CharSequence[].class}
     )
@@ -200,14 +199,12 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.concat((CharSequence[]) null);
             fail("Should throw NullPointerException");
         } catch (NullPointerException e) {
-            // issue 1695243, the javadoc for concat() doesn't describe
-            // the expected result when the varargs array is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test copySpansFrom method",
         method = "copySpansFrom",
         args = {Spanned.class, int.class, int.class, Class.class, Spannable.class, int.class}
     )
@@ -265,7 +262,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.copySpansFrom(source2, 0, source2.length(), Object.class, dest4, 0);
             fail("Should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-            // issue 1688347, not clear the expected result when dest.length < end - start.
+            // expected
         }
         TextUtils.copySpansFrom(source2, 0, dest4.length(), Object.class, dest4, 0);
         spans = dest4.getSpans(0, dest4.length(), Object.class);
@@ -291,8 +288,7 @@ public class TextUtilsTest extends AndroidTestCase {
                     Object.class, dest5, dest5.length() - source2.length() + 2);
             fail("Should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
-            // issue 1688347,
-            // not clear the expected result when dest.length - destoff < end - start.
+            // expected
         }
 
         // issue 1688347, no javadoc about the expected behavior of the exceptional argument.
@@ -357,7 +353,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test ellipsize method",
         method = "ellipsize",
         args = {CharSequence.class, TextPaint.class, float.class, TruncateAt.class}
     )
@@ -406,22 +401,19 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.ellipsize(text, null, textWidth, TruncateAt.MIDDLE);
             fail("Should throw NullPointerException");
         } catch (NullPointerException e) {
-            // issue 1688347, not clear what is supposed to happen if the TextPaint is null.
+            // expected
         }
 
         try {
             TextUtils.ellipsize(null, p, textWidth, TruncateAt.MIDDLE);
             fail("Should throw NullPointerException");
         } catch (NullPointerException e) {
-            // issue 1688347, not clear what is supposed to happen
-            // if the text to truncate is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test ellipsize method which can set callback class and can enable"
-            + "or disable to preserve length",
         method = "ellipsize",
         args = {CharSequence.class, TextPaint.class, float.class, TruncateAt.class,
                 boolean.class, EllipsizeCallback.class}
@@ -547,11 +539,13 @@ public class TextUtilsTest extends AndroidTestCase {
         try {
             TextUtils.ellipsize(text, null, textWidth, TruncateAt.END, true, callback);
         } catch (NullPointerException e) {
+            // expected
         }
 
         try {
             TextUtils.ellipsize(null, p, textWidth, TruncateAt.END, true, callback);
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
@@ -579,7 +573,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test equals method",
         method = "equals",
         args = {CharSequence.class, CharSequence.class}
     )
@@ -624,7 +617,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test expandTemplate method",
         method = "expandTemplate",
         args = {CharSequence.class, CharSequence[].class}
     )
@@ -709,7 +701,7 @@ public class TextUtilsTest extends AndroidTestCase {
         try {
             TextUtils.expandTemplate("template ^2 to be expanded", (CharSequence[]) null);
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if values is null
+            // expected
         }
 
         // the template requests 2 values but only one null value is provided
@@ -725,8 +717,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.expandTemplate("template ^2 to be expanded",
                     (CharSequence) null, (CharSequence) null);
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen
-            // if all CharSequences substituted into the template are null.
+            // expected
         }
 
         // the template requests 2 values but no value is provided.
@@ -734,13 +725,14 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.expandTemplate("template ^2 to be expanded");
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            // expected
         }
 
         // template is null
         try {
             TextUtils.expandTemplate(null, "value1");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if template is null.
+            // expected
         }
     }
 
@@ -762,7 +754,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getChars method",
         method = "getChars",
         args = {CharSequence.class, int.class, int.class, char[].class, int.class}
     )
@@ -850,6 +841,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(mockCharSequence, -1, end, destResult, destOff);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         destResult = destOriginal.clone();
@@ -866,6 +858,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(mockCharSequence, start, destResult.length + 1, destResult, destOff);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         destResult = destOriginal.clone();
@@ -899,7 +892,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(null, start, end, destResult, destOff);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if source is null.
+            // expected
         }
 
         // exceptional destination
@@ -907,7 +900,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getChars(mockCharSequence, start, end, null, destOff);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if dest is null.
+            // expected
         }
     }
 
@@ -990,7 +983,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getOffsetAfter method",
         method = "getOffsetAfter",
         args = {CharSequence.class, int.class}
     )
@@ -1037,7 +1029,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getOffsetAfter(null, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if text is null.
+            // expected
         }
     }
 
@@ -1058,7 +1050,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getOffsetBefore method",
         method = "getOffsetBefore",
         args = {CharSequence.class, int.class}
     )
@@ -1105,13 +1096,12 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getOffsetBefore(null, POS_FIRST_DC00);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if text is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getReverse method",
         method = "getReverse",
         args = {CharSequence.class, int.class, int.class}
     )
@@ -1166,13 +1156,12 @@ public class TextUtilsTest extends AndroidTestCase {
             result.toString();
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
-            // issue 1695243, not clear what is supposed result if source is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTrimmedLength method",
         method = "getTrimmedLength",
         args = {CharSequence.class}
     )
@@ -1197,13 +1186,12 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getTrimmedLength(null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed result if the CharSequence is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test htmlEncode method",
         method = "htmlEncode",
         args = {String.class}
     )
@@ -1217,13 +1205,12 @@ public class TextUtilsTest extends AndroidTestCase {
              TextUtils.htmlEncode(null);
              fail("Should throw NullPointerException!");
          } catch (NullPointerException e) {
-             // issue 1695243, not clear what is supposed result if the CharSequence is null.
+             // expected
          }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, char ch)",
         method = "indexOf",
         args = {CharSequence.class, char.class}
     )
@@ -1256,7 +1243,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, char ch, int start)",
         method = "indexOf",
         args = {CharSequence.class, char.class, int.class}
     )
@@ -1297,7 +1283,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, char ch, int start, int end)",
         method = "indexOf",
         args = {CharSequence.class, char.class, int.class, int.class}
     )
@@ -1349,7 +1334,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, CharSequence needle)",
         method = "indexOf",
         args = {CharSequence.class, CharSequence.class}
     )
@@ -1379,7 +1363,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, CharSequence needle, int start)",
         method = "indexOf",
         args = {CharSequence.class, CharSequence.class, int.class}
     )
@@ -1430,7 +1413,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test indexOf(CharSequence s, CharSequence needle, int start, int end)",
         method = "indexOf",
         args = {CharSequence.class, CharSequence.class, int.class, int.class}
     )
@@ -1488,7 +1470,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isDigitsOnly method",
         method = "isDigitsOnly",
         args = {CharSequence.class}
     )
@@ -1509,7 +1490,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isEmpty method",
         method = "isEmpty",
         args = {CharSequence.class}
     )
@@ -1522,7 +1502,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isGraphic(char c)",
         method = "isGraphic",
         args = {char.class}
     )
@@ -1553,13 +1532,12 @@ public class TextUtilsTest extends AndroidTestCase {
             assertFalse(TextUtils.isGraphic((Character) null));
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed result if the Character is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isGraphic(CharSequence str)",
         method = "isGraphic",
         args = {CharSequence.class}
     )
@@ -1575,14 +1553,13 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.isGraphic(null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed result if the CharSequence is null.
+            // expected
         }
     }
 
     @SuppressWarnings("unchecked")
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test join(CharSequence delimiter, Iterable tokens)",
         method = "join",
         args = {CharSequence.class, Iterable.class}
     )
@@ -1614,7 +1591,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test join(CharSequence delimiter, Object[] tokens)",
         method = "join",
         args = {CharSequence.class, Object[].class}
     )
@@ -1643,7 +1619,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test lastIndexOf(CharSequence s, char ch)",
         method = "lastIndexOf",
         args = {CharSequence.class, char.class}
     )
@@ -1675,7 +1650,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test lastIndexOf(CharSequence s, char ch)",
         method = "lastIndexOf",
         args = {CharSequence.class, char.class, int.class}
     )
@@ -1716,7 +1690,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test lastIndexOf(CharSequence s, char ch, int start, int last)",
         method = "lastIndexOf",
         args = {CharSequence.class, char.class, int.class, int.class}
     )
@@ -1763,7 +1736,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test regionMatches method",
         method = "regionMatches",
         args = {CharSequence.class, int.class, CharSequence.class, int.class, int.class}
     )
@@ -1840,7 +1812,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test replace method",
         method = "replace",
         args = {CharSequence.class, String[].class, CharSequence[].class}
     )
@@ -1872,32 +1843,31 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.replace(template, sources, destinations);
             fail("Should throw ArrayIndexOutOfBoundsException!");
         } catch (ArrayIndexOutOfBoundsException e) {
-            // issue 1695243, no description about this exception in javadoc.
+            // expected
         }
 
         try {
             TextUtils.replace(null, sources, destinations);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if template is null.
+            // expected
         }
         try {
             TextUtils.replace(template, null, destinations);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if sources is null.
+            // expected
         }
         try {
             TextUtils.replace(template, sources, null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if destinations is null.
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test split(String text, Pattern pattern)",
         method = "split",
         args = {String.class, Pattern.class}
     )
@@ -1952,7 +1922,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test split(String text, String expression)",
         method = "split",
         args = {String.class, String.class}
     )
@@ -1989,7 +1958,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test stringOrSpannedString method",
         method = "stringOrSpannedString",
         args = {CharSequence.class}
     )
@@ -2016,7 +1984,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test substring method",
         method = "substring",
         args = {CharSequence.class, int.class, int.class}
     )
@@ -2034,37 +2001,42 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.substring(string, string.length(), 0);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         try {
             TextUtils.substring(string, -1, string.length());
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         try {
             TextUtils.substring(string, Integer.MAX_VALUE, string.length());
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         try {
             TextUtils.substring(string, 0, -1);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         try {
             TextUtils.substring(string, 0, Integer.MAX_VALUE);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
+            // expected
         }
 
         try {
             TextUtils.substring(null, 0, string.length());
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if source is null.
+            // expected
         }
 
         StringBuffer stringBuffer = new StringBuffer("String Buffer");
@@ -2078,7 +2050,6 @@ public class TextUtilsTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {CharSequence.class, Parcel.class, int.class}
     )
@@ -2158,7 +2129,7 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.writeToParcel(spannableString, null, 0);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if the Parcel is null.
+            // expected
         }
     }
 
@@ -2186,10 +2157,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(TextUtils.CAP_MODE_WORDS,
                 TextUtils.getCapsMode(testString, 0, TextUtils.CAP_MODE_WORDS));
         // issue 1586346
-        // assertEquals(TextUtils.CAP_MODE_SENTENCES,
-        //         TextUtils.getCapsMode(testString, 0, TextUtils.CAP_MODE_SENTENCES));
-        // assertEquals(CAP_MODE_ALL,
-        //         TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
         assertEquals(TextUtils.CAP_MODE_WORDS,
                 TextUtils.getCapsMode(testString, 0, TextUtils.CAP_MODE_SENTENCES));
         assertEquals(CAP_MODE_CHARACTERS_AND_WORD,
@@ -2202,8 +2169,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(TextUtils.CAP_MODE_SENTENCES,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         // issue 1586346
-        // assertEquals(CAP_MODE_ALL,
-        //         TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
         assertEquals(CAP_MODE_CHARACTERS_AND_WORD,
                 TextUtils.getCapsMode(testString, 0, CAP_MODE_ALL));
 
@@ -2214,8 +2179,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(0,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         // issue 1586346
-        // assertEquals(CAP_MODE_CHARACTERS_AND_WORD,
-        //         TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
         assertEquals(TextUtils.CAP_MODE_CHARACTERS,
                 TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
 
@@ -2234,8 +2197,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(TextUtils.CAP_MODE_WORDS,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_WORDS));
         // issue 1586346
-        // assertEquals(TextUtils.CAP_MODE_SENTENCES,
-        //         TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         assertEquals(TextUtils.CAP_MODE_WORDS,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         assertEquals(CAP_MODE_CHARACTERS_AND_WORD,
@@ -2248,8 +2209,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(TextUtils.CAP_MODE_SENTENCES,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         // issue 1586346
-        // assertEquals(CAP_MODE_ALL,
-        //         TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
         assertEquals(TextUtils.CAP_MODE_SENTENCES | TextUtils.CAP_MODE_CHARACTERS,
                 TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
 
@@ -2260,15 +2219,12 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(TextUtils.CAP_MODE_SENTENCES,
                 TextUtils.getCapsMode(testString, offset, TextUtils.CAP_MODE_SENTENCES));
         // issue 1586346
-        // assertEquals(CAP_MODE_ALL,
-        //         TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
         assertEquals(TextUtils.CAP_MODE_SENTENCES | TextUtils.CAP_MODE_CHARACTERS,
                 TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getCapsMode method",
         method = "getCapsMode",
         args = {CharSequence.class, int.class, int.class}
     )
@@ -2286,21 +2242,46 @@ public class TextUtilsTest extends AndroidTestCase {
             TextUtils.getCapsMode(null, offset, TextUtils.CAP_MODE_SENTENCES);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if the CharSequence is null.
+            // expected
         }
 
         try {
             TextUtils.getCapsMode(testString, -1, TextUtils.CAP_MODE_SENTENCES);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
-            // issue 1695243, not clear what is supposed to happen if using a exceptional offset.
+            // expected
         }
 
         try {
-            TextUtils.getCapsMode(testString, testString.length() + 1, TextUtils.CAP_MODE_SENTENCES);
+            TextUtils.getCapsMode(testString, testString.length() + 1,
+                    TextUtils.CAP_MODE_SENTENCES);
             fail("Should throw IndexOutOfBoundsException!");
         } catch (IndexOutOfBoundsException e) {
-            // issue 1695243, not clear what is supposed to happen if using a exceptional offset.
+            // expected
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "dumpSpans",
+        args = {java.lang.CharSequence.class, android.util.Printer.class, java.lang.String.class}
+    )
+    public void testDumpSpans() {
+        StringBuilder builder = new StringBuilder();
+        StringBuilderPrinter printer = new StringBuilderPrinter(builder);
+        CharSequence source = "test dump spans";
+        String prefix = "prefix";
+
+        assertEquals(0, builder.length());
+        TextUtils.dumpSpans(source, printer, prefix);
+        assertTrue(builder.length() > 0);
+
+        builder = new StringBuilder();
+        printer = new StringBuilderPrinter(builder);
+        assertEquals(0, builder.length());
+        SpannableString spanned = new SpannableString(source);
+        spanned.setSpan(new Object(), 0, source.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        TextUtils.dumpSpans(spanned, printer, prefix);
+        assertTrue(builder.length() > 0);
     }
 }
