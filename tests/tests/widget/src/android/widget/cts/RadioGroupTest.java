@@ -18,10 +18,10 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -144,7 +144,7 @@ public class RadioGroupTest extends InstrumentationTestCase {
                 RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT));
         // set the id with hashCode
         // (PassThroughHierarchyChangeListener's behaviour when button is added)
-        assertTrue(newButton.getId() != View.NO_ID);
+        assertEquals(newButton.hashCode(), newButton.getId());
     }
 
     @TestTargetNew(
@@ -467,6 +467,26 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertHaveNotCalledOnCheckedChanged(listener);
         assertEquals(-1, radioGroup.getCheckedRadioButtonId());
         assertFalse(button.isChecked());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "addView",
+        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
+    )
+    public void testAddView() {
+        mDefaultRadioGroup.check(BUTTON_ID_0);
+        assertEquals(BUTTON_ID_0, mDefaultRadioGroup.getCheckedRadioButtonId());
+        assertEquals(4, mDefaultRadioGroup.getChildCount());
+
+        int id = BUTTON_ID_3 + 10;
+        RadioButton choice4 = new RadioButton(mContext);
+        choice4.setText("choice4");
+        choice4.setId(id);
+        choice4.setChecked(true);
+        mDefaultRadioGroup.addView(choice4, 4, new ViewGroup.LayoutParams(100, 200));
+        assertEquals(id, mDefaultRadioGroup.getCheckedRadioButtonId());
+        assertEquals(5, mDefaultRadioGroup.getChildCount());
     }
 
     /**

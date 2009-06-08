@@ -16,17 +16,15 @@
 
 package android.widget.cts;
 
-import android.content.Context;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.util.AttributeSet;
-import android.view.View;
 import android.widget.Chronometer;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import android.widget.Chronometer.OnChronometerTickListener;
 
 /**
  * Test {@link Chronometer}.
@@ -34,8 +32,6 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(Chronometer.class)
 public class ChronometerTest extends ActivityInstrumentationTestCase2<ChronometerStubActivity> {
     private ChronometerStubActivity mActivity;
-    private Context mContext;
-
     public ChronometerTest() {
         super("com.android.cts.stub", ChronometerStubActivity.class);
     }
@@ -44,47 +40,41 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
-        mContext = getInstrumentation().getContext();
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link Chronometer#Chronometer(Context)}.",
             method = "Chronometer",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
     public void testConstructor() {
-        new Chronometer(mContext);
+        new Chronometer(mActivity);
 
-        new Chronometer(mContext, null);
+        new Chronometer(mActivity, null);
 
-        new Chronometer(mContext, null, 0);
+        new Chronometer(mActivity, null, 0);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBase() and setBase(long)",
             method = "getBase",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBase() and setBase(long)",
             method = "setBase",
             args = {long.class}
         )
@@ -121,13 +111,11 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getFormat() and setFormat(string)",
             method = "getFormat",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getFormat() and setFormat(string)",
             method = "setFormat",
             args = {java.lang.String.class}
         )
@@ -146,81 +134,43 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         assertTrue(text.endsWith("trail"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onDetachedFromWindow()",
-        method = "onDetachedFromWindow",
-        args = {}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "The method onDetachedFromWindow() "
-        + "will set the private variable mVisible as true, but no method to get "
-        + "this value.")
-    @UiThreadTest
-    public void testOnDetachedFromWindow() {
-        MockChronometer mockChronometer = new MockChronometer(mContext);
-
-        // only when both visible and the start are true, the text will be updated.
-        // so in this time the visible is true.
-        mockChronometer.onWindowVisibilityChanged(View.VISIBLE);
-        CharSequence oldText = mockChronometer.getText();
-        mockChronometer.start();
-        CharSequence newText = mockChronometer.getText();
-        assertNotSame(oldText, newText);
-        oldText = newText;
-
-        // then the visible is false, so the text won't be updated.
-        mockChronometer.onDetachedFromWindow();
-        newText = mockChronometer.getText();
-        assertSame(oldText, newText);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onWindowVisibilityChanged(int)",
-        method = "onWindowVisibilityChanged",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "The method onDetachedFromWindow() "
-        + "will set the private variable mVisible according the visibility "
-        + "been set, but I can't get this value.")
-    public void testOnWindowVisibilityChanged() {
-        MockChronometer mockChronometer = new MockChronometer(mContext);
-
-        mockChronometer.start();
-
-        CharSequence oldText = mockChronometer.getText();
-        mockChronometer.onWindowVisibilityChanged(View.INVISIBLE);
-        CharSequence newText = mockChronometer.getText();
-        assertSame(oldText, newText);
-
-        oldText = mockChronometer.getText();
-        // only when both visible and the start are true, the text will be updated.
-        mockChronometer.onWindowVisibilityChanged(View.VISIBLE);
-        newText = mockChronometer.getText();
-        assertNotSame(oldText, newText);
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onWindowVisibilityChanged",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onDetachedFromWindow",
+            args = {}
+        )
+    })
+    public void testFoo() {
+        // Do not test these APIs. They are callbacks which:
+        // 1. The callback machanism has been tested in super class
+        // 2. The functionality is implmentation details, no need to test
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test start() and stop()",
             method = "start",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test start() and stop()",
             method = "stop",
             args = {}
         )
     })
-    public void testStartAndStop() {
+    public void testStartAndStop() throws Throwable {
         final Chronometer chronometer = mActivity.getChronometer();
 
         // we will check the text is really updated every 1000ms after start,
         // so we need sleep a moment to wait wait this time. The sleep code shouldn't
         // in the same thread with UI, that's why we use runOnMainSync here.
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 // the text will update immediately when call start.
                 CharSequence expected = chronometer.getText();
@@ -230,17 +180,13 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         });
         getInstrumentation().waitForIdleSync();
         CharSequence expected = chronometer.getText();
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1500);
         assertFalse(expected.equals(chronometer.getText()));
 
         // we will check the text is really NOT updated anymore every 1000ms after stop,
         // so we need sleep a moment to wait wait this time. The sleep code shouldn't
         // in the same thread with UI, that's why we use runOnMainSync here.
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 // the text will never be updated when call stop.
                 CharSequence expected = chronometer.getText();
@@ -250,38 +196,53 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         });
         getInstrumentation().waitForIdleSync();
         expected = chronometer.getText();
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1500);
         assertTrue(expected.equals(chronometer.getText()));
     }
 
-    private class MockChronometer extends Chronometer {
-        boolean mCalledOnDetachedFromWindow = false;
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getOnChronometerTickListener",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setOnChronometerTickListener",
+            args = {OnChronometerTickListener.class}
+        )
+    })
+    public void testAccessOnChronometerTickListener() throws Throwable {
+        final Chronometer chronometer = mActivity.getChronometer();
+        final MockOnChronometerTickListener listener = new MockOnChronometerTickListener();
 
-        public MockChronometer(Context context) {
-            super(context);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                chronometer.setOnChronometerTickListener(listener);
+                chronometer.start();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        assertEquals(listener, chronometer.getOnChronometerTickListener());
+        assertTrue(listener.hasCalledOnChronometerTick());
+        listener.reset();
+        Thread.sleep(1500);
+        assertTrue(listener.hasCalledOnChronometerTick());
+    }
+
+    private static class MockOnChronometerTickListener implements OnChronometerTickListener {
+        private boolean mCalledOnChronometerTick = false;
+
+        public void onChronometerTick(Chronometer chronometer) {
+            mCalledOnChronometerTick = true;
         }
 
-        @Override
-        protected void onDetachedFromWindow() {
-            super.onDetachedFromWindow();
-            mCalledOnDetachedFromWindow = false;
-        }
-
-        @Override
-        protected void onWindowVisibilityChanged(int visibility) {
-            super.onWindowVisibilityChanged(visibility);
+        public boolean hasCalledOnChronometerTick() {
+            return mCalledOnChronometerTick;
         }
 
         public void reset() {
-            mCalledOnDetachedFromWindow =false;
-        }
-
-        public boolean hasCalledOnDetachedFromWindow() {
-            return mCalledOnDetachedFromWindow;
+            mCalledOnChronometerTick = false;
         }
     }
 }

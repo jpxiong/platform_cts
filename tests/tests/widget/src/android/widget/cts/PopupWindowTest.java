@@ -16,15 +16,22 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.TouchUtils;
-import android.util.AttributeSet;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -37,15 +44,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.PopupWindow.OnDismissListener;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(PopupWindow.class)
 public class PopupWindowTest extends
@@ -77,54 +75,52 @@ public class PopupWindowTest extends
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.content.Context.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.view.View.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.view.View.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PopupWindow}",
             method = "PopupWindow",
             args = {android.view.View.class, int.class, int.class, boolean.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getContentView",
+            args = {}
         )
     })
-    @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
+    @ToBeFixed(bug = "1695243", explanation = "the javadoc for constructor is incomplete." +
+            "1. not clear what is supposed to happen when the LayoutParam is null.")
     public void testConstructor() {
         new PopupWindow(mActivity);
 
@@ -307,13 +303,11 @@ public class PopupWindowTest extends
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#getHeight()} and {@link PopupWindow#setHeight(int)}",
             method = "setHeight",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#getHeight()} and {@link PopupWindow#setHeight(int)}",
             method = "getHeight",
             args = {}
         )
@@ -356,13 +350,11 @@ public class PopupWindowTest extends
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#setWidth(int)} and {@link PopupWindow#getWidth()}",
             method = "setWidth",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#setWidth(int)} and {@link PopupWindow#getWidth()}",
             method = "getWidth",
             args = {}
         )
@@ -393,7 +385,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#showAsDropDown(View)}",
         method = "showAsDropDown",
         args = {android.view.View.class}
     )
@@ -425,7 +416,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#showAtLocation(View, int, int, int)}",
         method = "showAtLocation",
         args = {android.view.View.class, int.class, int.class, int.class}
     )
@@ -463,7 +453,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#showAsDropDown(View, int, int)}",
         method = "showAsDropDown",
         args = {android.view.View.class, int.class, int.class}
     )
@@ -495,12 +484,18 @@ public class PopupWindowTest extends
         dismissPopup();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#getMaxAvailableHeight(View)}",
-        method = "getMaxAvailableHeight",
-        args = {android.view.View.class}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getMaxAvailableHeight",
+            args = {android.view.View.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getMaxAvailableHeight",
+            args = {android.view.View.class, int.class}
+        )
+    })
     public void testGetMaxAvailableHeight() {
         mPopupWindow = createPopupWindow(createPopupContent());
 
@@ -509,6 +504,19 @@ public class PopupWindowTest extends
         int maxAvailableHeight = mPopupWindow.getMaxAvailableHeight(anchorView);
         assertTrue(maxAvailableHeight > 0);
         assertTrue(maxAvailableHeight <= avaliable);
+        int maxAvailableHeightWithOffset = mPopupWindow.getMaxAvailableHeight(anchorView, 2);
+        assertEquals(maxAvailableHeight - 2, maxAvailableHeightWithOffset);
+        maxAvailableHeightWithOffset =
+                mPopupWindow.getMaxAvailableHeight(anchorView, maxAvailableHeight);
+        assertTrue(maxAvailableHeightWithOffset > 0);
+        assertTrue(maxAvailableHeightWithOffset <= avaliable);
+        maxAvailableHeightWithOffset =
+                mPopupWindow.getMaxAvailableHeight(anchorView, maxAvailableHeight / 2 - 1);
+        assertTrue(maxAvailableHeightWithOffset > 0);
+        assertTrue(maxAvailableHeightWithOffset <= avaliable);
+        maxAvailableHeightWithOffset = mPopupWindow.getMaxAvailableHeight(anchorView, -1);
+        assertTrue(maxAvailableHeightWithOffset > 0);
+        assertTrue(maxAvailableHeightWithOffset <= avaliable);
 
         anchorView = mActivity.findViewById(R.id.anchor_lower);
         avaliable = getDisplay().getHeight() - anchorView.getHeight();
@@ -526,7 +534,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#dismiss()}",
         method = "dismiss",
         args = {}
     )
@@ -545,7 +552,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#setOnDismissListener(OnDismissListener)}",
         method = "setOnDismissListener",
         args = {android.widget.PopupWindow.OnDismissListener.class}
     )
@@ -586,7 +592,6 @@ public class PopupWindowTest extends
             args = {}
         )
     })
-    @BrokenTest("showPopup() has the problem of window leakage. Disable this test.")
     public void testUpdate() {
         mPopupWindow = createPopupWindow(createPopupContent());
         mPopupWindow.setBackgroundDrawable(null);
@@ -597,6 +602,7 @@ public class PopupWindowTest extends
         mPopupWindow.setTouchable(false);
         mPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         mPopupWindow.setClippingEnabled(false);
+        mPopupWindow.setOutsideTouchable(true);
 
         WindowManager.LayoutParams p = (WindowManager.LayoutParams)
                 mPopupWindow.getContentView().getLayoutParams();
@@ -605,8 +611,7 @@ public class PopupWindowTest extends
         assertEquals(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE & p.flags);
         assertEquals(0, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE & p.flags);
-        assertEquals(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH & p.flags);
+        assertEquals(0, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH & p.flags);
         assertEquals(0, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS & p.flags);
         assertEquals(0, WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM & p.flags);
 
@@ -622,7 +627,8 @@ public class PopupWindowTest extends
         assertEquals(0, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE & p.flags);
         assertEquals(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE & p.flags);
-        assertEquals(0, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH & p.flags);
+        assertEquals(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH & p.flags);
         assertEquals(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS & p.flags);
         assertEquals(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
@@ -634,6 +640,11 @@ public class PopupWindowTest extends
             level = TestLevel.COMPLETE,
             method = "update",
             args = {int.class, int.class, int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "update",
+            args = {int.class, int.class, int.class, int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -674,7 +685,7 @@ public class PopupWindowTest extends
         // ignore if width or height is -1
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
-                mPopupWindow.update(4, 0, -1, -1);
+                mPopupWindow.update(4, 0, -1, -1, true);
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -693,13 +704,11 @@ public class PopupWindowTest extends
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#update(View, int, int)} and PopupWindow#isShowing()}",
             method = "update",
             args = {android.view.View.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link PopupWindow#update(View, int, int)} and PopupWindow#isShowing()}",
             method = "isShowing",
             args = {}
         )
@@ -743,8 +752,6 @@ public class PopupWindowTest extends
             args = {}
         )
     })
-    @ToBeFixed(bug="", explanation="can not update the position of popup window" +
-            "when the new width and height both equal the old or -1.")
     public void testUpdateDimentionAndAlignAnchorViewWithOffsets() {
         int[] AnchorXY = new int[2];
         int[] viewInWindowOff = new int[2];
@@ -909,7 +916,6 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#isAboveAnchor()}",
         method = "isAboveAnchor",
         args = {}
     )
@@ -941,37 +947,50 @@ public class PopupWindowTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#setTouchInterceptor(OnTouchListener)}",
         method = "setTouchInterceptor",
         args = {android.view.View.OnTouchListener.class}
     )
-    @BrokenTest("showPopup() has the problem of window leakage. Disable this test.")
     public void testSetTouchInterceptor() {
         mPopupWindow = new PopupWindow(new TextView(mActivity));
 
         MockOnTouchListener onTouchListener = new MockOnTouchListener();
         mPopupWindow.setTouchInterceptor(onTouchListener);
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
         Drawable drawable = new ColorDrawable();
         mPopupWindow.setBackgroundDrawable(drawable);
         showPopup();
 
-        TouchUtils.tapView(this, mPopupWindow.getContentView());
-        mInstrumentation.waitForIdleSync();
+        int[] xy = new int[2];
+        mPopupWindow.getContentView().getLocationOnScreen(xy);
+        final int viewWidth = mPopupWindow.getContentView().getWidth();
+        final int viewHeight = mPopupWindow.getContentView().getHeight();
+        final float x = xy[0] + (viewWidth / 2.0f);
+        float y = xy[1] + (viewHeight / 2.0f);
+
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis();
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime,
+                MotionEvent.ACTION_DOWN, x, y, 0);
+        getInstrumentation().sendPointerSync(event);
         assertEquals(1, onTouchListener.getOnTouchCalledCount());
 
-        TouchUtils.tapView(this, mPopupWindow.getContentView());
-        mInstrumentation.waitForIdleSync();
+        downTime = SystemClock.uptimeMillis();
+        eventTime = SystemClock.uptimeMillis();
+        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 0);
+        getInstrumentation().sendPointerSync(event);
         assertEquals(2, onTouchListener.getOnTouchCalledCount());
 
         mPopupWindow.setTouchInterceptor(null);
-        TouchUtils.tapView(this, mPopupWindow.getContentView());
-        mInstrumentation.waitForIdleSync();
+        downTime = SystemClock.uptimeMillis();
+        eventTime = SystemClock.uptimeMillis();
+        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y, 0);
+        getInstrumentation().sendPointerSync(event);
         assertEquals(2, onTouchListener.getOnTouchCalledCount());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link PopupWindow#setWindowLayoutMode(int, int)}",
         method = "setWindowLayoutMode",
         args = {int.class, int.class}
     )
@@ -1002,7 +1021,7 @@ public class PopupWindowTest extends
      * the OnDismiss event occurs, that object's appropriate
      * method is invoked.
      */
-    private class MockOnDismissListener implements OnDismissListener {
+    private static class MockOnDismissListener implements OnDismissListener {
 
         /** The Ondismiss called count. */
         private int mOnDismissCalledCount;
@@ -1030,7 +1049,7 @@ public class PopupWindowTest extends
     /**
      * The listener interface for receiving touch events.
      */
-    private class MockOnTouchListener implements OnTouchListener {
+    private static class MockOnTouchListener implements OnTouchListener {
 
         /** The onTouch called count. */
         private int mOnTouchCalledCount;
@@ -1080,6 +1099,8 @@ public class PopupWindowTest extends
     /**
      * Show PopupWindow.
      */
+    // FIXME: logcat info complains that there is window leakage due to that mPopupWindow is not
+    // clean up. Need to fix it.
     private void showPopup() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {

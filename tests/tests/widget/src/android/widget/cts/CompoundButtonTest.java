@@ -16,6 +16,14 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import android.content.Context;
@@ -33,14 +41,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link CompoundButton}.
@@ -410,6 +410,23 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertTrue(compoundButton.isLayoutRequested());
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "verifyDrawable",
+        args = {android.graphics.drawable.Drawable.class}
+    )
+    public void testVerifyDrawable() {
+        MockCompoundButton compoundButton = new MockCompoundButton(mContext);
+        Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);
+
+        assertTrue(compoundButton.verifyDrawable(null));
+        assertFalse(compoundButton.verifyDrawable(drawable));
+
+        compoundButton.setButtonDrawable(drawable);
+        assertTrue(compoundButton.verifyDrawable(null));
+        assertTrue(compoundButton.verifyDrawable(drawable));
+    }
+
     private final class MockCompoundButton extends CompoundButton {
         public MockCompoundButton(Context context) {
             super(context);
@@ -436,6 +453,11 @@ public class CompoundButtonTest extends AndroidTestCase {
         @Override
         protected int[] onCreateDrawableState(int extraSpace) {
             return super.onCreateDrawableState(extraSpace);
+        }
+
+        @Override
+        protected boolean verifyDrawable(Drawable who) {
+            return super.verifyDrawable(who);
         }
     }
 
