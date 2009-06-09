@@ -448,8 +448,8 @@ public class TimeTest extends AndroidTestCase {
                         local.year, local.month, local.monthDay, local.hour, local.minute,
                         local.isDst);
                 throw new RuntimeException(
-                        "minute test index " + index + ", normalize(): expected local " + expectedTime
-                                + " got: " + actualTime);
+                        "minute test index " + index + ", normalize(): expected local "
+                                + expectedTime + " got: " + actualTime);
             }
 
             local.set(0, test.minute1, test.hour1, test.day1, test.month1, test.year1);
@@ -470,8 +470,8 @@ public class TimeTest extends AndroidTestCase {
                         local.year, local.month, local.monthDay, local.hour, local.minute,
                         local.isDst);
                 throw new RuntimeException(
-                        "minute test index " + index + ", toMillis(): expected local " + expectedTime
-                                + " got: " + actualTime);
+                        "minute test index " + index + ", toMillis(): expected local "
+                                + expectedTime + " got: " + actualTime);
             }
         }
     }
