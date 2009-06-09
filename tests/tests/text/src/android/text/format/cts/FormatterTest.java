@@ -19,19 +19,17 @@ package android.text.format.cts;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import android.content.Context;
-import android.text.format.Formatter;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
+import android.text.format.Formatter;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(Formatter.class)
 public class FormatterTest extends AndroidTestCase {
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link Formatter#formatFileSize(Context, long).",
         method = "formatFileSize",
         args = {android.content.Context.class, long.class}
     )
@@ -61,5 +59,18 @@ public class FormatterTest extends AndroidTestCase {
 
         // test Negative value
         assertEquals("-1.00B", Formatter.formatFileSize(mContext, -1));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "formatIpAddress",
+        args = {int.class}
+    )
+    public void testFormatIpAddress() {
+        assertEquals("1.0.168.192", Formatter.formatIpAddress(0xC0A80001));
+        assertEquals("1.0.0.127", Formatter.formatIpAddress(0x7F000001));
+        assertEquals("35.182.168.192", Formatter.formatIpAddress(0xC0A8B623));
+        assertEquals("0.255.255.255", Formatter.formatIpAddress(0xFFFFFF00));
+        assertEquals("222.5.15.10", Formatter.formatIpAddress(0x0A0F05DE));
     }
 }
