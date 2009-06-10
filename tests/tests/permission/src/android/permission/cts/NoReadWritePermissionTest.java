@@ -23,10 +23,12 @@ import android.provider.Browser;
 import android.provider.Contacts;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 
 /**
  * Verify the location access without specific permissions.
  */
+@MediumTest
 public class NoReadWritePermissionTest extends AndroidTestCase {
     private ContentResolver mContentResolver;
 

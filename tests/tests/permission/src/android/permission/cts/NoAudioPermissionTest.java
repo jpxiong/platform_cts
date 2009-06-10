@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.content.Context;
 import android.media.AudioManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify the audio related operations require specific permissions.
@@ -39,6 +40,7 @@ public class NoAudioPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#MODIFY_AUDIO_SETTINGS}.
      */
+    @SmallTest
     public void testSetMicrophoneMute() {
         boolean muteState = mAudioManager.isMicrophoneMute();
         int originalMode = mAudioManager.getMode();
@@ -62,6 +64,7 @@ public class NoAudioPermissionTest extends AndroidTestCase {
      *   {@link android.Manifest.permission#MODIFY_AUDIO_SETTINGS}.
      */
     @SuppressWarnings("deprecation")
+    @SmallTest
     public void testSetRouting() {
         int[] defaultRoutes = new int[MODE_COUNT];
         defaultRoutes[0] = mAudioManager.getRouting(AudioManager.MODE_NORMAL);

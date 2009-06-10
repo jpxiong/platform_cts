@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.content.Intent;
 import android.net.Uri;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify Phone calling related methods without specific Phone/Call permissions.
@@ -30,6 +31,7 @@ public class NoCallPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CALL_PHONE}.
      */
+    @SmallTest
     public void testActionCall() {
         Uri uri = Uri.parse("tel:123456");
         Intent intent = new Intent(Intent.ACTION_CALL, uri);

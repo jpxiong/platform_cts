@@ -20,10 +20,12 @@ import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify WifiManager related methods without specific Wifi state permissions.
  */
+@SmallTest
 public class NoWifiStatePermissionTest extends AndroidTestCase {
     private static final int TEST_NET_ID = 1;
     private static final WifiConfiguration TEST_WIFI_CONFIGURATION = new WifiConfiguration();

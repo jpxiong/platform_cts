@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.os.Vibrator;
 import android.telephony.gsm.SmsManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#RESTART_PACKAGES}.
      */
+    @SmallTest
     public void testRestartPackage() {
         ActivityManager activityManager = (ActivityManager) mContext.getSystemService(
                 Context.ACTIVITY_SERVICE);
@@ -57,6 +59,7 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#SET_TIME_ZONE}.
      */
+    @SmallTest
     public void testSetTimeZone() {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(
                 Context.ALARM_SERVICE);
@@ -77,6 +80,7 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      *   {@link android.Manifest.permission#SET_WALLPAPER}.
      * @throws IOException 
      */
+    @SmallTest
     public void testSetWallpaper() throws IOException {
         Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
 
@@ -107,6 +111,7 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#VIBRATE}.
      */
+    @SmallTest
     public void testVibrator() {
         Vibrator vibrator = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -139,6 +144,7 @@ public class NoSystemFunctionPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#SMS}.
      */
+    @SmallTest
     public void testSendSms() {
         SmsManager smsManager = SmsManager.getDefault();
         byte[] testData = new byte[10];
