@@ -23,6 +23,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.LargeTest;
 
 /**
  * Test that audio-related Permissions are enforced.
@@ -43,6 +44,7 @@ public class AudioPermissionTest extends AndroidTestCase {
         mMediaRecorder = new MediaRecorder();
     }
 
+    @LargeTest
     void testMicrophoneRecording() {
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -102,6 +104,7 @@ public class AudioPermissionTest extends AndroidTestCase {
         }
     }
 
+    @LargeTest
     void testRemoteMp3() {
         doRemoteMp3(Uri.parse("http://labs.isecpartners.com/chris/noodle.mp3?secret=1234"));
     }

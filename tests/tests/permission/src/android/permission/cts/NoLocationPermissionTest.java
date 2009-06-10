@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify the location access without specific permissions.
@@ -59,6 +60,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_COARSE_LOCATION.}
      */
+    @SmallTest
     public void testListenCellLocation() {
         TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
                    Context.TELEPHONY_SERVICE);
@@ -115,6 +117,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testRequestLocationUpdatesNetwork() {
         checkRequestLocationUpdates(LocationManager.NETWORK_PROVIDER);
     }
@@ -124,6 +127,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testRequestLocationUpdatesGps() {
         checkRequestLocationUpdates(LocationManager.GPS_PROVIDER);
     }
@@ -133,6 +137,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testAddProximityAlert() {
         PendingIntent mockPendingIntent = PendingIntent.getBroadcast(getContext(),
                 0, new Intent("mockIntent"), PendingIntent.FLAG_ONE_SHOT);
@@ -170,6 +175,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testGetLastKnownLocationGps() {
         checkGetLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
@@ -179,6 +185,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testGetLastKnownLocationNetwork() {
         checkGetLastKnownLocation(LocationManager.NETWORK_PROVIDER);
     }
@@ -208,6 +215,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testGetProviderGps() {
         checkGetProvider(LocationManager.GPS_PROVIDER);
     }
@@ -217,6 +225,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testGetProviderNetwork() {
         checkGetProvider(LocationManager.NETWORK_PROVIDER);
     }
@@ -246,6 +255,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testIsProviderEnabledGps() {
         checkIsProviderEnabled(LocationManager.GPS_PROVIDER);
     }
@@ -255,6 +265,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
      */
+    @SmallTest
     public void testIsProviderEnabledNetwork() {
         checkIsProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
@@ -264,6 +275,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testAddTestProvider() {
         final int TEST_POWER_REQUIREMENT_VALE = 0;
         final int TEST_ACCURACY_VALUE = 1;
@@ -281,6 +293,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testRemoveTestProvider() {
         try {
             mLocationManager.removeTestProvider(TEST_PROVIDER_NAME);
@@ -295,6 +308,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testSetTestProviderLocation() {
         Location location = new Location(TEST_PROVIDER_NAME);
 
@@ -311,6 +325,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testClearTestProviderLocation() {
         try {
             mLocationManager.clearTestProviderLocation(TEST_PROVIDER_NAME);
@@ -325,6 +340,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testSetTestProviderEnabled() {
         try {
             mLocationManager.setTestProviderEnabled(TEST_PROVIDER_NAME, true);
@@ -339,6 +355,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testClearTestProviderEnabled() {
         try {
             mLocationManager.clearTestProviderEnabled(TEST_PROVIDER_NAME);
@@ -353,6 +370,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testSetTestProviderStatus() {
         try {
             mLocationManager.setTestProviderStatus(TEST_PROVIDER_NAME, 0, Bundle.EMPTY, 0);
@@ -367,6 +385,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_MOCK_LOCATION}.
      */
+    @SmallTest
     public void testClearTestProviderStatus() {
         try {
             mLocationManager.clearTestProviderStatus(TEST_PROVIDER_NAME);

@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify the key input related operations require specific permissions.
@@ -39,6 +40,7 @@ public class NoKeyPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#DISABLE_KEYGUARD}.
      */
+    @SmallTest
     public void testDisableKeyguard() {
         try {
             mKeyLock.disableKeyguard();
@@ -54,7 +56,8 @@ public class NoKeyPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#DISABLE_KEYGUARD}.
      */
-    public void testEeenableKeyguard() {
+    @SmallTest
+    public void testReenableKeyguard() {
         try {
             mKeyLock.reenableKeyguard();
             fail("KeyguardManager.KeyguardLock.reenableKeyguard did not throw SecurityException as"
@@ -69,6 +72,7 @@ public class NoKeyPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#DISABLE_KEYGUARD}.
      */
+    @SmallTest
     public void testExitKeyguardSecurely() {
         try {
             mKeyManager.exitKeyguardSecurely(null);

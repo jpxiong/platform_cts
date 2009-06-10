@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
 /**
@@ -35,6 +36,7 @@ public class NoReadLogsPermissionTest extends AndroidTestCase {
      *   {@link android.Manifest.permission#READ_LOGS }.
      * @throws IOException
      */
+    @MediumTest
     public void testSetMicrophoneMute() throws IOException {
         Process logcatProc = null;
         BufferedReader reader = null;

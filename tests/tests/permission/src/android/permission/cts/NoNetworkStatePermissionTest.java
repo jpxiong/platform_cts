@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify ConnectivityManager related methods without specific network state permissions.
@@ -42,6 +43,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
      */
+    @SmallTest
     public void testGetNetworkPreference() {
         try {
             mConnectivityManager.getNetworkPreference();
@@ -57,6 +59,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
      */
+    @SmallTest
     public void testGetActiveNetworkInfo() {
         try {
             mConnectivityManager.getActiveNetworkInfo();
@@ -72,6 +75,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
      */
+    @SmallTest
     public void testGetNetworkInfo() {
         try {
             mConnectivityManager.getNetworkInfo(TEST_NETWORK_TYPE);
@@ -87,6 +91,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
      */
+    @SmallTest
     public void testGetAllNetworkInfo() {
         try {
             mConnectivityManager.getAllNetworkInfo();
@@ -102,6 +107,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
+    @SmallTest
     public void testSetNetworkPreference() {
         try {
             mConnectivityManager.setNetworkPreference(TEST_PREFERENCE);
@@ -117,6 +123,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
+    @SmallTest
     public void testStartUsingNetworkFeature() {
         try {
             mConnectivityManager.startUsingNetworkFeature(TEST_NETWORK_TYPE, TEST_FEATURE);
@@ -132,6 +139,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
+    @SmallTest
     public void testStopUsingNetworkFeature() {
         try {
             mConnectivityManager.stopUsingNetworkFeature(TEST_NETWORK_TYPE, TEST_FEATURE);
@@ -147,6 +155,7 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
+    @SmallTest
     public void testRequestRouteToHost() {
         try {
             mConnectivityManager.requestRouteToHost(TEST_NETWORK_TYPE, 0xffffffff);

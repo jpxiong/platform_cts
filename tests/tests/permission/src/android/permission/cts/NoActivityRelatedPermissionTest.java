@@ -24,6 +24,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.view.WindowManager;
 import android.view.WindowManager.BadTokenException;
 
@@ -52,6 +53,7 @@ public class NoActivityRelatedPermissionTest
      *   {@link android.Manifest.permission#SYSTEM_ALERT_WINDOW}.
      */
     @UiThreadTest
+    @MediumTest
     public void testSystemAlertWindow() {
         final int[] types = new int[] {
                 WindowManager.LayoutParams.TYPE_PHONE,
@@ -86,6 +88,7 @@ public class NoActivityRelatedPermissionTest
      *   {@link android.Manifest.permission#PERSISTENT_ACTIVITY}.
      */
     @UiThreadTest
+    @MediumTest
     public void testSetPersistent() {
         try {
             mActivity.setPersistent(true);
@@ -100,6 +103,7 @@ public class NoActivityRelatedPermissionTest
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#GET_TASKS}
      */
+    @MediumTest
     public void testGetTask() {
         ActivityManager manager = (ActivityManager) getActivity()
                 .getSystemService(Context.ACTIVITY_SERVICE);

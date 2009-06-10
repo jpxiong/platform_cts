@@ -23,6 +23,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.PowerManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify the Wake Lock related operations require specific permissions.
@@ -44,6 +45,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#WAKE_LOCK}.
      */
+    @SmallTest
     public void testWifiLockAcquire() {
         final WifiManager wifiManager = (WifiManager) mContext.getSystemService(
                 Context.WIFI_SERVICE);
@@ -61,6 +63,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#WAKE_LOCK}.
      */
+    @SmallTest
     public void testMediaPlayerWakeLock() {
         final MediaPlayer mediaPlayer = new MediaPlayer();
         mediaPlayer.setWakeMode(mContext, PowerManager.FULL_WAKE_LOCK);
@@ -79,6 +82,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#WAKE_LOCK}.
      */
+    @SmallTest
     public void testPowerManagerWakeLockAcquire() {
         try {
             mWakeLock.acquire();
@@ -93,6 +97,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#WAKE_LOCK}.
      */
+    @SmallTest
     public void testPowerManagerWakeLockAcquire2() {
         // Tset acquire(long)
         try {
@@ -108,6 +113,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#WAKE_LOCK}.
      */
+    @SmallTest
     public void testPowerManagerWakeLockRelease() {
         mWakeLock.setReferenceCounted(false);
         try {

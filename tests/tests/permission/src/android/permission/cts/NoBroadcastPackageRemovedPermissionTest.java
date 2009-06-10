@@ -19,6 +19,7 @@ package android.permission.cts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify Context related methods without specific BROADCAST series permissions.
@@ -33,6 +34,7 @@ public class NoBroadcastPackageRemovedPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#BROADCAST_STICKY }.
      */
+    @SmallTest
     public void testSendOrRemoveStickyBroadcast() {
         try {
             mContext.sendStickyBroadcast(createIntent(Intent.ACTION_WALLPAPER_CHANGED));
@@ -59,6 +61,7 @@ public class NoBroadcastPackageRemovedPermissionTest extends AndroidTestCase {
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#BROADCAST_PACKAGE_REMOVED}.
      */
+    @SmallTest
     public void testSendBroadcast() {
         try {
             mContext.sendBroadcast(createIntent(Intent.ACTION_PACKAGE_REMOVED));

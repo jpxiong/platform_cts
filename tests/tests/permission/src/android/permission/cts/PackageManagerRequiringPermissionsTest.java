@@ -18,10 +18,12 @@ package android.permission.cts;
 
 import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Verify the PackageManager related operations require specific permissions.
  */
+@SmallTest
 public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     private PackageManager mPackageManager;
