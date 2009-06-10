@@ -14,48 +14,19 @@
      limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<DialerFilter android:id="@+id/dialer_filter"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="fill_parent">
 
-    <LinearLayout android:id="@+id/inputArea"
+    <EditText android:id="@android:id/hint"
         android:layout_width="fill_parent"
-        android:layout_height="80dip"
-        android:orientation="vertical"
-        android:padding="0dip"
-        android:visibility="gone">
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/editbox_background"/>
 
-        <DialerFilter android:id="@android:id/input"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:layout_marginLeft="7dip"
-            android:layout_marginRight="5dip">
+    <EditText android:id="@android:id/primary"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/hint"/>
 
-            <EditText android:id="@android:id/hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:background="@null"
-                android:autoText="false"
-                android:capitalize="none"/>
-
-            <EditText android:id="@android:id/primary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@android:id/hint"
-                android:textSize="24sp"
-                android:background="@null"
-                android:autoText="false"
-                android:capitalize="none"/>
-
-            <ImageView android:id="@android:id/icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/sym_action_call"/>
-        </DialerFilter>
-    </LinearLayout>
-</LinearLayout>
+</DialerFilter>
