@@ -55,7 +55,7 @@ public class TypedValueTest extends TestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             notes = "Test complexToDimension().",
-            method = "getFloat",
+            method = "complexToDimension",
             args = {int.class, DisplayMetrics.class}
         ),
         @TestTargetNew(
@@ -76,7 +76,6 @@ public class TypedValueTest extends TestCase {
                 & TypedValue.COMPLEX_UNIT_MASK, TypedValue.complexToFloat(10), dm);
 
         assertEquals(EXPECTED, TypedValue.complexToDimension(10, dm));
-
         assertEquals((int)EXPECTED, TypedValue.complexToDimensionPixelOffset(10, dm));
     }
 
@@ -187,7 +186,6 @@ public class TypedValueTest extends TestCase {
 
         tv.type = 3;
         assertNotNull(tv.toString());
-
     }
 
     @TestTargetNew(
@@ -259,7 +257,6 @@ public class TypedValueTest extends TestCase {
         assertNotNull(TypedValue.coerceToString(TypedValue.TYPE_FIRST_COLOR_INT, 10));
         assertNotNull(TypedValue.coerceToString(0x11, 10));
         assertNull(TypedValue.coerceToString(-1, 10));
-
     }
 
     @TestTargetNew(
@@ -319,5 +316,4 @@ public class TypedValueTest extends TestCase {
         assertEquals(TypedValue.complexToDimension(1, dm),
                                  TypedValue.complexToDimensionNoisy(1, dm));
     }
-
 }
