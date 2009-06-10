@@ -16,6 +16,7 @@
 
 package android.permission.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargetClass;
 
 import android.app.Activity;
@@ -25,6 +26,7 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.Suppress;
 import android.view.WindowManager;
 import android.view.WindowManager.BadTokenException;
 
@@ -54,6 +56,8 @@ public class NoActivityRelatedPermissionTest
      */
     @UiThreadTest
     @MediumTest
+    @Suppress
+    @BrokenTest("This test passes, but crashes the UI thread later on. See issues 1909470, 1910487")
     public void testSystemAlertWindow() {
         final int[] types = new int[] {
                 WindowManager.LayoutParams.TYPE_PHONE,
@@ -75,6 +79,10 @@ public class NoActivityRelatedPermissionTest
             dialog.getWindow().setType(types[i]);
             try {
                 dialog.show();
+                // This throws an exception as expected, but only after already adding
+                // a new view to the view hierarchy. This later results in a NullPointerException
+                // when the activity gets destroyed. Since that crashes the UI thread and causes
+                // test runs to abort, this test is currently excluded.
                 fail("Add dialog to Window Manager did not throw BadTokenException as expected");
             } catch (BadTokenException e) {
                 // Expected
