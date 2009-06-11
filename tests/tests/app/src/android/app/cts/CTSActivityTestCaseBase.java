@@ -40,14 +40,10 @@ public class CTSActivityTestCaseBase extends InstrumentationTestCase implements 
         }
     }
 
-    protected void waitForResult() {
+    protected void waitForResult() throws InterruptedException {
         synchronized (mSync) {
             if (!mSync.mHasNotify) {
-                try {
-                    mSync.wait();
-                } catch (InterruptedException e) {
-                    fail();
-                }
+                mSync.wait();
                 assertTrue(mSync.mResult);
             }
         }

@@ -20,10 +20,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(ActivityManager.RecentTaskInfo.class)
 public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
@@ -47,7 +46,6 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test describeContents method",
         method = "describeContents",
         args = {}
     )
@@ -57,7 +55,6 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -97,7 +94,6 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test readFromParcel method",
         method = "readFromParcel",
         args = {android.os.Parcel.class}
     )

@@ -27,7 +27,7 @@ import dalvik.annotation.TestTargets;
 @TestTargetClass(AliasActivity.class)
 public class AliasActivityTest extends AndroidTestCase {
 
-    public static final long SLEEP_TIME = 1000;
+    private static final long SLEEP_TIME = 1000;
 
     @TestTargets({
         @TestTargetNew(
@@ -41,12 +41,7 @@ public class AliasActivityTest extends AndroidTestCase {
             args = {}
         )
     })
-    /**
-     * check points:
-     * 1  launches another activity
-     * 2  finishes itself
-     */
-    public void testAliasActivity() {
+    public void testAliasActivity() throws InterruptedException {
         new AliasActivity();
 
         Intent intent = new Intent();
@@ -56,17 +51,10 @@ public class AliasActivityTest extends AndroidTestCase {
         assertFalse(ChildActivity.isStarted);
         assertFalse(AliasActivityStub.isOnCreateCalled);
         getContext().startActivity(intent);
-        sleep(SLEEP_TIME);
+        Thread.sleep(SLEEP_TIME);
         assertTrue(AliasActivityStub.isOnCreateCalled);
         assertTrue(ChildActivity.isStarted);
         assertTrue(AliasActivityStub.isFinished);
     }
 
-    private void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        }
-    }
 }

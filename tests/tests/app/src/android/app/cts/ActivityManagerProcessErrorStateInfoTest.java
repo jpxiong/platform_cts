@@ -18,10 +18,9 @@ package android.app.cts;
 import android.app.ActivityManager;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(ActivityManager.ProcessErrorStateInfo.class)
 public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
@@ -45,7 +44,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test describeContents method",
         method = "describeContents",
         args = {}
     )
@@ -55,7 +53,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -82,8 +79,8 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         Parcel parcel = Parcel.obtain();
         mErrorStateInfo.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
-        ActivityManager.ProcessErrorStateInfo values = ActivityManager.ProcessErrorStateInfo.CREATOR
-                .createFromParcel(parcel);
+        ActivityManager.ProcessErrorStateInfo values =
+            ActivityManager.ProcessErrorStateInfo.CREATOR.createFromParcel(parcel);
 
         assertEquals(condition, values.condition);
         assertEquals(processName, values.processName);
@@ -101,8 +98,7 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         parcel = Parcel.obtain();
         mErrorStateInfo.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
-        values = ActivityManager.ProcessErrorStateInfo.CREATOR
-                .createFromParcel(parcel);
+        values = ActivityManager.ProcessErrorStateInfo.CREATOR.createFromParcel(parcel);
         assertNull(values.crashData);
 
     }

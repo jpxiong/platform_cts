@@ -43,7 +43,7 @@ class MyBadParcelable implements Parcelable {
         return 0;
     }
 
-    public static final Parcelable.Creator<MyBadParcelable> CREATOR = 
+    public static final Parcelable.Creator<MyBadParcelable> CREATOR =
         new Parcelable.Creator<MyBadParcelable>() {
         public MyBadParcelable createFromParcel(Parcel in) {
             return new MyBadParcelable(in);

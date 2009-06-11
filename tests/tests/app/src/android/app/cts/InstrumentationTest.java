@@ -54,8 +54,7 @@ import dalvik.annotation.ToBeFixed;
 @TestTargetClass(Instrumentation.class)
 public class InstrumentationTest extends InstrumentationTestCase {
 
-    public static final int SLEEP_TIME = 100;
-    public static final int WAIT_TIME = 1000;
+    private static final int WAIT_TIME = 1000;
     private Instrumentation mInstrumentation;
     private InstrumentationTestActivity mActivity;
     private Intent mIntent;
@@ -89,12 +88,8 @@ public class InstrumentationTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    /**
-     * Test point : check if the specified instrumentation is started by application loader
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test constructor of Instrumentation",
         method = "Instrumentation",
         args = {}
     )
@@ -102,13 +97,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         new Instrumentation();
     }
 
-    /**
-     * check all functions related to Monitor
-     * 1 Add a new {@link ActivityMonitor} that will be checked whenever an activity is started
-     * 2 Wait for an existing {@link ActivityMonitor} to be hit
-     * 3 whether an existing {@link ActivityMonitor} has been hit
-     * 4 Remove an {@link ActivityMonitor} that was previously added with {@link #addMonitor}
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -155,8 +143,8 @@ public class InstrumentationTest extends InstrumentationTestCase {
         if (mActivity != null)
             mActivity.finish();
         ActivityResult result = new ActivityResult(Activity.RESULT_OK, new Intent());
-        ActivityMonitor monitor = new ActivityMonitor(InstrumentationTestActivity.class.getName(),
-                result, false);
+        ActivityMonitor monitor = new ActivityMonitor(
+                InstrumentationTestActivity.class.getName(), result, false);
         mInstrumentation.addMonitor(monitor);
         Intent intent = new Intent(mContext, InstrumentationTestActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -191,11 +179,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mInstrumentation.removeMonitor(am);
     }
 
-    /**
-     * check points:
-     * 1 perform calling of an activity's {@link Activity#onCreate} method
-     * 2 synchronously wait for the application to be idle
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -208,9 +191,9 @@ public class InstrumentationTest extends InstrumentationTestCase {
             args = {}
         )
     })
-    public void testCallActivityOnCreate() throws Exception {
+    public void testCallActivityOnCreate() throws Throwable {
         mActivity.setOnCreateCalled(false);
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mInstrumentation.callActivityOnCreate(mActivity, new Bundle());
             }
@@ -219,13 +202,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnCreateCalled());
     }
 
-    /**
-     * check points:
-     * 1 start allocation counting
-     * 2 the current results from the allocation counting
-     * 3 the counts for various binder counts for this process
-     * 4 stop allocation counting
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -282,9 +258,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(threadAllocCount, Debug.getThreadAllocCount());
     }
 
-    /**
-     * Test dispatching a trackball event
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "sendTrackballEventSync",
@@ -300,9 +273,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(mMotionEvent.getDownTime(), motionEvent.getDownTime());
     }
 
-    /**
-     * Test performing calling of the application's {@link Application#onCreate} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callApplicationOnCreate",
@@ -314,11 +284,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(ca.mIsOnCreateCalled);
     }
 
-    /**
-     * check points:
-     * 1 Return the Context of this instrumentation's package
-     * 2 Return a Context for the target application being instrumented
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -337,9 +302,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertNotSame(c1.getPackageName(), c2.getPackageName());
     }
 
-    /**
-     * Test executing a particular menu item
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "invokeMenuActionSync",
@@ -353,17 +315,14 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(resId, mActivity.getMenuID());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onPostCreate} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnPostCreate",
         args = {Activity.class, Bundle.class}
     )
-    public void testCallActivityOnPostCreate() throws Exception {
+    public void testCallActivityOnPostCreate() throws Throwable {
         mActivity.setOnPostCreate(false);
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mInstrumentation.callActivityOnPostCreate(mActivity, new Bundle());
             }
@@ -372,17 +331,14 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnPostCreate());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onPostCreate} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnNewIntent",
         args = {Activity.class, Intent.class}
     )
-    public void testCallActivityOnNewIntent() throws Exception {
+    public void testCallActivityOnNewIntent() throws Throwable {
         mActivity.setOnNewIntentCalled(false);
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mInstrumentation.callActivityOnNewIntent(mActivity, null);
             }
@@ -392,17 +348,14 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnNewIntentCalled());
     }
 
-    /**
-     * Test perform calling of an activity's {@link Activity#onResume} method.
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnResume",
         args = {Activity.class}
     )
-    public void testCallActivityOnResume() throws Exception {
+    public void testCallActivityOnResume() throws Throwable {
         mActivity.setOnResume(false);
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mInstrumentation.callActivityOnResume(mActivity);
             }
@@ -411,11 +364,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnResume());
     }
 
-    /**
-     * test methods that hard to test, the reasons like:
-     * 1 some methods will crash the system
-     * 2 can't start another instrumentation to test some methods
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.NOT_FEASIBLE,
@@ -458,14 +406,9 @@ public class InstrumentationTest extends InstrumentationTestCase {
             args = {int.class, Bundle.class}
         )
     })
-    public void testMisc() throws Exception {  }
+    public void testMisc() throws Exception {
+    }
 
-    /**
-     * check points:
-     * 1 set automatic performance snapshot
-     * 2 start performance snapshot
-     * 3 stop performance snapshot
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -489,12 +432,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mInstrumentation.endPerformanceSnapshot();
     }
 
-    /**
-     * check points:
-     * 1 Check whether this instrumentation was started with profiling enabled
-     * 2 start profiling if isProfiling() returns true
-     * 3 Stops profiling if isProfiling() returns true
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.NOT_FEASIBLE,
@@ -521,10 +458,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mInstrumentation.stopProfiling();
     }
 
-    /**
-     * Test showing the context menu for the currently focused view and executing
-     *  a particular context menu item.
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "invokeContextMenuAction",
@@ -541,9 +474,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(flag, activity.mWindow.mFlags);
     }
 
-    /**
-     * Test sending the key events corresponding to the text to the app being instrumented
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "sendStringSync",
@@ -568,9 +498,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         }
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onPause} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnSaveInstanceState",
@@ -586,9 +513,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertSame(bundle, mActivity.getBundle());
     }
 
-    /**
-     * test sendPointerSync whether or not works with the global system in or out of touch mode
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.PARTIAL,
@@ -616,7 +540,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getComponentName function of Instrumentation",
         method = "getComponentName",
         args = {}
     )
@@ -627,9 +550,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertNotNull(com.getShortClassName());
     }
 
-    /**
-     * test performing instantiation of the process's {@link Application} object
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -653,9 +573,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(className, app.getClass().getName());
     }
 
-    /**
-     * Test executing a call on the application's main thread, blocking until it is complete
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "runOnMainSync",
@@ -672,9 +589,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mRunOnMainSyncResult);
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onPause} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnPause",
@@ -687,32 +601,24 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnPauseCalled());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onDestroy} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnDestroy",
         args = {Activity.class}
     )
     public void testCallActivityOnDestroy() throws Exception {
-
         mActivity.setOnDestroyCalled(false);
         mInstrumentation.callActivityOnDestroy(mActivity);
         mInstrumentation.waitForIdleSync();
         assertTrue(mActivity.isOnDestroyCalled());
     }
 
-    /**
-     * Test sending an up and down key event sync to the currently focused window
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "sendKeyDownUpSync",
         args = {int.class}
     )
     public void testSendKeyDownUpSync() throws Exception {
-
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_0);
         mInstrumentation.waitForIdleSync();
         assertEquals(1, mActivity.getKeyUpList().size());
@@ -721,9 +627,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(KeyEvent.KEYCODE_0, mActivity.getKeyDownList().get(0).getKeyCode());
     }
 
-    /**
-     * test performing instantiation of an {@link Activity} object
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -764,9 +667,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         activity.finish();
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onStart} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnStart",
@@ -779,9 +679,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnStart());
     }
 
-    /**
-     * Test scheduling a callback for when the application's main thread goes idle
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "waitForIdle",
@@ -796,16 +693,11 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mr.isRunCalled());
     }
 
-    /**
-     * Test sending both the down and up key events for a particular character key code
-     */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendCharacterSync",
-            args = {int.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "sendCharacterSync",
+        args = {int.class}
+    )
     public void testSendCharacterSync() throws Exception {
         mInstrumentation.sendCharacterSync(KeyEvent.KEYCODE_0);
         mInstrumentation.waitForIdleSync();
@@ -813,9 +705,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(KeyEvent.KEYCODE_0, mActivity.getKeyUpCode());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onRestart} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnRestart",
@@ -828,9 +717,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnRestart());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onStop} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnStop",
@@ -843,9 +729,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnStop());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onUserLeaveHint} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnUserLeaving",
@@ -858,9 +741,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnLeave());
     }
 
-    /**
-     * Test performing calling of an activity's {@link Activity#onRestoreInstanceState} method
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "callActivityOnRestoreInstanceState",
@@ -873,9 +753,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertTrue(mActivity.isOnRestoreInstanceState());
     }
 
-    /**
-     * Test sending a key event to the currently focused window/view and wait for it to be processed
-     */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "sendKeySync",
@@ -888,7 +765,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(KeyEvent.KEYCODE_0, mActivity.getKeyDownCode());
     }
 
-    class MockRunnable implements Runnable {
+    private static class MockRunnable implements Runnable {
         private boolean mIsRunCalled ;
 
         public void run() {
@@ -900,7 +777,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         }
     }
 
-    class MockActivity extends Activity {
+    private class MockActivity extends Activity {
         MockWindow mWindow = new MockWindow(mContext);
 
         @Override
@@ -908,7 +785,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
             return mWindow;
         }
 
-        class MockWindow extends Window {
+        private class MockWindow extends Window {
 
             public int mId;
             public int mFlags;
@@ -1084,7 +961,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         }
     }
 
-    class InstrumentationTestStub extends Application {
+    private static class InstrumentationTestStub extends Application {
         boolean mIsOnCreateCalled = false;
 
         @Override
