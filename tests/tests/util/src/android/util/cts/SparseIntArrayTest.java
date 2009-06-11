@@ -18,11 +18,13 @@ package android.util.cts;
 
 import android.test.AndroidTestCase;
 import android.util.SparseIntArray;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTargetNew;
+
+import java.util.Arrays;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(SparseIntArray.class)
 public class SparseIntArrayTest extends AndroidTestCase {
@@ -123,7 +125,8 @@ public class SparseIntArrayTest extends AndroidTestCase {
             assertEquals(VALUES[i], sparseIntArray.get(KEYS[i]));
         }
         for (int i = 0; i < length; i++) {
-            assertEquals(sparseIntArray.indexOfValue(VALUES[i]), sparseIntArray.indexOfKey(KEYS[i]));
+            assertEquals(sparseIntArray.indexOfValue(VALUES[i]),
+                    sparseIntArray.indexOfKey(KEYS[i]));
         }
 
         // for key already exist, old value will be replaced
@@ -279,5 +282,55 @@ public class SparseIntArrayTest extends AndroidTestCase {
         sparseIntArray.clear();
         assertEquals(0, sparseIntArray.size());
     }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "Test SparseIntArray with specified capacity.",
+            method = "removeAt",
+            args = {int.class}
+        )
+    })
+    public void testSparseIntArrayRemoveAt() {
+        final int[] testData = {
+            13, 42, 85932, 885932, -6, Integer.MAX_VALUE, 0, Integer.MIN_VALUE };
+
+        // test removal of one key/value pair, varying the index
+        for (int i = 0; i < testData.length; i++) {
+            SparseIntArray sia = new SparseIntArray();
+            for (int value : testData) {
+                sia.put(value, value);
+            }
+            int size = testData.length;
+            assertEquals(size, sia.size());
+            int key = sia.keyAt(i);
+            assertEquals(key, sia.get(key));
+            sia.removeAt(i);
+            assertEquals(21, sia.get(key, 21));
+            assertEquals(size-1, sia.size());
+        }
+
+        // remove the 0th pair repeatedly until the array is empty
+        SparseIntArray sia = new SparseIntArray();
+        for (int value : testData) {
+            sia.put(value, value);
+        }
+        for (int i = 0; i < testData.length; i++) {
+            sia.removeAt(0);
+        }
+        assertEquals(0, sia.size());
+        // make sure all pairs have been removed
+        for (int value : testData) {
+            assertEquals(21, sia.get(value, 21));
+        }
+
+        // test removal of a pair from an empty array
+        try {
+            new SparseIntArray().removeAt(0);
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            // expected
+        }
+    }
+
 }
 
