@@ -16,11 +16,11 @@
 
 package android.net.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -45,7 +45,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getNetworkInfo(int networkType).",
         method = "getNetworkInfo",
         args = {int.class}
     )
@@ -77,13 +76,11 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isNetworkTypeValid(int networkType).",
             method = "isNetworkTypeValid",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isNetworkTypeValid(int networkType).",
             method = "getAllNetworkInfo",
             args = {}
         )
@@ -105,33 +102,58 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.SUFFICIENT,
             method = "setNetworkPreference",
             args = {int.class}
         )
     })
-    @BrokenTest("Cannot write secure settings table")
     public void testAccessNetworkPreference() {
+        int initialSetting = mCm.getNetworkPreference();
 
-        final int expected = 1;
-        int per = mCm.getNetworkPreference();
-        mCm.setNetworkPreference(expected);
-        assertEquals(expected, mCm.getNetworkPreference());
+        // Changing the network preference requires android.permission.WRITE_SECURE_SETTINGS,
+        // which is only available to signed or system applications.
 
-        mCm.setNetworkPreference(0);
-        assertEquals(0, mCm.getNetworkPreference());
+        // Setting the same preference that is already set is a no-op and does not throw
+        // a SecurityException.
+        mCm.setNetworkPreference(initialSetting);
+        assertEquals(initialSetting, mCm.getNetworkPreference());
 
+        // find a valid setting that is different from the initial setting
+        int validSetting = -1;
+        NetworkInfo[] ni = mCm.getAllNetworkInfo();
+        for (NetworkInfo n : ni) {
+            int type = n.getType();
+            if (type != initialSetting) {
+                validSetting = type;
+                break;
+            }
+        }
+        if (validSetting >= 0) {
+            try {
+                mCm.setNetworkPreference(validSetting);
+                fail("Trying to change the network preference should throw SecurityException");
+            } catch (SecurityException expected) {
+                // expected
+            }
+        }
+
+        // find an invalid setting
+        int invalidSetting = -1;
+        for (int i = 0; i < 10; i++) {
+            if (!ConnectivityManager.isNetworkTypeValid(i)) {
+                invalidSetting = i;
+                break;
+            }
+        }
+        if (invalidSetting >= 0) {
+            // illegal setting should be ignored
+            mCm.setNetworkPreference(invalidSetting);
+            assertEquals(initialSetting, mCm.getNetworkPreference());
+        }
+
+        // illegal setting should be ignored
         mCm.setNetworkPreference(-1);
-        assertEquals(0, mCm.getNetworkPreference());
-
-        mCm.setNetworkPreference(2);
-        assertEquals(0, mCm.getNetworkPreference());
-
-        mCm.setNetworkPreference(1);
-
-        assertEquals(1, mCm.getNetworkPreference());
-
-        mCm.setNetworkPreference(per);
+        assertEquals(initialSetting, mCm.getNetworkPreference());
     }
 
     @TestTargetNew(
@@ -177,7 +199,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test requestRouteToHost(int networkType, int hostAddress).",
         method = "requestRouteToHost",
         args = {int.class, int.class}
     )
@@ -193,18 +214,24 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getActiveNetworkInfo().",
         method = "getActiveNetworkInfo",
         args = {}
     )
+    @ToBeFixed(bug="1695243", explanation="No Javadoc")
     public void testGetActiveNetworkInfo() {
-
         NetworkInfo ni = mCm.getActiveNetworkInfo();
+
         if (ni != null) {
             assertTrue(ni.getType() >= 0);
-        } else {
-            fail("There is no active network connected, should be at least one kind of network");
         }
     }
 
+    @TestTargetNew(
+        level = TestLevel.SUFFICIENT,
+        method = "getBackgroundDataSetting",
+        args = {}
+    )
+    public void testTest() {
+        mCm.getBackgroundDataSetting();
+    }
 }
