@@ -43,19 +43,16 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {android.content.Context.class, android.util.AttributeSet.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructors",
             method = "ViewGroup.LayoutParams",
             args = {android.view.ViewGroup.LayoutParams.class}
         )
@@ -82,26 +79,16 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
     public void testSetBaseAttributes() throws XmlPullParserException, IOException {
         MockLayoutParams mockLayoutParams = new MockLayoutParams(240, 320);
 
-        XmlResourceParser parser = mContext.getResources().getLayout(
-                R.layout.viewgroup_margin_layout);
-
-        XmlUtils.beginDocument(parser, "LinearLayout");
-        TypedArray array = mContext.obtainStyledAttributes(parser,
-                com.android.internal.R.styleable.ViewGroup_Layout);
-        mockLayoutParams.setBaseAttributes(array,
-                com.android.internal.R.styleable.ViewGroup_Layout_layout_width,
-                com.android.internal.R.styleable.ViewGroup_Layout_layout_height);
+        int[] attrs = R.styleable.style1;
+        TypedArray array = mContext.getTheme().obtainStyledAttributes(R.style.Whatever, attrs);
+        mockLayoutParams.setBaseAttributes(array, R.styleable.style1_type6,
+                R.styleable.style1_type7);
+        int defValue = -1;
+        assertEquals(array.getDimensionPixelSize(R.styleable.style1_type6, defValue),
+                mockLayoutParams.width);
+        assertEquals(array.getDimensionPixelSize(R.styleable.style1_type7, defValue),
+                mockLayoutParams.height);
         array.recycle();
-        assertEquals(200, mockLayoutParams.width);
-        assertEquals(300, mockLayoutParams.height);
-
-        try {
-            mockLayoutParams.setBaseAttributes(null,
-                com.android.internal.R.styleable.ViewGroup_Layout_layout_width,
-                com.android.internal.R.styleable.ViewGroup_Layout_layout_height);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     private class MockLayoutParams extends LayoutParams {
