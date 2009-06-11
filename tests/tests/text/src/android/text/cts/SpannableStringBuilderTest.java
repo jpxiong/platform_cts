@@ -49,13 +49,11 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
             method = "SpannableStringBuilder",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
             method = "SpannableStringBuilder",
             args = {java.lang.CharSequence.class}
         )
@@ -74,9 +72,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link SpannableStringBuilder}.",
         method = "SpannableStringBuilder",
-        args = {java.lang.CharSequence.class, int.class, int.class}
+        args = {CharSequence.class, int.class, int.class}
     )
     @ToBeFixed(bug = "1417734",
             explanation = "an unexpected StringIndexOutOfBoundsException thrown here")
@@ -105,9 +102,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#getSpanFlags(Object)}.",
         method = "getSpanFlags",
-        args = {java.lang.Object.class}
+        args = {Object.class}
     )
     public void testGetSpanFlags() {
         SpannableStringBuilder builder = new SpannableStringBuilder("spannable string");
@@ -124,9 +120,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#nextSpanTransition(int, int, Class)}.",
         method = "nextSpanTransition",
-        args = {int.class, int.class, java.lang.Class.class}
+        args = {int.class, int.class, Class.class}
     )
     public void testNextSpanTransition() {
         SpannableStringBuilder builder = new SpannableStringBuilder("spannable string");
@@ -145,9 +140,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#setSpan(Object, int, int, int)}.",
         method = "setSpan",
-        args = {java.lang.Object.class, int.class, int.class, int.class}
+        args = {Object.class, int.class, int.class, int.class}
     )
     @ToBeFixed(bug = "1417734",
             explanation = "an unexpected IndexOutOfBoundsException thrown here")
@@ -178,9 +172,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#valueOf(CharSequence)}.",
         method = "valueOf",
-        args = {java.lang.CharSequence.class}
+        args = {CharSequence.class}
     )
     @ToBeFixed(bug = "1371108", explanation = "an unexpected NullPointerException thrown here")
     public void testValueOf() {
@@ -204,9 +197,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#replace(int, int, CharSequence)}.",
         method = "replace",
-        args = {int.class, int.class, java.lang.CharSequence.class}
+        args = {int.class, int.class, CharSequence.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add throws into javadoc")
     public void testReplace1() {
@@ -240,9 +232,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#replace(int, int, CharSequence, int, int)}.",
         method = "replace",
-        args = {int.class, int.class, java.lang.CharSequence.class, int.class, int.class}
+        args = {int.class, int.class, CharSequence.class, int.class, int.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add throws into javadoc")
     public void testReplace2() {
@@ -293,7 +284,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#subSequence(int, int)}.",
         method = "subSequence",
         args = {int.class, int.class}
     )
@@ -314,7 +304,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#getChars(int, int, char[], int)}.",
         method = "getChars",
         args = {int.class, int.class, char[].class, int.class}
     )
@@ -351,9 +340,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#append(CharSequence)}.",
         method = "append",
-        args = {java.lang.CharSequence.class}
+        args = {CharSequence.class}
     )
     @ToBeFixed(bug = "1371108", explanation = "an unexpected NullPointerException thrown here")
     public void testAppend1() {
@@ -369,9 +357,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#append(CharSequence, int, int)}.",
         method = "append",
-        args = {java.lang.CharSequence.class, int.class, int.class}
+        args = {CharSequence.class, int.class, int.class}
     )
     @ToBeFixed(bug = "1371108", explanation = "an unexpected NullPointerException thrown here")
     public void testAppend2() {
@@ -404,7 +391,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#append(char)}.",
         method = "append",
         args = {char.class}
     )
@@ -425,7 +411,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#clearSpans()}.",
         method = "clearSpans",
         args = {}
     )
@@ -445,9 +430,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#getSpanStart(Object)}.",
         method = "getSpanStart",
-        args = {java.lang.Object.class}
+        args = {Object.class}
     )
     public void testGetSpanStart() {
         SpannableStringBuilder builder = new SpannableStringBuilder("hello");
@@ -460,18 +444,15 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Filters.",
             method = "getFilters",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set and get Filters.",
             method = "setFilters",
-            args = {android.text.InputFilter[].class}
+            args = {InputFilter[].class}
         )
     })
-    @ToBeFixed(bug = "", explanation = "should add throws into javadoc")
     public void testAccessFilters() {
         InputFilter[] filters = new InputFilter[100];
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -487,9 +468,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#removeSpan(Object)}.",
         method = "removeSpan",
-        args = {java.lang.Object.class}
+        args = {Object.class}
     )
     public void testRemoveSpan() {
         SpannableStringBuilder builder = new SpannableStringBuilder("hello, world");
@@ -515,7 +495,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#toString()}.",
         method = "toString",
         args = {}
     )
@@ -529,9 +508,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = " Test {@link SpannableStringBuilder#getSpanEnd(Object)}.",
         method = "getSpanEnd",
-        args = {java.lang.Object.class}
+        args = {Object.class}
     )
     public void testGetSpanEnd() {
         SpannableStringBuilder builder = new SpannableStringBuilder("hello");
@@ -543,7 +521,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#charAt(int)}.",
         method = "charAt",
         args = {int.class}
     )
@@ -567,9 +544,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#insert(int, CharSequence, int, int)}.",
         method = "insert",
-        args = {int.class, java.lang.CharSequence.class, int.class, int.class}
+        args = {int.class, CharSequence.class, int.class, int.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add throws into javadoc")
     public void testInsert1() {
@@ -614,9 +590,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#insert(int, CharSequence)}.",
         method = "insert",
-        args = {int.class, java.lang.CharSequence.class}
+        args = {int.class, CharSequence.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add throws into javadoc")
     public void testInsert2() {
@@ -649,7 +624,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#clear()}.",
         method = "clear",
         args = {}
     )
@@ -662,9 +636,8 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#getSpans(int, int, Class<T>)}.",
         method = "getSpans",
-        args = {int.class, int.class, java.lang.Class.class}
+        args = {int.class, int.class, Class.class}
     )
     public void testGetSpans() {
         SpannableStringBuilder builder = new SpannableStringBuilder("hello, world");
@@ -687,7 +660,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#length()}.",
         method = "length",
         args = {}
     )
@@ -700,7 +672,6 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannableStringBuilder#delete(int, int)}.",
         method = "delete",
         args = {int.class, int.class}
     )
