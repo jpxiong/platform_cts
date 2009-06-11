@@ -27,6 +27,7 @@ import android.util.StringBuilderPrinter;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Looper.class)
 public class LooperTest extends AndroidTestCase {
@@ -41,7 +42,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: dump",
         method = "dump",
         args = {Printer.class, String.class}
     )
@@ -53,7 +53,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: getMainLooper",
         method = "getMainLooper",
         args = {}
     )
@@ -64,7 +63,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: loop",
         method = "loop",
         args = {}
     )
@@ -82,7 +80,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: myLooper",
         method = "myLooper",
         args = {}
     )
@@ -100,7 +97,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: myQueue",
         method = "myQueue",
         args = {}
     )
@@ -124,7 +120,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: prepare",
         method = "prepare",
         args = {}
     )
@@ -154,7 +149,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: prepareMainLooper",
         method = "prepareMainLooper",
         args = {}
     )
@@ -182,12 +176,18 @@ public class LooperTest extends AndroidTestCase {
         t.runTest(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: quit",
-        method = "quit",
-        args = {}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "quit",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getThread",
+            args = {}
+        )
+    })
     public void testQuit() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -199,10 +199,12 @@ public class LooperTest extends AndroidTestCase {
                 mHasQuit = true;
             }
         });
+
         // Here doesn't call runTest() because we don't want to wait the runTest finish.
         // Just need to handle Looper#quit();
         t.start();
         Thread.sleep(WAIT_TIME);
+        assertSame(t, mLooper.getThread());
         int time = 100;
         // Send message before Looper has quit.
         assertTrue(mLoopHandler.sendEmptyMessageAtTime(0, SystemClock.uptimeMillis() + time));
@@ -214,12 +216,11 @@ public class LooperTest extends AndroidTestCase {
         assertFalse(mLoopHandler.sendEmptyMessageAtTime(1, SystemClock.uptimeMillis() + time));
         assertTrue(mHasQuit);
 
-        t.checkException();
+        t.joinAndCheck(WAIT_TIME);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: setMessageLogging",
         method = "setMessageLogging",
         args = {Printer.class}
     )
@@ -250,7 +251,6 @@ public class LooperTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: toString",
         method = "toString",
         args = {}
     )

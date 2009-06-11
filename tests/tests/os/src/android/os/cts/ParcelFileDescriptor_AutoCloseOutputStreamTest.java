@@ -41,26 +41,18 @@ public class ParcelFileDescriptor_AutoCloseOutputStreamTest extends AndroidTestC
             args = {}
         )
     })
-    public void testAutoCloseOutputStream(){
+    public void testAutoCloseOutputStream() throws Exception {
         ParcelFileDescriptor pf = ParcelFileDescriptorTest.makeParcelFileDescriptor(getContext());
 
         AutoCloseOutputStream out = new AutoCloseOutputStream(pf);
 
-        try {
-            out.write(2);
-        } catch (IOException e) {
-            fail("shouldn't come here");
-        }
+        out.write(2);
 
-        try {
-            out.close();
-        } catch (IOException e) {
-            fail("shouldn't come here");
-        }
+        out.close();
 
         try {
             out.write(2);
-            fail("shouldn't come here");
+            fail("Failed to throw exception.");
         } catch (IOException e) {
             // expected
         }

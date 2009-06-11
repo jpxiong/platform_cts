@@ -94,6 +94,9 @@ public class ProcessTest extends AndroidTestCase {
         if (mIntent != null) {
             getContext().stopService(mIntent);
         }
+        if (mSecondaryConnection != null) {
+            getContext().unbindService(mSecondaryConnection);
+        }
     }
 
     @TestTargets({
@@ -255,18 +258,15 @@ public class ProcessTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test send a signal to a process",
             method = "sendSignal",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test myPid() in StubRemoteService",
             method = "myPid",
             args = {}
         )
     })
-
     /**
      * Test myPid() point.
      * Returns the identifier of this process, which can be used with

@@ -64,6 +64,10 @@ public class RemoteCallbackListTest extends AndroidTestCase {
                 }
             }
         };
+        mIntent = new Intent(SERVICE_ACTION);
+        assertTrue(mContext.bindService(new Intent(ISecondary.class.getName()),
+                mSecondaryConnection, Context.BIND_AUTO_CREATE));
+
     }
 
     private static class Sync {
@@ -74,6 +78,9 @@ public class RemoteCallbackListTest extends AndroidTestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+        if (mSecondaryConnection != null) {
+            mContext.unbindService(mSecondaryConnection);
+        }
         if (mIntent != null) {
             mContext.stopService(mIntent);
         }
@@ -117,10 +124,6 @@ public class RemoteCallbackListTest extends AndroidTestCase {
     public void testRemoteCallbackList() throws Exception {
         // Test constructor(default one).
         MockRemoteCallbackList<IInterface> rc = new MockRemoteCallbackList<IInterface>();
-        mIntent = new Intent(SERVICE_ACTION);
-        mContext.startService(mIntent);
-        mContext.bindService(new Intent(ISecondary.class.getName()), mSecondaryConnection,
-                Context.BIND_AUTO_CREATE);
         synchronized (mSync) {
             if (!mSync.mIsConnected) {
                 mSync.wait();
@@ -176,10 +179,6 @@ public class RemoteCallbackListTest extends AndroidTestCase {
     )
     public void testKill() {
         MockRemoteCallbackList<IInterface> rc = new MockRemoteCallbackList<IInterface>();
-        mIntent = new Intent(SERVICE_ACTION);
-        mContext.startService(mIntent);
-        mContext.bindService(new Intent(ISecondary.class.getName()), mSecondaryConnection,
-                Context.BIND_AUTO_CREATE);
         synchronized (mSync) {
             if (!mSync.mIsConnected) {
                 try {

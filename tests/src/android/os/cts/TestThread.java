@@ -29,7 +29,7 @@ public final class TestThread extends Thread {
     }
 
     @Override
-    public void run() {
+    public final void run() {
         try {
             mTarget.run();
         } catch (Throwable t) {
@@ -40,23 +40,13 @@ public final class TestThread extends Thread {
     /**
      * Run the target Runnable object and wait until the test finish or throw
      * out Exception if test fail.
-     * 
+     *
      * @param runTime
      * @throws Throwable
      */
     public void runTest(long runTime) throws Throwable {
         start();
-        this.join(runTime);
-
-        if (this.isAlive()) {
-            this.interrupt();
-            this.join(runTime);
-            throw new Exception("Thread did not finish within allotted time.");
-        }
-
-        if(mThrowable != null) {
-            throw mThrowable;
-        }
+        joinAndCheck(runTime);
     }
 
     /**
@@ -68,8 +58,32 @@ public final class TestThread extends Thread {
     }
 
     /**
+     * Set the Throwable object which is thrown when test running
+     * @param t The Throwable object
+     */
+    public void setThrowable(Throwable t) {
+        mThrowable = t;
+    }
+
+    /**
+     * Wait for the test thread to complete and throw the stored exception if there is one.
+     *
+     * @param runTime The time to wait for the test thread to complete.
+     * @throws Throwable
+     */
+    public void joinAndCheck(long runTime) throws Throwable {
+        this.join(runTime);
+        if (this.isAlive()) {
+            this.interrupt();
+            this.join(runTime);
+            throw new Exception("Thread did not finish within allotted time.");
+        }
+        checkException();
+    }
+
+    /**
      * Check whether there is an exception when running Runnable object.
-     * @throws The Throwable object
+     * @throws Throwable
      */
     public void checkException() throws Throwable {
         if (mThrowable != null) {

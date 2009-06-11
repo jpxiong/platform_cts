@@ -17,10 +17,9 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.DeadObjectException;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(DeadObjectException.class)
 public class DeadObjectExceptionTest extends TestCase {

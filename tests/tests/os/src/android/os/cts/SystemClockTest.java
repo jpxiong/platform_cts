@@ -18,23 +18,12 @@ package android.os.cts;
 
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(SystemClock.class)
 public class SystemClockTest extends AndroidTestCase {
-
-    /**
-     * sleep 100 milliseconds
-     */
-    private void sleep(long sleepTime) {
-        try {
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException e) {
-        }
-    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
@@ -42,10 +31,10 @@ public class SystemClockTest extends AndroidTestCase {
         method = "currentThreadTimeMillis",
         args = {}
     )
-    public void testCurrentThreadTimeMillis() {
+    public void testCurrentThreadTimeMillis() throws InterruptedException {
 
         long start = SystemClock.currentThreadTimeMillis();
-        sleep(100);
+        Thread.sleep(100);
         long end = SystemClock.currentThreadTimeMillis();
         assertFalse(end - 100 >= start);
 
@@ -53,14 +42,13 @@ public class SystemClockTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test elapsedRealtime()",
         method = "elapsedRealtime",
         args = {}
     )
-    public void testElapsedRealtime() {
+    public void testElapsedRealtime() throws InterruptedException {
 
         long start = SystemClock.elapsedRealtime();
-        sleep(100);
+        Thread.sleep(100);
         long end = SystemClock.elapsedRealtime();
         assertTrue(end - 100 >= start);
 
@@ -68,7 +56,6 @@ public class SystemClockTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setCurrentTimeMillis(long).",
         method = "setCurrentTimeMillis",
         args = {long.class}
     )
@@ -108,17 +95,15 @@ public class SystemClockTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test uptimeMillis()",
         method = "uptimeMillis",
         args = {}
     )
-    public void testUptimeMillis() {
+    public void testUptimeMillis() throws InterruptedException {
 
         long start = SystemClock.uptimeMillis();
-        sleep(100);
+        Thread.sleep(100);
         long end = SystemClock.uptimeMillis();
         assertTrue(end - 100 >= start);
-
     }
 
 }

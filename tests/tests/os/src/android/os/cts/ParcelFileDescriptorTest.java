@@ -16,43 +16,45 @@
 
 package android.os.cts;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.content.Context;
 import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.os.ParcelFileDescriptor.AutoCloseInputStream;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 @TestTargetClass(ParcelFileDescriptor.class)
 public class ParcelFileDescriptorTest extends AndroidTestCase {
+    private static final long DURATION = 100l;
+
+    private TestThread mTestThread;
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ParcelFileDescriptor}",
             method = "ParcelFileDescriptor",
             args = {android.os.ParcelFileDescriptor.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: open",
             method = "open",
             args = {java.io.File.class, int.class}
         )
     })
-    public void testConstructorAndOpen() {
+    public void testConstructorAndOpen() throws Exception {
         ParcelFileDescriptor tempFile = makeParcelFileDescriptor(getContext());
 
         ParcelFileDescriptor pfd = new ParcelFileDescriptor(tempFile);
@@ -63,65 +65,52 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
             assertEquals(1, in.read());
             assertEquals(2, in.read());
             assertEquals(3, in.read());
-        } catch (IOException e) {
-            fail(e.getMessage());
         } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
+            in.close();
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: fromSocket",
         method = "fromSocket",
         args = {java.net.Socket.class}
     )
-    public void testFromSocket() {
+    public void testFromSocket() throws Throwable {
         final int PORT = 12222;
         final int DATA = 1;
 
-        new Thread(){
+        mTestThread = new TestThread(new Runnable() {
             public void run() {
-                ServerSocket ss;
-
                 try {
+                    ServerSocket ss;
                     ss = new ServerSocket(PORT);
                     Socket sSocket = ss.accept();
                     OutputStream out = sSocket.getOutputStream();
                     out.write(DATA);
-                    ParcelFileDescriptorTest.this.sleep(100);
+                    Thread.sleep(DURATION);
                     out.close();
-                } catch (IOException e) {
-                    fail(e.getMessage());
+                } catch (Exception e) {
+                    mTestThread.setThrowable(e);
                 }
             }
-        }.start();
+        });
+        mTestThread.start();
 
-        sleep(100);
+        Thread.sleep(DURATION);
         Socket socket;
+        socket = new Socket(InetAddress.getLocalHost(), PORT);
+        ParcelFileDescriptor pfd = ParcelFileDescriptor.fromSocket(socket);
+        AutoCloseInputStream in = new AutoCloseInputStream(pfd);
+        assertEquals(DATA, in.read());
+        in.close();
+        socket.close();
+        pfd.close();
 
-        try {
-            socket = new Socket(InetAddress.getLocalHost(), PORT);
-            ParcelFileDescriptor pfd = ParcelFileDescriptor.fromSocket(socket);
-            AutoCloseInputStream in = new AutoCloseInputStream(pfd);
-            assertEquals(DATA, in.read());
-            in.close();
-            socket.close();
-            pfd.close();
-        } catch (UnknownHostException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        mTestThread.joinAndCheck(DURATION * 2);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: toString",
         method = "toString",
         args = {}
     )
@@ -132,11 +121,10 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: writeToParcel",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
-    public void testWriteToParcel() {
+    public void testWriteToParcel() throws Exception {
         ParcelFileDescriptor pf = makeParcelFileDescriptor(getContext());
 
         Parcel pl = Parcel.obtain();
@@ -150,31 +138,21 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
             assertEquals(1, in.read());
             assertEquals(2, in.read());
             assertEquals(3, in.read());
-        } catch (IOException e) {
-            fail(e.getMessage());
         } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
+            in.close();
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test method: close",
         method = "close",
         args = {}
     )
-    public void testClose() throws IOException {
+    public void testClose() throws Exception {
         ParcelFileDescriptor pf = makeParcelFileDescriptor(getContext());
-
         AutoCloseInputStream in1 = new AutoCloseInputStream(pf);
         try {
             assertEquals(0, in1.read());
-        } catch (Exception e) {
-            fail("shouldn't come here");
         } finally {
             in1.close();
         }
@@ -184,12 +162,24 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
         AutoCloseInputStream in2 = new AutoCloseInputStream(pf);
         try {
             assertEquals(0, in2.read());
-            fail("shouldn't come here");
+            fail("Failed to throw exception.");
         } catch (Exception e) {
             // expected
         } finally {
             in2.close();
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.SUFFICIENT,
+        method = "getStatSize",
+        args = {}
+    )
+    @ToBeFixed(bug="1695243", explanation="getStatSize() will return -1 if the fd is not a file,"
+            + " but here it will throw IllegalArgumentException, it's not the same with javadoc.")
+    public void testGetStatSize() throws Exception {
+        ParcelFileDescriptor pf = makeParcelFileDescriptor(getContext());
+        assertTrue(pf.getStatSize() >= 0);
     }
 
     @TestTargetNew(
@@ -217,47 +207,25 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
         assertTrue((Parcelable.CONTENTS_FILE_DESCRIPTOR & pfd.describeContents()) != 0);
     }
 
-    static ParcelFileDescriptor makeParcelFileDescriptor(Context con) {
+    static ParcelFileDescriptor makeParcelFileDescriptor(Context con) throws Exception {
         final String fileName = "testParcelFileDescriptor";
 
         FileOutputStream fout = null;
 
-        try {
-            fout = con.openFileOutput(fileName, Context.MODE_WORLD_WRITEABLE);
-        } catch (FileNotFoundException e1) {
-            fail(e1.getMessage());
-        }
+        fout = con.openFileOutput(fileName, Context.MODE_WORLD_WRITEABLE);
 
         try {
-            fout.write(new byte[]{0x0, 0x1, 0x2, 0x3});
-        } catch (IOException e2) {
-            fail(e2.getMessage());
+            fout.write(new byte[] { 0x0, 0x1, 0x2, 0x3 });
         } finally {
-            try {
-                fout.close();
-            } catch (IOException e) {
-                // ignore this
-            }
+            fout.close();
         }
 
         File dir = con.getFilesDir();
         File file = new File(dir, fileName);
         ParcelFileDescriptor pf = null;
 
-        try {
-            pf = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE);
-        } catch (FileNotFoundException e) {
-            fail(e.getMessage());
-        }
+        pf = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE);
 
         return pf;
-    }
-
-    private void sleep(int time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            fail("shouldn't interrupted in sleep");
-        }
     }
 }
