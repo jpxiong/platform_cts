@@ -18,11 +18,10 @@ package android.util.cts;
 
 import android.test.AndroidTestCase;
 import android.util.SparseBooleanArray;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(SparseBooleanArray.class)
 public class SparseBooleanArrayTest extends AndroidTestCase {
@@ -40,73 +39,61 @@ public class SparseBooleanArrayTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "SparseBooleanArray",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "append",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "clear",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "delete",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "get",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "get",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "indexOfKey",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "indexOfValue",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "keyAt",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "put",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "size",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with default capacity.",
             method = "valueAt",
             args = {int.class}
         )
@@ -170,73 +157,61 @@ public class SparseBooleanArrayTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "SparseBooleanArray",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "append",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "clear",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "delete",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "get",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "get",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "indexOfKey",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "indexOfValue",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "keyAt",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "put",
             args = {int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "size",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test SparseBooleanArray with specified capacity.",
             method = "valueAt",
             args = {int.class}
         )

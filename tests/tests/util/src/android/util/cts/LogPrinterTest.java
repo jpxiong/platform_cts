@@ -19,10 +19,9 @@ package android.util.cts;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.util.LogPrinter;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(LogPrinter.class)
 public class LogPrinterTest extends AndroidTestCase {
@@ -34,27 +33,21 @@ public class LogPrinterTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of LogPrinter.",
         method = "LogPrinter",
-        args = {int.class, java.lang.String.class}
+        args = {int.class, String.class}
     )
     public void testConstructor() {
         int[] priorities = { Log.ASSERT, Log.DEBUG, Log.ERROR, Log.INFO,
                 Log.VERBOSE, Log.WARN };
         for (int i = 0; i < priorities.length; i++) {
-            try {
-                LogPrinter logPrinter = new LogPrinter(priorities[i], mTag);
-            } catch (Exception e) {
-                fail("shouldn't throw exception");
-            }
+            new LogPrinter(priorities[i], mTag);
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test println(String x).",
         method = "println",
-        args = {java.lang.String.class}
+        args = {String.class}
     )
     public void testPrintln() {
         LogPrinter logPrinter = new LogPrinter(Log.DEBUG, mTag);
@@ -63,4 +56,3 @@ public class LogPrinterTest extends AndroidTestCase {
     }
 
 }
-

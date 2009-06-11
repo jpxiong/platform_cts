@@ -16,17 +16,15 @@
 
 package android.util.cts;
 
-import android.test.AndroidTestCase;
-import android.util.EventLogTags;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTargetNew;
+import android.test.AndroidTestCase;
+import android.util.EventLogTags;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 /**
  * Test class android.util.EventLogTags.
@@ -39,27 +37,23 @@ public class EventLogTagsTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test EvnetLogTags operations.",
             method = "EventLogTags",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test EvnetLogTags operations.",
             method = "EventLogTags",
-            args = {java.io.BufferedReader.class}
+            args = {BufferedReader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test EvnetLogTags operations.",
             method = "get",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test EvnetLogTags operations.",
             method = "get",
-            args = {java.lang.String.class}
+            args = {String.class}
         )
     })
     public void testEventLogTagsOp() throws Exception {
