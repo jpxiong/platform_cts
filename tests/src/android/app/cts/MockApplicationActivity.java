@@ -28,7 +28,6 @@ public class MockApplicationActivity extends Activity {
         TextView textView = new TextView(this);
         textView.setText("Test");
         setContentView(textView);
-
     }
 
 }

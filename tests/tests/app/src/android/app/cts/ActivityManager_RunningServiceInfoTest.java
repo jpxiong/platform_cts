@@ -19,8 +19,6 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -28,8 +26,8 @@ import dalvik.annotation.TestTargetNew;
 @TestTargetClass(ActivityManager.RunningServiceInfo.class)
 public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
     private ActivityManager.RunningServiceInfo mRunningServiceInfo;
-    ComponentName mService;
-    final String mPROCESS = "process";
+    private ComponentName mService;
+    private static final String PROCESS = "process";
 
     @Override
     protected void setUp() throws Exception {
@@ -39,7 +37,7 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
 
         mRunningServiceInfo.service = mService;
         mRunningServiceInfo.pid = 1;
-        mRunningServiceInfo.process = mPROCESS;
+        mRunningServiceInfo.process = PROCESS;
         mRunningServiceInfo.foreground = true;
         mRunningServiceInfo.activeSince = 1l;
         mRunningServiceInfo.started = true;
@@ -51,7 +49,6 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor of this class",
         method = "ActivityManager.RunningServiceInfo",
         args = {}
     )
@@ -61,7 +58,6 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test describeContents method",
         method = "describeContents",
         args = {}
     )
@@ -71,7 +67,6 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel method",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -84,7 +79,7 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
             ActivityManager.RunningServiceInfo.CREATOR.createFromParcel(parcel);
         assertEquals(mService, values.service);
         assertEquals(1, values.pid);
-        assertEquals(mPROCESS, values.process);
+        assertEquals(PROCESS, values.process);
         assertTrue(values.foreground);
         assertEquals(1l, values.activeSince);
         assertTrue(values.started);
@@ -96,7 +91,6 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test readFromParcel method",
         method = "readFromParcel",
         args = {android.os.Parcel.class}
     )
@@ -110,7 +104,7 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
         values.readFromParcel(parcel);
         assertEquals(mService, values.service);
         assertEquals(1, values.pid);
-        assertEquals(mPROCESS, values.process);
+        assertEquals(PROCESS, values.process);
         assertTrue(values.foreground);
         assertEquals(1l, values.activeSince);
         assertTrue(values.started);

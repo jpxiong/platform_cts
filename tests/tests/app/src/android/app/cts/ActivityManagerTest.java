@@ -205,13 +205,15 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         mInstrumentation.getTargetContext().startService(intent);
         Thread.sleep(WAIT_TIME);
 
-        runningServiceInfo = mActivityManager.getRunningServices(5);
-        HashSet<String> set = new HashSet<String>();
-        assertTrue(runningServiceInfo.size() >= 0 && runningServiceInfo.size() <= 5);
+        runningServiceInfo = mActivityManager.getRunningServices(Integer.MAX_VALUE);
+        boolean foundService = false;
         for (RunningServiceInfo rs : runningServiceInfo) {
-            set.add(rs.service.getClassName());
+            if (rs.service.getClassName().equals(SERVICE_NAME)) {
+                foundService = true;
+                break;
+            }
         }
-        assertTrue(set.contains(SERVICE_NAME));
+        assertTrue(foundService);
         mContext.stopService(intent);
         Thread.sleep(WAIT_TIME);
     }
@@ -295,7 +297,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         for (ProcessErrorStateInfo pei : errList) {
             android.os.Process.killProcess(pei.pid);
         }
-
     }
 
     @TestTargetNew(

@@ -41,19 +41,16 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test startSearch function",
             method = "startSearch",
             args = {String.class, boolean.class, ComponentName.class, Bundle.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isVisible",
             method = "isVisible",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test stopSearch",
             method = "stopSearch",
             args = {}
         )
@@ -61,7 +58,7 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
     @ToBeFixed(bug="1443833", explanation="when start search with parameter"
           + "[test3, true, mComponentName, new Bundle(), false] mSearchManager is"
           + " invisible. Is this a bug?")
-    public void testStartSearch() {
+    public void testStartSearch() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_START_SEARCH);
         waitForResult();
@@ -70,24 +67,21 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test startSearch",
             method = "startSearch",
             args = {String.class, boolean.class, ComponentName.class, Bundle.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test stopSearch function",
             method = "stopSearch",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isVisible",
             method = "isVisible",
             args = {}
         )
     })
-    public void testStopSearch() {
+    public void testStopSearch() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_STOP_SEARCH);
         waitForResult();
@@ -96,54 +90,45 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setOnDismissListener function",
             method = "setOnDismissListener",
             args = {android.app.SearchManager.OnDismissListener.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test onDismiss",
             method = "onDismiss",
             args = {DialogInterface.class}
         )
     })
     @ToBeFixed(bug = "1731631", explanation = "From the doc of SearchManager, "
-         + "we see that \"If the user simply canceled the search UI, "
-         + "your activity will regain input focus and proceed as before. "
-         + "See setOnDismissListener(SearchManager.OnDismissListener) and "
-         + "setOnCancelListener(SearchManager.OnCancelListener) "
-         + "if you required direct notification of search dialog dismissals.\" "
-         + "So that means if the SearchManager has set the OnDismissListener "
-         + "and user cancel the search UI, OnDismissListener#onDismiss() will be called. "
-         + "But we have tried to cancel the search UI with the back key "
-         + "but onDismiss() is not called. Is this a bug?")
-    public void testSetOnDismissListener() {
+            + "we see that \"If the user simply canceled the search UI, "
+            + "your activity will regain input focus and proceed as before. "
+            + "See setOnDismissListener(SearchManager.OnDismissListener) and "
+            + "setOnCancelListener(SearchManager.OnCancelListener) "
+            + "if you required direct notification of search dialog dismissals.\" "
+            + "So that means if the SearchManager has set the OnDismissListener "
+            + "and user cancel the search UI, OnDismissListener#onDismiss() will be called. "
+            + "But we have tried to cancel the search UI with the back key "
+            + "but onDismiss() is not called. Is this a bug?")
+    public void testSetOnDismissListener() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_ON_DISMISSLISTENER);
         // Here sleep is to make sure stub Activity is finished
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        }
-//        waitForResult();
+        Thread.sleep(5000);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setOnCancelListener function",
             method = "setOnCancelListener",
             args = {android.app.SearchManager.OnCancelListener.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test onCancel",
             method = "onCancel",
             args = {DialogInterface.class}
         )
     })
-    public void testSetOnCancelListener() {
+    public void testSetOnCancelListener() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_ON_CANCELLISTENER);
         waitForResult();

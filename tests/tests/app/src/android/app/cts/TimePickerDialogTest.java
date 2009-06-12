@@ -21,17 +21,16 @@ import java.util.Calendar;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.test.ActivityInstrumentationTestCase2;
+import android.text.format.DateFormat;
 import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link TimePickerDialog}.
@@ -48,12 +47,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     private int mCallbackHour;
     private int mCallbackMinute;
 
-    private OnTimeSetListener mOnTimeSetListener = new OnTimeSetListener(){
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            mCallbackHour = hourOfDay;
-            mCallbackMinute = minute;
-        }
-    };
+    private OnTimeSetListener mOnTimeSetListener;
 
     private Context mContext;
     private DialogStubActivity mActivity;
@@ -69,43 +63,40 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
         mContext = getInstrumentation().getContext();
         mActivity = getActivity();
-        mTimePickerDialog = new TimePickerDialog( mContext,
-                                                  mOnTimeSetListener,
-                                                  TARGET_HOUR,
-                                                  TARGET_MINUTE,
-                                                  true);
+        mOnTimeSetListener = new OnTimeSetListener(){
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                mCallbackHour = hourOfDay;
+                mCallbackMinute = minute;
+            }
+        };
+        mTimePickerDialog = new TimePickerDialog( mContext, mOnTimeSetListener, TARGET_HOUR,
+                TARGET_MINUTE, true);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "TimePickerDialog",
-            args = {android.content.Context.class, 
-                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, 
+            args = {android.content.Context.class,
+                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class,
                     boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "TimePickerDialog",
-            args = {android.content.Context.class, int.class, 
-                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class, 
-                    boolean.class}
+            args = {android.content.Context.class,
+                    int.class, android.app.TimePickerDialog.OnTimeSetListener.class,
+                    int.class, int.class, boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: TimePickerDialog and onSaveInstanceState",
             method = "onSaveInstanceState",
             args = {}
         )
     })
     public void testSaveInstanceState(){
-        TimePickerDialog tD = new TimePickerDialog( mContext,
-                                                    mOnTimeSetListener,
-                                                    TARGET_HOUR,
-                                                    TARGET_MINUTE,
-                                                    true);
+        TimePickerDialog tD = new TimePickerDialog( mContext, mOnTimeSetListener, TARGET_HOUR,
+                TARGET_MINUTE, true);
 
         Bundle b = tD.onSaveInstanceState();
 
@@ -114,13 +105,8 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertTrue(b.getBoolean(IS_24_HOUR));
 
         int minute = 13;
-        int theme = com.android.internal.R.style.Theme_Translucent;
-        tD = new TimePickerDialog( mContext,
-                                   theme,
-                                   mOnTimeSetListener,
-                                   TARGET_HOUR,
-                                   minute,
-                                   false);
+        tD = new TimePickerDialog( mContext, com.android.cts.stub.R.style.Theme_AlertDialog,
+                mOnTimeSetListener, TARGET_HOUR, minute, false);
 
         b = tD.onSaveInstanceState();
 
@@ -131,7 +117,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: onClick",
         method = "onClick",
         args = {android.content.DialogInterface.class, int.class}
     )
@@ -144,16 +129,15 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: onTimeChanged",
         method = "onTimeChanged",
         args = {android.widget.TimePicker.class, int.class, int.class}
     )
-    public void testOnTimeChanged() {
+    public void testOnTimeChanged() throws Throwable {
         final int minute = 34;
         popDialog(DialogStubActivity.TEST_TIMEPICKERDIALOG);
         final TimePickerDialog d = (TimePickerDialog) mActivity.getDialog();
 
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 d.onTimeChanged(null, TARGET_HOUR, minute);
             }
@@ -166,13 +150,13 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         java.text.DateFormat dateFormat = DateFormat.getTimeFormat(getActivity());
 
         String expected = dateFormat.format(mCalendar.getTime());
-        TextView tv = (TextView) d.getWindow().findViewById(com.android.internal.R.id.alertTitle);
+        TextView tv = (TextView) d.getWindow().findViewById(
+                com.android.internal.R.id.alertTitle);
         assertEquals(expected, tv.getText());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: updateTime",
         method = "updateTime",
         args = {int.class, int.class}
     )
@@ -189,7 +173,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test methods onRestoreInstanceState",
         method = "onRestoreInstanceState",
         args = {android.os.Bundle.class}
     )
@@ -210,7 +193,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertFalse(b2.getBoolean(IS_24_HOUR));
     }
 
-    protected void popDialog(int index) {
+    private void popDialog(int index) {
         assertTrue(index > 0);
 
         while (index != 0) {
