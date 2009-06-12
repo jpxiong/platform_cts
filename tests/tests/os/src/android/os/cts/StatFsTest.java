@@ -29,38 +29,32 @@ import dalvik.annotation.TestTargets;
 public class StatFsTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test constructor(s) of {@link StatFs}",
+            level = TestLevel.COMPLETE,
             method = "StatFs",
-            args = {}
+            args = {String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test method: restat",
+            level = TestLevel.COMPLETE,
             method = "restat",
-            args = {}
+            args = {String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test method: getBlockSize",
+            level = TestLevel.COMPLETE,
             method = "getBlockSize",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test method: getBlockCount",
+            level = TestLevel.COMPLETE,
             method = "getBlockCount",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test method: getFreeBlocks",
+            level = TestLevel.COMPLETE,
             method = "getFreeBlocks",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.TODO,
-            notes = "Test method: getAvailableBlocks",
+            level = TestLevel.COMPLETE,
             method = "getAvailableBlocks",
             args = {}
         )

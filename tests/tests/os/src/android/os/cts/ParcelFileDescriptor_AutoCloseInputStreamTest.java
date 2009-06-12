@@ -27,40 +27,30 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 @TestTargetClass(ParcelFileDescriptor.AutoCloseInputStream.class)
-public class ParcelFileDescriptor_AutoCloseInputStreamTest extends  AndroidTestCase {
+public class ParcelFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link AutoCloseInputStream}",
             method = "AutoCloseInputStream",
             args = {android.os.ParcelFileDescriptor.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: close",
             method = "close",
             args = {}
         )
     })
-    public void testAutoCloseInputStream(){
+    public void testAutoCloseInputStream() throws Exception {
         ParcelFileDescriptor pf = ParcelFileDescriptorTest.makeParcelFileDescriptor(getContext());
 
         AutoCloseInputStream in = new AutoCloseInputStream(pf);
-        try {
-            assertEquals(0, in.read());
-        } catch (Exception e) {
-            fail("shouldn't come here");
-        }
+        assertEquals(0, in.read());
 
-        try {
-            in.close();
-        } catch (IOException e) {
-            fail("shouldn't come here");
-        }
+        in.close();
 
         try {
             in.read();
-            fail("shouldn't come here");
+            fail("Failed to throw exception.");
         } catch (IOException e) {
             // expected
         }

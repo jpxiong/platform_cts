@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import android.content.pm.Signature;
 import android.os.BadParcelableException;
 import android.os.Binder;
@@ -43,18 +44,23 @@ import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Parcel.class)
 public class ParcelTest extends AndroidTestCase {
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: obtain ",
             method = "obtain",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: recycle",
             method = "recycle",
             args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_FEASIBLE,
+            notes = "This method is protected final, which can't be invoked in test case.",
+            method = "obtain",
+            args = {int.class}
         )
     })
     public void testObtain() {
@@ -85,7 +91,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: appendFrom ",
             method = "appendFrom",
             args = {Parcel.class, int.class, int.class}
         )
@@ -142,7 +147,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: dataCapacity ",
             method = "dataCapacity",
             args = {}
         )
@@ -163,9 +167,8 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: setDataCapacity ",
-            method = "dataCapacity",
-            args = {}
+            method = "setDataCapacity",
+            args = {int.class}
         )
     })
     public void testSetDataCapacity() {
@@ -185,7 +188,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: dataPosition ",
             method = "dataPosition",
             args = {}
         )
@@ -206,7 +208,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: setDataPosition ",
             method = "setDataPosition",
             args = {int.class}
         )
@@ -234,7 +235,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: dataSize ",
             method = "dataSize",
             args = {}
         )
@@ -256,7 +256,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: setDataSize ",
             method = "setDataSize",
             args = {int.class}
         )
@@ -283,13 +282,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: enforceInterface ",
             method = "enforceInterface",
             args = {String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeInterfaceToken ",
             method = "writeInterfaceToken",
             args = {String.class}
         )
@@ -319,13 +316,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: marshall ",
             method = "marshall",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: unmarshall ",
             method = "unmarshall",
             args = {byte[].class, int.class, int.class}
         )
@@ -357,13 +352,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readValue ",
             method = "readValue",
             args = {ClassLoader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeValue ",
             method = "writeValue",
             args = {Object.class}
         )
@@ -645,13 +638,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readByte ",
             method = "readByte",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeByte ",
             method = "writeByte",
             args = {byte.class}
         )
@@ -711,13 +702,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readByteArray ",
             method = "readByteArray",
             args = {byte[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeByteArray ",
             method = "writeByteArray",
             args = {byte[].class}
         )
@@ -792,7 +781,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeByteArray ",
             method = "writeByteArray",
             args = {byte[].class, int.class, int.class}
         )
@@ -900,7 +888,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createByteArray ",
             method = "createByteArray",
             args = {}
         )
@@ -961,13 +948,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readCharArray ",
             method = "readCharArray",
             args = {char[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeCharArray ",
             method = "writeCharArray",
             args = {char[].class}
         )
@@ -1043,7 +1028,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createCharArray ",
             method = "createCharArray",
             args = {}
         )
@@ -1105,13 +1089,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readInt ",
             method = "readInt",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeInt ",
             method = "writeInt",
             args = {int.class}
         )
@@ -1171,13 +1153,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readIntArray ",
             method = "readIntArray",
             args = {int[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeIntArray ",
             method = "writeIntArray",
             args = {int[].class}
         )
@@ -1251,7 +1231,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createIntArray ",
             method = "createIntArray",
             args = {}
         )
@@ -1311,13 +1290,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readLong ",
             method = "readLong",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeLong ",
             method = "writeLong",
             args = {long.class}
         )
@@ -1365,13 +1342,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readLongArray ",
             method = "readLongArray",
             args = {long[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeLongArray ",
             method = "writeLongArray",
             args = {long[].class}
         )
@@ -1445,7 +1420,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createLongArray ",
             method = "createLongArray",
             args = {}
         )
@@ -1505,13 +1479,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readFloat ",
             method = "readFloat",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeFloat ",
             method = "writeFloat",
             args = {float.class}
         )
@@ -1571,13 +1543,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readFloatArray ",
             method = "readFloatArray",
             args = {float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeFloatArray ",
             method = "writeFloatArray",
             args = {float[].class}
         )
@@ -1651,7 +1621,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createFloatArray ",
             method = "createFloatArray",
             args = {}
         )
@@ -1711,13 +1680,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readDouble ",
             method = "readDouble",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeDouble ",
             method = "writeDouble",
             args = {double.class}
         )
@@ -1855,7 +1822,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createDoubleArray ",
             method = "createDoubleArray",
             args = {}
         )
@@ -1866,7 +1832,9 @@ public class ParcelTest extends AndroidTestCase {
         double[] a = {2.1d};
         double[] b;
 
-        double[] c = {Double.MAX_VALUE, 11.1d, 1.1d, 0.1d, .0d, -0.1d, -1.1d, -11.1d, Double.MIN_VALUE};
+        double[] c = {
+                Double.MAX_VALUE, 11.1d, 1.1d, 0.1d, .0d, -0.1d, -1.1d, -11.1d, Double.MIN_VALUE
+        };
         double[] d;
 
         double[] e = {};
@@ -1915,13 +1883,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readBooleanArray ",
             method = "readBooleanArray",
             args = {boolean[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeBooleanArray ",
             method = "writeBooleanArray",
             args = {boolean[].class}
         )
@@ -1995,7 +1961,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createBooleanArray ",
             method = "createBooleanArray",
             args = {}
         )
@@ -2056,13 +2021,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readString ",
             method = "readString",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeString ",
             method = "writeString",
             args = {String.class}
         )
@@ -2110,13 +2073,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readStringArray ",
             method = "readStringArray",
             args = {String[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeStringArray ",
             method = "writeStringArray",
             args = {String[].class}
         )
@@ -2193,7 +2154,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createStringArray ",
             method = "createStringArray",
             args = {}
         )
@@ -2256,13 +2216,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readStringList ",
             method = "readStringList",
             args = {List.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeStringList ",
             method = "writeStringList",
             args = {List.class}
         )
@@ -2337,7 +2295,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createStringArrayList ",
             method = "createStringArrayList",
             args = {}
         )
@@ -2396,13 +2353,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readSerializable ",
             method = "readSerializable",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeSerializable ",
             method = "writeSerializable",
             args = {Serializable.class}
         )
@@ -2427,13 +2382,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readParcelable ",
             method = "readParcelable",
             args = {ClassLoader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeParcelable ",
             method = "writeParcelable",
             args = {Parcelable.class, int.class}
         )
@@ -2512,12 +2465,12 @@ public class ParcelTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "readTypedArray",
-            args = {Parcelable[].class, android.os.Parcelable.Creator.class}
+            args = {Object[].class, android.os.Parcelable.Creator.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "writeTypedArray",
-            args = {Parcelable[].class, int.class}
+            args = {android.os.Parcelable[].class, int.class}
         )
     })
     public void testReadTypedArray() {
@@ -2592,7 +2545,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeTypedArray ",
             method = "writeTypedArray",
             args = {Parcelable[].class, int.class}
         )
@@ -2639,13 +2591,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createTypedArray ",
             method = "createTypedArray",
             args = {Parcelable.Creator.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeTypedArray ",
             method = "writeTypedArray",
             args = {Parcelable[].class, int.class}
         )
@@ -2691,13 +2641,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readTypedList ",
             method = "readTypedList",
             args = {List.class, Parcelable.Creator.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeTypedList ",
             method = "writeTypedList",
             args = {List.class}
         )
@@ -2773,13 +2721,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createTypedArrayList ",
             method = "createTypedArrayList",
             args = {Parcelable.Creator.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeTypedList ",
             method = "writeTypedList",
             args = {List.class}
         )
@@ -2826,8 +2772,7 @@ public class ParcelTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: readException ",
+            level = TestLevel.NOT_FEASIBLE,
             method = "readException",
             args = {int.class, String.class}
         )
@@ -2840,9 +2785,13 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeException ",
             method = "writeException",
             args = {Exception.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "readException",
+            args = {}
         )
     })
     public void testReadException2() {
@@ -2911,8 +2860,12 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeNoException ",
             method = "writeNoException",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "readException",
             args = {}
         )
     })
@@ -2927,13 +2880,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeFileDescriptor ",
             method = "writeFileDescriptor",
             args = {FileDescriptor.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readFileDescriptor ",
             method = "readFileDescriptor",
             args = {}
         )
@@ -2960,7 +2911,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: hasFileDescriptors ",
             method = "hasFileDescriptors",
             args = {}
         )
@@ -2985,13 +2935,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readBundle ",
             method = "readBundle",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeBundle ",
             method = "writeBundle",
             args = {Bundle.class}
         )
@@ -3102,13 +3050,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeArray ",
             method = "writeArray",
             args = {Object[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readArray ",
             method = "readArray",
             args = {ClassLoader.class}
         )
@@ -3145,13 +3091,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readArrayList ",
             method = "readArrayList",
             args = {ClassLoader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeArray ",
             method = "writeArray",
             args = {Object[].class}
         )
@@ -3189,13 +3133,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeSparseArray ",
             method = "writeSparseArray",
             args = {SparseArray.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readSparseArray ",
             method = "readSparseArray",
             args = {ClassLoader.class}
         )
@@ -3237,13 +3179,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeSparseBooleanArray ",
             method = "writeSparseBooleanArray",
             args = {SparseBooleanArray.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readSparseBooleanArray ",
             method = "readSparseBooleanArray",
             args = {}
         )
@@ -3284,13 +3224,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeStrongBinder ",
             method = "writeStrongBinder",
             args = {IBinder.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readStrongBinder ",
             method = "readStrongBinder",
             args = {}
         )
@@ -3317,7 +3255,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeStrongInterface ",
             method = "writeStrongInterface",
             args = {IInterface.class}
         )
@@ -3344,13 +3281,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeBinderArray ",
             method = "writeBinderArray",
             args = {IBinder[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readBinderArray ",
             method = "readBinderArray",
             args = {IBinder[].class}
         )
@@ -3419,7 +3354,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createBinderArray ",
             method = "createBinderArray",
             args = {}
         )
@@ -3461,13 +3395,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeBinderList ",
             method = "writeBinderList",
             args = {List.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readBinderList ",
             method = "readBinderList",
             args = {List.class}
         )
@@ -3520,7 +3452,6 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: createBinderArrayList ",
             method = "createBinderArrayList",
             args = {}
         )
@@ -3562,13 +3493,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeMap ",
             method = "writeMap",
             args = {Map.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readMap ",
             method = "readMap",
             args = {Map.class, ClassLoader.class}
         )
@@ -3606,13 +3535,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readHashMap ",
             method = "readHashMap",
             args = {ClassLoader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeMap ",
             method = "writeMap",
             args = {Map.class}
         )
@@ -3650,13 +3577,11 @@ public class ParcelTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: readList ",
             method = "readList",
             args = {List.class, ClassLoader.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: writeList ",
             method = "writeList",
             args = {List.class}
         )

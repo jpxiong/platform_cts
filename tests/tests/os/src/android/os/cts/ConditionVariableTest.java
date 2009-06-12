@@ -24,6 +24,7 @@ import dalvik.annotation.TestTargets;
 
 @TestTargetClass(ConditionVariable.class)
 public class ConditionVariableTest extends TestCase {
+    private static final int WAIT_TIME = 3000;
     private static final int BLOCK_TIME = 1000;
     private static final int BLOCK_TIME_DELTA = 200;
     private static final int SLEEP_TIME = 1000;
@@ -39,13 +40,11 @@ public class ConditionVariableTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ConditionVariable}",
             method = "ConditionVariable",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ConditionVariable}",
             method = "ConditionVariable",
             args = {boolean.class}
         )
@@ -59,75 +58,73 @@ public class ConditionVariableTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: block",
             method = "block",
             args = {long.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: open",
             method = "open",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: close",
             method = "close",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: block",
             method = "block",
             args = {}
         )
     })
-    public void testConditionVariable() {
-        try {
-            // test open then block(long)
-            mConditionVariable.open();
-            long time = System.currentTimeMillis();
-            assertTrue(mConditionVariable.block(BLOCK_TIME));
-            assertTrue(System.currentTimeMillis() - time < TOLERANCE_MS);
+    public void testConditionVariable() throws Throwable {
+        // test open then block(long)
+        mConditionVariable.open();
+        long time = System.currentTimeMillis();
+        assertTrue(mConditionVariable.block(BLOCK_TIME));
+        assertTrue(System.currentTimeMillis() - time < TOLERANCE_MS);
 
-            // test close then block(long)
-            mConditionVariable.close();
-            time = System.currentTimeMillis();
-            assertFalse(mConditionVariable.block(BLOCK_TIME));
-            assertTrue(System.currentTimeMillis() - time >= BLOCK_TIME);
+        // test close then block(long)
+        mConditionVariable.close();
+        time = System.currentTimeMillis();
+        assertFalse(mConditionVariable.block(BLOCK_TIME));
+        assertTrue(System.currentTimeMillis() - time >= BLOCK_TIME);
 
-            // test block then open
-            time = System.currentTimeMillis();
-            new Thread(){
-                public void run() {
-                    try {
-                        Thread.sleep(SLEEP_TIME);
-                    } catch (InterruptedException e) {
-                        fail(e.getMessage());
-                    }
-                    mConditionVariable.open();
+        // test block then open
+        time = System.currentTimeMillis();
+        TestThread t = new TestThread(new Runnable() {
+
+            public void run() {
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    fail(e.getMessage());
                 }
-            }.start();
+                mConditionVariable.open();
+            }
+        });
 
-            mConditionVariable.block();
-            long timeDelta = System.currentTimeMillis() - time;
-            assertTrue(timeDelta >= BLOCK_TIME && timeDelta <= BLOCK_TIME + BLOCK_TIME_DELTA);
+        t.start();
+        mConditionVariable.block();
+        long timeDelta = System.currentTimeMillis() - time;
+        assertTrue(timeDelta >= BLOCK_TIME && timeDelta <= BLOCK_TIME + BLOCK_TIME_DELTA);
+        t.joinAndCheck(WAIT_TIME);
 
-            time = System.currentTimeMillis();
-            new Thread(){
-                public void run() {
-                    try {
-                        Thread.sleep(BLOCK_TIME >> 1);
-                    } catch (InterruptedException e) {
-                        fail(e.getMessage());
-                    }
-                    mConditionVariable.open();
+        time = System.currentTimeMillis();
+        t = new TestThread(new Runnable() {
+
+            public void run() {
+                try {
+                    Thread.sleep(BLOCK_TIME >> 1);
+                } catch (InterruptedException e) {
+                    fail(e.getMessage());
                 }
-            }.start();
+                mConditionVariable.open();
+            }
+        });
+        t.start();
 
-            assertTrue(mConditionVariable.block(BLOCK_TIME));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        assertTrue(mConditionVariable.block(BLOCK_TIME));
+        t.joinAndCheck(WAIT_TIME);
     }
 }
