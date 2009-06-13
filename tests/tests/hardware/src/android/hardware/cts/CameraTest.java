@@ -66,7 +66,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private TestErrorCallback mErrorCallback = new TestErrorCallback();
     private TestAutoFocusCallback mAutoFocusCallback = new TestAutoFocusCallback();
 
-    private boolean mInitialized = false;
     private Looper mLooper = null;
     private final Object mLock = new Object();
     private final Object mPreviewDone = new Object();
@@ -102,7 +101,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 mLooper = Looper.myLooper();
                 mCamera = Camera.open();
                 synchronized (mLock) {
-                    mInitialized = true;
                     mLock.notify();
                 }
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
@@ -349,6 +347,27 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         checkPreviewCallback();
         terminateMessageLooper();
         assertTrue(mRawPreviewCallbackResult);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setOneShotPreviewCallback",
+        args = {PreviewCallback.class}
+    )
+    public void testSetOneShotPreviewCallback() throws Exception {
+        initializeMessageLooper();
+        syncLock();
+        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        checkPreviewCallback();
+        terminateMessageLooper();
+        assertTrue(mRawPreviewCallbackResult);
+
+        mRawPreviewCallbackResult = false;
+        initializeMessageLooper();
+        syncLock();
+        checkPreviewCallback();
+        terminateMessageLooper();
+        assertFalse(mRawPreviewCallbackResult);
     }
 
     @TestTargets({
