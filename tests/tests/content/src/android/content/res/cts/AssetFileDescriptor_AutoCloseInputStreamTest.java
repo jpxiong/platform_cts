@@ -34,8 +34,9 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
     private static final int FILE_END = -1;
     private static final int FILE_LENGTH = 10;
     private static final String FILE_NAME = "testAssertFileDescriptorAutoCloseInputStream";
-    private static final byte[] FILE_DATA =
-        new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+    private static final byte[] FILE_DATA = new byte[] {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+            };
     private static final int OFFSET = 0;
     private static final int READ_LENGTH = 1;
 
@@ -62,6 +63,11 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         getContext().deleteFile(FILE_NAME);
     }
 
+    /*
+     * Test AutoInputStream life circle.
+     * Test point:
+     * 1. Test AutoInputStream read what we write into file.
+     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -109,11 +115,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
             args = {}
         )
     })
-    /**
-     * Test AutoInputStream life circle.
-     * Test point:
-     * 1. Test AutoInputStream read what we write into file.
-     */
     public void testInputStream() throws IOException {
         initAssetFileDescriptor();
         FileOutputStream outputStream = null;
