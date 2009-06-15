@@ -29,25 +29,21 @@ public class CredentialsTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor of Credentials, and test getGid, getPid, getUid.",
             method = "Credentials",
             args = {int.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor of Credentials, and test getGid, getPid, getUid.",
             method = "getGid",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor of Credentials, and test getGid, getPid, getUid.",
             method = "getPid",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor of Credentials, and test getGid, getPid, getUid.",
             method = "getUid",
             args = {}
         )
