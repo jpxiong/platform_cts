@@ -43,6 +43,7 @@ public class DevicePowerPermissionTest extends AndroidTestCase {
     public void testGoToSleep() {
         try {
             mPowerManager.goToSleep(0);
+            fail("Was able to call PowerManager.goToSleep without DEVICE_POWER Permission.");
         } catch (SecurityException e) {
             // expected
         }
@@ -57,6 +58,7 @@ public class DevicePowerPermissionTest extends AndroidTestCase {
     public void testUserActivity() {
         try {
             mPowerManager.userActivity(0, false);
+            fail("Was able to call PowerManager.userActivity without DEVICE_POWER Permission.");
         } catch (SecurityException e) {
             // expected
         }
