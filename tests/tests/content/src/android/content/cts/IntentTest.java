@@ -1967,6 +1967,40 @@ public class IntentTest extends AndroidTestCase {
         assertEquals(expected.Name, target.Name);
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "replaceExtras",
+            args = {android.os.Bundle.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "replaceExtras",
+            args = {android.content.Intent.class}
+        )
+    })
+    public void testReplaceExtras() {
+        Bundle extras = new Bundle();
+        String bundleKey = "testKey";
+        String bundleValue = "testValue";
+        extras.putString(bundleKey, bundleValue);
+
+        Intent intent = mIntent.replaceExtras(extras);
+        assertSame(mIntent, intent);
+        String actualValue = intent.getExtras().getString(bundleKey);
+        assertEquals(bundleValue, actualValue);
+
+        Intent src = new Intent();
+        String intentName = "srcName";
+        String intentValue = "srcValue";
+        src.putExtra(intentName, intentValue);
+
+        intent = mIntent.replaceExtras(src);
+        assertSame(mIntent, intent);
+        actualValue = intent.getExtras().getString(intentName);
+        assertEquals(intentValue, actualValue);
+    }
+
     private static class TestSerializable implements Serializable {
         static final long serialVersionUID = 1l;
         public String Name;
