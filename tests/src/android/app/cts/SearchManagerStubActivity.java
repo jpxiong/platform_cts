@@ -170,9 +170,8 @@ public class SearchManagerStubActivity extends Activity {
         }
     }
 
-    private void startSearch(final String initialQuery, final boolean selectInitialQuery,
-            final ComponentName launchActivity, final Bundle appSearchData,
-            final boolean globalSearch) {
+    private void startSearch(String initialQuery, boolean selectInitialQuery,
+            ComponentName launchActivity, Bundle appSearchData, boolean globalSearch) {
         mSearchManager.startSearch(initialQuery, selectInitialQuery, launchActivity, appSearchData,
                 globalSearch);
         sleep(1000);

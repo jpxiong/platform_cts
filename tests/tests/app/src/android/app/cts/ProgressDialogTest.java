@@ -29,11 +29,13 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
+
+import com.android.internal.R;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
-import com.android.internal.R;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link ProgressDialog}.
@@ -72,13 +74,12 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         mActivity = getActivity();
         mContext = mActivity;
         mProgressDialog = new ProgressDialog(mContext);
-        mDrawable = getActivity().getResources()
-                .getDrawable(com.android.cts.stub.R.drawable.yellow);
+        mDrawable = getActivity().getResources().getDrawable(
+                com.android.cts.stub.R.drawable.yellow);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: ProgressDialog",
         method = "ProgressDialog",
         args = {android.content.Context.class}
     )
@@ -88,30 +89,26 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: ProgressDialog",
         method = "ProgressDialog",
         args = {android.content.Context.class, int.class}
     )
     public void testProgressDialog2(){
-        new ProgressDialog(mContext, com.android.internal.R.style.Theme_Translucent);
+        new ProgressDialog(mContext, com.android.cts.stub.R.style.Theme_AlertDialog);
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ",
             method = "onCreate",
             args = {android.os.Bundle.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ",
             method = "onStart",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ",
             method = "onStop",
             args = {}
         )
@@ -132,9 +129,8 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: show",
         method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class, 
+        args = {android.content.Context.class, java.lang.CharSequence.class,
                 java.lang.CharSequence.class}
     )
     @UiThreadTest
@@ -143,23 +139,22 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
         mMessageView = (TextView) mProgressDialog.getWindow().findViewById(R.id.message);
         mTitleView = (TextView) mProgressDialog.getWindow().findViewById(R.id.alertTitle);
-
         assertEquals(MESSAGE, mMessageView.getText());
         assertEquals(TITLE, mTitleView.getText());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: show",
         method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class, 
+        args = {android.content.Context.class, java.lang.CharSequence.class,
                 java.lang.CharSequence.class, boolean.class}
     )
     @UiThreadTest
     public void testShow2() {
         mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, false);
 
-        /* note: the progress bar's style only supports indeterminate mode,
+        /*
+         * note: the progress bar's style only supports indeterminate mode,
          * so can't change indeterminate
          */
         assertTrue(mProgressDialog.isIndeterminate());
@@ -170,12 +165,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: show",
         method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class, 
+        args = {android.content.Context.class, java.lang.CharSequence.class,
                 java.lang.CharSequence.class, boolean.class, boolean.class}
     )
-    public void testShow3() {
+    public void testShow3() throws Throwable {
         final OnCancelListener cL = new OnCancelListener(){
             public void onCancel(DialogInterface dialog) {
                 mCanceled = true;
@@ -183,12 +177,12 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         };
 
         // cancelable is false
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false);
 
                 mProgressDialog.setOnCancelListener(cL);
-                KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
+                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
                 mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
             }
         });
@@ -197,13 +191,13 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertFalse(mCanceled);
 
         // cancelable is true
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true);
 
                 assertFalse(mCanceled);
                 mProgressDialog.setOnCancelListener(cL);
-                KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
+                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
                 mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
             }
         });
@@ -214,13 +208,12 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: show",
         method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class, 
+        args = {android.content.Context.class, java.lang.CharSequence.class,
                 java.lang.CharSequence.class, boolean.class, boolean.class,
                 android.content.DialogInterface.OnCancelListener.class}
     )
-    public void testShow4() {
+    public void testShow4() throws Throwable {
         final OnCancelListener cL = new OnCancelListener(){
             public void onCancel(DialogInterface dialog) {
                 mCanceled = true;
@@ -228,11 +221,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         };
 
         // cancelable is false
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false, cL);
 
-                KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
+                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
                 mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
             }
         });
@@ -241,12 +234,12 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertFalse(mCanceled);
 
         // cancelable is true
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true, cL);
 
                 assertFalse(mCanceled);
-                KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
+                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
                 mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
             }
         });
@@ -258,13 +251,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setMax and getMax",
             method = "setMax",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setMax and getMax",
             method = "getMax",
             args = {}
         )
@@ -284,13 +275,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setProgress and getProgress",
             method = "setProgress",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setProgress and getProgress",
             method = "getProgress",
             args = {}
         )
@@ -313,13 +302,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setSecondaryProgress and getSecondaryProgress",
             method = "setSecondaryProgress",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setSecondaryProgress and getSecondaryProgress",
             method = "getSecondaryProgress",
             args = {}
         )
@@ -342,13 +329,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setIndeterminate and isIndeterminate",
             method = "setIndeterminate",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setIndeterminate and isIndeterminate",
             method = "isIndeterminate",
             args = {}
         )
@@ -374,12 +359,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: incrementProgressBy",
         method = "incrementProgressBy",
         args = {int.class}
     )
-    public void testIncrementProgressBy() {
-        mActivity.runOnUiThread(new Runnable() {
+    public void testIncrementProgressBy() throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = new ProgressDialog(mContext);
                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -399,12 +383,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: incrementSecondaryProgressBy",
         method = "incrementSecondaryProgressBy",
         args = {int.class}
     )
-    public void testIncrementSecondaryProgressBy() {
-        mActivity.runOnUiThread(new Runnable() {
+    public void testIncrementSecondaryProgressBy() throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = new ProgressDialog(mContext);
                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -423,16 +406,15 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: setProgressDrawable",
         method = "setProgressDrawable",
         args = {android.graphics.drawable.Drawable.class}
     )
-    public void testSetProgressDrawable() {
-        mActivity.runOnUiThread(new Runnable() {
+    public void testSetProgressDrawable() throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-                Window w = mProgressDialog.getWindow();
-                ProgressBar progressBar = (ProgressBar) w.findViewById(R.id.progress);
+                final Window w = mProgressDialog.getWindow();
+                final ProgressBar progressBar = (ProgressBar) w.findViewById(R.id.progress);
 
                 mProgressDialog.setProgressDrawable(mDrawable);
                 mActureDrawable = progressBar.getProgressDrawable();
@@ -449,15 +431,14 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: setIndeterminateDrawable",
         method = "setIndeterminateDrawable",
         args = {android.graphics.drawable.Drawable.class}
     )
-    public void testSetIndeterminateDrawable() {
-        mActivity.runOnUiThread(new Runnable() {
+    public void testSetIndeterminateDrawable() throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-                Window w = mProgressDialog.getWindow();
+                final Window w = mProgressDialog.getWindow();
                 mProgressBar = (ProgressBar) w.findViewById(R.id.progress);
 
                 mProgressDialog.setIndeterminateDrawable(mDrawable);
@@ -474,12 +455,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: setMessage",
         method = "setMessage",
         args = {java.lang.CharSequence.class}
     )
-    public void testSetMessage() {
-        mActivity.runOnUiThread(new Runnable() {
+    public void testSetMessage() throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 // mProgress is null
                 mProgressDialog = new ProgressDialog(mContext);
@@ -491,7 +471,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         });
         mInstrumentation.waitForIdleSync();
 
-        mActivity.runOnUiThread(new Runnable() {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 // mProgress is not null
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
@@ -505,11 +485,10 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: setProgressStyle",
         method = "setProgressStyle",
         args = {int.class}
     )
-    public void testSetProgressStyle() {
+    public void testSetProgressStyle() throws Throwable {
         setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         assertEquals("10/100", mProgressNumber.getText());
 
@@ -520,8 +499,8 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertNull(null, mProgressNumber);
     }
 
-    private void setProgressStyle(final int style) {
-        mActivity.runOnUiThread(new Runnable() {
+    private void setProgressStyle(final int style) throws Throwable {
+        runTestOnUiThread(new Runnable() {
             public void run() {
                 mProgressDialog = new ProgressDialog(mContext);
                 mProgressDialog.setProgressStyle(style);
@@ -529,14 +508,15 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 mProgressDialog.show();
                 mProgressDialog.setProgress(10);
                 mProgressDialog.setMax(100);
-                Window w = mProgressDialog.getWindow(); //for one line less than 100
+                Window w = mProgressDialog.getWindow();
+                //for one line less than 100
                 mProgressNumber = (TextView) w.findViewById(R.id.progress_number);
             }
         });
         mInstrumentation.waitForIdleSync();
     }
 
-    private class MockProgressDialog extends ProgressDialog {
+    private static class MockProgressDialog extends ProgressDialog {
         public boolean mIsOnStopCalled;
         public boolean mIsOnStartCalled;
         public boolean mIsOnCreateCalled;

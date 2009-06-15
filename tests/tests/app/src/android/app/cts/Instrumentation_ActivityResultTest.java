@@ -28,22 +28,20 @@ import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Instrumentation.ActivityResult.class)
 public class Instrumentation_ActivityResultTest extends AndroidTestCase {
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Instrumentation.ActivityResult}",
             method = "Instrumentation.ActivityResult",
             args = {int.class, Intent.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: getResultCode",
             method = "getResultCode",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test method: getResultData",
             method = "getResultData",
             args = {}
         )

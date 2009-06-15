@@ -37,13 +37,11 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test describeContents function",
             method = "describeContents",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test describeContents function",
             method = "ActivityManager.MemoryInfo",
             args = {}
         )
@@ -54,7 +52,6 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel function",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -68,8 +65,8 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
         Parcel parcel = Parcel.obtain();
         mMemory.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
-        ActivityManager.MemoryInfo values = ActivityManager.MemoryInfo.CREATOR
-                .createFromParcel(parcel);
+        ActivityManager.MemoryInfo values =
+            ActivityManager.MemoryInfo.CREATOR.createFromParcel(parcel);
         assertEquals(AVAILMEM, values.availMem);
         assertEquals(THRESHOLD, values.threshold);
         assertEquals(LOWMEMORY, values.lowMemory);
@@ -77,14 +74,14 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
         // test null condition.
         try {
             mMemory.writeToParcel(null, 0);
-            fail("writeToParcel should throw out NullPointerException" + "when Parcel is null");
+            fail("writeToParcel should throw out NullPointerException when Parcel is null");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test readFromParcel function",
         method = "readFromParcel",
         args = {android.os.Parcel.class}
     )
@@ -108,8 +105,9 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
         result = new ActivityManager.MemoryInfo();
         try {
             result.readFromParcel(null);
-            fail("readFromParcel should throw out NullPointerException" + " when Parcel is null");
+            fail("readFromParcel should throw out NullPointerException when Parcel is null");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 

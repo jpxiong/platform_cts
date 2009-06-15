@@ -16,17 +16,17 @@
 
 package android.app.cts;
 
+import android.app.Activity;
 import android.app.Application;
+import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.test.InstrumentationTestCase;
-
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link Application}.
@@ -37,62 +37,55 @@ public class ApplicationTest extends InstrumentationTestCase {
     @TestTargets({
       @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor of Application",
         method = "Application",
         args = {}
       ),
       @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onConfigurationChanged",
         method = "onConfigurationChanged",
         args = {android.content.res.Configuration.class}
       ),
       @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onCreate",
         method = "onCreate",
         args = {}
       ),
       @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test onLowMemory",
+        level = TestLevel.NOT_FEASIBLE,
+        notes = "According to issue 1653192, a Java app can't allocate memory without" +
+                " restriction, thus it's hard to test this callback.",
         method = "onLowMemory",
         args = {}
       ),
       @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onTerminate. The documentation states that one cannot rely on this method"
-                  + " being called. No need to test it here.",
+        level = TestLevel.NOT_FEASIBLE,
+        notes = "The documentation states that one cannot rely on this method being called.",
         method = "onTerminate",
         args = {}
       )
     })
-    @ToBeFixed(bug="1653192", explanation="System doesn't call function onLowMemory")
-    @BrokenTest("onConfigurationChanged() not called after requesting orientation change")
-    public void testApplication() {
-        Intent intent = new Intent();
-        intent.setClass(getInstrumentation().getTargetContext(), MockApplicationActivity.class);
+    public void testApplication() throws Throwable {
+        final Instrumentation instrumentation = getInstrumentation();
+        final Context targetContext = instrumentation.getTargetContext();
+
+        final Intent intent = new Intent(targetContext, MockApplicationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        final MockApplicationActivity activity =
-            (MockApplicationActivity)getInstrumentation().startActivitySync(intent);
-        MockApplication ma = (MockApplication)activity.getApplication();
 
-        activity.runOnUiThread(new Runnable() {
+        final Activity activity = instrumentation.startActivitySync(intent);
+        final MockApplication mockApp = (MockApplication) activity.getApplication();
+        assertTrue(mockApp.isConstructorCalled);
+        assertTrue(mockApp.isOnCreateCalled);
 
+        runTestOnUiThread(new Runnable() {
             public void run() {
-                // to make android call Application#onConfigurationChanged(Configuration) function.
+                // make sure the configuration has been changed.
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertTrue(ma.isConstructorCalled);
-        assertTrue(ma.isOnCreateCalled);
-        assertTrue(ma.isOnConfigurationChangedCalled);
-        // TODO: for testing onLowMemory function. We have tried to create
-        // many processes to consume a lot of memory but still cannot make
-        // system call it. Bug id is 1653192.
+
+        assertTrue(mockApp.isOnConfigurationChangedCalled);
     }
 
 }

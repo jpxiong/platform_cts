@@ -50,7 +50,6 @@ public class InstrumentationTestActivity extends Activity {
     private boolean mOnTouchEventCalled;
     private int mKeyDownCode;
     private int mKeyUpCode;
-    private boolean mIsOnKeyDownCalled;
     private MotionEvent mMotionEvent;
     private Bundle mBundle;
     private MockTextView mTextView;

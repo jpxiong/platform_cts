@@ -21,8 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 
 public class MockReceiver extends BroadcastReceiver {
-    // pendingintent maybe return same instance or new instance, so static
-    // variable is needed.
+
+    // PendingIntent may return same instance or new instance, so static variable is needed.
     public static int sResultCode = 0;
     public static final String MOCKACTION = "android.app.PendingIntentTest.TEST_RECEIVER";
     public static String sAction;
