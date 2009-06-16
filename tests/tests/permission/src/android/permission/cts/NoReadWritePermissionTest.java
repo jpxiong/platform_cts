@@ -19,14 +19,20 @@ package android.permission.cts;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.Browser;
 import android.provider.Contacts;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
- * Verify the location access without specific permissions.
+ * Tests Permissions related to reading from and writing to various data
+ * sources.
  */
 @MediumTest
 public class NoReadWritePermissionTest extends AndroidTestCase {
@@ -240,5 +246,24 @@ public class NoReadWritePermissionTest extends AndroidTestCase {
 
         insertProvider(uri, values);
     }
+
+    /**
+     * Verify that writing to the external storage device requires {@link
+     * android.permission.WRITE_EXTERNAL_STORAGE}.
+     */
+    public void testWriteExternalStorage() throws FileNotFoundException, IOException {
+        try {
+            String fl = Environment.getExternalStorageDirectory().toString() +
+                         "/this-should-not-exist.txt";
+            FileOutputStream strm = new FileOutputStream(fl);
+            strm.write("Oops!".getBytes());
+            strm.flush();
+            strm.close();
+            fail("Was able to create and write to " + fl);
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+
 }
 
