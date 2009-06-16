@@ -38,7 +38,7 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
     private static final long LENGTH = 100;
     private static final String FILE_NAME = "testAssetFileDescriptor";
     private static final byte[] FILE_DATA =
-        new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+        new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
     private static final int FILE_END = -1;
     private AssetFileDescriptor mAssetFileDes;
     private File mFile;
