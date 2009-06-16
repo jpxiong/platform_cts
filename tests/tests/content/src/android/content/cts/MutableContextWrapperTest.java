@@ -20,10 +20,9 @@ import android.app.cts.MockActivity;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestInfo;
-import dalvik.annotation.TestStatus;
-import dalvik.annotation.TestTarget;
+import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(MutableContextWrapper.class)
 public class MutableContextWrapperTest extends AndroidTestCase {
@@ -38,30 +37,22 @@ public class MutableContextWrapperTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "MutableContextWrapper",
-          methodArgs = {Context.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "MutableContextWrapper",
+        args = {android.content.Context.class}
+    )
     public void testConstructor() {
 
         mMutableContextWrapper = new MutableContextWrapper(mContext);
         assertNotNull(mMutableContextWrapper);
     }
 
-    @TestInfo(
-      status = TestStatus.TBR,
-      notes = "",
-      targets = {
-        @TestTarget(
-          methodName = "setBaseContext",
-          methodArgs = {Context.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setBaseContext",
+        args = {android.content.Context.class}
+    )
     public void testSetBaseContext() {
         mMutableContextWrapper = new MutableContextWrapper(mContext);
         assertTrue(mContext.equals(mMutableContextWrapper.getBaseContext()));
