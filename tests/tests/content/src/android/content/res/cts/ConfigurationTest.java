@@ -55,38 +55,28 @@ public class ConfigurationTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
             method = "Configuration",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
             method = "Configuration",
             args = {android.content.res.Configuration.class}
         )
     })
     public void testConstructor() {
-        mConfig = null;
-        // New a ColorStateList
-        mConfig = new Configuration();
-        assertNotNull(mConfig);
-
-        mConfig = null;
-        // New a ColorStateList
-        mConfig = new Configuration(mConfigDefault);
-        assertNotNull(mConfig);
+        new Configuration();
+        new Configuration(mConfigDefault);
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test compareTo.",
         method = "compareTo",
         args = {android.content.res.Configuration.class}
     )
     public void testCompareTo() {
-        Configuration cfg1 = new Configuration();
-        Configuration cfg2 = new Configuration();
+        final Configuration cfg1 = new Configuration();
+        final Configuration cfg2 = new Configuration();
         assertEquals(0, cfg1.compareTo(cfg2));
 
         cfg1.orientation = 2;
@@ -169,7 +159,6 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test describeContents.",
         method = "describeContents",
         args = {}
     )
@@ -179,7 +168,6 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test diff",
         method = "diff",
         args = {android.content.res.Configuration.class}
     )
@@ -197,13 +185,11 @@ public class ConfigurationTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "equals",
             args = {android.content.res.Configuration.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "equals",
             args = {java.lang.Object.class}
         )
@@ -215,7 +201,6 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test hashCode.",
         method = "hashCode",
         args = {}
     )
@@ -226,19 +211,17 @@ public class ConfigurationTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test updateFrom and needNewResources.",
             method = "needNewResources",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test updateFrom and needNewResources.",
             method = "updateFrom",
             args = {android.content.res.Configuration.class}
         )
     })
     public void testNeedNewResources() {
-        int configChanges = mConfigDefault.updateFrom(mConfig);
+        final int configChanges = mConfigDefault.updateFrom(mConfig);
         assertEquals(ActivityInfo.CONFIG_FONT_SCALE
                 | ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
@@ -247,19 +230,18 @@ public class ConfigurationTest extends AndroidTestCase {
                 | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
                 | ActivityInfo.CONFIG_NAVIGATION
                 | ActivityInfo.CONFIG_ORIENTATION, configChanges);
-        int interestingChanges = 20080917;
+        final int interestingChanges = 20080917;
         assertTrue(Configuration.needNewResources(configChanges,
                 interestingChanges));
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setToDefaults.",
         method = "setToDefaults",
         args = {}
     )
     public void testSetToDefaults() {
-        Configuration temp = new Configuration(mConfig);
+        final Configuration temp = new Configuration(mConfig);
         assertFalse(temp.equals(mConfigDefault));
         temp.setToDefaults();
         assertTrue(temp.equals(mConfigDefault));
@@ -267,7 +249,6 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test toString",
         method = "toString",
         args = {}
     )
@@ -277,12 +258,11 @@ public class ConfigurationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel.",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
     public void testWriteToParcel() {
-        Parcel parcel = Parcel.obtain();
+        final Parcel parcel = Parcel.obtain();
         mConfigDefault.writeToParcel(parcel, 0);
 
         parcel.setDataPosition(0);

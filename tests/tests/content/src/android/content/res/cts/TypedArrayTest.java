@@ -150,6 +150,11 @@ public class TypedArrayTest extends AndroidTestCase{
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
+            method = "getLayoutDimension",
+            args = {int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
             method = "getNonResourceString",
             args = {int.class}
         ),
@@ -231,6 +236,8 @@ public class TypedArrayTest extends AndroidTestCase{
                 mTypedArray.getDimensionPixelOffset(R.styleable.style1_type6, DEFINT));
         assertEquals(EXPECTED_LAYOUT_DIMENSION,
                 mTypedArray.getLayoutDimension(R.styleable.style1_type6, "type6"));
+        assertEquals(EXPECTED_LAYOUT_DIMENSION,
+                mTypedArray.getLayoutDimension(R.styleable.style1_type6, 0));
         assertEquals(EXPECTED_PIXEL_SIZE,
                 mTypedArray.getDimensionPixelSize(R.styleable.style1_type7, DEFINT));
 
