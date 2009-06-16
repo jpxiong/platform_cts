@@ -43,4 +43,42 @@ public class NoCallPermissionTest extends AndroidTestCase {
             // expected
         }
     }
+
+    /**
+     * Verify that Intent.ACTION_CALL_PRIVILEGED requires permissions.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#CALL_PRIVILEGED}.
+     */
+    @SmallTest
+    public void testCallVoicemail() {
+        try {
+            //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED,
+            Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED",
+                    Uri.fromParts("voicemail", "", null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(intent);
+            fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw SecurityException as expected");
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Verify that Intent.ACTION_CALL_PRIVILEGED requires permissions.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#CALL_PRIVILEGED}.
+     */
+    @SmallTest
+    public void testCall911() {
+        //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED, Uri.parse("tel:911"));
+        Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED", Uri.parse("tel:911"));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            mContext.startActivity(intent);
+            fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw SecurityException as expected");
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+
 }
