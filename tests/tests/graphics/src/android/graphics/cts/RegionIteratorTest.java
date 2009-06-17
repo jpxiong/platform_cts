@@ -20,7 +20,6 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.RegionIterator;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -30,7 +29,6 @@ public class RegionIteratorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of RegionIterator.",
         method = "RegionIterator",
         args = {android.graphics.Region.class}
     )
@@ -40,7 +38,6 @@ public class RegionIteratorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test next(Rect r).",
         method = "next",
         args = {android.graphics.Rect.class}
     )
@@ -188,13 +185,4 @@ public class RegionIteratorTest extends AndroidTestCase {
         assertEquals(1, rect.bottom);
     }
 
-    class MockRegionIterator extends RegionIterator {
-        public MockRegionIterator(Region region) {
-            super(region);
-        }
-
-        public void finalize() throws Throwable {
-            super.finalize();
-        }
-    }
 }

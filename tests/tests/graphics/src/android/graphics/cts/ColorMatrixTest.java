@@ -43,19 +43,16 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ColorMatrix",
             method = "ColorMatrix",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ColorMatrix",
             method = "ColorMatrix",
             args = {float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: ColorMatrix",
             method = "ColorMatrix",
             args = {android.graphics.ColorMatrix.class}
         )
@@ -86,13 +83,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: reset and getArray",
             method = "reset",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: reset and getArray",
             method = "getArray",
             args = {}
         )
@@ -118,13 +113,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: set and getArray",
             method = "set",
             args = {float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: set and getArray",
             method = "getArray",
             args = {}
         )
@@ -153,13 +146,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: set and getArray",
             method = "set",
             args = {android.graphics.ColorMatrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: set and getArray",
             method = "getArray",
             args = {}
         )
@@ -188,13 +179,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setRotate and getArray",
             method = "setRotate",
             args = {int.class, float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setRotate and getArray",
             method = "getArray",
             args = {}
         )
@@ -231,13 +220,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setSaturation and getArray",
             method = "setSaturation",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setSaturation and getArray",
             method = "getArray",
             args = {}
         )
@@ -271,13 +258,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setScale and getArray",
             method = "setScale",
             args = {float.class, float.class, float.class, float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setScale and getArray",
             method = "getArray",
             args = {}
         )
@@ -307,13 +292,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setRGB2YUV and getArray",
             method = "setRGB2YUV",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setRGB2YUV and getArray",
             method = "getArray",
             args = {}
         )
@@ -347,13 +330,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setYUV2RGB and getArray",
             method = "setYUV2RGB",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setYUV2RGB and getArray",
             method = "getArray",
             args = {}
         )
@@ -387,13 +368,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: postConcat and getArray",
             method = "postConcat",
             args = {android.graphics.ColorMatrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: postConcat and getArray",
             method = "getArray",
             args = {}
         )
@@ -411,13 +390,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: preConcat and getArray",
             method = "preConcat",
             args = {android.graphics.ColorMatrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: preConcat and getArray",
             method = "getArray",
             args = {}
         )
@@ -435,13 +412,11 @@ public class ColorMatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setConcat and getArray",
             method = "setConcat",
             args = {android.graphics.ColorMatrix.class, android.graphics.ColorMatrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setConcat and getArray",
             method = "getArray",
             args = {}
         )

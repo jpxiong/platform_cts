@@ -37,19 +37,16 @@ public class PointTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Point.",
             method = "Point",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Point.",
             method = "Point",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Point.",
             method = "Point",
             args = {android.graphics.Point.class}
         )
@@ -70,7 +67,6 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test set(int x, int y).",
         method = "set",
         args = {int.class, int.class}
     )
@@ -83,7 +79,6 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test equals(int x, int y).",
         method = "equals",
         args = {int.class, int.class}
     )
@@ -95,7 +90,6 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test equals(Object o).",
         method = "equals",
         args = {java.lang.Object.class}
     )
@@ -109,7 +103,6 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test hashCode().",
         method = "hashCode",
         args = {}
     )
@@ -121,20 +114,16 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test toString().",
         method = "toString",
         args = {}
     )
     public void testToString() {
         mPoint = new Point();
-        assertEquals("Point(0, 0)", mPoint.toString());
-        mPoint = new Point(10, 10);
-        assertEquals("Point(10, 10)", mPoint.toString());
+        assertNotNull(mPoint.toString());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test offset(int dx, int dy).",
         method = "offset",
         args = {int.class, int.class}
     )
@@ -147,7 +136,6 @@ public class PointTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test negate().",
         method = "negate",
         args = {}
     )

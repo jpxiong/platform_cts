@@ -29,7 +29,6 @@ public class Paint_StyleTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -42,19 +41,16 @@ public class Paint_StyleTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setStyle",
             args = {android.graphics.Paint.Style.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getStyle",
             args = {}
         )

@@ -19,22 +19,15 @@ package android.graphics.cts;
 import junit.framework.TestCase;
 import android.graphics.LayerRasterizer;
 import android.graphics.Paint;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(LayerRasterizer.class)
 public class LayerRasterizerTest extends TestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of LayerRasterizer.",
         method = "LayerRasterizer",
         args = {}
     )
@@ -46,7 +39,6 @@ public class LayerRasterizerTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test addLayer(Paint paint, float dx, float dy).",
         method = "addLayer",
         args = {android.graphics.Paint.class, float.class, float.class}
     )
@@ -61,7 +53,6 @@ public class LayerRasterizerTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test addLayer(Paint paint).",
         method = "addLayer",
         args = {android.graphics.Paint.class}
     )

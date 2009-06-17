@@ -29,7 +29,6 @@ public class Paint_CapTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -43,19 +42,16 @@ public class Paint_CapTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setStrokeCap",
             args = {android.graphics.Paint.Cap.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getStrokeCap",
             args = {}
         )

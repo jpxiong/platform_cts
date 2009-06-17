@@ -16,20 +16,18 @@
 
 package android.graphics.cts;
 
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.os.Parcel;
-import android.test.AndroidTestCase;
-import android.util.Log;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Parcel;
+import android.test.AndroidTestCase;
+
 @TestTargetClass(RectF.class)
 public class RectFTest extends AndroidTestCase {
-
-    private final static String TAG = "RectFTest";
 
     private RectF mRectF;
 

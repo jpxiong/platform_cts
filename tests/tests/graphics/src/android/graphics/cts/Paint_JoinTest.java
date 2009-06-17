@@ -29,7 +29,6 @@ public class Paint_JoinTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -42,19 +41,16 @@ public class Paint_JoinTest extends TestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setStrokeJoin",
             args = {android.graphics.Paint.Join.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getStrokeJoin",
             args = {}
         )

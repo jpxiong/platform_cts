@@ -16,6 +16,19 @@
 
 package android.graphics.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.os.ParcelFileDescriptor;
+import android.test.InstrumentationTestCase;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -23,21 +36,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.os.ParcelFileDescriptor;
-import android.test.AndroidTestCase;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import com.android.cts.stub.R;
-
 @TestTargetClass(BitmapFactory.class)
-public class BitmapFactoryTest extends AndroidTestCase {
+public class BitmapFactoryTest extends InstrumentationTestCase {
     private Resources mRes;
     // opt for non-null
     private BitmapFactory.Options mOpt1;
@@ -50,7 +50,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mRes = getContext().getResources();
+        mRes = getInstrumentation().getTargetContext().getResources();
         mOpt1 = new BitmapFactory.Options();
         mOpt2 = new BitmapFactory.Options();
         mOpt2.inJustDecodeBounds = true;
@@ -58,7 +58,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of BitmapFactory.",
         method = "BitmapFactory",
         args = {}
     )
@@ -69,9 +68,8 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeResource(Resources res, int id,BitmapFactory.Options opts).",
         method = "decodeResource",
-        args = {android.content.res.Resources.class, int.class, 
+        args = {android.content.res.Resources.class, int.class,
                 android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeResource1() {
@@ -87,7 +85,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeResource(Resources res, int id).",
         method = "decodeResource",
         args = {android.content.res.Resources.class, int.class}
     )
@@ -101,7 +98,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class, android.graphics.BitmapFactory.Options.class}
     )
@@ -118,7 +114,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeByteArray(byte[] data, int offset, int length).",
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class}
     )
@@ -133,9 +128,8 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeStream(InputStream is, Rect outPadding,BitmapFactory.Options opts).",
         method = "decodeStream",
-        args = {java.io.InputStream.class, android.graphics.Rect.class, 
+        args = {java.io.InputStream.class, android.graphics.Rect.class,
                 android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeStream1() {
@@ -152,7 +146,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeStream(InputStream is).",
         method = "decodeStream",
         args = {java.io.InputStream.class}
     )
@@ -167,9 +160,8 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "decodeFileDescriptor",
-        args = {java.io.FileDescriptor.class, android.graphics.Rect.class, 
+        args = {java.io.FileDescriptor.class, android.graphics.Rect.class,
                 android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeFileDescriptor1() throws IOException {
@@ -186,7 +178,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeFileDescriptor(FileDescriptor fd).",
         method = "decodeFileDescriptor",
         args = {java.io.FileDescriptor.class}
     )
@@ -201,7 +192,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeFile(String pathName, BitmapFactory.Options opts).",
         method = "decodeFile",
         args = {java.lang.String.class, android.graphics.BitmapFactory.Options.class}
     )
@@ -217,7 +207,6 @@ public class BitmapFactoryTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test decodeFile(String pathName).",
         method = "decodeFile",
         args = {java.lang.String.class}
     )
@@ -237,7 +226,7 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     private InputStream obtainInputStream() {
-        return(getContext().getResources().openRawResource(R.drawable.start));
+        return mRes.openRawResource(R.drawable.start);
     }
 
     private FileDescriptor obtainDescriptor(String path) throws IOException {
@@ -247,19 +236,23 @@ public class BitmapFactoryTest extends AndroidTestCase {
     }
 
     private String obtainPath() throws IOException {
-        File dir = getContext().getFilesDir();
+        File dir = getInstrumentation().getTargetContext().getFilesDir();
         dir.mkdirs();
         File file = new File(dir, "test.jpg");
-        file.createNewFile();
+        if (!file.createNewFile()) {
+            if (!file.exists()) {
+                fail("Failed to create new File!");
+            }
+        }
         InputStream is = obtainInputStream();
         FileOutputStream fOutput = new FileOutputStream(file);
-        int read = 10000;
-        do {
-            read = is.read();
-            fOutput.write(read);
-        } while (read != -1);
+        byte[] dataBuffer = new byte[1024];
+        int readLength = 0;
+        while ((readLength = is.read(dataBuffer)) != -1) {
+            fOutput.write(dataBuffer, 0, readLength);
+        }
         is.close();
         fOutput.close();
-        return(file.getPath());
+        return (file.getPath());
     }
 }

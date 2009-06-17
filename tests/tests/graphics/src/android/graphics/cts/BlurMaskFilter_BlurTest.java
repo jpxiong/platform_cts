@@ -15,20 +15,18 @@
  */
 package android.graphics.cts;
 
+import junit.framework.TestCase;
 import android.graphics.BlurMaskFilter;
 import android.graphics.BlurMaskFilter.Blur;
-import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(BlurMaskFilter.Blur.class)
-public class BlurMaskFilter_BlurTest extends AndroidTestCase{
+public class BlurMaskFilter_BlurTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -39,22 +37,11 @@ public class BlurMaskFilter_BlurTest extends AndroidTestCase{
         assertEquals(Blur.INNER, Blur.valueOf("INNER"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "BlurMaskFilter",
-            args = {float.class, android.graphics.BlurMaskFilter.Blur.class}
-        )
-    })
-    // test method: values and tests for the behavior of the methods where this enumeration is 
-    // used as an argument
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "values",
+        args = {}
+    )
     public void testValues(){
         Blur[] bulr = Blur.values();
 

@@ -39,19 +39,16 @@ public class MatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "Matrix",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "Matrix",
             args = {android.graphics.Matrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "finalize",
             args = {}
         )
@@ -63,7 +60,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "isIdentity",
         args = {}
     )
@@ -75,7 +71,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "rectStaysRect",
         args = {}
     )
@@ -87,7 +82,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "set",
         args = {android.graphics.Matrix.class}
     )
@@ -104,7 +98,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "equals",
         args = {java.lang.Object.class}
     )
@@ -119,7 +112,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "reset",
         args = {}
     )
@@ -134,7 +126,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setScale",
         args = {float.class, float.class}
     )
@@ -148,7 +139,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setScale",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -163,7 +153,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setRotate",
         args = {float.class}
     )
@@ -176,7 +165,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setRotate",
         args = {float.class, float.class, float.class}
     )
@@ -189,7 +177,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setSinCos",
         args = {float.class, float.class}
     )
@@ -201,7 +188,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setSinCos",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -213,7 +199,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setSkew",
         args = {float.class, float.class}
     )
@@ -225,7 +210,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setSkew",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -237,7 +221,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setConcat",
         args = {android.graphics.Matrix.class, android.graphics.Matrix.class}
     )
@@ -262,7 +245,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preTranslate",
         args = {float.class, float.class}
     )
@@ -274,7 +256,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preScale",
         args = {float.class, float.class}
     )
@@ -286,7 +267,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preScale",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -298,7 +278,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preRotate",
         args = {float.class}
     )
@@ -311,7 +290,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preRotate",
         args = {float.class, float.class, float.class}
     )
@@ -326,7 +304,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preSkew",
         args = {float.class, float.class}
     )
@@ -338,7 +315,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preSkew",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -350,7 +326,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "preConcat",
         args = {android.graphics.Matrix.class}
     )
@@ -366,7 +341,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postTranslate",
         args = {float.class, float.class}
     )
@@ -378,7 +352,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postScale",
         args = {float.class, float.class}
     )
@@ -390,7 +363,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postScale",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -402,7 +374,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postRotate",
         args = {float.class}
     )
@@ -415,7 +386,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postRotate",
         args = {float.class, float.class, float.class}
     )
@@ -428,7 +398,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postSkew",
         args = {float.class, float.class}
     )
@@ -440,7 +409,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postSkew",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -452,7 +420,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "postConcat",
         args = {android.graphics.Matrix.class}
     )
@@ -469,9 +436,8 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setRectToRect",
-        args = {android.graphics.RectF.class, android.graphics.RectF.class, 
+        args = {android.graphics.RectF.class, android.graphics.RectF.class,
                 android.graphics.Matrix.ScaleToFit.class}
     )
     public void testSetRectToRect() {
@@ -510,7 +476,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "invert",
         args = {android.graphics.Matrix.class}
     )
@@ -535,7 +500,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setPolyToPoly",
         args = {float[].class, int.class, float[].class, int.class, int.class}
     )
@@ -557,7 +521,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapPoints",
         args = {float[].class}
     )
@@ -575,7 +538,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapPoints",
         args = {float[].class, float[].class}
     )
@@ -595,7 +557,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapPoints",
         args = {float[].class, int.class, float[].class, int.class, int.class}
     )
@@ -615,7 +576,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapVectors",
         args = {float[].class}
     )
@@ -634,7 +594,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapVectors",
         args = {float[].class, float[].class}
     )
@@ -655,7 +614,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapVectors",
         args = {float[].class, int.class, float[].class, int.class, int.class}
     )
@@ -675,7 +633,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapRadius",
         args = {float.class}
     )
@@ -688,7 +645,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapRect",
         args = {android.graphics.RectF.class}
     )
@@ -710,7 +666,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "mapRect",
         args = {android.graphics.RectF.class, android.graphics.RectF.class}
     )
@@ -740,13 +695,11 @@ public class MatrixTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setValues",
             args = {float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "getValues",
             args = {float[].class}
         )
@@ -772,18 +725,15 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "toString",
         args = {}
     )
     public void testToString() {
-        String expect = "Matrix{[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]}";
-        assertEquals(expect, mMatrix.toString());
+        assertNotNull(mMatrix.toString());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "toShortString",
         args = {}
     )
@@ -794,7 +744,6 @@ public class MatrixTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setTranslate",
         args = {float.class, float.class}
     )

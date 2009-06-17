@@ -28,7 +28,6 @@ public class AvoidXfermode_ModeTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -40,15 +39,11 @@ public class AvoidXfermode_ModeTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this "
-                    + "enumeration is used as an argument",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this "
-                    + "enumeration is used as an argument",
             method = "AvoidXfermode",
             args = {int.class, int.class, android.graphics.AvoidXfermode.Mode.class}
         )
