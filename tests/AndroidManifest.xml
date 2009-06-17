@@ -796,6 +796,7 @@
         <service android:name="android.os.cts.MessengerService"
                 android:process=":messengerService">
         </service>
+        <service android:name="android.app.cts.IntentServiceStub"/>
 
         <activity android:name="android.app.cts.LaunchpadActivity" android:multiprocess="true">
         </activity>
