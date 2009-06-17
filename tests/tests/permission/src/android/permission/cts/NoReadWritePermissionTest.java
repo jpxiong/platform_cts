@@ -262,6 +262,8 @@ public class NoReadWritePermissionTest extends AndroidTestCase {
             fail("Was able to create and write to " + fl);
         } catch (SecurityException e) {
             // expected
+        } catch (FileNotFoundException e) {
+            // expected
         }
     }
 
