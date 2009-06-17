@@ -38,7 +38,6 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "android.content";
     private static final String TITLE = "params title";
     private static final String PARAMS_TITLE = "params title";
-    private static final String EMPTY = "";
     private static final float HORIZONTAL_MARGIN = 1.0f;
     private static final float VERTICAL_MARGIN = 3.0f;
     private static final float ALPHA = 1.0f;
@@ -86,6 +85,11 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
             level = TestLevel.COMPLETE,
             method = "WindowManager.LayoutParams",
             args = {Parcel.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "WindowManager.mayUseInputMethod",
+            args = {int.class}
         )
     })
     public void testConstructor() {
@@ -120,6 +124,14 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
         parcel.setDataPosition(0);
 
         new WindowManager.LayoutParams(parcel);
+        assertTrue(WindowManager.LayoutParams.mayUseInputMethod(0));
+        assertTrue(WindowManager.LayoutParams.mayUseInputMethod(
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM));
+        assertFalse(WindowManager.LayoutParams
+                .mayUseInputMethod(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE));
+        assertFalse(WindowManager.LayoutParams
+                .mayUseInputMethod(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM));
     }
 
     @TestTargetNew(
