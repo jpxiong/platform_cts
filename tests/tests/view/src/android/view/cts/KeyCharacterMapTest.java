@@ -242,7 +242,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-
             method = "getKeyData",
             args = {int.class, android.view.KeyCharacterMap.KeyData.class}
         ),
@@ -260,6 +259,16 @@ public class KeyCharacterMapTest extends AndroidTestCase {
             level = TestLevel.NOT_FEASIBLE,
             method = "getDeadChar",
             args = {int.class, int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.SUFFICIENT,
+            method = "deviceHasKey",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.SUFFICIENT,
+            method = "deviceHasKeys",
+            args = {int[].class}
         )
     })
     public void testGetKeyData() throws Exception {
@@ -274,6 +283,14 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertFalse(mKeyCharacterMap.getKeyData(KeyEvent.KEYCODE_HOME, result));
         assertTrue(mKeyCharacterMap.getKeyData(KeyEvent.KEYCODE_0, result));
         assertEquals(48, result.meta[0]);
+
+        // here just call deviceHasKey and deviceHasKeys.
+        KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_0);
+        final int[] keyChar = new int[] {
+                KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_3
+        };
+        boolean[] keys = KeyCharacterMap.deviceHasKeys(keyChar);
+        assertEquals(keyChar.length, keys.length);
     }
 
 }
