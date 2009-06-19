@@ -390,6 +390,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.TabHostStubActivity"
+            android:label="TabHostStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.view.animation.cts.AnimationTestStubActivity"
             android:label="AnimationTestStubActivity">
             <intent-filter>
@@ -762,6 +770,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.text.method.cts.StubActivity"
+            android:label="StubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <service android:name="android.app.cts.StubRemoteService"
             android:process=":remote">
             <intent-filter>
@@ -774,6 +790,8 @@
 
         <activity android:name="android.app.cts.ListActivityTestHelper"
             android:label="ListActivityTestHelper" />
+        <activity android:name="android.app.ActivityGroup"
+            android:label="ActivityGroup" />
 
         <activity android:name="android.app.cts.KeyguardManagerActivity"
             android:label="KeyguardManagerActivity">
