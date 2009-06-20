@@ -79,18 +79,6 @@ public class ProviderPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that write to secure settings requires permissions.
-     * <p>Tests Permission:
-     *   {@link android.Manifest.permission#WRITE_SECURE_SETTINGS}
-     */
-    public void testWriteSecureSettings() {
-        // TODO: the error message returned is failure to write to settings. We need a test app
-        // that has WRITE_SETTINGS permission, but not WRITE_SECURE_SETTINGS to test this
-        assertWritingContentUriRequiresPermission(android.provider.Settings.Secure.CONTENT_URI,
-                android.Manifest.permission.WRITE_SETTINGS);
-    }
-
-    /**
      * Verify that read and write to browser bookmarks requires permissions.
      * <p>Tests Permission:
      *   {@link com.android.browser.permission.READ_HISTORY_BOOKMARKS}
