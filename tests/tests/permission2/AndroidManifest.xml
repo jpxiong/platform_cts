@@ -36,6 +36,9 @@
     <!--  need app that has WRITE_SETTINGS but not WRITE_SECURE_SETTINGS -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
+    <!--  need app that has CALL_PHONE but not PROCESS_OUTGOING_CALL -->
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+
     <instrumentation android:name="android.test.InstrumentationTestRunner"
                      android:targetPackage="com.android.cts.permission2"
                      android:label="More CTS tests for permissions"/>
