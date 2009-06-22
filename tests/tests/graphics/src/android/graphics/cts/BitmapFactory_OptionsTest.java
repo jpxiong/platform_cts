@@ -17,16 +17,14 @@ package android.graphics.cts;
 
 import android.graphics.BitmapFactory;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(BitmapFactory.Options.class)
 public class BitmapFactory_OptionsTest extends AndroidTestCase{
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: BitmapFactory.Options",
         method = "BitmapFactory.Options",
         args = {}
     )
@@ -36,7 +34,6 @@ public class BitmapFactory_OptionsTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: requestCancelDecode",
         method = "requestCancelDecode",
         args = {}
     )

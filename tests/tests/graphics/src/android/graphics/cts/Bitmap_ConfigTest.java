@@ -15,20 +15,18 @@
  */
 package android.graphics.cts;
 
+import junit.framework.TestCase;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(Bitmap.Config.class)
-public class Bitmap_ConfigTest extends AndroidTestCase{
+public class Bitmap_ConfigTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -39,22 +37,11 @@ public class Bitmap_ConfigTest extends AndroidTestCase{
         assertEquals(Config.ARGB_8888, Config.valueOf("ARGB_8888"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "createBitmap",
-            args = {int.class, int.class, android.graphics.Bitmap.Config.class}
-        )
-    })
-    // test method: values and tests for the behavior of the methods where this enumeration 
-    // is used as an argument
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "values",
+        args = {}
+    )
     public void testValues(){
         Config[] config = Config.values();
 

@@ -19,22 +19,16 @@ package android.graphics.cts;
 import android.graphics.PathDashPathEffect;
 import android.graphics.PathDashPathEffect.Style;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(PathDashPathEffect.Style.class)
 public class PathDashPathEffect_StyleTest extends AndroidTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -47,7 +41,6 @@ public class PathDashPathEffect_StyleTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test values().",
         method = "values",
         args = {}
     )

@@ -18,22 +18,16 @@ package android.graphics.cts;
 
 import android.graphics.Matrix.ScaleToFit;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(ScaleToFit.class)
 public class Matrix_ScaleToFitTest extends AndroidTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "values",
         args = {}
     )
@@ -47,7 +41,6 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -60,7 +53,6 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "valueOf",
         args = {android.graphics.Matrix.ScaleToFit.class, java.lang.String.class}
     )

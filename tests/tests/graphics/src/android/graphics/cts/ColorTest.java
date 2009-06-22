@@ -28,13 +28,11 @@ public class ColorTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: alpha and default constructor",
             method = "alpha",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: alpha and default constructor",
             method = "Color",
             args = {}
         )
@@ -47,7 +45,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: argb",
         method = "argb",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -58,7 +55,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: blue",
         method = "blue",
         args = {int.class}
     )
@@ -69,7 +65,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: green",
         method = "green",
         args = {int.class}
     )
@@ -81,13 +76,11 @@ public class ColorTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: HSVToColor and colorToHSV",
             method = "HSVToColor",
             args = {float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: HSVToColor and colorToHSV",
             method = "colorToHSV",
             args = {int.class, float[].class}
         )
@@ -110,13 +103,11 @@ public class ColorTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: HSVToColor and colorToHSV",
             method = "HSVToColor",
             args = {int.class, float[].class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: HSVToColor and colorToHSV",
             method = "colorToHSV",
             args = {int.class, float[].class}
         )
@@ -138,7 +129,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: parseColor",
         method = "parseColor",
         args = {java.lang.String.class}
     )
@@ -177,7 +167,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: red",
         method = "red",
         args = {int.class}
     )
@@ -188,7 +177,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: rgb",
         method = "rgb",
         args = {int.class, int.class, int.class}
     )
@@ -199,7 +187,6 @@ public class ColorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: RGBToHSV",
         method = "RGBToHSV",
         args = {int.class, int.class, int.class, float[].class}
     )

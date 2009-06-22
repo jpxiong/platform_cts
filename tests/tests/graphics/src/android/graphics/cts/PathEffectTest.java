@@ -18,7 +18,6 @@ package android.graphics.cts;
 
 import android.graphics.PathEffect;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
@@ -28,7 +27,6 @@ public class PathEffectTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of PathEffect.",
         method = "PathEffect",
         args = {}
     )
@@ -36,24 +34,4 @@ public class PathEffectTest extends AndroidTestCase {
         new PathEffect();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test finalize().",
-        method = "finalize",
-        args = {}
-    )
-    public void testFinalize() {
-        MockPathEffect pathEffect = new MockPathEffect();
-        try {
-            pathEffect.finalize();
-        } catch (Throwable e) {
-            fail("shoudn't throw exception");
-        }
-    }
-
-    class MockPathEffect extends PathEffect {
-        public void finalize() throws Throwable {
-            super.finalize();
-        }
-    }
 }

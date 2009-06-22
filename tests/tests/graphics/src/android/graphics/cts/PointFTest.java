@@ -38,19 +38,16 @@ public class PointFTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PointF.",
             method = "PointF",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PointF.",
             method = "PointF",
             args = {float.class, float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PointF.",
             method = "PointF",
             args = {android.graphics.Point.class}
         )
@@ -74,7 +71,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test negate().",
         method = "negate",
         args = {}
     )
@@ -87,7 +83,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test length().",
         method = "length",
         args = {}
     )
@@ -98,7 +93,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test length(float x, float y).",
         method = "length",
         args = {float.class, float.class}
     )
@@ -108,7 +102,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test set(float x, float y).",
         method = "set",
         args = {float.class, float.class}
     )
@@ -121,7 +114,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test set(PointF p).",
         method = "set",
         args = {android.graphics.PointF.class}
     )
@@ -135,7 +127,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test equals(float x, float y).",
         method = "equals",
         args = {float.class, float.class}
     )
@@ -147,7 +138,6 @@ public class PointFTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test offset(float dx, float dy).",
         method = "offset",
         args = {float.class, float.class}
     )

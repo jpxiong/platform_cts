@@ -16,23 +16,21 @@
 package android.graphics.cts;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Bitmap.CompressFormat.class)
 public class Bitmap_CompressFormatTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -44,17 +42,13 @@ public class Bitmap_CompressFormatTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this "
-                    + "enumeration is used as an argument",
             method = "values",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this "
-                    + "enumeration is used as an argument",
             method = "compress",
-            args = {android.graphics.Bitmap.CompressFormat.class, int.class, 
+            args = {android.graphics.Bitmap.CompressFormat.class, int.class,
                     java.io.OutputStream.class}
         )
     })

@@ -43,13 +43,11 @@ public class PathMeasureTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PathMeasure.",
             method = "PathMeasure",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PathMeasure.",
             method = "PathMeasure",
             args = {android.graphics.Path.class, boolean.class}
         )
@@ -67,7 +65,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getPosTan(float distance, float[] pos, float[] tan).",
         method = "getPosTan",
         args = {float.class, float[].class, float[].class}
     )
@@ -95,7 +92,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test nextContour().",
         method = "nextContour",
         args = {}
     )
@@ -108,7 +104,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getLength().",
         method = "getLength",
         args = {}
     )
@@ -121,7 +116,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isClosed().",
         method = "isClosed",
         args = {}
     )
@@ -136,7 +130,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setPath(Path path, boolean forceClosed).",
         method = "setPath",
         args = {android.graphics.Path.class, boolean.class}
     )
@@ -147,7 +140,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getSegment(float startD, float stopD, Path dst,boolean startWithMoveTo).",
         method = "getSegment",
         args = {float.class, float.class, android.graphics.Path.class, boolean.class}
     )
@@ -160,18 +152,15 @@ public class PathMeasureTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getMatrix(float distance, Matrix matrix, int flags).",
         method = "getMatrix",
         args = {float.class, android.graphics.Matrix.class, int.class}
     )
     public void testGetMatrix() {
         Matrix matrix = new Matrix();
-        assertFalse(mPathMeasure.getMatrix(1f, matrix,
-                PathMeasure.POSITION_MATRIX_FLAG));
+        assertFalse(mPathMeasure.getMatrix(1f, matrix, PathMeasure.POSITION_MATRIX_FLAG));
         matrix.setScale(1f, 2f);
         mPath.addRect(1f, 2f, 3f, 4f, Path.Direction.CW);
         mPathMeasure.setPath(mPath, true);
-        assertTrue(mPathMeasure.getMatrix(0f, matrix,
-                PathMeasure.TANGENT_MATRIX_FLAG));
+        assertTrue(mPathMeasure.getMatrix(0f, matrix, PathMeasure.TANGENT_MATRIX_FLAG));
     }
 }

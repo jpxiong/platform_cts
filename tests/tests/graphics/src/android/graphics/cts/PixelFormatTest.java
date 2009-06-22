@@ -16,15 +16,14 @@
 
 package android.graphics.cts;
 
+import junit.framework.TestCase;
 import android.graphics.PixelFormat;
-import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(PixelFormat.class)
-public class PixelFormatTest extends AndroidTestCase {
+public class PixelFormatTest extends TestCase {
 
     private PixelFormat mPixelFormat;
 
@@ -36,7 +35,6 @@ public class PixelFormatTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of PixelFormat.",
         method = "PixelFormat",
         args = {}
     )
@@ -48,7 +46,6 @@ public class PixelFormatTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "There are 13 kinds of valid format in PixelFormat.",
         method = "getPixelFormatInfo",
         args = {int.class, android.graphics.PixelFormat.class}
     )
@@ -109,36 +106,40 @@ public class PixelFormatTest extends AndroidTestCase {
             PixelFormat.getPixelFormatInfo(PixelFormat.UNKNOWN, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            //excepted
         }
-        
+
         try {
             PixelFormat.getPixelFormatInfo(PixelFormat.JPEG, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            //excepted
         }
 
         try {
             PixelFormat.getPixelFormatInfo(PixelFormat.TRANSLUCENT, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            //excepted
         }
 
         try {
             PixelFormat.getPixelFormatInfo(PixelFormat.TRANSPARENT, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            //excepted
         }
 
         try {
             PixelFormat.getPixelFormatInfo(PixelFormat.OPAQUE, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
+            //excepted
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test formatHasAlpha(int format).",
         method = "formatHasAlpha",
         args = {int.class}
     )
@@ -157,7 +158,6 @@ public class PixelFormatTest extends AndroidTestCase {
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.YCbCr_422_SP));
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.YCbCr_420_SP));
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.UNKNOWN));
-
     }
 
 }

@@ -26,18 +26,16 @@ import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(Camera.class)
 public class CameraTest extends AndroidTestCase {
-    private MockCamera mCamera;
+    private Camera mCamera;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        mCamera = new MockCamera();
+        mCamera = new Camera();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: Camera",
         method = "Camera",
         args = {}
     )
@@ -48,19 +46,17 @@ public class CameraTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore, save must be called before restore",
             method = "save",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore, save must be called before restore",
             method = "restore",
             args = {}
         )
     })
-    public void testRestore(){
-        //we cannot get the state changed because it was a native method
+    public void testRestore() {
+        // we cannot get the state changed because it was a native method
         mCamera.save();
         mCamera.restore();
     }
@@ -68,18 +64,16 @@ public class CameraTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: translate and getMatrix",
             method = "translate",
             args = {float.class, float.class, float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: translate and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         )
     })
-    public void testTranslate(){
+    public void testTranslate() {
         Matrix m1 = new Matrix();
         preCompare(m1);
 
@@ -104,18 +98,16 @@ public class CameraTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateX and getMatrix",
             method = "rotateX",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateX and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         )
     })
-    public void testRotateX(){
+    public void testRotateX() {
         Matrix m1 = new Matrix();
         preCompare(m1);
 
@@ -140,18 +132,16 @@ public class CameraTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateY and getMatrix",
             method = "rotateY",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateY and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         )
     })
-    public void testRotateY(){
+    public void testRotateY() {
         Matrix m1 = new Matrix();
         preCompare(m1);
 
@@ -176,18 +166,16 @@ public class CameraTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateZ and getMatrix",
             method = "rotateZ",
             args = {float.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: rotateZ and getMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         )
     })
-    public void testRotateZ(){
+    public void testRotateZ() {
         Matrix m1 = new Matrix();
         preCompare(m1);
 
@@ -211,11 +199,10 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: applyToCanvas",
         method = "applyToCanvas",
         args = {android.graphics.Canvas.class}
     )
-    public void testApplyToCanvas(){
+    public void testApplyToCanvas() {
         Canvas c1 = new Canvas();
         mCamera.applyToCanvas(c1);
 
@@ -229,29 +216,14 @@ public class CameraTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: dotWithNormal",
         method = "dotWithNormal",
         args = {float.class, float.class, float.class}
     )
-    public void testDotWithNormal(){
+    public void testDotWithNormal() {
         assertEquals(0.0792f, mCamera.dotWithNormal(0.1f, 0.28f, 0.2008f));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test method: finalize",
-        method = "finalize",
-        args = {}
-    )
-    public void testFinalize(){
-        try {
-            mCamera.finalize();
-        } catch (Throwable e) {
-            fail("Camera finalize method throw exception");
-        }
-    }
-
-    private void preCompare(Matrix m){
+    private void preCompare(Matrix m) {
         mCamera.getMatrix(m);
         float[] f = new float[9];
         m.getValues(f);
@@ -266,10 +238,4 @@ public class CameraTest extends AndroidTestCase {
         assertEquals(1.0f, f[8]);
     }
 
-    private class MockCamera extends Camera{
-        @Override
-        public void finalize() throws Throwable {
-            super.finalize();
-        }
-    }
 }

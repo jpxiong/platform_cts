@@ -17,19 +17,17 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import android.graphics.Paint.FontMetricsInt;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetricsInt;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(Paint.FontMetricsInt.class)
 public class Paint_FontMetricsIntTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of FontMetricsInt.",
         method = "Paint.FontMetricsInt",
         args = {}
     )
@@ -40,7 +38,6 @@ public class Paint_FontMetricsIntTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test toString().",
         method = "toString",
         args = {}
     )
@@ -51,9 +48,6 @@ public class Paint_FontMetricsIntTest extends TestCase {
         int descent = 3;
         int bottom = 4;
         int leading = 5;
-        String expected = "FontMetricsInt: top=" + top + " ascent=" + ascent +
-                    " descent=" + descent + " bottom=" + bottom +
-                    " leading=" + leading;
 
         FontMetricsInt fontMetricsInt = new FontMetricsInt();
         fontMetricsInt.top = top;
@@ -62,6 +56,6 @@ public class Paint_FontMetricsIntTest extends TestCase {
         fontMetricsInt.bottom = bottom;
         fontMetricsInt.leading = leading;
 
-        assertEquals(expected, fontMetricsInt.toString());
+        assertNotNull(fontMetricsInt.toString());
     }
 }

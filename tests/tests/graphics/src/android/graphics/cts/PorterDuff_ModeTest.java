@@ -19,22 +19,15 @@ package android.graphics.cts;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(PorterDuff.Mode.class)
 public class PorterDuff_ModeTest extends AndroidTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -60,7 +53,6 @@ public class PorterDuff_ModeTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test values().",
         method = "values",
         args = {}
     )
