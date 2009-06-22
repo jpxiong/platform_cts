@@ -15,22 +15,20 @@
  */
 package android.graphics.cts;
 
+import junit.framework.TestCase;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Canvas.EdgeType;
-import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(Canvas.EdgeType.class)
-public class Canvas_EdgeTypeTest extends AndroidTestCase {
+public class Canvas_EdgeTypeTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: valueOf",
         method = "valueOf",
         args = {java.lang.String.class}
     )
@@ -39,37 +37,11 @@ public class Canvas_EdgeTypeTest extends AndroidTestCase {
         assertEquals(EdgeType.AA, EdgeType.valueOf("AA"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this"
-                    + "enumeration is used as an argument",
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this"
-                    + "enumeration is used as an argument",
-            method = "quickReject",
-            args = {android.graphics.Path.class, android.graphics.Canvas.EdgeType.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this"
-                    + "enumeration is used as an argument",
-            method = "quickReject",
-            args = {android.graphics.RectF.class, android.graphics.Canvas.EdgeType.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: values and tests for the behavior of the methods where this"
-                    + "enumeration is used as an argument",
-            method = "quickReject",
-            args = {int.class, int.class, int.class, int.class, 
-                    android.graphics.Canvas.EdgeType.class}
-        )
-    })
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "values",
+        args = {}
+    )
     public void testValues(){
         EdgeType[] edgeType = EdgeType.values();
 

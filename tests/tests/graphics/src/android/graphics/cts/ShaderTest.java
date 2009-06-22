@@ -30,7 +30,6 @@ import dalvik.annotation.TestTargetClass;
 public class ShaderTest extends AndroidTestCase {
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Default constructor",
         method = "Shader",
         args = {}
     )
@@ -41,13 +40,11 @@ public class ShaderTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setLocalMatrix(Matrix localM) and getLocalMatrix(Matrix localM).",
             method = "setLocalMatrix",
             args = {android.graphics.Matrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setLocalMatrix(Matrix localM) and getLocalMatrix(Matrix localM).",
             method = "getLocalMatrix",
             args = {android.graphics.Matrix.class}
         )

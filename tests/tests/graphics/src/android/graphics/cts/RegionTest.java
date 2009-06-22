@@ -104,12 +104,6 @@ public class RegionTest extends AndroidTestCase {
 
     private Region mRegion;
 
-    @Override  
-    protected void setUp() throws Exception {   
-        super.setUp();  
-        mRegion = null; 
-    }
-
     private void assertPointsInsideRegion(int[][] area) {
         for (int i = 0; i < area.length; i ++) {
             assertTrue(mRegion.contains(area[i][0], area[i][1]));
@@ -125,25 +119,21 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Region.",
             method = "Region",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Region.",
             method = "Region",
             args = {android.graphics.Region.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Region.",
             method = "Region",
             args = {android.graphics.Rect.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of Region.",
             method = "Region",
             args = {int.class, int.class, int.class, int.class}
         )
@@ -167,13 +157,11 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(Region region).",
             method = "set",
             args = {android.graphics.Region.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(Region region).",
             method = "getBounds",
             args = {}
         )
@@ -193,13 +181,11 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(Rect r).",
             method = "set",
             args = {android.graphics.Rect.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(Rect r).",
             method = "getBounds",
             args = {}
         )
@@ -218,13 +204,11 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(int left, int top, int right, int bottom).",
             method = "set",
             args = {int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test set(int left, int top, int right, int bottom).",
             method = "getBounds",
             args = {}
         )
@@ -241,7 +225,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isRect().",
         method = "isRect",
         args = {}
     )
@@ -256,13 +239,11 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isComplex().",
             method = "isComplex",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isComplex().",
             method = "set",
             args = {int.class, int.class, int.class, int.class}
         )
@@ -287,32 +268,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test finalize().",
-        method = "finalize",
-        args = {}
-    )
-    public void testFinalize() {
-
-        MockRegion mockRegion = new MockRegion();
-        try {
-            mockRegion.finalize();
-        } catch (Throwable e) {
-            fail("Should not throw Throwable");
-        }
-        // finalize function just make sure it doesn't throw out any exception.
-    }
-
-    class MockRegion extends Region {
-
-        @Override
-        protected void finalize() throws Throwable {
-            super.finalize();
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test quickContains(Rect r).",
         method = "quickContains",
         args = {android.graphics.Rect.class}
     )
@@ -332,7 +287,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test quickContains(int left, int top, int right, int bottom).",
         method = "quickContains",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -351,7 +305,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test union(Rect r).",
         method = "union",
         args = {android.graphics.Rect.class}
     )
@@ -399,7 +352,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test contains(int x, int y).",
         method = "contains",
         args = {int.class, int.class}
     )
@@ -439,13 +391,11 @@ public class RegionTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setEmpty() and isEmpty().",
             method = "setEmpty",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setEmpty() and isEmpty().",
             method = "isEmpty",
             args = {}
         )
@@ -463,7 +413,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getBounds(Rect r).",
         method = "getBounds",
         args = {android.graphics.Rect.class}
     )
@@ -474,6 +423,7 @@ public class RegionTest extends AndroidTestCase {
             mRegion.getBounds(null);
             fail("Should throw NullPointerException!");
         } catch (NullPointerException e) {
+            //except here
         }
 
         // Normal, return true.
@@ -486,11 +436,8 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.getBounds(rect2));
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test op(Rect r, Op op).",
         method = "op",
         args = {android.graphics.Rect.class, android.graphics.Region.Op.class}
     )
@@ -719,11 +666,8 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect5, mRegion.getBounds());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test op(int left, int top, int right, int bottom, Op op).",
         method = "op",
         args = {int.class, int.class, int.class, int.class, android.graphics.Region.Op.class}
     )
@@ -942,11 +886,8 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect5, mRegion.getBounds());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test op(Region region, Op op).",
         method = "op",
         args = {android.graphics.Region.class, android.graphics.Region.Op.class}
     )
@@ -1175,13 +1116,10 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test op(Rect rect, Region region, Op op).",
         method = "op",
-        args = {android.graphics.Rect.class, android.graphics.Region.class, 
+        args = {android.graphics.Rect.class, android.graphics.Region.class,
                 android.graphics.Region.Op.class}
     )
     public void testOp4() {
@@ -1213,6 +1151,7 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.op(rect1, region1, Region.Op.DIFFERENCE));
         assertFalse(mRegion.op(rect1, region1, Region.Op.INTERSECT));
         assertFalse(mRegion.op(rect1, region1, Region.Op.UNION));
+
         assertFalse(mRegion.op(rect1, region1, Region.Op.XOR));
         assertFalse(mRegion.op(rect1, region1, Region.Op.REVERSE_DIFFERENCE));
         assertFalse(mRegion.op(rect1, region1, Region.Op.REPLACE));
@@ -1385,13 +1324,10 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test op(Region region1, Region region2, Op op).",
         method = "op",
-        args = {android.graphics.Region.class, android.graphics.Region.class, 
+        args = {android.graphics.Region.class, android.graphics.Region.class,
                 android.graphics.Region.Op.class}
     )
     public void testOp5() {
@@ -1591,11 +1527,8 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getBoundaryPath().",
         method = "getBoundaryPath",
         args = {}
     )
@@ -1613,7 +1546,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getBoundaryPath(Path path).",
         method = "getBoundaryPath",
         args = {android.graphics.Path.class}
     )
@@ -1643,7 +1575,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "The rect in the region will match the smaller one.",
         method = "setPath",
         args = {android.graphics.Path.class, android.graphics.Region.class}
     )
@@ -1698,7 +1629,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test translate(int dx, int dy).",
         method = "translate",
         args = {int.class, int.class}
     )
@@ -1714,7 +1644,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test translate(int dx, int dy, Region dst).",
         method = "translate",
         args = {int.class, int.class, android.graphics.Region.class}
     )
@@ -1733,7 +1662,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel p, int flags).",
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
@@ -1762,7 +1690,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test describeContents().",
         method = "describeContents",
         args = {}
     )
@@ -1775,7 +1702,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test quickReject(Rect r).",
         method = "quickReject",
         args = {android.graphics.Rect.class}
     )
@@ -1799,7 +1725,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test quickReject(int left, int top, int right, int bottom).",
         method = "quickReject",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -1817,7 +1742,6 @@ public class RegionTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test quickReject(Region rgn).",
         method = "quickReject",
         args = {android.graphics.Region.class}
     )

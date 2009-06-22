@@ -15,13 +15,7 @@
  */
 package android.graphics.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import javax.microedition.khronos.opengles.GL;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -41,15 +35,21 @@ import android.graphics.Canvas.VertexMode;
 import android.graphics.Path.Direction;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Region.Op;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 
-import javax.microedition.khronos.opengles.GL;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Canvas.class)
-public class CanvasTest extends AndroidTestCase {
+public class CanvasTest extends InstrumentationTestCase {
     private final static int PAINT_COLOR = 0xff00ff00;
     private final static int BITMAP_WIDTH = 10;
     private final static int BITMAP_HEIGHT = 28;
@@ -68,13 +68,10 @@ public class CanvasTest extends AndroidTestCase {
             9, 8, 7, 6, 5, 4, 3, 2, 1
     };
 
-    Paint mPaint;
-
-    Canvas mCanvas;
-
-    Bitmap mImmutableBitmap;
-
-    Bitmap mMutableBitmap;
+    private Paint mPaint;
+    private Canvas mCanvas;
+    private Bitmap mImmutableBitmap;
+    private Bitmap mMutableBitmap;
 
     @Override
     protected void setUp() throws Exception {
@@ -83,7 +80,7 @@ public class CanvasTest extends AndroidTestCase {
         mPaint = new Paint();
         mPaint.setColor(PAINT_COLOR);
 
-        final Resources res = getContext().getResources();
+        final Resources res = getInstrumentation().getTargetContext().getResources();
         mImmutableBitmap = BitmapFactory.decodeResource(res, R.drawable.start);
         mMutableBitmap = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Config.ARGB_8888);
         mCanvas = new Canvas(mMutableBitmap);
@@ -91,7 +88,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: Canvas",
         method = "Canvas",
         args = {}
     )
@@ -102,15 +98,15 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: Canvas",
         method = "Canvas",
         args = {android.graphics.Bitmap.class}
     )
+    @ToBeFixed(bug="1839977", explanation="These two abnormal case will crash the process")
     public void testCanvas2() {
         // abnormal case: bitmap to be constructed is immutable
         try {
             new Canvas(mImmutableBitmap);
-            fail("testCanvas2 failed");
+            fail("should throw out IllegalStateException when creating Canvas with an ImmutableBitmap");
         } catch (IllegalStateException e) {
             // expected
         }
@@ -119,7 +115,8 @@ public class CanvasTest extends AndroidTestCase {
         mMutableBitmap.recycle();
         try {
             new Canvas(mMutableBitmap);
-            fail("testCanvas2 failed");
+            fail("should throw out RuntimeException when creating Canvas with a"
+                     + " MutableBitmap which is recycled");
         } catch (RuntimeException e) {
             // expected
         }
@@ -131,13 +128,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: Canvas and getGL",
             method = "Canvas",
             args = {javax.microedition.khronos.opengles.GL.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: Canvas and getGL",
             method = "getGL",
             args = {}
         )
@@ -152,7 +147,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: freeGlCaches",
         method = "freeGlCaches",
         args = {}
     )
@@ -163,7 +157,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: setBitmap",
         method = "setBitmap",
         args = {android.graphics.Bitmap.class}
     )
@@ -171,7 +164,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: bitmap to be set is immutable
         try {
             mCanvas.setBitmap(mImmutableBitmap);
-            fail("testSetBitmap failed");
+            fail("should throw out IllegalStateException when setting an "
+                    + "ImmutableBitmap to a Canvas");
         } catch (IllegalStateException e) {
             // expected
         }
@@ -180,7 +174,8 @@ public class CanvasTest extends AndroidTestCase {
         final Canvas c = new Canvas(new MyGL());
         try {
             c.setBitmap(mMutableBitmap);
-            fail("testSetBitmap failed");
+            fail("should throw out RuntimeException when setting MutableBitmap to Canvas "
+                    + "when the Canvas is created with GL");
         } catch (RuntimeException e) {
             // expected
         }
@@ -189,7 +184,8 @@ public class CanvasTest extends AndroidTestCase {
         mMutableBitmap.recycle();
         try {
             mCanvas.setBitmap(mMutableBitmap);
-            fail("testCanvas2 failed");
+            fail("should throw out RuntimeException when setting Bitmap which is recycled"
+                          + " to a Canvas");
         } catch (RuntimeException e) {
             // expected
         }
@@ -203,19 +199,16 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setViewport, getWidth and getHeight",
             method = "setViewport",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setViewport, getWidth and getHeight",
             method = "getWidth",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: setViewport, getWidth and getHeight",
             method = "getHeight",
             args = {}
         )
@@ -238,7 +231,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: isOpaque",
         method = "isOpaque",
         args = {}
     )
@@ -248,7 +240,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: restore",
         method = "restore",
         args = {}
     )
@@ -256,7 +247,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: save not called before restore
         try {
             mCanvas.restore();
-            fail("testRestore failed");
+            fail("should throw out IllegalStateException because cannot restore Canvas"
+                            + " before save");
         } catch (IllegalStateException e) {
             // expected
         }
@@ -268,13 +260,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore",
             method = "save",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore",
             method = "restore",
             args = {}
         )
@@ -310,13 +300,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore",
             method = "save",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: save and restore",
             method = "restore",
             args = {}
         )
@@ -408,13 +396,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayer and restore",
             method = "saveLayer",
             args = {android.graphics.RectF.class, android.graphics.Paint.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayer and restore",
             method = "restore",
             args = {}
         )
@@ -509,14 +495,12 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayer and restore",
             method = "saveLayer",
             args = {float.class, float.class, float.class, float.class,
                     android.graphics.Paint.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayer and restore",
             method = "restore",
             args = {}
         )
@@ -610,13 +594,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayerAlpha and restore",
             method = "saveLayerAlpha",
             args = {android.graphics.RectF.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayerAlpha and restore",
             method = "restore",
             args = {}
         )
@@ -710,13 +692,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayerAlpha and restore",
             method = "saveLayerAlpha",
             args = {float.class, float.class, float.class, float.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: saveLayerAlpha and restore",
             method = "restore",
             args = {}
         )
@@ -807,7 +787,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: getSaveCount",
         method = "getSaveCount",
         args = {}
     )
@@ -826,7 +805,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: restoreToCount",
         method = "restoreToCount",
         args = {int.class}
     )
@@ -834,7 +812,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: saveCount less than 1
         try {
             mCanvas.restoreToCount(0);
-            fail("testRestoreToCount failed");
+            fail("should throw out IllegalArgumentException because saveCount is less than 1");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -870,13 +848,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getMatrix abd setMatrix",
             method = "getMatrix",
             args = {android.graphics.Matrix.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getMatrix abd setMatrix",
             method = "setMatrix",
             args = {android.graphics.Matrix.class}
         )
@@ -905,13 +881,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getMatrix abd setMatrix",
             method = "getMatrix",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getMatrix abd setMatrix",
             method = "setMatrix",
             args = {android.graphics.Matrix.class}
         )
@@ -938,7 +912,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: translate",
         method = "translate",
         args = {float.class, float.class}
     )
@@ -962,7 +935,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: scale",
         method = "scale",
         args = {float.class, float.class}
     )
@@ -986,7 +958,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: scale",
         method = "scale",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -1010,7 +981,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: rotate",
         method = "rotate",
         args = {float.class}
     )
@@ -1034,7 +1004,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: rotate",
         method = "rotate",
         args = {float.class, float.class, float.class}
     )
@@ -1058,7 +1027,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: skew",
         method = "skew",
         args = {float.class, float.class}
     )
@@ -1082,7 +1050,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: concat",
         method = "concat",
         args = {android.graphics.Matrix.class}
     )
@@ -1109,7 +1076,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.RectF.class, android.graphics.Region.Op.class}
     )
@@ -1124,7 +1090,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.Rect.class, android.graphics.Region.Op.class}
     )
@@ -1139,7 +1104,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.RectF.class}
     )
@@ -1149,7 +1113,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {android.graphics.Rect.class}
     )
@@ -1159,9 +1122,8 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
-        args = {float.class, float.class, float.class, float.class, 
+        args = {float.class, float.class, float.class, float.class,
                 android.graphics.Region.Op.class}
     )
     public void testClipRect5() {
@@ -1175,7 +1137,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {float.class, float.class, float.class, float.class}
     )
@@ -1185,7 +1146,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRect",
         method = "clipRect",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -1195,7 +1155,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipPath",
         method = "clipPath",
         args = {android.graphics.Path.class}
     )
@@ -1207,7 +1166,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipPath",
         method = "clipPath",
         args = {android.graphics.Path.class, android.graphics.Region.Op.class}
     )
@@ -1225,7 +1183,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRegion",
         method = "clipRegion",
         args = {android.graphics.Region.class}
     )
@@ -1235,7 +1192,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: clipRegion",
         method = "clipRegion",
         args = {android.graphics.Region.class, android.graphics.Region.Op.class}
     )
@@ -1253,13 +1209,11 @@ public class CanvasTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getDrawFilter and setDrawFilter",
             method = "getDrawFilter",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test methods: getDrawFilter and setDrawFilter",
             method = "setDrawFilter",
             args = {android.graphics.DrawFilter.class}
         )
@@ -1274,7 +1228,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: quickReject",
         method = "quickReject",
         args = {android.graphics.RectF.class, android.graphics.Canvas.EdgeType.class}
     )
@@ -1285,7 +1238,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: quickReject",
         method = "quickReject",
         args = {android.graphics.Path.class, android.graphics.Canvas.EdgeType.class}
     )
@@ -1299,7 +1251,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: quickReject",
         method = "quickReject",
         args = {float.class, float.class, float.class, float.class,
                 android.graphics.Canvas.EdgeType.class}
@@ -1311,7 +1262,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: getClipBounds",
         method = "getClipBounds",
         args = {android.graphics.Rect.class}
     )
@@ -1326,7 +1276,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: getClipBounds",
         method = "getClipBounds",
         args = {}
     )
@@ -1346,7 +1295,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawRGB",
         method = "drawRGB",
         args = {int.class, int.class, int.class}
     )
@@ -1364,7 +1312,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawARGB",
         method = "drawARGB",
         args = {int.class, int.class, int.class, int.class}
     )
@@ -1381,7 +1328,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawColor",
         method = "drawColor",
         args = {int.class}
     )
@@ -1394,7 +1340,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawColor",
         method = "drawColor",
         args = {int.class, android.graphics.PorterDuff.Mode.class}
     )
@@ -1419,7 +1364,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPaint",
         method = "drawPaint",
         args = {android.graphics.Paint.class}
     )
@@ -1431,7 +1375,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPoints",
         method = "drawPoints",
         args = {float[].class, int.class, int.class, android.graphics.Paint.class}
     )
@@ -1441,7 +1384,7 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawPoints(new float[] {
                     10.0f, 29.0f
             }, -1, 2, mPaint);
-            fail("testDrawPoints1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because of invalid offset");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1451,7 +1394,7 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawPoints(new float[] {
                     10.0f, 29.0f
             }, 0, 31, mPaint);
-            fail("testDrawPoints1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because of invalid count");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1466,7 +1409,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPoints",
         method = "drawPoints",
         args = {float[].class, android.graphics.Paint.class}
     )
@@ -1478,7 +1420,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPoint",
         method = "drawPoint",
         args = {float.class, float.class, android.graphics.Paint.class}
     )
@@ -1490,7 +1431,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawLine",
         method = "drawLine",
         args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
     )
@@ -1502,7 +1442,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawLines",
         method = "drawLines",
         args = {float[].class, int.class, int.class, android.graphics.Paint.class}
     )
@@ -1512,7 +1451,7 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawLines(new float[] {
                     0, 0, 10, 31
             }, 2, 4, new Paint());
-            fail("testDrawLines1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because of invalid offset");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1522,7 +1461,7 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawLines(new float[] {
                     0, 0, 10, 31
             }, 0, 8, new Paint());
-            fail("testDrawLines1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because of invalid count");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1537,7 +1476,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawLines",
         method = "drawLines",
         args = {float[].class, android.graphics.Paint.class}
     )
@@ -1557,7 +1495,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawRect",
         method = "drawRect",
         args = {android.graphics.RectF.class, android.graphics.Paint.class}
     )
@@ -1569,7 +1506,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawRect",
         method = "drawRect",
         args = {android.graphics.Rect.class, android.graphics.Paint.class}
     )
@@ -1581,7 +1517,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawRect",
         method = "drawRect",
         args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
     )
@@ -1593,7 +1528,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawOval",
         method = "drawOval",
         args = {android.graphics.RectF.class, android.graphics.Paint.class}
     )
@@ -1601,7 +1535,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: Oval is null
         try {
             mCanvas.drawOval(null, mPaint);
-            fail("testDrawOval failed");
+            fail("should throw out NullPointerException because oval is null");
         } catch (NullPointerException e) {
             // expected
         }
@@ -1612,7 +1546,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawCircle",
         method = "drawCircle",
         args = {float.class, float.class, float.class, android.graphics.Paint.class}
     )
@@ -1628,16 +1561,15 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawArc",
         method = "drawArc",
         args = {android.graphics.RectF.class, float.class, float.class, boolean.class,
                 android.graphics.Paint.class}
     )
     public void testDrawArc() {
-        // abnormal case: Arc is null
+        // abnormal case: oval is null
         try {
             mCanvas.drawArc(null, 10.0f, 29.0f, true, mPaint);
-            fail("shouldn't come here");
+            fail("should throw NullPointerException because oval is null");
         } catch (NullPointerException e) {
             // expected
         }
@@ -1649,16 +1581,15 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawRoundRect",
         method = "drawRoundRect",
-        args = {android.graphics.RectF.class, float.class, float.class, 
+        args = {android.graphics.RectF.class, float.class, float.class,
                 android.graphics.Paint.class}
     )
     public void testDrawRoundRect() {
         // abnormal case: RoundRect is null
         try {
             mCanvas.drawRoundRect(null, 10.0f, 29.0f, mPaint);
-            fail("shouldn't come here");
+            fail("should throw out NullPointerException because RoundRect is null");
         } catch (NullPointerException e) {
             // expected
         }
@@ -1668,7 +1599,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPath",
         method = "drawPath",
         args = {android.graphics.Path.class, android.graphics.Paint.class}
     )
@@ -1678,7 +1608,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, float.class, float.class,
                 android.graphics.Paint.class}
@@ -1690,7 +1619,7 @@ public class CanvasTest extends AndroidTestCase {
         b.recycle();
         try {
             mCanvas.drawBitmap(b, 10.0f, 29.0f, mPaint);
-            fail("testDrawBitmap1 failed");
+            fail("should throw out RuntimeException because bitmap has been recycled");
         } catch (RuntimeException e) {
             // expected
         }
@@ -1702,7 +1631,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
                 android.graphics.RectF.class, android.graphics.Paint.class}
@@ -1714,7 +1642,7 @@ public class CanvasTest extends AndroidTestCase {
         b.recycle();
         try {
             mCanvas.drawBitmap(b, null, new RectF(), mPaint);
-            fail("testDrawBitmap1 failed");
+            fail("should throw out RuntimeException because bitmap has been recycled");
         } catch (RuntimeException e) {
             // expected
         }
@@ -1726,7 +1654,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
                 android.graphics.Rect.class, android.graphics.Paint.class}
@@ -1738,7 +1665,7 @@ public class CanvasTest extends AndroidTestCase {
         b.recycle();
         try {
             mCanvas.drawBitmap(b, null, new Rect(), mPaint);
-            fail("testDrawBitmap1 failed");
+            fail("should throw out RuntimeException because bitmap has been recycled");
         } catch (RuntimeException e) {
             // expected
         }
@@ -1750,7 +1677,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmap",
         method = "drawBitmap",
         args = {int[].class, int.class, int.class, int.class, int.class, int.class,
                 int.class, boolean.class, android.graphics.Paint.class}
@@ -1761,7 +1687,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: width less than 0
         try {
             mCanvas.drawBitmap(colors, 10, 10, 10, 10, -1, 10, true, null);
-            fail("testDrawBitmap4 failed");
+            fail("should throw out IllegalArgumentException because width is less than 0");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -1769,7 +1695,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: height less than 0
         try {
             mCanvas.drawBitmap(colors, 10, 10, 10, 10, 10, -1, true, null);
-            fail("testDrawBitmap4 failed");
+            fail("should throw out IllegalArgumentException because height is less than 0");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -1777,7 +1703,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: stride less than width and bigger than -width
         try {
             mCanvas.drawBitmap(colors, 10, 5, 10, 10, 10, 10, true, null);
-            fail("testDrawBitmap4 failed");
+            fail("should throw out IllegalArgumentException because stride less than width and"
+                            + " bigger than -width");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -1785,7 +1712,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: offset less than 0
         try {
             mCanvas.drawBitmap(colors, -1, 10, 10, 10, 10, 10, true, null);
-            fail("testDrawBitmap4 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because offset less than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1793,7 +1720,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: (offset + width) bigger than colors' length
         try {
             mCanvas.drawBitmap(new int[29], 10, 29, 10, 10, 20, 10, true, null);
-            fail("testDrawBitmap4 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of offset and width"
+                            + " is bigger than colors' length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1811,7 +1739,68 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmap",
+        method = "drawBitmap",
+        args = {int[].class, int.class, int.class, float.class, float.class, int.class,
+                int.class, boolean.class, android.graphics.Paint.class}
+    )
+    public void testDrawBitmap6() {
+        final int[] colors = new int[2008];
+
+        // abnormal case: width less than 0
+        try {
+            mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, -1, 10, true, null);
+            fail("should throw out IllegalArgumentException because width is less than 0");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // abnormal case: height less than 0
+        try {
+            mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 10, -1, true, null);
+            fail("should throw out IllegalArgumentException because height is less than 0");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // abnormal case: stride less than width and bigger than -width
+        try {
+            mCanvas.drawBitmap(colors, 10, 5, 10.0f, 10.0f, 10, 10, true, null);
+            fail("should throw out IllegalArgumentException because stride is less than width "
+                                + "and bigger than -width");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // abnormal case: offset less than 0
+        try {
+            mCanvas.drawBitmap(colors, -1, 10, 10.0f, 10.0f, 10, 10, true, null);
+            fail("should throw out IllegalArgumentException because offset is less than 0");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected
+        }
+
+        // abnormal case: (offset + width) bigger than colors' length
+        try {
+            mCanvas.drawBitmap(new int[29], 10, 29, 10.0f, 10.0f, 20, 10, true, null);
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of offset and width"
+                            + " is bigger than colors' length");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected
+        }
+
+        // special case: width equals to 0
+        mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 0, 10, true, null);
+
+        // special case: height equals to 0
+        mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 10, 0, true, null);
+
+        // normal case
+        mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 10, 29, true, null);
+        mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 10, 29, true, mPaint);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "drawBitmap",
         args = {android.graphics.Bitmap.class, android.graphics.Matrix.class,
                 android.graphics.Paint.class}
@@ -1824,7 +1813,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawBitmapMesh",
         method = "drawBitmapMesh",
         args = {android.graphics.Bitmap.class, int.class, int.class, float[].class,
                 int.class, int[].class, int.class, android.graphics.Paint.class}
@@ -1835,7 +1823,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: meshWidth less than 0
         try {
             mCanvas.drawBitmapMesh(b, -1, 10, null, 0, null, 0, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because meshWidth less than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1843,7 +1831,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: meshHeight less than 0
         try {
             mCanvas.drawBitmapMesh(b, 10, -1, null, 0, null, 0, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because meshHeight "
+                                    + "is less than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1851,7 +1840,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: vertOffset less than 0
         try {
             mCanvas.drawBitmapMesh(b, 10, 10, null, -1, null, 0, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because vertOffset "
+                                                + "is less than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1859,7 +1849,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: colorOffset less than 0
         try {
             mCanvas.drawBitmapMesh(b, 10, 10, null, 10, null, -1, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because colorOffset is"
+                                    + " less than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1875,7 +1866,8 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawBitmapMesh(b, 10, 10, new float[] {
                     10.0f, 29.0f
             }, 10, null, 10, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because verts' length"
+                                    + " is too short");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1886,7 +1878,8 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawBitmapMesh(b, 10, 10, verts, 10, new int[] {
                     10, 29
             }, 10, null);
-            fail("testDrawBitmapMesh failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because colors' "
+                        + "length is too short");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1899,7 +1892,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawVertices",
         method = "drawVertices",
         args = {android.graphics.Canvas.VertexMode.class, int.class, float[].class,
                 int.class, float[].class, int.class, int[].class, int.class, short[].class,
@@ -1917,7 +1909,8 @@ public class CanvasTest extends AndroidTestCase {
         try {
             mCanvas.drawVertices(VertexMode.TRIANGLES, 10, verts, 8, texs, 0, colors, 0, indices,
                     0, 4, mPaint);
-            fail("testDrawVertices failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of vertOffset and"
+                            + " vertexCount is bigger than verts' length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1926,7 +1919,8 @@ public class CanvasTest extends AndroidTestCase {
         try {
             mCanvas.drawVertices(VertexMode.TRIANGLES, 10, verts, 0, texs, 30, colors, 0, indices,
                     0, 4, mPaint);
-            fail("testDrawVertices failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of texOffset and"
+                                    + " vertexCount is bigger thatn texs' length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1935,7 +1929,8 @@ public class CanvasTest extends AndroidTestCase {
         try {
             mCanvas.drawVertices(VertexMode.TRIANGLES, 10, verts, 0, texs, 0, colors, 30, indices,
                     0, 4, mPaint);
-            fail("testDrawVertices failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of colorOffset and"
+                                + " vertexCount is bigger than colors' length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1944,7 +1939,8 @@ public class CanvasTest extends AndroidTestCase {
         try {
             mCanvas.drawVertices(VertexMode.TRIANGLES, 10, verts, 0, texs, 0, colors, 0, indices,
                     10, 30, mPaint);
-            fail("testDrawVertices failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of indexOffset and"
+                            + " indexCount is bigger than indices' length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -1973,7 +1969,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawText",
         method = "drawText",
         args = {char[].class, int.class, int.class, float.class, float.class,
                 android.graphics.Paint.class}
@@ -1986,7 +1981,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: index less than 0
         try {
             mCanvas.drawText(text, -1, 7, 10, 10, mPaint);
-            fail("testDrawText1 failed");
+            fail("should throw out IndexOutOfBoundsException because index is less than 0");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -1994,7 +1989,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: count less than 0
         try {
             mCanvas.drawText(text, 0, -1, 10, 10, mPaint);
-            fail("testDrawText1 failed");
+            fail("should throw out IndexOutOfBoundsException because count is less than 0");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2002,7 +1997,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: (index + count) bigger than text's length
         try {
             mCanvas.drawText(text, 0, 10, 10, 10, mPaint);
-            fail("testDrawText1 failed");
+            fail("should throw out IndexOutOfBoundsException because sum of index and count "
+                                + "is bigger than text's length");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2013,7 +2009,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.String.class, float.class, float.class, android.graphics.Paint.class}
     )
@@ -2023,7 +2018,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.String.class, int.class, int.class, float.class, float.class,
                 android.graphics.Paint.class}
@@ -2034,7 +2028,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: start less than 0
         try {
             mCanvas.drawText(text, -1, 7, 10, 30, mPaint);
-            fail("testDrawText3 failed");
+            fail("should throw out IndexOutOfBoundsException because start is lesss than 0");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2042,7 +2036,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: end less than 0
         try {
             mCanvas.drawText(text, 0, -1, 10, 30, mPaint);
-            fail("testDrawText3 failed");
+            fail("should throw out IndexOutOfBoundsException because end is less than 0");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2050,7 +2044,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: start bigger than end
         try {
             mCanvas.drawText(text, 3, 1, 10, 30, mPaint);
-            fail("testDrawText3 failed");
+            fail("should throw out IndexOutOfBoundsException because start is bigger than end");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2058,7 +2052,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: (end - start) bigger than text's length
         try {
             mCanvas.drawText(text, 0, 10, 10, 30, mPaint);
-            fail("testDrawText3 failed");
+            fail("should throw out IndexOutOfBoundsException because end subtracts start should"
+                                + " bigger than text's length");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2069,7 +2064,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawText",
         method = "drawText",
         args = {java.lang.CharSequence.class, int.class, int.class, float.class, float.class,
                 android.graphics.Paint.class}
@@ -2093,7 +2087,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPosText",
         method = "drawPosText",
         args = {char[].class, int.class, int.class, float[].class, android.graphics.Paint.class}
     )
@@ -2109,7 +2102,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: index less than 0
         try {
             mCanvas.drawPosText(text, -1, 7, pos, mPaint);
-            fail("testDrawPosText1 failed");
+            fail("should throw out IndexOutOfBoundsException because index is less than 0");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2117,7 +2110,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: index + count > text.length
         try {
             mCanvas.drawPosText(text, 1, 10, pos, mPaint);
-            fail("testDrawPosText1 failed");
+            fail("should throw out IndexOutOfBoundsException because sum of index and count is"
+                                + " bigger than text's length");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2127,7 +2121,8 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawPosText(text, 1, 10, new float[] {
                     10.0f, 30.f
             }, mPaint);
-            fail("testDrawPosText1 failed");
+            fail("should throw out IndexOutOfBoundsException because 2 times of count is"
+                                + " bigger than pos' length");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2138,7 +2133,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPosText",
         method = "drawPosText",
         args = {java.lang.String.class, float[].class, android.graphics.Paint.class}
     )
@@ -2154,7 +2148,8 @@ public class CanvasTest extends AndroidTestCase {
             mCanvas.drawPosText(text, new float[] {
                     10.0f, 30.f
             }, mPaint);
-            fail("testDrawPosText1 failed");
+            fail("should throw out IndexOutOfBoundsException because 2 times of text's length is"
+                                + " bigger than pos' length");
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
@@ -2165,7 +2160,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawTextOnPath",
         method = "drawTextOnPath",
         args = {char[].class, int.class, int.class, android.graphics.Path.class,
                 float.class, float.class, android.graphics.Paint.class}
@@ -2179,7 +2173,7 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: index < 0
         try {
             mCanvas.drawTextOnPath(text, -1, 7, path, 10.0f, 10.0f, mPaint);
-            fail("testDrawTextOnPath1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because index is smaller than 0");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -2187,7 +2181,8 @@ public class CanvasTest extends AndroidTestCase {
         // abnormal case: index + count > text.length
         try {
             mCanvas.drawTextOnPath(text, 0, 10, path, 10.0f, 10.0f, mPaint);
-            fail("testDrawTextOnPath1 failed");
+            fail("should throw out ArrayIndexOutOfBoundsException because sum of index and"
+                            + " count is bigger than text's length");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }
@@ -2198,7 +2193,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawTextOnPath",
         method = "drawTextOnPath",
         args = {java.lang.String.class, android.graphics.Path.class, float.class,
                 float.class, android.graphics.Paint.class}
@@ -2217,7 +2211,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class}
     )
@@ -2227,7 +2220,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class, android.graphics.RectF.class}
     )
@@ -2244,7 +2236,6 @@ public class CanvasTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "test method: drawPicture",
         method = "drawPicture",
         args = {android.graphics.Picture.class, android.graphics.Rect.class}
     )
@@ -2257,16 +2248,6 @@ public class CanvasTest extends AndroidTestCase {
 
         p.beginRecording(10, 30);
         mCanvas.drawPicture(p, dst);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test method: finalize",
-        method = "finalize",
-        args = {}
-    )
-    public void testfinalize() {
-        // this method need not to test, write here just for coverage
     }
 
     private void preCompare() {
