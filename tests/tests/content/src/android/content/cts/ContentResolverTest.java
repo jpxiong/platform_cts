@@ -51,6 +51,8 @@ public class ContentResolverTest extends AndroidTestCase {
     private static final Uri TABLE1_URI = Uri.parse("content://" + AUTHORITY + "/testtable1/");
     private static final Uri TABLE2_URI = Uri.parse("content://" + AUTHORITY + "/testtable2/");
 
+    private static final Account ACCOUNT = new Account("cts", "cts");
+
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key2";
     private static final String KEY3 = "key3";
@@ -729,13 +731,12 @@ public class ContentResolverTest extends AndroidTestCase {
     public void testStartCancelSync() {
         Bundle extras = new Bundle();
 
-        extras.putBoolean(ContentResolver.SYNC_EXTRAS_FORCE, true);
-        extras.putParcelable(ContentResolver.SYNC_EXTRAS_ACCOUNT, new Account("cts", "cts"));
+        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 
-        mContentResolver.startSync(TABLE1_URI, extras);
+        ContentResolver.requestSync(ACCOUNT, AUTHORITY, extras);
         //FIXME: how to get the result to assert.
 
-        mContentResolver.cancelSync(TABLE1_URI);
+        ContentResolver.cancelSync(ACCOUNT, AUTHORITY);
         //FIXME: how to assert.
     }
 
@@ -748,7 +749,7 @@ public class ContentResolverTest extends AndroidTestCase {
             "ContentResolver#startSync(Uri, Bundle) when extras is null")
     public void testStartSyncFailure() {
         try {
-            mContentResolver.startSync(TABLE1_URI, null);
+            ContentResolver.requestSync(null, null, null);
             fail("did not throw IllegalArgumentException when extras is null.");
         } catch (IllegalArgumentException e) {
             //expected.
