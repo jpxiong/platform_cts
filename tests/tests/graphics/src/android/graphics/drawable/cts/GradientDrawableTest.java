@@ -16,7 +16,13 @@
 
 package android.graphics.drawable.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,31 +34,22 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
-import android.graphics.drawable.GradientDrawable.Orientation;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(android.graphics.drawable.GradientDrawable.class)
 public class GradientDrawableTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of GradientDrawable.",
             method = "GradientDrawable",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of GradientDrawable.",
             method = "GradientDrawable",
             args = {android.graphics.drawable.GradientDrawable.Orientation.class, int[].class}
         )
@@ -67,38 +64,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getPadding(Rect padding).",
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException")
-    public void testGetPadding() {
-        // super class always return false
-        Rect r = new Rect(1, 1, 1, 1);
-        assertEquals(1, r.left);
-        assertEquals(1, r.top);
-        assertEquals(1, r.right);
-        assertEquals(1, r.bottom);
-
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        assertFalse(gradientDrawable.getPadding(r));
-        assertEquals(0, r.left);
-        assertEquals(0, r.top);
-        assertEquals(0, r.right);
-        assertEquals(0, r.bottom);
-
-        // input null as param
-        try {
-            assertFalse(gradientDrawable.getPadding(null));
-            fail("There should be a NullPointerException thrown out.");
-        } catch (NullPointerException e) {
-            // expected, test success
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
         method = "setCornerRadii",
         args = {float[].class}
     )
@@ -120,7 +85,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setCornerRadius",
         args = {float.class}
     )
@@ -136,7 +100,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setStroke",
         args = {int.class, int.class}
     )
@@ -152,7 +115,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setStroke",
         args = {int.class, int.class, float.class, float.class}
     )
@@ -177,7 +139,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setSize(int width, int height).",
         method = "setSize",
         args = {int.class, int.class}
     )
@@ -202,7 +163,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setShape",
         args = {int.class}
     )
@@ -221,7 +181,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setGradientType",
         args = {int.class}
     )
@@ -240,7 +199,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setGradientCenter",
         args = {float.class, float.class}
     )
@@ -256,7 +214,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setGradientRadius",
         args = {float.class}
     )
@@ -272,7 +229,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setUseLevel",
         args = {boolean.class}
     )
@@ -288,7 +244,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test draw(Canvas canvas). Can not assert.",
         method = "draw",
         args = {android.graphics.Canvas.class}
     )
@@ -304,7 +259,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "setColor",
         args = {int.class}
     )
@@ -323,7 +277,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getChangingConfigurations().",
         method = "getChangingConfigurations",
         args = {}
     )
@@ -340,7 +293,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setAlpha(int alpha). No getter can not be tested",
         method = "setAlpha",
         args = {int.class}
     )
@@ -354,7 +306,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setDither(boolean dither). No getter can not be tested",
         method = "setDither",
         args = {boolean.class}
     )
@@ -368,7 +319,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setColorFilter(ColorFilter cf). No getter can not be tested",
         method = "setColorFilter",
         args = {android.graphics.ColorFilter.class}
     )
@@ -384,7 +334,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getOpacity(). The method always return value: PixelFormat.TRANSLUCENT.",
         method = "getOpacity",
         args = {}
     )
@@ -393,69 +342,75 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, gradientDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onBoundsChange(Rect r). No getter can not be tested",
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
-    public void testOnBoundsChange() {
-        MockGradientDrawable gradientDrawable = new MockGradientDrawable();
-        Rect r = new Rect(1, 1, 1, 1);
-        gradientDrawable.onBoundsChange(r);
-
-        // input null as param
-        gradientDrawable.onBoundsChange(null);
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onBoundsChange",
+            args = {android.graphics.Rect.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.NOT_NECESSARY,
+            method = "onLevelChange",
+            args = {int.class}
+        )
+    })
+    public void testMethods() {
+        // implementation details, do not test.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onLevelChange(int level). No getter can not be tested",
-        method = "onLevelChange",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
-    public void testOnLevelChange() {
-        MockGradientDrawable gradientDrawable = new MockGradientDrawable();
-
-        gradientDrawable.onLevelChange(5);
-        gradientDrawable.onLevelChange(-5);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested, and there" +
-            " should not be a NullPointerException thrown out.")
-    public void testInflate() {
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "inflate",
+            args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
+                    android.util.AttributeSet.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getPadding",
+            args = {android.graphics.Rect.class}
+        )
+    })
+    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
+    public void testInflate() throws XmlPullParserException, IOException {
         GradientDrawable gradientDrawable = new GradientDrawable();
+        Rect rect = new Rect();
+        assertFalse(gradientDrawable.getPadding(rect));
+        assertEquals(0, rect.left);
+        assertEquals(0, rect.top);
+        assertEquals(0, rect.right);
+        assertEquals(0, rect.bottom);
 
-        Resources r = mContext.getResources();
-        XmlPullParser parser = r.getXml(R.layout.framelayout_layout);
+        Resources resources = mContext.getResources();
+        XmlPullParser parser = resources.getXml(R.drawable.gradientdrawable);
         AttributeSet attrs = Xml.asAttributeSet(parser);
 
+        // find the START_TAG
+        int type;
+        while ((type = parser.next()) != XmlPullParser.START_TAG &&
+                type != XmlPullParser.END_DOCUMENT) {
+            // Empty loop
+        }
+        assertEquals(XmlPullParser.START_TAG, type);
+
+        // padding is set in gradientdrawable.xml
+        gradientDrawable.inflate(resources, parser, attrs);
+        assertTrue(gradientDrawable.getPadding(rect));
+        assertEquals(4, rect.left);
+        assertEquals(2, rect.top);
+        assertEquals(6, rect.right);
+        assertEquals(10, rect.bottom);
+
         try {
-            gradientDrawable.inflate(r, parser, attrs);
+            gradientDrawable.getPadding(null);
+            fail("did not throw NullPointerException when rect is null.");
+        } catch (NullPointerException e) {
             // expected, test success
-        } catch (XmlPullParserException e) {
-            fail("There should not be a XmlPullParserException thrown out.");
-        } catch (IOException e) {
-            fail("There should not be an IOException thrown out.");
         }
 
-        // input null as params
         try {
             gradientDrawable.inflate(null, null, null);
-            fail("There should be a NullPointerException thrown out.");
-        } catch (XmlPullParserException e) {
-            fail("There should not be a XmlPullParserException thrown out.");
-        } catch (IOException e) {
-            fail("There should not be an IOException thrown out.");
+            fail("did not throw NullPointerException when parameters are null.");
         } catch (NullPointerException e) {
             // expected, test success
         }
@@ -463,7 +418,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicWidth().",
         method = "getIntrinsicWidth",
         args = {}
     )
@@ -478,7 +432,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicHeight().",
         method = "getIntrinsicHeight",
         args = {}
     )
@@ -493,7 +446,6 @@ public class GradientDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getConstantState().",
         method = "getConstantState",
         args = {}
     )
@@ -504,13 +456,40 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertNotNull(gradientDrawable.getConstantState());
     }
 
-    private class MockGradientDrawable extends GradientDrawable {
-        public void onBoundsChange(Rect r) {
-            super.onBoundsChange(r);
-        }
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "mutate",
+        args = {}
+    )
+    public void testMutate() {
+        Resources resources = mContext.getResources();
+        GradientDrawable d1 = (GradientDrawable) resources.getDrawable(R.drawable.gradientdrawable);
+        GradientDrawable d2 = (GradientDrawable) resources.getDrawable(R.drawable.gradientdrawable);
+        GradientDrawable d3 = (GradientDrawable) resources.getDrawable(R.drawable.gradientdrawable);
 
-        public boolean onLevelChange(int level) {
-            return super.onLevelChange(level);
-        }
+        d1.setSize(10, 10);
+        assertEquals(10, d1.getIntrinsicHeight());
+        assertEquals(10, d1.getIntrinsicWidth());
+        assertEquals(10, d2.getIntrinsicHeight());
+        assertEquals(10, d2.getIntrinsicWidth());
+        assertEquals(10, d3.getIntrinsicHeight());
+        assertEquals(10, d3.getIntrinsicWidth());
+
+        d1.mutate();
+        d1.setSize(20, 30);
+        assertEquals(30, d1.getIntrinsicHeight());
+        assertEquals(20, d1.getIntrinsicWidth());
+        assertEquals(10, d2.getIntrinsicHeight());
+        assertEquals(10, d2.getIntrinsicWidth());
+        assertEquals(10, d3.getIntrinsicHeight());
+        assertEquals(10, d3.getIntrinsicWidth());
+
+        d2.setSize(40, 50);
+        assertEquals(30, d1.getIntrinsicHeight());
+        assertEquals(20, d1.getIntrinsicWidth());
+        assertEquals(50, d2.getIntrinsicHeight());
+        assertEquals(40, d2.getIntrinsicWidth());
+        assertEquals(50, d3.getIntrinsicHeight());
+        assertEquals(40, d3.getIntrinsicWidth());
     }
 }

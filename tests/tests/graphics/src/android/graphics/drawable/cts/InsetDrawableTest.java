@@ -16,7 +16,13 @@
 
 package android.graphics.drawable.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -33,28 +39,20 @@ import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(android.graphics.drawable.InsetDrawable.class)
 public class InsetDrawableTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s).",
             method = "InsetDrawable",
             args = {android.graphics.drawable.Drawable.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s).",
             method = "InsetDrawable",
-            args = {android.graphics.drawable.Drawable.class, int.class, int.class, int.class, 
+            args = {android.graphics.drawable.Drawable.class, int.class, int.class, int.class,
                     int.class}
         )
     })
@@ -69,9 +67,8 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test inflate(Resources r, XmlPullParser parser, AttributeSet attrs).",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested," +
@@ -108,7 +105,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "The param \"who\" is not used in this method.",
         method = "invalidateDrawable",
         args = {android.graphics.drawable.Drawable.class}
     )
@@ -123,7 +119,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "The param \"who\" is not used in this method.",
         method = "scheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
     )
@@ -146,7 +141,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "The param \"who\" is not used in this method.",
         method = "unscheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
     )
@@ -169,7 +163,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test draw(Canvas canvas).",
         method = "draw",
         args = {android.graphics.Canvas.class}
     )
@@ -193,7 +186,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getChangingConfigurations().",
         method = "getChangingConfigurations",
         args = {}
     )
@@ -210,7 +202,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getPadding(Rect padding).",
         method = "getPadding",
         args = {android.graphics.Rect.class}
     )
@@ -260,7 +251,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setVisible(boolean visible, boolean restart).",
         method = "setVisible",
         args = {boolean.class, boolean.class}
     )
@@ -275,7 +265,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setAlpha(int alpha).",
         method = "setAlpha",
         args = {int.class}
     )
@@ -294,7 +283,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setColorFilter(ColorFilter cf).",
         method = "setColorFilter",
         args = {android.graphics.ColorFilter.class}
     )
@@ -313,7 +301,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getOpacity().",
         method = "getOpacity",
         args = {}
     )
@@ -329,7 +316,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isStateful(). This method always return false.",
         method = "isStateful",
         args = {}
     )
@@ -341,7 +327,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onStateChange(int[] state).",
         method = "onStateChange",
         args = {int[].class}
     )
@@ -371,7 +356,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onBoundsChange(Rect bounds).",
         method = "onBoundsChange",
         args = {android.graphics.Rect.class}
     )
@@ -406,7 +390,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicWidth().",
         method = "getIntrinsicWidth",
         args = {}
     )
@@ -426,7 +409,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicHeight().",
         method = "getIntrinsicHeight",
         args = {}
     )
@@ -446,7 +428,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getConstantState().",
         method = "getConstantState",
         args = {}
     )
@@ -458,6 +439,22 @@ public class InsetDrawableTest extends AndroidTestCase {
 
         ConstantState constantState = insetDrawable.getConstantState();
         assertNotNull(constantState);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.SUFFICIENT,
+        method = "mutate",
+        args = {}
+    )
+    public void testMutate() {
+        Resources resources = mContext.getResources();
+        InsetDrawable d1 = (InsetDrawable) resources.getDrawable(R.drawable.insetdrawable);
+
+        d1.setAlpha(100);
+        d1.mutate();
+        d1.setAlpha(200);
+
+        // Cannot test whether alpha was set properly.
     }
 
     private class MockInsetDrawable extends InsetDrawable {

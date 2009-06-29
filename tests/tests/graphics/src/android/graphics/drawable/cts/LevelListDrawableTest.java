@@ -16,13 +16,7 @@
 
 package android.graphics.drawable.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,10 +29,14 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.test.InstrumentationTestCase;
-import android.util.AttributeSet;
 import android.util.Xml;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(LevelListDrawable.class)
 public class LevelListDrawableTest extends InstrumentationTestCase {
@@ -58,7 +56,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor.",
         method = "LevelListDrawable",
         args = {}
     )
@@ -71,7 +68,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link LevelListDrawable#addLevel(int, int, Drawable)}.",
         method = "addLevel",
         args = {int.class, int.class, android.graphics.drawable.Drawable.class}
     )
@@ -98,7 +94,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link LevelListDrawable#onLevelChange(int)}.",
         method = "onLevelChange",
         args = {int.class}
     )
@@ -136,9 +131,8 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link LevelListDrawable#inflate(Resources, XmlPullParser, AttributeSet)}.",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
@@ -176,9 +170,8 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
@@ -203,6 +196,30 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
             fail("Should throw XmlPullParserException if AttributeSet is null");
         } catch (NullPointerException e) {
         }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.SUFFICIENT,
+        method = "mutate",
+        args = {}
+    )
+    public void testMutate() throws InterruptedException {
+        Resources resources = getInstrumentation().getTargetContext().getResources();
+        LevelListDrawable d1 =
+            (LevelListDrawable) resources.getDrawable(R.drawable.levellistdrawable);
+        LevelListDrawable d2 =
+            (LevelListDrawable) resources.getDrawable(R.drawable.levellistdrawable);
+        LevelListDrawable d3 =
+            (LevelListDrawable) resources.getDrawable(R.drawable.levellistdrawable);
+
+        // the state does not appear to be shared before calling mutate()
+        d1.addLevel(100, 200, resources.getDrawable(R.drawable.testimage));
+        assertEquals(3, ((DrawableContainerState) d1.getConstantState()).getChildCount());
+        assertEquals(2, ((DrawableContainerState) d2.getConstantState()).getChildCount());
+        assertEquals(2, ((DrawableContainerState) d3.getConstantState()).getChildCount());
+
+        // simply call mutate to make sure no exception is thrown
+        d1.mutate();
     }
 
     private XmlResourceParser getResourceParser(int resId) throws XmlPullParserException,

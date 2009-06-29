@@ -16,6 +16,32 @@
 
 package android.graphics.drawable.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import android.content.ContentResolver;
+import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable.Callback;
+import android.net.Uri;
+import android.test.AndroidTestCase;
+import android.util.AttributeSet;
+import android.util.StateSet;
+import android.util.Xml;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,37 +50,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.Drawable.Callback;
-import android.net.Uri;
-import android.test.AndroidTestCase;
-import android.util.AttributeSet;
-import android.util.StateSet;
-import android.util.Xml;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
-
 @TestTargetClass(Drawable.class)
-public class DrawableTest extends AndroidTestCase{
+public class DrawableTest extends AndroidTestCase {
+    Resources mResources;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        mResources = mContext.getResources();
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test clearColorFilter()",
         method = "clearColorFilter",
         args = {}
     )
@@ -74,13 +82,11 @@ public class DrawableTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test copyBounds() and copyBounds(Rect)",
             method = "copyBounds",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test copyBounds() and copyBounds(Rect)",
             method = "copyBounds",
             args = {android.graphics.Rect.class}
         )
@@ -135,152 +141,146 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test createFromPath(String)",
         method = "createFromPath",
         args = {java.lang.String.class}
     )
-    public void testCreateFromPath() {
+    public void testCreateFromPath() throws IOException {
         assertNull(Drawable.createFromPath(null));
 
-        Uri uri = Uri.parse("android.resource://com.android.cts.stub/" + R.raw.testimage);
+        Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                mContext.getPackageName() + R.raw.testimage);
         assertNull(Drawable.createFromPath(uri.getPath()));
 
-        File imagefile = new File("/data/data/com.android.cts.stub", "tempimage.jpg");
-        if (imagefile.exists()) {
-            imagefile.delete();
-        }
-        writeSampleImage(imagefile);
+        File imageFile = new File(mContext.getFilesDir(), "tempimage.jpg");
+        assertTrue(imageFile.createNewFile());
+        assertTrue(imageFile.exists());
+        writeSampleImage(imageFile);
 
-        final String path = imagefile.getPath();
+        final String path = imageFile.getPath();
         Uri u = Uri.parse(path);
         assertNotNull(Drawable.createFromPath(u.toString()));
-
-        imagefile.delete();
+        assertTrue(imageFile.delete());
     }
 
-    private void writeSampleImage(File imagefile) {
+    private void writeSampleImage(File imagefile) throws IOException {
         InputStream source = null;
         OutputStream target = null;
 
         try {
-            source = getContext().getResources().openRawResource(R.raw.testimage);
+            source = mResources.openRawResource(R.raw.testimage);
             target = new FileOutputStream(imagefile);
 
             byte[] buffer = new byte[1024];
-            for (int len = source.read(buffer); len > 0; len = source.read(buffer)) {
+            for (int len = source.read(buffer); len >= 0; len = source.read(buffer)) {
                 target.write(buffer, 0, len);
             }
-        } catch (IOException e) {
-            fail(e.getMessage());
         } finally {
-            try {
-                if (source != null) {
-                    source.close();
-                }
-                if (target != null) {
-                    target.close();
-                }
-            } catch (IOException _) {
-                // Ignore the IOException.
+            if (target != null) {
+                target.close();
+            }
+
+            if (source != null) {
+                source.close();
             }
         }
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test createFromStream(InputStream, String)",
         method = "createFromStream",
         args = {java.io.InputStream.class, java.lang.String.class}
     )
     public void testCreateFromStream() throws FileNotFoundException, IOException {
+        FileInputStream inputEmptyStream = null;
+        FileInputStream inputStream = null;
+        File imageFile = null;
+        OutputStream outputEmptyStream = null;
+
         assertNull(Drawable.createFromStream(null, "test.bmp"));
 
-        File emptyfile = new File("/data/data/com.android.cts.stub", "tempemptyimage.jpg");
-        if (emptyfile.exists()) {
-            emptyfile.delete();
-        }
+        File emptyFile = new File(mContext.getFilesDir(), "tempemptyimage.jpg");
+
         // write some random data.
-        OutputStream outputEmptyStream = new FileOutputStream(emptyfile);
-        outputEmptyStream.write(10);
+        try {
+            outputEmptyStream = new FileOutputStream(emptyFile);
+            outputEmptyStream.write(10);
 
-        FileInputStream inputEmptyStream = new FileInputStream(emptyfile);
-        assertNull(Drawable.createFromStream(inputEmptyStream, "Sample"));
+            inputEmptyStream = new FileInputStream(emptyFile);
+            assertNull(Drawable.createFromStream(inputEmptyStream, "Sample"));
 
-        File imagefile = new File("/data/data/com.android.cts.stub", "tempimage.jpg");
-        if (imagefile.exists()) {
-            imagefile.delete();
+            imageFile = new File(mContext.getFilesDir(), "tempimage.jpg");
+
+            writeSampleImage(imageFile);
+
+            inputStream = new FileInputStream(imageFile);
+            assertNotNull(Drawable.createFromStream(inputStream, "Sample"));
+        } finally {
+
+            if (null != outputEmptyStream) {
+                outputEmptyStream.close();
+            }
+            if (null != inputEmptyStream) {
+                inputEmptyStream.close();
+            }
+            if (null != inputStream) {
+                inputStream.close();
+            }
+            if (emptyFile.exists()) {
+                assertTrue(emptyFile.delete());
+            }
+            if (imageFile.exists()) {
+                assertTrue(imageFile.delete());
+            }
         }
-        writeSampleImage(imagefile);
-
-        FileInputStream inputStream = new FileInputStream(imagefile);
-        assertNotNull(Drawable.createFromStream(inputStream, "Sample"));
-
-        imagefile.delete();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test createFromXml(Resources, XmlPullParser)",
         method = "createFromXml",
         args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class}
     )
     public void testCreateFromXml() throws XmlPullParserException, IOException {
-        XmlPullParser parser = mContext.getResources().getXml(R.drawable.shapedrawable_test);
-        assertNotNull(Drawable.createFromXml(mContext.getResources(), parser));
+        XmlPullParser parser = mResources.getXml(R.drawable.gradientdrawable);
+        Drawable drawable = Drawable.createFromXml(mResources, parser);
+        // values from gradientdrawable.xml
+        assertEquals(42, drawable.getIntrinsicWidth());
+        assertEquals(63, drawable.getIntrinsicHeight());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test createFromXmlInner(Resources, XmlPullParser, AttributeSet)",
         method = "createFromXmlInner",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     public void testCreateFromXmlInner() throws XmlPullParserException, IOException {
-        XmlPullParser parser = mContext.getResources().getXml(R.drawable.shapedrawable_test);
-        AttributeSet attrs = Xml.asAttributeSet(parser);
-
-        int type;
-        while ((type=parser.next()) != XmlPullParser.START_TAG &&
-                type != XmlPullParser.END_DOCUMENT) {
-            // Empty loop
+        XmlPullParser parser = mResources.getXml(R.drawable.gradientdrawable);
+        while (parser.next() != XmlPullParser.START_TAG) {
+            // ignore event, just seek to first tag
         }
-        Drawable drawable = Drawable.createFromXmlInner(mContext.getResources(), parser, attrs);
+        AttributeSet attrs = Xml.asAttributeSet(parser);
+        Drawable drawable = Drawable.createFromXmlInner(mResources, parser, attrs);
         assertNotNull(drawable);
 
-        Drawable expected = mContext.getResources().getDrawable(R.drawable.shapedrawable_test);
-        GradientDrawable d1 = (GradientDrawable) expected;
-        GradientDrawable d2 = (GradientDrawable) drawable;
-        assertEquals(d1.getBounds(), d2.getBounds());
-        assertEquals(d1.getLevel(), d2.getLevel());
-    }
+        Drawable expected = mResources.getDrawable(R.drawable.gradientdrawable);
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test draw(Canvas)",
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    public void testDraw() {
-        // draw is an abstract function.
+        assertEquals(expected.getIntrinsicWidth(), drawable.getIntrinsicWidth());
+        assertEquals(expected.getIntrinsicHeight(), drawable.getIntrinsicHeight());
     }
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "getBounds",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "setBounds",
             args = {int.class, int.class, int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBounds(), setBounds(int, int, int, int) and setBounds(Rect)",
             method = "setBounds",
             args = {android.graphics.Rect.class}
         )
@@ -312,13 +312,11 @@ public class DrawableTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setChangingConfigurations(int) and getChangingConfigurations()",
             method = "getChangingConfigurations",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test setChangingConfigurations(int) and getChangingConfigurations()",
             method = "setChangingConfigurations",
             args = {int.class}
         )
@@ -339,7 +337,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getConstantState(), this function always returns null.",
         method = "getConstantState",
         args = {}
     )
@@ -350,7 +347,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getCurrent(), this function just returns the object itself.",
         method = "getCurrent",
         args = {}
     )
@@ -361,7 +357,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicHeight(), this function always returns -1.",
         method = "getIntrinsicHeight",
         args = {}
     )
@@ -372,7 +367,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicWidth(), this function always returns -1.",
         method = "getIntrinsicWidth",
         args = {}
     )
@@ -384,13 +378,11 @@ public class DrawableTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getLevel() and setLevel(int)",
             method = "getLevel",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getLevel() and setLevel(int)",
             method = "setLevel",
             args = {int.class}
         )
@@ -414,7 +406,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getMinimumHeight()",
         method = "getMinimumHeight",
         args = {}
     )
@@ -425,7 +416,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getMinimumWidth()",
         method = "getMinimumWidth",
         args = {}
     )
@@ -436,17 +426,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getOpacity()",
-        method = "getOpacity",
-        args = {}
-    )
-    public void testGetOpacity() {
-        // getOpacity is an abstract function.
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getPadding(Rect)",
         method = "getPadding",
         args = {android.graphics.Rect.class}
     )
@@ -470,15 +449,13 @@ public class DrawableTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getState() and setState(int[])",
             method = "getState",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getState() and setState(int[])",
             method = "setState",
-            args = {java.lang.Integer[].class}
+            args = {int[].class}
         )
     })
     public void testAccessState() {
@@ -494,7 +471,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getTransparentRegion(), this function always returns null.",
         method = "getTransparentRegion",
         args = {}
     )
@@ -505,9 +481,8 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "", explanation = "the attribute visible has been set to false " +
@@ -515,16 +490,19 @@ public class DrawableTest extends AndroidTestCase{
     public void testInflate() throws XmlPullParserException, IOException {
         MockDrawable mockDrawable = new MockDrawable();
 
-        XmlPullParser parser = mContext.getResources().getXml(R.xml.drawable_test);
+        XmlPullParser parser = mResources.getXml(R.xml.drawable_test);
+        while (parser.next() != XmlPullParser.START_TAG) {
+            // ignore event, just seek to first tag
+        }
         AttributeSet attrs = Xml.asAttributeSet(parser);
-        mockDrawable.inflate(mContext.getResources(), parser, attrs);
-        // isVisible() should returns false.
-        //assertFalse(mockDrawable.isVisible());
+
+        mockDrawable.inflate(mResources, parser, attrs);
+        // visibility set to false in resource
+        assertFalse(mockDrawable.isVisible());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test invalidateSelf()",
         method = "invalidateSelf",
         args = {}
     )
@@ -542,7 +520,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isStateful(), this function always returns false.",
         method = "isStateful",
         args = {}
     )
@@ -554,13 +531,11 @@ public class DrawableTest extends AndroidTestCase{
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isVisible()",
             method = "isVisible",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isVisible()",
             method = "setVisible",
             args = {boolean.class, boolean.class}
         )
@@ -581,7 +556,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onBoundsChange(Rect)",
         method = "onBoundsChange",
         args = {android.graphics.Rect.class}
     )
@@ -594,7 +568,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onLevelChange(int), this function always returns false.",
         method = "onLevelChange",
         args = {int.class}
     )
@@ -605,9 +578,8 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onStateChange(int[]), this function always returns false.",
         method = "onStateChange",
-        args = {java.lang.Integer[].class}
+        args = {int[].class}
     )
     public void testOnStateChange() {
         MockDrawable mockDrawable = new MockDrawable();
@@ -616,7 +588,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test resolveOpacity(int, int)",
         method = "resolveOpacity",
         args = {int.class, int.class}
     )
@@ -635,7 +606,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test scheduleSelf(Runnable, long)",
         method = "scheduleSelf",
         args = {java.lang.Runnable.class, long.class}
     )
@@ -651,17 +621,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setAlpha(int)",
-        method = "setAlpha",
-        args = {int.class}
-    )
-    public void testSetAlpha() {
-        // setAlpha is an abstract function.
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setCallback(Callback)",
         method = "setCallback",
         args = {android.graphics.drawable.Drawable.Callback.class}
     )
@@ -678,7 +637,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setColorFilter(int, PorterDuff.Mode)",
         method = "setColorFilter",
         args = {int.class, android.graphics.PorterDuff.Mode.class}
     )
@@ -691,7 +649,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setDither(boolean)",
         method = "setDither",
         args = {boolean.class}
     )
@@ -704,7 +661,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test setFilterBitmap(boolean)",
         method = "setFilterBitmap",
         args = {boolean.class}
     )
@@ -717,7 +673,6 @@ public class DrawableTest extends AndroidTestCase{
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test unscheduleSelf(Runnable)",
         method = "unscheduleSelf",
         args = {java.lang.Runnable.class}
     )
@@ -730,7 +685,18 @@ public class DrawableTest extends AndroidTestCase{
         assertNull(mockCallback.getRunnable());
     }
 
-    private class MockDrawable extends Drawable {
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "mutate",
+        args = {}
+    )
+    public void testMutate() {
+        MockDrawable mockDrawable = new MockDrawable();
+
+        assertSame(mockDrawable, mockDrawable.mutate());
+    }
+
+    private static class MockDrawable extends Drawable {
         private ColorFilter mColorFilter;
 
         public void draw(Canvas canvas) {
@@ -764,7 +730,7 @@ public class DrawableTest extends AndroidTestCase{
         }
     }
 
-    private class MockCallback implements Callback {
+    private static class MockCallback implements Callback {
         private Drawable mInvalidateDrawable;
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;
