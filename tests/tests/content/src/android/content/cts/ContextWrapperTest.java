@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -408,13 +409,15 @@ public class ContextWrapperTest extends AndroidTestCase {
         // Test fileList()
         fileLst = contextWrapper.fileList();
         assertEquals(3, fileLst.length);
-        assertEquals("contexttest3", fileLst[0]);
-        assertEquals("contexttest2", fileLst[1]);
-        assertEquals("contexttest1", fileLst[2]);
 
-        for (int j = 1; j < 4; j++) {
+        List<String> list = Arrays.asList(fileLst);
+        assertTrue(list.contains("contexttest1"));
+        assertTrue(list.contains("contexttest2"));
+        assertTrue(list.contains("contexttest3"));
+
+        for (String file: fileLst) {
             // Test deleteFile(String)
-            contextWrapper.deleteFile("contexttest" + j);
+            contextWrapper.deleteFile(file);
         }
         fileLst = contextWrapper.fileList();
         assertEquals(0, fileLst.length);
