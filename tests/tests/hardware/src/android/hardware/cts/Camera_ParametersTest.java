@@ -28,26 +28,26 @@ public class Camera_ParametersTest extends TestCase {
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "get",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "set",
             args = {java.lang.String.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "getInt",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "set",
             args = {java.lang.String.class, java.lang.String.class}
         ),
@@ -112,28 +112,26 @@ public class Camera_ParametersTest extends TestCase {
             args = {int.class, int.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "flatten",
             args = {}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.SUFFICIENT,
+            notes = "tested indirectly",
             method = "unflatten",
             args = {java.lang.String.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
+            level = TestLevel.TODO,
+            notes = "test removed due to invalid assumptions",
             method = "remove",
             args = {java.lang.String.class}
         )
     })
-    // We test Camera.Parameters related methods in CameraTest with testAccessParameters()
     public void testAccessMethods() {
-        // We test Camera.Parameters related methods in android.hardware.cts.CameraTest
-        // #testAccessParameters().
+        // Camera.Parameters methods are tested in CameraTest#testAccessParameters().
     }
 
 }
