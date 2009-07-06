@@ -52,16 +52,20 @@ public class DialerKeyListenerTest extends TestCase {
     @ToBeFixed(bug="1371108", explanation="NPE is not expected.")
     public void testLookup() {
         MockDialerKeyListener mockDialerKeyListener = new MockDialerKeyListener();
-
-        KeyEvent event1 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_N);
-        SpannableString str = new SpannableString("012345");
-        assertEquals(54, mockDialerKeyListener.lookup(event1, str));
-
-        KeyEvent event2 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
-        assertEquals(48, mockDialerKeyListener.lookup(event2, str));
+        final int[] events = { KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_A };
+        SpannableString span = new SpannableString(""); // no meta spans
+        for (int event: events) {
+            KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, event);
+            int keyChar = keyEvent.getNumber();
+            if (keyChar != 0) {
+                assertEquals(keyChar, mockDialerKeyListener.lookup(keyEvent, span));
+            } else {
+                // cannot make any assumptions how the key code gets translated
+            }
+        }
 
         try {
-            mockDialerKeyListener.lookup(null, str);
+            mockDialerKeyListener.lookup(null, span);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
         }
