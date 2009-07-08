@@ -18,13 +18,17 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -38,6 +42,10 @@ import android.graphics.Bitmap.Config;
 import android.graphics.drawable.NinePatchDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.InstrumentationTestCase;
+import android.util.AttributeSet;
+import android.util.Xml;
+
+import java.io.IOException;
 
 @TestTargetClass(NinePatchDrawable.class)
 public class NinePatchDrawableTest extends InstrumentationTestCase {
@@ -57,14 +65,11 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor.",
             method = "NinePatchDrawable",
-            args = {android.graphics.Bitmap.class, byte[].class, android.graphics.Rect.class, 
-                    java.lang.String.class}
+            args = {Bitmap.class, byte[].class, Rect.class, String.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor.",
             method = "NinePatchDrawable",
             args = {android.graphics.NinePatch.class}
         )
@@ -131,7 +136,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#draw(Canvas)}.",
         method = "draw",
         args = {android.graphics.Canvas.class}
     )
@@ -170,7 +174,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getChangingConfigurations()}.",
         method = "getChangingConfigurations",
         args = {}
     )
@@ -198,7 +201,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getPadding(Rect)}.",
         method = "getPadding",
         args = {android.graphics.Rect.class}
     )
@@ -236,7 +238,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#setAlpha(int)}.",
         method = "setAlpha",
         args = {int.class}
     )
@@ -255,7 +256,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#setColorFilter(ColorFilter)}.",
         method = "setColorFilter",
         args = {android.graphics.ColorFilter.class}
     )
@@ -272,7 +272,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#setDither(boolean)}.",
         method = "setDither",
         args = {boolean.class}
     )
@@ -288,7 +287,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getPaint()}.",
         method = "getPaint",
         args = {}
     )
@@ -301,7 +299,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getIntrinsicWidth()}.",
         method = "getIntrinsicWidth",
         args = {}
     )
@@ -318,7 +315,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getMinimumWidth()}.",
         method = "getMinimumWidth",
         args = {}
     )
@@ -335,7 +331,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getIntrinsicHeight()}.",
         method = "getIntrinsicHeight",
         args = {}
     )
@@ -352,7 +347,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getMinimumHeight()}.",
         method = "getMinimumHeight",
         args = {}
     )
@@ -369,7 +363,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getOpacity()}.",
         method = "getOpacity",
         args = {}
     )
@@ -382,7 +375,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link NinePatchDrawable#getTransparentRegion()}.",
         method = "getTransparentRegion",
         args = {}
     )
@@ -408,7 +400,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "This method will refresh the configuraion of the state.",
         method = "getConstantState",
         args = {}
     )
@@ -422,6 +413,58 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         // the state's configuration refreshed when getConstantState is called.
         constantState = mNinePatchDrawable.getConstantState();
         assertEquals(0xff, constantState.getChangingConfigurations());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "inflate",
+        args = {Resources.class, XmlPullParser.class, AttributeSet.class}
+    )
+    public void testInflate() throws XmlPullParserException, IOException {
+        final int WIDTH = 80;
+        final int HEIGTH = 120;
+        final int[] COLOR = new int[WIDTH * HEIGTH];
+        Bitmap bitmap = Bitmap.createBitmap(COLOR, WIDTH, HEIGTH, Bitmap.Config.RGB_565);
+        NinePatchDrawable ninePatchDrawable =
+            new NinePatchDrawable(bitmap, new byte[1000], null, "TESTNAME");
+
+        assertEquals(HEIGTH, ninePatchDrawable.getIntrinsicHeight());
+        assertEquals(WIDTH, ninePatchDrawable.getIntrinsicWidth());
+        XmlResourceParser parser = mResources.getXml(R.drawable.ninepatchdrawable);
+        int type;
+        while ((type = parser.next()) != XmlPullParser.END_DOCUMENT
+                && type != XmlPullParser.START_TAG) {
+        }
+        AttributeSet attrs = Xml.asAttributeSet(parser);
+        ninePatchDrawable.inflate(mResources, parser, attrs);
+
+        assertTrue(ninePatchDrawable.getPaint().isDither());
+        assertTrue(HEIGTH != ninePatchDrawable.getIntrinsicHeight());
+        assertTrue(WIDTH != ninePatchDrawable.getIntrinsicWidth());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.SUFFICIENT,
+        method = "mutate",
+        args = {}
+    )
+    @ToBeFixed(bug = "", explanation = "mutate() always throw NullPointerException.")
+    public void testMutate() {
+        NinePatchDrawable d1 =
+            (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatchdrawable);
+        NinePatchDrawable d2 =
+            (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatchdrawable);
+        NinePatchDrawable d3 =
+            (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatchdrawable);
+
+        // the state is not shared before mutate.
+        d1.setDither(false);
+        assertFalse(d1.getPaint().isDither());
+        assertTrue(d2.getPaint().isDither());
+        assertTrue(d3.getPaint().isDither());
+
+        // cannot test if mutate worked, since state was not shared before
+        d1.mutate();
     }
 
     private void assertColorFillRect(Bitmap bmp, int x, int y, int w, int h, int color) {

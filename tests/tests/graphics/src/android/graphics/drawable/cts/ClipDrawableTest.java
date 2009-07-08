@@ -16,12 +16,16 @@
 
 package android.graphics.drawable.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -39,13 +43,7 @@ import android.util.StateSet;
 import android.util.Xml;
 import android.view.Gravity;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(android.graphics.drawable.ClipDrawable.class)
 public class ClipDrawableTest extends AndroidTestCase {
@@ -213,7 +211,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         level = TestLevel.COMPLETE,
         notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
@@ -221,7 +219,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         ClipDrawable clipDrawable = new ClipDrawable(bmpDrawable,
                 Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
 
-        XmlPullParser parser = mContext.getResources().getXml(R.drawable.shapedrawable_test);
+        XmlPullParser parser = mContext.getResources().getXml(R.drawable.gradientdrawable);
         AttributeSet attrs = Xml.asAttributeSet(parser);
         clipDrawable.inflate(mContext.getResources(), parser, attrs);
     }

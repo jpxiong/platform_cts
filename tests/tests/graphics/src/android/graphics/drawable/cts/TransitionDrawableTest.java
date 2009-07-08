@@ -18,12 +18,13 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
@@ -59,16 +60,28 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         mCanvas = new Canvas(mBitmap);
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "TransitionDrawable",
+        args = {Drawable[].class}
+    )
+    public void testConstructor() {
+        Resources resources = getInstrumentation().getTargetContext().getResources();
+        Drawable[] drawables = new Drawable[] {
+                resources.getDrawable(R.drawable.testimage),
+                resources.getDrawable(R.drawable.levellistdrawable)
+        };
+        new TransitionDrawable(drawables);
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#startTransition(int)}.",
             method = "startTransition",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#startTransition(int)}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
         )
@@ -105,13 +118,11 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#resetTransition()}.",
             method = "resetTransition",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#resetTransition()}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
         )
@@ -145,13 +156,11 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#reverseTransition()}.",
             method = "reverseTransition",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test {@link TransitionDrawable#reverseTransition()}.",
             method = "draw",
             args = {android.graphics.Canvas.class}
         )
@@ -213,13 +222,11 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "setCrossFadeEnabled",
             args = {boolean.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "",
             method = "isCrossFadeEnabled",
             args = {}
         )
@@ -248,13 +255,13 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
     }
 
     private void assertTransitionInProgress(int colorFrom, int colorTo, long delay) {
-        waitUntilDrawFinish(delay);
+        drawAfterDelaySync(delay);
         assertColorNotFillRect(mBitmap, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, colorFrom);
         assertColorNotFillRect(mBitmap, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, colorTo);
     }
 
     private void assertTransitionEnd(int colorTo, long delay) {
-        waitUntilDrawFinish(delay);
+        drawAfterDelaySync(delay);
         assertColorFillRect(mBitmap, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, colorTo);
     }
 
@@ -290,7 +297,7 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         assertTransitionInProgress(COLOR0, COLOR1, delay);
     }
 
-    private void waitUntilDrawFinish(long delay) {
+    private void drawAfterDelaySync(long delay) {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 mBitmap.eraseColor(0x00000000);
@@ -299,13 +306,10 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         });
         try {
             Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        }
-        t.start();
-        try {
+            t.start();
             t.join();
         } catch (InterruptedException e) {
+            // catch and fail, because propagating this all the way up is messy
             fail(e.getMessage());
         }
     }

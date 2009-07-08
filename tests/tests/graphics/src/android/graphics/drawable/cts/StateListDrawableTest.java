@@ -16,13 +16,7 @@
 
 package android.graphics.drawable.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -32,15 +26,20 @@ import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.test.InstrumentationTestCase;
-import android.util.AttributeSet;
 import android.util.StateSet;
 import android.util.Xml;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(StateListDrawable.class)
 public class StateListDrawableTest extends InstrumentationTestCase {
@@ -60,7 +59,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor.",
         method = "StateListDrawable",
         args = {}
     )
@@ -73,7 +71,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link StateListDrawable#addState(int[], Drawable)}.",
         method = "addState",
         args = {int[].class, android.graphics.drawable.Drawable.class}
     )
@@ -108,7 +105,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link StateListDrawable#isStateful()}.Always returns true.",
         method = "isStateful",
         args = {}
     )
@@ -118,7 +114,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link StateListDrawable#onStateChange(int[])}.",
         method = "onStateChange",
         args = {int[].class}
     )
@@ -199,9 +194,8 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link StateListDrawable#inflate(Resources, XmlPullParser, AttributeSet)}.",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
@@ -253,9 +247,8 @@ public class StateListDrawableTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "",
         method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class, 
+        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
@@ -278,6 +271,32 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         try {
             mStateListDrawable.inflate(mResources, parser, null);
             fail("Should throw XmlPullParserException if AttributeSet is null");
+        } catch (NullPointerException e) {
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "mutate",
+        args = {}
+    )
+    @ToBeFixed(bug = "", explanation = "mutate() always throw NullPointerException.")
+    public void testMutate() {
+        StateListDrawable d1 =
+            (StateListDrawable) mResources.getDrawable(R.drawable.statelistdrawable);
+        StateListDrawable d2 =
+            (StateListDrawable) mResources.getDrawable(R.drawable.statelistdrawable);
+        StateListDrawable d3 =
+            (StateListDrawable) mResources.getDrawable(R.drawable.statelistdrawable);
+
+        d1.getCurrent().setAlpha(100);
+        assertEquals(100, ((BitmapDrawable) d1.getCurrent()).getPaint().getAlpha());
+        assertEquals(100, ((BitmapDrawable) d2.getCurrent()).getPaint().getAlpha());
+        assertEquals(100, ((BitmapDrawable) d3.getCurrent()).getPaint().getAlpha());
+
+        try {
+            d1.mutate();
+            fail("Should throw NullPointerException.");
         } catch (NullPointerException e) {
         }
     }
