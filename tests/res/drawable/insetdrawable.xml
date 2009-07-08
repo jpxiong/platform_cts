@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2009 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  * limitations under the License.
  -->
 
-<MockShapeDrawable xmlns:android="http://schemas.android.com/apk/res/android"
-       android:color="#00000000" android:width="42px" android:height="63px">
-    <padding android:left="1px" android:top="2px" android:right="3px" android:bottom="4px"/>
-    <testattrs android:id="@id/background"/>
-</MockShapeDrawable>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/testimage"/>
 
