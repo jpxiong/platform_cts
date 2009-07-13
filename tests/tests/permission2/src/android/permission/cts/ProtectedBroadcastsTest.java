@@ -32,7 +32,6 @@ public class ProtectedBroadcastsTest extends AndroidTestCase {
         Intent.ACTION_TIME_TICK,
         Intent.ACTION_TIMEZONE_CHANGED,
         Intent.ACTION_BOOT_COMPLETED,
-        Intent.ACTION_CLOSE_SYSTEM_DIALOGS,
         Intent.ACTION_PACKAGE_INSTALL,
         Intent.ACTION_PACKAGE_ADDED,
         Intent.ACTION_PACKAGE_REPLACED,
