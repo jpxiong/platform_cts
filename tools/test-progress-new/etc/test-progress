@@ -268,6 +268,8 @@ ${INPUT}/dalvik/libcore/xml/src/main/java:\
 ${INPUT}/dalvik/libcore/junit/src/main/java:"
 
 ANDROID_PACKAGE="\
+android.accessibilityservice \
+android.accessibilityservice.cts \
 android.accounts \
 android.accounts.cts \
 android.app \
@@ -282,6 +284,8 @@ android.database \
 android.database.cts \
 android.database.sqlite \
 android.database.sqlite.cts \
+android.gesture \
+android.gesture.cts \
 android.graphics \
 android.graphics.cts \
 android.graphics.drawable \
@@ -314,6 +318,8 @@ android.security \
 android.security.cts \
 android.speech.srec \
 android.speech.srec.cts \
+android.speech.tts \
+android.speech.tts.cts \
 android.telephony \
 android.telephony.cts \
 android.telephony.gsm \
@@ -332,6 +338,8 @@ android.util \
 android.util.cts \
 android.view \
 android.view.cts \
+android.view.accessibility \
+android.view.accessibility.cts \
 android.view.animation \
 android.view.animation.cts \
 android.view.inputmethod \
