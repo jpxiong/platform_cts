@@ -465,6 +465,9 @@
             <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
         </activity>
 
+       <activity android:name="android.media.cts.FaceDetectorStub"
+            android:label="FaceDetectorStub"/>
+
         <activity android:name="android.widget.cts.ListViewStubActivity"
             android:label="ListViewStubActivity">
             <intent-filter>
