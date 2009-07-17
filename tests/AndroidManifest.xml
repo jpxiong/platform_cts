@@ -83,6 +83,8 @@
     <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
     <!-- Used for PackageManager test, don't delete this permission-tree -->
     <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
                     android:label="Test Tree"/>
