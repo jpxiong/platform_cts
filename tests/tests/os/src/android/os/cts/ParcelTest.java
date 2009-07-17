@@ -2975,7 +2975,9 @@ public class ParcelTest extends AndroidTestCase {
 
         bundle2 = null;
         Parcel a = Parcel.obtain();
-        a.writeFileDescriptor(FileDescriptor.in);
+        bundle2 = new Bundle();
+        bundle2.putString("foo", "test");
+        a.writeBundle(bundle2);
         a.setDataPosition(0);
         bundle.readFromParcel(a);
         p = Parcel.obtain();
@@ -3031,19 +3033,6 @@ public class ParcelTest extends AndroidTestCase {
         assertEquals(true, b.getBoolean("boolean"));
         assertEquals(Integer.MAX_VALUE, b.getInt("int"));
         assertEquals("String", b.getString("string"));
-        p.recycle();
-
-        u = null;
-        Parcel a = Parcel.obtain();
-        a.writeFileDescriptor(FileDescriptor.in);
-        a.setDataPosition(0);
-        p = Parcel.obtain();
-        b.readFromParcel(a);
-        p.setDataPosition(0);
-        p.writeBundle(b);
-        p.setDataPosition(0);
-        u = p.readBundle(m);
-        a.recycle();
         p.recycle();
     }
 

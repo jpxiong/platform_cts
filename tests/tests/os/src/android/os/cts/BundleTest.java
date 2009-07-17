@@ -26,10 +26,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
 import android.util.SparseArray;
 
-import java.io.FileDescriptor;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -1007,16 +1009,29 @@ public class BundleTest extends AndroidTestCase {
     )
 
     public void testDescribeContents() {
-        assertEquals(0, mBundle.describeContents());
+        assertTrue((mBundle.describeContents()
+                & Parcelable.CONTENTS_FILE_DESCRIPTOR) == 0);
+        
         final Parcel parcel = Parcel.obtain();
-        parcel.writeFileDescriptor(new FileDescriptor());
+        try {
+            mBundle.putParcelable("foo", ParcelFileDescriptor.open(
+                    new File("/system"), ParcelFileDescriptor.MODE_READ_ONLY));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("can't open /system", e);
+        }
+        assertTrue((mBundle.describeContents()
+                & Parcelable.CONTENTS_FILE_DESCRIPTOR) != 0);
+        mBundle.writeToParcel(parcel, 0);
+        mBundle.clear();
+        assertTrue((mBundle.describeContents()
+                & Parcelable.CONTENTS_FILE_DESCRIPTOR) == 0);
+        parcel.setDataPosition(0);
         mBundle.readFromParcel(parcel);
-        assertEquals(Parcelable.CONTENTS_FILE_DESCRIPTOR, mBundle.describeContents());
-        mBundle = new Bundle();
-        assertEquals(0, mBundle.describeContents());
-        final MockParcelable myParcelable = new MockParcelable();
-        mBundle.putParcelable(KEY, myParcelable);
-        assertEquals(Parcelable.CONTENTS_FILE_DESCRIPTOR, mBundle.describeContents());
+        assertTrue((mBundle.describeContents()
+                & Parcelable.CONTENTS_FILE_DESCRIPTOR) != 0);
+        ParcelFileDescriptor pfd = (ParcelFileDescriptor)mBundle.getParcelable("foo");
+        assertTrue((mBundle.describeContents()
+                & Parcelable.CONTENTS_FILE_DESCRIPTOR) != 0);
     }
 
     // case 1: The default bundle doesn't has FileDescriptor.
@@ -1031,16 +1046,24 @@ public class BundleTest extends AndroidTestCase {
     )
     public void testHasFileDescriptors() {
         assertFalse(mBundle.hasFileDescriptors());
-
+        
         final Parcel parcel = Parcel.obtain();
-        parcel.writeFileDescriptor(new FileDescriptor());
+        assertFalse(parcel.hasFileDescriptors());
+        try {
+            mBundle.putParcelable("foo", ParcelFileDescriptor.open(
+                    new File("/system"), ParcelFileDescriptor.MODE_READ_ONLY));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("can't open /system", e);
+        }
+        assertTrue(mBundle.hasFileDescriptors());
+        mBundle.writeToParcel(parcel, 0);
+        assertTrue(parcel.hasFileDescriptors());
+        mBundle.clear();
+        assertFalse(mBundle.hasFileDescriptors());
+        parcel.setDataPosition(0);
         mBundle.readFromParcel(parcel);
         assertTrue(mBundle.hasFileDescriptors());
-
-        mBundle = new Bundle();
-        assertFalse(mBundle.hasFileDescriptors());
-        final MockParcelable myParcelable = new MockParcelable();
-        mBundle.putParcelable(KEY, myParcelable);
+        ParcelFileDescriptor pfd = (ParcelFileDescriptor)mBundle.getParcelable("foo");
         assertTrue(mBundle.hasFileDescriptors());
     }
 
@@ -1132,8 +1155,7 @@ public class BundleTest extends AndroidTestCase {
     })
     public void testToString() {
         assertNotNull(mBundle.toString());
-        final Parcel parcel = Parcel.obtain();
-        mBundle.readFromParcel(parcel);
+        mBundle.putString("foo", "this test is so stupid");
         assertNotNull(mBundle.toString());
     }
 
@@ -1161,26 +1183,5 @@ public class BundleTest extends AndroidTestCase {
         MockClassLoader(ClassLoader parent) {
             super(parent);
         }
-    }
-
-    static class MockParcelable implements Parcelable {
-        public int describeContents() {
-            return CONTENTS_FILE_DESCRIPTOR;
-        }
-
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeParcelable(this, 0);
-        }
-
-        public static Parcelable.Creator<MockParcelable> CREATER =
-            new Parcelable.Creator<MockParcelable>() {
-            public MockParcelable createFromParcel(final Parcel source) {
-                return null;
-            }
-
-            public MockParcelable[] newArray(final int size) {
-                return new MockParcelable[size];
-            }
-        };
     }
 }
