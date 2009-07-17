@@ -59,57 +59,22 @@ public class NoAudioPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that AudioManager.setRouting requires permissions.
+     * Verify that AudioManager routing methods require permissions.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#MODIFY_AUDIO_SETTINGS}.
      */
     @SuppressWarnings("deprecation")
     @SmallTest
-    public void testSetRouting() {
-        int[] defaultRoutes = new int[MODE_COUNT];
-        defaultRoutes[0] = mAudioManager.getRouting(AudioManager.MODE_NORMAL);
-        defaultRoutes[1] = mAudioManager.getRouting(AudioManager.MODE_RINGTONE);
-        defaultRoutes[2] = mAudioManager.getRouting(AudioManager.MODE_IN_CALL);
+    public void testRouting() {
 
-        // If there is no permission of MODIFY_AUDIO_SETTINGS, setRouting does nothing.
-        // Please referring android.media.cts.AudioManagerTest#testRouting().
-        mAudioManager.setBluetoothScoOn(true);
-        mAudioManager.setRouting(AudioManager.MODE_IN_CALL, AudioManager.ROUTE_BLUETOOTH_SCO,
-                AudioManager.ROUTE_ALL);
-        assertEquals(defaultRoutes[0], getRouting(AudioManager.MODE_NORMAL));
-        assertEquals(defaultRoutes[1], getRouting(AudioManager.MODE_RINGTONE));
-        assertEquals(defaultRoutes[2], getRouting(AudioManager.MODE_IN_CALL));
+        // If there is no permission of MODIFY_AUDIO_SETTINGS, setSpeakerphoneOn does nothing.
+        boolean prevState = mAudioManager.isSpeakerphoneOn();
+        mAudioManager.setSpeakerphoneOn(!prevState);
+        assertEquals(prevState, mAudioManager.isSpeakerphoneOn());
 
-        mAudioManager.setRouting(AudioManager.MODE_NORMAL, AudioManager.ROUTE_SPEAKER,
-                AudioManager.ROUTE_ALL);
-        mAudioManager.setRouting(AudioManager.MODE_RINGTONE, AudioManager.ROUTE_SPEAKER,
-                AudioManager.ROUTE_ALL);
-        mAudioManager.setRouting(AudioManager.MODE_IN_CALL, AudioManager.ROUTE_SPEAKER,
-                AudioManager.ROUTE_ALL);
-        assertEquals(defaultRoutes[0], getRouting(AudioManager.MODE_NORMAL));
-        assertEquals(defaultRoutes[1], getRouting(AudioManager.MODE_RINGTONE));
-        assertEquals(defaultRoutes[2], getRouting(AudioManager.MODE_IN_CALL));
-
-        mAudioManager.setSpeakerphoneOn(true);
-        assertFalse(mAudioManager.isSpeakerphoneOn());
-        assertEquals(defaultRoutes[2], getRouting(AudioManager.MODE_IN_CALL));
-        mAudioManager.setSpeakerphoneOn(false);
-        assertFalse(mAudioManager.isSpeakerphoneOn());
-        assertEquals(defaultRoutes[2], getRouting(AudioManager.MODE_IN_CALL));
-
-        mAudioManager.setRouting(AudioManager.MODE_NORMAL, AudioManager.ROUTE_EARPIECE,
-                AudioManager.ROUTE_ALL);
-        mAudioManager.setRouting(AudioManager.MODE_RINGTONE, AudioManager.ROUTE_EARPIECE,
-                AudioManager.ROUTE_ALL);
-        mAudioManager.setRouting(AudioManager.MODE_IN_CALL, AudioManager.ROUTE_EARPIECE,
-                AudioManager.ROUTE_ALL);
-        assertEquals(defaultRoutes[0], getRouting(AudioManager.MODE_NORMAL));
-        assertEquals(defaultRoutes[1], getRouting(AudioManager.MODE_RINGTONE));
-        assertEquals(defaultRoutes[2], getRouting(AudioManager.MODE_IN_CALL));
-    }
-
-    @SuppressWarnings("deprecation")
-    private int getRouting(int mode) {
-        return mAudioManager.getRouting(mode);
+        // If there is no permission of MODIFY_AUDIO_SETTINGS, setBluetoothScoOn does nothing.
+        prevState = mAudioManager.isBluetoothScoOn();
+        mAudioManager.setBluetoothScoOn(!prevState);
+        assertEquals(prevState, mAudioManager.isBluetoothScoOn());
     }
 }
