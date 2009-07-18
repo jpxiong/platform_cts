@@ -28,16 +28,15 @@ import junit.framework.TestCase;
 
 @TestTargetClass(UsernameFilterGeneric.class)
 public class LoginFilter_UsernameFilterGenericTest extends TestCase {
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of UsernameFilterGeneric.",
             method = "LoginFilter.UsernameFilterGeneric",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of UsernameFilterGeneric.",
             method = "LoginFilter.UsernameFilterGeneric",
             args = {boolean.class}
         )

@@ -31,7 +31,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test charAt(int off)",
         method = "charAt",
         args = {int.class}
     )
@@ -64,7 +63,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getChars(int start, int end, char[] dest, int off)",
         method = "getChars",
         args = {int.class, int.class, char[].class, int.class}
     )
@@ -102,7 +100,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test length()",
         method = "length",
         args = {}
     )
@@ -119,7 +116,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test make method",
         method = "make",
         args = {java.lang.CharSequence.class, char[].class, int.class, int.class}
     )
@@ -143,7 +139,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test subSequence(int start, int end)",
         method = "subSequence",
         args = {int.class, int.class}
     )
@@ -165,7 +160,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test toString()",
         method = "toString",
         args = {}
     )

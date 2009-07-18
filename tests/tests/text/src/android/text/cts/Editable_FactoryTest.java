@@ -20,10 +20,9 @@ import android.test.AndroidTestCase;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Editable.Factory;
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(Editable.Factory.class)
 public class Editable_FactoryTest extends AndroidTestCase {
