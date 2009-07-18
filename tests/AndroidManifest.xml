@@ -97,6 +97,11 @@
     <application android:label="Android TestCase"
                 android:icon="@drawable/size_48x48" android:name="android.app.cts.MockApplication">
 
+        <activity android:name="android.media.cts.AudioManagerStub"
+            android:label="AudioManagerStub"/>
+        <activity android:name="android.media.cts.AudioManagerStubHelper"
+            android:label="AudioManagerStubHelper"/>
+
         <activity android:name="android.widget.cts.TwoLineListItemStubActivity"
             android:label="TwoLineListItemStubActivity">
             <intent-filter>
