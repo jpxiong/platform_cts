@@ -29,8 +29,6 @@ public class AutoTextTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link AutoText#get(CharSequence, int, int, View)}"
-            + ".It simply get a word value according to the word key.",
         method = "get",
         args = {java.lang.CharSequence.class, int.class, int.class, android.view.View.class}
     )
@@ -78,6 +76,18 @@ public class AutoTextTest extends AndroidTestCase {
         actual = AutoText.get(src, 0, src.length() - 1, view);
         assertNotNull(actual);
         assertEquals("can", actual);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getSize",
+        args = {android.view.View.class}
+    )
+    public void testGetSize() {
+        Locale.setDefault(Locale.ENGLISH);
+        View view = new View(getContext());
+        // Returns the size of the auto text dictionary. Just make sure it is bigger than 0.
+        assertTrue(AutoText.getSize(view) > 0);
     }
 }
 

@@ -45,13 +45,11 @@ public class HtmlTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class}
         ),
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class, ImageGetter.class, TagHandler.class}
         )
@@ -81,13 +79,11 @@ public class HtmlTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class}
         ),
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class, ImageGetter.class, TagHandler.class}
         )
@@ -113,13 +109,11 @@ public class HtmlTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class}
         ),
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class, ImageGetter.class, TagHandler.class}
         )
@@ -137,13 +131,11 @@ public class HtmlTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class}
         ),
         @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test method: fromHtml",
             method = "fromHtml",
             args = {String.class, ImageGetter.class, TagHandler.class}
         )
@@ -173,7 +165,6 @@ public class HtmlTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
         method = "toHtml",
         args = {Spanned.class}
     )
@@ -193,7 +184,6 @@ public class HtmlTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
         method = "toHtml",
         args = {Spanned.class}
     )
@@ -213,7 +203,6 @@ public class HtmlTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
         method = "toHtml",
         args = {Spanned.class}
     )
@@ -230,7 +219,6 @@ public class HtmlTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
         method = "toHtml",
         args = {Spanned.class}
     )
@@ -281,7 +269,6 @@ public class HtmlTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
         method = "toHtml",
         args = {Spanned.class}
     )

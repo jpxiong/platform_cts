@@ -29,13 +29,11 @@ public class BoringLayout_MetricsTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test toString()",
             method = "toString",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor",
             method = "BoringLayout.Metrics",
             args = {}
         )

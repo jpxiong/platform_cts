@@ -43,7 +43,6 @@ public class AnnotationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test constructor",
         method = "Annotation",
         args = {java.lang.String.class, java.lang.String.class}
     )
@@ -54,7 +53,6 @@ public class AnnotationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getValue()",
         method = "getValue",
         args = {}
     )
@@ -68,7 +66,6 @@ public class AnnotationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getKey()",
         method = "getKey",
         args = {}
     )
@@ -82,7 +79,6 @@ public class AnnotationTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getSpanTypeId()",
         method = "getSpanTypeId",
         args = {}
     )
@@ -95,15 +91,18 @@ public class AnnotationTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
             method = "writeToParcel",
             args = {Parcel.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor create from parcel",
             method = "Annotation",
             args = {Parcel.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "describeContents",
+            args = {}
         )
     })
     public void testWriteToParcel() {
@@ -114,5 +113,7 @@ public class AnnotationTest extends AndroidTestCase {
         Annotation out = new Annotation(dest);
         assertEquals(out.getKey(), mAnnotation.getKey());
         assertEquals(out.getValue(), mAnnotation.getValue());
+
+        assertEquals(0, out.describeContents());
     }
 }
