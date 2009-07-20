@@ -65,7 +65,6 @@ public class BoringLayoutTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor",
             method = "BoringLayout",
             args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
                     android.text.Layout.Alignment.class, float.class, float.class,
@@ -73,7 +72,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor",
             method = "BoringLayout",
             args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
                     android.text.Layout.Alignment.class, float.class, float.class,
@@ -82,7 +80,7 @@ public class BoringLayoutTest extends AndroidTestCase {
         )
     })
     public void testConstructors() {
-        BoringLayout boringLayout = new BoringLayout(DEFAULT_CHAR_SEQUENCE,
+        new BoringLayout(DEFAULT_CHAR_SEQUENCE,
                 DEFAULT_PAINT,
                 DEFAULT_OUTER_WIDTH,
                 DEFAULT_ALIGN,
@@ -90,7 +88,8 @@ public class BoringLayoutTest extends AndroidTestCase {
                 SPACING_ADD_NO_SCALE,
                 DEFAULT_METRICS,
                 true);
-        boringLayout = new BoringLayout(DEFAULT_CHAR_SEQUENCE,
+
+        new BoringLayout(DEFAULT_CHAR_SEQUENCE,
                 DEFAULT_PAINT,
                 DEFAULT_OUTER_WIDTH,
                 DEFAULT_ALIGN,
@@ -385,13 +384,11 @@ public class BoringLayoutTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getBottomPadding",
             method = "getBottomPadding",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getLineDescent",
             method = "getLineDescent",
             args = {int.class}
         )
@@ -432,7 +429,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test isBoring",
             method = "isBoring",
             args = {java.lang.CharSequence.class, android.text.TextPaint.class,
                     android.text.BoringLayout.Metrics.class}
@@ -456,7 +452,6 @@ public class BoringLayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getLineDirections(int line)",
         method = "getLineDirections",
         args = {int.class}
     )
@@ -468,7 +463,6 @@ public class BoringLayoutTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test make",
             method = "make",
             args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
                     android.text.Layout.Alignment.class, float.class, float.class,
@@ -476,7 +470,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test make",
             method = "make",
             args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
                     android.text.Layout.Alignment.class, float.class, float.class,
@@ -511,7 +504,6 @@ public class BoringLayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test draw",
         method = "draw",
         args = {android.graphics.Canvas.class, android.graphics.Path.class,
                 android.graphics.Paint.class, int.class}

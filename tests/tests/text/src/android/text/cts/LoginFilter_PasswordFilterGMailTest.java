@@ -28,16 +28,15 @@ import junit.framework.TestCase;
 
 @TestTargetClass(PasswordFilterGMail.class)
 public class LoginFilter_PasswordFilterGMailTest extends TestCase {
-    @TestTargets({
+
+@TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PasswordFilterGMail.",
             method = "LoginFilter.PasswordFilterGMail",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of PasswordFilterGMail.",
             method = "LoginFilter.PasswordFilterGMail",
             args = {boolean.class}
         )
@@ -51,7 +50,6 @@ public class LoginFilter_PasswordFilterGMailTest extends TestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isAllowed(char c).",
         method = "isAllowed",
         args = {char.class}
     )

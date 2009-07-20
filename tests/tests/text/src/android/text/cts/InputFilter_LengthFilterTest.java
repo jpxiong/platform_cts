@@ -31,14 +31,12 @@ public class InputFilter_LengthFilterTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test filter",
             method = "filter",
             args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class,
                     int.class, int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test constructor",
             method = "InputFilter.LengthFilter",
             args = {int.class}
         )
