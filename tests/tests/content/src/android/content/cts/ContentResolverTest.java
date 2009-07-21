@@ -644,9 +644,11 @@ public class ContentResolverTest extends AndroidTestCase {
 
         try {
             mContentResolver.registerContentObserver(null, false, mco);
-            fail("did not throw NullPointerException when uri is null.");
+            fail("did not throw NullPointerException or IllegalArgumentException when uri is null.");
         } catch (NullPointerException e) {
             //expected.
+        } catch (IllegalArgumentException e) {
+            // also expected
         }
 
         try {
@@ -680,12 +682,6 @@ public class ContentResolverTest extends AndroidTestCase {
         mContentResolver.notifyChange(TABLE1_URI, mco);
         assertTrue(mco.hadOnChanged());
 
-        try {
-            mContentResolver.notifyChange(null, mco);
-            fail("did not throw NullPointerException when uri is null.");
-        } catch (NullPointerException e) {
-            //expected.
-        }
         mContentResolver.unregisterContentObserver(mco);
     }
 
@@ -705,12 +701,6 @@ public class ContentResolverTest extends AndroidTestCase {
         mContentResolver.notifyChange(TABLE1_URI, mco, false);
         assertTrue(mco.hadOnChanged());
 
-        try {
-            mContentResolver.notifyChange(null, mco, false);
-            fail("did not throw NullPointerException when uri is null.");
-        } catch (NullPointerException e) {
-            //expected.
-        }
         mContentResolver.unregisterContentObserver(mco);
     }
 
