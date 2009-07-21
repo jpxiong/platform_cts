@@ -16,47 +16,77 @@
 
 package android.content.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.IContentProvider;
 import android.content.ISyncAdapter;
 import android.content.pm.ProviderInfo;
-import android.content.res.Configuration;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.CursorWindow;
 import android.database.IBulkCursor;
 import android.database.IContentObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.os.ParcelFileDescriptor;
+import android.os.RemoteException;
 import android.test.AndroidTestCase;
-
-import com.google.android.collect.Lists;
-
-import com.android.internal.database.ArrayListCursor;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Test {@link ContentProvider}.
  */
 @TestTargetClass(ContentProvider.class)
 public class ContentProviderTest extends AndroidTestCase {
+    private static final String TEST_PACKAGE_NAME = "com.android.cts.stub";
+    private static final String TEST_FILE_NAME = "testFile.tmp";
+    private static final String TEST_DB_NAME = "test.db";
+
+    @Override
+    protected void tearDown() throws Exception {
+        mContext.deleteDatabase(TEST_DB_NAME);
+        mContext.deleteFile(TEST_FILE_NAME);
+        super.tearDown();
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test attachInfo(Context, android.content.pm.ProviderInfo)",
+        method = "openAssetFile",
+        args = {android.net.Uri.class, java.lang.String.class}
+    )
+    public void testOpenAssetFile() throws IOException {
+        MockContentProvider mockContentProvider = new MockContentProvider();
+        Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
+                "://" + TEST_PACKAGE_NAME + "/" + R.raw.testimage);
+
+        try {
+            mockContentProvider.openAssetFile(uri, "r");
+            fail("Should always throw out FileNotFoundException!");
+        } catch (FileNotFoundException e) {
+        }
+
+        try {
+            mockContentProvider.openFile(null, null);
+            fail("Should always throw out FileNotFoundException!");
+        } catch (FileNotFoundException e) {
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "attachInfo",
         args = {android.content.Context.class, android.content.pm.ProviderInfo.class}
     )
@@ -98,7 +128,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test bulkInsert(Uri, ContentValues[])",
         method = "bulkInsert",
         args = {android.net.Uri.class, android.content.ContentValues[].class}
     )
@@ -124,7 +153,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getContext()",
         method = "getContext",
         args = {}
     )
@@ -141,13 +169,11 @@ public class ContentProviderTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getReadPermission() and setReadPermission(String)",
             method = "getReadPermission",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getReadPermission() and setReadPermission(String)",
             method = "setReadPermission",
             args = {java.lang.String.class}
         )
@@ -171,13 +197,11 @@ public class ContentProviderTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getWritePermission() and setWritePermission(String)",
             method = "getWritePermission",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "Test getWritePermission() and setWritePermission(String)",
             method = "setWritePermission",
             args = {java.lang.String.class}
         )
@@ -200,7 +224,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test getSyncAdapter()",
         method = "getSyncAdapter",
         args = {}
     )
@@ -211,7 +234,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test isTemporary()",
         method = "isTemporary",
         args = {}
     )
@@ -222,7 +244,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test openFile(Uri, String)",
         method = "openFile",
         args = {android.net.Uri.class, java.lang.String.class}
     )
@@ -245,85 +266,65 @@ public class ContentProviderTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test openFileHelper(Uri, String)",
         method = "openFileHelper",
         args = {android.net.Uri.class, java.lang.String.class}
     )
-    public void testOpenFileHelper() {
-        MockContentProvider mockContentProvider = new MockContentProvider();
+    public void testOpenFileHelper() throws IOException {
 
         // create a temporary File
-        File tempFile = new File("/sqlite_stmt_journals", "content_provider_test.temp");
-        try {
-            tempFile.createNewFile();
-        } catch (IOException e1) {
-            fail("create temporary file failed!");
-        }
+        mContext.openFileOutput(TEST_FILE_NAME, Context.MODE_PRIVATE).close();
+        File file = mContext.getFileStreamPath(TEST_FILE_NAME);
+        assertTrue(file.exists());
+
+        ContentProvider cp = new OpenFileContentProvider(file.getAbsolutePath(), TEST_DB_NAME);
+
+        Uri uri = Uri.parse("content://test");
+        assertNotNull(cp.openFile(uri, "r"));
 
         try {
-            Uri uri = Uri.parse("content://test");
-            assertNotNull(mockContentProvider.openFileHelperWrapper(uri, "r"));
-        } catch (FileNotFoundException e) {
-            fail("Shouldn't throw out FileNotFoundException!");
-        }
-
-        try {
-            Uri uri = Uri.parse("content://test");
-            mockContentProvider.openFileHelperWrapper(uri, "wrong");
-            fail("Should throw out FileNotFoundException!");
+            uri = Uri.parse("content://test");
+            cp.openFile(uri, "wrong");
+            fail("Should throw FileNotFoundException!");
         } catch (FileNotFoundException e) {
         }
 
-        // delete the created temporary file
-        if (tempFile.exists()) {
-            tempFile.delete();
-        }
+        // delete the temporary file
+        file.delete();
 
         try {
-            Uri uri = Uri.parse("content://test");
-            mockContentProvider.openFileHelperWrapper(uri, "r");
-            fail("Should throw out FileNotFoundException!");
+            uri = Uri.parse("content://test");
+            cp.openFile(uri, "r");
+            fail("Should throw FileNotFoundException!");
         } catch (FileNotFoundException e) {
         }
 
         try {
-            mockContentProvider.openFileHelperWrapper((Uri) null, "r");
-            fail("Should always throw out FileNotFoundException!");
+            cp.openFile((Uri) null, "r");
+            fail("Should always throw FileNotFoundException!");
         } catch (FileNotFoundException e) {
         }
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onConfigurationChanged(android.content.res.Configuration)",
+        level = TestLevel.NOT_FEASIBLE,
         method = "onConfigurationChanged",
         args = {android.content.res.Configuration.class}
     )
-    @ToBeFixed( bug = "1400249", explanation = "hard to test call back in unit test," +
-            " will be tested by functional test.")
     public void testOnConfigurationChanged() {
-        MockContentProvider mockContentProvider = new MockContentProvider();
-
-        mockContentProvider.onConfigurationChanged(null);
+        // cannot trigger this callback reliably
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onLowMemory()",
+        level = TestLevel.NOT_FEASIBLE,
         method = "onLowMemory",
         args = {}
     )
-    @ToBeFixed( bug = "1400249", explanation = "hard to test call back in unit test," +
-            " will be tested by functional test.")
     public void testOnLowMemory() {
-        MockContentProvider mockContentProvider = new MockContentProvider();
-
-        mockContentProvider.onLowMemory();
+        // cannot trigger this callback reliably
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test coerceToLocalContentProvider(IContentProvider abstractInterface)",
         method = "coerceToLocalContentProvider",
         args = {android.content.IContentProvider.class}
     )
@@ -334,14 +335,14 @@ public class ContentProviderTest extends AndroidTestCase {
         assertSame(mockContentProvider, ContentProvider.coerceToLocalContentProvider(transport));
 
         IContentProvider iContentProvider = new IContentProvider() {
-            public int bulkInsert(Uri url, ContentValues[] initialValues) {
-                return 0;
+            public IBulkCursor bulkQuery(Uri url, String[] projection, String selection,
+                    String[] selectionArgs, String sortOrder, IContentObserver observer,
+                    CursorWindow window) throws RemoteException {
+                return null;
             }
 
-            public IBulkCursor bulkQuery(Uri url, String[] projection,
-                    String selection, String[] selectionArgs, String sortOrder,
-                    IContentObserver observer, CursorWindow window) {
-                return null;
+            public int bulkInsert(Uri url, ContentValues[] initialValues) {
+                return 0;
             }
 
             public int delete(Uri url, String selection, String[] selectionArgs) {
@@ -381,6 +382,7 @@ public class ContentProviderTest extends AndroidTestCase {
             public IBinder asBinder() {
                 return null;
             }
+
         };
         assertNull(ContentProvider.coerceToLocalContentProvider(iContentProvider));
     }
@@ -423,13 +425,6 @@ public class ContentProviderTest extends AndroidTestCase {
         @Override
         public Cursor query(Uri uri, String[] projection, String selection,
                 String[] selectionArgs, String sortOrder) {
-            if (uri != null) {
-                ArrayList row = Lists.newArrayList(
-                        "/sqlite_stmt_journals/content_provider_test.temp");
-                ArrayList<ArrayList> rows = Lists.newArrayList(row);
-                ArrayListCursor cursor = new ArrayListCursor(projection, rows);
-                return cursor;
-            }
             return null;
         }
 
@@ -461,6 +456,57 @@ public class ContentProviderTest extends AndroidTestCase {
         public ParcelFileDescriptor openFileHelperWrapper(Uri uri, String mode)
                 throws FileNotFoundException {
             return super.openFileHelper(uri, mode);
+        }
+    }
+
+    /**
+     * This provider implements openFile() using ContentProvider.openFileHelper().
+     */
+    private class OpenFileContentProvider extends ContentProvider {
+        private SQLiteDatabase mDb;
+
+        OpenFileContentProvider(String fileName, String dbName) {
+            // delete the database if it already exists
+            mContext.deleteDatabase(dbName);
+            mDb = mContext.openOrCreateDatabase(dbName, Context.MODE_PRIVATE, null);
+            mDb.execSQL("CREATE TABLE files ( _data TEXT );");
+            mDb.execSQL("INSERT INTO files VALUES ( \"" + fileName + "\");");
+        }
+
+        @Override
+        public int delete(Uri uri, String selection, String[] selectionArgs) {
+            throw new RuntimeException("not implemented");
+        }
+
+        @Override
+        public String getType(Uri uri) {
+            throw new RuntimeException("not implemented");
+        }
+
+        @Override
+        public Uri insert(Uri uri, ContentValues values) {
+            throw new RuntimeException("not implemented");
+        }
+
+        @Override
+        public boolean onCreate() {
+            return true;
+        }
+
+        @Override
+        public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                String sortOrder) {
+            return mDb.query("files", projection, selection, selectionArgs, null, null, null);
+        }
+
+        @Override
+        public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+            throw new RuntimeException("not implemented");
+        }
+
+        @Override
+        public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+            return openFileHelper(uri, mode);
         }
     }
 }

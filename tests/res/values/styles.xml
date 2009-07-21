@@ -131,4 +131,11 @@
         <item name="android:maxHeight">20dip</item>
         <item name="android:focusable">true</item>
     </style>
+
+    <style name="Test_Theme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:panelColorForeground">#ff000000</item>
+        <item name="android:panelColorBackground">#ffffffff</item>
+    </style>
+
 </resources>
