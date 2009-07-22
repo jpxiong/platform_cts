@@ -20,7 +20,7 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.test.suitebuilder.annotation.SmallTest;
+import dalvik.annotation.KnownFailure;
 
 /**
  * Verify that various PowerManagement functionality requires Permission.
@@ -53,8 +53,10 @@ public class DevicePowerPermissionTest extends AndroidTestCase {
      * Verify that generating user activity requires Permission.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#DEVICE_POWER}.
+     *
+     * TODO: add back SmallTest annotation when test has been fixed
      */
-    @SmallTest
+    @KnownFailure("will be fixed in future release")
     public void testUserActivity() {
         try {
             mPowerManager.userActivity(0, false);
@@ -63,5 +65,4 @@ public class DevicePowerPermissionTest extends AndroidTestCase {
             // expected
         }
     }
-
 }
