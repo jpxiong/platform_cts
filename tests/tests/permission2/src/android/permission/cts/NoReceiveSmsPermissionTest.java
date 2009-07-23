@@ -25,7 +25,6 @@ import android.content.IntentFilter;
 import android.telephony.gsm.SmsManager;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
 /**
@@ -47,8 +46,9 @@ public class NoReceiveSmsPermissionTest extends AndroidTestCase {
      * Verify that SmsManager.sendTextMessage requires permissions.
      * <p>Tests Permission:
      *   {@link android.Manifest.permission#SEND_SMS}.
+     *
+     * Note: this test requires that the device under test reports a valid phone number
      */
-    @LargeTest
     public void testReceiveTextMessage() {
         // register our test receiver to receive SMSs. This won't throw a SecurityException,
         // so test needs to wait to determine if it actual receives an SMS
