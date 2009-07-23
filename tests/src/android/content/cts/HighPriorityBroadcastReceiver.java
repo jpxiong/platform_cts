@@ -16,31 +16,22 @@
 
 package android.content.cts;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * This class is used for testing android.content.ContentWrapper.
- *
- * @see ContextWrapperTest
- */
-public class ResultReceiver extends BroadcastReceiver {
-    public static final String MOCK_ACTION =
-        "android.content.cts.ContextWrapperTest.BROADCAST_RESULT";
+public class HighPriorityBroadcastReceiver extends ResultReceiver {
 
-    private boolean mReceivedBroadCast;
-
+    @Override
     public void onReceive(Context context, Intent intent) {
-        mReceivedBroadCast = MOCK_ACTION.equals(intent.getAction());
+        super.onReceive(context, intent);
+
+        try {
+            synchronized (this) {
+                wait();
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Got interrupted during wait()", e);
+        }
     }
 
-    public boolean hasReceivedBroadCast() {
-        return mReceivedBroadCast;
-    }
-
-    public void reset() {
-        mReceivedBroadCast = false;
-    }
 }
-
