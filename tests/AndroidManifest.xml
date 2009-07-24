@@ -600,6 +600,14 @@
                 android:resource="@xml/alias" />
         </activity>
 
+        <activity android:name="android.webkit.cts.WebViewStubActivity"
+            android:label="WebViewStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.app.cts.ChildActivity"
                         android:label="ChildActivity" />
 
