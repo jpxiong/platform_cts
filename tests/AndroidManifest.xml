@@ -725,6 +725,9 @@
         <!-- Used for PackageManager test, don't delete this MockContentProvider provider -->
         <provider android:name="android.content.cts.MockContentProvider" android:authorities="ctstest"
             android:multiprocess="false" />
+        <provider android:name="android.content.cts.DummyProvider"
+            android:authorities="android.content.cts.dummyprovider"
+            android:multiprocess="true" />
 
         <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
 
