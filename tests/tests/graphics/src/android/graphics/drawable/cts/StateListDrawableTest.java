@@ -229,7 +229,9 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         // default value of android:constantSize is false
         assertFalse(mDrawableContainerState.isConstantSize());
         // default value of android:variablePadding is false
-        assertNotNull(mDrawableContainerState.getConstantPadding());
+        // TODO: behavior of mDrawableContainerState.getConstantPadding() when variablePadding is
+        // false is undefined
+        //assertNotNull(mDrawableContainerState.getConstantPadding());
         assertTrue(mStateListDrawable.hasCalledOnStateChanged());
         assertEquals(1, mDrawableContainerState.getChildCount());
         mStateListDrawable.setState(new int[]{ - attr.state_pressed, attr.state_focused });

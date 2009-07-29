@@ -170,12 +170,12 @@ public class DrawableContainerStateTest extends TestCase{
 
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "setVariablePadding",
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             notes = "Dynamically changing a child's padding does not change this value",
             method = "getConstantPadding",
             args = {}
@@ -185,6 +185,10 @@ public class DrawableContainerStateTest extends TestCase{
         mDrawableContainerState.setVariablePadding(true);
         assertNull(mDrawableContainerState.getConstantPadding());
 
+        /*
+         * TODO: the behavior of getConstantPadding when variable padding is 
+         * false is undefined
+         * 
         mDrawableContainerState.setVariablePadding(false);
         Rect padding = mDrawableContainerState.getConstantPadding();
         assertNotNull(padding);
@@ -206,6 +210,7 @@ public class DrawableContainerStateTest extends TestCase{
 
         mDrawableContainerState.setVariablePadding(true);
         assertNull(mDrawableContainerState.getConstantPadding());
+        */
     }
 
     @TestTargets({

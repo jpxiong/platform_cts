@@ -343,6 +343,10 @@ public class InstrumentationTestActivity extends Activity {
     public boolean isOnTouchEventCalled() {
         return mOnTouchEventCalled;
     }
+    
+    public void setOnTouchEventCalled(boolean onTouchEventCalled) {
+        mOnTouchEventCalled = onTouchEventCalled;
+    }
 
     public int getKeyUpCode() {
         return mKeyUpCode;

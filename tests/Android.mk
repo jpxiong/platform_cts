@@ -24,6 +24,9 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)\
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
+# Resource unit tests use a private locale
+LOCAL_AAPT_FLAGS = -c xx_YY -c cs
+
 LOCAL_PACKAGE_NAME := CtsTestStubs
 
 include $(BUILD_PACKAGE)

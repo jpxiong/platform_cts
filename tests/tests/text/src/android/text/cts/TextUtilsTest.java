@@ -365,6 +365,11 @@ public class TextUtilsTest extends AndroidTestCase {
             "   In other methods, MARQUEE is equivalent to END, except for the first line.")
     public void testEllipsize() {
         TextPaint p = new TextPaint();
+        
+        // turn off kerning. with kerning enabled, different methods of measuring the same text
+        // produce different results.
+        p.setFlags(p.getFlags() & ~p.DEV_KERN_TEXT_FLAG);
+        
         CharSequence text = "long string to truncate";
 
         float textWidth = p.measureText(mEllipsis + "uncate");
@@ -428,6 +433,10 @@ public class TextUtilsTest extends AndroidTestCase {
     public void testEllipsizeCallback() {
         TextPaint p = new TextPaint();
 
+        // turn off kerning. with kerning enabled, different methods of measuring the same text
+        // produce different results.
+        p.setFlags(p.getFlags() & ~p.DEV_KERN_TEXT_FLAG);
+        
         TextUtils.EllipsizeCallback callback = new TextUtils.EllipsizeCallback() {
             public void ellipsized(final int start, final int end) {
                 mStart = start;
