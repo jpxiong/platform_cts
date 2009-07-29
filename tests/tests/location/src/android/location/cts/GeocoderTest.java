@@ -62,17 +62,15 @@ public class GeocoderTest extends AndroidTestCase {
         method = "getFromLocation",
         args = {double.class, double.class, int.class}
     )
-    @ToBeFixed(bug = "", explanation = "getFromLocation always returns a empty List.")
     public void testGetFromLocation() throws IOException {
-        Geocoder geocoder = new Geocoder(getContext(), Locale.US);
+        Geocoder geocoder = new Geocoder(getContext());
 
+        // There is no guarantee that geocoder.getFromLocation returns accurate results
+        // Thus only test that calling the method with valid arguments doesn't produce
+        // an unexpected exception
+        // Note: there is a risk this test will fail if device under test does not have
+        // a network connection
         List<Address> addrs = geocoder.getFromLocation(60, 30, 5);
-        assertNotNull(addrs);
-        assertTrue(addrs.isEmpty());
-
-        // (37.435067, -122.166767) locates 'Lasuen St'
-        List<Address> addresses = geocoder.getFromLocation(37.435067, -122.166767, 1);
-        assertNotNull(addresses);
 
         try {
             // latitude is less than -90
@@ -120,29 +118,18 @@ public class GeocoderTest extends AndroidTestCase {
     public void testGetFromLocationName() throws IOException {
         Geocoder geocoder = new Geocoder(getContext(), Locale.US);
 
+        // There is no guarantee that geocoder.getFromLocationName returns accurate results.
+        // Thus only test that calling the method with valid arguments doesn't produce
+        // an unexpected exception
+        // Note: there is a risk this test will fail if device under test does not have
+        // a network connection
         List<Address> addrs = geocoder.getFromLocationName("Dalvik,Iceland", 5);
-        assertNotNull(addrs);
-        assertTrue(addrs.isEmpty());
-
-        addrs = geocoder.getFromLocationName("wrong place name", 5);
-        assertNotNull(addrs);
-        assertTrue(addrs.isEmpty());
-
-        List<Address> addresses = geocoder.getFromLocationName("San Francisco, CA", 1);
-        assertNotNull(addresses);
 
         try {
             geocoder.getFromLocationName(null, 5);
             fail("should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
-
-        addrs = geocoder.getFromLocationName("Beijing", 5, 35, 110, 45, 120);
-        assertNotNull(addrs);
-
-        addrs = geocoder.getFromLocationName("wrong place name", 5, 25, 100, 45, 130);
-        assertNotNull(addrs);
-        assertTrue(addrs.isEmpty());
 
         try {
             geocoder.getFromLocationName("Beijing", 5, -91, 100, 45, 130);

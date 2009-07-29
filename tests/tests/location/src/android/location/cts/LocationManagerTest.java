@@ -176,8 +176,11 @@ public class LocationManagerTest extends InstrumentationTestCase {
     })
     public void testGetProviders() {
         List<String> providers = mManager.getAllProviders();
-        assertTrue(providers.size() >= 1);
+        assertTrue(providers.size() >= 2);
         assertTrue(hasTestProvider(providers));
+
+        assertTrue(hasGpsProvider(providers));
+
         int oldSizeAllProviders = providers.size();
 
         providers = mManager.getProviders(false);
@@ -205,8 +208,16 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     private boolean hasTestProvider(List<String> providers) {
+        return hasProvider(providers, TEST_MOCK_PROVIDER_NAME);
+    }
+
+    private boolean hasGpsProvider(List<String> providers) {
+        return hasProvider(providers, LocationManager.GPS_PROVIDER);
+    }
+
+    private boolean hasProvider(List<String> providers, String providerName) {
         for (String provider : providers) {
-            if (provider != null && provider.equals(TEST_MOCK_PROVIDER_NAME)) {
+            if (provider != null && provider.equals(providerName)) {
                 return true;
             }
         }
@@ -223,6 +234,10 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertNotNull(p);
         assertEquals(TEST_MOCK_PROVIDER_NAME, p.getName());
 
+        p = mManager.getProvider(LocationManager.GPS_PROVIDER);
+        assertNotNull(p);
+        assertEquals(LocationManager.GPS_PROVIDER, p.getName());
+        
         p = mManager.getProvider(UNKNOWN_PROVIDER_NAME);
         assertNull(p);
 

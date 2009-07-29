@@ -36,8 +36,9 @@ class GestureDetectorTestUtil {
         TouchUtils.touchAndCancelView(testcase, view);
         int fromX = 1;
         int toX = 10;
-        int fromY = 2;
-        int toY = 20;
+        // Y has to be outside the status bar bounding box
+        int fromY = 50;
+        int toY = 100;
         int stepCount = 20;
         TouchUtils.drag(testcase, fromX, toX, fromY, toY, stepCount);
         InstrumentationTestCase.assertTrue(activity.isDown);

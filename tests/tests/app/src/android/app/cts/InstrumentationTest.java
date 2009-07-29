@@ -69,8 +69,10 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mContext = mInstrumentation.getTargetContext();
         final long downTime = SystemClock.uptimeMillis();
         final long eventTime = SystemClock.uptimeMillis();
-        final long x = 0;
-        final long y = 0;
+        // use coordinates for MotionEvent that do not include the status bar
+        // TODO: is there a more deterministic way to get these values
+        final long x = 50;
+        final long y = 50;
         final int metaState = 0;
         mMotionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y,
                 metaState);
@@ -520,22 +522,18 @@ public class InstrumentationTest extends InstrumentationTestCase {
             args = {boolean.class}
         ),
         @TestTargetNew(
-            level = TestLevel.PARTIAL,
+            level = TestLevel.COMPLETE,
             method = "sendPointerSync",
             args = {MotionEvent.class}
         )
     })
-    @ToBeFixed(bug="1477928", explanation="sendPointerSync can't pass a MotionEvent to a Activity")
     public void testSendPointerSync() throws Exception {
+        mInstrumentation.waitForIdleSync();
         mInstrumentation.setInTouchMode(true);
         mInstrumentation.sendPointerSync(mMotionEvent);
         mInstrumentation.waitForIdleSync();
-        assertFalse(mActivity.isOnTouchEventCalled());
-
-        mInstrumentation.setInTouchMode(false);
-        mInstrumentation.sendPointerSync(mMotionEvent);
-        mInstrumentation.waitForIdleSync();
-        assertFalse(mActivity.isOnTouchEventCalled());
+        assertTrue(mActivity.isOnTouchEventCalled());
+        mActivity.setOnTouchEventCalled(false);
     }
 
     @TestTargetNew(
