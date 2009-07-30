@@ -40,7 +40,7 @@ public class FaceDetectorTest extends InstrumentationTestCase {
         Intent intent = new Intent();
         intent.setClass(getInstrumentation().getTargetContext(), FaceDetectorStub.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(FaceDetectorStub.IMAGE_ID, R.drawable.baby_face);
+        intent.putExtra(FaceDetectorStub.IMAGE_ID, R.drawable.faces);
         mActivity = (FaceDetectorStub) getInstrumentation().startActivitySync(intent);
     }
 
