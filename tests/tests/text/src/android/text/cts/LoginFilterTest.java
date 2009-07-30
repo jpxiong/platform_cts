@@ -95,7 +95,7 @@ public class LoginFilterTest extends TestCase {
         loginFilter.reset();
         result = loginFilter.filter(spannedSource, 0, spannedSource.length(),
                 dest1, 0, dest1.length());
-        assertTrue(result instanceof SpannableString);
+        //assertTrue(result instanceof SpannableString);
         assertEquals("spanned_source_with_invalid_char", result.toString());
         assertTrue(loginFilter.isStarted());
         assertTrue(loginFilter.isStopped());
@@ -115,12 +115,9 @@ public class LoginFilterTest extends TestCase {
         } catch (StringIndexOutOfBoundsException e) {
         }
 
-        try {
-            // start is larger than end.
-            loginFilter.filter(source1, source1.length(), 0, dest1, 0, dest1.length());
-            fail("should throw NegativeArraySizeException when start is larger than end");
-        } catch (NegativeArraySizeException e) {
-        }
+        // start is larger than end.
+        assertNull("should return null when start is larger than end",
+                loginFilter.filter(source1, source1.length(), 0, dest1, 0, dest1.length()));
 
         try {
             loginFilter.filter(source1, 0, source1.length(), null, 2, dest1.length());

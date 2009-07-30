@@ -95,7 +95,7 @@ public class ConfigTest extends AndroidTestCase {
             mMetrics = new DisplayMetrics();
             mMetrics.widthPixels = 200;
             mMetrics.heightPixels = 320;
-            mMetrics.density = 120;
+            mMetrics.density = 1;
         }
 
         public void setProperty(final Properties p, final int value) {
@@ -128,7 +128,9 @@ public class ConfigTest extends AndroidTestCase {
                     mMetrics.heightPixels = value;
                     break;
                 case DENSITY:
-                    mMetrics.density = value;
+                    // this is the ratio from the standard
+
+                    mMetrics.density = (((float)value)/((float)DisplayMetrics.DENSITY_DEFAULT));
                     break;
                 default:
                     assert(false);
@@ -159,6 +161,23 @@ public class ConfigTest extends AndroidTestCase {
         }
     }
 
+    private static void checkPair(Resources res, int[] notResIds,
+            int simpleRes, String simpleString,
+            int bagRes, String bagString) {
+        boolean willHave = true;
+        if (notResIds != null) {
+            for (int i : notResIds) {
+                if (i == simpleRes) {
+                    willHave = false;
+                    break;
+                }
+            }
+        }
+        checkValue(res, simpleRes, willHave ? simpleString : null);
+        checkValue(res, bagRes, R.styleable.TestConfig,
+                new String[]{willHave ? bagString : null});
+    }
+
     @SmallTest
     public void testAllConfigs() {
         /**
@@ -167,110 +186,200 @@ public class ConfigTest extends AndroidTestCase {
          */
         TotalConfig config = new TotalConfig();
         Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple default");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag default"});
 
         config = new TotalConfig();
         config.setProperty(Properties.LANGUAGE, "xx");
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple xx");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag xx"});
 
         config = new TotalConfig();
         config.setProperty(Properties.LANGUAGE, "xx");
         config.setProperty(Properties.COUNTRY, "YY");
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple xx-rYY");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig, new String[] { "bag xx-rYY" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag xx-rYY"});
 
         config = new TotalConfig();
         config.setProperty(Properties.MCC, 111);
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple mcc111");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig, new String[] { "bag mcc111" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag mcc111"});
 
         config = new TotalConfig();
         config.setProperty(Properties.MNC, 222);
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple mnc222");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig, new String[] { "bag mnc222" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag mnc222"});
 
         config = new TotalConfig();
         config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_NOTOUCH);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_FINGER);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple notouch");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag notouch"});
 
         config = new TotalConfig();
         config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_STYLUS);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple stylus");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag stylus"});
 
         config = new TotalConfig();
         config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_NOKEYS);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_QWERTY);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple nokeys");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag nokeys"});
 
         config = new TotalConfig();
         config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_12KEY);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_YES);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 12key");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 12key"});
 
         config = new TotalConfig();
         config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_NO);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple keysexposed");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag keysexposed"});
 
         config = new TotalConfig();
         config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_NONAV);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple nonav");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag nonav"});
 
         config = new TotalConfig();
         config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_DPAD);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_TRACKBALL);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple dpad");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag dpad"});
 
         config = new TotalConfig();
         config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_WHEEL);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.HEIGHT, 320);
-        config.setProperty(Properties.WIDTH, 200);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple wheel");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag wheel"});
 
         config = new TotalConfig();
         config.setProperty(Properties.HEIGHT, 480);
         config.setProperty(Properties.WIDTH, 320);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 480x320");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 480x320"});
 
         config = new TotalConfig();
         config.setProperty(Properties.DENSITY, 240);
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple 240dpi");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig, new String[] { "bag 240dpi" });
-
-        config = new TotalConfig();
-        config.setProperty(Properties.DENSITY, 120);
-        res = config.getResources();
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 240dpi"});
 
         config = new TotalConfig();
         config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_LANDSCAPE);
         res = config.getResources();
-
-        config = new TotalConfig();
-        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_PORTRAIT);
-        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple landscape");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag landscape"});
 
         config = new TotalConfig();
         config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_SQUARE);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple square");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag square"});
     }
+    
+    @MediumTest
+    public void testDensity() throws Exception {
+        // have 32, 240 and the default 160 content.
+        // rule is that closest wins, with down scaling (larger content)
+        // being twice as nice as upscaling.
+        // transition at H/2 * (-1 +/- sqrt(1+8L/H))
+        // SO, X < 49 goes to 32
+        // 49 >= X < 182 goes to 160
+        // X >= 182 goes to 240
+        TotalConfig config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 2);
+        Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 32dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 32dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 32);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 32dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 32dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 48);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 32dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 32dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 49);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple default");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag default"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 150);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple default");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag default"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 181);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple default");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag default"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 182);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 240dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 240dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 239);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 240dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 240dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 490);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 240dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 240dpi"});
+    }
+
+// TODO - add tests for special cases - ie, other key params seem ignored if 
+// nokeys is set
 
     @MediumTest
     public void testCombinations() {
@@ -300,6 +409,9 @@ public class ConfigTest extends AndroidTestCase {
         config = new TotalConfig();
         config.setProperty(Properties.MNC, 333);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple default");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag default"});
     }
 
     @MediumTest
@@ -308,71 +420,118 @@ public class ConfigTest extends AndroidTestCase {
          * Verify that in cases of ties, the specific ordering is followed
          */
 
-        /*
-         * full A + B + C doesn't exist. Do we get A + C or B + C?
+        /**
+         * Precidence order: mcc, mnc, locale, orientation, density,
+         * touchscreen, hidden, keyboard, navigation, width-height
+         */
+
+        /**
+         * verify mcc trumps mnc.  Have 110-xx, 220-xx but no 110-220
+         * so with is selected?  Should be mcc110-xx. 
          */
         TotalConfig config = new TotalConfig();
+        config.setProperty(Properties.MCC, 110);
+        config.setProperty(Properties.MNC, 220);
+        config.setProperty(Properties.LANGUAGE, "xx");
+        Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple mcc110 xx");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag mcc110 xx"});
+
+        /* full A + B + C doesn't exist.  Do we get A + C or B + C? 
+         */
+        config = new TotalConfig();
         config.setProperty(Properties.MCC, 111);
         config.setProperty(Properties.MNC, 222);
         config.setProperty(Properties.LANGUAGE, "xx");
-        Resources res = config.getResources();
+        res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple mcc111 mnc222");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig,
-                new String[] { "bag mcc111 mnc222" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag mcc111 mnc222"});
 
         config = new TotalConfig();
         config.setProperty(Properties.MNC, 222);
         config.setProperty(Properties.LANGUAGE, "xx");
-        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_SQUARE);
+        config.setProperty(Properties.ORIENTATION, 
+                Configuration.ORIENTATION_SQUARE);
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple mnc222 xx");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig,
-                new String[] { "bag mnc222 xx" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag mnc222 xx"});
 
         config = new TotalConfig();
         config.setProperty(Properties.LANGUAGE, "xx");
-        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_SQUARE);
+        config.setProperty(Properties.ORIENTATION, 
+                Configuration.ORIENTATION_SQUARE);
         config.setProperty(Properties.DENSITY, 32);
         res = config.getResources();
-        checkValue(res, R.configVarying.simple, "simple xx 32dpi");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig,
-                new String[] { "bag xx 32dpi" });
+        checkValue(res, R.configVarying.simple, "simple xx square");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag xx square"});
 
         config = new TotalConfig();
-        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_SQUARE);
+        config.setProperty(Properties.ORIENTATION, 
+                Configuration.ORIENTATION_SQUARE);
         config.setProperty(Properties.DENSITY, 32);
-        config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_STYLUS);
+        config.setProperty(Properties.TOUCHSCREEN, 
+                Configuration.TOUCHSCREEN_STYLUS);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple square 32dpi");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag square 32dpi"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.DENSITY, 32);
+        config.setProperty(Properties.TOUCHSCREEN, 
+                Configuration.TOUCHSCREEN_STYLUS);
+        config.setProperty(Properties.KEYBOARDHIDDEN, 
+                Configuration.KEYBOARDHIDDEN_NO);
         res = config.getResources();
         checkValue(res, R.configVarying.simple, "simple 32dpi stylus");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig,
-                new String[] { "bag 32dpi stylus" });
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 32dpi stylus"});
 
         config = new TotalConfig();
-        config.setProperty(Properties.DENSITY, 32);
-        config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_STYLUS);
-        config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_NO);
-        res = config.getResources();
-        checkValue(res, R.configVarying.simple, "simple 32dpi stylus");
-        checkValue(res, R.configVarying.bag, R.styleable.TestConfig,
-                new String[] { "bag 32dpi stylus" });
-
-        config = new TotalConfig();
-        config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_STYLUS);
-        config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_NO);
+        config.setProperty(Properties.TOUCHSCREEN, 
+                Configuration.TOUCHSCREEN_STYLUS);
+        config.setProperty(Properties.KEYBOARDHIDDEN, 
+                Configuration.KEYBOARDHIDDEN_NO);
         config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_12KEY);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple stylus keysexposed");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag stylus keysexposed"});
 
         config = new TotalConfig();
-        config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_NO);
+        config.setProperty(Properties.KEYBOARDHIDDEN, 
+                Configuration.KEYBOARDHIDDEN_NO);
         config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_12KEY);
-        config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_DPAD);
+        config.setProperty(Properties.NAVIGATION, 
+                Configuration.NAVIGATION_DPAD);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple keysexposed 12key");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag keysexposed 12key"});
 
         config = new TotalConfig();
         config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_12KEY);
-        config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_DPAD);
+        config.setProperty(Properties.NAVIGATION, 
+                Configuration.NAVIGATION_DPAD);
         config.setProperty(Properties.HEIGHT, 63);
         config.setProperty(Properties.WIDTH, 57);
         res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple 12key dpad");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag 12key dpad"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.NAVIGATION, 
+                Configuration.NAVIGATION_DPAD);
+        config.setProperty(Properties.HEIGHT, 640);
+        config.setProperty(Properties.WIDTH, 400);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple dpad");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag dpad"});
     }
 }

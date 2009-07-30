@@ -31,6 +31,7 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
@@ -70,10 +71,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "breakText",
         args = {char[].class, int.class, int.class, float.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testBreakText1() {
         Paint p = new Paint();
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
@@ -136,11 +139,13 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "breakText",
         args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class,
                 float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testBreakText2() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -220,10 +225,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "breakText",
         args = {java.lang.String.class, boolean.class, float.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testBreakText3() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -828,10 +835,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "getTextWidths",
         args = {char[].class, int.class, int.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testGetTextWidths1() throws Exception {
         Paint p = new Paint();
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
@@ -883,10 +892,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "getTextWidths",
         args = {java.lang.CharSequence.class, int.class, int.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testGetTextWidths2() throws Exception {
         Paint p = new Paint();
 
@@ -1154,10 +1165,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "getTextWidths",
         args = {java.lang.String.class, int.class, int.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testGetTextWidths3() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -1215,10 +1228,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "getTextWidths",
         args = {java.lang.String.class, float[].class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testGetTextWidths4() throws Exception {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -1913,10 +1928,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "measureText",
         args = {char[].class, int.class, int.class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testMeasureText1() {
         Paint p = new Paint();
 
@@ -1968,10 +1985,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "measureText",
         args = {java.lang.String.class, int.class, int.class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress
     public void testMeasureText2() {
         Paint p = new Paint();
         String string = "HIJHIJ";
@@ -2031,6 +2050,8 @@ public class PaintTest extends AndroidTestCase {
         method = "measureText",
         args = {java.lang.String.class}
     )
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress    
     public void testMeasureText3() {
         Paint p = new Paint();
 
@@ -2079,11 +2100,12 @@ public class PaintTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.TODO,
         method = "measureText",
         args = {java.lang.CharSequence.class, int.class, int.class}
     )
-
+    // test is asserting a set of hardcoded values - it is not clear that these values are correct
+    @Suppress       
     public void testMeasureText4() {
 
         Paint p = new Paint();

@@ -2442,12 +2442,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         View view = new View(mActivity);
         int[] location = new int[] { -1, -1 };
 
-        try {
-            view.getLocationOnScreen(location);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
         // mAttachInfo is not null
         View layout = mActivity.findViewById(R.id.viewlayout_root);
         int[] layoutLocation = new int[] { -1, -1 };

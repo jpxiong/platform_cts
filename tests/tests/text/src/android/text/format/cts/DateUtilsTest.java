@@ -104,8 +104,8 @@ public class DateUtilsTest extends AndroidTestCase {
         args = {int.class}
     )
     public void testGetAMPMString() {
-        assertEquals("AM", DateUtils.getAMPMString(Calendar.AM));
-        assertEquals("PM", DateUtils.getAMPMString(Calendar.PM));
+        assertEquals("am", DateUtils.getAMPMString(Calendar.AM));
+        assertEquals("pm", DateUtils.getAMPMString(Calendar.PM));
     }
 
     @TestTargets({
@@ -277,9 +277,11 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("Jan 19", DateUtils.formatDateRange(mContext, fixedTime,
                 fixedTime + HOUR_DURATION,
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL));
-        assertEquals("01/19/2009", DateUtils.formatDateRange(mContext, fixedTime,
+        String actual = DateUtils.formatDateRange(mContext, fixedTime,
                 fixedTime + HOUR_DURATION,
-                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE));
+                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
+        // accept with leading zero or without
+        assertTrue("1/19/2009".equals(actual) || "01/19/2009".equals(actual));
 
         assertEquals("Monday", DateUtils.formatDateTime(mContext, fixedTime,
                 DateUtils.FORMAT_SHOW_WEEKDAY));
@@ -318,8 +320,10 @@ public class DateUtilsTest extends AndroidTestCase {
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH));
         assertEquals("Jan 19", DateUtils.formatDateTime(mContext, fixedTime,
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL));
-        assertEquals("01/19/2009", DateUtils.formatDateTime(mContext, fixedTime,
-                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE));
+        actual = DateUtils.formatDateTime(mContext, fixedTime,
+                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
+        // accept with leading zero or without
+        assertTrue("1/19/2009".equals(actual) || "01/19/2009".equals(actual));
     }
 
     @TestTargetNew(
