@@ -616,13 +616,13 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         private Context mContext;
 
         private Integer[] mImageIds = {
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
         };

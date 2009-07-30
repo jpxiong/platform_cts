@@ -72,13 +72,13 @@ public class GalleryStubActivity extends Activity {
         private Context mContext;
 
         private Integer[] mImageIds = {
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
-                R.drawable.baby_face,
+                R.drawable.faces,
                 R.drawable.scenery,
                 R.drawable.testimage,
         };
