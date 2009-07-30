@@ -95,7 +95,6 @@ public class LoginFilterTest extends TestCase {
         loginFilter.reset();
         result = loginFilter.filter(spannedSource, 0, spannedSource.length(),
                 dest1, 0, dest1.length());
-        //assertTrue(result instanceof SpannableString);
         assertEquals("spanned_source_with_invalid_char", result.toString());
         assertTrue(loginFilter.isStarted());
         assertTrue(loginFilter.isStopped());

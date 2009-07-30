@@ -281,26 +281,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
     public void testGetProcessInErrorState() throws Exception {
         List<ActivityManager.ProcessErrorStateInfo> errList = null;
         errList = mActivityManager.getProcessesInErrorState();
-        /*
-        int preCrashProcessCount = 0;
-        if (errList != null) {
-            preCrashProcessCount = errList.size();
-        }
-
-        final Process p = new ProcessBuilder("am",
-                "start -a android.intent.action.MAIN -n com.android.cts.stub/"
-                        + "android.app.cts.ActivityManagerStubCrashActivity").start();
-        
-        assertNotNull(p);
-        assertEquals(0, p.waitFor());
-
-        errList = mActivityManager.getProcessesInErrorState();
-        assertNotNull(errList);
-        assertTrue(errList.size() > preCrashProcessCount);
-        for (ProcessErrorStateInfo pei : errList) {
-            android.os.Process.killProcess(pei.pid);
-        }
-        */
     }
 
     @TestTargetNew(

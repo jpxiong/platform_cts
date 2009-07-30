@@ -27,7 +27,7 @@ public class BuildVersionTest extends TestCase {
 
     // TODO: need to change these constants once release number and SDK API value has been
     // defined for donut 
-    private static final String EXPECTED_RELEASE = "1.5";
+    private static final String EXPECTED_RELEASE = "Donut";
     private static final String EXPECTED_SDK = "3";
 
     public void testReleaseVersion() {

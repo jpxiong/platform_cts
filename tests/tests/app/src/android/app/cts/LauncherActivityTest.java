@@ -108,7 +108,6 @@ public class LauncherActivityTest extends InstrumentationTestCase {
         assertNotNull(mActivity.intentForPosition(0));
         // Test onListItemClick
         sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
-        mInstrumentation.waitForIdleSync();
         assertTrue(mActivity.isOnListItemClick);
     }
 }
