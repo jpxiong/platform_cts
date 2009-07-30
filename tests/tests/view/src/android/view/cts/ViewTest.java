@@ -4345,7 +4345,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         });
         getInstrumentation().waitForIdleSync();
 
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
+        getInstrumentation().sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
         assertTrue(view.hasCalledDispatchKeyEventPreIme());
         assertTrue(view.hasCalledOnKeyPreIme());
     }
