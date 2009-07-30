@@ -54,7 +54,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
     /** The interval time to wait for completing an operation. */
     private static final long   OPERATION_INTERVAL  = 1500L;
     /** The duration of R.raw.testvideo. */
-    private static final int    TEST_VIDEO_DURATION = 8484;
+    private static final int    TEST_VIDEO_DURATION = 11047;
     /** The full name of R.raw.testvideo. */
     private static final String VIDEO_NAME   = "testvideo.3gp";
     /** delta for duration in case user uses different decoders on different
