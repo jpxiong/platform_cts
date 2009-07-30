@@ -649,7 +649,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
                 // functionality with
                 // setBackgroundDrawable(Drawable drawable), just different in
                 // parameter.
-                mWindow.setBackgroundDrawableResource(R.drawable.baby_face);
+                mWindow.setBackgroundDrawableResource(R.drawable.faces);
             }
         });
         mInstrumentation.waitForIdleSync();
