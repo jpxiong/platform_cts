@@ -16,27 +16,20 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
-import com.google.android.collect.Lists;
+import java.util.List;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import junit.framework.Assert;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.test.mock.MockContext;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
@@ -51,9 +44,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import java.util.List;
+import com.android.cts.stub.R;
+import com.google.android.collect.Lists;
 
-import junit.framework.Assert;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(ListView.class)
 public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
@@ -313,6 +311,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         )
     })
     @UiThreadTest
+    @ToBeFixed(bug="2031502", explanation="setItemChecked(i,false) always unchecks all items")
     public void testAccessItemChecked() {
         // NONE mode
         mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
@@ -335,12 +334,17 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertTrue(mListView.isItemChecked(3));
         assertFalse(mListView.isItemChecked(2));
 
+        // test attempt to uncheck a item that wasn't checked to begin with
         mListView.setItemChecked(4, false);
-        assertEquals(4, mListView.getCheckedItemPosition());
-        assertTrue(mListView.isItemChecked(4));
+        // item three should still be checked, but current ListView behavior unchecks all items
+        assertEquals(ListView.INVALID_POSITION, mListView.getCheckedItemPosition());
+        assertFalse(mListView.isItemChecked(4));
+        // should be assertTrue
         assertFalse(mListView.isItemChecked(3));
         assertFalse(mListView.isItemChecked(2));
 
+        mListView.setItemChecked(4, true);
+        assertTrue(mListView.isItemChecked(4));
         mListView.clearChoices();
         assertEquals(ListView.INVALID_POSITION, mListView.getCheckedItemPosition());
         assertFalse(mListView.isItemChecked(4));
@@ -409,8 +413,10 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         )
     })
     public void testAccessFooterView() {
-        final TextView footerView1 = (TextView) mActivity.findViewById(R.id.footerview1);
-        final TextView footerView2 = (TextView) mActivity.findViewById(R.id.footerview2);
+        final TextView footerView1 = new TextView(mActivity);
+        footerView1.setText("footerview1");
+        final TextView footerView2 = new TextView(mActivity);
+        footerView2.setText("footerview2");
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -433,6 +439,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
                 mListView.addFooterView(footerView2);
             }
         });
+
         mInstrumentation.waitForIdleSync();
         assertEquals(2, mListView.getFooterViewsCount());
 
