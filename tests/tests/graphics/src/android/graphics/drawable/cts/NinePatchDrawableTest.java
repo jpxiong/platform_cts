@@ -77,6 +77,7 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "NinePatchDrawable#NinePatchDrawable(Bitmap, byte[], Rect, String) "
             + "when param bitmap, chunk, padding or srcName is null")
+    @SuppressWarnings("deprecation")
     public void testConstructors() {
         byte[] chunk = new byte[MIN_CHUNK_SIZE];
         chunk[MIN_CHUNK_SIZE - 1] = 1;
@@ -116,13 +117,8 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
 
         new NinePatchDrawable(new NinePatch(bmp, chunk, name));
 
+        // constructor should accept a null NinePatch
         mNinePatchDrawable = new NinePatchDrawable(null);
-        assertNotNull(mNinePatchDrawable);
-        try {
-            mNinePatchDrawable.getMinimumHeight();
-            fail("The constructor should check whether the ninepatch is null.");
-        } catch (NullPointerException e) {
-        }
 
         chunk = new byte[MIN_CHUNK_SIZE - 1];
         chunk[MIN_CHUNK_SIZE - 2] = 1;
