@@ -16,13 +16,7 @@
 
 package android.widget.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -45,7 +39,13 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.AutoCompleteTextView.Validator;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(AutoCompleteTextView.class)
 public class AutoCompleteTextViewTest extends
@@ -532,6 +532,8 @@ public class AutoCompleteTextViewTest extends
         mInstrumentation.sendStringSync("test");
         assertTrue(mAutoCompleteTextView.hasFocus());
         assertTrue(mAutoCompleteTextView.hasWindowFocus());
+        // give some time for UI to settle
+        Thread.sleep(200);
         assertTrue(mAutoCompleteTextView.isPopupShowing());
     }
 
@@ -593,6 +595,8 @@ public class AutoCompleteTextViewTest extends
         // performFiltering will be indirectly invoked by onKeyDown
         assertNull(filter.getResult());
         mInstrumentation.sendStringSync(STRING_TEST);
+        // give some time for UI to settle
+        Thread.sleep(100);
         assertEquals(STRING_TEST, filter.getResult());
     }
 
@@ -666,7 +670,12 @@ public class AutoCompleteTextViewTest extends
         listener.clearItemClickedStatus();
 
         // Test the method on the scene of popup is closed.
-        mAutoCompleteTextView.dismissDropDown();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+               mAutoCompleteTextView.dismissDropDown();
+            }
+        });
+
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER);
         assertFalse(listener.isOnItemClicked());
