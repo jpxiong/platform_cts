@@ -222,7 +222,7 @@ public class ResourcesTest extends AndroidTestCase {
 
         final Configuration config = new Configuration();
         final Resources res = getResources(config, 0, 0, 0, 0, 0, 0, 0, 0);
-        checkGetText1(res, R.configVarying.simple, "simple 32dpi keysexposed");
+        checkGetText1(res, R.configVarying.simple, "simple default");
     }
 
     @TestTargetNew(
@@ -235,7 +235,7 @@ public class ResourcesTest extends AndroidTestCase {
 
         final Configuration config = new Configuration();
         final Resources res = getResources(config, 0, 0, 0, 0, 0, 0, 0, 0);
-        checkGetText2(res, R.configVarying.simple, "simple 32dpi keysexposed");
+        checkGetText2(res, R.configVarying.simple, "simple default");
     }
 
     @TestTargetNew(

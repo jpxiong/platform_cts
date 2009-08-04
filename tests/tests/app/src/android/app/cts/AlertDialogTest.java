@@ -29,13 +29,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.android.internal.R;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -130,18 +123,6 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
     private void doTestAlertDialog(int index) throws Throwable {
         popDialog(index);
         assertTrue(mActivity.getDialog().isShowing());
-
-        final TextView titleView = (TextView) mActivity.getDialog().getWindow().findViewById(
-                R.id.alertTitle);
-        assertNotNull(titleView);
-        final String title = (String) titleView.getText();
-        assertEquals(DialogStubActivity.DEFAULT_ALERTDIALOG_TITLE, title);
-
-        final TextView messageView = (TextView) mActivity.getDialog().getWindow().findViewById(
-                R.id.message);
-        assertNotNull(messageView);
-        final String message = (String) messageView.getText();
-        assertEquals(DialogStubActivity.DEFAULT_ALERTDIALOG_MESSAGE, message);
 
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_POSITIVE);
@@ -316,18 +297,6 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         popDialog(DialogStubActivity.TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE);
         assertTrue(mActivity.getDialog().isShowing());
 
-        final TextView titleView = (TextView) mActivity.getDialog().getWindow().findViewById(
-                R.id.alertTitle);
-        assertNotNull(titleView);
-        final String title = (String) titleView.getText();
-        assertEquals(DialogStubActivity.DEFAULT_ALERTDIALOG_TITLE, title);
-
-        final TextView messageView = (TextView) mActivity.getDialog().getWindow().findViewById(
-                R.id.message);
-        assertNotNull(messageView);
-        final String message = (String) messageView.getText();
-        assertEquals(DialogStubActivity.DEFAULT_ALERTDIALOG_MESSAGE, message);
-
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
                 DialogInterface.BUTTON_POSITIVE);
         assertNotNull(mPositiveButton);
@@ -401,25 +370,6 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
     public void testCustomAlertDialog() {
         popDialog(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG);
         assertTrue(mActivity.getDialog().isShowing());
-
-        final LinearLayout topPanel = (LinearLayout) mActivity.getDialog().getWindow().findViewById(
-                R.id.topPanel);
-        final TextView atv = (TextView) topPanel.getChildAt(2);
-        final String title = (String) atv.getText();
-        assertEquals(ALERTDIALOG_CUSTOM_TITLE, title);
-
-        final FrameLayout custom = (FrameLayout) mActivity.getDialog().getWindow().findViewById(
-                R.id.custom);
-        final LinearLayout ll = (LinearLayout) custom.getChildAt(0);
-        assertNotNull(ll);
-        assertEquals(2, ll.getChildCount());
-        final TextView tv = (TextView) ll.getChildAt(0);
-        assertNotNull(tv);
-        final String expect = mActivity.getString(
-                com.android.cts.stub.R.string.alert_dialog_username);
-        assertEquals(expect, tv.getText());
-        final EditText et = (EditText) ll.getChildAt(1);
-        assertNotNull(et);
     }
 
     @TestTargets({
@@ -457,30 +407,6 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
     public void testCustomAlertDialogView() {
         popDialog(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG_VIEW);
         assertTrue(mActivity.getDialog().isShowing());
-
-        final LinearLayout topPanel = (LinearLayout) mActivity.getDialog().getWindow().findViewById(
-                R.id.topPanel);
-        final TextView atv = (TextView) topPanel.getChildAt(2);
-        final String title = (String) atv.getText();
-        assertEquals(ALERTDIALOG_CUSTOM_TITLE, title);
-
-        final FrameLayout custom = (FrameLayout) mActivity.getDialog().getWindow().findViewById(
-                R.id.custom);
-        final LinearLayout ll = (LinearLayout) custom.getChildAt(0);
-        assertNotNull(ll);
-        final int childCount = 2;
-        assertEquals(childCount, ll.getChildCount());
-        final TextView tv = (TextView) ll.getChildAt(0);
-        assertNotNull(tv);
-        final String expect = mActivity.getString(
-                com.android.cts.stub.R.string.alert_dialog_username);
-        assertEquals(expect, tv.getText());
-        final EditText et = (EditText) ll.getChildAt(1);
-        assertNotNull(et);
-        assertEquals(DialogStubActivity.SPACING_TOP, custom.getPaddingTop());
-        assertEquals(DialogStubActivity.SPACING_LEFT, custom.getPaddingLeft());
-        assertEquals(DialogStubActivity.SPACING_RIGHT, custom.getPaddingRight());
-        assertEquals(DialogStubActivity.SPACING_BOTTOM, custom.getPaddingBottom());
     }
 
 
