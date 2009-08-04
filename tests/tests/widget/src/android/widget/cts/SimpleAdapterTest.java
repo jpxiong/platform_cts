@@ -108,7 +108,7 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         level = TestLevel.COMPLETE,
         notes = "Test constructor",
         method = "SimpleAdapter",
-        args = {android.content.Context.class, java.util.List.class, int.class, 
+        args = {android.content.Context.class, java.util.List.class, int.class,
                 java.lang.String[].class, int[].class}
     )
     public void testConstructor() {
@@ -195,10 +195,9 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertTrue(result instanceof TextView);
         assertEquals("191", ((TextView) result).getText().toString());
 
-        // use the convert view as the result if it is not null
-        // the param ViewGroup is never readed
-        TextView convertView = (TextView) mInflater.inflate(R.layout.simple_list_item_1, null);
-        convertView.setTag(new View[]{convertView.findViewById(R.id.text1)});
+        // use the previous result as the convert view
+        // the param ViewGroup is never read
+        TextView convertView = (TextView) result;
         result = mSimpleAdapter.getView(0, convertView, mAdapterHost);
         assertEquals("01", ((TextView) result).getText().toString());
         assertSame(convertView, result);
@@ -279,10 +278,9 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertTrue(result instanceof TextView);
         assertEquals("191", ((TextView) result).getText().toString());
 
-        // Use the convert view
-        // the param ViewGroup is never readed
-        TextView convertView = (TextView) mInflater.inflate(R.layout.simple_list_item_1, null);
-        convertView.setTag(new View[]{convertView.findViewById(R.id.text1)});
+        // use the previous result as the convert view
+        TextView convertView = (TextView) result;
+        // the param ViewGroup is never read
         result = mSimpleAdapter.getDropDownView(0, convertView, mAdapterHost);
         assertEquals("01", convertView.getText().toString());
         assertSame(convertView, result);
