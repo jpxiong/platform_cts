@@ -226,9 +226,15 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         mockTabWidget.addView(view1);
         assertSame(view1, mockTabWidget.getChildAt(0));
         LayoutParams defaultLayoutParam = mockTabWidget.generateDefaultLayoutParams();
-        // issue 1695243: the default width is not equal to generateDefaultLayoutParams().width
-        assertEquals(defaultLayoutParam.height, view1.getLayoutParams().height);
-        assertEquals(1.0f, ((LinearLayout.LayoutParams) view1.getLayoutParams()).weight, 0.01);
+        if (mockTabWidget.getOrientation() == LinearLayout.VERTICAL) {
+            assertEquals(defaultLayoutParam.height, LayoutParams.WRAP_CONTENT);
+            assertEquals(defaultLayoutParam.width, LayoutParams.FILL_PARENT);
+        } else if (mockTabWidget.getOrientation() == LinearLayout.HORIZONTAL) {
+            assertEquals(defaultLayoutParam.height, LayoutParams.WRAP_CONTENT);
+            assertEquals(defaultLayoutParam.width, LayoutParams.WRAP_CONTENT);
+        } else {
+            assertNull(defaultLayoutParam);
+        }
 
         View view2 = new RelativeLayout(mActivity);
         mockTabWidget.addView(view2);
