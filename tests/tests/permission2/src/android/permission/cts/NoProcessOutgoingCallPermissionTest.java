@@ -49,7 +49,7 @@ public class NoProcessOutgoingCallPermissionTest extends AndroidTestCase {
      * <p>Tests Permission:
      *   {@link android.Manifest.permission#PROCESS_OUTGOING_CALL}
      */
-    @LargeTest
+    // TODO: add back to LargeTest when test can cancel initiated call
     public void testProcessOutgoingCall() {
         Log.i(LOG_TAG, "Beginning testProcessOutgoingCall");
         OutgoingCallBroadcastReceiver rcvr = new OutgoingCallBroadcastReceiver();
