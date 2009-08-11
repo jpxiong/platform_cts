@@ -18,6 +18,7 @@
 CTS_SH=cts
 CTS_LIB=cts.jar
 DDMS_LIB=ddmlib.jar
+JUNIT_LIB=junit.jar
 
 # Checking if "adb" is known by the system
 PATH=.:${PATH}
@@ -59,7 +60,10 @@ CTS_DIR=`dirname ${CTS_PATH}`
 # Setup the correct path for getting "adb"
 PATH=${PATH}:${ANDROID_ROOT}/${BINARY_DIR}
 # Add paths to JAR files in Android framework
-CTS_LIBS=${ANDROID_ROOT}/${JAR_DIR}/${DDMS_LIB}:${ANDROID_ROOT}/${JAR_DIR}/${CTS_LIB}
+CTS_LIBS=\
+${ANDROID_ROOT}/${JAR_DIR}/${DDMS_LIB}:\
+${ANDROID_ROOT}/${JAR_DIR}/${JUNIT_LIB}:\
+${ANDROID_ROOT}/${JAR_DIR}/${CTS_LIB}
 # Add path to CTS JAR file in the CTS archive
 CTS_LIBS=${CTS_LIBS}:${CTS_DIR}/${CTS_LIB}
 
