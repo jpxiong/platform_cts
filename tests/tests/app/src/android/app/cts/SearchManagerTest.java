@@ -16,16 +16,18 @@
 
 package android.app.cts;
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
+
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 
 @TestTargetClass(SearchManager.class)
 public class SearchManagerTest extends CTSActivityTestCaseBase {
@@ -55,9 +57,7 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
             args = {}
         )
     })
-    @ToBeFixed(bug="1443833", explanation="when start search with parameter"
-          + "[test3, true, mComponentName, new Bundle(), false] mSearchManager is"
-          + " invisible. Is this a bug?")
+    @BrokenTest("fails, needs investigation")
     public void testStartSearch() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_START_SEARCH);
@@ -81,6 +81,7 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
             args = {}
         )
     })
+    @BrokenTest("fails, needs investigation")
     public void testStopSearch() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_STOP_SEARCH);

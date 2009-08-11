@@ -16,6 +16,7 @@
 
 package android.provider.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -126,24 +127,27 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
       method = "getContentUri",
       args = {String.class, long.class}
     )
-    @ToBeFixed(bug = "1559913", explanation = "Query with the typical input values of the method "
-            + "will throw NullPointerException")
+    @BrokenTest("brittle test")
     public void testGetContentUri() {
+        // this verification seems brittle - will break if there happens to be a playlist with Id 1
+        // present in external volume
+        // setUp should create a playlist which this method should verify can be queried
         Cursor c = mContentResolver.query(
                 Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME, 1),
                 mMembersProjection, null, null, Members.DEFAULT_SORT_ORDER);
         assertEquals(0, c.getCount());
         c.close();
- 
-        try {
-            mContentResolver.query(
-                    Members.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME, 1), null,
-                    Members.ALBUM + "=?", new String[] { Audio1.ALBUM },
-                    Members.DEFAULT_SORT_ORDER);
-            fail("Should throw NullPointerException if the param projection is null");
-        } catch (NullPointerException e) {
-            // expected
-        }
+
+        // test querying media provider with null projection, should return all columns
+        c = mContentResolver.query(
+                Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME, 1), null,
+                Members.ALBUM + "=?", new String[] { Audio1.ALBUM },
+                Members.DEFAULT_SORT_ORDER);
+        assertEquals(0, c.getCount());
+        // TODO: need a way to verify all expected columns are returned. Purely testing for number
+        // of columns returned is brittle
+        assertEquals(31, c.getColumnCount());
+        c.close();
 
         try {
             mContentResolver.query(

@@ -29,6 +29,8 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.Layout.Alignment;
 import android.text.style.StrikethroughSpan;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -343,6 +345,7 @@ public class LayoutTest extends AndroidTestCase {
         method = "getLineMax",
         args = {int.class}
     )
+    @BrokenTest("unsure if asserted widths are correct")
     public void testGetLineMax() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -356,6 +359,7 @@ public class LayoutTest extends AndroidTestCase {
         method = "getLineWidth",
         args = {int.class}
     )
+    @BrokenTest("unsure if asserted widths are correct")
     public void testGetLineWidth() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
