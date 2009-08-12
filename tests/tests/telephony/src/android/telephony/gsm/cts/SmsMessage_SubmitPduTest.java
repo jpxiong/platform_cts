@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+@SuppressWarnings("deprecation")
 @TestTargetClass(SmsMessage.SubmitPdu.class)
 public class SmsMessage_SubmitPduTest extends AndroidTestCase {
 
