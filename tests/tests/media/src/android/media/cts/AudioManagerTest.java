@@ -41,6 +41,7 @@ import static android.provider.Settings.System.SOUND_EFFECTS_ENABLED;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -98,6 +99,7 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
             args = {int.class, boolean.class}
         )
     })
+    @BrokenTest("flaky")
     public void testMuteSolo() throws Exception {
         /**
          * this test must be run on screen unlocked model

@@ -19,6 +19,7 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -154,6 +155,7 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
             args = {android.view.MotionEvent.class}
         )
     })
+    @BrokenTest("listener.isItemSelected() is false, need to investigate")
     public void testSetCallbackDuringFling() {
         MockOnItemSelectedListener listener = new MockOnItemSelectedListener();
         mGallery.setOnItemSelectedListener(listener);

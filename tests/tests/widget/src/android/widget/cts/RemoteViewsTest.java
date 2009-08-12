@@ -18,6 +18,7 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -219,7 +220,7 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
     )
     public void testSetImageViewUri() {
         // create the test image first
-        String path = "/sqlite_stmt_journals/test.jpg";
+        String path = getTestImagePath();
         File imagefile = new File(path);
         createSampleImage(imagefile, R.raw.testimage);
 
@@ -236,6 +237,13 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
 
         // remove the test image file
         imagefile.delete();
+    }
+
+    /**
+     * Returns absolute file path of location where test image should be stored
+     */
+    private String getTestImagePath() {
+        return getInstrumentation().getContext().getFilesDir() + "/test.jpg";
     }
 
     @TestTargetNew(
@@ -589,7 +597,7 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
     )
     public void testSetUri() {
         // create the test image first
-        String path = "/sqlite_stmt_journals/test.jpg";
+        String path = getTestImagePath();
         File imagefile = new File(path);
         createSampleImage(imagefile, R.raw.testimage);
 
