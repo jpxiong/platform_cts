@@ -293,6 +293,7 @@ ${TOP_DIR}/cts/tests/tests/performance2/src:\
 ${TOP_DIR}/cts/tests/tests/performance3/src:\
 ${TOP_DIR}/cts/tests/tests/performance4/src:\
 ${TOP_DIR}/cts/tests/tests/performance5/src:\
+${TOP_DIR}/cts/tests/tests/dpi/src:\
 ${TOP_DIR}/dalvik/libcore/dalvik/src/main/java:\
 ${TOP_DIR}/dalvik/libcore/junit/src/main/java \
 ${SOURCES}  1>/dev/null 2>/dev/null
