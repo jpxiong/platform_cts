@@ -162,7 +162,7 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         assertNull(mContentResolver.query(Members.getContentUri(volume, 1), null, null, null,
                 null));
     }
-
+    @BrokenTest("needs investigation")
     public void testStoreAudioPlaylistsMembersExternal() {
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");

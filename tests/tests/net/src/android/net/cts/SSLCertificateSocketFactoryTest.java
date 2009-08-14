@@ -24,6 +24,8 @@ import javax.net.SocketFactory;
 
 import android.net.SSLCertificateSocketFactory;
 import android.test.AndroidTestCase;
+
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -99,6 +101,7 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
             args = {int.class}
         )
     })
+    @BrokenTest("flaky")
     public void testCreateSocket() throws Exception {
         new SSLCertificateSocketFactory(100);
         int port = 443;

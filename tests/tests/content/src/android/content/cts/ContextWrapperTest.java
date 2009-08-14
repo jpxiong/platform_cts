@@ -18,6 +18,7 @@ package android.content.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -249,6 +250,7 @@ public class ContextWrapperTest extends AndroidTestCase {
             args = {int.class}
         )
     })
+    @BrokenTest("needs investigation")
     public void testAccessTheme() {
         mContextWrapper.setTheme(R.style.Test_Theme);
         final Theme testTheme = mContextWrapper.getTheme();

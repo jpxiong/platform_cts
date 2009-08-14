@@ -280,6 +280,7 @@ ${TOP_DIR}/cts/tests/tests/media/src:\
 ${TOP_DIR}/cts/tests/tests/net/src:\
 ${TOP_DIR}/cts/tests/tests/os/src:\
 ${TOP_DIR}/cts/tests/tests/permission/src:\
+${TOP_DIR}/cts/tests/tests/permission2/src:\
 ${TOP_DIR}/cts/tests/tests/preference/src:\
 ${TOP_DIR}/cts/tests/tests/provider/src:\
 ${TOP_DIR}/cts/tests/tests/telephony/src:\
