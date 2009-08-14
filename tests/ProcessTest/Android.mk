@@ -15,7 +15,7 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE_TAGS := optional
 LOCAL_JAVA_LIBRARIES := framework-tests android.test.runner
 
 LOCAL_AAPT_FLAGS = -c xx_YY -c cs

@@ -19,9 +19,10 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
 
+LOCAL_MODULE_TAGS := optional
+
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_MODULE := android.cts.refapp
-LOCAL_MODULE_TAGS := tests
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
