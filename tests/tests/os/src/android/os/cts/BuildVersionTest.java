@@ -25,10 +25,8 @@ import junit.framework.TestCase;
 @TestTargetClass(Build.VERSION.class)
 public class BuildVersionTest extends TestCase {
 
-    // TODO: need to change these constants once release number and SDK API value has been
-    // defined for donut 
-    private static final String EXPECTED_RELEASE = "Donut";
-    private static final String EXPECTED_SDK = "3";
+    private static final String EXPECTED_RELEASE = "1.6";
+    private static final String EXPECTED_SDK = "4";
 
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
