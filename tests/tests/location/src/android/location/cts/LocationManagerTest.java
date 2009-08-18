@@ -237,7 +237,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         p = mManager.getProvider(LocationManager.GPS_PROVIDER);
         assertNotNull(p);
         assertEquals(LocationManager.GPS_PROVIDER, p.getName());
-        
+
         p = mManager.getProvider(UNKNOWN_PROVIDER_NAME);
         assertNull(p);
 
@@ -324,9 +324,13 @@ public class LocationManagerTest extends InstrumentationTestCase {
             public void run() {
                 Looper.prepare();
                 mManager.requestLocationUpdates(TEST_MOCK_PROVIDER_NAME, 0, 0, listener);
+                listener.setLocationRequested();
                 Looper.loop();
             }
         }).start();
+        // wait for location requested to be called first, otherwise setLocation can be called
+        // before there is a listener attached
+        assertTrue(listener.hasCalledLocationRequested(TEST_TIME_OUT));
         updateLocation(latitude1, longitude1);
         assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
         Location location = listener.getLocation();
@@ -886,7 +890,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         private Location mLocation;
         private Object mStatusLock = new Object();
         private Object mLocationLock = new Object();
-
+        private Object mLocationRequestLock = new Object();
 
         private boolean mHasCalledOnLocationChanged;
 
@@ -896,13 +900,35 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
         private boolean mHasCalledOnStatusChanged;
 
+        private boolean mHasCalledRequestLocation;
+
         public void reset(){
             mHasCalledOnLocationChanged = false;
             mHasCalledOnProviderDisabled = false;
             mHasCalledOnProviderEnabled = false;
             mHasCalledOnStatusChanged = false;
+            mHasCalledRequestLocation = false;
             mProvider = null;
             mStatus = 0;
+        }
+
+        /**
+         * Call to inform listener that location has been updates have been requested
+         */
+        public void setLocationRequested() {
+            synchronized (mLocationRequestLock) {
+                mHasCalledRequestLocation = true;
+                mLocationRequestLock.notify();
+            }
+        }
+
+        public boolean hasCalledLocationRequested(long timeout) throws InterruptedException {
+            synchronized (mLocationRequestLock) {
+                if (timeout > 0 && !mHasCalledRequestLocation) {
+                    mLocationRequestLock.wait(timeout);
+                }
+            }
+            return mHasCalledRequestLocation;
         }
 
         /**

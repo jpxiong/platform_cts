@@ -318,14 +318,12 @@ public class ProgressBarTest extends InstrumentationTestCase {
             args = {}
         )
     })
-    @ToBeFixed(bug="2031844", explanation="default interpolator is null")
     public void testAccessInterpolator() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 com.android.internal.R.attr.progressBarStyle);
 
         // default should be LinearInterpolator
-        //assertTrue(progressBar.getInterpolator() instanceof LinearInterpolator);
-        assertNull(progressBar.getInterpolator());
+        assertTrue(progressBar.getInterpolator() instanceof LinearInterpolator);
 
         // normal value
         Interpolator i = new AccelerateDecelerateInterpolator();

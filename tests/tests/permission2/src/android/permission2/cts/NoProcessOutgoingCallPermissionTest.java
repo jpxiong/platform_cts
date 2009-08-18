@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.permission.cts;
+package android.permission2.cts;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

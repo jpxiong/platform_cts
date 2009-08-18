@@ -16,17 +16,19 @@
 
 package android.view.cts;
 
+import dalvik.annotation.BrokenTest;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.Surface;
 import android.view.Surface.OutOfResourcesException;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Surface.class)
 public class SurfaceTest extends ActivityInstrumentationTestCase2<SurfaceViewStubActivity> {
@@ -172,6 +174,7 @@ public class SurfaceTest extends ActivityInstrumentationTestCase2<SurfaceViewStu
     @ToBeFixed(bug = "1698482", explanation = "The APIs which set surface parameters should be " +
         " set '@hide', because they needs to be inside open/closeTransaction block, " +
         "while the APIs that open/closeTransaction block is set '@hide'")
+    @BrokenTest("needs investigation")
     public void testSurface() throws OutOfResourcesException {
         Surface surface = getActivity().getSurfaceView().getHolder().getSurface();
         surface.describeContents();

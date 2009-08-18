@@ -27,7 +27,7 @@
     <!-- Number of tests executed between reboots. A value <= 0 disables reboots. -->
     <IntValue name="maxTestCount" value="200" />
     <!-- Max size [tests] for a package to be run in batch mode. -->
-    <IntValue name="maxTestsInBatchMode" value="0" />
+    <IntValue name="maxTestsInBatchMode" value="5000" />
 
     <!-- Max time [ms] between test status updates. -->
     <IntValue name="testStatusTimeoutMs" value="300000" />
@@ -40,6 +40,6 @@
     <!-- Timeout [ms] for package installations. -->
     <IntValue name="packageInstallTimeoutMs" value="120000" />
     <!-- Time to wait [ms] after a package installation or removal. -->
-    <IntValue name="postInstallWaitMs" value="30000" />
+    <IntValue name="postInstallWaitMs" value="10000" />
 
 </HostConfiguration>

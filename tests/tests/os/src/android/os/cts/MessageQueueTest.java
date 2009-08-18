@@ -16,6 +16,7 @@
 
 package android.os.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -63,6 +64,7 @@ public class MessageQueueTest extends AndroidTestCase {
         method = "addIdleHandler",
         args = {android.os.MessageQueue.IdleHandler.class}
     )
+    @BrokenTest("needs investigation")
     public void testAddIdleHandler() throws RuntimeException, InterruptedException {
         try {
             Looper.myQueue().addIdleHandler(null);
@@ -90,6 +92,7 @@ public class MessageQueueTest extends AndroidTestCase {
         method = "removeIdleHandler",
         args = {android.os.MessageQueue.IdleHandler.class}
     )
+    @BrokenTest("needs investigation")
     public void testRemoveIdleHandler() throws RuntimeException, InterruptedException {
         mActionFlag = false;
         mResult = false;
