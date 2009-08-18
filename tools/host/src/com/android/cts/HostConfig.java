@@ -66,6 +66,9 @@ public class HostConfig extends XMLResourceHandler {
     private CaseRepository mCaseRepos;
     private ResultRepository mResultRepos;
     private PlanRepository mPlanRepos;
+
+    // key: app package name
+    // value: TestPackage
     private HashMap<String, TestPackage> mTestPackageMap;
 
     enum Ints {
@@ -262,9 +265,9 @@ public class HostConfig extends XMLResourceHandler {
      * @return The binary name of the package.
      */
     public String getPackageBinaryName(String appPackageName) {
+
         for (TestPackage pkg : mTestPackageMap.values()) {
-            if ((appPackageName.startsWith(pkg.getAppPackageName()))
-                    || (appPackageName.equals(pkg.getAppBinaryName()))) {
+            if (appPackageName.equals(pkg.getAppPackageName())) {
                 return pkg.getAppBinaryName();
             }
         }
