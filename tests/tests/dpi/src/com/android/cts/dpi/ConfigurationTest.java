@@ -57,7 +57,7 @@ public class ConfigurationTest extends AndroidTestCase {
                     break;
                 }
             }
-            return d;
+            return density;
         }
     };
 
@@ -91,7 +91,7 @@ public class ConfigurationTest extends AndroidTestCase {
             this.height = height;
             this.density = density;
         }
-n
+
         public Density getDensity() {
             return density;
         }
