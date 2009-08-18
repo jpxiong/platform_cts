@@ -22,13 +22,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.telephony.gsm.SmsManager;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
 /**
  * Verify Sms and Mms cannot be received without required permissions.
+ * Uses {@link android.telephony.SmsManager}.
  */
 public class NoReceiveSmsPermissionTest extends AndroidTestCase {
 
@@ -86,9 +87,13 @@ public class NoReceiveSmsPermissionTest extends AndroidTestCase {
         // get current phone number
         String currentNumber = telephony.getLine1Number();
         Log.i(LOG_TAG, String.format("Sending SMS to self: %s", currentNumber));
-        // TODO: change this to use android.telephony.SmsManager once its made public
-        SmsManager.getDefault().sendTextMessage(currentNumber, null, "test message",
-                sentIntent, deliveryIntent);
+        sendSms(currentNumber, "test message", sentIntent, deliveryIntent);
+    }
+
+    protected void sendSms(String currentNumber, String text, PendingIntent sentIntent,
+            PendingIntent deliveryIntent) {
+        SmsManager.getDefault().sendTextMessage(currentNumber, null, text, sentIntent,
+                deliveryIntent);
     }
 
     /**
