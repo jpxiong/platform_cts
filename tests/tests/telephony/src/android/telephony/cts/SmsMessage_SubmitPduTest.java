@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-package android.telephony.gsm.cts;
+package android.telephony.cts;
 
-import junit.framework.TestCase;
-import android.telephony.gsm.SmsMessage;
-
+import android.telephony.SmsMessage;
+import android.test.AndroidTestCase;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-@SuppressWarnings("deprecation")
-@TestTargetClass(SmsMessage.MessageClass.class)
-public class SmsMessage_MessageClassTest extends TestCase {
+@TestTargetClass(SmsMessage.SubmitPdu.class)
+public class SmsMessage_SubmitPduTest extends AndroidTestCase {
 
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.NOT_NECESSARY,
-            method = "valueOf",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "values",
+            method = "toString",
             args = {}
         )
     })
-    public void testMessageClass() {
+    // SmsMessage.SubmitPdu constructor is not public, so no need to test its methods
+    public void testToString() {
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2009 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package android.telephony.gsm.cts;
+package android.telephony.cts;
 
 import junit.framework.TestCase;
-import android.telephony.gsm.SmsMessage;
+import android.telephony.SmsMessage;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-@SuppressWarnings("deprecation")
 @TestTargetClass(SmsMessage.MessageClass.class)
 public class SmsMessage_MessageClassTest extends TestCase {
 
