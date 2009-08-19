@@ -16,6 +16,8 @@
 
 package com.android.cts;
 
+import com.android.hosttest.DeviceTest;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -34,9 +36,11 @@ public class HostUnitTestRunner extends BaseTestRunner{
     private static String JAR_SUFFIX = ".jar";
 
     private TestCase mTestCase;
+    private HostSideOnlyTest mTest;
 
-    public HostUnitTestRunner() {
+    public HostUnitTestRunner(HostSideOnlyTest test) {
         mTestCase = null;
+        mTest = test;
     }
 
     /**
@@ -56,6 +60,11 @@ public class HostUnitTestRunner extends BaseTestRunner{
         loadTestCase(jarPath, testPkgName, testClassName, testMethodName);
 
         if (mTestCase != null) {
+            if (mTestCase instanceof DeviceTest) {
+                DeviceTest deviceTest = (DeviceTest) mTestCase;
+                deviceTest.setDevice(mTest.mDevice.getDevice());
+                deviceTest.setTestAppPath(HostConfig.getInstance().getCaseRepository().getRoot());
+            }
             mTestCase.run(result);
         }
         return result;

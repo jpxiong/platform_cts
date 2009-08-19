@@ -149,15 +149,16 @@ public class CtsTestResult {
      *
      * @param testResult The result in the form of JUnit test result.
      */
+    @SuppressWarnings("unchecked")
     public void setResult(TestResult testResult) {
         int resCode = CODE_PASS;
         String failedMessage = null;
         String stackTrace = null;
         if ((testResult != null) && (testResult.failureCount() > 0)) {
             resCode = CODE_FAIL;
-            Enumeration<TestFailure> falures = testResult.failures();
-            TestFailure failure = null;
-            while ((failure = falures.nextElement()) != null) {
+            Enumeration<TestFailure> failures = testResult.failures();
+            while (failures.hasMoreElements()) {
+                TestFailure failure = failures.nextElement();
                 failedMessage += failure.exceptionMessage();
                 stackTrace += failure.trace();
             }
