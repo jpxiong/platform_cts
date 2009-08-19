@@ -85,6 +85,8 @@ public class DescriptionGenerator extends Doclet {
 
     static final String XML_OUTPUT_PATH = "./description.xml";
 
+    static final String OUTPUT_PATH_OPTION = "-o";
+
     /**
      * Start to parse the classes passed in by javadoc, and generate
      * the xml file needed by CTS packer.
@@ -99,9 +101,17 @@ public class DescriptionGenerator extends Doclet {
             return true;
         }
 
+        String outputPath = XML_OUTPUT_PATH;
+        String[][] options = root.options();
+        for (String[] option : options) {
+            if (option.length == 2 && option[0].equals(OUTPUT_PATH_OPTION)) {
+                outputPath = option[1];
+            }
+        }
+
         XMLGenerator xmlGenerator = null;
         try {
-            xmlGenerator = new XMLGenerator(XML_OUTPUT_PATH);
+            xmlGenerator = new XMLGenerator(outputPath);
         } catch (ParserConfigurationException e) {
             Log.e("Cant initialize XML Generator!", e);
             return true;
@@ -120,6 +130,19 @@ public class DescriptionGenerator extends Doclet {
         }
 
         return true;
+    }
+
+    /**
+     * Return the length of any doclet options we recognize
+     * @param option The option name
+     * @return The number of words this option takes (including the option) or 0 if the option
+     * is not recognized.
+     */
+    public static int optionLength(String option) {
+        if (option.equals(OUTPUT_PATH_OPTION)) {
+            return 2;
+        }
+        return 0;
     }
 
     /**
