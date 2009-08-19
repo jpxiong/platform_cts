@@ -18,7 +18,6 @@ package com.android.cts;
 
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
-import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
 import java.io.IOException;
@@ -33,8 +32,8 @@ public class DeviceManager implements IDeviceChangeListener {
 
     private static final int SHORT_DELAY = 1000 * 15; // 15 seconds
     private static final int LONG_DELAY = 1000 * 60 * 10; // 10 minutes
-    /** Time to wait after issuing reboot command through ddmlib. */
-    private static final int DDMLIB_REBOOT_DELAY = 5000; // 5 seconds
+    /** Time to wait after issuing reboot command  */
+    private static final int REBOOT_DELAY = 5 * 1000; // 5 seconds
     /** Time to wait after device reports that boot is complete. */
     private static final int POST_BOOT_DELAY = 1000 * 60; // 1 minute
     /** Maximal number of attempts to restart ADB connection. */
@@ -297,17 +296,15 @@ public class DeviceManager implements IDeviceChangeListener {
 
         String deviceSerialNumber = ts.getDeviceId();
         if (!deviceSerialNumber.toLowerCase().startsWith("emulator")) {
-            try {
-                // send reboot command through ddmlib
-                IDevice dev = searchTestDevice(deviceSerialNumber).getDevice();
-                dev.executeShellCommand("reboot", new NullOutputReceiver());
-                // wait to make sure the reboot gets through before we tear down the connection
-                Thread.sleep(DDMLIB_REBOOT_DELAY);
-            } catch (Exception e) {
-                Log.d("Could not issue reboot command through ddmlib: " + e);
-                // try to reboot the device using the command line adb
-                executeCommand("adb -s " + deviceSerialNumber + " shell reboot");
-            }
+            // try to reboot the device using the command line adb
+            // TODO: do we need logic to retry this
+            executeCommand("adb -s " + deviceSerialNumber + " reboot");
+            // wait to make sure the reboot gets through before we tear down the connection
+            
+            // TODO: this is flaky, no guarantee device has actually rebooted, host should wait till
+            // device goes offline
+            Thread.sleep(REBOOT_DELAY);
+            
             int attempts = 0;
             boolean deviceConnected = false;
             while (!deviceConnected && (attempts < MAX_ADB_RESTART_ATTEMPTS)) {
@@ -358,6 +355,7 @@ public class DeviceManager implements IDeviceChangeListener {
                 attempts += 1;
             }
             // dismiss the screen lock by sending a MENU key event
+            // TODO: this command isn't going to work on a user device, seems like its not needed
             executeCommand("adb -s " + deviceSerialNumber + " shell input keyevent 82");
         }
     }
