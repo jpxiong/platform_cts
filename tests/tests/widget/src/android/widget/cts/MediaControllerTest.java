@@ -558,6 +558,18 @@ public class MediaControllerTest extends
         public int getBufferPercentage() {
             return 0;
         }
+
+        public boolean canPause() {
+            return true;
+        }
+
+        public boolean canSeekBackward() {
+            return true;
+        }
+
+        public boolean canSeekForward() {
+            return true;
+        }
     }
 
     private static class MockOnClickListener implements OnClickListener {
