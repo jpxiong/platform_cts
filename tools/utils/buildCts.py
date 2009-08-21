@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python
 
 # Copyright (C) 2009 The Android Open Source Project
 #
