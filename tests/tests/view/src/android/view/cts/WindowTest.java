@@ -1299,6 +1299,12 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         public void onWindowFocusChanged(boolean hasFocus) {
         }
 
+        public void onDetachedFromWindow() {
+        }
+
+        public void onAttachedToWindow() {
+        }
+
         public void onPanelClosed(int featureId, Menu menu) {
             mIsOnPanelClosedCalled = true;
         }
