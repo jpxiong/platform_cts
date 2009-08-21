@@ -215,7 +215,7 @@ class CtsBuilder(object):
     # TODO: Instead of hard-coding the plans here, use a configuration file,
     # such as test_defs.xml
     packages = []
-    descriptions = glob.glob(os.path.join(self.test_repository, '*.xml'))
+    descriptions = sorted(glob.glob(os.path.join(self.test_repository, '*.xml')))
     for description in descriptions:
       doc = tools.XmlFile(description)
       packages.append(doc.GetAttr('TestPackage', 'appPackageName'))
