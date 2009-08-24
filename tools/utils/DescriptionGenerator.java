@@ -79,7 +79,6 @@ public class DescriptionGenerator extends Doclet {
     static final String ATTRIBUTE_VALUE_FRAMEWORK = "Android 1.0";
 
     static final String ATTRIBUTE_NAME = "name";
-    static final String ATTRIBUTE_XML_INFO = "XML_INFO";
     static final String ATTRIBUTE_HOST_CONTROLLER = "HostController";
     static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
@@ -249,10 +248,6 @@ public class DescriptionGenerator extends Doclet {
             mDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
             Node testPackageElem = mDoc.appendChild(mDoc.createElement(TAG_PACKAGE));
-
-            // Use special hard-coded value, so that the CTS packer could find
-            // it and replace it with correct value
-            setAttribute(testPackageElem, ATTRIBUTE_XML_INFO, "");
 
             setAttribute(testPackageElem, ATTRIBUTE_NAME_VERSION, ATTRIBUTE_VALUE_VERSION);
             setAttribute(testPackageElem, ATTRIBUTE_NAME_FRAMEWORK, ATTRIBUTE_VALUE_FRAMEWORK);
