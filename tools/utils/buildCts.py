@@ -95,6 +95,7 @@ class CtsBuilder(object):
         'frameworks/base/core/java',            # android test classes
         'frameworks/base/test-runner',          # test runner
         'dalvik/libcore/junit/src/main/java',   # junit classes
+        'development/tools/hosttestlib/src',    # hosttestlib TestCase extensions
         'dalvik/libcore/dalvik/src/main/java',  # test annotations
         'cts/tests/src',                        # cts test stubs
         source_root                             # the source for this package
@@ -140,6 +141,26 @@ class CtsBuilder(object):
     package.WriteDescription(description)
     description.close()
 
+  def GenerateAppSecurityDescription(self):
+    """Generate the test description for the application security tests."""
+    test_root = 'cts/tests/appsecurity-tests'
+    makefile_name = os.path.join(test_root, 'Android.mk')
+    makefile_vars = GetMakeFileVars(makefile_name)
+    name = makefile_vars['LOCAL_MODULE']
+    package_name = 'android.tests.appsecurity'
+    self.__LogGenerateDescription(package_name)
+    temp_desc = os.path.join(self.temp_dir, 'description.xml')
+    self.RunDescriptionGeneratorDoclet(os.path.join(test_root, 'src'), temp_desc)
+    doc = dom.parse(temp_desc)
+    test_description = doc.getElementsByTagName('TestPackage')[0]
+    test_description.setAttribute('name', package_name)
+    test_description.setAttribute('appPackageName', package_name)
+    test_description.setAttribute('hostSideOnly', 'true')
+    test_description.setAttribute('jarPath', name + '.jar')
+    description = open(os.path.join(self.test_repository, package_name + '.xml'), 'w')
+    doc.writexml(description, addindent='    ', encoding='UTF-8')
+    description.close()
+
   @staticmethod
   def RelPath(path, start=os.getcwd()):
     """Get a relative version of a path.
@@ -168,6 +189,7 @@ class CtsBuilder(object):
     # individually generate descriptions not following conventions
     self.GenerateSignatureCheckDescription()
     self.GenerateReferenceAppDescription()
+    self.GenerateAppSecurityDescription()
 
     # generate test descriptions for android tests
     android_packages = GetSubDirectories(self.test_root)
@@ -246,6 +268,10 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.performance.*')
     self.__WritePlan(plan, 'Performance')
+
+    plan = tools.TestPlan(packages)
+    plan.Include(r'android\.tests\.appsecurity')
+    self.__WritePlan(plan, 'AppSecurity')
 
 
 if __name__ == '__main__':

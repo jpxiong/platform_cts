@@ -17,6 +17,7 @@
 package com.android.cts;
 
 import java.io.IOException;
+
 import junit.framework.TestResult;
 
 /**
@@ -37,15 +38,15 @@ public class HostSideOnlyTest extends Test {
      */
     class HostSideTestRunner extends Thread {
 
-        private Test mTest;
+        private HostSideOnlyTest mTest;
 
-        public HostSideTestRunner(final Test test) {
+        public HostSideTestRunner(final HostSideOnlyTest test) {
             mTest = test;
         }
 
         @Override
         public void run() {
-            HostUnitTestRunner runner = new HostUnitTestRunner();
+            HostUnitTestRunner runner = new HostUnitTestRunner(mTest);
             TestController controller = mTest.getTestController();
             TestResult testResult = null;
             try {

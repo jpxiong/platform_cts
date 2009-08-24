@@ -52,13 +52,17 @@ checkDir ${SDK_ROOT} "Error: Cannot locate SDK installation in \"${SDK_ROOT}\". 
 DDM_LIB=${SDK_ROOT}/tools/lib/ddmlib.jar
 CTS_LIB=${CTS_ROOT}/tools/cts.jar
 JUNIT_LIB=${CTS_ROOT}/tools/junit.jar
+HOSTTEST_LIB=${CTS_ROOT}/tools/hosttestlib.jar
 ADB_PATH=${SDK_ROOT}/tools
 ADB_EXE=${ADB_PATH}/adb
 
 checkFile ${DDM_LIB}
 checkFile ${CTS_LIB}
 checkFile ${JUNIT_LIB}
+checkFile ${HOSTTEST_LIB}
 checkFile ${ADB_EXE}
+
+JARS=${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB}:${HOSTTEST_LIB}
 
 PATH=${ADB_PATH}:${PATH}
 
@@ -87,4 +91,4 @@ else
     fi;
 fi;
 
-java ${JAVA_OPTS} -cp ${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB} com.android.cts.TestHost ${CONFIG} "$@" ${DDCONFIG}
+java ${JAVA_OPTS} -cp ${JARS} com.android.cts.TestHost ${CONFIG} "$@" ${DDCONFIG}
