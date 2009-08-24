@@ -300,11 +300,11 @@ public class DeviceManager implements IDeviceChangeListener {
             // TODO: do we need logic to retry this
             executeCommand("adb -s " + deviceSerialNumber + " reboot");
             // wait to make sure the reboot gets through before we tear down the connection
-            
+
             // TODO: this is flaky, no guarantee device has actually rebooted, host should wait till
             // device goes offline
             Thread.sleep(REBOOT_DELAY);
-            
+
             int attempts = 0;
             boolean deviceConnected = false;
             while (!deviceConnected && (attempts < MAX_ADB_RESTART_ATTEMPTS)) {
