@@ -195,17 +195,27 @@ class CtsBuilder(object):
     android_packages = GetSubDirectories(self.test_root)
     for package in android_packages:
       app_package_name = 'android.' + package
+      package_root = os.path.join(self.test_root, package)
+
+      makefile_name = os.path.join(package_root, 'Android.mk')
+      if not os.path.exists(makefile_name):
+        print 'Skipping directory "%s" due to missing Android.mk' % package_root
+        continue
+      makefile_vars = GetMakeFileVars(makefile_name)
+
+      manifest_name = os.path.join(package_root, 'AndroidManifest.xml')
+      if not os.path.exists(manifest_name):
+        print 'Skipping directory "%s" due to missing AndroidManifest.xml' % package_root
+        continue
+      manifest = tools.XmlFile(manifest_name)
+
       self.__LogGenerateDescription(app_package_name)
 
       # Run the description generator doclet to get the test package structure
       # TODO: The Doclet does not currently add all required attributes. Instead of rewriting
       # the document below, additional attributes should be passed to the Doclet as arguments.
       temp_desc = os.path.join(self.temp_dir, 'description.xml')
-      self.RunDescriptionGeneratorDoclet(os.path.join(self.test_root, package), temp_desc)
-
-      makefile_name = os.path.join(self.test_root, package, 'Android.mk')
-      makefile_vars = GetMakeFileVars(makefile_name)
-      manifest = tools.XmlFile(os.path.join(self.test_root, package, 'AndroidManifest.xml'))
+      self.RunDescriptionGeneratorDoclet(package_root, temp_desc)
 
       # obtain missing attribute values from the makefile and manifest
       package_name = makefile_vars['LOCAL_PACKAGE_NAME']
