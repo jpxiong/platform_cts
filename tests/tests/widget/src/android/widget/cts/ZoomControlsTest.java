@@ -16,8 +16,6 @@
 
 package android.widget.cts;
 
-import com.android.internal.R;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -29,7 +27,6 @@ import android.test.InstrumentationTestCase;
 import android.test.UiThreadTest;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ZoomButton;
 import android.widget.ZoomControls;
 
 /**
@@ -64,11 +61,11 @@ public class ZoomControlsTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setOnZoomInClickListener",
-        args = {android.view.View.OnClickListener.class}
+        args = {android.view.View.OnClickListener.class},
+        notes = "not possible to trigger a zoom button click programmatically using public API"
     )
-    @UiThreadTest
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetOnZoomInClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
@@ -76,39 +73,23 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         // normal parameters
         final MockOnClickListener clickListener = new MockOnClickListener();
         zoomControls.setOnZoomInClickListener(clickListener);
-        ZoomButton zoomIn = (ZoomButton) zoomControls.findViewById(R.id.zoomIn);
-        zoomIn.performClick();
-        assertTrue(clickListener.hasCalledOnClick());
 
         // exceptional parameters
-        clickListener.reset();
         zoomControls.setOnZoomInClickListener(null);
-        zoomIn.performClick();
-        assertFalse(clickListener.hasCalledOnClick());
     }
 
     private class MockOnClickListener implements OnClickListener {
-        private boolean mCalledOnClick = false;
-
         public void onClick(View v) {
-            mCalledOnClick = true;
-        }
-
-        public boolean hasCalledOnClick() {
-            return mCalledOnClick;
-        }
-
-        public void reset() {
-            mCalledOnClick = false;
+            // ignore
         }
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setOnZoomOutClickListener",
-        args = {android.view.View.OnClickListener.class}
+        args = {android.view.View.OnClickListener.class},
+        notes = "not possible to trigger a zoom button click programmatically using public API"
     )
-    @UiThreadTest
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetOnZoomOutClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
@@ -116,15 +97,9 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         // normal parameters
         final MockOnClickListener clickListener = new MockOnClickListener();
         zoomControls.setOnZoomOutClickListener(clickListener);
-        ZoomButton zoomOut = (ZoomButton) zoomControls.findViewById(R.id.zoomOut);
-        zoomOut.performClick();
-        assertTrue(clickListener.hasCalledOnClick());
 
         // exceptional parameters
-        clickListener.reset();
         zoomControls.setOnZoomOutClickListener(null);
-        zoomOut.performClick();
-        assertFalse(clickListener.hasCalledOnClick());
     }
 
     @TestTargetNew(
@@ -176,39 +151,29 @@ public class ZoomControlsTest extends InstrumentationTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setIsZoomInEnabled",
-        args = {boolean.class}
+        args = {boolean.class},
+        notes="not feasible to test effect of calling this method"
     )
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetIsZoomInEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
-        ZoomButton zoomIn = (ZoomButton) zoomControls.findViewById(R.id.zoomIn);
-        assertTrue(zoomIn.isEnabled());
-
         zoomControls.setIsZoomInEnabled(false);
-        assertFalse(zoomIn.isEnabled());
-
         zoomControls.setIsZoomInEnabled(true);
-        assertTrue(zoomIn.isEnabled());
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setIsZoomOutEnabled",
-        args = {boolean.class}
+        args = {boolean.class},
+        notes="not feasible to test effect of calling this method"
     )
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetIsZoomOutEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
-        ZoomButton zoomOut = (ZoomButton) zoomControls.findViewById(R.id.zoomOut);
-        assertTrue(zoomOut.isEnabled());
-
         zoomControls.setIsZoomOutEnabled(false);
-        assertFalse(zoomOut.isEnabled());
-
         zoomControls.setIsZoomOutEnabled(true);
-        assertTrue(zoomOut.isEnabled());
     }
 
     @TestTargetNew(
@@ -221,15 +186,7 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         ZoomControls zoomControls = new ZoomControls(mContext);
         assertFalse(zoomControls.hasFocus());
 
-        ZoomButton zoomOut = (ZoomButton) zoomControls.findViewById(R.id.zoomOut);
-        zoomOut.requestFocus();
-        assertTrue(zoomControls.hasFocus());
-
-        zoomControls = new ZoomControls(mContext);
-        assertFalse(zoomControls.hasFocus());
-
-        ZoomButton zoomIn = (ZoomButton) zoomControls.findViewById(R.id.zoomIn);
-        zoomIn.requestFocus();
+        zoomControls.requestFocus();
         assertTrue(zoomControls.hasFocus());
     }
 }
