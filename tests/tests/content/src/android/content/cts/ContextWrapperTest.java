@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
@@ -712,10 +713,20 @@ public class ContextWrapperTest extends AndroidTestCase {
         args = {String.class, int.class}
     )
     public void testCreatePackageContext() throws PackageManager.NameNotFoundException {
-        Context actualContext = mContextWrapper.createPackageContext("com.android.camera",
+        Context actualContext = mContextWrapper.createPackageContext(getValidPackageName(),
                 Context.CONTEXT_IGNORE_SECURITY);
 
         assertNotNull(actualContext);
+    }
+
+    /**
+     * Helper method to retrieve a valid application package name to use for tests.
+     */
+    private String getValidPackageName() {
+        List<PackageInfo> packages = mContextWrapper.getPackageManager().getInstalledPackages(
+                PackageManager.GET_ACTIVITIES);
+        assertTrue(packages.size() >= 1);
+        return packages.get(0).packageName;
     }
 
     @TestTargetNew(
@@ -855,7 +866,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         // Test getBaseContext()
         assertSame(mContext, testContextWrapper.getBaseContext());
 
-        Context secondContext = testContextWrapper.createPackageContext("com.android.camera",
+        Context secondContext = testContextWrapper.createPackageContext(getValidPackageName(),
                 Context.CONTEXT_IGNORE_SECURITY);
         assertNotNull(secondContext);
 
