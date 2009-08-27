@@ -100,19 +100,18 @@ public class GestureTest extends TestCase {
     }
 
     /**
-     * Test method for {@link android.gesture.Gesture#writeToParcel(android.os.Parcel, int)}.
+     * Test method for {@link android.gesture.Gesture#writeToParcel(android.os.Parcel, int)} and
+     * android.gesture.Gesture.CREATOR.createFromParcel.
      *
      * Verify Gesture can be written into and read from a Parcel
      */
-    public void testWriteToParcel() {
+    public void testReadWriteToParcel() {
         Parcel parcel = Parcel.obtain();
         mGesture.addStroke(mLineHelper.createLineGesture());
         mGesture.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
         Gesture readGesture = Gesture.CREATOR.createFromParcel(parcel);
         // check that all attributes are equal
-        assertEquals(mGesture.getID(), readGesture.getID());
-        assertEquals(mGesture.getStrokesCount(), readGesture.getStrokesCount());
-        assertEquals(mGesture.getStrokes().get(0), mGesture.getStrokes().get(0));
+        new GestureComparator().assertGesturesEquals(mGesture, readGesture);
     }
 }
