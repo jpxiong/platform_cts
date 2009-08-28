@@ -16,7 +16,10 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
+# don't include this package in any target
 LOCAL_MODULE_TAGS := optional
+# and when built explicitly put it in the data partition
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
 
