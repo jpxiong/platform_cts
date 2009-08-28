@@ -23,6 +23,7 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
+# include this package in the tests target for continuous testing
 LOCAL_MODULE_TAGS := tests
 
 LOCAL_SRC_FILES := $(call all-java-files-under,src)
