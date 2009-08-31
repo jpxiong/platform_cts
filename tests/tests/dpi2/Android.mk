@@ -18,32 +18,17 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
+# We use the DefaultManifestAttributesTest from the android.cts.dpi package.
+LOCAL_STATIC_JAVA_LIBRARIES := android.cts.dpi
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsDpiTestCases
+LOCAL_PACKAGE_NAME := CtsDpiTestCases2
 
-# don't include this package in any target
 LOCAL_MODULE_TAGS := optional
-# and when built explicitly put it in the data partition
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_SDK_VERSION := current
+# We would set LOCAL_SDK_VERSION := 3 here, but the build system
+# doesn't currenlty support setting LOCAL_SDK_VERSION to anything but
+# current.
 
 include $(BUILD_PACKAGE)
-
-# ============================================================
-
-# DefaultManifestAttributesTest can be used as a base class for other
-# CTS tests, so drop it into a library that other tests can use.
-include $(CLEAR_VARS)
-
-LOCAL_SRC_FILES := src/com/android/cts/dpi/DefaultManifestAttributesTest.java
-
-LOCAL_MODULE_TAGS := optional
-
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
-LOCAL_MODULE := android.cts.dpi
-
-include $(BUILD_STATIC_JAVA_LIBRARY)
