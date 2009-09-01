@@ -55,7 +55,7 @@
     <string name="dialog_stub_dialog_test_button13">Test AlertDialog deprecated with Message</string>
     <string name="dialog_stub_dialog_test_button14">Test AlertDialog with theme</string>
     <string name="dialog_stub_dialog_test_button15">Test AlertDialog cancelable</string>
-    <string name="dialog_stub_dialog_test_button16">Test AlertDialog can'n cancelable</string>
+    <string name="dialog_stub_dialog_test_button16">Test AlertDialog can\'n cancelable</string>
     <string name="dialog_stub_dialog_test_button17">Test Dialog cancelable</string>
     <string name="dialog_stub_dialog_test_button18">Test Dialog not cancelable</string>
     <string name="hello_world">Hello, World!</string>
