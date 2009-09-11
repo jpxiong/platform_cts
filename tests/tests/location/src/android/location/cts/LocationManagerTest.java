@@ -85,7 +85,14 @@ public class LocationManagerTest extends InstrumentationTestCase {
             mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         }
 
-        mManager.addTestProvider(TEST_MOCK_PROVIDER_NAME, true, //requiresNetwork,
+        addTestProvider(TEST_MOCK_PROVIDER_NAME);
+    }
+
+    /**
+     * Helper method to add a test provider with given name.
+     */
+    private void addTestProvider(final String providerName) {
+        mManager.addTestProvider(providerName, true, //requiresNetwork,
                 false, // requiresSatellite,
                 true,  // requiresCell,
                 false, // hasMonetaryCost,
@@ -94,7 +101,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
                 false, // supportsBearing,
                 Criteria.POWER_MEDIUM, // powerRequirement
                 Criteria.ACCURACY_FINE); // accuracy
-        mManager.setTestProviderEnabled(TEST_MOCK_PROVIDER_NAME, true);
+        mManager.setTestProviderEnabled(providerName, true);
     }
 
     @Override
@@ -313,37 +320,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         )
     })
     public void testLocationUpdatesWithLocationListener() throws InterruptedException {
-        double latitude1 = 10;
-        double longitude1 = 40;
-        double latitude2 = 35;
-        double longitude2 = 80;
-        final MockLocationListener listener = new MockLocationListener();
-
-        // update location and notify listener
-        new Thread(new Runnable() {
-            public void run() {
-                Looper.prepare();
-                mManager.requestLocationUpdates(TEST_MOCK_PROVIDER_NAME, 0, 0, listener);
-                listener.setLocationRequested();
-                Looper.loop();
-            }
-        }).start();
-        // wait for location requested to be called first, otherwise setLocation can be called
-        // before there is a listener attached
-        assertTrue(listener.hasCalledLocationRequested(TEST_TIME_OUT));
-        updateLocation(latitude1, longitude1);
-        assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
-        Location location = listener.getLocation();
-        assertEquals(TEST_MOCK_PROVIDER_NAME, location.getProvider());
-        assertEquals(latitude1, location.getLatitude());
-        assertEquals(longitude1, location.getLongitude());
-
-        // update location without notifying listener
-        listener.reset();
-        assertFalse(listener.hasCalledOnLocationChanged(0));
-        mManager.removeUpdates(listener);
-        updateLocation(latitude2, longitude2);
-        assertFalse(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
+        doLocationUpdatesWithLocationListener(TEST_MOCK_PROVIDER_NAME);
 
         try {
             mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
@@ -354,7 +331,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         }
 
         try {
-            mManager.requestLocationUpdates(null, 0, 0, listener);
+            mManager.requestLocationUpdates(null, 0, 0, new MockLocationListener());
             fail("Should throw IllegalArgumentException if param provider is null!");
         } catch (IllegalArgumentException e) {
             // expected
@@ -372,6 +349,69 @@ public class LocationManagerTest extends InstrumentationTestCase {
             fail("Should throw IllegalArgumentException if provider is unknown!");
         } catch (IllegalArgumentException e) {
             // expected
+        }
+    }
+
+    /**
+     * Helper method to test a location update with given provider
+     *
+     * @param providerName name of provider to test. Must already exist.
+     * @throws InterruptedException
+     */
+    private void doLocationUpdatesWithLocationListener(final String providerName)
+            throws InterruptedException {
+        final double latitude1 = 10;
+        final double longitude1 = 40;
+        final double latitude2 = 35;
+        final double longitude2 = 80;
+        final MockLocationListener listener = new MockLocationListener();
+
+        // update location and notify listener
+        new Thread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                mManager.requestLocationUpdates(providerName, 0, 0, listener);
+                listener.setLocationRequested();
+                Looper.loop();
+            }
+        }).start();
+        // wait for location requested to be called first, otherwise setLocation can be called
+        // before there is a listener attached
+        assertTrue(listener.hasCalledLocationRequested(TEST_TIME_OUT));
+        updateLocation(providerName, latitude1, longitude1);
+        assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
+        Location location = listener.getLocation();
+        assertEquals(providerName, location.getProvider());
+        assertEquals(latitude1, location.getLatitude());
+        assertEquals(longitude1, location.getLongitude());
+
+        // update location without notifying listener
+        listener.reset();
+        assertFalse(listener.hasCalledOnLocationChanged(0));
+        mManager.removeUpdates(listener);
+        updateLocation(providerName, latitude2, longitude2);
+        assertFalse(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
+    }
+
+    /**
+     * Verifies that all real location providers can be replaced by a mock provider.
+     * <p/>
+     * This feature is quite useful for developer automated testing.
+     * This test may fail if another unknown test provider already exists, because there is no
+     * known way to determine if a given provider is a test provider.
+     * @throws InterruptedException
+     */
+    public void testReplaceRealProvidersWithMocks() throws InterruptedException {
+        for (String providerName : mManager.getAllProviders()) {
+            if (!providerName.equals(TEST_MOCK_PROVIDER_NAME)) {
+                addTestProvider(providerName);
+                try {
+                    // run the update location test logic to ensure location updates can be injected
+                    doLocationUpdatesWithLocationListener(providerName);
+                } finally {
+                    mManager.removeTestProvider(providerName);
+                }
+            }
         }
     }
 
@@ -837,13 +877,18 @@ public class LocationManagerTest extends InstrumentationTestCase {
                 expectedEnterProximity, proximityTest);
     }
 
-    private void updateLocation(final double latitude, final double longitude) {
-        Location location = new Location(TEST_MOCK_PROVIDER_NAME);
+    private void updateLocation(final String providerName, final double latitude,
+            final double longitude) {
+        Location location = new Location(providerName);
         location.setLatitude(latitude);
         location.setLongitude(longitude);
 
         location.setTime(java.lang.System.currentTimeMillis());
-        mManager.setTestProviderLocation(TEST_MOCK_PROVIDER_NAME, location);
+        mManager.setTestProviderLocation(providerName, location);
+    }
+
+    private void updateLocation(final double latitude, final double longitude) {
+        updateLocation(TEST_MOCK_PROVIDER_NAME, latitude, longitude);
     }
 
     /**
