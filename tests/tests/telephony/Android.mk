@@ -30,7 +30,8 @@ LOCAL_PACKAGE_NAME := CtsTelephonyTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-LOCAL_SDK_VERSION := current
+# uncomment when dalvik.annotation.Test* are removed or part of SDK
+# #LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
 

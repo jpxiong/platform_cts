@@ -25,7 +25,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsPermissionTestCases
 
-LOCAL_SDK_VERSION := current
+# uncomment when dalvik test annotations are removed or part of SDK
+#LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
 
