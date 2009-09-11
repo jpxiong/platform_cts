@@ -26,8 +26,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.BitmapFactory.Options;
 import android.os.ParcelFileDescriptor;
 import android.test.InstrumentationTestCase;
+import android.util.DisplayMetrics;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,13 +48,20 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     // height and width of start.jpg
     private static final int START_HEIGHT = 31;
     private static final int START_WIDTH = 31;
+    private int mDefaultDensity;
+    private int mTargetDensity;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mRes = getInstrumentation().getTargetContext().getResources();
+        mDefaultDensity = DisplayMetrics.DENSITY_DEFAULT;
+        mTargetDensity = mRes.getDisplayMetrics().densityDpi;
+
         mOpt1 = new BitmapFactory.Options();
+        mOpt1.inScaled = false;
         mOpt2 = new BitmapFactory.Options();
+        mOpt2.inScaled = false;
         mOpt2.inJustDecodeBounds = true;
     }
 
@@ -92,8 +101,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         Bitmap b = BitmapFactory.decodeResource(mRes, R.drawable.start);
         assertNotNull(b);
         // Test the bitmap size
-        assertEquals(START_HEIGHT, b.getHeight());
-        assertEquals(START_WIDTH, b.getWidth());
+        assertEquals(START_HEIGHT * mTargetDensity / mDefaultDensity, b.getHeight());
+        assertEquals(START_WIDTH * mTargetDensity / mDefaultDensity, b.getWidth());
     }
 
     @TestTargetNew(
@@ -220,7 +229,9 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
     private byte[] obtainArray() {
         ByteArrayOutputStream stm = new ByteArrayOutputStream();
-        Bitmap bitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        Options opt = new BitmapFactory.Options();
+        opt.inScaled = false;
+        Bitmap bitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, opt);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 0, stm);
         return(stm.toByteArray());
     }
