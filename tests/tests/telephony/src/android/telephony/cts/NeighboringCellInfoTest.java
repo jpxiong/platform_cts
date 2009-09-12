@@ -16,6 +16,11 @@
 
 package android.telephony.cts;
 
+import static android.telephony.TelephonyManager.NETWORK_TYPE_UNKNOWN;
+import static android.telephony.TelephonyManager.NETWORK_TYPE_EDGE;
+import static android.telephony.TelephonyManager.NETWORK_TYPE_GPRS;
+import static android.telephony.TelephonyManager.NETWORK_TYPE_UMTS;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -28,7 +33,7 @@ import android.test.AndroidTestCase;
 @TestTargetClass(NeighboringCellInfo.class)
 public class NeighboringCellInfoTest extends AndroidTestCase{
     private static final int RSSI = 20;
-    private static final int CID = 0x0000ffff;
+    private static final int CID = 0xffff;
 
     @TestTargets({
         @TestTargetNew(
@@ -53,8 +58,18 @@ public class NeighboringCellInfoTest extends AndroidTestCase{
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getCid",
+            method = "getLac",
             args = {}
+        ),
+        @TestTargetNew(
+                level = TestLevel.COMPLETE,
+                method = "getCid",
+                args = {}
+        ),
+        @TestTargetNew(
+                level = TestLevel.COMPLETE,
+                method = "getPsc",
+                args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -83,30 +98,50 @@ public class NeighboringCellInfoTest extends AndroidTestCase{
         )
     })
     public void testNeighboringCellInfo() {
+        int rssi = 31;
+        String location = "ffffffff";
+        NeighboringCellInfo nc;
+
+        // test constructor
+        nc = new NeighboringCellInfo(rssi, "FFFFFFF", NETWORK_TYPE_EDGE);
+        assertEquals(NETWORK_TYPE_EDGE, nc.getNetworkType());
+        assertEquals(rssi, nc.getRssi());
+        assertEquals(0xfff, nc.getLac());
+        assertEquals(0xffff, nc.getCid());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getPsc());
+
+        nc = new NeighboringCellInfo(rssi, "1FF", NETWORK_TYPE_UMTS);
+        assertEquals(NETWORK_TYPE_UMTS, nc.getNetworkType());
+        assertEquals(rssi, nc.getRssi());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getCid());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getLac());
+        assertEquals(0x1ff, nc.getPsc());
+
+        nc = new NeighboringCellInfo(rssi, "1FF", NETWORK_TYPE_UNKNOWN);
+        assertEquals(NETWORK_TYPE_UNKNOWN, nc.getNetworkType());
+        assertEquals(rssi, nc.getRssi());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getCid());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getLac());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getPsc());
+
+        // test parcel
+        nc = new NeighboringCellInfo(rssi, "12345678", NETWORK_TYPE_GPRS);
+        assertEquals(NETWORK_TYPE_GPRS, nc.getNetworkType());
+        assertEquals(rssi, nc.getRssi());
+        assertEquals(0x1234, nc.getLac());
+        assertEquals(0x5678, nc.getCid());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nc.getPsc());
+
         Parcel p = Parcel.obtain();
-        Integer[] val = { RSSI, CID };
-        p.writeArray(val);
-        new NeighboringCellInfo(p);
-        NeighboringCellInfo info = new NeighboringCellInfo(RSSI, CID);
-        assertEquals(RSSI, info.getRssi());
-        assertEquals(CID, info.getCid());
-
-        info = new NeighboringCellInfo();
-        assertEquals(NeighboringCellInfo.UNKNOWN_RSSI, info.getRssi());
-        assertEquals(NeighboringCellInfo.UNKNOWN_CID, info.getCid());
-        info.setRssi(RSSI);
-        info.setCid(CID);
-        assertEquals(RSSI, info.getRssi());
-        assertEquals(CID, info.getCid());
-
-        assertEquals(0, info.describeContents());
-        assertNotNull(info.toString());
-
-        p = Parcel.obtain();
-        info.writeToParcel(p, 0);
         p.setDataPosition(0);
-        NeighboringCellInfo target = NeighboringCellInfo.CREATOR.createFromParcel(p);
-        assertEquals(info.getRssi(), target.getRssi());
-        assertEquals(info.getCid(), target.getCid());
+        nc.writeToParcel(p, 0);
+
+        p.setDataPosition(0);
+        NeighboringCellInfo nw = new NeighboringCellInfo(p);
+        assertEquals(NETWORK_TYPE_GPRS, nw.getNetworkType());
+        assertEquals(rssi, nw.getRssi());
+        assertEquals(0x1234, nw.getLac());
+        assertEquals(0x5678, nw.getCid());
+        assertEquals(NeighboringCellInfo.UNKNOWN_CID, nw.getPsc());
     }
 }
