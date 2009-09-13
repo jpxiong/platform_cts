@@ -768,6 +768,10 @@ public class KeyEventTest extends AndroidTestCase {
             return true;
         }
 
+        public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+            return false;
+        }
+        
         public boolean onKeyMultiple(int keyCode, int count, KeyEvent event) {
             mIsMultiple = true;
             mKeyCode = keyCode;
