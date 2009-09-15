@@ -45,13 +45,16 @@ public class BitmapTest extends AndroidTestCase {
     private static final int BUFFER_SIZE = 1016;
     private Resources mRes;
     private Bitmap mBitmap;
+    private BitmapFactory.Options mOptions;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         mRes = getContext().getResources();
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mOptions = new BitmapFactory.Options();
+        mOptions.inScaled = false;
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
     }
 
     @TestTargetNew(
@@ -69,7 +72,7 @@ public class BitmapTest extends AndroidTestCase {
         }catch(IllegalStateException e){
         }
 
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
 
         // abnormal case: out stream is null
         try{
@@ -392,7 +395,7 @@ public class BitmapTest extends AndroidTestCase {
         }catch(IllegalStateException e){
         }
 
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
 
         //abnormal case: bitmap is immutable
         try{
@@ -424,7 +427,7 @@ public class BitmapTest extends AndroidTestCase {
         }
 
         // normal case
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
         Bitmap ret = mBitmap.extractAlpha();
         assertNotNull(ret);
         int color = ret.getPixel(10, 20);
@@ -447,7 +450,7 @@ public class BitmapTest extends AndroidTestCase {
         }
 
         // normal case
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
         Bitmap ret = mBitmap.extractAlpha(new Paint(), new int[]{0, 1});
         assertNotNull(ret);
         int color = ret.getPixel(10, 20);
@@ -612,7 +615,7 @@ public class BitmapTest extends AndroidTestCase {
         }catch(IllegalStateException e){
         }
 
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
 
         //abnormal case: the bitmap is immutable
         try{
@@ -666,7 +669,7 @@ public class BitmapTest extends AndroidTestCase {
         }catch(IllegalStateException e){
         }
 
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
 
         // abnormal case: the bitmap is immutable
         try{
@@ -767,7 +770,7 @@ public class BitmapTest extends AndroidTestCase {
         }
 
         // abnormal case: failed to unparcel Bitmap
-        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
         Parcel p = Parcel.obtain();
         mBitmap.writeToParcel(p, 0);
 

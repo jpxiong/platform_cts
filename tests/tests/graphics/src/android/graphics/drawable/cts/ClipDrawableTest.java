@@ -53,6 +53,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         method = "ClipDrawable",
         args = {android.graphics.drawable.Drawable.class, int.class, int.class}
     )
+    @SuppressWarnings("deprecation")
     public void testClipDrawable() {
         new ClipDrawable((Drawable) null, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
 
@@ -133,14 +134,16 @@ public class ClipDrawableTest extends AndroidTestCase {
         method = "getIntrinsicHeight",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetIntrinsicHeight() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
                 Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
         assertEquals(-1, clipDrawable.getIntrinsicHeight());
 
-        BitmapDrawable bmpDrawable =
-                new BitmapDrawable(Bitmap.createBitmap(100, 50, Config.RGB_565));
+        Bitmap bitmap = Bitmap.createBitmap(100, 50, Config.RGB_565);
+        BitmapDrawable bmpDrawable = new BitmapDrawable(bitmap);
+        bmpDrawable.setTargetDensity(bitmap.getDensity()); // avoid scaling
         clipDrawable = new ClipDrawable(bmpDrawable, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
         assertEquals(50, clipDrawable.getIntrinsicHeight());
     }
@@ -151,14 +154,16 @@ public class ClipDrawableTest extends AndroidTestCase {
         method = "getIntrinsicWidth",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetIntrinsicWidth() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
                 Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
         assertEquals(-1, clipDrawable.getIntrinsicWidth());
 
-        BitmapDrawable bmpDrawable =
-                new BitmapDrawable(Bitmap.createBitmap(100, 50, Config.RGB_565));
+        Bitmap bitmap = Bitmap.createBitmap(100, 50, Config.RGB_565);
+        BitmapDrawable bmpDrawable = new BitmapDrawable(bitmap);
+        bmpDrawable.setTargetDensity(bitmap.getDensity()); // avoid scaling
         clipDrawable = new ClipDrawable(bmpDrawable, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
         assertEquals(100, clipDrawable.getIntrinsicWidth());
     }
@@ -169,6 +174,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         method = "getOpacity",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetOpacity() {
         BitmapDrawable bmpDrawable =
             new BitmapDrawable(Bitmap.createBitmap(100, 50, Config.RGB_565));
@@ -214,6 +220,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
                 android.util.AttributeSet.class}
     )
+    @SuppressWarnings("deprecation")
     public void testInflate() throws XmlPullParserException, IOException {
         BitmapDrawable bmpDrawable = new BitmapDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(bmpDrawable,
@@ -248,6 +255,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         method = "isStateful",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testIsStateful() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,

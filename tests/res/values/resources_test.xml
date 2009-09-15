@@ -20,7 +20,7 @@
      <dimen name="thumbnail_height">63dp</dimen>
      <!-- The standard size (both width and height) of an application icon that
           will be displayed in the app launcher and elsewhere. -->
-     <dimen name="app_icon_size">48dip</dimen>
+     <dimen name="app_icon_size">48px</dimen>
      <dimen name="toast_y_offset">64dip</dimen>
      <plurals name="plurals_test">
         <item quantity="one">A dog</item>

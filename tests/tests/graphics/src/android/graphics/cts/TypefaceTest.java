@@ -185,8 +185,10 @@ public class TypefaceTest extends AndroidTestCase {
         p.setFlags(0); // clear all flags (not sure what defaults flags are set)
         canvas.drawText("test", bitmap.getWidth() / 2, 3 * bitmap.getHeight() / 4 , p);
 
-        Bitmap expected =
-            BitmapFactory.decodeResource(getContext().getResources(), R.drawable.typeface_test);
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inScaled = false;
+        Bitmap expected = BitmapFactory.decodeResource(
+                getContext().getResources(), R.drawable.typeface_test, opt);
         assertEquals(expected.getWidth(), bitmap.getWidth());
         assertEquals(expected.getHeight(), bitmap.getHeight());
         for (int y = 0; y < bitmap.getHeight(); y++) {
