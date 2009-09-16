@@ -16,8 +16,6 @@
 
 package android.widget.cts;
 
-import com.android.internal.R;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -29,15 +27,9 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.util.AttributeSet;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
-
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
 
 /**
  * Test {@link TimePicker}.
@@ -127,94 +119,12 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
     public void testSetEnabled() {
         mTimePicker = new TimePicker(mContext);
         assertTrue(mTimePicker.isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.minute).isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.hour).isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.amPm).isEnabled());
 
         mTimePicker.setEnabled(false);
         assertFalse(mTimePicker.isEnabled());
-        assertFalse(mTimePicker.findViewById(R.id.minute).isEnabled());
-        assertFalse(mTimePicker.findViewById(R.id.hour).isEnabled());
-        assertFalse(mTimePicker.findViewById(R.id.amPm).isEnabled());
 
         mTimePicker.setEnabled(true);
         assertTrue(mTimePicker.isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.minute).isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.hour).isEnabled());
-        assertTrue(mTimePicker.findViewById(R.id.amPm).isEnabled());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnTimeChangedListener",
-        args = {OnTimeChangedListener.class}
-    )
-    @UiThreadTest
-    public void testClickTimePicker() {
-        int initialHour = 12;
-        int initialMinute = 50;
-        mTimePicker = new TimePicker(mContext);
-        DateFormatSymbols dfs = new DateFormatSymbols();
-        String[] dfsAmPm = dfs.getAmPmStrings();
-        String amText = dfsAmPm[Calendar.AM];
-        String pmText = dfsAmPm[Calendar.PM];
-        EditText hourText = (EditText) mTimePicker.findViewById(R.id.hour)
-                .findViewById(R.id.timepicker_input);
-        EditText minuteText = (EditText) mTimePicker.findViewById(R.id.minute)
-                .findViewById(R.id.timepicker_input);
-        Button amPmButton = (Button) mTimePicker.findViewById(R.id.amPm);
-
-        mTimePicker.setIs24HourView(false);
-        mTimePicker.setCurrentHour(Integer.valueOf(initialHour));
-        mTimePicker.setCurrentMinute(Integer.valueOf(initialMinute));
-        MockOnTimeChangeListener listener = new MockOnTimeChangeListener();
-        mTimePicker.setOnTimeChangedListener(listener);
-
-        assertEquals(initialHour, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(pmText, amPmButton.getText().toString());
-
-        // layout it
-        mActivity.setContentView(mTimePicker);
-        // increase hour
-        listener.reset();
-        mTimePicker.findViewById(R.id.hour).findViewById(R.id.increment).performClick();
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(1, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(pmText, amPmButton.getText().toString());
-
-        // decrease hour
-        listener.reset();
-        mTimePicker.findViewById(R.id.hour).findViewById(R.id.decrement).performClick();
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(pmText, amPmButton.getText().toString());
-
-        // increase minute
-        listener.reset();
-        mTimePicker.findViewById(R.id.minute).findViewById(R.id.increment).performClick();
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute + 1, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(pmText, amPmButton.getText().toString());
-
-        // decrease minute
-        listener.reset();
-        mTimePicker.findViewById(R.id.minute).findViewById(R.id.decrement).performClick();
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(pmText, amPmButton.getText().toString());
-
-        // change ampm
-        listener.reset();
-        mTimePicker.findViewById(R.id.amPm).performClick();
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour, Integer.parseInt(hourText.getText().toString()));
-        assertEquals(initialMinute, Integer.parseInt(minuteText.getText().toString()));
-        assertEquals(amText, amPmButton.getText().toString());
     }
 
     @TestTargetNew(
