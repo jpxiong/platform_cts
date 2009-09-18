@@ -31,6 +31,12 @@ public class TestHtmlConstants {
     public static final String LARGE_IMG_URL = "images/robot.png";
     public static final String SMALL_IMG_URL = "images/tomato.png";
 
+    public static final String EMBEDDED_IMG_URL = "webkit/embedded_image.html";
+    public static final String POPUP_URL = "webkit/popup_base.html";
+    public static final String JAVASCRIPT_URL = "webkit/javascript.html";
+
+    public static final String FONT_URL = "webkit/fonts.html";
+
     public static final String NETWORK_STATE_URL = "webkit/network_state.html";
     public static final String TEST_TIMER_URL = "webkit/test_timer.html";
 
@@ -42,4 +48,11 @@ public class TestHtmlConstants {
     public static final String ADD_JAVA_SCRIPT_INTERFACE_URL = "webkit/test_jsInterface.html";
 
     public static final String EXT_WEB_URL1 = "http://www.example.com/";
+
+    public static final String getFileUrl(String assetName) {
+        if (assetName.contains(":") || assetName.startsWith("/")) {
+            throw new IllegalArgumentException();
+        }
+        return "file:///android_asset/" + assetName;
+    }
 }
