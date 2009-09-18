@@ -147,7 +147,9 @@ public class HostTimer {
      *                If false, the cancellation is no caused by timer timing out.
      */
     public void cancel(boolean timeout) {
-        mTimer.cancel();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
         if (mStatus == RUNNING) {
             if (timeout) {
                 mStatus = TIMEOUT;
