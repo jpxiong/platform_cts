@@ -2486,7 +2486,7 @@ public class AudioTrackTest extends AndroidTestCase {
         track.setState(AudioTrack.STATE_UNINITIALIZED);
         assertEquals(TEST_NAME, AudioTrack.STATE_UNINITIALIZED, track.getState());
         final int nativeFrameCount = 2400;
-        assertEquals(TEST_NAME, nativeFrameCount, track.getNativeFrameCount());
+        assertTrue(TEST_NAME, track.getNativeFrameCount() >= nativeFrameCount);
     }
 
     @TestTargets({
