@@ -66,6 +66,7 @@ public class CtsTestServer {
     private static final int SSL_SERVER_PORT = 4445;
 
     public static final String FAVICON_PATH = "/favicon.ico";
+    public static final String USERAGENT_PATH = "/useragent.html";
     public static final String ASSET_PREFIX = "/assets/";
     public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
     public static final String REDIRECT_PREFIX = "/redirect";
@@ -82,6 +83,7 @@ public class CtsTestServer {
     private Context mContext;
     private MimeTypeMap mMap;
     private String mLastQuery;
+    private int mRequestCount;
 
     /**
      * Create and start a local HTTP server instance.
@@ -188,8 +190,18 @@ public class CtsTestServer {
         return sb.toString();
     }
 
+    public String getUserAgentUrl() {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(USERAGENT_PATH);
+        return sb.toString();
+    }
+
     public String getLastRequestUrl() {
         return mLastQuery;
+    }
+
+    public int getRequestCount() {
+        return mRequestCount;
     }
 
     /**
@@ -198,6 +210,7 @@ public class CtsTestServer {
     private HttpResponse getResponse(HttpRequest request) {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
+        mRequestCount += 1;
         if (requestLine.getMethod().equals(HttpGet.METHOD_NAME)) {
             Log.i(TAG, "GET: " + requestLine.getUri());
             String uriString = requestLine.getUri();
@@ -303,6 +316,22 @@ public class CtsTestServer {
                     entity.setContentType("text/html");
                     response.setEntity(entity);
                     response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
+                } catch (UnsupportedEncodingException e) {
+                    Log.w(TAG, e);
+                }
+            } else if (path.equals(USERAGENT_PATH)) {
+                response = createResponse(HttpStatus.SC_OK);
+                Header agentHeader = request.getFirstHeader("User-Agent");
+                String agent = "";
+                if (agentHeader != null) {
+                    agent = agentHeader.getValue();
+                }
+                String content = "<html><head><title>" + agent + "</title></head>" +
+                "<body>" + agent + "</body></html>";
+                try {
+                    StringEntity entity = new StringEntity(content);
+                    entity.setContentType("text/html");
+                    response.setEntity(entity);
                 } catch (UnsupportedEncodingException e) {
                     Log.w(TAG, e);
                 }
