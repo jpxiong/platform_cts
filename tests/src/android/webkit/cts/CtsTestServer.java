@@ -74,6 +74,8 @@ public class CtsTestServer {
     public static final String COOKIE_PREFIX = "/cookie";
     public static final int DELAY_MILLIS = 2000;
 
+    private static CtsTestServer sInstance;
+
     private ServerThread mServerThread;
     private String mServerUri;
     private AssetManager mAssets;
@@ -97,6 +99,12 @@ public class CtsTestServer {
      * @throws Exception
      */
     public CtsTestServer(Context context, boolean ssl) throws Exception {
+        if (sInstance != null) {
+            // attempt to start a new instance while one is still running
+            // shut down the old instance first
+            sInstance.shutdown();
+        }
+        sInstance = this;
         mContext = context;
         mAssets = mContext.getAssets();
         if (ssl) {
@@ -114,6 +122,7 @@ public class CtsTestServer {
      */
     public void shutdown() {
         mServerThread.shutdown();
+        sInstance = null;
     }
 
     /**
@@ -376,12 +385,26 @@ public class CtsTestServer {
         public ServerThread(CtsTestServer server, boolean ssl) throws Exception {
             mServer = server;
             mIsSsl = ssl;
-            if (mIsSsl) {
-                mSslContext = SSLContext.getInstance("TLS");
-                mSslContext.init(getKeyManagers(), null, null);
-                mSocket = mSslContext.getServerSocketFactory().createServerSocket(SSL_SERVER_PORT);
-            } else {
-                mSocket = new ServerSocket(SERVER_PORT);
+            int retry = 3;
+            while (true) {
+                try {
+                    if (mIsSsl) {
+                        mSslContext = SSLContext.getInstance("TLS");
+                        mSslContext.init(getKeyManagers(), null, null);
+                        mSocket = mSslContext.getServerSocketFactory().createServerSocket(
+                                SSL_SERVER_PORT);
+                    } else {
+                        mSocket = new ServerSocket(SERVER_PORT);
+                    }
+                    return;
+                } catch (IOException e) {
+                    Log.w(TAG, e);
+                    if (--retry == 0) {
+                        throw e;
+                    }
+                    // sleep in case server socket is still being closed
+                    Thread.sleep(1000);
+                }
             }
         }
 
