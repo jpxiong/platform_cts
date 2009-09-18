@@ -30,7 +30,6 @@ import org.xmlpull.v1.XmlPullParser;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -41,9 +40,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.cts.DelayedCheck;
-import android.widget.ImageButton;
 import android.widget.MediaController;
-import android.widget.ProgressBar;
 import android.widget.VideoView;
 
 import java.io.IOException;
@@ -128,9 +125,7 @@ public class MediaControllerTest extends
     /**
      * scenario description:
      * 1. Show the MediaController.
-     * 2. Click Pause button to check if MediaPlayerControl is not playing.
-     * 3. Click forward and reward buttons to check if current position is right.
-     * 4. Check forward button's status is GONE.
+     *
      */
     @UiThreadTest
     @ToBeFixed(bug = "1695243", explanation = "setAnchorView() must be called before show(), " +
@@ -153,39 +148,8 @@ public class MediaControllerTest extends
         mMediaController.show();
         assertTrue(mMediaController.isShowing());
 
-        final ImageButton pauseButton =
-                (ImageButton) mMediaController.findViewById(com.android.internal.R.id.pause);
-        assertNotNull(pauseButton);
-        pauseButton.requestFocus();
-        final Drawable d1 = pauseButton.getDrawable();
-        assertFalse(mediaPlayerControl.isPlaying());
-        pauseButton.performClick();
-
-        final Drawable d2 = pauseButton.getDrawable();
-        assertNotSame(d1, d2);
-
-        assertTrue(mediaPlayerControl.isPlaying());
-
-        ImageButton ffwdButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.ffwd);
-        assertNotNull(ffwdButton);
-        int origPos = mediaPlayerControl.getCurrentPosition();
-        ffwdButton.performClick();
-        assertTrue(mediaPlayerControl.getCurrentPosition() > origPos);
-
-        final ImageButton rewButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.rew);
-        assertNotNull(rewButton);
-        origPos = mediaPlayerControl.getCurrentPosition();
-        rewButton.performClick();
-        assertTrue(mediaPlayerControl.getCurrentPosition() < origPos);
-
-        final ImageButton nextButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.next);
-        assertEquals(View.GONE, nextButton.getVisibility());
-        final ImageButton prevButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.prev);
-        assertEquals(View.GONE, prevButton.getVisibility());
+        // ideally test would trigger pause/play/ff/rew here and test response, but no way
+        // to trigger those actions from MediaController
 
         mMediaController = new MediaController(mActivity, false);
         mMediaController.setMediaPlayer(mediaPlayerControl);
@@ -194,11 +158,6 @@ public class MediaControllerTest extends
 
         mMediaController.show();
         assertTrue(mMediaController.isShowing());
-
-        ffwdButton = (ImageButton) mMediaController.findViewById(com.android.internal.R.id.ffwd);
-        assertNotNull(ffwdButton);
-        // forward button is GONE
-        assertEquals(View.GONE, ffwdButton.getVisibility());
     }
 
     @TestTargets({
@@ -451,44 +410,16 @@ public class MediaControllerTest extends
 
         mMediaController.show();
 
-        final ImageButton pauseButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.pause);
-        final ImageButton nextButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.next);
-        final ImageButton ffwdButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.ffwd);
-        final ImageButton rewButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.rew);
-        final ImageButton prevButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.prev);
-        final ProgressBar progress = (ProgressBar) mMediaController.findViewById(
-                com.android.internal.R.id.mediacontroller_progress);
-
         mMediaController.setEnabled(true);
-
         assertTrue(mMediaController.isEnabled());
-        assertTrue(pauseButton.isEnabled());
-        assertTrue(ffwdButton.isEnabled());
-        assertTrue(rewButton.isEnabled());
-        assertTrue(nextButton.isEnabled());
-        assertTrue(prevButton.isEnabled());
-        assertTrue(progress.isEnabled());
 
         mMediaController.setEnabled(false);
-
         assertFalse(mMediaController.isEnabled());
-        assertFalse(pauseButton.isEnabled());
-        assertFalse(ffwdButton.isEnabled());
-        assertFalse(rewButton.isEnabled());
-        assertFalse(nextButton.isEnabled());
-        assertFalse(prevButton.isEnabled());
-        assertFalse(progress.isEnabled());
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test " +
-                "{@link MediaController#setPrevNextListeners(OnClickListener,OnClickListener)}",
+        level = TestLevel.SUFFICIENT,
+        notes = "no way to trigger next/prev press",
         method = "setPrevNextListeners",
         args = {android.view.View.OnClickListener.class, android.view.View.OnClickListener.class}
     )
@@ -500,25 +431,9 @@ public class MediaControllerTest extends
         mMediaController.setAnchorView(videoView);
         mMediaController.setMediaPlayer(mediaPlayerControl);
 
-        final ImageButton nextButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.next);
-        final ImageButton prevButton = (ImageButton) mMediaController.findViewById(
-                com.android.internal.R.id.prev);
-        assertFalse(nextButton.performClick());
-        assertFalse(prevButton.performClick());
-
         final MockOnClickListener next = new MockOnClickListener();
         final MockOnClickListener prev = new MockOnClickListener();
         mMediaController.setPrevNextListeners(next, prev);
-
-        assertTrue(nextButton.isEnabled());
-        assertTrue(prevButton.isEnabled());
-
-        assertTrue(nextButton.performClick());
-        assertTrue(next.hasOnClickCalled());
-
-        assertTrue(prevButton.performClick());
-        assertTrue(prev.hasOnClickCalled());
     }
 
     private static class MockMediaPlayerControl implements MediaController.MediaPlayerControl {
