@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -107,6 +108,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
             args = {}
     )
     @ToBeFixed(explanation = "History item does not have the original URL set after a redirect.")
+    @BrokenTest(value = "Bug 2121787: Test times out on the host side. Not 100% reproducible.")
     public void testRedirect() throws InterruptedException {
         final WebView view = getActivity().getWebView();
         // set the web view client so that redirects are loaded in the WebView itself
