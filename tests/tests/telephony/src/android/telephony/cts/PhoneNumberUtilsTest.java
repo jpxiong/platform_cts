@@ -150,36 +150,79 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Tests which must be successful both in compareLoosely() and in compareStrictly().  
+     */
+    private void testCompareCommon(final boolean strict) {
+        assertTrue(PhoneNumberUtils.compare("911", "911", strict));
+        assertFalse(PhoneNumberUtils.compare("911", "18005550911", strict));
+
+        assertTrue(PhoneNumberUtils.compare("+17005554141", "+17005554141", strict));
+        assertTrue(PhoneNumberUtils.compare("+17005554141", "+1 (700).555-4141", strict));
+        assertTrue(PhoneNumberUtils.compare("+17005554141", "7005554141", strict));
+        assertFalse(PhoneNumberUtils.compare("+1 999 7005554141", "+1 7005554141", strict));
+        assertTrue(PhoneNumberUtils.compare("011 1 7005554141", "7005554141", strict));
+        assertFalse(PhoneNumberUtils.compare("011 11 7005554141", "+17005554141", strict));
+        assertTrue(PhoneNumberUtils.compare("+44 207 792 3490", "0 207 792 3490", strict));
+        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "00 207 792 3490", strict));
+
+        // MMI header should be ignored
+        assertFalse(PhoneNumberUtils.compare("+17005554141", "**31#17005554141", strict));
+        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "+44 (0) 207 792 3490", strict));
+        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "010 44 207 792 3490", strict));
+        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "0011 44 207 792 3490", strict));
+        assertFalse(PhoneNumberUtils.compare("+7(095)9100766", "8(095)9100766", strict));
+        assertTrue(PhoneNumberUtils.compare("+444 207 792 3490", "0 207 792 3490", strict));
+        
+        // Phone numbers with Ascii characters, which are common in some countries
+        assertFalse(PhoneNumberUtils.compare("abcd", "bcde", strict));
+        assertTrue(PhoneNumberUtils.compare("1-800-flowers", "800-flowers", strict));
+        assertFalse(PhoneNumberUtils.compare("1-800-flowers", "1-800-abcdefg", strict));
+    }
+
     @TestTargetNew(
       level = TestLevel.COMPLETE,
       method = "compare",
       args = {String.class, String.class}
     )
-    public void testCompare() {
-        assertFalse(PhoneNumberUtils.compare("", ""));
+    public void testCompareLoosely() {
+        testCompareCommon(false);
 
-        assertTrue(PhoneNumberUtils.compare("911", "911"));
-        assertFalse(PhoneNumberUtils.compare("911", "18005550911"));
+        assertFalse(PhoneNumberUtils.compareLoosely("", ""));
+        assertTrue(PhoneNumberUtils.compareLoosely("17005554141", "5554141"));
+        assertTrue(PhoneNumberUtils.compareLoosely("+17005554141", "**31#+17005554141"));
+    }
+    
+    @TestTargetNew(
+      level = TestLevel.COMPLETE,
+      method = "compare",
+      args = {String.class, String.class}
+    )
+    public void testCompareStrictly() {
+        testCompareCommon(true);
 
-        assertTrue(PhoneNumberUtils.compare("+17005554141", "+17005554141"));
-        assertTrue(PhoneNumberUtils.compare("+17005554141", "+1 (700).555-4141"));
-        assertTrue(PhoneNumberUtils.compare("+17005554141", "7005554141"));
-        assertTrue(PhoneNumberUtils.compare("17005554141", "5554141"));
-        assertTrue(PhoneNumberUtils.compare("+17005554141", "0017005554141"));
-        assertTrue(PhoneNumberUtils.compare("+17005554141", "**31#+17005554141"));
-        assertFalse(PhoneNumberUtils.compare("+1 999 7005554141", "+1 7005554141"));
-        assertTrue(PhoneNumberUtils.compare("011 1 7005554141", "7005554141"));
-        assertFalse(PhoneNumberUtils.compare("011 11 7005554141", "+17005554141"));
-        assertTrue(PhoneNumberUtils.compare("+44 207 792 3490", "0 207 792 3490"));
-        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "00 207 792 3490"));
+        assertTrue(PhoneNumberUtils.compareStrictly(null, null));
+        assertTrue(PhoneNumberUtils.compareStrictly("", null));
+        assertTrue(PhoneNumberUtils.compareStrictly(null, ""));
+        assertTrue(PhoneNumberUtils.compareStrictly("", ""));
 
-        // MMI header should be ignored
-        assertFalse(PhoneNumberUtils.compare("+17005554141", "**31#17005554141"));
-        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "+44 (0) 207 792 3490"));
-        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "010 44 207 792 3490"));
-        assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "0011 44 207 792 3490"));
-        assertFalse(PhoneNumberUtils.compare("+7(095)9100766", "8(095)9100766"));
-        assertTrue(PhoneNumberUtils.compare("+444 207 792 3490", "0 207 792 3490"));
+        // This must be true, since
+        // - +7 is russian country calling code
+        // - 8 is russian trunk prefix, which should be omitted when being compared to
+        //   the number with country calling code.
+        // - so, this comparation becomes same as comparation between
+        //   "(095)9100766" v.s."(095)9100766", which is definitely true.
+        assertTrue(PhoneNumberUtils.compareStrictly("+7(095)9100766", "8(095)9100766"));
+        // assertFalse(PhoneNumberUtils.compare("+7(095)9100766", "8(095)9100766"));
+
+        // Test broken caller ID seen on call from Thailand to the US.
+        assertTrue(PhoneNumberUtils.compareStrictly("+66811234567", "166811234567"));
+
+        // This is not related to Thailand case. NAMP "1" + region code "661".
+        assertTrue(PhoneNumberUtils.compareStrictly("16610001234", "6610001234"));
+
+        assertFalse(PhoneNumberUtils.compareStrictly("080-1234-5678", "+819012345678"));
+        assertTrue(PhoneNumberUtils.compareStrictly("650-000-3456", "16500003456"));
     }
 
     @TestTargets({
