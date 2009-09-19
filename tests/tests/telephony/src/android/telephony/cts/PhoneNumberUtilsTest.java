@@ -151,9 +151,14 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
     }
 
     /**
-     * Tests which must be successful both in compareLoosely() and in compareStrictly().  
+     * Tests which must be successful both in compareLoosely() and in compareStrictly().
      */
     private void testCompareCommon(final boolean strict) {
+        assertTrue(PhoneNumberUtils.compare(null, null, strict));
+        assertFalse(PhoneNumberUtils.compare(null, "", strict));
+        assertFalse(PhoneNumberUtils.compare("", null, strict));
+        assertFalse(PhoneNumberUtils.compare("", "", strict));
+
         assertTrue(PhoneNumberUtils.compare("911", "911", strict));
         assertFalse(PhoneNumberUtils.compare("911", "18005550911", strict));
 
@@ -171,13 +176,7 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "+44 (0) 207 792 3490", strict));
         assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "010 44 207 792 3490", strict));
         assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "0011 44 207 792 3490", strict));
-        assertFalse(PhoneNumberUtils.compare("+7(095)9100766", "8(095)9100766", strict));
         assertTrue(PhoneNumberUtils.compare("+444 207 792 3490", "0 207 792 3490", strict));
-        
-        // Phone numbers with Ascii characters, which are common in some countries
-        assertFalse(PhoneNumberUtils.compare("abcd", "bcde", strict));
-        assertTrue(PhoneNumberUtils.compare("1-800-flowers", "800-flowers", strict));
-        assertFalse(PhoneNumberUtils.compare("1-800-flowers", "1-800-abcdefg", strict));
     }
 
     @TestTargetNew(
@@ -188,11 +187,11 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
     public void testCompareLoosely() {
         testCompareCommon(false);
 
-        assertFalse(PhoneNumberUtils.compareLoosely("", ""));
         assertTrue(PhoneNumberUtils.compareLoosely("17005554141", "5554141"));
         assertTrue(PhoneNumberUtils.compareLoosely("+17005554141", "**31#+17005554141"));
+        assertFalse(PhoneNumberUtils.compareLoosely("+7(095)9100766", "8(095)9100766"));
     }
-    
+
     @TestTargetNew(
       level = TestLevel.COMPLETE,
       method = "compare",
@@ -201,11 +200,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
     public void testCompareStrictly() {
         testCompareCommon(true);
 
-        assertTrue(PhoneNumberUtils.compareStrictly(null, null));
-        assertTrue(PhoneNumberUtils.compareStrictly("", null));
-        assertTrue(PhoneNumberUtils.compareStrictly(null, ""));
-        assertTrue(PhoneNumberUtils.compareStrictly("", ""));
-
         // This must be true, since
         // - +7 is russian country calling code
         // - 8 is russian trunk prefix, which should be omitted when being compared to
@@ -213,7 +207,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // - so, this comparation becomes same as comparation between
         //   "(095)9100766" v.s."(095)9100766", which is definitely true.
         assertTrue(PhoneNumberUtils.compareStrictly("+7(095)9100766", "8(095)9100766"));
-        // assertFalse(PhoneNumberUtils.compare("+7(095)9100766", "8(095)9100766"));
 
         // Test broken caller ID seen on call from Thailand to the US.
         assertTrue(PhoneNumberUtils.compareStrictly("+66811234567", "166811234567"));
@@ -223,6 +216,11 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
 
         assertFalse(PhoneNumberUtils.compareStrictly("080-1234-5678", "+819012345678"));
         assertTrue(PhoneNumberUtils.compareStrictly("650-000-3456", "16500003456"));
+
+        // Phone numbers with Ascii characters, which are common in some countries
+        assertFalse(PhoneNumberUtils.compareStrictly("abcd", "bcde"));
+        assertTrue(PhoneNumberUtils.compareStrictly("1-800-flowers", "800-flowers"));
+        assertFalse(PhoneNumberUtils.compareStrictly("1-800-flowers", "1-800-abcdefg"));
     }
 
     @TestTargets({
