@@ -112,15 +112,15 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
 
         // Test toCallerIDMinMatch
         assertNull(PhoneNumberUtils.toCallerIDMinMatch(null));
-        assertEquals("14145", PhoneNumberUtils.toCallerIDMinMatch("17005554141"));
-        assertEquals("14145", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141"));
-        assertEquals("14145", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141,1234"));
-        assertEquals("14145", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141;1234"));
-        assertEquals("NN145", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-41NN"));
+        assertEquals("1414555", PhoneNumberUtils.toCallerIDMinMatch("17005554141"));
+        assertEquals("1414555", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141"));
+        assertEquals("1414555", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141,1234"));
+        assertEquals("1414555", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-4141;1234"));
+        assertEquals("NN14555", PhoneNumberUtils.toCallerIDMinMatch("1-700-555-41NN"));
         assertEquals("", PhoneNumberUtils.toCallerIDMinMatch(""));
         assertEquals("0032", PhoneNumberUtils.toCallerIDMinMatch("2300"));
         assertEquals("0032+", PhoneNumberUtils.toCallerIDMinMatch("+2300"));
-        assertEquals("#130#", PhoneNumberUtils.toCallerIDMinMatch("*#031#"));
+        assertEquals("#130#*", PhoneNumberUtils.toCallerIDMinMatch("*#031#"));
 
         // Test networkPortionToCalledPartyBCD, calledPartyBCDToString
         byte[] bRet = PhoneNumberUtils.networkPortionToCalledPartyBCD("+17005550020");
