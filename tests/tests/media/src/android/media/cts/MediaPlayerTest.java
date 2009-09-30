@@ -196,10 +196,10 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         )
     })
     public void testPlayAudio() throws Exception {
-        final int mp3Duration = 4231;
-        final int tolerance = 50;
+        final int mp3Duration = 34909;
+        final int tolerance = 70;
         final int seekDuration = 100;
-        final int resid = R.raw.testmp3;
+        final int resid = R.raw.testmp3_2;
 
         MediaPlayer mp = MediaPlayer.create(mContext, resid);
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
