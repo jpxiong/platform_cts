@@ -16,15 +16,19 @@
 
 package android.content.res.cts;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
+import com.android.cts.stub.R;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -42,14 +46,9 @@ import android.util.Xml;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
 
 @TestTargetClass(Resources.class)
 public class ResourcesTest extends AndroidTestCase {
@@ -266,7 +265,7 @@ public class ResourcesTest extends AndroidTestCase {
             //expected
         }
 
-        // app_icon_size is defined in cts/tests/res/values/resources_test.xml which value is 48
+        // app_icon_size is 48px, as defined in cts/tests/res/values/resources_test.xml
         final float dim = mResources.getDimension(R.dimen.app_icon_size);
         assertEquals(48.0f, dim);
     }
@@ -284,7 +283,7 @@ public class ResourcesTest extends AndroidTestCase {
             //expected
         }
 
-        // app_icon_size is defined in cts/tests/res/values/resources_test.xml which value is 48
+        // app_icon_size is 48px, as defined in cts/tests/res/values/resources_test.xml
         final int dim = mResources.getDimensionPixelOffset(R.dimen.app_icon_size);
         assertEquals(48, dim);
     }
@@ -384,7 +383,7 @@ public class ResourcesTest extends AndroidTestCase {
             //expected
         }
 
-        // app_icon_size is defined in cts/tests/res/values/resources_test.xml which value is 48
+        // app_icon_size is 48px, as defined in cts/tests/res/values/resources_test.xml
         final int size = mResources.getDimensionPixelSize(R.dimen.app_icon_size);
         assertEquals(48, size);
     }
@@ -402,12 +401,13 @@ public class ResourcesTest extends AndroidTestCase {
             //expected
         }
 
-        // testimage is defined in cts/tests/res/drawable/testimage.jpg
-        // which width is 212 and height is 142
+        // testimage is defined in cts/tests/res/drawable/testimage.jpg and measures 212px x 142px
         final Drawable draw = mResources.getDrawable(R.drawable.testimage);
+        int targetDensity = mResources.getDisplayMetrics().densityDpi;
+        int defaultDensity = DisplayMetrics.DENSITY_DEFAULT;
         assertNotNull(draw);
-        assertEquals(212, draw.getIntrinsicWidth());
-        assertEquals(142, draw.getIntrinsicHeight());
+        assertEquals(212 * targetDensity / defaultDensity, draw.getIntrinsicWidth(), 1);
+        assertEquals(142 * targetDensity / defaultDensity, draw.getIntrinsicHeight(), 1);
     }
 
     @TestTargetNew(

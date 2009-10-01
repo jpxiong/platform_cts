@@ -81,7 +81,10 @@ public class CanvasTest extends InstrumentationTestCase {
         mPaint.setColor(PAINT_COLOR);
 
         final Resources res = getInstrumentation().getTargetContext().getResources();
-        mImmutableBitmap = BitmapFactory.decodeResource(res, R.drawable.start);
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inScaled = false; // bitmap will only be immutable if not scaled during load
+        mImmutableBitmap = BitmapFactory.decodeResource(res, R.drawable.start, opt);
+        assertFalse(mImmutableBitmap.isMutable());
         mMutableBitmap = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Config.ARGB_8888);
         mCanvas = new Canvas(mMutableBitmap);
     }

@@ -16,6 +16,11 @@
 
 package android.app.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -28,14 +33,6 @@ import android.test.UiThreadTest;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.android.internal.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link ProgressDialog}.
@@ -46,12 +43,9 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     private final CharSequence MESSAGE = "message";
 
     private boolean mCanceled;
-    private TextView mMessageView;
-    private TextView mTitleView;
-    private TextView mProgressNumber;
     private Drawable mDrawable;
-    private Drawable mActureDrawable;
-    private Drawable mActureDrawableNull;
+    private Drawable mActualDrawableNull;
+    private Drawable mActualDrawable;
     private ProgressBar mProgressBar;
     private int mProgress1;
     private int mProgress2;
@@ -128,7 +122,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "show",
         args = {android.content.Context.class, java.lang.CharSequence.class,
                 java.lang.CharSequence.class}
@@ -136,11 +130,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
     @UiThreadTest
     public void testShow1() {
         mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
-
-        mMessageView = (TextView) mProgressDialog.getWindow().findViewById(R.id.message);
-        mTitleView = (TextView) mProgressDialog.getWindow().findViewById(R.id.alertTitle);
-        assertEquals(MESSAGE, mMessageView.getText());
-        assertEquals(TITLE, mTitleView.getText());
     }
 
     @TestTargetNew(
@@ -414,19 +403,18 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
                 final Window w = mProgressDialog.getWindow();
-                final ProgressBar progressBar = (ProgressBar) w.findViewById(R.id.progress);
+                final ProgressBar progressBar = (ProgressBar) w.findViewById(android.R.id.progress);
 
                 mProgressDialog.setProgressDrawable(mDrawable);
-                mActureDrawable = progressBar.getProgressDrawable();
+                mActualDrawable = progressBar.getProgressDrawable();
 
                 mProgressDialog.setProgressDrawable(null);
-                mActureDrawableNull = progressBar.getProgressDrawable();
+                mActualDrawableNull = progressBar.getProgressDrawable();
             }
         });
         mInstrumentation.waitForIdleSync();
-
-        assertEquals(mDrawable, mActureDrawable);
-        assertEquals(null, mActureDrawableNull);
+        assertEquals(mDrawable, mActualDrawable);
+        assertEquals(null, mActualDrawableNull);
     }
 
     @TestTargetNew(
@@ -439,24 +427,25 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
                 final Window w = mProgressDialog.getWindow();
-                mProgressBar = (ProgressBar) w.findViewById(R.id.progress);
+                mProgressBar = (ProgressBar) w.findViewById(android.R.id.progress);
 
                 mProgressDialog.setIndeterminateDrawable(mDrawable);
-                mActureDrawable = mProgressBar.getIndeterminateDrawable();
-                assertEquals(mDrawable, mActureDrawable);
+                mActualDrawable = mProgressBar.getIndeterminateDrawable();
+                assertEquals(mDrawable, mActualDrawable);
 
                 mProgressDialog.setIndeterminateDrawable(null);
-                mActureDrawableNull = mProgressBar.getIndeterminateDrawable();
-                assertEquals(null, mActureDrawableNull);
+                mActualDrawableNull = mProgressBar.getIndeterminateDrawable();
+                assertEquals(null, mActualDrawableNull);
             }
         });
         mInstrumentation.waitForIdleSync();
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setMessage",
-        args = {java.lang.CharSequence.class}
+        args = {java.lang.CharSequence.class},
+        notes= "no way to verify dialog contents"
     )
     public void testSetMessage() throws Throwable {
         runTestOnUiThread(new Runnable() {
@@ -465,8 +454,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 mProgressDialog = new ProgressDialog(mContext);
                 mProgressDialog.setMessage(MESSAGE);
                 mProgressDialog.show();
-                mMessageView = (TextView) mProgressDialog.getWindow().findViewById(R.id.message);
-                assertEquals(MESSAGE, mMessageView.getText());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -476,27 +463,22 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 // mProgress is not null
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
                 mProgressDialog.setMessage("Bruce Li");
-                mMessageView = (TextView) mProgressDialog.getWindow().findViewById(R.id.message);
-                assertEquals("Bruce Li", mMessageView.getText());
             }
         });
         mInstrumentation.waitForIdleSync();
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
+        level = TestLevel.SUFFICIENT,
         method = "setProgressStyle",
-        args = {int.class}
+        args = {int.class},
+        notes="no way to verify dialog conteents"
     )
     public void testSetProgressStyle() throws Throwable {
         setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        assertEquals("10/100", mProgressNumber.getText());
 
         setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        assertNull(mProgressNumber);
-
         setProgressStyle(100);
-        assertNull(null, mProgressNumber);
     }
 
     private void setProgressStyle(final int style) throws Throwable {
@@ -508,9 +490,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 mProgressDialog.show();
                 mProgressDialog.setProgress(10);
                 mProgressDialog.setMax(100);
-                Window w = mProgressDialog.getWindow();
-                //for one line less than 100
-                mProgressNumber = (TextView) w.findViewById(R.id.progress_number);
             }
         });
         mInstrumentation.waitForIdleSync();

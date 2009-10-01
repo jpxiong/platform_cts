@@ -17,6 +17,13 @@
 package android.graphics.cts;
 
 import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -27,10 +34,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(NinePatch.class)
 public class NinePatchTest extends AndroidTestCase {
@@ -38,6 +41,8 @@ public class NinePatchTest extends AndroidTestCase {
 
     private NinePatch mNinePatch;
     private Bitmap mBitmap;
+    private BitmapFactory.Options mOptNoScale;
+    private Resources mRes;
     private final String NAME = "TESTNAME";
     private final int WIDTH = 80;
     private final int HEIGTH = 120;
@@ -47,8 +52,10 @@ public class NinePatchTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mBitmap = BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.opaque);
+        mRes = getContext().getResources();
+        mOptNoScale = new BitmapFactory.Options();
+        mOptNoScale.inDensity = mOptNoScale.inTargetDensity = mRes.getDisplayMetrics().densityDpi;
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.opaque, mOptNoScale);
         mChunk = mBitmap.getNinePatchChunk();
         assertNotNull(mChunk);
         mNinePatch = new NinePatch(mBitmap, mChunk, NAME);
@@ -105,8 +112,7 @@ public class NinePatchTest extends AndroidTestCase {
         )
     })
     public void testDraw() {
-        Bitmap expected =
-            BitmapFactory.decodeResource(getContext().getResources(), R.drawable.scaled1);
+        Bitmap expected = BitmapFactory.decodeResource(mRes, R.drawable.scaled1, mOptNoScale);
 
         Bitmap bitmap = Bitmap.createBitmap(expected.getWidth(), expected.getHeight(),
                 Bitmap.Config.ARGB_8888);
@@ -115,7 +121,7 @@ public class NinePatchTest extends AndroidTestCase {
         mNinePatch.draw(c, rectf);
         checkBitmapWithAlpha(expected, bitmap, ALPHA_OPAQUE);
 
-        expected = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.scaled2);
+        expected = BitmapFactory.decodeResource(mRes, R.drawable.scaled2, mOptNoScale);
         bitmap = Bitmap.createBitmap(expected.getWidth(), expected.getHeight(),
                 Bitmap.Config.ARGB_8888);
         c = new Canvas(bitmap);
@@ -171,8 +177,8 @@ public class NinePatchTest extends AndroidTestCase {
         assertFalse(mNinePatch.hasAlpha());
         assertEquals(mNinePatch.hasAlpha(), mBitmap.hasAlpha());
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.transparent_border);
+        Bitmap bitmap =
+            BitmapFactory.decodeResource(mRes, R.drawable.transparent_border, mOptNoScale);
         byte[] chunk = bitmap.getNinePatchChunk();
         NinePatch ninePatch = new NinePatch(bitmap, chunk, NAME);
         assertTrue(ninePatch.hasAlpha());
@@ -211,8 +217,7 @@ public class NinePatchTest extends AndroidTestCase {
         assertNull(region);
 
         // transparent border of 1px
-        mBitmap = BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.transparent_border);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.transparent_border, mOptNoScale);
         mChunk = mBitmap.getNinePatchChunk();
         assertNotNull(mChunk);
         mNinePatch = new NinePatch(mBitmap, mChunk, NAME);
@@ -230,8 +235,7 @@ public class NinePatchTest extends AndroidTestCase {
         assertBounds(regionBounds, 0, 0, 10, 10);
 
         // transparent padding of 1px on the right side
-        mBitmap = BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.transparent_right);
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.transparent_right, mOptNoScale);
         mChunk = mBitmap.getNinePatchChunk();
         assertNotNull(mChunk);
         mNinePatch = new NinePatch(mBitmap, mChunk, NAME);

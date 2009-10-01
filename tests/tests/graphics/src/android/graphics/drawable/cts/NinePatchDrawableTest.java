@@ -32,6 +32,7 @@ import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.NinePatch;
 import android.graphics.Paint;
@@ -138,33 +139,36 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
             + "NinePatchDrawable#draw(Canvas) when param canvas is null")
     public void testDraw() {
-        Bitmap bmp = Bitmap.createBitmap(100, 100, Config.ARGB_8888);
+        Bitmap bmp = Bitmap.createBitmap(9, 9, Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
+
+        int ocean = Color.rgb(0, 0xFF, 0x80);
 
         mNinePatchDrawable.setBounds(0, 0, 9, 9);
         mNinePatchDrawable.draw(c);
-        assertColorFillRect(bmp, 0, 0, 4, 4, 0xffff0000);
-        assertColorFillRect(bmp, 5, 0, 4, 4, 0xff0000ff);
-        assertColorFillRect(bmp, 0, 5, 4, 4, 0xff00ff80);
-        assertColorFillRect(bmp, 5, 5, 4, 4, 0xffffff00);
-        assertColorFillRect(bmp, 4, 0, 1, 9, 0xffffffff);
-        assertColorFillRect(bmp, 0, 4, 9, 1, 0xffffffff);
+        assertColorFillRect(bmp, 0, 0, 4, 4, Color.RED);
+        assertColorFillRect(bmp, 5, 0, 4, 4, Color.BLUE);
+        assertColorFillRect(bmp, 0, 5, 4, 4, ocean);
+        assertColorFillRect(bmp, 5, 5, 4, 4, Color.YELLOW);
+        assertColorFillRect(bmp, 4, 0, 1, 9, Color.WHITE);
+        assertColorFillRect(bmp, 0, 4, 9, 1, Color.WHITE);
 
         bmp.eraseColor(0xff000000);
 
         mNinePatchDrawable.setBounds(0, 0, 3, 3);
         mNinePatchDrawable.draw(c);
-        assertColorFillRect(bmp, 0, 0, 1, 1, 0xffff0000);
-        assertColorFillRect(bmp, 2, 0, 1, 1, 0xff0000ff);
-        assertColorFillRect(bmp, 0, 2, 1, 1, 0xff00ff80);
-        assertColorFillRect(bmp, 2, 2, 1, 1, 0xffffff00);
-        assertColorFillRect(bmp, 1, 0, 1, 3, 0xffffffff);
-        assertColorFillRect(bmp, 0, 1, 3, 1, 0xffffffff);
+        assertColorFillRect(bmp, 0, 0, 1, 1, Color.RED);
+        assertColorFillRect(bmp, 2, 0, 1, 1, Color.BLUE);
+        assertColorFillRect(bmp, 0, 2, 1, 1, ocean);
+        assertColorFillRect(bmp, 2, 2, 1, 1, Color.YELLOW);
+        assertColorFillRect(bmp, 1, 0, 1, 3, Color.WHITE);
+        assertColorFillRect(bmp, 0, 1, 3, 1, Color.WHITE);
 
         try {
             mNinePatchDrawable.draw(null);
             fail("The method should check whether the canvas is null.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
@@ -205,23 +209,27 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
             + "the insternal padding field is not set ")
     public void testGetPadding() {
         Rect r = new Rect();
-        assertTrue(mNinePatchDrawable.getPadding(r));
-        assertEquals(new Rect(0, 0, 3, 3), r);
+        NinePatchDrawable npd = (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatch_0);
+        assertTrue(npd.getPadding(r));
+        // exact padding unknown due to possible density scaling
+        assertEquals(0, r.left);
+        assertEquals(0, r.top);
+        assertTrue(r.right > 0);
+        assertTrue(r.bottom > 0);
 
-        mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);
-        assertTrue(mNinePatchDrawable.getPadding(r));
-        assertEquals(new Rect(3, 5, 5, 3), r);
+        npd = (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatch_1);
+        assertTrue(npd.getPadding(r));
+        assertTrue(r.left > 0);
+        assertTrue(r.top > 0);
+        assertTrue(r.right > 0);
+        assertTrue(r.bottom > 0);
 
-        // make a drawable with padding field set to null;
-        byte[] chunk = new byte[MIN_CHUNK_SIZE];
-        chunk[MIN_CHUNK_SIZE - 1] = 1;
-        Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
-        String name = mResources.getResourceName(R.drawable.ninepatch_0);
-        mNinePatchDrawable = new NinePatchDrawable(new NinePatch(bmp, chunk, name));
         try {
+            // drawable constructed from a bitmap has no padding set
             mNinePatchDrawable.getPadding(r);
             fail("The method should check whether the padding field is null.");
         } catch (NullPointerException e) {
+            // expected
         }
 
         // passed in a null rect
@@ -229,6 +237,7 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
             mNinePatchDrawable.getPadding(null);
             fail("The method should check whether the rect is null.");
         } catch (NullPointerException e) {
+            // expected
         }
     }
 
@@ -299,12 +308,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {}
     )
     public void testGetIntrinsicWidth() {
-        Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
+        Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getIntrinsicWidth());
         assertEquals(5, mNinePatchDrawable.getIntrinsicWidth());
 
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);
-        bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_1);
+        bmp = getBitmapUnscaled(R.drawable.ninepatch_1);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getIntrinsicWidth());
         assertEquals(9, mNinePatchDrawable.getIntrinsicWidth());
     }
@@ -315,12 +324,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {}
     )
     public void testGetMinimumWidth() {
-        Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
+        Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getMinimumWidth());
         assertEquals(5, mNinePatchDrawable.getMinimumWidth());
 
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);
-        bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_1);
+        bmp = getBitmapUnscaled(R.drawable.ninepatch_1);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getMinimumWidth());
         assertEquals(9, mNinePatchDrawable.getMinimumWidth());
     }
@@ -331,12 +340,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {}
     )
     public void testGetIntrinsicHeight() {
-        Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
+        Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getIntrinsicHeight());
         assertEquals(5, mNinePatchDrawable.getIntrinsicHeight());
 
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);
-        bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_1);
+        bmp = getBitmapUnscaled(R.drawable.ninepatch_1);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getIntrinsicHeight());
         assertEquals(9, mNinePatchDrawable.getIntrinsicHeight());
     }
@@ -347,12 +356,12 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {}
     )
     public void testGetMinimumHeight() {
-        Bitmap bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_0);
+        Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getMinimumHeight());
         assertEquals(5, mNinePatchDrawable.getMinimumHeight());
 
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);
-        bmp = BitmapFactory.decodeResource(mResources, R.drawable.ninepatch_1);
+        bmp = getBitmapUnscaled(R.drawable.ninepatch_1);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getMinimumHeight());
         assertEquals(9, mNinePatchDrawable.getMinimumHeight());
     }
@@ -417,15 +426,15 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {Resources.class, XmlPullParser.class, AttributeSet.class}
     )
     public void testInflate() throws XmlPullParserException, IOException {
-        final int WIDTH = 80;
-        final int HEIGTH = 120;
-        final int[] COLOR = new int[WIDTH * HEIGTH];
-        Bitmap bitmap = Bitmap.createBitmap(COLOR, WIDTH, HEIGTH, Bitmap.Config.RGB_565);
+        final int width = 80;
+        final int height = 120;
+        final int[] COLOR = new int[width * height];
+        Bitmap bitmap = Bitmap.createBitmap(COLOR, width, height, Bitmap.Config.RGB_565);
         NinePatchDrawable ninePatchDrawable =
-            new NinePatchDrawable(bitmap, new byte[1000], null, "TESTNAME");
+            new NinePatchDrawable(mResources, bitmap, new byte[1000], null, "TESTNAME");
 
-        assertEquals(HEIGTH, ninePatchDrawable.getIntrinsicHeight());
-        assertEquals(WIDTH, ninePatchDrawable.getIntrinsicWidth());
+        assertEquals(height, ninePatchDrawable.getIntrinsicHeight());
+        assertEquals(width, ninePatchDrawable.getIntrinsicWidth());
         XmlResourceParser parser = mResources.getXml(R.drawable.ninepatchdrawable);
         int type;
         while ((type = parser.next()) != XmlPullParser.END_DOCUMENT
@@ -435,8 +444,8 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         ninePatchDrawable.inflate(mResources, parser, attrs);
 
         assertTrue(ninePatchDrawable.getPaint().isDither());
-        assertTrue(HEIGTH != ninePatchDrawable.getIntrinsicHeight());
-        assertTrue(WIDTH != ninePatchDrawable.getIntrinsicWidth());
+        assertTrue(height != ninePatchDrawable.getIntrinsicHeight());
+        assertTrue(width != ninePatchDrawable.getIntrinsicWidth());
     }
 
     @TestTargetNew(
@@ -472,7 +481,18 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     }
 
     private NinePatchDrawable getNinePatchDrawable(int resId) {
-        return (NinePatchDrawable) mResources.getDrawable(resId);
+        // jump through hoops to avoid scaling the tiny ninepatch, which would skew the results
+        // depending on device density
+        Bitmap bitmap = getBitmapUnscaled(resId);
+        NinePatch np = new NinePatch(bitmap, bitmap.getNinePatchChunk(), null);
+        return new NinePatchDrawable(mResources, np);
+    }
+
+    private Bitmap getBitmapUnscaled(int resId) {
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inDensity = opts.inTargetDensity = mResources.getDisplayMetrics().densityDpi;
+        Bitmap bitmap = BitmapFactory.decodeResource(mResources, resId, opts);
+        return bitmap;
     }
 
     private class MockColorFilter extends ColorFilter {

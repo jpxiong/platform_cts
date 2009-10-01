@@ -90,6 +90,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
             args = {}
         )
     })
+    @SuppressWarnings("deprecation")
     public void testConstructor() {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
         assertNotNull(bitmapDrawable.getPaint());
@@ -392,6 +393,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
             args = {}
         )
     })
+    @SuppressWarnings("deprecation")
     public void testGetIntrinsicSize() {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
         assertEquals(0, bitmapDrawable.getIntrinsicWidth());
@@ -399,11 +401,13 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
 
         Bitmap bitmap = Bitmap.createBitmap(200, 300, Config.RGB_565);
         bitmapDrawable = new BitmapDrawable(bitmap);
+        bitmapDrawable.setTargetDensity(bitmap.getDensity());
         assertEquals(200, bitmapDrawable.getIntrinsicWidth());
         assertEquals(300, bitmapDrawable.getIntrinsicHeight());
 
         InputStream source = mContext.getResources().openRawResource(R.drawable.size_48x48);
         bitmapDrawable = new BitmapDrawable(source);
+        bitmapDrawable.setTargetDensity(mContext.getResources().getDisplayMetrics().densityDpi);
         assertEquals(48, bitmapDrawable.getIntrinsicWidth());
         assertEquals(48, bitmapDrawable.getIntrinsicHeight());
     }
@@ -416,6 +420,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for draw() is incomplete." +
             "1. not clear what is supposed to happen if the Resource is null.")
+    @SuppressWarnings("deprecation")
     public void testInflate() throws IOException, XmlPullParserException {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
 

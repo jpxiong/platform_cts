@@ -87,8 +87,11 @@ public class SensorTest extends AndroidTestCase {
         assertSensorValues(sensor);
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
-        assertEquals(Sensor.TYPE_TEMPERATURE, sensor.getType());
-        assertSensorValues(sensor);
+        // temperature sensor is optional
+        if (sensor != null) {
+            assertEquals(Sensor.TYPE_TEMPERATURE, sensor.getType());
+            assertSensorValues(sensor);
+        }
     }
 
     private void assertSensorValues(Sensor sensor) {

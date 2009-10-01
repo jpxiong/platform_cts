@@ -446,6 +446,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.webkit.cts.CookieSyncManagerStubActivity"
+            android:label="CookieSyncManagerStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.ExpandableListSimple"
             android:label="ExpandableListSimple">
             <intent-filter>

@@ -49,7 +49,6 @@ public class ProtectedBroadcastsTest extends AndroidTestCase {
         Intent.ACTION_SHUTDOWN,
         Intent.ACTION_DEVICE_STORAGE_LOW,
         Intent.ACTION_DEVICE_STORAGE_OK,
-        Intent.ACTION_AIRPLANE_MODE_CHANGED,
         Intent.ACTION_NEW_OUTGOING_CALL,
         Intent.ACTION_REBOOT,
         "android.intent.action.SERVICE_STATE",

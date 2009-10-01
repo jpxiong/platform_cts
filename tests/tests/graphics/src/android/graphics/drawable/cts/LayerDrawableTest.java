@@ -60,6 +60,7 @@ public class LayerDrawableTest extends AndroidTestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for constructor is incomplete." +
             "1. not clear what is supposed to happen if layers is null.")
+    @SuppressWarnings("deprecation")
     public void testConstructor() {
         Drawable bitmapDrawable = new BitmapDrawable();
         Drawable colorDrawable  = new ColorDrawable(Color.BLUE);
@@ -103,8 +104,6 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertEquals(View.NO_ID, layerDrawable.getId(0));
         assertEquals(BitmapDrawable.class, layerDrawable.getDrawable(1).getClass());
         assertEquals(View.NO_ID, layerDrawable.getId(1));
-        assertEquals(212, layerDrawable.getDrawable(1).getIntrinsicWidth());
-        assertEquals(142, layerDrawable.getDrawable(1).getIntrinsicHeight());
         assertEquals(RotateDrawable.class, layerDrawable.getDrawable(2).getClass());
         assertEquals(View.NO_ID, layerDrawable.getId(2));
         assertEquals(GradientDrawable.class, layerDrawable.getDrawable(3).getClass());
@@ -149,6 +148,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "findDrawableByLayerId",
         args = {int.class}
     )
+    @SuppressWarnings("deprecation")
     public void testFindDrawableByLayerId() {
         Drawable bitmapDrawable = new BitmapDrawable();
         Drawable colorDrawable  = new ColorDrawable(Color.BLUE);
@@ -186,6 +186,7 @@ public class LayerDrawableTest extends AndroidTestCase {
     })
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for setId and getId are incomplete." +
             "1. not clear what is supposed to happen if index is exceptional.")
+    @SuppressWarnings("deprecation")
     public void testAccessId() {
         Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -230,6 +231,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "getNumberOfLayers",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetNumberOfLayers() {
         Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -261,6 +263,7 @@ public class LayerDrawableTest extends AndroidTestCase {
     })
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for getDrawable is incomplete." +
             "1. not clear what is supposed to happen if index is exceptional.")
+    @SuppressWarnings("deprecation")
     public void testAccessDrawable() {
         Drawable bitmapDrawable = new BitmapDrawable();
         Drawable colorDrawable  = new ColorDrawable(Color.BLUE);
@@ -303,6 +306,7 @@ public class LayerDrawableTest extends AndroidTestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for setLayerInset is incomplete." +
             "1. not clear what is supposed to happen if index is exceptional.")
+    @SuppressWarnings("deprecation")
     public void testSetLayerInset() {
         Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -341,6 +345,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "invalidateDrawable",
         args = {android.graphics.drawable.Drawable.class}
     )
+    @SuppressWarnings("deprecation")
     public void testInvalidateDrawable() {
         Drawable[] array = new Drawable[0];
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -365,6 +370,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "scheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
     )
+    @SuppressWarnings("deprecation")
     public void testScheduleDrawable() {
         Drawable[] array = new Drawable[0];
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -392,6 +398,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "unscheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
     )
+    @SuppressWarnings("deprecation")
     public void testUnscheduleDrawable() {
         Drawable[] array = new Drawable[0];
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -478,6 +485,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "getChangingConfigurations",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetChangingConfigurations() {
         final int superConfig = 1;
         final int bitmapDrawableConfig = 2;
@@ -535,6 +543,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "setVisible",
         args = {boolean.class, boolean.class}
     )
+    @SuppressWarnings("deprecation")
     public void testSetVisible() {
         Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -654,6 +663,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "isStateful",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testIsStateful() {
         Drawable[] array = new Drawable[0];
         LayerDrawable layerDrawable = new LayerDrawable(array);
@@ -853,6 +863,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         method = "getConstantState",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetConstantState() {
         Drawable[] array = new Drawable[] { new BitmapDrawable(), new ColorDrawable(Color.BLUE) };
         LayerDrawable layerDrawable = new LayerDrawable(array);
