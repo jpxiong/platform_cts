@@ -28,7 +28,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.IContentProvider;
-import android.content.Entity;
 import android.content.EntityIterator;
 import android.content.ContentProviderResult;
 import android.content.ContentProviderOperation;
@@ -336,10 +335,6 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
-            public Uri insertEntity(Uri uri, Entity entities) throws RemoteException {
-                return null;
-            }
-
             public int bulkInsert(Uri url, ContentValues[] initialValues) {
                 return 0;
             }
@@ -375,6 +370,9 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
+            /**
+             * @hide
+             */
             public EntityIterator queryEntities(Uri url, String selection, String[] selectionArgs,
                     String sortOrder) throws RemoteException {
                 return null;
@@ -382,10 +380,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
             public int update(Uri url, ContentValues values, String selection,
                     String[] selectionArgs) {
-                return 0;
-            }
-
-            public int updateEntity(Uri uri, Entity entity) throws RemoteException {
                 return 0;
             }
 
