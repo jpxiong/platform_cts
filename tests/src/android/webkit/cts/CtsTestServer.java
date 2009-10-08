@@ -16,6 +16,7 @@
 package android.webkit.cts;
 
 import org.apache.harmony.luni.util.Base64;
+import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -49,6 +50,8 @@ import java.net.Socket;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -68,6 +71,7 @@ public class CtsTestServer {
     public static final String REDIRECT_PREFIX = "/redirect";
     public static final String DELAY_PREFIX = "/delayed";
     public static final String BINARY_PREFIX = "/binary";
+    public static final String COOKIE_PREFIX = "/cookie";
     public static final int DELAY_MILLIS = 2000;
 
     private ServerThread mServerThread;
@@ -167,6 +171,14 @@ public class CtsTestServer {
         return sb.toString();
     }
 
+    public String getCookieUrl(String path) {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(COOKIE_PREFIX);
+        sb.append("/");
+        sb.append(path);
+        return sb.toString();
+    }
+
     public String getLastRequestUrl() {
         return mLastQuery;
     }
@@ -249,6 +261,39 @@ public class CtsTestServer {
                     StringEntity entity = new StringEntity(content);
                     entity.setContentType("text/html");
                     response.setEntity(entity);
+                } catch (UnsupportedEncodingException e) {
+                    Log.w(TAG, e);
+                }
+            } else if (path.startsWith(COOKIE_PREFIX)) {
+                /*
+                 * Return a page with a title containing a list of all incoming cookies,
+                 * separated by '|' characters. If a numeric 'count' value is passed in a cookie,
+                 * return a cookie with the value incremented by 1. Otherwise, return a cookie
+                 * setting 'count' to 0.
+                 */
+                response = createResponse(HttpStatus.SC_OK);
+                Header[] cookies = request.getHeaders("Cookie");
+                Pattern p = Pattern.compile("count=(\\d+)");
+                StringBuilder cookieString = new StringBuilder(100);
+                int count = 0;
+                for (Header cookie : cookies) {
+                    String value = cookie.getValue();
+                    if (cookieString.length() > 0) {
+                        cookieString.append("|");
+                    }
+                    cookieString.append(value);
+                    Matcher m = p.matcher(value);
+                    if (m.find()) {
+                        count = Integer.parseInt(m.group(1)) + 1;
+                    }
+                }
+                String content = "<html><head><title>" + cookieString + "</title></head>" +
+                        "<body>" + cookieString + "</body></html>";
+                try {
+                    StringEntity entity = new StringEntity(content);
+                    entity.setContentType("text/html");
+                    response.setEntity(entity);
+                    response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
                 } catch (UnsupportedEncodingException e) {
                     Log.w(TAG, e);
                 }
