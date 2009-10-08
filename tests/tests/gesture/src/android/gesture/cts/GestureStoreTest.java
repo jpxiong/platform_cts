@@ -19,87 +19,81 @@ import dalvik.annotation.TestTargetClass;
 
 import android.gesture.Gesture;
 import android.gesture.GestureStore;
-import android.gesture.GestureStroke;
+import android.gesture.Prediction;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Compatibility unit tests for {@link GestureStore}
+ * <p/>
+ * Inherits from GestureStorageTester to test common methods.
  */
 @TestTargetClass(GestureStore.class)
-public class GestureStoreTest extends TestCase {
+public class GestureStoreTest extends GestureStorageTester {
 
-    private GestureStore mGestureStore;
-    /** Simple straight line gesture used for basic testing */
-    private Gesture mLineGesture;
-    private Gesture mAnotherGesture;
-    private static final String TEST_GESTURE_NAME ="cts-test-gesture";
+    private GestureStore mGestureStore = null;
+
+    private static class GestureStoreFacade implements GestureStorageAccessor {
+
+        private GestureStore mGestureStore;
+
+        public GestureStoreFacade(GestureStore gestureStore) {
+            mGestureStore = gestureStore;
+        }
+
+        public void addGesture(String entryName, Gesture gesture) {
+            mGestureStore.addGesture(entryName, gesture);
+        }
+
+        public Set<String> getGestureEntries() {
+            return mGestureStore.getGestureEntries();
+        }
+
+        public ArrayList<Gesture> getGestures(String entryName) {
+            return mGestureStore.getGestures(entryName);
+        }
+
+        public int getOrientationStyle() {
+            return mGestureStore.getOrientationStyle();
+        }
+
+        public int getSequenceType() {
+            return mGestureStore.getSequenceType();
+        }
+
+        public ArrayList<Prediction> recognize(Gesture gesture) {
+            return mGestureStore.recognize(gesture);
+        }
+
+        public void removeEntry(String entryName) {
+            mGestureStore.removeEntry(entryName);
+        }
+
+        public void removeGesture(String entryName, Gesture gesture) {
+            mGestureStore.removeGesture(entryName, gesture);
+        }
+
+        public void setOrientationStyle(int style) {
+            mGestureStore.setOrientationStyle(style);
+        }
+
+        public void setSequenceType(int type) {
+            mGestureStore.setSequenceType(type);
+        }
+    }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mGestureStore = new GestureStore();
-        GestureStroke stroke = new LineGestureStrokeHelper().createLineGesture();
-        mLineGesture = new Gesture();
-        mLineGesture.addStroke(stroke);
-        mAnotherGesture = new Gesture();
-        mAnotherGesture.addStroke(stroke);
+    protected GestureStorageAccessor createFixture() {
+        if (mGestureStore == null) {
+            mGestureStore = new GestureStore();
+        }
+        return new GestureStoreFacade(mGestureStore);
     }
 
-    /**
-     * Test method for {@link android.gesture.GestureStore#getGestureEntries()}.
-     *
-     * Simple check to verify an added gesture appears in set of gesture entries.
-     */
-    public void testGetGestureEntries() {
-        // assert initially empty
-        assertEquals(0, mGestureStore.getGestureEntries().size());
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mLineGesture);
-        assertEquals(1, mGestureStore.getGestureEntries().size());
-        assertTrue(mGestureStore.getGestureEntries().contains(TEST_GESTURE_NAME));
-    }
-
-    // TODO: add tests for recognize
-
-    /**
-     * Test method for {@link android.gesture.GestureStore#removeGesture(java.lang.String, android.gesture.Gesture)}.
-     */
-    public void testRemoveGesture() {
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mLineGesture);
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mAnotherGesture);
-        mGestureStore.removeGesture(TEST_GESTURE_NAME, mAnotherGesture);
-        // check that gesture just removed is gone
-        assertFalse(mGestureStore.getGestures(TEST_GESTURE_NAME).contains(mAnotherGesture));
-
-        mGestureStore.removeGesture(TEST_GESTURE_NAME, mLineGesture);
-        // test that entry itself is removed
-        assertFalse(mGestureStore.getGestureEntries().contains(TEST_GESTURE_NAME));
-    }
-
-    /**
-     * Test method for {@link android.gesture.GestureStore#removeEntry(java.lang.String)}.
-     */
-    public void testRemoveEntry() {
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mLineGesture);
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mAnotherGesture);
-        mGestureStore.removeEntry(TEST_GESTURE_NAME);
-        assertFalse(mGestureStore.getGestureEntries().contains(TEST_GESTURE_NAME));
-        assertNull(mGestureStore.getGestures(TEST_GESTURE_NAME));
-    }
-
-    /**
-     * Test method for {@link android.gesture.GestureStore#getGestures(java.lang.String)}.
-     */
-    public void testGetGestures() {
-        // test getting gestures for non existent entry
-        assertNull(mGestureStore.getGestures(TEST_GESTURE_NAME));
-        mGestureStore.addGesture(TEST_GESTURE_NAME, mLineGesture);
-        assertTrue(mGestureStore.getGestures(TEST_GESTURE_NAME).contains(mLineGesture));
-    }
 
     /**
      * Verify that adding a gesture is flagged as change.
