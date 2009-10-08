@@ -16,6 +16,15 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.os.Parcelable;
@@ -25,18 +34,6 @@ import android.util.SparseArray;
 import android.util.Xml;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.TextView;
-import android.widget.DatePicker.OnDateChangedListener;
-
-import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
-import com.android.internal.widget.NumberPicker;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link DatePicker}.
@@ -94,28 +91,19 @@ public class DatePickerTest extends AndroidTestCase {
         MockDatePicker datePicker = createDatePicker();
 
         assertTrue(datePicker.isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.year).isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.month).isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.day).isEnabled());
 
         datePicker.setEnabled(false);
         assertFalse(datePicker.isEnabled());
-        assertFalse(datePicker.findViewById(com.android.internal.R.id.year).isEnabled());
-        assertFalse(datePicker.findViewById(com.android.internal.R.id.month).isEnabled());
-        assertFalse(datePicker.findViewById(com.android.internal.R.id.day).isEnabled());
 
         datePicker.setEnabled(true);
         assertTrue(datePicker.isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.year).isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.month).isEnabled());
-        assertTrue(datePicker.findViewById(com.android.internal.R.id.day).isEnabled());
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test {@link DatePicker#init()}.",
         method = "init",
-        args = {int.class, int.class, int.class, 
+        args = {int.class, int.class, int.class,
                 android.widget.DatePicker.OnDateChangedListener.class}
     )
     public void testInit() {
@@ -129,10 +117,6 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(2000, datePicker.getYear());
         assertEquals(10, datePicker.getMonth());
         assertEquals(15, datePicker.getDayOfMonth());
-
-        assertEquals("2000", getPickerText(datePicker, com.android.internal.R.id.year));
-        assertEquals("Nov", getPickerText(datePicker, com.android.internal.R.id.month));
-        assertEquals("15", getPickerText(datePicker, com.android.internal.R.id.day));
 
         // test invalid input values
         datePicker = createDatePicker();
@@ -176,17 +160,11 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(2000, datePicker.getYear());
         assertEquals(10, datePicker.getMonth());
         assertEquals(15, datePicker.getDayOfMonth());
-        assertEquals("2000", getPickerText(datePicker, com.android.internal.R.id.year));
-        assertEquals("Nov", getPickerText(datePicker, com.android.internal.R.id.month));
-        assertEquals("15", getPickerText(datePicker, com.android.internal.R.id.day));
 
         datePicker.updateDate(1989, 9, 19);
         assertEquals(1989, datePicker.getYear());
         assertEquals(9, datePicker.getMonth());
         assertEquals(19, datePicker.getDayOfMonth());
-        assertEquals("1989", getPickerText(datePicker, com.android.internal.R.id.year));
-        assertEquals("Oct", getPickerText(datePicker, com.android.internal.R.id.month));
-        assertEquals("19", getPickerText(datePicker, com.android.internal.R.id.day));
     }
 
     @TestTargetNew(
@@ -206,9 +184,6 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(1989, datePicker.getYear());
         assertEquals(9, datePicker.getMonth());
         assertEquals(19, datePicker.getDayOfMonth());
-        assertEquals("1989", getPickerText(datePicker, com.android.internal.R.id.year));
-        assertEquals("Oct", getPickerText(datePicker, com.android.internal.R.id.month));
-        assertEquals("19", getPickerText(datePicker, com.android.internal.R.id.day));
 
         // Test invalid input values.
         try {
@@ -319,11 +294,5 @@ public class DatePickerTest extends AndroidTestCase {
         public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
         }
-    }
-
-    private String getPickerText(DatePicker datePicker, int Id) {
-        NumberPicker nbrPicker = (NumberPicker) datePicker.findViewById(Id);
-        View view = nbrPicker.findViewById(com.android.internal.R.id.timepicker_input);
-        return ((TextView) view).getText().toString();
     }
 }

@@ -16,21 +16,18 @@
 
 package android.app.cts;
 
-import java.util.Calendar;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
-import android.text.format.DateFormat;
 import android.view.KeyEvent;
-import android.widget.TextView;
 import android.widget.TimePicker;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link TimePickerDialog}.
@@ -144,15 +141,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         });
         getInstrumentation().waitForIdleSync();
 
-        Calendar mCalendar = Calendar.getInstance();
-        mCalendar.set(Calendar.HOUR_OF_DAY, TARGET_HOUR);
-        mCalendar.set(Calendar.MINUTE, minute);
-        java.text.DateFormat dateFormat = DateFormat.getTimeFormat(getActivity());
-
-        String expected = dateFormat.format(mCalendar.getTime());
-        TextView tv = (TextView) d.getWindow().findViewById(
-                com.android.internal.R.id.alertTitle);
-        assertEquals(expected, tv.getText());
     }
 
     @TestTargetNew(
