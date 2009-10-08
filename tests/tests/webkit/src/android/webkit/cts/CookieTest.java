@@ -16,6 +16,8 @@
 
 package android.webkit.cts;
 
+import dalvik.annotation.BrokenTest;
+
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.webkit.CookieManager;
@@ -52,13 +54,14 @@ public class CookieTest extends AndroidTestCase {
         assertTrue(cookie.equals("a=b; c=\"d;\""));
     }
 
+    @BrokenTest(value="Bug 2129378: Occasionally fails with NPE")
     public void testDomain() {
         mCookieManager.removeAllCookie();
         String url = "http://www.foo.com";
 
         // basic
         mCookieManager.setCookie(url, "a=b");
-        String cookie = mCookieManager.getCookie(url);
+        String cookie = mCookieManager.getCookie(url); // FIXME: This occasionally returns null
         assertTrue(cookie.equals("a=b"));
 
         // no cross domain cookie
