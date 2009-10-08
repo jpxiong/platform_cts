@@ -118,7 +118,7 @@ public class SmsManagerTest extends AndroidTestCase {
 
         // send single text sms
         init();
-        sendTextMessage(mDestAddr, mDestAddr, mDeliveredIntent, mDeliveredIntent);
+        sendTextMessage(mDestAddr, mDestAddr, mSentIntent, mDeliveredIntent);
         mSendReceiver.waitForCalls(1, TIME_OUT);
         mDeliveryReceiver.waitForCalls(1, TIME_OUT);
 
@@ -127,7 +127,7 @@ public class SmsManagerTest extends AndroidTestCase {
         short port = 19989;
 
         init();
-        sendDataMessage(mDestAddr, port, data, mDeliveredIntent, mDeliveredIntent);
+        sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
         mSendReceiver.waitForCalls(1, TIME_OUT);
         mDeliveryReceiver.waitForCalls(1, TIME_OUT);
 
