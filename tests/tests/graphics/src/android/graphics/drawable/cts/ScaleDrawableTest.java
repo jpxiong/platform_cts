@@ -38,6 +38,7 @@ import android.graphics.drawable.Drawable.Callback;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.StateSet;
 import android.view.Gravity;
 
@@ -58,6 +59,7 @@ public class ScaleDrawableTest extends AndroidTestCase {
             args = {}
         )
     })
+    @SuppressWarnings("deprecation")
     public void testConstructor() {
         Drawable d = new BitmapDrawable();
         ScaleDrawable scaleDrawable = new ScaleDrawable(d, Gravity.CENTER, 100, 200);
@@ -71,6 +73,7 @@ public class ScaleDrawableTest extends AndroidTestCase {
         method = "invalidateDrawable",
         args = {android.graphics.drawable.Drawable.class}
     )
+    @SuppressWarnings("deprecation")
     public void testInvalidateDrawable() {
         ScaleDrawable scaleDrawable = new ScaleDrawable(new BitmapDrawable(),
                 Gravity.CENTER, 100, 200);
@@ -95,6 +98,7 @@ public class ScaleDrawableTest extends AndroidTestCase {
         method = "scheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
     )
+    @SuppressWarnings("deprecation")
     public void testScheduleDrawable() {
         ScaleDrawable scaleDrawable = new ScaleDrawable(new BitmapDrawable(),
                 Gravity.CENTER, 100, 200);
@@ -122,6 +126,7 @@ public class ScaleDrawableTest extends AndroidTestCase {
         method = "unscheduleDrawable",
         args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
     )
+    @SuppressWarnings("deprecation")
     public void testUnscheduleDrawable() {
         ScaleDrawable scaleDrawable = new ScaleDrawable(new BitmapDrawable(),
                 Gravity.CENTER, 100, 200);
@@ -478,6 +483,7 @@ public class ScaleDrawableTest extends AndroidTestCase {
         method = "getConstantState",
         args = {}
     )
+    @SuppressWarnings("deprecation")
     public void testGetConstantState() {
         ScaleDrawable scaleDrawable = new ScaleDrawable(new BitmapDrawable(),
                 Gravity.CENTER, 100, 200);
@@ -500,20 +506,23 @@ public class ScaleDrawableTest extends AndroidTestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for inflate is incomplete." +
             "1. not clear what is supposed to happen if any parameter is null.")
+    @SuppressWarnings("deprecation")
     public void testInflate() throws XmlPullParserException, IOException {
         ScaleDrawable scaleDrawable = new ScaleDrawable(new BitmapDrawable(),
                 Gravity.RIGHT, 100, 200);
 
-        XmlResourceParser parser = mContext.getResources().getXml(R.xml.scaledrawable);
+        Resources res = mContext.getResources();
+        XmlResourceParser parser = res.getXml(R.xml.scaledrawable);
         AttributeSet attrs = DrawableTestUtils.getAttributeSet(parser, "scale_allattrs");
-        scaleDrawable.inflate(mContext.getResources(), parser, attrs);
-        assertEquals(48, scaleDrawable.getIntrinsicWidth());
-        assertEquals(48, scaleDrawable.getIntrinsicHeight());
+        scaleDrawable.inflate(res, parser, attrs);
+        int bitmapSize = 48 * res.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT;
+        assertEquals(bitmapSize, scaleDrawable.getIntrinsicWidth());
+        assertEquals(bitmapSize, scaleDrawable.getIntrinsicHeight());
 
-        parser = mContext.getResources().getXml(R.xml.scaledrawable);
+        parser = res.getXml(R.xml.scaledrawable);
         attrs = DrawableTestUtils.getAttributeSet(parser, "scale_nodrawable");
         try {
-            scaleDrawable.inflate(mContext.getResources(), parser, attrs);
+            scaleDrawable.inflate(res, parser, attrs);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -525,13 +534,13 @@ public class ScaleDrawableTest extends AndroidTestCase {
         }
 
         try {
-            scaleDrawable.inflate(mContext.getResources(), null, attrs);
+            scaleDrawable.inflate(res, null, attrs);
             fail("Should throw NullPointerException if parser is null");
         } catch (NullPointerException e) {
         }
 
         try {
-            scaleDrawable.inflate(mContext.getResources(), parser, null);
+            scaleDrawable.inflate(res, parser, null);
             fail("Should throw NullPointerException if attribute set is null");
         } catch (NullPointerException e) {
         }
