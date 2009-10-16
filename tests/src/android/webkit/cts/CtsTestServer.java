@@ -67,7 +67,7 @@ public class CtsTestServer {
 
     public static final String FAVICON_PATH = "/favicon.ico";
     public static final String ASSET_PREFIX = "/assets/";
-    public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "favicon.png";
+    public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
     public static final String REDIRECT_PREFIX = "/redirect";
     public static final String DELAY_PREFIX = "/delayed";
     public static final String BINARY_PREFIX = "/binary";
