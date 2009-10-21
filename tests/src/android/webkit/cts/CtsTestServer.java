@@ -49,6 +49,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.security.KeyStore;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,9 +74,21 @@ public class CtsTestServer {
     public static final String DELAY_PREFIX = "/delayed";
     public static final String BINARY_PREFIX = "/binary";
     public static final String COOKIE_PREFIX = "/cookie";
+    public static final String AUTH_PREFIX = "/auth";
     public static final int DELAY_MILLIS = 2000;
 
+    public static final String AUTH_REALM = "Android CTS";
+    public static final String AUTH_USER = "cts";
+    public static final String AUTH_PASS = "secret";
+    // base64 encoded credentials "cts:secret" used for basic authentication
+    public static final String AUTH_CREDENTIALS = "Basic Y3RzOnNlY3JldA==";
+
+    public static final String MESSAGE_401 = "401 unauthorized";
+    public static final String MESSAGE_403 = "403 forbidden";
+    public static final String MESSAGE_404 = "404 not found";
+
     private static CtsTestServer sInstance;
+    private static Hashtable<Integer, String> sReasons;
 
     private ServerThread mServerThread;
     private String mServerUri;
@@ -92,6 +105,17 @@ public class CtsTestServer {
      */
     public CtsTestServer(Context context) throws Exception {
         this(context, false);
+    }
+
+    public static String getReasonString(int status) {
+        if (sReasons == null) {
+            sReasons = new Hashtable<Integer, String>();
+            sReasons.put(HttpStatus.SC_UNAUTHORIZED, "Unauthorized");
+            sReasons.put(HttpStatus.SC_NOT_FOUND, "Not Found");
+            sReasons.put(HttpStatus.SC_FORBIDDEN, "Forbidden");
+            sReasons.put(HttpStatus.SC_MOVED_TEMPORARILY, "Moved Temporarily");
+        }
+        return sReasons.get(status);
     }
 
     /**
@@ -157,6 +181,20 @@ public class CtsTestServer {
         sb.append(path);
         return sb.toString();
     }
+
+    /**
+     * Return an absolute URL that refers to the given asset and is protected by
+     * HTTP authentication.
+     * @param path The path of the asset. See {@link AssetManager#open(String)}
+     */
+    public String getAuthAssetUrl(String path) {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(AUTH_PREFIX);
+        sb.append(ASSET_PREFIX);
+        sb.append(path);
+        return sb.toString();
+    }
+
 
     /**
      * Return an absolute URL that indirectly refers to the given asset.
@@ -228,6 +266,23 @@ public class CtsTestServer {
                 }
                 path = path.substring(DELAY_PREFIX.length());
             }
+            if (path.startsWith(AUTH_PREFIX)) {
+                // authentication required
+                Header[] auth = request.getHeaders("Authorization");
+                if (auth.length > 0) {
+                    if (auth[0].getValue().equals(AUTH_CREDENTIALS)) {
+                        // fall through and serve content
+                        path = path.substring(AUTH_PREFIX.length());
+                    } else {
+                        // incorrect password
+                        response = createResponse(HttpStatus.SC_FORBIDDEN);
+                    }
+                } else {
+                    // request authorization
+                    response = createResponse(HttpStatus.SC_UNAUTHORIZED);
+                    response.addHeader("WWW-Authenticate", "Basic realm=\"" + AUTH_REALM + "\"");
+                }
+            }
             if (path.startsWith(BINARY_PREFIX)) {
                 List <NameValuePair> args = URLEncodedUtils.parse(uri, "UTF-8");
                 int length = 0;
@@ -277,15 +332,6 @@ public class CtsTestServer {
                 String location = getBaseUri() + path.substring(REDIRECT_PREFIX.length());
                 Log.i(TAG, "Redirecting to: " + location);
                 response.addHeader("Location", location);
-                String content = "<html><head><title>moved</title></head><body><a href=\"" +
-                    location + "\">here</a></body></html>";
-                try {
-                    StringEntity entity = new StringEntity(content);
-                    entity.setContentType("text/html");
-                    response.setEntity(entity);
-                } catch (UnsupportedEncodingException e) {
-                    Log.w(TAG, e);
-                }
             } else if (path.startsWith(COOKIE_PREFIX)) {
                 /*
                  * Return a page with a title containing a list of all incoming cookies,
@@ -309,16 +355,10 @@ public class CtsTestServer {
                         count = Integer.parseInt(m.group(1)) + 1;
                     }
                 }
-                String content = "<html><head><title>" + cookieString + "</title></head>" +
-                        "<body>" + cookieString + "</body></html>";
-                try {
-                    StringEntity entity = new StringEntity(content);
-                    entity.setContentType("text/html");
-                    response.setEntity(entity);
-                    response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
-                } catch (UnsupportedEncodingException e) {
-                    Log.w(TAG, e);
-                }
+
+                response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
+                response.setEntity(createEntity("<html><head><title>" + cookieString +
+                        "</title></head><body>" + cookieString + "</body></html>"));
             } else if (path.equals(USERAGENT_PATH)) {
                 response = createResponse(HttpStatus.SC_OK);
                 Header agentHeader = request.getFirstHeader("User-Agent");
@@ -326,15 +366,8 @@ public class CtsTestServer {
                 if (agentHeader != null) {
                     agent = agentHeader.getValue();
                 }
-                String content = "<html><head><title>" + agent + "</title></head>" +
-                "<body>" + agent + "</body></html>";
-                try {
-                    StringEntity entity = new StringEntity(content);
-                    entity.setContentType("text/html");
-                    response.setEntity(entity);
-                } catch (UnsupportedEncodingException e) {
-                    Log.w(TAG, e);
-                }
+                response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
+                        "<body>" + agent + "</body></html>"));
             }
         }
         if (response == null) {
@@ -349,7 +382,33 @@ public class CtsTestServer {
      * Create an empty response with the given status.
      */
     private HttpResponse createResponse(int status) {
-        return new BasicHttpResponse(HttpVersion.HTTP_1_0, status, null);
+        HttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_0, status, null);
+
+        // Fill in error reason. Avoid use of the ReasonPhraseCatalog, which is Locale-dependent.
+        String reason = getReasonString(status);
+        if (reason != null) {
+            StringBuffer buf = new StringBuffer("<html><head><title>");
+            buf.append(reason);
+            buf.append("</title></head><body>");
+            buf.append(reason);
+            buf.append("</body></html>");
+            response.setEntity(createEntity(buf.toString()));
+        }
+        return response;
+    }
+
+    /**
+     * Create a string entity for the given content.
+     */
+    private StringEntity createEntity(String content) {
+        try {
+            StringEntity entity = new StringEntity(content);
+            entity.setContentType("text/html");
+            return entity;
+        } catch (UnsupportedEncodingException e) {
+            Log.w(TAG, e);
+        }
+        return null;
     }
 
     private static class ServerThread extends Thread {
