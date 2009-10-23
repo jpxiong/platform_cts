@@ -177,6 +177,11 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "010 44 207 792 3490", strict));
         assertFalse(PhoneNumberUtils.compare("+44 207 792 3490", "0011 44 207 792 3490", strict));
         assertTrue(PhoneNumberUtils.compare("+444 207 792 3490", "0 207 792 3490", strict));
+
+        // make sure SMS short code comparison for numbers less than 7 digits work correctly.
+        // For example, "404-04" and "40404" should match because the dialable portion for both
+        // numbers are the same.
+        assertTrue(PhoneNumberUtils.compare("404-04", "40404", strict));
     }
 
     @TestTargetNew(
