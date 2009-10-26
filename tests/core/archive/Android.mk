@@ -25,7 +25,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/archive/src/test/java) \
 	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
-	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java/tests/support) \
+	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java) \
 	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
 
 LOCAL_PACKAGE_NAME := android.core.tests.archive
