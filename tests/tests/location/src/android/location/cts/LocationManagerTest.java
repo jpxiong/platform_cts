@@ -716,12 +716,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertFalse(mManager.sendExtraCommand(TEST_MOCK_PROVIDER_NAME, "unknown", new Bundle()));
 
         assertNull(mManager.getProvider(UNKNOWN_PROVIDER_NAME));
-        try {
-            mManager.sendExtraCommand(UNKNOWN_PROVIDER_NAME, "unknown", new Bundle());
-            fail("Should throw NullPointerException if the provider does not exist!");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        assertFalse(mManager.sendExtraCommand(UNKNOWN_PROVIDER_NAME, "unknown", new Bundle()));
     }
 
     @TestTargets({
