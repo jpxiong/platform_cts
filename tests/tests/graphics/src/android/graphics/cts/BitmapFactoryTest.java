@@ -101,8 +101,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         Bitmap b = BitmapFactory.decodeResource(mRes, R.drawable.start);
         assertNotNull(b);
         // Test the bitmap size
-        assertEquals(START_HEIGHT * mTargetDensity / mDefaultDensity, b.getHeight());
-        assertEquals(START_WIDTH * mTargetDensity / mDefaultDensity, b.getWidth());
+        assertEquals(START_HEIGHT * mTargetDensity / mDefaultDensity, b.getHeight(), 1.1);
+        assertEquals(START_WIDTH * mTargetDensity / mDefaultDensity, b.getWidth(), 1.1);
     }
 
     @TestTargetNew(
