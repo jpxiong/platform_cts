@@ -148,7 +148,8 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
 
         sql = sqliteQueryBuilder.buildQuery(null, // projectionIn is null
                 null, null, null, null, null, null);
-        expected = "SELECT age, address, name FROM " + TEST_TABLE_NAME;
+        // TODO: implement an order-independent way of doing the projection columns comparison
+        expected = "SELECT age, name, address FROM " + TEST_TABLE_NAME;
         assertEquals(expected, sql);
 
         sqliteQueryBuilder.setProjectionMap(null);
