@@ -171,8 +171,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false);
 
                 mProgressDialog.setOnCancelListener(cL);
-                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
-                mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
+                mProgressDialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -186,8 +185,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
 
                 assertFalse(mCanceled);
                 mProgressDialog.setOnCancelListener(cL);
-                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
-                mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
+                mProgressDialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -214,8 +212,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
             public void run() {
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, false, cL);
 
-                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
-                mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
+                mProgressDialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -228,8 +225,7 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, true, true, cL);
 
                 assertFalse(mCanceled);
-                final KeyEvent event = new KeyEvent(KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_BACK);
-                mProgressDialog.onKeyDown(KeyEvent.KEYCODE_BACK, event);
+                mProgressDialog.onBackPressed();
             }
         });
         mInstrumentation.waitForIdleSync();
