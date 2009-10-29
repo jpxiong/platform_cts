@@ -31,6 +31,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultHttpServerConnection;
+import org.apache.http.impl.cookie.DateUtils;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
@@ -49,6 +50,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.security.KeyStore;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -97,6 +99,8 @@ public class CtsTestServer {
     private MimeTypeMap mMap;
     private String mLastQuery;
     private int mRequestCount;
+    private long mDocValidity;
+    private long mDocAge;
 
     /**
      * Create and start a local HTTP server instance.
@@ -243,6 +247,24 @@ public class CtsTestServer {
     }
 
     /**
+     * Set the validity of any future responses in milliseconds. If this is set to a non-zero
+     * value, the server will include a "Expires" header.
+     * @param timeMillis The time, in milliseconds, for which any future response will be valid.
+     */
+    public void setDocumentValidity(long timeMillis) {
+        mDocValidity = timeMillis;
+    }
+
+    /**
+     * Set the age of documents served. If this is set to a non-zero value, the server will include
+     * a "Last-Modified" header calculated from the value.
+     * @param timeMillis The age, in milliseconds, of any document served in the future.
+     */
+    public void setDocumentAge(long timeMillis) {
+        mDocAge = timeMillis;
+    }
+
+    /**
      * Generate a response to the given request.
      */
     private HttpResponse getResponse(HttpRequest request) {
@@ -375,7 +397,23 @@ public class CtsTestServer {
         }
         StatusLine sl = response.getStatusLine();
         Log.i(TAG, sl.getStatusCode() + "(" + sl.getReasonPhrase() + ")");
+        setDateHeaders(response);
         return response;
+    }
+
+    private void setDateHeaders(HttpResponse response) {
+        long time = System.currentTimeMillis();
+        if (mDocValidity != 0) {
+            String expires =
+                    DateUtils.formatDate(new Date(time + mDocValidity), DateUtils.PATTERN_RFC1123);
+            response.addHeader("Expires", expires);
+        }
+        if (mDocAge != 0) {
+            String modified =
+                    DateUtils.formatDate(new Date(time - mDocAge), DateUtils.PATTERN_RFC1123);
+            response.addHeader("Last-Modified", modified);
+        }
+        response.addHeader("Date", DateUtils.formatDate(new Date(), DateUtils.PATTERN_RFC1123));
     }
 
     /**
