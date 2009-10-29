@@ -468,6 +468,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         assertTrue(mActivity.getDialog().isShowing());
         assertFalse(mActivity.onCancelCalled);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
+        mInstrumentation.waitForIdleSync();
         assertTrue(mActivity.onCancelCalled);
     }
 
