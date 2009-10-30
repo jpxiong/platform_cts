@@ -684,9 +684,8 @@ public class InstrumentationTest extends InstrumentationTestCase {
     )
     public void testWaitForIdle() throws Exception {
         MockRunnable mr = new MockRunnable();
-        mInstrumentation.waitForIdle(mr);
-
         assertFalse(mr.isRunCalled());
+        mInstrumentation.waitForIdle(mr);
         Thread.sleep(WAIT_TIME);
         assertTrue(mr.isRunCalled());
     }
