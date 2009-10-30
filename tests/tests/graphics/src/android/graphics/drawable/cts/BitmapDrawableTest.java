@@ -92,16 +92,19 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
     })
     @SuppressWarnings("deprecation")
     public void testConstructor() {
+        // TODO: should default paint flags be left as an untested implementation detail?
+        final int defaultPaintFlags = Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG |
+            Paint.DEV_KERN_TEXT_FLAG;
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
         assertNotNull(bitmapDrawable.getPaint());
-        assertEquals(Paint.FILTER_BITMAP_FLAG | Paint.DEV_KERN_TEXT_FLAG,
+        assertEquals(defaultPaintFlags,
                 bitmapDrawable.getPaint().getFlags());
         assertNull(bitmapDrawable.getBitmap());
 
         Bitmap bitmap = Bitmap.createBitmap(200, 300, Config.ARGB_8888);
         bitmapDrawable = new BitmapDrawable(bitmap);
         assertNotNull(bitmapDrawable.getPaint());
-        assertEquals(Paint.FILTER_BITMAP_FLAG | Paint.DEV_KERN_TEXT_FLAG,
+        assertEquals(defaultPaintFlags,
                 bitmapDrawable.getPaint().getFlags());
         assertEquals(bitmap, bitmapDrawable.getBitmap());
 
@@ -190,13 +193,14 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
 
+        assertTrue(bitmapDrawable.getPaint().isDither());
+
+        bitmapDrawable.setDither(false);
         assertFalse(bitmapDrawable.getPaint().isDither());
 
         bitmapDrawable.setDither(true);
         assertTrue(bitmapDrawable.getPaint().isDither());
 
-        bitmapDrawable.setDither(false);
-        assertFalse(bitmapDrawable.getPaint().isDither());
     }
 
     @TestTargets({
@@ -444,7 +448,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(TileMode.MIRROR, bitmapDrawable.getTileModeX());
         assertEquals(TileMode.MIRROR, bitmapDrawable.getTileModeY());
         // default value
-        assertFalse(bitmapDrawable.getPaint().isDither());
+        assertTrue(bitmapDrawable.getPaint().isDither());
         assertFalse(bitmapDrawable.getPaint().isAntiAlias());
         assertTrue(bitmapDrawable.getPaint().isFilterBitmap());
 
