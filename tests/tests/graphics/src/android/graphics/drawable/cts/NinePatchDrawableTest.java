@@ -103,9 +103,8 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         // } catch (Exception e) {
         // }
 
-        mNinePatchDrawable = new NinePatchDrawable(bmp, chunk, null, name);
         try {
-            mNinePatchDrawable.getPadding(new Rect());
+            mNinePatchDrawable = new NinePatchDrawable(bmp, chunk, null, name);
             fail("The constructor should not accept null padding.");
         } catch (NullPointerException e) {
         }
@@ -281,13 +280,13 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         args = {boolean.class}
     )
     public void testSetDither() {
-        assertFalse(mNinePatchDrawable.getPaint().isDither());
-
-        mNinePatchDrawable.setDither(true);
         assertTrue(mNinePatchDrawable.getPaint().isDither());
 
         mNinePatchDrawable.setDither(false);
         assertFalse(mNinePatchDrawable.getPaint().isDither());
+
+        mNinePatchDrawable.setDither(true);
+        assertTrue(mNinePatchDrawable.getPaint().isDither());
     }
 
     @TestTargetNew(
