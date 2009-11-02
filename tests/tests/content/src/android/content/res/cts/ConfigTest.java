@@ -534,4 +534,20 @@ public class ConfigTest extends AndroidTestCase {
         checkValue(res, R.configVarying.bag,
                 R.styleable.TestConfig, new String[]{"bag dpad"});
     }
+    
+    @MediumTest
+    public void testVersions() {
+        // Check that we get the most recent resources that are <= our
+        // current version.  Note the special version adjustment, so that
+        // during development the resource version is incremented to the
+        // next one.
+        int vers = android.os.Build.VERSION.SDK_INT;
+        if (!"REL".equals(android.os.Build.VERSION.CODENAME)) {
+            vers++;
+        }
+        String expected = "v" + vers + "cur";
+        assertEquals(expected, mContext.getResources().getString(R.string.version_cur));
+        assertEquals("base",  mContext.getResources().getString(R.string.version_old));
+        assertEquals("v3",  mContext.getResources().getString(R.string.version_v3));
+    }
 }

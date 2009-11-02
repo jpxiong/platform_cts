@@ -164,4 +164,7 @@
    <string name="country">Country:</string>
    <string name="symbol">Symbol:</string>
    <string name="country_warning">No such country registered</string>
+   <string name="version_cur">base</string>
+   <string name="version_old">base</string>
+   <string name="version_v3">base</string>
 </resources>
