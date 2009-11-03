@@ -274,6 +274,7 @@ android.accounts \
 android.accounts.cts \
 android.app \
 android.app.cts \
+android.bluetooth \
 android.content \
 android.content.cts \
 android.content.pm \
@@ -321,6 +322,7 @@ android.speech.srec.cts \
 android.speech.tts \
 android.speech.tts.cts \
 android.telephony \
+android.telephony.cdma \
 android.telephony.cts \
 android.telephony.gsm \
 android.telephony.gsm.cts \
