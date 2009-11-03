@@ -28,7 +28,7 @@ LOCAL_PACKAGE_NAME := CtsDpiTestCases2
 LOCAL_MODULE_TAGS := optional
 
 # We would set LOCAL_SDK_VERSION := 3 here, but the build system
-# doesn't currenlty support setting LOCAL_SDK_VERSION to anything but
+# doesn't currently support setting LOCAL_SDK_VERSION to anything but
 # current.
 
 include $(BUILD_PACKAGE)
