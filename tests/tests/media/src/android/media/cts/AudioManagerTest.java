@@ -280,33 +280,36 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
     @ToBeFixed(bug="1713090", explanation="setRouting() has not only been deprecated, but is no"
         + " longer having any effect.")
     public void testRouting() throws Exception {
+        // setBluetoothA2dpOn is a no-op, and getRouting should always return -1
+        // AudioManager.MODE_CURRENT
+        boolean oldA2DP = mAudioManager.isBluetoothA2dpOn();
         mAudioManager.setBluetoothA2dpOn(true);
-        assertTrue(mAudioManager.isBluetoothA2dpOn());
-
+        assertEquals(oldA2DP , mAudioManager.isBluetoothA2dpOn());
         mAudioManager.setBluetoothA2dpOn(false);
-        assertFalse(mAudioManager.isBluetoothA2dpOn());
-        assertEquals(ROUTE_SPEAKER, mAudioManager.getRouting(MODE_RINGTONE));
-        assertEquals(ROUTE_SPEAKER, mAudioManager.getRouting(MODE_NORMAL));
-        assertEquals(ROUTE_EARPIECE, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(oldA2DP , mAudioManager.isBluetoothA2dpOn());
+
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
 
         mAudioManager.setBluetoothScoOn(true);
         assertTrue(mAudioManager.isBluetoothScoOn());
-        assertEquals(ROUTE_BLUETOOTH_SCO, mAudioManager.getRouting(MODE_RINGTONE));
-        assertEquals(ROUTE_BLUETOOTH_SCO, mAudioManager.getRouting(MODE_NORMAL));
-        assertEquals(ROUTE_BLUETOOTH_SCO, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
 
         mAudioManager.setBluetoothScoOn(false);
         assertFalse(mAudioManager.isBluetoothScoOn());
-        assertEquals(ROUTE_SPEAKER, mAudioManager.getRouting(MODE_RINGTONE));
-        assertEquals(ROUTE_SPEAKER, mAudioManager.getRouting(MODE_NORMAL));
-        assertEquals(ROUTE_EARPIECE, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
 
         mAudioManager.setSpeakerphoneOn(true);
         assertTrue(mAudioManager.isSpeakerphoneOn());
-        assertEquals(ROUTE_SPEAKER, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
         mAudioManager.setSpeakerphoneOn(false);
         assertFalse(mAudioManager.isSpeakerphoneOn());
-        assertEquals(ROUTE_EARPIECE, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
     }
 
     @TestTargets({
