@@ -38,7 +38,7 @@ include $(BUILD_PACKAGE)
 # CTS tests, so drop it into a library that other tests can use.
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := src/com/android/cts/dpi/DefaultManifestAttributesTest.java
+LOCAL_SRC_FILES := src/android/dpi/cts/DefaultManifestAttributesTest.java
 
 LOCAL_MODULE_TAGS := optional
 
