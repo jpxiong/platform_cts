@@ -16,17 +16,19 @@
 
 package android.dpi.cts;
 
+import android.os.Build;
+
 /**
  * This class actually tests the manifest attributes from
- * DefaultManifestAttributesTest for the donut sdk
+ * DefaultManifestAttributesTest for the current sdk
  */
-public class DefaultManifestAttributesDonutTest extends DefaultManifestAttributesTest {
+public class DefaultManifestAttributesSdkTest extends DefaultManifestAttributesTest {
     protected String getPackageName() {
         return "com.android.cts.dpi";
     }
 
     // This is a sanity test to make sure that we're instrumenting the proper package
     public void testPackageHasExpectedSdkVersion() {
-        assertEquals(4, getAppInfo().targetSdkVersion);
+        assertEquals(Build.VERSION.SDK_INT, getAppInfo().targetSdkVersion);
     }
 }
