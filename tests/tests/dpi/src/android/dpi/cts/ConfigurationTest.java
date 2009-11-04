@@ -27,7 +27,7 @@ import java.lang.Integer;
 import java.util.EnumSet;
 
 /**
- * This is verifyin that the device under test is running a supported
+ * This is verifying that the device under test is running a supported
  * resolution, and is being classified as the right Screen Layout
  * Size.
  */
