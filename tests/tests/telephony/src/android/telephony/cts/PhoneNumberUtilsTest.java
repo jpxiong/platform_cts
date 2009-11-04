@@ -513,7 +513,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         // Test isEmergencyNumber, now only know US emergency number
         if (Locale.getDefault().getCountry().equals("US")) {
             assertTrue(PhoneNumberUtils.isEmergencyNumber("911"));
-            assertTrue(PhoneNumberUtils.isEmergencyNumber("112"));
             assertFalse(PhoneNumberUtils.isEmergencyNumber("119"));
         }
 
