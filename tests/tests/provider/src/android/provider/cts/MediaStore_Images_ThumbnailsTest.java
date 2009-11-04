@@ -221,20 +221,10 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         values.put(Thumbnails.HEIGHT, 50);
         values.put(Thumbnails.WIDTH, 50);
         values.put(Thumbnails.DATA, "/sdcard/testimage1.jpg");
-        try {
-            assertEquals(1, mContentResolver.update(uri, values, null, null));
-            fail("Should throw UnsupportedOperationException when updating the thumbnail");
-        } catch (UnsupportedOperationException e) {
-            // expected
-        }
+        assertEquals(1, mContentResolver.update(uri, values, null, null));
 
         // delete
-        try {
-            assertEquals(1, mContentResolver.delete(uri, null, null));
-            fail("Should throw UnsupportedOperationException when deleting the thumbnail");
-        } catch (UnsupportedOperationException e) {
-            // expected
-        }
+        assertEquals(1, mContentResolver.delete(uri, null, null));
     }
 
     public void testStoreImagesMediaInternal() {
