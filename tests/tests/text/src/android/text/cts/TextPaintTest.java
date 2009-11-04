@@ -17,7 +17,6 @@
 package android.text.cts;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.test.AndroidTestCase;
 import android.text.TextPaint;
@@ -32,7 +31,7 @@ import dalvik.annotation.ToBeFixed;
  */
 @TestTargetClass(TextPaint.class)
 public class TextPaintTest extends AndroidTestCase {
-    private static final int PAINT_FLAGS_MASK     = 0x000001FF;
+    private static final int DEFAULT_PAINT_FLAGS = TextPaint.DEV_KERN_TEXT_FLAG;
 
     @TestTargets({
         @TestTargetNew(
@@ -57,28 +56,11 @@ public class TextPaintTest extends AndroidTestCase {
         TextPaint textPaint;
 
         textPaint = new TextPaint();
-        assertEquals(TextPaint.DEV_KERN_TEXT_FLAG & PAINT_FLAGS_MASK, textPaint.getFlags());
+        assertEquals(DEFAULT_PAINT_FLAGS, textPaint.getFlags());
 
         textPaint = new TextPaint(TextPaint.DITHER_FLAG);
-        assertEquals((TextPaint.DITHER_FLAG | TextPaint.DEV_KERN_TEXT_FLAG) & PAINT_FLAGS_MASK,
+        assertEquals((TextPaint.DITHER_FLAG | DEFAULT_PAINT_FLAGS),
                 textPaint.getFlags());
-
-        textPaint = new TextPaint(-1);
-        assertEquals((-1 | TextPaint.DEV_KERN_TEXT_FLAG) & PAINT_FLAGS_MASK,
-                textPaint.getFlags());
-
-        textPaint = new TextPaint(Integer.MAX_VALUE);
-        assertEquals((Integer.MAX_VALUE | TextPaint.DEV_KERN_TEXT_FLAG) & PAINT_FLAGS_MASK,
-                textPaint.getFlags());
-
-        textPaint = new TextPaint(new Paint());
-        assertEquals(TextPaint.DEV_KERN_TEXT_FLAG & PAINT_FLAGS_MASK, textPaint.getFlags());
-
-        try {
-            new TextPaint(null);
-            fail("Should throw NullPointerException!");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -103,7 +85,6 @@ public class TextPaintTest extends AndroidTestCase {
         assertEquals(0, textPaint.linkColor);
         assertNull(textPaint.drawableState);
         assertNull(textPaint.getTypeface());
-        assertEquals(TextPaint.DEV_KERN_TEXT_FLAG & PAINT_FLAGS_MASK, textPaint.getFlags());
 
         textPaint.set(textPaintSrc);
         assertEquals(textPaintSrc.bgColor, textPaint.bgColor);
