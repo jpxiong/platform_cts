@@ -28,7 +28,7 @@ import dalvik.annotation.TestTargetClass;
 public class MailToTest extends AndroidTestCase {
     private static final String MAILTOURI_1 = "mailto:chris@example.com";
     private static final String MAILTOURI_2 = "mailto:infobot@example.com?subject=current-issue";
-    private static final String MAILTOURI_3 = 
+    private static final String MAILTOURI_3 =
             "mailto:infobot@example.com?body=send%20current-issue";
     private static final String MAILTOURI_4 = "mailto:infobot@example.com?body=send%20current-" +
                                               "issue%0D%0Asend%20index";
@@ -115,8 +115,10 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("current-issue", mailTo_2.getSubject());
         assertNull(mailTo_2.getBody());
         assertNull(mailTo_2.getCc());
-        assertEquals("mailto:?to=infobot%40example.com&subject=current-issue&",
-                mailTo_2.toString());
+        String stringUrl = mailTo_2.toString();
+        assertTrue(stringUrl.startsWith("mailto:?"));
+        assertTrue(stringUrl.contains("to=infobot%40example.com&"));
+        assertTrue(stringUrl.contains("subject=current-issue&"));
 
         assertTrue(MailTo.isMailTo(MAILTOURI_3));
         MailTo mailTo_3 = MailTo.parse(MAILTOURI_3);
@@ -126,8 +128,10 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("send current-issue", mailTo_3.getBody());
         assertNull(mailTo_3.getCc());
         assertNull(mailTo_3.getSubject());
-        assertEquals("mailto:?body=send%20current-issue&to=infobot%40example.com&",
-                mailTo_3.toString());
+        stringUrl = mailTo_3.toString();
+        assertTrue(stringUrl.startsWith("mailto:?"));
+        assertTrue(stringUrl.contains("to=infobot%40example.com&"));
+        assertTrue(stringUrl.contains("body=send%20current-issue&"));
 
         assertTrue(MailTo.isMailTo(MAILTOURI_4));
         MailTo mailTo_4 = MailTo.parse(MAILTOURI_4);
@@ -137,9 +141,11 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("send current-issue\r\nsend index", mailTo_4.getBody());
         assertNull(mailTo_4.getCc());
         assertNull(mailTo_4.getSubject());
-        assertEquals(
-                "mailto:?body=send%20current-issue%0D%0Asend%20index&to=infobot%40example.com&",
-                mailTo_4.toString());
+        stringUrl = mailTo_4.toString();
+        assertTrue(stringUrl.startsWith("mailto:?"));
+        assertTrue(stringUrl.contains("to=infobot%40example.com&"));
+        assertTrue(stringUrl.contains("body=send%20current-issue%0D%0Asend%20index&"));
+
 
         assertTrue(MailTo.isMailTo(MAILTOURI_5));
         MailTo mailTo_5 = MailTo.parse(MAILTOURI_5);
@@ -150,8 +156,11 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("bob@example.com", mailTo_5.getCc());
         assertEquals("hello", mailTo_5.getBody());
         assertNull(mailTo_5.getSubject());
-        assertEquals("mailto:?cc=bob%40example.com&body=hello&to=joe%40example.com&",
-                mailTo_5.toString());
+        stringUrl = mailTo_5.toString();
+        assertTrue(stringUrl.startsWith("mailto:?"));
+        assertTrue(stringUrl.contains("cc=bob%40example.com&"));
+        assertTrue(stringUrl.contains("body=hello&"));
+        assertTrue(stringUrl.contains("to=joe%40example.com&"));
 
         assertTrue(MailTo.isMailTo(MAILTOURI_6));
         MailTo mailTo_6 = MailTo.parse(MAILTOURI_6);
@@ -162,7 +171,10 @@ public class MailToTest extends AndroidTestCase {
         assertEquals("bob@example.com", mailTo_6.getCc());
         assertEquals("hello", mailTo_6.getBody());
         assertNull(mailTo_6.getSubject());
-        assertEquals("mailto:?cc=bob%40example.com&body=hello&to=%2C%20joe%40example.com&",
-                mailTo_6.toString());
+        stringUrl = mailTo_6.toString();
+        assertTrue(stringUrl.startsWith("mailto:?"));
+        assertTrue(stringUrl.contains("cc=bob%40example.com&"));
+        assertTrue(stringUrl.contains("body=hello&"));
+        assertTrue(stringUrl.contains("to=%2C%20joe%40example.com&"));
     }
 }
