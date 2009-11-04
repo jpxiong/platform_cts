@@ -35,12 +35,12 @@ import java.io.IOException;
  * read/write</B>
  * Pay attention that if run test test on emulator. You must using mksdcard to
  * create a sdcard image file then start emulator with command emulator -sdcard <filepath>
- * If run this on device, must insert a sdcard into device. 
+ * If run this on device, must insert a sdcard into device.
  *
  * mksdcard <size> <file>
  * emulator -sdcard <filepath>
  */
-public class FileAcessPermissionTest extends AndroidTestCase {
+public class FileAccessPermissionTest extends AndroidTestCase {
 
     /**
      * Test /system dir access.
@@ -80,11 +80,7 @@ public class FileAcessPermissionTest extends AndroidTestCase {
         assertFalse(file.canRead());
         assertFalse(file.canWrite());
         File[] files = file.listFiles();
-        for (File f : files) {
-            assertTrue(f.canRead());
-            assertFalse(f.canWrite());
-            assertFalse(f.delete());
-        }
+        assertTrue(files == null || files.length == 0);
 
         // test app data dir.
         File dir = getContext().getFilesDir();
@@ -103,21 +99,14 @@ public class FileAcessPermissionTest extends AndroidTestCase {
         File otherAppDataDir = new File(userAppDataDir, "com.test.test.dir");
         assertFalse(otherAppDataDir.mkdirs());
         files = userAppDataDir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (!files[i].getAbsolutePath().endsWith("com.android")) {
-                File f = new File(files[i], "files");
-                if (!f.exists()) {
-                    assertFalse(f.mkdirs());
-                } else {
-                    assertFalse(f.canWrite());
-                    File dataFile = new File(f, "test");
-                    try {
-                        dataFile.createNewFile();
-                        fail("should throw out exception");
-                    } catch (IOException e) {
-                    }
-                }
-            }
+        assertTrue(files == null || files.length == 0);
+        File newOtherAppFile = new File(userAppDataDir, "test.txt");
+        try {
+            assertFalse(newOtherAppFile.createNewFile());
+            writeFileCheck(newOtherAppFile);
+            fail("Created file in other app's directory");
+        } catch (IOException e) {
+            // expected
         }
 
         // test /sdcard dir.
