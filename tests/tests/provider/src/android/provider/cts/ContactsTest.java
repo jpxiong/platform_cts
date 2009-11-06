@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.provider.CallLog;
 import android.provider.Contacts;
 import android.provider.CallLog.Calls;
 import android.provider.Contacts.ContactMethods;
@@ -55,12 +56,14 @@ import java.util.Date;
 public class ContactsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
     private IContentProvider mProvider;
+    private IContentProvider mCallLogProvider;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
         mProvider = mContentResolver.acquireProvider(Contacts.AUTHORITY);
+        mCallLogProvider = mContentResolver.acquireProvider(CallLog.AUTHORITY);
     }
 
     /**
@@ -69,27 +72,18 @@ public class ContactsTest extends InstrumentationTestCase {
      */
     public void testPeopleTable() {
         final String[] PEOPLE_PROJECTION = new String[] {
-                People._ID, People._SYNC_ACCOUNT, People._SYNC_ACCOUNT_TYPE, People._SYNC_ID,
-                People._SYNC_TIME,
-                People._SYNC_VERSION, People._SYNC_LOCAL_ID, People._SYNC_DIRTY,
+                People._ID,
                 People.NAME, People.NOTES, People.TIMES_CONTACTED,
                 People.LAST_TIME_CONTACTED, People.STARRED,
                 People.CUSTOM_RINGTONE, People.SEND_TO_VOICEMAIL,};
         final int ID_INDEX = 0;
-        final int SYNC_ACCOUNT_NAME_INDEX = 1;
-        final int SYNC_ACCOUNT_TYPE_INDEX = 2;
-        final int SYNC_ID_INDEX = 3;
-        final int SYNC_TIME_INDEX = 4;
-        final int SYNC_VERSION_INDEX = 5;
-        final int SYNC_LOCAL_ID_INDEX = 6;
-        final int SYNC_DIRTY_INDEX = 7;
-        final int NAME_INDEX = 8;
-        final int NOTES_INDEX = 9;
-        final int TIMES_CONTACTED_INDEX = 10;
-        final int LAST_TIME_CONTACTED_INDEX = 11;
-        final int STARRED_INDEX = 12;
-        final int CUSTOM_RINGTONE_INDEX = 13;
-        final int SEND_TO_VOICEMAIL_INDEX = 14;
+        final int NAME_INDEX = 1;
+        final int NOTES_INDEX = 2;
+        final int TIMES_CONTACTED_INDEX = 3;
+        final int LAST_TIME_CONTACTED_INDEX = 4;
+        final int STARRED_INDEX = 5;
+        final int CUSTOM_RINGTONE_INDEX = 6;
+        final int SEND_TO_VOICEMAIL_INDEX = 7;
 
         String insertPeopleName = "name_insert";
         String insertPeopleNotes = "notes_insert";
@@ -366,6 +360,7 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(Phones.PERSON_ID, peopleId);
             value.put(Phones.TYPE, Phones.TYPE_HOME);
             value.put(Phones.NUMBER, insertPhonesNumber);
+            value.put(Phones.ISPRIMARY, 1);
 
             Uri uri = mProvider.insert(Phones.CONTENT_URI, value);
             Cursor cursor = mProvider.query(Phones.CONTENT_URI,
@@ -395,7 +390,7 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
             assertEquals(Phones.TYPE_CUSTOM, cursor.getInt(TYPE_INDEX));
             assertEquals(updatePhonesNumber, cursor.getString(NUMBER_INDEX));
-            assertEquals(PhoneNumberUtils.getStrippedReversed(insertPhonesNumber),
+            assertEquals(PhoneNumberUtils.getStrippedReversed(updatePhonesNumber),
                     cursor.getString(NUMBER_KEY_INDEX));
             assertEquals(customeLabel, cursor.getString(LABEL_INDEX));
             assertEquals(1, cursor.getInt(ISPRIMARY_INDEX));
@@ -448,6 +443,7 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(Organizations.TITLE, insertOrganizationsTitle);
             value.put(Organizations.TYPE, Organizations.TYPE_WORK);
             value.put(Organizations.PERSON_ID, peopleId);
+            value.put(Organizations.ISPRIMARY, 1);
 
             Uri uri = mProvider.insert(Organizations.CONTENT_URI, value);
             Cursor cursor = mProvider.query(
@@ -536,8 +532,8 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(Calls.CACHED_NUMBER_TYPE, Phones.TYPE_HOME);
             value.put(Calls.CACHED_NUMBER_LABEL, insertCallsNumberLabel);
 
-            Uri uri = mProvider.insert(Calls.CONTENT_URI, value);
-            Cursor cursor = mProvider.query(
+            Uri uri = mCallLogProvider.insert(Calls.CONTENT_URI, value);
+            Cursor cursor = mCallLogProvider.query(
                     Calls.CONTENT_URI, CALLS_PROJECTION,
                     Calls.NUMBER + " = ?",
                     new String[] {insertCallsNumber}, null);
@@ -565,8 +561,8 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(Calls.CACHED_NUMBER_TYPE, Phones.TYPE_CUSTOM);
             value.put(Calls.CACHED_NUMBER_LABEL, updateCallsNumberLabel);
 
-            mProvider.update(uri, value, null, null);
-            cursor = mProvider.query(Calls.CONTENT_URI, CALLS_PROJECTION,
+            mCallLogProvider.update(uri, value, null, null);
+            cursor = mCallLogProvider.query(Calls.CONTENT_URI, CALLS_PROJECTION,
                     Calls._ID + " = " + id, null, null);
             assertTrue(cursor.moveToNext());
             assertEquals(updateCallsNumber, cursor.getString(NUMBER_INDEX));
@@ -580,8 +576,8 @@ public class ContactsTest extends InstrumentationTestCase {
             cursor.close();
 
             // Test: delete
-            mProvider.delete(Calls.CONTENT_URI, Calls._ID + " = " + id, null);
-            cursor = mProvider.query(Calls.CONTENT_URI, CALLS_PROJECTION,
+            mCallLogProvider.delete(Calls.CONTENT_URI, Calls._ID + " = " + id, null);
+            cursor = mCallLogProvider.query(Calls.CONTENT_URI, CALLS_PROJECTION,
                     Calls._ID + " = " + id, null, null);
             assertEquals(0, cursor.getCount());
             cursor.close();
@@ -611,8 +607,7 @@ public class ContactsTest extends InstrumentationTestCase {
         int insertKind = Contacts.KIND_EMAIL;
         String insertData = "sample@gmail.com";
         String insertAuxData = "auxiliary_data_insert";
-        int updateKind = Contacts.KIND_PHONE;
-        String updateData = "0123456789";
+        String updateData = "elpmas@liamg.com";
         String updateAuxData = "auxiliary_data_update";
         String customLabel = "custom_label";
 
@@ -629,6 +624,7 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(ContactMethods.DATA, insertData);
             value.put(ContactMethods.AUX_DATA, insertAuxData);
             value.put(ContactMethods.TYPE, ContactMethods.TYPE_WORK);
+            value.put(ContactMethods.ISPRIMARY, 1);
 
             Uri uri = mProvider.insert(ContactMethods.CONTENT_URI, value);
             Cursor cursor = mProvider.query(
@@ -648,11 +644,11 @@ public class ContactsTest extends InstrumentationTestCase {
 
             // Test: update
             value.clear();
-            value.put(ContactMethods.KIND, updateKind);
             value.put(ContactMethods.DATA, updateData);
             value.put(ContactMethods.AUX_DATA, updateAuxData);
             value.put(ContactMethods.TYPE, ContactMethods.TYPE_CUSTOM);
             value.put(ContactMethods.LABEL, customLabel);
+            value.put(ContactMethods.ISPRIMARY, 1);
 
             mProvider.update(uri, value, null, null);
             cursor = mProvider.query(ContactMethods.CONTENT_URI,
@@ -660,7 +656,6 @@ public class ContactsTest extends InstrumentationTestCase {
                     "contact_methods._id" + " = " + id, null, null);
             assertTrue(cursor.moveToNext());
             assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
-            assertEquals(updateKind, cursor.getInt(KIND_INDEX));
             assertEquals(updateData, cursor.getString(DATA_INDEX));
             assertEquals(updateAuxData, cursor.getString(AUX_DATA_INDEX));
             assertEquals(ContactMethods.TYPE_CUSTOM, cursor.getInt(TYPE_INDEX));
