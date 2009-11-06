@@ -202,10 +202,10 @@ public class DrawableContainerTest extends TestCase {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
 
+        mDrawableContainer.setConstantState(mDrawableContainerState);
         mDrawableContainer.setDither(false);
         mDrawableContainer.setDither(true);
 
-        mDrawableContainer.setConstantState(mDrawableContainerState);
         MockDrawable dr = new MockDrawable();
         addAndSelectDrawable(dr);
 
