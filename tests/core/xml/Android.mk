@@ -24,6 +24,7 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/xml/src/test/java) \
+	$(call all-java-files-under,../../../../dalvik/libcore/dom/src/test) \
 	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
 	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java) \
 	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
