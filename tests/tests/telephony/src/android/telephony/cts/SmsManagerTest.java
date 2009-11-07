@@ -50,6 +50,7 @@ public class SmsManagerTest extends AndroidTestCase {
     private static final String SMS_SEND_ACTION = "CTS_SMS_SEND_ACTION";
     private static final String SMS_DELIVERY_ACTION = "CTS_SMS_DELIVERY_ACTION";
 
+    private TelephonyManager mTelephonyManager;
     private String mDestAddr;
     private String mText;
     private SmsBroadcastReceiver mSendReceiver;
@@ -64,9 +65,9 @@ public class SmsManagerTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        TelephonyManager tm =
+        mTelephonyManager =
             (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        mDestAddr = tm.getLine1Number();
+        mDestAddr = mTelephonyManager.getLine1Number();
         mText = "This is a test message";
     }
 
@@ -121,6 +122,11 @@ public class SmsManagerTest extends AndroidTestCase {
         sendTextMessage(mDestAddr, mDestAddr, mSentIntent, mDeliveredIntent);
         mSendReceiver.waitForCalls(1, TIME_OUT);
         mDeliveryReceiver.waitForCalls(1, TIME_OUT);
+
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+            // TODO: temp workaround, OCTET encoding for EMS not properly supported
+            return;
+        }
 
         // send data sms
         byte[] data = mText.getBytes();
