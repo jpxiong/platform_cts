@@ -80,14 +80,14 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      * compatibility definition:
      * <p/>
      * Mozilla/5.0 (Linux; U; Android <version>; <language>-<country>; <devicemodel>;
-     * Build/<buildID>) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
+     * Build/<buildID>) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17
      */
     public void testUserAgentString_default() {
         final String actualUserAgentString = mSettings.getUserAgentString();
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
         final String patternString = "Mozilla/5\\.0 \\(Linux; U; Android (.+); (\\w+)-(\\w+);" +
-            " (.+) Build/(.+)\\) AppleWebKit/528\\.5\\+ \\(KHTML, like Gecko\\) Version/3\\.1\\.2" +
-            " Mobile Safari/525\\.20\\.1";
+            " (.+) Build/(.+)\\) AppleWebKit/530\\.17 \\(KHTML, like Gecko\\) Version/4\\.0" +
+            " Mobile Safari/530\\.17";
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
         Matcher patternMatcher = userAgentExpr.matcher(actualUserAgentString);
