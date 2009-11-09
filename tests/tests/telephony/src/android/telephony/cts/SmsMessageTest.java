@@ -29,7 +29,9 @@ import android.test.AndroidTestCase;
 @TestTargetClass(SmsMessage.class)
 public class SmsMessageTest extends AndroidTestCase{
 
-    private static final String DISPLAY_MESSAGE_BODY = "test body";
+    private TelephonyManager mTelephonyManager;
+
+    private static final String DISPLAY_MESSAGE_BODY = "test subject /test body";
     private static final String DMB = "{ testBody[^~\\] }";
     private static final String EMAIL_ADD = "foo@example.com";
     private static final String EMAIL_FROM = "foo@example.com";
@@ -44,7 +46,8 @@ public class SmsMessageTest extends AndroidTestCase{
     private static final String OA2 = "+15122977683";
     private static final String OA3 = "_@";
     private static final String OA4 = "\u0394@";
-    private static final String PSEUDO_SUBJECT = "test subject";
+    // pseudo subject will always be empty
+    private static final String PSEUDO_SUBJECT = "";
     private static final String SCA1 = "+16466220020";
     private static final String SCA2 = "+12063130012";
     private static final String SCA3 = "+14155551212";
@@ -60,6 +63,14 @@ public class SmsMessageTest extends AndroidTestCase{
     private static final int STATUS_ON_ICC_DEF = -1;
     private static final int TPLAYER_LENGTH_FOR_PDU = 23;
     private static final long TIMESTAMP_MILLIS = 1149631383000l;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mTelephonyManager =
+            (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        assertNotNull(mTelephonyManager);
+    }
 
     @SuppressWarnings("deprecation")
     @TestTargets({
@@ -160,9 +171,7 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testCreateFromPdu() throws Exception {
-        TelephonyManager telephonyManager =
-            (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
@@ -245,9 +254,7 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testCPHSVoiceMail() throws Exception {
-        TelephonyManager telephonyManager =
-            (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
@@ -295,9 +302,7 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testGetUserData() throws Exception {
-        TelephonyManager telephonyManager =
-            (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
@@ -347,9 +352,7 @@ public class SmsMessageTest extends AndroidTestCase{
             // expected
         }
 
-        TelephonyManager telephonyManager =
-            (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // TODO: temp workaround, OCTET encoding for EMS not properly supported
             return;
         }
@@ -400,6 +403,10 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testEmailGateway() throws Exception {
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+            // TODO: temp workaround, need to adjust test to use CDMA pdus
+            return;
+        }
         String pdu = "07914151551512f204038105f300007011103164638a28e6f71b50c687db" +
                          "7076d9357eb7412f7a794e07cdeb6275794c07bde8e5391d247e93f3";
 
