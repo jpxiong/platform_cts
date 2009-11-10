@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -167,13 +168,13 @@ public class WebIconDatabaseTest extends
         method = "removeAllIcons",
         args = {}
     )
+    @BrokenTest(value="intermittently fails bug 2250024")
     public void testRemoveAllIcons() throws Exception {
         final WebIconDatabase webIconDatabase = WebIconDatabase.getInstance();
         webIconDatabase.open(mFilePath);
 
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-
         assertLoadUrlSuccessfully(mWebView, url);
 
         MyIconListener listener = new MyIconListener();
@@ -188,7 +189,7 @@ public class WebIconDatabaseTest extends
 
         // remove all icons.
         webIconDatabase.removeAllIcons();
-
+        
         listener = new MyIconListener();
         webIconDatabase.requestIconForPageUrl(url, listener);
 
