@@ -16,9 +16,6 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.BrokenTest;
-
-import android.content.Context;
 import android.test.AndroidTestCase;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -29,18 +26,29 @@ import android.webkit.CookieSyncManager;
 public class CookieTest extends AndroidTestCase {
 
     private CookieManager mCookieManager;
+    private static final long WAIT_TIME = 50;
 
     @Override
-    public void setContext(Context context) {
-        assertTrue(mContext == null);
-        super.setContext(context);
-        CookieSyncManager.createInstance(context);
+    protected void setUp() throws Exception {
+        super.setUp();
+        CookieSyncManager.createInstance(getContext());
         mCookieManager = CookieManager.getInstance();
         mCookieManager.removeAllCookie();
+        // cookies are removed asynchronously, wait a bit for cookies to be removed
+        int maxWait = 10;
+        for (int i=0; i < maxWait; i++) {
+            // this is unfortuately non-deterministic, but ensure sleep a least once to limit
+            // chance of remove thread running after test has begun
+            Thread.sleep(WAIT_TIME);
+            if (!mCookieManager.hasCookies()) {
+                break;
+            }
+        }
+        assertFalse(mCookieManager.hasCookies());
+
     }
 
     public void testParse() {
-        mCookieManager.removeAllCookie();
         String url = "http://www.foo.com";
 
         // basic
@@ -51,17 +59,17 @@ public class CookieTest extends AndroidTestCase {
         // quoted
         mCookieManager.setCookie(url, "c=\"d;\"");
         cookie = mCookieManager.getCookie(url);
-        assertTrue(cookie.equals("a=b; c=\"d;\""));
+
+        assertTrue(cookie.contains("a=b"));
+        assertTrue(cookie.contains("c=\"d;\""));
     }
 
-    @BrokenTest(value="Bug 2129378: Occasionally fails with NPE")
     public void testDomain() {
-        mCookieManager.removeAllCookie();
         String url = "http://www.foo.com";
 
         // basic
         mCookieManager.setCookie(url, "a=b");
-        String cookie = mCookieManager.getCookie(url); // FIXME: This occasionally returns null
+        String cookie = mCookieManager.getCookie(url);
         assertTrue(cookie.equals("a=b"));
 
         // no cross domain cookie
@@ -71,7 +79,8 @@ public class CookieTest extends AndroidTestCase {
         // more than one cookie
         mCookieManager.setCookie(url, "c=d; domain=.foo.com");
         cookie = mCookieManager.getCookie(url);
-        assertTrue(cookie.equals("a=b; c=d"));
+        assertTrue(cookie.contains("a=b;"));
+        assertTrue(cookie.contains("c=d"));
 
         // host cookie should not be accessible from a sub-domain.
         cookie = mCookieManager.getCookie("http://bar.www.foo.com");
@@ -81,15 +90,19 @@ public class CookieTest extends AndroidTestCase {
         // treat it as a domain cookie, as if there was a pre-pended dot.
         mCookieManager.setCookie(url, "e=f; domain=www.foo.com");
         cookie = mCookieManager.getCookie(url);
-        assertTrue(cookie.equals("a=b; c=d; e=f"));
+        assertTrue(cookie.contains("a=b"));
+        assertTrue(cookie.contains("c=d"));
+        assertTrue(cookie.contains("e=f"));
+
         cookie = mCookieManager.getCookie("http://sub.www.foo.com");
-        assertTrue(cookie.equals("c=d; e=f"));
+        assertTrue(cookie.contains("c=d"));
+        assertTrue(cookie.contains("e=f"));
+
         cookie = mCookieManager.getCookie("http://foo.com");
         assertTrue(cookie.equals("c=d"));
     }
 
     public void testSubDomain() {
-        mCookieManager.removeAllCookie();
         String url_abcd = "http://a.b.c.d.com";
         String url_bcd = "http://b.c.d.com";
         String url_cd = "http://c.d.com";
@@ -101,11 +114,17 @@ public class CookieTest extends AndroidTestCase {
         mCookieManager.setCookie(url_abcd, "d=4; domain=.d.com");
 
         String cookie = mCookieManager.getCookie(url_abcd);
-        assertTrue(cookie.equals("a=1; b=2; c=3; d=4"));
+        assertTrue(cookie.contains("a=1"));
+        assertTrue(cookie.contains("b=2"));
+        assertTrue(cookie.contains("c=3"));
+        assertTrue(cookie.contains("d=4"));
         cookie = mCookieManager.getCookie(url_bcd);
-        assertTrue(cookie.equals("b=2; c=3; d=4"));
+        assertTrue(cookie.contains("b=2"));
+        assertTrue(cookie.contains("c=3"));
+        assertTrue(cookie.contains("d=4"));
         cookie = mCookieManager.getCookie(url_cd);
-        assertTrue(cookie.equals("c=3; d=4"));
+        assertTrue(cookie.contains("c=3"));
+        assertTrue(cookie.contains("d=4"));
         cookie = mCookieManager.getCookie(url_d);
         assertTrue(cookie.equals("d=4"));
 
@@ -113,13 +132,18 @@ public class CookieTest extends AndroidTestCase {
         mCookieManager.setCookie(url_bcd, "x=bcd; domain=.b.c.d.com");
         mCookieManager.setCookie(url_bcd, "x=cd; domain=.c.d.com");
         cookie = mCookieManager.getCookie(url_bcd);
-        assertTrue(cookie.equals("b=2; c=3; d=4; x=bcd; x=cd"));
+        assertTrue(cookie.contains("b=2"));
+        assertTrue(cookie.contains("c=3"));
+        assertTrue(cookie.contains("d=4"));
+        assertTrue(cookie.contains("x=bcd"));
+        assertTrue(cookie.contains("x=cd"));
         cookie = mCookieManager.getCookie(url_cd);
-        assertTrue(cookie.equals("c=3; d=4; x=cd"));
+        assertTrue(cookie.contains("c=3"));
+        assertTrue(cookie.contains("d=4"));
+        assertTrue(cookie.contains("x=cd"));
     }
 
     public void testInvalidDomain() {
-        mCookieManager.removeAllCookie();
         String url = "http://foo.bar.com";
 
         mCookieManager.setCookie(url, "a=1; domain=.yo.foo.bar.com");
@@ -156,7 +180,6 @@ public class CookieTest extends AndroidTestCase {
     }
 
     public void testPath() {
-        mCookieManager.removeAllCookie();
         String url = "http://www.foo.com";
 
         mCookieManager.setCookie(url, "a=b; path=/wee");
@@ -175,6 +198,7 @@ public class CookieTest extends AndroidTestCase {
 
         mCookieManager.setCookie(url, "a=c; path=");
         cookie = mCookieManager.getCookie(url + "/wee");
+        // order of contents matters in this case, per spec
         assertTrue(cookie.equals("a=b; a=c"));
         cookie = mCookieManager.getCookie(url);
         assertTrue(cookie.equals("a=c"));
