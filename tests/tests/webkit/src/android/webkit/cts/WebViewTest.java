@@ -757,20 +757,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             mWebView.setHttpAuthUsernamePassword(host, realm, userName, null);
             result = mWebView.getHttpAuthUsernamePassword(host, realm);
             assertNotNull(result);
-            assertNull(result[0]);
-            assertEquals(password, result[1]);
+            assertEquals(userName, result[0]);
+            assertEquals(null, result[1]);
 
             mWebView.setHttpAuthUsernamePassword(host, realm, null, null);
             result = mWebView.getHttpAuthUsernamePassword(host, realm);
             assertNotNull(result);
             assertNull(result[0]);
-            assertEquals(password, result[1]);
+            assertNull(result[1]);
 
             mWebView.setHttpAuthUsernamePassword(host, realm, newUserName, newPassword);
             result = mWebView.getHttpAuthUsernamePassword(host, realm);
             assertNotNull(result);
-            assertNull(result[0]);
-            assertEquals(password, result[1]);
+            assertEquals(newUserName, result[0]);
+            assertEquals(newPassword, result[1]);
         } finally {
             WebViewDatabase.getInstance(getActivity()).clearHttpAuthUsernamePassword();
         }
