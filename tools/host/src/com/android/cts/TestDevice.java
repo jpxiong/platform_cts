@@ -21,6 +21,7 @@ import com.android.ddmlib.ClientData;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
+import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.RawImage;
 import com.android.ddmlib.SyncService;
 import com.android.ddmlib.SyncService.ISyncProgressMonitor;
@@ -50,7 +51,8 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class TestDevice implements DeviceObserver {
-    private static final String GET_INFO_APP_PACKAGE_NAME = "android.tests.getinfo";
+    private static final String DEVICE_SETUP_APK = "TestDeviceSetup";
+    private static final String DEVICE_SETUP_APP_PACKAGE_NAME = "android.tests.devicesetup";
     private static final String DEFAULT_TEST_RUNNER_NAME =
                                   "android.test.InstrumentationTestRunner";
     private static final String ACTION_INSTALL = "install";
@@ -144,7 +146,10 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
-     * get the information of this device
+     * Gets this device's information.
+     *
+     * Assumes that the test device setup apk is already installed.
+     * See {@link #installDeviceSetupApp()}.
      *
      * @return information of this device.
      */
@@ -157,6 +162,24 @@ public class TestDevice implements DeviceObserver {
             genDeviceInfo();
         }
         return mDeviceInfo;
+    }
+
+    /**
+     * Attempt to disable the screen guard on device.
+     *
+     * Assumes the test device setup apk is already installed.
+     * See {@link #installDeviceSetupApp()}.
+     *
+     * Note: uninstalling the device setup app {@link #uninstallDeviceSetupApp()} will re-enable
+     * keyguard.
+     *
+     * @throws DeviceDisconnectedException
+     */
+    public void disableKeyguard () throws DeviceDisconnectedException {
+        final String commandStr = "am broadcast -a android.tests.util.disablekeyguard";
+        Log.d(commandStr);
+
+        executeShellCommand(commandStr, new NullOutputReceiver());
     }
 
     /**
@@ -246,20 +269,51 @@ public class TestDevice implements DeviceObserver {
     }
 
     /**
-     * Run device information collector apk to got the device info.
+     * Run device information collector command to got the device info.
      */
     private void genDeviceInfo() throws DeviceDisconnectedException,
                 InvalidNameSpaceException, InvalidApkPathException {
-        String apkName = "DeviceInfoCollector";
+        mDeviceInfo.set(DeviceParameterCollector.SERIAL_NUMBER, getSerialNumber());
+        // run shell command to run device information collector
+        Log.d("run device information collector");
+        runDeviceInfoCollectorCommand();
+        waitForCommandFinish();
+    }
 
-        String apkPath = HostConfig.getInstance().getCaseRepository().getApkPath(apkName);
+    /**
+     * Uninstall the device setup apk from device.
+     *
+     * See {@link #installDeviceSetupApp}
+     *
+     * @throws DeviceDisconnectedException
+     * @throws InvalidNameSpaceException
+     */
+    public void uninstallDeviceSetupApp() throws DeviceDisconnectedException,
+            InvalidNameSpaceException {
+        // reset device observer
+        DeviceObserver tmpDeviceObserver = mDeviceObserver;
+        mDeviceObserver = this;
+        Log.d("uninstall get info ...");
+        uninstallAPK(DEVICE_SETUP_APP_PACKAGE_NAME);
+        waitForCommandFinish();
+        Log.d("uninstall device information collector successfully");
+        mDeviceObserver = tmpDeviceObserver;
+    }
+
+    /**
+     * Install the device setup apk on the device.
+     *
+     * @throws DeviceDisconnectedException
+     * @throws InvalidApkPathException
+     */
+    public void installDeviceSetupApp() throws DeviceDisconnectedException, InvalidApkPathException {
+        String apkPath = HostConfig.getInstance().getCaseRepository().getApkPath(DEVICE_SETUP_APK);
         if (!HostUtils.isFileExist(apkPath)) {
             Log.e("File doesn't exist: " + apkPath, null);
             return;
         }
 
-        mDeviceInfo.set(DeviceParameterCollector.SERIAL_NUMBER, getSerialNumber());
-        Log.d("installing " + apkName + " apk");
+        Log.d("installing " + DEVICE_SETUP_APK + " apk");
         mObjectSync = new ObjectSync();
 
         // reset device observer
@@ -269,16 +323,6 @@ public class TestDevice implements DeviceObserver {
         Log.d("install get info ...");
         installAPK(apkPath);
         waitForCommandFinish();
-
-        // run shell command to run device information collector
-        Log.d("run device information collector");
-        runDeviceInfoCollectorCommand();
-        waitForCommandFinish();
-
-        Log.d("uninstall get info ...");
-        uninstallAPK(GET_INFO_APP_PACKAGE_NAME);
-        waitForCommandFinish();
-        Log.d("uninstall device information collector successfully");
         mDeviceObserver = tmpDeviceObserver;
     }
 
@@ -286,8 +330,9 @@ public class TestDevice implements DeviceObserver {
      * Run command to collect device info.
      */
     private void runDeviceInfoCollectorCommand() throws DeviceDisconnectedException {
-        final String commandStr = "am instrument -w -e bundle"
-            + " true android.tests.getinfo/.DeviceInfoInstrument";
+        final String commandStr = "am instrument -w -e bundle true "
+            + String.format("%s/android.tests.getinfo.DeviceInfoInstrument",
+                    DEVICE_SETUP_APP_PACKAGE_NAME);
         Log.d(commandStr);
 
         mPackageActionTimer.start(ACTION_GET_DEV_INFO, this);
@@ -1545,6 +1590,8 @@ public class TestDevice implements DeviceObserver {
             final LogReceiver logReceiver)
             throws DeviceDisconnectedException {
         if (mStatus == STATUS_OFFLINE) {
+            Log.d(String.format("device %s is offline when attempting to execute %s",
+                    getSerialNumber(), cmd));
             throw new DeviceDisconnectedException(getSerialNumber());
         }
 
