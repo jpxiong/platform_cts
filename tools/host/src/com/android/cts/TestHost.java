@@ -458,11 +458,12 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         TestDevice device = sDeviceManager.allocateFreeDeviceById(deviceId);
         TestSessionLog sessionLog = ts.getSessionLog();
         ts.setTestDevice(device);
-
-        sessionLog.setDeviceInfo(device.getDeviceInfo());
+        ts.getDevice().installDeviceSetupApp();
+        sessionLog.setDeviceInfo(ts.getDevice().getDeviceInfo());
 
         boolean finish = false;
         while (!finish) {
+            ts.getDevice().disableKeyguard();
             try {
                 switch (type) {
                 case RUN_SINGLE_TEST:
@@ -498,6 +499,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         if (HostConfig.getMaxTestCount() > 0) {
             sDeviceManager.resetTestDevice(ts.getDevice());
         }
+
+        ts.getDevice().uninstallDeviceSetupApp();
     }
 
     /**

@@ -16,13 +16,12 @@
 
 package android.tests.getinfo;
 
-import java.util.Locale;
-
 import android.app.Activity;
-import android.app.ActivityThread;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 
 /**
@@ -53,8 +52,7 @@ public class DeviceInfoActivity extends Activity {
         TextView view = new TextView(this);
         view.setText("hello");
         setContentView(view);
-        ActivityThread t = ActivityThread.currentActivityThread();
-        Configuration con = t.getConfiguration();
+        Configuration con = getResources().getConfiguration();
         String touchScreen = null;
         if (con.touchscreen == Configuration.TOUCHSCREEN_UNDEFINED) {
             touchScreen = "undefined";
