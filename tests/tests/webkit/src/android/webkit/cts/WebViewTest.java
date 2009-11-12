@@ -63,6 +63,7 @@ import java.io.FileInputStream;
 
 @TestTargetClass(android.webkit.WebView.class)
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+    private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
     private static long TIME_FOR_LAYOUT = 1000L;
 
@@ -410,7 +411,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testLoadUrl() throws Exception {
         assertNull(mWebView.getUrl());
         assertNull(mWebView.getOriginalUrl());
-        assertEquals(0, mWebView.getProgress());
+        assertEquals(INITIAL_PROGRESS, mWebView.getProgress());
 
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
@@ -457,7 +458,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     )
     public void testStopLoading() throws Exception {
         assertNull(mWebView.getUrl());
-        assertEquals(0, mWebView.getProgress());
+        assertEquals(INITIAL_PROGRESS, mWebView.getProgress());
 
         startWebServer(false);
         String url = mWebServer.getDelayedAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
@@ -1067,7 +1068,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testGetContentHeight() throws InterruptedException {
         mWebView.loadData("<html><body></body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(mWebView.getHeight(), mWebView.getContentHeight());
+        assertEquals(mWebView.getHeight(), mWebView.getContentHeight() * mWebView.getScale(), 2f);
 
         final int pageHeight = 600;
         // set the margin to 0
@@ -1438,22 +1439,25 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(1.0f, mWebView.getScale(), 0f);
+        final float defaultScale = getInstrumentation().getTargetContext().getResources().
+            getDisplayMetrics().density;
+        assertEquals(defaultScale, mWebView.getScale(), 0f);
 
         mWebView.setInitialScale(0);
-        mWebView.reload();
+        // modify content to fool WebKit into re-loading
+        mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(1.0f, mWebView.getScale(), 0f);
+        assertEquals(defaultScale, mWebView.getScale(), 0f);
 
         mWebView.setInitialScale(50);
-        mWebView.reload();
+        mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(0.5f, mWebView.getScale(), 0f);
+        assertEquals(0.5f, mWebView.getScale(), .02f);
 
         mWebView.setInitialScale(0);
-        mWebView.reload();
+        mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(1.0f, mWebView.getScale(), 0f);
+        assertEquals(defaultScale, mWebView.getScale(), 0f);
     }
 
     @TestTargetNew(
