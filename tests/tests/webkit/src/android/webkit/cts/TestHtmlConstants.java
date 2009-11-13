@@ -34,6 +34,13 @@ public class TestHtmlConstants {
     public static final String EMBEDDED_IMG_URL = "webkit/embedded_image.html";
     public static final String POPUP_URL = "webkit/popup_base.html";
     public static final String JAVASCRIPT_URL = "webkit/javascript.html";
+    public static final String JS_ALERT_URL = "webkit/jsalert.html";
+    public static final String JS_CONFIRM_URL = "webkit/jsconfirm.html";
+    public static final String JS_PROMPT_URL = "webkit/jsprompt.html";
+    public static final String JS_UNLOAD_URL = "webkit/jsunload.html";
+    public static final String JS_WINDOW_URL = "webkit/jswindow.html";
+    public static final String JS_TIMEOUT_URL = "webkit/jstimeout.html";
+    public static final String JS_FORM_URL = "webkit/jsform.html";
 
     public static final String FONT_URL = "webkit/fonts.html";
 

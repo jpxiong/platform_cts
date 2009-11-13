@@ -25,7 +25,6 @@ import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.InputStreamEntity;
@@ -207,8 +206,21 @@ public class CtsTestServer {
      * @param path The path of the asset. See {@link AssetManager#open(String)}
      */
     public String getRedirectingAssetUrl(String path) {
+        return getRedirectingAssetUrl(path, 1);
+    }
+
+    /**
+     * Return an absolute URL that indirectly refers to the given asset.
+     * When a client fetches this URL, the server will respond with a temporary redirect (302)
+     * referring to the absolute URL of the given asset.
+     * @param path The path of the asset. See {@link AssetManager#open(String)}
+     * @param numRedirects The number of redirects required to reach the given asset.
+     */
+    public String getRedirectingAssetUrl(String path, int numRedirects) {
         StringBuilder sb = new StringBuilder(getBaseUri());
-        sb.append(REDIRECT_PREFIX);
+        for (int i = 0; i < numRedirects; i++) {
+            sb.append(REDIRECT_PREFIX);
+        }
         sb.append(ASSET_PREFIX);
         sb.append(path);
         return sb.toString();
@@ -271,126 +283,124 @@ public class CtsTestServer {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
         mRequestCount += 1;
-        if (requestLine.getMethod().equals(HttpGet.METHOD_NAME)) {
-            Log.i(TAG, "GET: " + requestLine.getUri());
-            String uriString = requestLine.getUri();
-            mLastQuery = uriString;
-            URI uri = URI.create(uriString);
-            String path = uri.getPath();
-            if (path.equals(FAVICON_PATH)) {
-                path = FAVICON_ASSET_PATH;
+        Log.i(TAG, requestLine.getMethod() + ": " + requestLine.getUri());
+        String uriString = requestLine.getUri();
+        mLastQuery = uriString;
+        URI uri = URI.create(uriString);
+        String path = uri.getPath();
+        if (path.equals(FAVICON_PATH)) {
+            path = FAVICON_ASSET_PATH;
+        }
+        if (path.startsWith(DELAY_PREFIX)) {
+            try {
+                Thread.sleep(DELAY_MILLIS);
+            } catch (InterruptedException ignored) {
+                // ignore
             }
-            if (path.startsWith(DELAY_PREFIX)) {
-                try {
-                    Thread.sleep(DELAY_MILLIS);
-                } catch (InterruptedException ignored) {
-                    // ignore
-                }
-                path = path.substring(DELAY_PREFIX.length());
-            }
-            if (path.startsWith(AUTH_PREFIX)) {
-                // authentication required
-                Header[] auth = request.getHeaders("Authorization");
-                if (auth.length > 0) {
-                    if (auth[0].getValue().equals(AUTH_CREDENTIALS)) {
-                        // fall through and serve content
-                        path = path.substring(AUTH_PREFIX.length());
-                    } else {
-                        // incorrect password
-                        response = createResponse(HttpStatus.SC_FORBIDDEN);
-                    }
+            path = path.substring(DELAY_PREFIX.length());
+        }
+        if (path.startsWith(AUTH_PREFIX)) {
+            // authentication required
+            Header[] auth = request.getHeaders("Authorization");
+            if (auth.length > 0) {
+                if (auth[0].getValue().equals(AUTH_CREDENTIALS)) {
+                    // fall through and serve content
+                    path = path.substring(AUTH_PREFIX.length());
                 } else {
-                    // request authorization
-                    response = createResponse(HttpStatus.SC_UNAUTHORIZED);
-                    response.addHeader("WWW-Authenticate", "Basic realm=\"" + AUTH_REALM + "\"");
+                    // incorrect password
+                    response = createResponse(HttpStatus.SC_FORBIDDEN);
                 }
+            } else {
+                // request authorization
+                response = createResponse(HttpStatus.SC_UNAUTHORIZED);
+                response.addHeader("WWW-Authenticate", "Basic realm=\"" + AUTH_REALM + "\"");
             }
-            if (path.startsWith(BINARY_PREFIX)) {
-                List <NameValuePair> args = URLEncodedUtils.parse(uri, "UTF-8");
-                int length = 0;
-                String mimeType = null;
-                try {
-                    for (NameValuePair pair : args) {
-                        String name = pair.getName();
-                        if (name.equals("type")) {
-                            mimeType = pair.getValue();
-                        } else if (name.equals("length")) {
-                            length = Integer.parseInt(pair.getValue());
-                        }
+        }
+        if (path.startsWith(BINARY_PREFIX)) {
+            List <NameValuePair> args = URLEncodedUtils.parse(uri, "UTF-8");
+            int length = 0;
+            String mimeType = null;
+            try {
+                for (NameValuePair pair : args) {
+                    String name = pair.getName();
+                    if (name.equals("type")) {
+                        mimeType = pair.getValue();
+                    } else if (name.equals("length")) {
+                        length = Integer.parseInt(pair.getValue());
                     }
-                    if (length > 0 && mimeType != null) {
-                        ByteArrayEntity entity = new ByteArrayEntity(new byte[length]);
-                        entity.setContentType(mimeType);
-                        response = createResponse(HttpStatus.SC_OK);
-                        response.setEntity(entity);
-                        response.addHeader("Content-Disposition", "attachment; filename=test.bin");
-                    } else {
-                        // fall through, return 404 at the end
-                    }
-                } catch (Exception e) {
-                    // fall through, return 404 at the end
-                    Log.w(TAG, e);
                 }
-            } else if (path.startsWith(ASSET_PREFIX)) {
-                path = path.substring(ASSET_PREFIX.length());
-                // request for an asset file
-                try {
-                    InputStream in = mAssets.open(path);
-                    response = createResponse(HttpStatus.SC_OK);
-                    InputStreamEntity entity = new InputStreamEntity(in, in.available());
-                    String mimeType =
-                        mMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(path));
-                    if (mimeType == null) {
-                        mimeType = "text/html";
-                    }
+                if (length > 0 && mimeType != null) {
+                    ByteArrayEntity entity = new ByteArrayEntity(new byte[length]);
                     entity.setContentType(mimeType);
+                    response = createResponse(HttpStatus.SC_OK);
                     response.setEntity(entity);
-                } catch (IOException e) {
-                    response = null;
+                    response.addHeader("Content-Disposition", "attachment; filename=test.bin");
+                } else {
                     // fall through, return 404 at the end
                 }
-            } else if (path.startsWith(REDIRECT_PREFIX)) {
-                response = createResponse(HttpStatus.SC_MOVED_TEMPORARILY);
-                String location = getBaseUri() + path.substring(REDIRECT_PREFIX.length());
-                Log.i(TAG, "Redirecting to: " + location);
-                response.addHeader("Location", location);
-            } else if (path.startsWith(COOKIE_PREFIX)) {
-                /*
-                 * Return a page with a title containing a list of all incoming cookies,
-                 * separated by '|' characters. If a numeric 'count' value is passed in a cookie,
-                 * return a cookie with the value incremented by 1. Otherwise, return a cookie
-                 * setting 'count' to 0.
-                 */
-                response = createResponse(HttpStatus.SC_OK);
-                Header[] cookies = request.getHeaders("Cookie");
-                Pattern p = Pattern.compile("count=(\\d+)");
-                StringBuilder cookieString = new StringBuilder(100);
-                int count = 0;
-                for (Header cookie : cookies) {
-                    String value = cookie.getValue();
-                    if (cookieString.length() > 0) {
-                        cookieString.append("|");
-                    }
-                    cookieString.append(value);
-                    Matcher m = p.matcher(value);
-                    if (m.find()) {
-                        count = Integer.parseInt(m.group(1)) + 1;
-                    }
-                }
-
-                response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
-                response.setEntity(createEntity("<html><head><title>" + cookieString +
-                        "</title></head><body>" + cookieString + "</body></html>"));
-            } else if (path.equals(USERAGENT_PATH)) {
-                response = createResponse(HttpStatus.SC_OK);
-                Header agentHeader = request.getFirstHeader("User-Agent");
-                String agent = "";
-                if (agentHeader != null) {
-                    agent = agentHeader.getValue();
-                }
-                response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
-                        "<body>" + agent + "</body></html>"));
+            } catch (Exception e) {
+                // fall through, return 404 at the end
+                Log.w(TAG, e);
             }
+        } else if (path.startsWith(ASSET_PREFIX)) {
+            path = path.substring(ASSET_PREFIX.length());
+            // request for an asset file
+            try {
+                InputStream in = mAssets.open(path);
+                response = createResponse(HttpStatus.SC_OK);
+                InputStreamEntity entity = new InputStreamEntity(in, in.available());
+                String mimeType =
+                    mMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(path));
+                if (mimeType == null) {
+                    mimeType = "text/html";
+                }
+                entity.setContentType(mimeType);
+                response.setEntity(entity);
+            } catch (IOException e) {
+                response = null;
+                // fall through, return 404 at the end
+            }
+        } else if (path.startsWith(REDIRECT_PREFIX)) {
+            response = createResponse(HttpStatus.SC_MOVED_TEMPORARILY);
+            String location = getBaseUri() + path.substring(REDIRECT_PREFIX.length());
+            Log.i(TAG, "Redirecting to: " + location);
+            response.addHeader("Location", location);
+        } else if (path.startsWith(COOKIE_PREFIX)) {
+            /*
+             * Return a page with a title containing a list of all incoming cookies,
+             * separated by '|' characters. If a numeric 'count' value is passed in a cookie,
+             * return a cookie with the value incremented by 1. Otherwise, return a cookie
+             * setting 'count' to 0.
+             */
+            response = createResponse(HttpStatus.SC_OK);
+            Header[] cookies = request.getHeaders("Cookie");
+            Pattern p = Pattern.compile("count=(\\d+)");
+            StringBuilder cookieString = new StringBuilder(100);
+            int count = 0;
+            for (Header cookie : cookies) {
+                String value = cookie.getValue();
+                if (cookieString.length() > 0) {
+                    cookieString.append("|");
+                }
+                cookieString.append(value);
+                Matcher m = p.matcher(value);
+                if (m.find()) {
+                    count = Integer.parseInt(m.group(1)) + 1;
+                }
+            }
+
+            response.addHeader("Set-Cookie", "count=" + count + "; path=" + COOKIE_PREFIX);
+            response.setEntity(createEntity("<html><head><title>" + cookieString +
+                    "</title></head><body>" + cookieString + "</body></html>"));
+        } else if (path.equals(USERAGENT_PATH)) {
+            response = createResponse(HttpStatus.SC_OK);
+            Header agentHeader = request.getFirstHeader("User-Agent");
+            String agent = "";
+            if (agentHeader != null) {
+                agent = agentHeader.getValue();
+            }
+            response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
+                    "<body>" + agent + "</body></html>"));
         }
         if (response == null) {
             response = createResponse(HttpStatus.SC_NOT_FOUND);
