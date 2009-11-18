@@ -354,9 +354,6 @@ public class DeviceManager implements IDeviceChangeListener {
                 }
                 attempts += 1;
             }
-            // dismiss the screen lock by sending a MENU key event
-            // TODO: this command isn't going to work on a user device, seems like its not needed
-            executeCommand("adb -s " + deviceSerialNumber + " shell input keyevent 82");
         }
     }
 
