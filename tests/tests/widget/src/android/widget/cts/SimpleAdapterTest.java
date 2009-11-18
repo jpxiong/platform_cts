@@ -18,18 +18,18 @@ package android.widget.cts;
 
 import com.android.internal.R;
 
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
@@ -39,7 +39,6 @@ import android.widget.SimpleAdapter.ViewBinder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -411,9 +410,9 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
             mSimpleAdapter.setViewImage(view, SimpleCursorAdapterTest.createTestImage(mContext,
                     "testimage", com.android.cts.stub.R.raw.testimage));
             assertNotNull(view.getDrawable());
-            d = (BitmapDrawable) mContext.getResources()
-                    .getDrawable(com.android.cts.stub.R.raw.testimage);
-            WidgetTestUtils.assertEquals(d.getBitmap(),
+            Bitmap testBitmap = WidgetTestUtils.getUnscaledBitmap(mContext.getResources(),
+                    com.android.cts.stub.R.raw.testimage);
+            WidgetTestUtils.assertEquals(testBitmap,
                     ((BitmapDrawable) view.getDrawable()).getBitmap());
         } finally {
             SimpleCursorAdapterTest.destroyTestImage(mContext,"testimage");

@@ -310,7 +310,8 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         setArrayAdapter(mAdapterView);
 
         // LastVisiblePosition should be adapter's getCount - 1,by mocking method
-        mAdapterView.layout(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
+        // TODO: the +50 is a gross hack
+        mAdapterView.layout(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT+50);
         assertEquals(FRUIT.length - 1, mAdapterView.getLastVisiblePosition());
     }
 

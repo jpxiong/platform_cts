@@ -275,11 +275,12 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         mImageView.setImageURI(Uri.parse(path));
         assertTrue(mImageView.isLayoutRequested());
         assertNotNull(mImageView.getDrawable());
-        Drawable drawable = mActivity.getResources().getDrawable(R.raw.testimage);
-        BitmapDrawable testimageBitmap = (BitmapDrawable) drawable;
+
+        Bitmap testimageBitmap = WidgetTestUtils.getUnscaledBitmap(mActivity.getResources(),
+                R.raw.testimage);
         Drawable imageViewDrawable = mImageView.getDrawable();
         BitmapDrawable imageViewBitmap = (BitmapDrawable) imageViewDrawable;
-        WidgetTestUtils.assertEquals(testimageBitmap.getBitmap(), imageViewBitmap.getBitmap());
+        WidgetTestUtils.assertEquals(testimageBitmap, imageViewBitmap.getBitmap());
     }
 
     @TestTargetNew(
