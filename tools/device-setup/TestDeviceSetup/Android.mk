@@ -24,7 +24,9 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_PACKAGE_NAME := DeviceInfoCollector
+LOCAL_SDK_VERSION := current
+
+LOCAL_PACKAGE_NAME := TestDeviceSetup
 
 include $(BUILD_PACKAGE)
 

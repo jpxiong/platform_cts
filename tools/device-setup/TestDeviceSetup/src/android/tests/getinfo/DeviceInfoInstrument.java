@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -99,20 +100,22 @@ public class DeviceInfoInstrument extends Instrumentation {
         waitForIdleSync();
         activity.waitForAcitityToFinish();
 
+        TelephonyManager tm = (TelephonyManager) getContext().getSystemService(
+                Context.TELEPHONY_SERVICE);
         // network
-        String network = android.telephony.TelephonyManager.getDefault().getNetworkOperatorName();
+        String network = tm.getNetworkOperatorName();
         addResult(NETWORK, network);
 
         // imei
-        String imei = android.telephony.TelephonyManager.getDefault().getDeviceId();
+        String imei = tm.getDeviceId();
         addResult(IMEI, imei);
 
         // imsi
-        String imsi = android.telephony.TelephonyManager.getDefault().getSubscriberId();
+        String imsi = tm.getSubscriberId();
         addResult(IMSI, imsi);
 
         // phone number
-        String phoneNumber = android.telephony.TelephonyManager.getDefault().getLine1Number();
+        String phoneNumber = tm.getLine1Number();
         addResult(PHONE_NUMBER, phoneNumber);
 
         finish(Activity.RESULT_OK, mResults);
