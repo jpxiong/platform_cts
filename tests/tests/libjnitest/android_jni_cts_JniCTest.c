@@ -15,37 +15,27 @@
  */
 
 /*
- * Native implementation for the InstanceNonce class. See the test code
- * in JniInstanceTest for more info.
+ * Native implementation for the JniCTest class.
  */
 
+#include <stdlib.h>
 #include <jni.h>
 #include <JNIHelp.h>
 
-// public native void nop();
-static void InstanceNonce_nop(JNIEnv *env, jobject this) {
-    // This space intentionally left blank.
-}
-
-// public native int returnInt();
-static jint InstanceNonce_returnInt(JNIEnv *env, jobject this) {
-    return 12345678;
-}
-
-// public native double returnDouble();
-static jdouble InstanceNonce_returnDouble(JNIEnv *env, jobject this) {
-    return 12345678.9;
+// private static native String runTest();
+static jstring JniCTest_runAllTests(JNIEnv *env, jclass clazz) {
+    // TODO: Actual tests go here.
+   
+    return NULL;
 }
 
 static JNINativeMethod methods[] = {
     // name, signature, function
-    { "nop",          "()V", InstanceNonce_nop },
-    { "returnInt",    "()I", InstanceNonce_returnInt },
-    { "returnDouble", "()D", InstanceNonce_returnDouble },
+    { "runAllTests", "()Ljava/lang/String;", JniCTest_runAllTests },
 };
 
-int register_InstanceNonce(JNIEnv *env) {
+int register_JniCTest(JNIEnv *env) {
     return jniRegisterNativeMethods(
-            env, "android/jni/cts/InstanceNonce",
+            env, "android/jni/cts/JniCTest",
             methods, sizeof(methods) / sizeof(JNINativeMethod));
 }
