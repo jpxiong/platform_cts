@@ -13,8 +13,7 @@
 # limitations under the License.
 
 #
-# This is the shared library included by the NDK test app. See that
-# app (in the sibling directory "ndk") for more info.
+# This is the shared library included by the JNI test app.
 #
 
 LOCAL_PATH:= $(call my-dir)
