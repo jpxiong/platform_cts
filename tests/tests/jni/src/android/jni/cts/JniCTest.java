@@ -19,31 +19,31 @@ package android.jni.cts;
 import junit.framework.TestCase;
 
 /**
- * Basic static method tests. The "nonce" class being tested by this
- * class is a class defined in this package that declares the bulk of
- * its methods as native.
+ * Basic tests of calling the C functions that make up the JNI. This
+ * class merely calls into native code and reports back if there was
+ * a problem.
  */
-public class JniStaticTest extends TestCase {
-    /**
-     * Test a simple no-op and void-returning method call.
-     */
-    public void test_nop() {
-        StaticNonce.nop();
+public class JniCTest extends TestCase {
+    static {
+        System.loadLibrary("jnitest");
     }
 
     /**
-     * Test a simple value-returning (but otherwise no-op) method call.
+     * Calls the native test, and {@code fail()}s appropriately if
+     * there was a problem.
      */
-    public void test_returnInt() {
-        assertEquals(12345678, StaticNonce.returnInt());
+    public void testEverything() {
+        String msg = runAllTests();
+
+        if (msg != null) {
+            fail(msg);
+        }
     }
 
     /**
-     * Test a simple value-returning (but otherwise no-op) method call.
+     * The native method that does all the actual testing.
+     *
+     * @returns an error message or {@code null} if all went well
      */
-    public void test_returnDouble() {
-        assertEquals(12345678.9, StaticNonce.returnDouble());
-    }
-
-    // TODO: Add more tests here.
+    private static native String runAllTests();
 }

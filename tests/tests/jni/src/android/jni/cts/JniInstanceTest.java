@@ -16,8 +16,6 @@
 
 package android.jni.cts;
 
-import dalvik.annotation.TestTargetClass;
-
 import junit.framework.TestCase;
 
 /**

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
+#include <cutils/log.h>
 #include <jni.h>
+#include <stdlib.h>
 
 /*
  * This function is called automatically by the system when this
@@ -31,11 +32,25 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     extern int register_InstanceNonce(JNIEnv *);
     if (register_InstanceNonce(env)) {
+        LOGE("failed to register InstanceNonce");
         return JNI_ERR;
     }
 
     extern int register_StaticNonce(JNIEnv *);
     if (register_StaticNonce(env)) {
+        LOGE("failed to register StaticNonce");
+        return JNI_ERR;
+    }
+
+    extern int register_JniCTest(JNIEnv *);
+    if (register_JniCTest(env)) {
+        LOGE("failed to register JniCTest");
+        return JNI_ERR;
+    }
+
+    extern int register_JniCppTest(JNIEnv *);
+    if (register_JniCppTest(env)) {
+        LOGE("failed to register JniCppTest");
         return JNI_ERR;
     }
 

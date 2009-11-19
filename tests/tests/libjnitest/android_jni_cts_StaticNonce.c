@@ -22,18 +22,18 @@
 #include <jni.h>
 #include <JNIHelp.h>
 
-// public native void nop();
-void StaticNonce_nop(void) {
+// public static native void nop();
+static void StaticNonce_nop(JNIEnv *env, jclass clazz) {
     // This space intentionally left blank.
 }
 
-// public native int returnInt();
-jint StaticNonce_returnInt(void) {
+// public static native int returnInt();
+static jint StaticNonce_returnInt(JNIEnv *env, jclass clazz) {
     return 12345678;
 }
 
-// public native double returnDouble();
-jdouble StaticNonce_returnDouble(void) {
+// public static native double returnDouble();
+static jdouble StaticNonce_returnDouble(JNIEnv *env, jclass clazz) {
     return 12345678.9;
 }
 
