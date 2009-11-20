@@ -14,12 +14,8 @@
      limitations under the License.
 -->
 
-<!-- Replace all the "example" stuff below with your package name, and
-     remove this comment.
--->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cts.example">
+    package="com.android.cts.bluetooth">
 
     <application>
         <uses-library android:name="android.test.runner" />
@@ -27,8 +23,8 @@
 
     <!-- This is a self-instrumenting test package. -->
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.android.cts.example"
-                     android:label="CTS tests of example component"/>
+                     android:targetPackage="com.android.cts.bluetooth"
+                     android:label="CTS tests of bluetooth component"/>
 
 </manifest>
 
