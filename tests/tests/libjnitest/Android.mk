@@ -31,11 +31,13 @@ LOCAL_PRELINK_MODULE := false
 
 LOCAL_SRC_FILES := \
 	android_jni_cts_InstanceNonce.c \
+	android_jni_cts_JniCTest.c \
+	android_jni_cts_JniCppTest.cpp \
 	android_jni_cts_StaticNonce.c \
 	register.c
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libnativehelper
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog
 
 include $(BUILD_SHARED_LIBRARY)

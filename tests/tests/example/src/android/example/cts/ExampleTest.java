@@ -18,8 +18,6 @@ package android.example.cts;
 
 import android.example.Example;
 
-import dalvik.annotation.TestTargetClass;
-
 import junit.framework.TestCase;
 
 /**
