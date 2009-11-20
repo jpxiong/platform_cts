@@ -260,9 +260,12 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
 
         // The attributes defined in tabhost_layout.xml
         assertEquals(android.R.id.tabs, tabHost.getTabWidget().getId());
-        assertEquals(1, tabHost.getTabWidget().getPaddingLeft());
-        assertEquals(1, tabHost.getTabWidget().getPaddingRight());
-        assertEquals(4, tabHost.getTabWidget().getPaddingTop());
+        WidgetTestUtils.assertScaledPixels(1, tabHost.getTabWidget().getPaddingLeft(),
+                getActivity());
+        WidgetTestUtils.assertScaledPixels(1, tabHost.getTabWidget().getPaddingRight(),
+                getActivity());
+        WidgetTestUtils.assertScaledPixels(4, tabHost.getTabWidget().getPaddingTop(),
+                getActivity());
     }
 
     @TestTargets({

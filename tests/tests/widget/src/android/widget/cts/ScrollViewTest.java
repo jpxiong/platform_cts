@@ -48,13 +48,21 @@ import android.widget.TextView;
  */
 @TestTargetClass(ScrollView.class)
 public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewStubActivity> {
-    private static final int ITEM_WIDTH  = 250;
-    private static final int ITEM_HEIGHT = 100;
+    // view dpi constants. Must match those defined in scroll_view layout
+    private static final int ITEM_WIDTH_DPI  = 250;
+    private static final int ITEM_HEIGHT_DPI = 100;
     private static final int ITEM_COUNT  = 15;
-    private static final int PAGE_WIDTH  = 100;
-    private static final int PAGE_HEIGHT = 100;
-    private static final int SCROLL_BOTTOM = ITEM_HEIGHT * ITEM_COUNT - PAGE_HEIGHT;
-    private static final int SCROLL_RIGHT = ITEM_WIDTH - PAGE_WIDTH;
+    private static final int PAGE_WIDTH_DPI  = 100;
+    private static final int PAGE_HEIGHT_DPI = 100;
+    private static final int TOLERANCE = 2;
+
+    private int mItemWidth;
+    private int mItemHeight;
+    private int mPageWidth;
+    private int mPageHeight;
+    private int mScrollBottom;
+    private int mScrollRight;
+
     private MyScrollView mScrollView;
     private Activity mActivity;
 
@@ -67,6 +75,16 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         super.setUp();
         mActivity = getActivity();
         mScrollView = (MyScrollView) mActivity.findViewById(R.id.scroll_view);
+
+        // calculate pixel positions from dpi constants.
+        final float density = getActivity().getResources().getDisplayMetrics().density;
+        mItemWidth = (int) (ITEM_WIDTH_DPI * density);
+        mItemHeight = (int) (ITEM_HEIGHT_DPI * density);
+        mPageWidth = (int) (PAGE_WIDTH_DPI * density);
+        mPageHeight = (int) (PAGE_HEIGHT_DPI * density);
+
+        mScrollBottom = mItemHeight * ITEM_COUNT - mPageHeight;
+        mScrollRight = mItemWidth - mPageWidth;
     }
 
     @TestTargets({
@@ -345,7 +363,8 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
                 mScrollView.fullScroll(View.FOCUS_DOWN);
             }
         });
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+
+        assertEquals(mScrollBottom, mScrollView.getScrollY(), TOLERANCE);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -363,15 +382,15 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
                 mScrollView.fullScroll(View.FOCUS_DOWN);
             }
         });
-        delayedCheckSmoothScrolling(0, 0, 0, SCROLL_BOTTOM);
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        delayedCheckSmoothScrolling(0, 0, 0, mScrollBottom);
+        assertEquals(mScrollBottom, mScrollView.getScrollY(), TOLERANCE);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mScrollView.fullScroll(View.FOCUS_UP);
             }
         });
-        delayedCheckSmoothScrolling(0, 0, SCROLL_BOTTOM, 0);
+        delayedCheckSmoothScrolling(0, 0, mScrollBottom, 0);
         assertEquals(0, mScrollView.getScrollY());
     }
 
@@ -439,22 +458,22 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
 
         assertTrue(mScrollView.pageScroll(View.FOCUS_DOWN));
-        assertEquals(PAGE_HEIGHT, mScrollView.getScrollY());
+        assertEquals(mPageHeight, mScrollView.getScrollY(), TOLERANCE);
 
         assertTrue(mScrollView.pageScroll(View.FOCUS_DOWN));
-        assertEquals(PAGE_HEIGHT * 2, mScrollView.getScrollY());
+        assertEquals(mPageHeight * 2, mScrollView.getScrollY(), TOLERANCE);
 
-        mScrollView.scrollTo(PAGE_WIDTH, SCROLL_BOTTOM);
+        mScrollView.scrollTo(mPageWidth, mScrollBottom);
         assertFalse(mScrollView.pageScroll(View.FOCUS_DOWN));
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        assertEquals(mScrollBottom, mScrollView.getScrollY(), TOLERANCE);
 
         assertTrue(mScrollView.pageScroll(View.FOCUS_UP));
-        assertEquals(SCROLL_BOTTOM - PAGE_HEIGHT, mScrollView.getScrollY());
+        assertEquals(mScrollBottom - mPageHeight, mScrollView.getScrollY(), TOLERANCE);
 
         assertTrue(mScrollView.pageScroll(View.FOCUS_UP));
-        assertEquals(SCROLL_BOTTOM - PAGE_HEIGHT * 2, mScrollView.getScrollY());
+        assertEquals(mScrollBottom -mPageHeight * 2, mScrollView.getScrollY(), TOLERANCE);
 
-        mScrollView.scrollTo(PAGE_WIDTH, 0);
+        mScrollView.scrollTo(mPageWidth, 0);
         assertFalse(mScrollView.pageScroll(View.FOCUS_UP));
         assertEquals(0, mScrollView.getScrollY());
     }
@@ -470,10 +489,10 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
 
         assertTrue(mScrollView.fullScroll(View.FOCUS_DOWN));
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         assertFalse(mScrollView.fullScroll(View.FOCUS_DOWN));
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         assertTrue(mScrollView.fullScroll(View.FOCUS_UP));
         assertEquals(0, mScrollView.getScrollY());
@@ -493,14 +512,14 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
 
         int y = mScrollView.getScrollY();
-        while (SCROLL_BOTTOM != y) {
+        while (mScrollBottom != y) {
             assertTrue(mScrollView.arrowScroll(View.FOCUS_DOWN));
             assertTrue(y <= mScrollView.getScrollY());
             y = mScrollView.getScrollY();
         }
 
         assertFalse(mScrollView.arrowScroll(View.FOCUS_DOWN));
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         y = mScrollView.getScrollY();
         while (0 != y) {
@@ -524,19 +543,19 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.smoothScrollBy(SCROLL_RIGHT, SCROLL_BOTTOM);
+                mScrollView.smoothScrollBy(mScrollRight, mScrollBottom);
             }
         });
-        delayedCheckSmoothScrolling(0, SCROLL_RIGHT, 0, SCROLL_BOTTOM);
-        assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        delayedCheckSmoothScrolling(0, mScrollRight, 0, mScrollBottom);
+        assertEquals(mScrollRight, mScrollView.getScrollX());
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.smoothScrollBy(-SCROLL_RIGHT, -SCROLL_BOTTOM);
+                mScrollView.smoothScrollBy(-mScrollRight, -mScrollBottom);
             }
         });
-        delayedCheckSmoothScrolling(SCROLL_RIGHT, 0, SCROLL_BOTTOM, 0);
+        delayedCheckSmoothScrolling(mScrollRight, 0, mScrollBottom, 0);
         assertEquals(0, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
     }
@@ -552,21 +571,21 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.smoothScrollTo(SCROLL_RIGHT, SCROLL_BOTTOM);
+                mScrollView.smoothScrollTo(mScrollRight, mScrollBottom);
             }
         });
-        delayedCheckSmoothScrolling(0, SCROLL_RIGHT, 0, SCROLL_BOTTOM);
-        assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
+        delayedCheckSmoothScrolling(0, mScrollRight, 0, mScrollBottom);
+        assertEquals(mScrollRight, mScrollView.getScrollX());
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.smoothScrollTo(PAGE_WIDTH, PAGE_HEIGHT);
+                mScrollView.smoothScrollTo(mPageWidth, mPageHeight);
             }
         });
-        delayedCheckSmoothScrolling(SCROLL_RIGHT, PAGE_WIDTH, SCROLL_BOTTOM, PAGE_HEIGHT);
-        assertEquals(PAGE_WIDTH, mScrollView.getScrollX());
-        assertEquals(PAGE_HEIGHT, mScrollView.getScrollY());
+        delayedCheckSmoothScrolling(mScrollRight, mPageWidth, mScrollBottom, mPageHeight);
+        assertEquals(mPageWidth, mScrollView.getScrollX());
+        assertEquals(mPageHeight, mScrollView.getScrollY());
     }
 
     @TestTargetNew(
@@ -582,11 +601,11 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         Rect rect = new Rect(0, 0, 0, 0);
         assertEquals(0, mScrollView.computeScrollDeltaToGetChildRectOnScreen(rect));
 
-        rect = new Rect(0, edge, 0, PAGE_HEIGHT);
+        rect = new Rect(0, edge, 0, mPageHeight);
         assertEquals(0, mScrollView.computeScrollDeltaToGetChildRectOnScreen(rect));
 
         mScrollView.scrollTo(0, 0);
-        rect = new Rect(0, edge + 1, 0, PAGE_HEIGHT);
+        rect = new Rect(0, edge + 1, 0, mPageHeight);
         assertEquals(edge, mScrollView.computeScrollDeltaToGetChildRectOnScreen(rect));
     }
 
@@ -597,7 +616,8 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
     )
     public void testComputeVerticalScrollRange() {
         assertTrue(mScrollView.getChildCount() > 0);
-        assertEquals(ITEM_HEIGHT * ITEM_COUNT, mScrollView.computeVerticalScrollRange());
+        assertEquals(mItemHeight * ITEM_COUNT,
+                mScrollView.computeVerticalScrollRange(), TOLERANCE);
 
         MyScrollView myScrollView = new MyScrollView(mActivity);
         assertEquals(0, myScrollView.getChildCount());
@@ -639,8 +659,10 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         int edge = mScrollView.getVerticalFadingEdgeLength();
 
         View child = mScrollView.findViewById(R.id.first_child);
-        final Rect originalRect = new Rect(0, 0, 10, 10);
-        final Rect newRect = new Rect(ITEM_WIDTH - 10, ITEM_HEIGHT - 10, ITEM_WIDTH, ITEM_HEIGHT);
+        int orgRectSize = (int)(10 * getActivity().getResources().getDisplayMetrics().density);
+        final Rect originalRect = new Rect(0, 0, orgRectSize, orgRectSize);
+        final Rect newRect = new Rect(mItemWidth - orgRectSize, mItemHeight - orgRectSize,
+                mItemWidth, mItemHeight);
 
         assertFalse(mScrollView.requestChildRectangleOnScreen(child, originalRect, true));
         assertEquals(0, mScrollView.getScrollX());
@@ -706,13 +728,13 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(10, mScrollView.getScrollY());
         assertEquals(10, mScrollView.getScrollX());
 
-        mScrollView.scrollTo(PAGE_WIDTH, PAGE_HEIGHT);
-        assertEquals(PAGE_HEIGHT, mScrollView.getScrollY());
-        assertEquals(PAGE_WIDTH, mScrollView.getScrollX());
+        mScrollView.scrollTo(mPageWidth, mPageHeight);
+        assertEquals(mPageHeight, mScrollView.getScrollY());
+        assertEquals(mPageWidth, mScrollView.getScrollX());
 
-        mScrollView.scrollTo(SCROLL_RIGHT, SCROLL_BOTTOM);
-        assertEquals(SCROLL_BOTTOM, mScrollView.getScrollY());
-        assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
+        mScrollView.scrollTo(mScrollRight, mScrollBottom);
+        assertEquals(mScrollBottom, mScrollView.getScrollY());
+        assertEquals(mScrollRight, mScrollView.getScrollX());
 
         // reach the top and left
         mScrollView.scrollTo(-10, -10);

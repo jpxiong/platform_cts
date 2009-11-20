@@ -40,14 +40,12 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.util.Xml;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
@@ -309,9 +307,11 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
                 mListView.setStackFromBottom(true);
             }
         });
+
         mInstrumentation.waitForIdleSync();
         assertTrue(mListView.isStackFromBottom());
-        assertEquals(mListView.getChildCount(), mListView.getSelectedItemPosition());
+        // ensure last item in list is selected
+        assertEquals(mCountryList.length-1, mListView.getSelectedItemPosition());
     }
 
     @TestTargetNew(
@@ -899,13 +899,6 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         assertTrue(listView.isTextFilterEnabled());
         assertTrue(listView.hasTextFilter());
         assertTrue(listView.isInFilterMode());
-
-        LayoutInflater layoutInflater = (LayoutInflater)
-                mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        EditText textFilter = (EditText) layoutInflater.inflate(
-                com.android.internal.R.layout.typing_filter, null);
-        textFilter.setText(filterText);
-        assertFalse(mListView.checkInputConnectionProxy(textFilter));
 
         listView.clearTextFilter();
         assertTrue(listView.isTextFilterEnabled());

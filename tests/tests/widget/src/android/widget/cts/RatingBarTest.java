@@ -16,28 +16,27 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.test.ActivityInstrumentationTestCase;
+import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.util.AttributeSet;
 import android.view.View.MeasureSpec;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link RatingBar}.
  */
 @TestTargetClass(RatingBar.class)
-public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStubActivity> {
+public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStubActivity> {
     private Context mContext;
     private RatingBarStubActivity mActivity;
 
@@ -308,7 +307,13 @@ public class RatingBarTest extends ActivityInstrumentationTestCase<RatingBarStub
         Drawable d = getActivity().getResources().getDrawable(R.drawable.blue);
         mRatingBar.setIndeterminateDrawable(d);
         mRatingBar.onMeasure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-        assertEquals(285, mRatingBar.getMeasuredWidth());
+
+        // TODO: this line appears to fail when density < 1. Need a cleaner way to handle this
+        if (getActivity().getResources().getDisplayMetrics().density >= 1) {
+            WidgetTestUtils.assertScaledPixels(285, mRatingBar.getMeasuredWidth(), getActivity());
+        } else {
+            assertEquals(285, mRatingBar.getMeasuredWidth());
+        }
         assertEquals(57, mRatingBar.getMeasuredHeight());
 
         mRatingBar.onMeasure(MeasureSpec.AT_MOST, MeasureSpec.AT_MOST);
