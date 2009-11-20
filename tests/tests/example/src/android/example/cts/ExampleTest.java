@@ -28,7 +28,6 @@ import junit.framework.TestCase;
  * probably means that there's something fundamentally wrong with your
  * setup.)
  */
-@TestTargetClass(Example.class)
 public class ExampleTest extends TestCase {
     /*
      * You can define standard JUnit setUp() and tearDown() methods here,

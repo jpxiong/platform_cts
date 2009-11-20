@@ -29,7 +29,6 @@ import junit.framework.TestCase;
  * separate your test classes by what class or major piece of
  * functionality is being tested.
  */
-@TestTargetClass(Example.class)
 public class ExampleSecondaryTest extends TestCase {
     /*
      * You can define standard JUnit setUp() and tearDown() methods here,
