@@ -18,8 +18,17 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import android.content.Context;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
+import org.xmlpull.v1.XmlPullParser;
+
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -28,19 +37,12 @@ import android.util.AttributeSet;
 import android.util.Xml;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.xmlpull.v1.XmlPullParser;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(ImageSwitcher.class)
 public class ImageSwitcherTest extends AndroidTestCase {
@@ -141,22 +143,22 @@ public class ImageSwitcherTest extends AndroidTestCase {
         Uri uri = Uri.parse(imagefile.getPath());
         imageSwitcher.setImageURI(uri);
         assertSame(iv1, imageSwitcher.getCurrentView());
-        Resources resources = getContext().getResources();
-        Drawable drawable = resources.getDrawable(R.raw.testimage);
-        BitmapDrawable testimageBitmap = (BitmapDrawable) drawable;
+
+        Bitmap testImageBitmap = WidgetTestUtils.getUnscaledBitmap(getContext().getResources(),
+                R.raw.testimage);
         BitmapDrawable currViewBitmap =
             (BitmapDrawable) ((ImageView) imageSwitcher.getCurrentView()).getDrawable();
-        WidgetTestUtils.assertEquals(testimageBitmap.getBitmap(), currViewBitmap.getBitmap());
+        WidgetTestUtils.assertEquals(testImageBitmap, currViewBitmap.getBitmap());
 
         createSampleImage(imagefile, R.raw.scenery);
         uri = Uri.parse(imagefile.getPath());
         imageSwitcher.setImageURI(uri);
         assertSame(iv, imageSwitcher.getCurrentView());
-        drawable = resources.getDrawable(R.raw.scenery);
-        BitmapDrawable sceneryBitmap = (BitmapDrawable) drawable;
+        Bitmap sceneryImageBitmap = WidgetTestUtils.getUnscaledBitmap(getContext().getResources(),
+                R.raw.scenery);
         currViewBitmap =
             (BitmapDrawable) ((ImageView) imageSwitcher.getCurrentView()).getDrawable();
-        WidgetTestUtils.assertEquals(sceneryBitmap.getBitmap(), currViewBitmap.getBitmap());
+        WidgetTestUtils.assertEquals(sceneryImageBitmap, currViewBitmap.getBitmap());
 
         imagefile.delete();
 

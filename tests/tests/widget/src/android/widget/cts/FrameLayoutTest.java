@@ -137,8 +137,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
     public void testSetForegroundGravity() {
         final BitmapDrawable foreground
                 = (BitmapDrawable) mActivity.getResources().getDrawable(R.drawable.size_48x48);
-        assertEquals(48, foreground.getIntrinsicHeight());
-        assertEquals(48, foreground.getIntrinsicWidth());
+        compareScaledPixels(48, foreground.getIntrinsicHeight());
+        compareScaledPixels(48, foreground.getIntrinsicWidth());
         assertTrue(mFrameLayout.getHeight() > foreground.getIntrinsicHeight());
         assertTrue(mFrameLayout.getWidth() > foreground.getIntrinsicWidth());
         assertNull(mFrameLayout.getForeground());
@@ -160,8 +160,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         // should get a new foreground again, because former foreground has been stretched
         final BitmapDrawable newForeground
                 = (BitmapDrawable) mActivity.getResources().getDrawable(R.drawable.size_48x48);
-        assertEquals(48, newForeground.getIntrinsicHeight());
-        assertEquals(48, newForeground.getIntrinsicWidth());
+        compareScaledPixels(48, newForeground.getIntrinsicHeight());
+        compareScaledPixels(48, newForeground.getIntrinsicWidth());
         assertTrue(mFrameLayout.getHeight() > newForeground.getIntrinsicHeight());
         assertTrue(mFrameLayout.getWidth() > foreground.getIntrinsicWidth());
 
@@ -229,8 +229,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
 
         // text view and button are VISIBLE, they should be measured
         final TextView textView = (TextView) frameLayout.findViewById(R.id.framelayout_textview);
-        assertEquals(30, textView.getMeasuredHeight());
-        assertEquals(100, textView.getMeasuredWidth());
+        compareScaledPixels(30, textView.getMeasuredHeight());
+        compareScaledPixels(100, textView.getMeasuredWidth());
         assertEquals(textView.getMeasuredHeight(), frameLayout.getMeasuredHeight());
         assertEquals(textView.getMeasuredWidth(), frameLayout.getMeasuredWidth());
 
@@ -244,8 +244,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         mInstrumentation.waitForIdleSync();
         assertFalse(frameLayout.getConsiderGoneChildrenWhenMeasuring());
         Button button = (Button) frameLayout.findViewById(R.id.framelayout_button);
-        assertEquals(15, button.getMeasuredHeight());
-        assertEquals(50, button.getMeasuredWidth());
+        compareScaledPixels(15, button.getMeasuredHeight());
+        compareScaledPixels(50, button.getMeasuredWidth());
         assertEquals(button.getMeasuredHeight(), frameLayout.getMeasuredHeight());
         assertEquals(button.getMeasuredWidth(), frameLayout.getMeasuredWidth());
 
@@ -260,6 +260,13 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         assertTrue(frameLayout.getConsiderGoneChildrenWhenMeasuring());
         assertEquals(textView.getMeasuredHeight(), frameLayout.getMeasuredHeight());
         assertEquals(textView.getMeasuredWidth(), frameLayout.getMeasuredWidth());
+    }
+
+    /**
+     * Helper method to compare expected pixels, scaled to device density, with actual
+     */
+    private void compareScaledPixels(int expected, int actual) {
+        WidgetTestUtils.assertScaledPixels(expected, actual, getActivity());
     }
 
     @TestTargetNew(

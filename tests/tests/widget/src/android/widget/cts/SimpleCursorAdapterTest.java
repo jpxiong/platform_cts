@@ -27,6 +27,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
 import android.view.LayoutInflater;
@@ -255,8 +256,9 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
             mSimpleCursorAdapter.setViewImage(view,
                     createTestImage(mContext, SAMPLE_IMAGE_NAME, testimgRawId));
             assertNotNull(view.getDrawable());
-            d = (BitmapDrawable) mContext.getResources().getDrawable(testimgRawId);
-            WidgetTestUtils.assertEquals(d.getBitmap(),
+            Bitmap testBitmap = WidgetTestUtils.getUnscaledBitmap(mContext.getResources(),
+                    testimgRawId);
+            WidgetTestUtils.assertEquals(testBitmap,
                     ((BitmapDrawable) view.getDrawable()).getBitmap());
         } finally {
             destroyTestImage(mContext, SAMPLE_IMAGE_NAME);
