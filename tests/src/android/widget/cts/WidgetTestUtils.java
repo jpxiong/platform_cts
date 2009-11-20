@@ -19,7 +19,10 @@ package android.widget.cts;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.io.IOException;
 
@@ -88,5 +91,26 @@ public class WidgetTestUtils {
             throw new XmlPullParserException("Unexpected start tag: found " + parser.getName()
                     + ", expected " + firstElementName);
         }
+    }
+
+    /**
+     * Compare the expected pixels with actual, scaling for the target context density
+     *
+     * @throws AssertionFailedError
+     */
+    public static void assertScaledPixels(int expected, int actual, Context context) {
+        Assert.assertEquals(expected * context.getResources().getDisplayMetrics().density,
+                actual, 3);
+    }
+
+    /**
+     * Retrieve a bitmap that can be used for comparison on any density
+     * @param resources
+     * @return the {@link Bitmap} or <code>null</code>
+     */
+    public static Bitmap getUnscaledBitmap(Resources resources, int resId) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        return BitmapFactory.decodeResource(resources, resId, options);
     }
 }
