@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
@@ -35,3 +35,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
+
+# Include the associated library's makefile.
+include $(LOCAL_PATH)/libjnitest/Android.mk
