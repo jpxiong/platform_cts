@@ -57,6 +57,8 @@ public class FaceView extends View {
 
         BitmapFactory.Options bfo = new BitmapFactory.Options();
         bfo.inPreferredConfig = Bitmap.Config.RGB_565;
+        bfo.inScaled = false;
+        bfo.inDither = false;
 
         mSourceImage = BitmapFactory.decodeResource(getResources(), resId, bfo);
 
