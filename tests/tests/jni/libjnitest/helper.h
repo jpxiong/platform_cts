@@ -30,8 +30,15 @@ typedef char *JniTestFunction(JNIEnv *env);
  * Used as arguments to runTest(), it takes a simple name and expands
  * it to both a string name and function pointer.
  */
-#define JNI_TEST(name) #name, test_##name
+#define RUN_TEST(name) #name, test_##name
 
+/**    
+ * Standard function delcaration for a test of the JNI function with
+ * the given name. The function is static, returns a (char *), and
+ * takes a (JNIEnv *) named "env".
+ */
+#define TEST_DECLARATION(name) static char *test_##name(JNIEnv *env)
+    
 /**
  * Logs and returns an error message, passed and formatted in printf()
  * style. The returned string should be freed by calling free().
