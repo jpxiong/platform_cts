@@ -19,6 +19,10 @@
 
 #include <jni.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** A JNI test function */
 typedef char *JniTestFunction(JNIEnv *env);
 
@@ -48,5 +52,9 @@ char *failure(const char *format, ...);
  * @return a string containing information about all the failures
  */
 char *runJniTests(JNIEnv *env, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HELPER_H
