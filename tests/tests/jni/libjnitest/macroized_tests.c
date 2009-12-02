@@ -29,7 +29,7 @@
 #endif
 
 #include "helper.h"
-#include <string.h>
+#include <stdlib.h>
 
 
 /*
