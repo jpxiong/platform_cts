@@ -73,7 +73,89 @@ public class SQLiteProgramTest extends AndroidTestCase {
         statementOne.close();
         statementTwo.close();
     }
+    
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onAllReferencesReleased(). set compiled-sql-cache size in SQLiteDatabase " +
+        		"to zero. compiledSql should be released when onAllReferencesReleased() is called",
+        method = "onAllReferencesReleased",
+        args = {}
+    )
+    public void testOnAllReferencesReleased() {
+        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
+                "num1 INTEGER, num2 INTEGER, image BLOB);");
+        final String statement = "DELETE FROM test WHERE _id=?;";
+        mDatabase.setMaxSqlCacheSize(0); // no compiled-sql cache.
+        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
+        assertTrue(statementOne.getUniqueId() > 0);
+        statementOne.releaseReference();
+        assertTrue(statementOne.getUniqueId() == 0);
+        statementOne.close();
+    }
+    
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
+        		"SQLiteDatabase to zero. compiledSql should be released when " +
+        		"onAllReferencesReleasedFromContainer() is called",
+        method = "onAllReferencesReleasedFromContainer",
+        args = {}
+    )
+    public void testOnAllReferencesReleasedFromContainer() {
+        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
+                "num1 INTEGER, num2 INTEGER, image BLOB);");
+        final String statement = "DELETE FROM test WHERE _id=?;";
+        mDatabase.setMaxSqlCacheSize(0); // no compiled-sql cache.
+        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
+        assertTrue(statementOne.getUniqueId() > 0);
+        statementOne.releaseReferenceFromContainer();
+        assertTrue(statementOne.getUniqueId() == 0);
+        statementOne.close();
+    }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onAllReferencesReleased(). set compiled-sql-cache size in " +
+                "SQLiteDatabase to non-zero;i.e., compiledSql will be cached." +
+                "compiledSql should NOT be released when onAllReferencesReleased() is called",
+        method = "onAllReferencesReleasedFromContainer",
+        args = {}
+    )
+    public void testOnAllReferencesReleasedNOreleaseOfCompiledSql() {
+        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
+                "num1 INTEGER, num2 INTEGER, image BLOB);");
+        final String statement = "DELETE FROM test WHERE _id=?;";
+        mDatabase.setMaxSqlCacheSize(10); // compiled-sql cache enabled for this database.
+        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
+        assertTrue(statementOne.getUniqueId() > 0);
+        int nStatement = statementOne.getUniqueId();
+        statementOne.releaseReference();
+        assertTrue(statementOne.getUniqueId() == nStatement);
+        statementOne.close();
+    }
+    
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
+                "SQLiteDatabase to non-zero;i.e., compiledSql will be cached." +
+                "compiledSql should NOT be released when onAllReferencesReleasedFromContainer() " +
+                "is called",
+        method = "onAllReferencesReleasedFromContainer",
+        args = {}
+    )
+    public void testOnAllReferencesReleasedFromContainerNOreleaseOfCompiledSql() {
+        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
+                "num1 INTEGER, num2 INTEGER, image BLOB);");
+        final String statement = "DELETE FROM test WHERE _id=?;";
+        mDatabase.setMaxSqlCacheSize(10); // compiled-sql cache enabled for this database.
+        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
+        assertTrue(statementOne.getUniqueId() > 0);
+        int nStatement = statementOne.getUniqueId();
+        statementOne.releaseReferenceFromContainer();
+        assertTrue(statementOne.getUniqueId() == nStatement);
+        statementOne.close();
+    }
+    
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
