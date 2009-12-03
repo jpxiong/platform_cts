@@ -34,8 +34,43 @@ public class JniStaticTest extends TestCase {
     /**
      * Test a simple value-returning (but otherwise no-op) method call.
      */
+    public void test_returnByte() {
+        assertEquals(123, StaticNonce.returnByte());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnShort() {
+        assertEquals(-12345, StaticNonce.returnShort());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnChar() {
+        assertEquals(34567, StaticNonce.returnChar());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
     public void test_returnInt() {
         assertEquals(12345678, StaticNonce.returnInt());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnLong() {
+        assertEquals(-1098765432109876543L, StaticNonce.returnLong());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnFloat() {
+        assertEquals(-98765.4321F, StaticNonce.returnFloat());
     }
 
     /**
@@ -46,14 +81,10 @@ public class JniStaticTest extends TestCase {
     }
 
     // TODO: Add more tests here. E.g:
-    //    call to method that instantiates its class (based on received jclass)
-    //    call to method returning constant byte
-    //    call to method returning constant char
-    //    call to method returning constant short
-    //    call to method returning constant long
-    //    call to method returning constant float
     //    call to method returning constant Object (null)
     //    call to method returning constant String (non-null)
+    //    call to method that instantiates its class (based on received jclass)
+    //    call to method taking "this class", returning a "got expected" flag
     //    call to method taking byte, returning a "got expected" flag
     //    call to method taking char, returning a "got expected" flag
     //    call to method taking short, returning a "got expected" flag

@@ -28,6 +28,11 @@ public class StaticNonce {
     // See JniStaticTest for the expected behavior of these methods.
 
     public static native void nop();
+    public static native byte returnByte();
+    public static native short returnShort();
+    public static native char returnChar();
     public static native int returnInt();
+    public static native long returnLong();
+    public static native float returnFloat();
     public static native double returnDouble();
 }

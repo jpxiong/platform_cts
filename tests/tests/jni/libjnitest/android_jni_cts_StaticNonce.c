@@ -27,9 +27,34 @@ static void StaticNonce_nop(JNIEnv *env, jclass clazz) {
     // This space intentionally left blank.
 }
 
+// public static native byte returnByte();
+static jbyte StaticNonce_returnByte(JNIEnv *env, jclass clazz) {
+    return (jbyte) 123;
+}
+
+// public static native short returnShort();
+static jshort StaticNonce_returnShort(JNIEnv *env, jclass clazz) {
+    return (jshort) -12345;
+}
+
+// public static native char returnChar();
+static jchar StaticNonce_returnChar(JNIEnv *env, jclass clazz) {
+    return (jchar) 34567;
+}
+
 // public static native int returnInt();
 static jint StaticNonce_returnInt(JNIEnv *env, jclass clazz) {
     return 12345678;
+}
+
+// public static native long returnLong();
+static jlong StaticNonce_returnLong(JNIEnv *env, jclass clazz) {
+    return (jlong) -1098765432109876543LL;
+}
+
+// public static native float returnFloat();
+static jfloat StaticNonce_returnFloat(JNIEnv *env, jclass clazz) {
+    return (jfloat) -98765.4321F;
 }
 
 // public static native double returnDouble();
@@ -40,7 +65,12 @@ static jdouble StaticNonce_returnDouble(JNIEnv *env, jclass clazz) {
 static JNINativeMethod methods[] = {
     // name, signature, function
     { "nop",          "()V", StaticNonce_nop },
+    { "returnByte",   "()B", StaticNonce_returnByte },
+    { "returnShort",  "()S", StaticNonce_returnShort },
+    { "returnChar",   "()C", StaticNonce_returnChar },
     { "returnInt",    "()I", StaticNonce_returnInt },
+    { "returnLong",   "()J", StaticNonce_returnLong },
+    { "returnFloat",  "()F", StaticNonce_returnFloat },
     { "returnDouble", "()D", StaticNonce_returnDouble },
 };
 
