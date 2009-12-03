@@ -18,61 +18,22 @@
  * Native implementation for the JniCTest class.
  */
 
-#include "helper.h"
-
 #include <jni.h>
 #include <JNIHelp.h>
 
 
 /*
- * The tests.
+ * This includes source for all the tests as well as for a runner
+ * function. See the comment in that file for more information.
  */
-
-// Test GetVersion().
-static char *test_GetVersion(JNIEnv *env) {
-    // Android implementations should all be at version 1.6.
-    jint version = (*env)->GetVersion(env);
-
-    if (version != JNI_VERSION_1_6) {
-        return failure("Expected JNI_VERSION_1_6 but got 0x%x", version);
-    }
-
-    return NULL;
-}
-
-// Test DefineClass().
-static char *test_DefineClass(JNIEnv *env) {
-    // Android implementations should always return NULL.
-    jclass clazz = (*env)->DefineClass(env, "foo", NULL, NULL, 0);
-
-    if (clazz != NULL) {
-        return failure("Expected NULL but got %p", clazz);
-    }
-
-    return NULL;
-}
+#define INCLUDED_FROM_WRAPPER 1
+#include "macroized_tests.c"
 
 
-/*
- * Plumbing.
- */
-
-// private static native String runTest();
+// private static native String runAllTests();
 static jstring JniCTest_runAllTests(JNIEnv *env, jclass clazz) {
-    char *result = runJniTests(env,
-            JNI_TEST(GetVersion),
-            JNI_TEST(DefineClass),
-            NULL);
-
-    // TODO: Add more tests, above.
-
-    if (result != NULL) {
-        jstring s = (*env)->NewStringUTF(env, result);
-        free(result);
-        return s;
-    }
-
-    return NULL;
+    // Simply call the static function defined in "macroized_tests.c".
+    return runAllTests(env);
 }
 
 static JNINativeMethod methods[] = {
