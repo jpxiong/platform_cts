@@ -23,6 +23,11 @@
 #include <jni.h>
 #include <JNIHelp.h>
 
+
+/*
+ * The tests.
+ */
+
 // Test GetVersion().
 static char *test_GetVersion(JNIEnv *env) {
     // Android implementations should all be at version 1.6.
@@ -46,6 +51,11 @@ static char *test_DefineClass(JNIEnv *env) {
 
     return NULL;
 }
+
+
+/*
+ * Plumbing.
+ */
 
 // private static native String runTest();
 static jstring JniCTest_runAllTests(JNIEnv *env, jclass clazz) {
