@@ -45,5 +45,23 @@ public class JniStaticTest extends TestCase {
         assertEquals(12345678.9, StaticNonce.returnDouble());
     }
 
-    // TODO: Add more tests here.
+    // TODO: Add more tests here. E.g:
+    //    call to method that instantiates its class (based on received jclass)
+    //    call to method returning constant byte
+    //    call to method returning constant char
+    //    call to method returning constant short
+    //    call to method returning constant long
+    //    call to method returning constant float
+    //    call to method returning constant Object (null)
+    //    call to method returning constant String (non-null)
+    //    call to method taking byte, returning a "got expected" flag
+    //    call to method taking char, returning a "got expected" flag
+    //    call to method taking short, returning a "got expected" flag
+    //    call to method taking int, returning a "got expected" flag
+    //    call to method taking long, returning a "got expected" flag
+    //    call to method taking float, returning a "got expected" flag
+    //    call to method taking double, returning a "got expected" flag
+    //    call to method taking String, returning a "got expected" flag
+    //    call to method taking (int, long), returning a "got expected" flag
+    //    call to method taking (long, int), returning a "got expected" flag
 }

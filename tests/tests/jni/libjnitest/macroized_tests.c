@@ -52,33 +52,7 @@
  * The tests.
  */
 
-// Test GetVersion().
-TEST_DECLARATION(GetVersion) {
-    // Android implementations should all be at version 1.6.
-    jint version = CALL(GetVersion);
-
-    if (version != JNI_VERSION_1_6) {
-        return failure("Expected JNI_VERSION_1_6 but got 0x%x", version);
-    }
-
-    return NULL;
-}
-
-// Test DefineClass().
-TEST_DECLARATION(DefineClass) {
-    // Android implementations should always return NULL.
-    jclass clazz = CALL(DefineClass, "foo", NULL, NULL, 0);
-
-    if (clazz != NULL) {
-        return failure("Expected NULL but got %p", clazz);
-    }
-
-    return NULL;
-}
-
-// TODO: More tests go here!
-//
-// Missing functions:
+// TODO: Missing functions:
 //   AllocObject
 //   CallBooleanMethod
 //   CallBooleanMethodA
@@ -170,6 +144,19 @@ TEST_DECLARATION(DefineClass) {
 //   CallVoidMethod
 //   CallVoidMethodA
 //   CallVoidMethodV
+
+TEST_DECLARATION(DefineClass) {
+    // Android implementations should always return NULL.
+    jclass clazz = CALL(DefineClass, "foo", NULL, NULL, 0);
+
+    if (clazz != NULL) {
+        return failure("Expected NULL but got %p", clazz);
+    }
+
+    return NULL;
+}
+
+// TODO: Missing functions:
 //   DeleteLocalRef
 //   DeleteWeakGlobalRef
 //   EnsureLocalCapacity
@@ -235,6 +222,19 @@ TEST_DECLARATION(DefineClass) {
 //   GetStringUTFLength
 //   GetStringUTFRegion
 //   GetSuperclass
+
+TEST_DECLARATION(GetVersion) {
+    // Android implementations should all be at version 1.6.
+    jint version = CALL(GetVersion);
+
+    if (version != JNI_VERSION_1_6) {
+        return failure("Expected JNI_VERSION_1_6 but got 0x%x", version);
+    }
+
+    return NULL;
+}
+
+// TODO: Missing functions:
 //   IsAssignableFrom
 //   IsInstanceOf
 //   IsSameObject
@@ -314,8 +314,8 @@ TEST_DECLARATION(DefineClass) {
  */
 static jstring runAllTests(JNIEnv *env) {
     char *result = runJniTests(env,
-            RUN_TEST(GetVersion),
             RUN_TEST(DefineClass),
+            RUN_TEST(GetVersion),
             NULL);
 
     // TODO: Add more tests, above.
