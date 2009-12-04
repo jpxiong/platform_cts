@@ -34,6 +34,13 @@ public class JniStaticTest extends TestCase {
     /**
      * Test a simple value-returning (but otherwise no-op) method call.
      */
+    public void test_returnBoolean() {
+        assertEquals(true, StaticNonce.returnBoolean());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
     public void test_returnByte() {
         assertEquals(123, StaticNonce.returnByte());
     }
@@ -80,11 +87,32 @@ public class JniStaticTest extends TestCase {
         assertEquals(12345678.9, StaticNonce.returnDouble());
     }
 
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnNull() {
+        assertNull(StaticNonce.returnNull());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnString() {
+        assertEquals("blort", StaticNonce.returnString());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call,
+     * that returns the class that the method is defined on.
+     */
+    public void test_returnThisClass() {
+        assertSame(StaticNonce.class, StaticNonce.returnThisClass());
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method returning constant Object (null)
-    //    call to method returning constant String (non-null)
     //    call to method that instantiates its class (based on received jclass)
     //    call to method taking "this class", returning a "got expected" flag
+    //    call to method taking boolean, returning a "got expected" flag
     //    call to method taking byte, returning a "got expected" flag
     //    call to method taking char, returning a "got expected" flag
     //    call to method taking short, returning a "got expected" flag

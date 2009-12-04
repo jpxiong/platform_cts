@@ -42,6 +42,13 @@ public class JniInstanceTest extends TestCase {
     /**
      * Test a simple value-returning (but otherwise no-op) method call.
      */
+    public void test_returnBoolean() {
+        assertEquals(false, target.returnBoolean());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
     public void test_returnByte() {
         assertEquals(123, target.returnByte());
     }
@@ -88,11 +95,31 @@ public class JniInstanceTest extends TestCase {
         assertEquals(12345678.9, target.returnDouble());
     }
 
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnNull() {
+        assertNull(target.returnNull());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnString() {
+        assertEquals("blort", target.returnString());
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call,
+     * that returns the implicit {@code this} argument.
+     */
+    public void test_returnThis() {
+        assertSame(target, target.returnThis());
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method returning constant Object (null)
-    //    call to method returning constant String (non-null)
-    //    call to method returning "this"
     //    call to method taking "this", returning a "got expected" flag
+    //    call to method taking boolean, returning a "got expected" flag
     //    call to method taking byte, returning a "got expected" flag
     //    call to method taking char, returning a "got expected" flag
     //    call to method taking short, returning a "got expected" flag
