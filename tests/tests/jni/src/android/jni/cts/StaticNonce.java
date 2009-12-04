@@ -25,9 +25,17 @@ public class StaticNonce {
         System.loadLibrary("jnitest");
     }
 
+    /**
+     * Construct an instance.
+     */
+    public StaticNonce() {
+        // This space intentionally left blank.
+    }
+
     // See JniStaticTest for the expected behavior of these methods.
 
     public static native void nop();
+
     public static native boolean returnBoolean();
     public static native byte returnByte();
     public static native short returnShort();
@@ -38,5 +46,17 @@ public class StaticNonce {
     public static native double returnDouble();
     public static native Object returnNull();
     public static native String returnString();
+    public static native short[] returnShortArray();
+    public static native String[] returnStringArray();
     public static native Class returnThisClass();
+    public static native StaticNonce returnInstance();
+
+    public static native boolean takeBoolean(boolean v);
+    public static native boolean takeByte(byte v);
+    public static native boolean takeShort(short v);
+    public static native boolean takeChar(char v);
+    public static native boolean takeInt(int v);
+    public static native boolean takeLong(long v);
+    public static native boolean takeFloat(float v);
+    public static native boolean takeDouble(double v);
 }
