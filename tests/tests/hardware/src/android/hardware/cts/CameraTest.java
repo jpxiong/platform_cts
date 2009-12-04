@@ -29,6 +29,7 @@ import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
+import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
@@ -38,6 +39,7 @@ import android.view.SurfaceHolder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * This test case must run with hardware. It can't be tested in emulator
@@ -399,8 +401,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     // Also test Camera.Parameters
     private void assertParameters(Parameters parameters) {
         // Parameters constants
-        final int WIDTH = 480;
-        final int HEIGHT = 320;
         final int PICTURE_FORMAT = PixelFormat.JPEG;
         final int PREVIEW_FORMAT = PixelFormat.YCbCr_420_SP;
         final int PREVIEW_FRAMERATE = 10;
@@ -417,39 +417,57 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(isValidPixelFormat(origPictureFormat));
         assertTrue(origPictureWidth > 0);
         assertTrue(origPictureHeight > 0);
-        assertTrue(isValidPixelFormat(origPreviewFormat));
         assertTrue(origPreviewWidth > 0);
         assertTrue(origPreviewHeight > 0);
         assertTrue(origPreviewFrameRate > 0);
 
+        // The default preview format must be yuv420 (NV21).
+        assertTrue(origPreviewFormat == PixelFormat.YCbCr_420_SP);
+
+        // If camera supports flash, the default flash mode must be off.
+        String flashMode = parameters.getFlashMode();
+        assertTrue(flashMode == null || flashMode.equals(parameters.FLASH_MODE_OFF));
+
+        // Camera must provide focus mode, supported preview sizes, and
+        // supported picture sizes for applications.
+        List<Size> previewSizes = parameters.getSupportedPreviewSizes();
+        List<Size> pictureSizes = parameters.getSupportedPictureSizes();
+        String focusMode = parameters.getFocusMode();
+        assertTrue(previewSizes != null && previewSizes.size() != 0);
+        assertTrue(pictureSizes != null && pictureSizes.size() != 0);
+        assertTrue(focusMode != null);
+        Size previewSize = previewSizes.get(0);
+        Size pictureSize = pictureSizes.get(0);
+
         parameters.setPictureFormat(PICTURE_FORMAT);
         assertEquals(PICTURE_FORMAT, parameters.getPictureFormat());
-        parameters.setPictureSize(WIDTH, HEIGHT);
-        assertEquals(WIDTH, parameters.getPictureSize().width);
-        assertEquals(HEIGHT, parameters.getPictureSize().height);
+        parameters.setPictureSize(pictureSize.width, pictureSize.height);
+        assertEquals(pictureSize.width, parameters.getPictureSize().width);
+        assertEquals(pictureSize.height, parameters.getPictureSize().height);
         parameters.setPreviewFormat(PREVIEW_FORMAT);
         assertEquals(PREVIEW_FORMAT, parameters.getPreviewFormat());
         parameters.setPreviewFrameRate(PREVIEW_FRAMERATE);
         assertEquals(PREVIEW_FRAMERATE, parameters.getPreviewFrameRate());
-        parameters.setPreviewSize(WIDTH, HEIGHT);
-        assertEquals(WIDTH, parameters.getPreviewSize().width);
-        assertEquals(HEIGHT, parameters.getPreviewSize().height);
+        parameters.setPreviewSize(previewSize.width, previewSize.height);
+        assertEquals(previewSize.width, parameters.getPreviewSize().width);
+        assertEquals(previewSize.height, parameters.getPreviewSize().height);
 
         mCamera.setParameters(parameters);
         Parameters paramActual = mCamera.getParameters();
 
         // camera may not accept exact parameters, but values must be in valid range
         assertTrue(isValidPixelFormat(paramActual.getPictureFormat()));
-        assertTrue(paramActual.getPictureSize().width > 0);
-        assertTrue(paramActual.getPictureSize().height > 0);
+        assertEquals(paramActual.getPictureSize().width, pictureSize.width);
+        assertEquals(paramActual.getPictureSize().height, pictureSize.height);
         assertTrue(isValidPixelFormat(paramActual.getPreviewFormat()));
-        assertTrue(paramActual.getPreviewSize().width > 0);
-        assertTrue(paramActual.getPreviewSize().height > 0);
+        assertEquals(paramActual.getPreviewSize().width, previewSize.width);
+        assertEquals(paramActual.getPreviewSize().height, previewSize.height);
         assertTrue(paramActual.getPreviewFrameRate() > 0);
+
     }
 
     private boolean isValidPixelFormat(int format) {
         return (format == PixelFormat.RGB_565) || (format == PixelFormat.YCbCr_420_SP)
-                || (format == PixelFormat.JPEG);
+                || (format == PixelFormat.JPEG) || (format == PixelFormat.YCbCr_422_I);
     }
 }
