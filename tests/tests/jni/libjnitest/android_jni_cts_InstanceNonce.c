@@ -22,9 +22,16 @@
 #include <jni.h>
 #include <JNIHelp.h>
 
+#include <stdbool.h>
+
 // public native void nop();
 static void InstanceNonce_nop(JNIEnv *env, jobject this) {
     // This space intentionally left blank.
+}
+
+// public native boolean returnBoolean();
+static jboolean InstanceNonce_returnBoolean(JNIEnv *env, jobject this) {
+    return (jboolean) false;
 }
 
 // public native byte returnByte();
@@ -62,9 +69,25 @@ static jdouble InstanceNonce_returnDouble(JNIEnv *env, jobject this) {
     return 12345678.9;
 }
 
+// public native Object returnNull();
+static jobject InstanceNonce_returnNull(JNIEnv *env, jobject this) {
+    return NULL;
+}
+
+// public native String returnString();
+static jobject InstanceNonce_returnString(JNIEnv *env, jobject this) {
+    return (*env)->NewStringUTF(env, "blort");
+}
+
+// public native Class returnThisClass();
+static jobject InstanceNonce_returnThis(JNIEnv *env, jobject this) {
+    return this;
+}
+
 static JNINativeMethod methods[] = {
     // name, signature, function
     { "nop",          "()V", InstanceNonce_nop },
+    { "returnBoolean","()Z", InstanceNonce_returnBoolean },
     { "returnByte",   "()B", InstanceNonce_returnByte },
     { "returnShort",  "()S", InstanceNonce_returnShort },
     { "returnChar",   "()C", InstanceNonce_returnChar },
@@ -72,6 +95,10 @@ static JNINativeMethod methods[] = {
     { "returnLong",   "()J", InstanceNonce_returnLong },
     { "returnFloat",  "()F", InstanceNonce_returnFloat },
     { "returnDouble", "()D", InstanceNonce_returnDouble },
+    { "returnNull",   "()Ljava/lang/Object;", InstanceNonce_returnNull },
+    { "returnString", "()Ljava/lang/String;", InstanceNonce_returnString },
+    { "returnThis",   "()Landroid/jni/cts/InstanceNonce;",
+      InstanceNonce_returnThis },
 };
 
 int register_InstanceNonce(JNIEnv *env) {

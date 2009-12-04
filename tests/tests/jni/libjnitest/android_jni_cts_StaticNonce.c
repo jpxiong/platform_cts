@@ -22,9 +22,16 @@
 #include <jni.h>
 #include <JNIHelp.h>
 
+#include <stdbool.h>
+
 // public static native void nop();
 static void StaticNonce_nop(JNIEnv *env, jclass clazz) {
     // This space intentionally left blank.
+}
+
+// public static native boolean returnBoolean();
+static jboolean StaticNonce_returnBoolean(JNIEnv *env, jclass clazz) {
+    return (jboolean) true;
 }
 
 // public static native byte returnByte();
@@ -62,16 +69,35 @@ static jdouble StaticNonce_returnDouble(JNIEnv *env, jclass clazz) {
     return 12345678.9;
 }
 
+// public static native Object returnNull();
+static jobject StaticNonce_returnNull(JNIEnv *env, jclass clazz) {
+    return NULL;
+}
+
+// public static native String returnString();
+static jobject StaticNonce_returnString(JNIEnv *env, jclass clazz) {
+    return (*env)->NewStringUTF(env, "blort");
+}
+
+// public static native Class returnThisClass();
+static jclass StaticNonce_returnThisClass(JNIEnv *env, jclass clazz) {
+    return clazz;
+}
+
 static JNINativeMethod methods[] = {
     // name, signature, function
-    { "nop",          "()V", StaticNonce_nop },
-    { "returnByte",   "()B", StaticNonce_returnByte },
-    { "returnShort",  "()S", StaticNonce_returnShort },
-    { "returnChar",   "()C", StaticNonce_returnChar },
-    { "returnInt",    "()I", StaticNonce_returnInt },
-    { "returnLong",   "()J", StaticNonce_returnLong },
-    { "returnFloat",  "()F", StaticNonce_returnFloat },
-    { "returnDouble", "()D", StaticNonce_returnDouble },
+    { "nop",             "()V", StaticNonce_nop },
+    { "returnBoolean",   "()Z", StaticNonce_returnBoolean },
+    { "returnByte",      "()B", StaticNonce_returnByte },
+    { "returnShort",     "()S", StaticNonce_returnShort },
+    { "returnChar",      "()C", StaticNonce_returnChar },
+    { "returnInt",       "()I", StaticNonce_returnInt },
+    { "returnLong",      "()J", StaticNonce_returnLong },
+    { "returnFloat",     "()F", StaticNonce_returnFloat },
+    { "returnDouble",    "()D", StaticNonce_returnDouble },
+    { "returnNull",      "()Ljava/lang/Object;", StaticNonce_returnNull },
+    { "returnString",    "()Ljava/lang/String;", StaticNonce_returnString },
+    { "returnThisClass", "()Ljava/lang/Class;",  StaticNonce_returnThisClass },
 };
 
 int register_StaticNonce(JNIEnv *env) {
