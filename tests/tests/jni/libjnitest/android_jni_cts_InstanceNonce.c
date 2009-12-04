@@ -75,8 +75,64 @@ static jobject InstanceNonce_returnNull(JNIEnv *env, jobject this) {
 }
 
 // public native String returnString();
-static jobject InstanceNonce_returnString(JNIEnv *env, jobject this) {
+static jstring InstanceNonce_returnString(JNIEnv *env, jobject this) {
     return (*env)->NewStringUTF(env, "blort");
+}
+
+// public native short[] returnShortArray();
+static jshortArray InstanceNonce_returnShortArray(JNIEnv *env, jobject this) {
+    static jshort contents[] = { 10, 20, 30 };
+
+    jshortArray result = (*env)->NewShortArray(env, 3);
+
+    if (result == NULL) {
+        return NULL;
+    }
+
+    (*env)->SetShortArrayRegion(env, result, 0, 3, contents);
+    return result;
+}
+
+// public String[] returnStringArray();
+static jobjectArray InstanceNonce_returnStringArray(JNIEnv *env,
+        jobject this) {
+    static int indices[] = { 0, 50, 99 };
+    static const char *contents[] = { "blort", "zorch", "fizmo" };
+
+    jclass stringClass = (*env)->FindClass(env, "java/lang/String");
+
+    if ((*env)->ExceptionOccurred(env) != NULL) {
+        return NULL;
+    }
+
+    if (stringClass == NULL) {
+        jniThrowException(env, "java/lang/AssertionError",
+                "class String not found");
+        return NULL;
+    }
+
+    jobjectArray result = (*env)->NewObjectArray(env, 100, stringClass, NULL);
+
+    if (result == NULL) {
+        return NULL;
+    }
+
+    jsize i;
+    for (i = 0; i < 3; i++) {
+        jstring s = (*env)->NewStringUTF(env, contents[i]);
+
+        if (s == NULL) {
+            return NULL;
+        }
+
+        (*env)->SetObjectArrayElement(env, result, indices[i], s);
+
+        if ((*env)->ExceptionOccurred(env) != NULL) {
+            return NULL;
+        }
+    }
+
+    return result;
 }
 
 // public native Class returnThisClass();
@@ -84,21 +140,75 @@ static jobject InstanceNonce_returnThis(JNIEnv *env, jobject this) {
     return this;
 }
 
+// public native boolean takeBoolean(boolean v);
+static jboolean InstanceNonce_takeBoolean(JNIEnv *env, jobject this,
+        jboolean v) {
+    return v == false;
+}
+
+// public native boolean takeByte(byte v);
+static jboolean InstanceNonce_takeByte(JNIEnv *env, jobject this, jbyte v) {
+    return v == -99;
+}
+
+// public native boolean takeShort(short v);
+static jboolean InstanceNonce_takeShort(JNIEnv *env, jobject this, jshort v) {
+    return v == 19991;
+}
+
+// public native boolean takeChar(char v);
+static jboolean InstanceNonce_takeChar(JNIEnv *env, jobject this, jchar v) {
+    return v == 999;
+}
+
+// public native boolean takeInt(int v);
+static jboolean InstanceNonce_takeInt(JNIEnv *env, jobject this, jint v) {
+    return v == -999888777;
+}
+
+// public native boolean takeLong(long v);
+static jboolean InstanceNonce_takeLong(JNIEnv *env, jobject this, jlong v) {
+    return v == 999888777666555444LL;
+}
+
+// public native boolean takeFloat(float v);
+static jboolean InstanceNonce_takeFloat(JNIEnv *env, jobject this, jfloat v) {
+    return v == -9988.7766F;
+}
+
+// public native boolean takeDouble(double v);
+static jboolean InstanceNonce_takeDouble(JNIEnv *env, jobject this,
+        jdouble v) {
+    return v == 999888777.666555;
+}
+
 static JNINativeMethod methods[] = {
     // name, signature, function
-    { "nop",          "()V", InstanceNonce_nop },
-    { "returnBoolean","()Z", InstanceNonce_returnBoolean },
-    { "returnByte",   "()B", InstanceNonce_returnByte },
-    { "returnShort",  "()S", InstanceNonce_returnShort },
-    { "returnChar",   "()C", InstanceNonce_returnChar },
-    { "returnInt",    "()I", InstanceNonce_returnInt },
-    { "returnLong",   "()J", InstanceNonce_returnLong },
-    { "returnFloat",  "()F", InstanceNonce_returnFloat },
-    { "returnDouble", "()D", InstanceNonce_returnDouble },
-    { "returnNull",   "()Ljava/lang/Object;", InstanceNonce_returnNull },
-    { "returnString", "()Ljava/lang/String;", InstanceNonce_returnString },
-    { "returnThis",   "()Landroid/jni/cts/InstanceNonce;",
+    { "nop",               "()V", InstanceNonce_nop },
+    { "returnBoolean",     "()Z", InstanceNonce_returnBoolean },
+    { "returnByte",        "()B", InstanceNonce_returnByte },
+    { "returnShort",       "()S", InstanceNonce_returnShort },
+    { "returnChar",        "()C", InstanceNonce_returnChar },
+    { "returnInt",         "()I", InstanceNonce_returnInt },
+    { "returnLong",        "()J", InstanceNonce_returnLong },
+    { "returnFloat",       "()F", InstanceNonce_returnFloat },
+    { "returnDouble",      "()D", InstanceNonce_returnDouble },
+    { "returnNull",        "()Ljava/lang/Object;", InstanceNonce_returnNull },
+    { "returnString",      "()Ljava/lang/String;",
+      InstanceNonce_returnString },
+    { "returnShortArray",  "()[S", InstanceNonce_returnShortArray },
+    { "returnStringArray", "()[Ljava/lang/String;",
+      InstanceNonce_returnStringArray },
+    { "returnThis",        "()Landroid/jni/cts/InstanceNonce;",
       InstanceNonce_returnThis },
+    { "takeBoolean",       "(Z)Z", InstanceNonce_takeBoolean },
+    { "takeByte",          "(B)Z", InstanceNonce_takeByte },
+    { "takeShort",         "(S)Z", InstanceNonce_takeShort },
+    { "takeChar",          "(C)Z", InstanceNonce_takeChar },
+    { "takeInt",           "(I)Z", InstanceNonce_takeInt },
+    { "takeLong",          "(J)Z", InstanceNonce_takeLong },
+    { "takeFloat",         "(F)Z", InstanceNonce_takeFloat },
+    { "takeDouble",        "(D)Z", InstanceNonce_takeDouble },
 };
 
 int register_InstanceNonce(JNIEnv *env) {

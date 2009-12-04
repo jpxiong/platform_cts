@@ -35,6 +35,7 @@ public class InstanceNonce {
     // See JniInstanceTest for the expected behavior of these methods.
 
     public native void nop();
+
     public native boolean returnBoolean();
     public native byte returnByte();
     public native short returnShort();
@@ -45,5 +46,16 @@ public class InstanceNonce {
     public native double returnDouble();
     public native Object returnNull();
     public native String returnString();
+    public native short[] returnShortArray();
+    public native String[] returnStringArray();
     public native InstanceNonce returnThis();
+
+    public native boolean takeBoolean(boolean v);
+    public native boolean takeByte(byte v);
+    public native boolean takeShort(short v);
+    public native boolean takeChar(char v);
+    public native boolean takeInt(int v);
+    public native boolean takeLong(long v);
+    public native boolean takeFloat(float v);
+    public native boolean takeDouble(double v);
 }

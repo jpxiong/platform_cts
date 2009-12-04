@@ -102,6 +102,31 @@ public class JniStaticTest extends TestCase {
     }
 
     /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnShortArray() {
+        short[] array = StaticNonce.returnShortArray();
+        assertSame(short[].class, array.getClass());
+        assertEquals(3, array.length);
+        assertEquals(10, array[0]);
+        assertEquals(20, array[1]);
+        assertEquals(30, array[2]);
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnStringArray() {
+        String[] array = StaticNonce.returnStringArray();
+        assertSame(String[].class, array.getClass());
+        assertEquals(100, array.length);
+        assertEquals("blort", array[0]);
+        assertEquals(null,    array[1]);
+        assertEquals("zorch", array[50]);
+        assertEquals("fizmo", array[99]);
+    }
+
+    /**
      * Test a simple value-returning (but otherwise no-op) method call,
      * that returns the class that the method is defined on.
      */
@@ -109,18 +134,86 @@ public class JniStaticTest extends TestCase {
         assertSame(StaticNonce.class, StaticNonce.returnThisClass());
     }
 
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call,
+     * that returns the class that the method is defined on.
+     */
+    public void test_returnInstance() {
+        StaticNonce nonce = StaticNonce.returnInstance();
+        assertSame(StaticNonce.class, nonce.getClass());
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeBoolean() {
+        assertTrue(StaticNonce.takeBoolean(true));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeByte() {
+        assertTrue(StaticNonce.takeByte((byte) -99));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeShort() {
+        assertTrue(StaticNonce.takeShort((short) 19991));
+    }
+    
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeChar() {
+        assertTrue(StaticNonce.takeChar((char) 999));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeInt() {
+        assertTrue(StaticNonce.takeInt(-999888777));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeLong() {
+        assertTrue(StaticNonce.takeLong(999888777666555444L));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeFloat() {
+        assertTrue(StaticNonce.takeFloat(-9988.7766F));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeDouble() {
+        assertTrue(StaticNonce.takeDouble(999888777.666555));
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method that instantiates its class (based on received jclass)
-    //    call to method taking "this class", returning a "got expected" flag
-    //    call to method taking boolean, returning a "got expected" flag
-    //    call to method taking byte, returning a "got expected" flag
-    //    call to method taking char, returning a "got expected" flag
-    //    call to method taking short, returning a "got expected" flag
-    //    call to method taking int, returning a "got expected" flag
-    //    call to method taking long, returning a "got expected" flag
-    //    call to method taking float, returning a "got expected" flag
-    //    call to method taking double, returning a "got expected" flag
+    //    call to method taking null, returning a "got expected" flag
     //    call to method taking String, returning a "got expected" flag
+    //    call to method taking "this class", returning a "got expected" flag
     //    call to method taking (int, long), returning a "got expected" flag
     //    call to method taking (long, int), returning a "got expected" flag
+    //    call to method taking one of each primitive type, an object, and
+    //      an array
+    //    call to method taking 50 arguments
 }

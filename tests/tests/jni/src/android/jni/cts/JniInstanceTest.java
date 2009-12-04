@@ -110,6 +110,31 @@ public class JniInstanceTest extends TestCase {
     }
 
     /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnShortArray() {
+        short[] array = target.returnShortArray();
+        assertSame(short[].class, array.getClass());
+        assertEquals(3, array.length);
+        assertEquals(10, array[0]);
+        assertEquals(20, array[1]);
+        assertEquals(30, array[2]);
+    }
+
+    /**
+     * Test a simple value-returning (but otherwise no-op) method call.
+     */
+    public void test_returnStringArray() {
+        String[] array = target.returnStringArray();
+        assertSame(String[].class, array.getClass());
+        assertEquals(100, array.length);
+        assertEquals("blort", array[0]);
+        assertEquals(null,    array[1]);
+        assertEquals("zorch", array[50]);
+        assertEquals("fizmo", array[99]);
+    }
+
+    /**
      * Test a simple value-returning (but otherwise no-op) method call,
      * that returns the implicit {@code this} argument.
      */
@@ -117,17 +142,77 @@ public class JniInstanceTest extends TestCase {
         assertSame(target, target.returnThis());
     }
 
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeBoolean() {
+        assertTrue(target.takeBoolean(false));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeByte() {
+        assertTrue(target.takeByte((byte) -99));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeShort() {
+        assertTrue(target.takeShort((short) 19991));
+    }
+    
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeChar() {
+        assertTrue(target.takeChar((char) 999));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeInt() {
+        assertTrue(target.takeInt(-999888777));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeLong() {
+        assertTrue(target.takeLong(999888777666555444L));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeFloat() {
+        assertTrue(target.takeFloat(-9988.7766F));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeDouble() {
+        assertTrue(target.takeDouble(999888777.666555));
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method taking "this", returning a "got expected" flag
-    //    call to method taking boolean, returning a "got expected" flag
-    //    call to method taking byte, returning a "got expected" flag
-    //    call to method taking char, returning a "got expected" flag
-    //    call to method taking short, returning a "got expected" flag
-    //    call to method taking int, returning a "got expected" flag
-    //    call to method taking long, returning a "got expected" flag
-    //    call to method taking float, returning a "got expected" flag
-    //    call to method taking double, returning a "got expected" flag
+    //    call to method taking null, returning a "got expected" flag
     //    call to method taking String, returning a "got expected" flag
+    //    call to method taking "this", returning a "got expected" flag
     //    call to method taking (int, long), returning a "got expected" flag
     //    call to method taking (long, int), returning a "got expected" flag
+    //    call to method taking one of each primitive type, an object, and
+    //      an array
+    //    call to method taking 50 arguments
 }
