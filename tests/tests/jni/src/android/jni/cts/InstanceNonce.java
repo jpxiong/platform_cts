@@ -35,6 +35,11 @@ public class InstanceNonce {
     // See JniInstanceTest for the expected behavior of these methods.
 
     public native void nop();
+    public native byte returnByte();
+    public native short returnShort();
+    public native char returnChar();
     public native int returnInt();
+    public native long returnLong();
+    public native float returnFloat();
     public native double returnDouble();
 }
