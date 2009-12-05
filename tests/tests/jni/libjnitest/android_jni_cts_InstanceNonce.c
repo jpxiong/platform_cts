@@ -23,6 +23,7 @@
 #include <JNIHelp.h>
 
 #include <stdbool.h>
+#include <string.h>
 
 // public native void nop();
 static void InstanceNonce_nop(JNIEnv *env, jobject this) {
@@ -182,6 +183,37 @@ static jboolean InstanceNonce_takeDouble(JNIEnv *env, jobject this,
     return v == 999888777.666555;
 }
 
+// public native boolean takeNull(Object v);
+static jboolean InstanceNonce_takeNull(JNIEnv *env, jobject this, jobject v) {
+    return v == NULL;
+}
+
+// public native boolean takeString(String v);
+static jboolean InstanceNonce_takeString(JNIEnv *env, jobject this,
+        jstring v) {
+    if (v == NULL) {
+        return false;
+    }
+    
+    jsize length = (*env)->GetStringUTFLength(env, v);
+
+    if (length != 7) {
+        jniThrowException(env, "java/lang/AssertionError", "bad length");
+        return false;
+    }
+
+    const char *utf = (*env)->GetStringUTFChars(env, v, NULL);
+    jboolean result = (strncmp("fuzzbot", utf, 7) == 0);
+
+    (*env)->ReleaseStringUTFChars(env, v, utf);
+    return result;
+}
+
+// public native boolean takeThis(InstanceNonce v);
+static jboolean InstanceNonce_takeThis(JNIEnv *env, jobject this, jobject v) {
+    return (*env)->IsSameObject(env, this, v);
+}
+
 static JNINativeMethod methods[] = {
     // name, signature, function
     { "nop",               "()V", InstanceNonce_nop },
@@ -209,6 +241,10 @@ static JNINativeMethod methods[] = {
     { "takeLong",          "(J)Z", InstanceNonce_takeLong },
     { "takeFloat",         "(F)Z", InstanceNonce_takeFloat },
     { "takeDouble",        "(D)Z", InstanceNonce_takeDouble },
+    { "takeNull",          "(Ljava/lang/Object;)Z", InstanceNonce_takeNull },
+    { "takeString",        "(Ljava/lang/String;)Z", InstanceNonce_takeString },
+    { "takeThis",          "(Landroid/jni/cts/InstanceNonce;)Z",
+      InstanceNonce_takeThis },
 };
 
 int register_InstanceNonce(JNIEnv *env) {

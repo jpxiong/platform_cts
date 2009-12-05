@@ -58,4 +58,7 @@ public class InstanceNonce {
     public native boolean takeLong(long v);
     public native boolean takeFloat(float v);
     public native boolean takeDouble(double v);
+    public native boolean takeNull(Object v);
+    public native boolean takeString(String v);
+    public native boolean takeThis(InstanceNonce v);
 }
