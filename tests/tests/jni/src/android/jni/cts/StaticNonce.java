@@ -59,4 +59,7 @@ public class StaticNonce {
     public static native boolean takeLong(long v);
     public static native boolean takeFloat(float v);
     public static native boolean takeDouble(double v);
+    public static native boolean takeNull(Object v);
+    public static native boolean takeString(String v);
+    public static native boolean takeThisClass(Class v);
 }
