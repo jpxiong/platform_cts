@@ -231,10 +231,42 @@ public class JniInstanceTest extends TestCase {
         assertTrue(target.takeThis(target));
     }
 
-    // TODO: Add more tests here. E.g:
-    //    call to method taking (int, long), returning a "got expected" flag
-    //    call to method taking (long, int), returning a "got expected" flag
-    //    call to method taking one of each primitive type, an object, and
-    //      an array
-    //    call to method taking 50 arguments
+    /**
+     * Test a simple multiple value-taking method call, that returns whether it
+     * got the expected values.
+     */
+    public void test_takeIntLong() {
+        assertTrue(target.takeIntLong(914, 9140914091409140914L));
+    }
+
+    /**
+     * Test a simple multiple value-taking method call, that returns whether it
+     * got the expected values.
+     */
+    public void test_takeLongInt() {
+        assertTrue(target.takeLongInt(-4321L, 12341234));
+    }
+
+    /**
+     * Test a simple multiple value-taking method call, that returns whether it
+     * got the expected values.
+     */
+    public void test_takeOneOfEach() {
+        assertTrue(target.takeOneOfEach((boolean) false, (byte) 1,
+                        (short) 2, (char) 3, (int) 4, 5L, "six", 7.0f, 8.0,
+                        new int[] { 9, 10 }));
+    }
+
+    /**
+     * Test a simple multiple value-taking method call, that returns whether it
+     * got the expected values.
+     */
+    public void test_takeCoolHandLuke() {
+        assertTrue(target.takeCoolHandLuke(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                        20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                        30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                        40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                        50));
+    }
 }
