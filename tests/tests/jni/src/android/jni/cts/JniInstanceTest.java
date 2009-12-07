@@ -206,10 +206,32 @@ public class JniInstanceTest extends TestCase {
         assertTrue(target.takeDouble(999888777.666555));
     }
 
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeNull() {
+        assertTrue(target.takeNull(null));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeString() {
+        assertTrue(target.takeString("fuzzbot"));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value. In particular, this test passes the
+     * instance the method is called on.
+     */
+    public void test_takeThis() {
+        assertTrue(target.takeThis(target));
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method taking null, returning a "got expected" flag
-    //    call to method taking String, returning a "got expected" flag
-    //    call to method taking "this", returning a "got expected" flag
     //    call to method taking (int, long), returning a "got expected" flag
     //    call to method taking (long, int), returning a "got expected" flag
     //    call to method taking one of each primitive type, an object, and

@@ -207,10 +207,32 @@ public class JniStaticTest extends TestCase {
         assertTrue(StaticNonce.takeDouble(999888777.666555));
     }
 
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeNull() {
+        assertTrue(StaticNonce.takeNull(null));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value.
+     */
+    public void test_takeString() {
+        assertTrue(StaticNonce.takeString("fuzzbot"));
+    }
+
+    /**
+     * Test a simple value-taking method call, that returns whether it
+     * got the expected value. In particular, this test passes the
+     * class the method is defined on.
+     */
+    public void test_takeThisClass() {
+        assertTrue(StaticNonce.takeThisClass(StaticNonce.class));
+    }
+
     // TODO: Add more tests here. E.g:
-    //    call to method taking null, returning a "got expected" flag
-    //    call to method taking String, returning a "got expected" flag
-    //    call to method taking "this class", returning a "got expected" flag
     //    call to method taking (int, long), returning a "got expected" flag
     //    call to method taking (long, int), returning a "got expected" flag
     //    call to method taking one of each primitive type, an object, and
