@@ -428,13 +428,18 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         String flashMode = parameters.getFlashMode();
         assertTrue(flashMode == null || flashMode.equals(parameters.FLASH_MODE_OFF));
 
-        // Camera must provide focus mode, supported preview sizes, and
-        // supported picture sizes for applications.
+        // Some parameters must be supported.
         List<Size> previewSizes = parameters.getSupportedPreviewSizes();
         List<Size> pictureSizes = parameters.getSupportedPictureSizes();
+        List<Integer> previewFormats = parameters.getSupportedPreviewFormats();
+        List<Integer> pictureFormats = parameters.getSupportedPictureFormats();
+        List<String> focusModes = parameters.getSupportedFocusModes();
         String focusMode = parameters.getFocusMode();
         assertTrue(previewSizes != null && previewSizes.size() != 0);
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
+        assertTrue(previewFormats != null && previewFormats.size() != 0);
+        assertTrue(pictureFormats != null && pictureFormats.size() != 0);
+        assertTrue(focusModes != null && focusModes.size() != 0);
         assertTrue(focusMode != null);
         Size previewSize = previewSizes.get(0);
         Size pictureSize = pictureSizes.get(0);
