@@ -16,61 +16,84 @@
 
 package android.accounts.cts;
 
-import android.accounts.*;
+import android.accounts.AbstractAccountAuthenticator;
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A simple Mock Account Authenticator
  */
 public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
 
-    public static final String MOCK_ACCOUNT_NAME = "android.accounts.cts.account.name";
-    public static final String MOCK_ACCOUNT_TYPE = "android.accounts.cts.account.type";
-    public static final String MOCK_ACCOUNT_PASSWORD = "android.accounts.cts.account.password";
-    public static final String MOCK_AUTH_TOKEN = "mockAuthToken";
-    public static final String MOCK_AUTH_TOKEN_TYPE = "mockAuthTokenType";
-    public static final String MOCK_AUTH_TOKEN_LABEL = "mockAuthTokenLabel";
-
-    public static final int ERROR_CODE_ACCOUNT_TYPE = 11;
-    public static final String ERROR_MESSAGE_ACCOUNT_TYPE = "Account Type Unknown";
-
-    public static final int ERROR_CODE_ACCOUNT_CANNOT_ADD = 12;
-    public static final String ERROR_MESSAGE_ACCOUNT_CANNOT_ADD = "Cannot add account explicitely";
-
-    public static final int ERROR_CODE_ACCOUNT_UNKNOWN = 13;
-    public static final String ERROR_MESSAGE_ACCOUNT_UNKNOWN = "Account Unknown";
-
-    public static final int ERROR_CODE_AUTH_TOKEN_TYPE = 21;
-    public static final String ERROR_MESSAGE_AUTH_TOKEN_TYPE = "Auth Token Unknown";
-
-    public static final int ERROR_CODE_FEATURE_UNKNOWN = 31;
-    public static final String ERROR_MESSAGE_FEATURE_UNKNOWN = "Feature Unknown";
-
-    public static final String MOCK_FEATURE_1 = "feature1";
-    public static final String MOCK_FEATURE_2 = "feature2";
-
-    private final Map<String, Map<Integer, Account>> accountMapByType;
-    private final Context mContext;
+    private AccountAuthenticatorResponse mResponse;
+    private String mAccountType;
+    private String mAuthTokenType;
+    private String[] mRequiredFeatures;
+    private Bundle mOptions;
+    private Account mAccount;
+    private String[] mFeatures;
 
     private final ArrayList<String> mockFeatureList = new ArrayList<String>();
 
     public MockAccountAuthenticator(Context context) {
         super(context);
 
-        accountMapByType = new HashMap<String, Map<Integer, Account>>();
+        // Create some mock features
+        mockFeatureList.add(AccountManagerTest.FEATURE_1);
+        mockFeatureList.add(AccountManagerTest.FEATURE_2);
+    }
 
-        // we need the Context and AbstractAccountAuthenticator doe not provide
-        // access to it even if it stores it, so just duplicate it
-        mContext = context;
+    public AccountAuthenticatorResponse getResponse() {
+        return mResponse;
+    }
 
-        // create some mock features
-        mockFeatureList.add(MOCK_FEATURE_1);
-        mockFeatureList.add(MOCK_FEATURE_2);
+    public String getAccountType() {
+        return mAccountType;
+    }
+
+    public String getAuthTokenType() {
+        return mAuthTokenType;
+    }
+
+    public String[] getRequiredFeatures() {
+        return mRequiredFeatures;
+    }
+
+    public Bundle getOptions() {
+        return mOptions;
+    }
+
+    public Account getAccount() {
+        return mAccount;
+    }
+
+    public String[] getFeatures() {
+        return mFeatures;
+    }
+
+    public void clearData() {
+        mResponse = null;
+        mAccountType = null;
+        mAuthTokenType = null;
+        mRequiredFeatures = null;
+        mOptions = null;
+        mAccount = null;
+        mFeatures = null;
+    }
+
+    private Bundle createResultBundle() {
+        Bundle result = new Bundle();
+        result.putString(AccountManager.KEY_ACCOUNT_NAME, AccountManagerTest.ACCOUNT_NAME);
+        result.putString(AccountManager.KEY_ACCOUNT_TYPE, AccountManagerTest.ACCOUNT_TYPE);
+        result.putString(AccountManager.KEY_AUTHTOKEN, AccountManagerTest.AUTH_TOKEN);
+
+        return result;
     }
 
     /**
@@ -81,52 +104,13 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
             String authTokenType, String[] requiredFeatures, Bundle options)
             throws NetworkErrorException {
 
-        if(null == response) {
-            throw new IllegalArgumentException("response cannot be null");
-        }
-        if(null == accountType) {
-            throw new IllegalArgumentException("accountType cannot be null");
-        }
-        if(null == authTokenType) {
-            throw new IllegalArgumentException("authTokenType cannot be null");
-        }
+        this.mResponse = response;
+        this.mAccountType = accountType;
+        this.mAuthTokenType = authTokenType;
+        this.mRequiredFeatures = requiredFeatures;
+        this.mOptions = options;
 
-        Bundle result = new Bundle();
-
-        if (accountType.equals(MOCK_ACCOUNT_TYPE)) {
-            Account account = new Account(MOCK_ACCOUNT_NAME, MOCK_ACCOUNT_TYPE);
-            // Add the account in the DB
-            if(AccountManager.get(mContext).addAccountExplicitly(account,
-                    MOCK_ACCOUNT_PASSWORD, 
-                    null)) {
-                getAccountMapByType(accountType).put(account.hashCode(), account);
-
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                result.putString(AccountManager.KEY_AUTHTOKEN, getAuthTokenForAccount(account));
-            }
-            else {
-                result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_CANNOT_ADD);
-                result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_CANNOT_ADD);
-            }
-
-        } else {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_TYPE);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_TYPE);
-        }
-
-        return result;
-    }
-
-    private Map<Integer, Account> getAccountMapByType(String accountType) {
-        String type = (null != accountType) ? accountType : "";
-
-        Map<Integer, Account> map = accountMapByType.get(type);
-        if(null == map) {
-            map = new HashMap<Integer, Account>();
-        }
-
-        return map;
+        return createResultBundle();
     }
 
     /**
@@ -136,45 +120,12 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
 
-        if(null == response) {
-            throw new IllegalArgumentException("response cannot be null");
-        }
-        if(null == account) {
-            throw new IllegalArgumentException("account cannot be null");
-        }
+        this.mResponse = response;
+        this.mAccount = account;
+        this.mAuthTokenType = authTokenType;
+        this.mOptions = options;
 
-        Bundle result = new Bundle();
-
-        Account accountInMap = getAccountMapByType(account.type).get(account.hashCode());
-        if(null == accountInMap) {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_UNKNOWN);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_UNKNOWN);
-        }
-
-        if(authTokenType.equals(MOCK_AUTH_TOKEN_TYPE)) {
-            result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-            result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            result.putString(AccountManager.KEY_AUTHTOKEN, getAuthTokenForAccount(account));
-        } else {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_AUTH_TOKEN_TYPE);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_AUTH_TOKEN_TYPE);
-        }
-
-        return result;
-    }
-
-    private String getAuthTokenForAccount(Account account) {
-        StringBuilder sb  = new StringBuilder(MOCK_AUTH_TOKEN);
-        sb.append(":");
-        if(null != account) {
-            sb.append(account.name);
-        }
-        sb.append(":");
-        if(null != account) {
-            sb.append(account.type);
-        }
-
-        return sb.toString();
+        return createResultBundle();
     }
 
     /**
@@ -184,7 +135,11 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
      */
     @Override
     public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
-        throw new UnsupportedOperationException();
+
+        this.mResponse = response;
+        this.mAccountType = accountType;
+
+        return createResultBundle();
     }
 
     /**
@@ -194,24 +149,13 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
             Bundle options) throws NetworkErrorException {
 
-        if(null == response) {
-            throw new IllegalArgumentException("response cannot be null");
-        }
-        if(null == account) {
-            throw new IllegalArgumentException("account cannot be null");
-        }
+        this.mResponse = response;
+        this.mAccount = account;
+        this.mOptions = options;
 
         Bundle result = new Bundle();
+        result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
 
-        Account accountInMap = getAccountMapByType(account.type).get(account.hashCode());
-        if(null == accountInMap) {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_UNKNOWN);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_UNKNOWN);
-        }
-        else {
-            result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
-        }
- 
         return result;
     }
 
@@ -222,36 +166,12 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
 
-        if(null == response) {
-            throw new IllegalArgumentException("response cannot be null");
-        }
-        if(null == account) {
-            throw new IllegalArgumentException("account cannot be null");
-        }
-        if(null == authTokenType) {
-            throw new IllegalArgumentException("authTokenType cannot be null");
-        }
+        this.mResponse = response;
+        this.mAccount = account;
+        this.mAuthTokenType = authTokenType;
+        this.mOptions = options;
 
-        Bundle result = new Bundle();
-
-        Account accountInMap = getAccountMapByType(account.type).get(account.hashCode());
-        if(null == accountInMap) {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_UNKNOWN);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_UNKNOWN);
-        }
-        else {
-            if(authTokenType.equals(MOCK_AUTH_TOKEN_TYPE)) {
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                result.putString(AccountManager.KEY_AUTHTOKEN, getAuthTokenForAccount(account));
-            }
-            else {
-                result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_AUTH_TOKEN_TYPE);
-                result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_AUTH_TOKEN_TYPE);
-            }
-        }
-
-        return result;
+        return createResultBundle();
     }
 
     /**
@@ -259,14 +179,9 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
      */
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        if(null == authTokenType) {
-            throw new IllegalArgumentException("authTokenType cannot be null");
-        }
-        if(! authTokenType.equals(MOCK_AUTH_TOKEN_TYPE)) {
-            throw new IllegalArgumentException("unknown authTokenType: " + authTokenType);
-        }
+        this.mAuthTokenType = authTokenType;
 
-        return MOCK_AUTH_TOKEN_LABEL;
+        return AccountManagerTest.AUTH_TOKEN_LABEL;
     }
 
     /**
@@ -276,33 +191,24 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account,
             String[] features) throws NetworkErrorException {
 
-        if(null == response) {
-            throw new IllegalArgumentException("response cannot be null");
-        }
-        if(null == account) {
-            throw new IllegalArgumentException("account cannot be null");
-        }
-        if(null == features) {
-            throw new IllegalArgumentException("featues cannot be null");
-        }
+        this.mResponse = response;
+        this.mAccount = account;
+        this.mFeatures = features;
 
         Bundle result = new Bundle();
-
-        Account accountInMap = getAccountMapByType(account.type).get(account.hashCode());
-        if(null == accountInMap) {
-            result.putInt(AccountManager.KEY_ERROR_CODE , ERROR_CODE_ACCOUNT_UNKNOWN);
-            result.putString(AccountManager.KEY_ERROR_MESSAGE , ERROR_MESSAGE_ACCOUNT_UNKNOWN);
-        }
-        else {
-            for(String featureName: features) {
-                if(! mockFeatureList.contains(featureName)) {
-                    result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, false);
-                    return result;
-                }
-            }
+        if (null == features) {
             result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
         }
-
+        else {
+            boolean booleanResult = true;
+            for (String feature: features) {
+                if (!mockFeatureList.contains(feature)) {
+                    booleanResult = false;
+                    break;
+                }
+            }
+            result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, booleanResult);
+        }
         return result;
     }
 }
