@@ -28,7 +28,7 @@ public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
     private static final String EXPECTED_RELEASE = "2.1";
-    private static final String EXPECTED_SDK = "6";
+    private static final String EXPECTED_SDK = "7";
 
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
