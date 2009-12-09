@@ -36,6 +36,8 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
     private static final int HOST_ADDRESS = 0x7f000001;// represent ip 127.0.0.1
     private ConnectivityManager mCm;
+    // must include both mobile data + wifi
+    private static final int MIN_NUM_NETWORK_TYPES = 2;
 
     @Override
     protected void setUp() throws Exception {
@@ -51,7 +53,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public void testGetNetworkInfo() {
 
         // this test assumes that there are at least two network types.
-        assertTrue(mCm.getAllNetworkInfo().length >= 2);
+        assertTrue(mCm.getAllNetworkInfo().length >= MIN_NUM_NETWORK_TYPES);
         NetworkInfo ni = mCm.getNetworkInfo(1);
         State state = ni.getState();
         assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
@@ -163,12 +165,8 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         args = {}
     )
     public void testGetAllNetworkInfo() {
-
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
-        assertEquals(2, ni.length);
-
-        assertTrue(ni[0].getType() >= 0 && ni[0].getType() <= 1);
-        assertTrue(ni[1].getType() >= 0 && ni[1].getType() <= 1);
+        assertTrue(ni.length >= MIN_NUM_NETWORK_TYPES);
     }
 
     @TestTargets({
@@ -206,7 +204,10 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
         for (NetworkInfo n : ni) {
-            assertTrue(mCm.requestRouteToHost(n.getType(), HOST_ADDRESS));
+            // make sure network is up
+            if (n.isConnected()) {
+                assertTrue(mCm.requestRouteToHost(n.getType(), HOST_ADDRESS));
+            }
         }
 
         assertFalse(mCm.requestRouteToHost(-1, HOST_ADDRESS));
