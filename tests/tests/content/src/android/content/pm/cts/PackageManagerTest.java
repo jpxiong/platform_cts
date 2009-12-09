@@ -655,25 +655,8 @@ public class PackageManagerTest extends AndroidTestCase {
         int pkgInfoSize = pkgInfo.size();
         mPackageManager.addPackageToPreferred(CONTENT_PKG_NAME);
         pkgInfo = mPackageManager.getPreferredPackages(0);
-        assertTrue(pkgInfo.size() == 1 + pkgInfoSize);
-        checkPreferredPackagesName(CONTENT_PKG_NAME, pkgInfo);
-        // Test removePackageFromPreferred
-        mPackageManager.removePackageFromPreferred(CONTENT_PKG_NAME);
-        assertTrue(mPackageManager.getPreferredPackages(0).size() == 0);
-    }
-
-    private void checkPreferredPackagesName(String expectedName, List<PackageInfo> pkgs) {
-        boolean isContained = false;
-        Iterator<PackageInfo> infoIterator = pkgs.iterator();
-        String current;
-        while (infoIterator.hasNext()) {
-            current = infoIterator.next().packageName;
-            if (current.equals(expectedName)) {
-                isContained = true;
-                break;
-            }
-        }
-        assertTrue(isContained);
+        // addPackageToPreferred should have no effect
+        assertEquals(pkgInfo.size(), pkgInfoSize);
     }
 
     @TestTargets({
