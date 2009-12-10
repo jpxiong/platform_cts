@@ -55,6 +55,7 @@ char *runJniTests(JNIEnv *env, ...) {
         }
 
         JniTestFunction *function = va_arg(args, JniTestFunction *);
+
         char *oneResult = function(env);
         if (oneResult != NULL) {
             char *newResult;
@@ -67,6 +68,12 @@ char *runJniTests(JNIEnv *env, ...) {
                 return NULL;
             }
             result = newResult;
+        }
+
+        jthrowable oneException = (*env)->ExceptionOccurred(env);
+        if (oneException != NULL) {
+            (*env)->ExceptionDescribe(env);
+            (*env)->ExceptionClear(env);
         }
     }
 
