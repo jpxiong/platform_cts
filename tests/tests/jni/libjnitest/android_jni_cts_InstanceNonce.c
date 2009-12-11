@@ -195,15 +195,8 @@ static jboolean InstanceNonce_takeString(JNIEnv *env, jobject this,
         return false;
     }
     
-    jsize length = (*env)->GetStringUTFLength(env, v);
-
-    if (length != 7) {
-        jniThrowException(env, "java/lang/AssertionError", "bad length");
-        return false;
-    }
-
     const char *utf = (*env)->GetStringUTFChars(env, v, NULL);
-    jboolean result = (strncmp("fuzzbot", utf, 7) == 0);
+    jboolean result = (strcmp("fuzzbot", utf) == 0);
 
     (*env)->ReleaseStringUTFChars(env, v, utf);
     return result;

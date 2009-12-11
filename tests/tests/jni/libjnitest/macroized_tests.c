@@ -42,6 +42,9 @@ static jclass StaticFromNative;
 /** reference to field {@code InstanceFromNative.theOne} */
 static jfieldID InstanceFromNative_theOne;
 
+/** reference to string {@code "biscuits"} */
+static jstring biscuits;
+
 /**
  * how to call a method: (virtual, direct, static) x (standard, array of
  * args, va_list) */
@@ -105,6 +108,13 @@ static char *initializeVariables(JNIEnv *env) {
     }
 
     InstanceFromNative_theOne = field;
+
+    biscuits = CALL(NewStringUTF, "biscuits");
+    if (biscuits == NULL) {
+        return failure("could not construct string");
+    }
+
+    biscuits = (jstring) CALL(NewGlobalRef, biscuits);
 
     return NULL;
 }
@@ -750,7 +760,7 @@ static char *help_CallLongMethod(JNIEnv *env, callType ct, ...) {
 
     va_end(args);
 
-    return FAIL_IF_UNEQUAL("%lld", -80080080087L, result);
+    return FAIL_IF_UNEQUAL("%lld", -80080080087LL, result);
 }
 
 TEST_DECLARATION(CallLongMethod) {
@@ -1098,19 +1108,251 @@ TEST_DECLARATION(CallStaticVoidMethodV) {
     return help_CallVoidMethod(env, STATIC_VA);
 }
 
+static char *help_CallObjectMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnString", "()Ljava/lang/String;");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jstring result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = (jstring) CALL(CallObjectMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = (jstring) CALL(CallObjectMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = (jstring) CALL(CallObjectMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = (jstring)
+                CALL(CallNonvirtualObjectMethod, o, InstanceFromNative,
+                        method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = (jstring)
+                CALL(CallNonvirtualObjectMethodA, o, InstanceFromNative,
+                        method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = (jstring)
+                CALL(CallNonvirtualObjectMethodV, o, InstanceFromNative,
+                        method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = (jstring)
+                CALL(CallStaticObjectMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = (jstring)
+                CALL(CallStaticObjectMethodA, StaticFromNative, method, NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = (jstring)
+                CALL(CallStaticObjectMethodV, StaticFromNative, method, args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    if (result == NULL) {
+        return failure("got null from call");
+    }
+
+    const char *utf = CALL(GetStringUTFChars, result, NULL);
+
+    if (strcmp(utf, "muffins") == 0) {
+        msg = NULL;
+    } else {
+        msg = failure("unexpected string: %s", utf);
+    }
+
+    CALL(ReleaseStringUTFChars, result, utf);
+
+    return msg;
+}
+
+TEST_DECLARATION(CallObjectMethod) {
+    return help_CallObjectMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallObjectMethodA) {
+    return help_CallObjectMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallObjectMethodV) {
+    return help_CallObjectMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualObjectMethod) {
+    return help_CallObjectMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualObjectMethodA) {
+    return help_CallObjectMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualObjectMethodV) {
+    return help_CallObjectMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticObjectMethod) {
+    return help_CallObjectMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticObjectMethodA) {
+    return help_CallObjectMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticObjectMethodV) {
+    return help_CallObjectMethod(env, STATIC_VA);
+}
+
+static char *help_TakeOneOfEach(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "takeOneOfEach", "(DFJICSBZLjava/lang/String;)Z");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jvalue jargs[] = {
+        {d: 0.0}, {f: 1.0f}, {j: 2LL}, {i: 3}, {c: 4}, {s: 5}, {b: 6},
+        {z: true}, {l: biscuits}
+    };
+
+    jboolean result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallBooleanMethod, o, method,
+                    0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+                    (jboolean) true, biscuits);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallBooleanMethodA, o, method, jargs);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallBooleanMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualBooleanMethod, o, InstanceFromNative,
+                    method,
+                    0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+                    (jboolean) true, biscuits);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualBooleanMethodA, o, InstanceFromNative,
+                    method, jargs);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualBooleanMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticBooleanMethod, StaticFromNative, method,
+                    0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+                    (jboolean) true, biscuits);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticBooleanMethodA, StaticFromNative, method,
+                    jargs);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticBooleanMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", true, result);
+}
+
+TEST_DECLARATION(TakeOneOfEach) {
+    return help_TakeOneOfEach(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(TakeOneOfEachA) {
+    return help_TakeOneOfEach(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(TakeOneOfEachV) {
+    return help_TakeOneOfEach(env, VIRTUAL_VA,
+            0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+            (jboolean) true, biscuits);
+}
+
+TEST_DECLARATION(NonvirtualTakeOneOfEach) {
+    return help_TakeOneOfEach(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(NonvirtualTakeOneOfEachA) {
+    return help_TakeOneOfEach(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(NonvirtualTakeOneOfEachV) {
+    return help_TakeOneOfEach(env, DIRECT_VA,
+            0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+            (jboolean) true, biscuits);
+}
+
+TEST_DECLARATION(StaticTakeOneOfEach) {
+    return help_TakeOneOfEach(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(StaticTakeOneOfEachA) {
+    return help_TakeOneOfEach(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(StaticTakeOneOfEachV) {
+    return help_TakeOneOfEach(env, STATIC_VA,
+            0.0, 1.0f, 2LL, 3, (jchar) 4, (jshort) 5, (jbyte) 6,
+            (jboolean) true, biscuits);
+}
+
 // TODO: Missing functions:
-//   CallNonvirtualObjectMethod
-//   CallNonvirtualObjectMethodA
-//   CallNonvirtualObjectMethodV
-//   CallObjectMethod
-//   CallObjectMethodA
-//   CallObjectMethodV
 //   CallStaticBooleanMethod (interesting args)
 //   CallStaticBooleanMethodA (interesting args)
 //   CallStaticBooleanMethodV (interesting args)
-//   CallStaticObjectMethod
-//   CallStaticObjectMethodA
-//   CallStaticObjectMethodV
 
 TEST_DECLARATION(DefineClass) {
     // Android implementations should always return NULL.
@@ -1378,6 +1620,26 @@ static jstring runAllTests(JNIEnv *env) {
                 RUN_TEST(CallStaticVoidMethod),
                 RUN_TEST(CallStaticVoidMethodA),
                 RUN_TEST(CallStaticVoidMethodV),
+
+                RUN_TEST(CallObjectMethod),
+                RUN_TEST(CallObjectMethodA),
+                RUN_TEST(CallObjectMethodV),
+                RUN_TEST(CallNonvirtualObjectMethod),
+                RUN_TEST(CallNonvirtualObjectMethodA),
+                RUN_TEST(CallNonvirtualObjectMethodV),
+                RUN_TEST(CallStaticObjectMethod),
+                RUN_TEST(CallStaticObjectMethodA),
+                RUN_TEST(CallStaticObjectMethodV),
+
+                RUN_TEST(TakeOneOfEach),
+                RUN_TEST(TakeOneOfEachA),
+                RUN_TEST(TakeOneOfEachV),
+                RUN_TEST(NonvirtualTakeOneOfEach),
+                RUN_TEST(NonvirtualTakeOneOfEachA),
+                RUN_TEST(NonvirtualTakeOneOfEachV),
+                RUN_TEST(StaticTakeOneOfEach),
+                RUN_TEST(StaticTakeOneOfEachA),
+                RUN_TEST(StaticTakeOneOfEachV),
 
                 RUN_TEST(DefineClass),
                 RUN_TEST(GetVersion),
