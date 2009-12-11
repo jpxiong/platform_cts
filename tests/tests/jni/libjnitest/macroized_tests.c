@@ -42,8 +42,14 @@ static jclass StaticFromNative;
 /** reference to field {@code InstanceFromNative.theOne} */
 static jfieldID InstanceFromNative_theOne;
 
-/** how to call a method: standard, array of args, or with a va_list */
-typedef enum { CALL_PLAIN, CALL_ARRAY, CALL_VA } callType;
+/**
+ * how to call a method: (virtual, direct, static) x (standard, array of
+ * args, va_list) */
+typedef enum {
+    VIRTUAL_PLAIN, VIRTUAL_ARRAY, VIRTUAL_VA,
+    DIRECT_PLAIN, DIRECT_ARRAY, DIRECT_VA,
+    STATIC_PLAIN, STATIC_ARRAY, STATIC_VA,
+} callType;
 
 /*
  * CALL() calls the JNI function with the given name, using a JNIEnv
@@ -142,6 +148,20 @@ static jmethodID findInstanceMethod(JNIEnv *env, char **errorMsg,
     return result;
 }
 
+/**
+ * Looks up either an instance method on InstanceFromNative or a
+ * static method on StaticFromNative, depending on the given
+ * call type.
+ */
+static jmethodID findAppropriateMethod(JNIEnv *env, char **errorMsg,
+        callType ct, const char *name, const char *sig) {
+    if ((ct == STATIC_PLAIN) || (ct == STATIC_ARRAY) ||
+            (ct == STATIC_VA)) {
+        return findStaticMethod(env, errorMsg, name, sig);
+    } else {
+        return findInstanceMethod(env, errorMsg, name, sig);
+    }
+}
 
 
 /*
@@ -152,9 +172,13 @@ static jmethodID findInstanceMethod(JNIEnv *env, char **errorMsg,
 //   AllocObject
 
 static char *help_CallBooleanMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
     char *msg;
     jobject o = getStandardInstance(env);
-    jmethodID method = findInstanceMethod(env, &msg, "returnBoolean", "()Z");
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnBoolean", "()Z");
 
     if (method == NULL) {
         return msg;
@@ -163,19 +187,45 @@ static char *help_CallBooleanMethod(JNIEnv *env, callType ct, ...) {
     jboolean result;
 
     switch (ct) {
-        case CALL_PLAIN: {
+        case VIRTUAL_PLAIN: {
             result = CALL(CallBooleanMethod, o, method);
             break;
         }
-        case CALL_ARRAY: {
+        case VIRTUAL_ARRAY: {
             result = CALL(CallBooleanMethodA, o, method, NULL);
             break;
         }
-        case CALL_VA: {
-            va_list args;
-            va_start(args, ct);
+        case VIRTUAL_VA: {
             result = CALL(CallBooleanMethodV, o, method, args);
-            va_end(args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualBooleanMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualBooleanMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualBooleanMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticBooleanMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticBooleanMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticBooleanMethodV, StaticFromNative, method,
+                    args);
             break;
         }
         default: {
@@ -183,19 +233,45 @@ static char *help_CallBooleanMethod(JNIEnv *env, callType ct, ...) {
         }
     }
     
+    va_end(args);
+
     return FAIL_IF_UNEQUAL("%d", true, result);
 }
 
 TEST_DECLARATION(CallBooleanMethod) {
-    return help_CallBooleanMethod(env, CALL_PLAIN);
+    return help_CallBooleanMethod(env, VIRTUAL_PLAIN);
 }
 
 TEST_DECLARATION(CallBooleanMethodA) {
-    return help_CallBooleanMethod(env, CALL_ARRAY);
+    return help_CallBooleanMethod(env, VIRTUAL_ARRAY);
 }
 
 TEST_DECLARATION(CallBooleanMethodV) {
-    return help_CallBooleanMethod(env, CALL_VA);
+    return help_CallBooleanMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualBooleanMethod) {
+    return help_CallBooleanMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualBooleanMethodA) {
+    return help_CallBooleanMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualBooleanMethodV) {
+    return help_CallBooleanMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticBooleanMethod) {
+    return help_CallBooleanMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticBooleanMethodA) {
+    return help_CallBooleanMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticBooleanMethodV) {
+    return help_CallBooleanMethod(env, STATIC_VA);
 }
 
 // TODO: Missing functions:
@@ -217,9 +293,6 @@ TEST_DECLARATION(CallBooleanMethodV) {
 //   CallLongMethod
 //   CallLongMethodA
 //   CallLongMethodV
-//   CallNonvirtualBooleanMethod
-//   CallNonvirtualBooleanMethodA
-//   CallNonvirtualBooleanMethodV
 //   CallNonvirtualByteMethod
 //   CallNonvirtualByteMethodA
 //   CallNonvirtualByteMethodV
@@ -253,9 +326,6 @@ TEST_DECLARATION(CallBooleanMethodV) {
 //   CallShortMethod
 //   CallShortMethodA
 //   CallShortMethodV
-//   CallStaticBooleanMethod (no args)
-//   CallStaticBooleanMethodA (no args)
-//   CallStaticBooleanMethodV (no args)
 //   CallStaticBooleanMethod (interesting args)
 //   CallStaticBooleanMethodA (interesting args)
 //   CallStaticBooleanMethodV (interesting args)
@@ -470,6 +540,12 @@ static jstring runAllTests(JNIEnv *env) {
                 RUN_TEST(CallBooleanMethod),
                 RUN_TEST(CallBooleanMethodA),
                 RUN_TEST(CallBooleanMethodV),
+                RUN_TEST(CallNonvirtualBooleanMethod),
+                RUN_TEST(CallNonvirtualBooleanMethodA),
+                RUN_TEST(CallNonvirtualBooleanMethodV),
+                RUN_TEST(CallStaticBooleanMethod),
+                RUN_TEST(CallStaticBooleanMethodA),
+                RUN_TEST(CallStaticBooleanMethodV),
                 RUN_TEST(DefineClass),
                 RUN_TEST(GetVersion),
                 NULL);
