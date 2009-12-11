@@ -648,6 +648,31 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             fail("should throw SQLException.");
         } catch (SQLException e) {
         }
+
+        // make sure execSQL can't be used to execute more than 1 sql statement at a time
+        mDatabase.execSQL("UPDATE test SET age = 40 WHERE name = 'Mike';" + 
+                "UPDATE test SET age = 50 WHERE name = 'Mike';");
+        // age should be updated to 40 not to 50
+        cursor = mDatabase.query(TABLE_NAME, TEST_PROJECTION, null, null, null, null, null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToFirst();
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX));
+        assertEquals(40, cursor.getInt(COLUMN_AGE_INDEX));
+        assertEquals("LA", cursor.getString(COLUMN_ADDR_INDEX));
+        cursor.close();
+
+        // make sure sql injection is NOT allowed or has no effect when using query()
+        String harmfulQuery = "name = 'Mike';UPDATE test SET age = 50 WHERE name = 'Mike'";
+        cursor = mDatabase.query(TABLE_NAME, TEST_PROJECTION, harmfulQuery, null, null, null, null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToFirst();
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX));
+        // row's age column SHOULD NOT be 50
+        assertEquals(40, cursor.getInt(COLUMN_AGE_INDEX));
+        assertEquals("LA", cursor.getString(COLUMN_ADDR_INDEX));
+        cursor.close();;
     }
 
     @TestTargetNew(
