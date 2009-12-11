@@ -31,6 +31,7 @@
 #include "helper.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 /** reference to test class {@code InstanceFromNative} */
