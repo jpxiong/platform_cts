@@ -29,8 +29,21 @@
 #endif
 
 #include "helper.h"
+#include <stdbool.h>
 #include <stdlib.h>
 
+
+/** reference to test class {@code InstanceFromNative} */
+static jclass InstanceFromNative;
+
+/** reference to test class {@code StaticFromNative} */
+static jclass StaticFromNative;
+
+/** reference to field {@code InstanceFromNative.theOne} */
+static jfieldID InstanceFromNative_theOne;
+
+/** how to call a method: standard, array of args, or with a va_list */
+typedef enum { CALL_PLAIN, CALL_ARRAY, CALL_VA } callType;
 
 /*
  * CALL() calls the JNI function with the given name, using a JNIEnv
@@ -47,6 +60,89 @@
 #endif
 
 
+/**
+ * Simple assert-like macro which returns NULL if the two values are
+ * equal, or an error message if they aren't.
+ */
+#define FAIL_IF_UNEQUAL(printfType, expected, actual)          \
+    ((expected) == (actual)) ? NULL :                          \
+        failure("expected " printfType " but got " printfType, \
+                expected, actual);
+
+
+/**
+ * Initializes the static variables. Returns NULL on success or an
+ * error string on failure.
+ */
+static char *initializeVariables(JNIEnv *env) {
+    jclass clazz;
+    jfieldID field;
+
+    clazz = CALL(FindClass, "android/jni/cts/StaticFromNative");
+    if (clazz == NULL) {
+        return failure("could not find StaticFromNative");
+    }
+
+    StaticFromNative = (jclass) CALL(NewGlobalRef, clazz);
+
+    clazz = CALL(FindClass, "android/jni/cts/InstanceFromNative");
+    if (clazz == NULL) {
+        return failure("could not find InstanceFromNative");
+    }
+
+    InstanceFromNative = (jclass) CALL(NewGlobalRef, clazz);
+
+    field = CALL(GetStaticFieldID, InstanceFromNative, "theOne",
+            "Landroid/jni/cts/InstanceFromNative;");
+    if (field == NULL) {
+        return failure("could not find InstanceFromNative.theOne");
+    }
+
+    InstanceFromNative_theOne = field;
+
+    return NULL;
+}
+
+/**
+ * Gets the standard instance of InstanceFromNative.
+ */
+static jobject getStandardInstance(JNIEnv *env) {
+    return CALL(GetStaticObjectField, InstanceFromNative,
+            InstanceFromNative_theOne);
+}
+
+/**
+ * Looks up a static method on StaticFromNative.
+ */
+static jmethodID findStaticMethod(JNIEnv *env, char **errorMsg,
+        const char *name, const char *sig) {
+    jmethodID result = CALL(GetStaticMethodID, StaticFromNative,
+            name, sig);
+
+    if (result == NULL) {
+        *errorMsg = failure("could not find static test method %s:%s",
+                name, sig);
+    }
+
+    return result;
+}
+
+/**
+ * Looks up an instance method on InstanceFromNative.
+ */
+static jmethodID findInstanceMethod(JNIEnv *env, char **errorMsg,
+        const char *name, const char *sig) {
+    jmethodID result = CALL(GetMethodID, InstanceFromNative, name, sig);
+
+    if (result == NULL) {
+        *errorMsg = failure("could not find instance test method %s:%s",
+                name, sig);
+    }
+
+    return result;
+}
+
+
 
 /*
  * The tests.
@@ -54,9 +150,55 @@
 
 // TODO: Missing functions:
 //   AllocObject
-//   CallBooleanMethod
-//   CallBooleanMethodA
-//   CallBooleanMethodV
+
+static char *help_CallBooleanMethod(JNIEnv *env, callType ct, ...) {
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findInstanceMethod(env, &msg, "returnBoolean", "()Z");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jboolean result;
+
+    switch (ct) {
+        case CALL_PLAIN: {
+            result = CALL(CallBooleanMethod, o, method);
+            break;
+        }
+        case CALL_ARRAY: {
+            result = CALL(CallBooleanMethodA, o, method, NULL);
+            break;
+        }
+        case CALL_VA: {
+            va_list args;
+            va_start(args, ct);
+            result = CALL(CallBooleanMethodV, o, method, args);
+            va_end(args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+    
+    return FAIL_IF_UNEQUAL("%d", true, result);
+}
+
+TEST_DECLARATION(CallBooleanMethod) {
+    return help_CallBooleanMethod(env, CALL_PLAIN);
+}
+
+TEST_DECLARATION(CallBooleanMethodA) {
+    return help_CallBooleanMethod(env, CALL_ARRAY);
+}
+
+TEST_DECLARATION(CallBooleanMethodV) {
+    return help_CallBooleanMethod(env, CALL_VA);
+}
+
+// TODO: Missing functions:
 //   CallByteMethod
 //   CallByteMethodA
 //   CallByteMethodV
@@ -111,9 +253,12 @@
 //   CallShortMethod
 //   CallShortMethodA
 //   CallShortMethodV
-//   CallStaticBooleanMethod
-//   CallStaticBooleanMethodA
-//   CallStaticBooleanMethodV
+//   CallStaticBooleanMethod (no args)
+//   CallStaticBooleanMethodA (no args)
+//   CallStaticBooleanMethodV (no args)
+//   CallStaticBooleanMethod (interesting args)
+//   CallStaticBooleanMethodA (interesting args)
+//   CallStaticBooleanMethodV (interesting args)
 //   CallStaticByteMethod
 //   CallStaticByteMethodA
 //   CallStaticByteMethodV
@@ -164,7 +309,7 @@ TEST_DECLARATION(DefineClass) {
 //   ExceptionClear
 //   ExceptionDescribe
 //   ExceptionOccurred
-//   FatalError
+//   FatalError (Note: impossible to test in this framework)
 //   FindClass
 //   FromReflectedField
 //   FromReflectedMethod
@@ -313,12 +458,24 @@ TEST_DECLARATION(GetVersion) {
  * a string listing information about all the failures.
  */
 static jstring runAllTests(JNIEnv *env) {
-    char *result = runJniTests(env,
-            RUN_TEST(DefineClass),
-            RUN_TEST(GetVersion),
-            NULL);
+    char *result = initializeVariables(env);
 
-    // TODO: Add more tests, above.
+    if (CALL(ExceptionOccurred)) {
+        CALL(ExceptionDescribe);
+        CALL(ExceptionClear);
+    }
+
+    if (result == NULL) {
+        result = runJniTests(env,
+                RUN_TEST(CallBooleanMethod),
+                RUN_TEST(CallBooleanMethodA),
+                RUN_TEST(CallBooleanMethodV),
+                RUN_TEST(DefineClass),
+                RUN_TEST(GetVersion),
+                NULL);
+
+        // TODO: Add more tests, above.
+    }
 
     if (result != NULL) {
         jstring s = CALL(NewStringUTF, result);
