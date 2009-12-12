@@ -336,11 +336,10 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
 
         // test attempt to uncheck a item that wasn't checked to begin with
         mListView.setItemChecked(4, false);
-        // item three should still be checked, but current ListView behavior unchecks all items
-        assertEquals(ListView.INVALID_POSITION, mListView.getCheckedItemPosition());
+        // item three should still be checked
+        assertEquals(3, mListView.getCheckedItemPosition());
         assertFalse(mListView.isItemChecked(4));
-        // should be assertTrue
-        assertFalse(mListView.isItemChecked(3));
+        assertTrue(mListView.isItemChecked(3));
         assertFalse(mListView.isItemChecked(2));
 
         mListView.setItemChecked(4, true);
