@@ -131,11 +131,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
     )
     public void testGetBaseline() {
         LinearLayout linearLayout = new LinearLayout(mContext);
-        try {
-            linearLayout.getBaseline();
-            fail("LinearLayout.getBaseline() should throw exception here.");
-        } catch (RuntimeException e) {
-        }
+
         ListView lv1 = new ListView(mContext);
         linearLayout.addView(lv1);
         assertEquals(-1, linearLayout.getBaseline());
