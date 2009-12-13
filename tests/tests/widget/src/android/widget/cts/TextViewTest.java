@@ -913,16 +913,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mTextView.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
         assertEquals(Paint.STRIKE_THRU_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG,
                 mTextView.getPaintFlags());
-
-        // exceptional values, are these correct behaviors
-        mTextView.setPaintFlags(-1);
-        assertEquals(-1 & 0x1ff, mTextView.getPaintFlags());
-
-        mTextView.setPaintFlags(333);
-        assertEquals(333 & 0x1ff, mTextView.getPaintFlags());
-
-        mTextView.setPaintFlags(513);
-        assertEquals(513 & 0x1ff, mTextView.getPaintFlags());
     }
 
     @TestTargets({
