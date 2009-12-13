@@ -968,7 +968,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         assertFalse(d.isOnContextMenuClosedCalled);
         // Closed context menu
         sendKeys(KeyEvent.KEYCODE_BACK);
-        assertTrue(d.isOnPanelClosedCalled);
+        assertFalse(d.isOnPanelClosedCalled);
         // Here isOnContextMenuClosedCalled should be true, see bug 1716918.
         assertFalse(d.isOnContextMenuClosedCalled);
 
