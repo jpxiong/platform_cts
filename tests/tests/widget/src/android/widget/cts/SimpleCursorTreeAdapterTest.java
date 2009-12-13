@@ -19,14 +19,15 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.database.ArrayListCursor;
 
-import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
 import android.view.View;
@@ -212,9 +213,9 @@ public class SimpleCursorTreeAdapterTest extends InstrumentationTestCase {
             mSimpleCursorTreeAdapter.setViewImage(view,
                     SimpleCursorAdapterTest.createTestImage(mContext, SAMPLE_IMAGE_NAME,
                             com.android.cts.stub.R.raw.testimage));
-            d = (BitmapDrawable) mContext.getResources().getDrawable(
+            Bitmap test = WidgetTestUtils.getUnscaledBitmap(mContext.getResources(),
                     com.android.cts.stub.R.raw.testimage);
-            WidgetTestUtils.assertEquals(d.getBitmap(),
+            WidgetTestUtils.assertEquals(test,
                     ((BitmapDrawable) view.getDrawable()).getBitmap());
         } finally {
             SimpleCursorAdapterTest.destroyTestImage(mContext, SAMPLE_IMAGE_NAME);
