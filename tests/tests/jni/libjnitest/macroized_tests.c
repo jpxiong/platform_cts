@@ -232,7 +232,7 @@ static char *help_CallBooleanMethod(JNIEnv *env, callType ct, ...) {
             return failure("shouldn't happen");
         }
     }
-    
+
     va_end(args);
 
     return FAIL_IF_UNEQUAL("%d", true, result);
@@ -274,91 +274,843 @@ TEST_DECLARATION(CallStaticBooleanMethodV) {
     return help_CallBooleanMethod(env, STATIC_VA);
 }
 
+static char *help_CallByteMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnByte", "()B");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jbyte result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallByteMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallByteMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallByteMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualByteMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualByteMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualByteMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticByteMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticByteMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticByteMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", 14, result);
+}
+
+TEST_DECLARATION(CallByteMethod) {
+    return help_CallByteMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallByteMethodA) {
+    return help_CallByteMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallByteMethodV) {
+    return help_CallByteMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualByteMethod) {
+    return help_CallByteMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualByteMethodA) {
+    return help_CallByteMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualByteMethodV) {
+    return help_CallByteMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticByteMethod) {
+    return help_CallByteMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticByteMethodA) {
+    return help_CallByteMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticByteMethodV) {
+    return help_CallByteMethod(env, STATIC_VA);
+}
+
+static char *help_CallShortMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnShort", "()S");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jshort result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallShortMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallShortMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallShortMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualShortMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualShortMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualShortMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticShortMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticShortMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticShortMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", -608, result);
+}
+
+TEST_DECLARATION(CallShortMethod) {
+    return help_CallShortMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallShortMethodA) {
+    return help_CallShortMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallShortMethodV) {
+    return help_CallShortMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualShortMethod) {
+    return help_CallShortMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualShortMethodA) {
+    return help_CallShortMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualShortMethodV) {
+    return help_CallShortMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticShortMethod) {
+    return help_CallShortMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticShortMethodA) {
+    return help_CallShortMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticShortMethodV) {
+    return help_CallShortMethod(env, STATIC_VA);
+}
+
+static char *help_CallCharMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnChar", "()C");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jchar result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallCharMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallCharMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallCharMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualCharMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualCharMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualCharMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticCharMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticCharMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticCharMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", 9000, result);
+}
+
+TEST_DECLARATION(CallCharMethod) {
+    return help_CallCharMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallCharMethodA) {
+    return help_CallCharMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallCharMethodV) {
+    return help_CallCharMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualCharMethod) {
+    return help_CallCharMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualCharMethodA) {
+    return help_CallCharMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualCharMethodV) {
+    return help_CallCharMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticCharMethod) {
+    return help_CallCharMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticCharMethodA) {
+    return help_CallCharMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticCharMethodV) {
+    return help_CallCharMethod(env, STATIC_VA);
+}
+
+static char *help_CallIntMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnInt", "()I");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jint result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallIntMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallIntMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallIntMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualIntMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualIntMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualIntMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticIntMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticIntMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticIntMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", 4004004, result);
+}
+
+TEST_DECLARATION(CallIntMethod) {
+    return help_CallIntMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallIntMethodA) {
+    return help_CallIntMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallIntMethodV) {
+    return help_CallIntMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualIntMethod) {
+    return help_CallIntMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualIntMethodA) {
+    return help_CallIntMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualIntMethodV) {
+    return help_CallIntMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticIntMethod) {
+    return help_CallIntMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticIntMethodA) {
+    return help_CallIntMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticIntMethodV) {
+    return help_CallIntMethod(env, STATIC_VA);
+}
+
+static char *help_CallLongMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnLong", "()J");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jlong result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallLongMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallLongMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallLongMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualLongMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualLongMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualLongMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticLongMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticLongMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticLongMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%lld", -80080080087L, result);
+}
+
+TEST_DECLARATION(CallLongMethod) {
+    return help_CallLongMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallLongMethodA) {
+    return help_CallLongMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallLongMethodV) {
+    return help_CallLongMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualLongMethod) {
+    return help_CallLongMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualLongMethodA) {
+    return help_CallLongMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualLongMethodV) {
+    return help_CallLongMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticLongMethod) {
+    return help_CallLongMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticLongMethodA) {
+    return help_CallLongMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticLongMethodV) {
+    return help_CallLongMethod(env, STATIC_VA);
+}
+
+static char *help_CallFloatMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnFloat", "()F");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jfloat result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallFloatMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallFloatMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallFloatMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualFloatMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualFloatMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualFloatMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticFloatMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticFloatMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticFloatMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%g", 2.5e22f, result);
+}
+
+TEST_DECLARATION(CallFloatMethod) {
+    return help_CallFloatMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallFloatMethodA) {
+    return help_CallFloatMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallFloatMethodV) {
+    return help_CallFloatMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualFloatMethod) {
+    return help_CallFloatMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualFloatMethodA) {
+    return help_CallFloatMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualFloatMethodV) {
+    return help_CallFloatMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticFloatMethod) {
+    return help_CallFloatMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticFloatMethodA) {
+    return help_CallFloatMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticFloatMethodV) {
+    return help_CallFloatMethod(env, STATIC_VA);
+}
+
+static char *help_CallDoubleMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "returnDouble", "()D");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jdouble result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallDoubleMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallDoubleMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallDoubleMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualDoubleMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualDoubleMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualDoubleMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticDoubleMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticDoubleMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticDoubleMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%g", 7.503e100, result);
+}
+
+TEST_DECLARATION(CallDoubleMethod) {
+    return help_CallDoubleMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallDoubleMethodA) {
+    return help_CallDoubleMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallDoubleMethodV) {
+    return help_CallDoubleMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualDoubleMethod) {
+    return help_CallDoubleMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualDoubleMethodA) {
+    return help_CallDoubleMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualDoubleMethodV) {
+    return help_CallDoubleMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticDoubleMethod) {
+    return help_CallDoubleMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticDoubleMethodA) {
+    return help_CallDoubleMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticDoubleMethodV) {
+    return help_CallDoubleMethod(env, STATIC_VA);
+}
+
+static char *help_CallVoidMethod(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "nop", "()V");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    // For these, we simply consider "success" to be "didn't crash."
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            CALL(CallVoidMethod, o, method);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            CALL(CallVoidMethodA, o, method, NULL);
+            break;
+        }
+        case VIRTUAL_VA: {
+            CALL(CallVoidMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            CALL(CallNonvirtualVoidMethod, o, InstanceFromNative,
+                    method);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            CALL(CallNonvirtualVoidMethodA, o, InstanceFromNative,
+                    method, NULL);
+            break;
+        }
+        case DIRECT_VA: {
+            CALL(CallNonvirtualVoidMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            CALL(CallStaticVoidMethod, StaticFromNative, method);
+            break;
+        }
+        case STATIC_ARRAY: {
+            CALL(CallStaticVoidMethodA, StaticFromNative, method,
+                    NULL);
+            break;
+        }
+        case STATIC_VA: {
+            CALL(CallStaticVoidMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return NULL;
+}
+
+TEST_DECLARATION(CallVoidMethod) {
+    return help_CallVoidMethod(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(CallVoidMethodA) {
+    return help_CallVoidMethod(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(CallVoidMethodV) {
+    return help_CallVoidMethod(env, VIRTUAL_VA);
+}
+
+TEST_DECLARATION(CallNonvirtualVoidMethod) {
+    return help_CallVoidMethod(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(CallNonvirtualVoidMethodA) {
+    return help_CallVoidMethod(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(CallNonvirtualVoidMethodV) {
+    return help_CallVoidMethod(env, DIRECT_VA);
+}
+
+TEST_DECLARATION(CallStaticVoidMethod) {
+    return help_CallVoidMethod(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(CallStaticVoidMethodA) {
+    return help_CallVoidMethod(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(CallStaticVoidMethodV) {
+    return help_CallVoidMethod(env, STATIC_VA);
+}
+
 // TODO: Missing functions:
-//   CallByteMethod
-//   CallByteMethodA
-//   CallByteMethodV
-//   CallCharMethod
-//   CallCharMethodA
-//   CallCharMethodV
-//   CallDoubleMethod
-//   CallDoubleMethodA
-//   CallDoubleMethodV
-//   CallFloatMethod
-//   CallFloatMethodA
-//   CallFloatMethodV
-//   CallIntMethod
-//   CallIntMethodA
-//   CallIntMethodV
-//   CallLongMethod
-//   CallLongMethodA
-//   CallLongMethodV
-//   CallNonvirtualByteMethod
-//   CallNonvirtualByteMethodA
-//   CallNonvirtualByteMethodV
-//   CallNonvirtualCharMethod
-//   CallNonvirtualCharMethodA
-//   CallNonvirtualCharMethodV
-//   CallNonvirtualDoubleMethod
-//   CallNonvirtualDoubleMethodA
-//   CallNonvirtualDoubleMethodV
-//   CallNonvirtualFloatMethod
-//   CallNonvirtualFloatMethodA
-//   CallNonvirtualFloatMethodV
-//   CallNonvirtualIntMethod
-//   CallNonvirtualIntMethodA
-//   CallNonvirtualIntMethodV
-//   CallNonvirtualLongMethod
-//   CallNonvirtualLongMethodA
-//   CallNonvirtualLongMethodV
 //   CallNonvirtualObjectMethod
 //   CallNonvirtualObjectMethodA
 //   CallNonvirtualObjectMethodV
-//   CallNonvirtualShortMethod
-//   CallNonvirtualShortMethodA
-//   CallNonvirtualShortMethodV
-//   CallNonvirtualVoidMethod
-//   CallNonvirtualVoidMethodA
-//   CallNonvirtualVoidMethodV
 //   CallObjectMethod
 //   CallObjectMethodA
 //   CallObjectMethodV
-//   CallShortMethod
-//   CallShortMethodA
-//   CallShortMethodV
 //   CallStaticBooleanMethod (interesting args)
 //   CallStaticBooleanMethodA (interesting args)
 //   CallStaticBooleanMethodV (interesting args)
-//   CallStaticByteMethod
-//   CallStaticByteMethodA
-//   CallStaticByteMethodV
-//   CallStaticCharMethod
-//   CallStaticCharMethodA
-//   CallStaticCharMethodV
-//   CallStaticDoubleMethod
-//   CallStaticDoubleMethodA
-//   CallStaticDoubleMethodV
-//   CallStaticFloatMethod
-//   CallStaticFloatMethodA
-//   CallStaticFloatMethodV
-//   CallStaticIntMethod
-//   CallStaticIntMethodA
-//   CallStaticIntMethodV
-//   CallStaticLongMethod
-//   CallStaticLongMethodA
-//   CallStaticLongMethodV
 //   CallStaticObjectMethod
 //   CallStaticObjectMethodA
 //   CallStaticObjectMethodV
-//   CallStaticShortMethod
-//   CallStaticShortMethodA
-//   CallStaticShortMethodV
-//   CallStaticVoidMethod
-//   CallStaticVoidMethodA
-//   CallStaticVoidMethodV
-//   CallVoidMethod
-//   CallVoidMethodA
-//   CallVoidMethodV
 
 TEST_DECLARATION(DefineClass) {
     // Android implementations should always return NULL.
@@ -546,6 +1298,87 @@ static jstring runAllTests(JNIEnv *env) {
                 RUN_TEST(CallStaticBooleanMethod),
                 RUN_TEST(CallStaticBooleanMethodA),
                 RUN_TEST(CallStaticBooleanMethodV),
+
+                RUN_TEST(CallByteMethod),
+                RUN_TEST(CallByteMethodA),
+                RUN_TEST(CallByteMethodV),
+                RUN_TEST(CallNonvirtualByteMethod),
+                RUN_TEST(CallNonvirtualByteMethodA),
+                RUN_TEST(CallNonvirtualByteMethodV),
+                RUN_TEST(CallStaticByteMethod),
+                RUN_TEST(CallStaticByteMethodA),
+                RUN_TEST(CallStaticByteMethodV),
+
+                RUN_TEST(CallShortMethod),
+                RUN_TEST(CallShortMethodA),
+                RUN_TEST(CallShortMethodV),
+                RUN_TEST(CallNonvirtualShortMethod),
+                RUN_TEST(CallNonvirtualShortMethodA),
+                RUN_TEST(CallNonvirtualShortMethodV),
+                RUN_TEST(CallStaticShortMethod),
+                RUN_TEST(CallStaticShortMethodA),
+                RUN_TEST(CallStaticShortMethodV),
+
+                RUN_TEST(CallCharMethod),
+                RUN_TEST(CallCharMethodA),
+                RUN_TEST(CallCharMethodV),
+                RUN_TEST(CallNonvirtualCharMethod),
+                RUN_TEST(CallNonvirtualCharMethodA),
+                RUN_TEST(CallNonvirtualCharMethodV),
+                RUN_TEST(CallStaticCharMethod),
+                RUN_TEST(CallStaticCharMethodA),
+                RUN_TEST(CallStaticCharMethodV),
+
+                RUN_TEST(CallIntMethod),
+                RUN_TEST(CallIntMethodA),
+                RUN_TEST(CallIntMethodV),
+                RUN_TEST(CallNonvirtualIntMethod),
+                RUN_TEST(CallNonvirtualIntMethodA),
+                RUN_TEST(CallNonvirtualIntMethodV),
+                RUN_TEST(CallStaticIntMethod),
+                RUN_TEST(CallStaticIntMethodA),
+                RUN_TEST(CallStaticIntMethodV),
+
+                RUN_TEST(CallLongMethod),
+                RUN_TEST(CallLongMethodA),
+                RUN_TEST(CallLongMethodV),
+                RUN_TEST(CallNonvirtualLongMethod),
+                RUN_TEST(CallNonvirtualLongMethodA),
+                RUN_TEST(CallNonvirtualLongMethodV),
+                RUN_TEST(CallStaticLongMethod),
+                RUN_TEST(CallStaticLongMethodA),
+                RUN_TEST(CallStaticLongMethodV),
+
+                RUN_TEST(CallFloatMethod),
+                RUN_TEST(CallFloatMethodA),
+                RUN_TEST(CallFloatMethodV),
+                RUN_TEST(CallNonvirtualFloatMethod),
+                RUN_TEST(CallNonvirtualFloatMethodA),
+                RUN_TEST(CallNonvirtualFloatMethodV),
+                RUN_TEST(CallStaticFloatMethod),
+                RUN_TEST(CallStaticFloatMethodA),
+                RUN_TEST(CallStaticFloatMethodV),
+
+                RUN_TEST(CallDoubleMethod),
+                RUN_TEST(CallDoubleMethodA),
+                RUN_TEST(CallDoubleMethodV),
+                RUN_TEST(CallNonvirtualDoubleMethod),
+                RUN_TEST(CallNonvirtualDoubleMethodA),
+                RUN_TEST(CallNonvirtualDoubleMethodV),
+                RUN_TEST(CallStaticDoubleMethod),
+                RUN_TEST(CallStaticDoubleMethodA),
+                RUN_TEST(CallStaticDoubleMethodV),
+
+                RUN_TEST(CallVoidMethod),
+                RUN_TEST(CallVoidMethodA),
+                RUN_TEST(CallVoidMethodV),
+                RUN_TEST(CallNonvirtualVoidMethod),
+                RUN_TEST(CallNonvirtualVoidMethodA),
+                RUN_TEST(CallNonvirtualVoidMethodV),
+                RUN_TEST(CallStaticVoidMethod),
+                RUN_TEST(CallStaticVoidMethodA),
+                RUN_TEST(CallStaticVoidMethodV),
+
                 RUN_TEST(DefineClass),
                 RUN_TEST(GetVersion),
                 NULL);
