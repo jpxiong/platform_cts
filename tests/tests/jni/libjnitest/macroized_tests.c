@@ -1350,10 +1350,159 @@ TEST_DECLARATION(StaticTakeOneOfEachV) {
             (jboolean) true, biscuits);
 }
 
-// TODO: Missing functions:
-//   CallStaticBooleanMethod (interesting args)
-//   CallStaticBooleanMethodA (interesting args)
-//   CallStaticBooleanMethodV (interesting args)
+static char *help_TakeCoolHandLuke(JNIEnv *env, callType ct, ...) {
+    va_list args;
+    va_start(args, ct);
+
+    char *msg;
+    jobject o = getStandardInstance(env);
+    jmethodID method = findAppropriateMethod(env, &msg, ct,
+            "takeCoolHandLuke",
+            "(IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII)Z");
+
+    if (method == NULL) {
+        return msg;
+    }
+
+    jvalue jargs[] = {
+        {i: 1}, {i: 2}, {i: 3}, {i: 4},
+        {i: 5}, {i: 6}, {i: 7}, {i: 8}, {i: 9}, 
+        {i: 10}, {i: 11}, {i: 12}, {i: 13}, {i: 14},
+        {i: 15}, {i: 16}, {i: 17}, {i: 18}, {i: 19}, 
+        {i: 20}, {i: 21}, {i: 22}, {i: 23}, {i: 24},
+        {i: 25}, {i: 26}, {i: 27}, {i: 28}, {i: 29}, 
+        {i: 30}, {i: 31}, {i: 32}, {i: 33}, {i: 34},
+        {i: 35}, {i: 36}, {i: 37}, {i: 38}, {i: 39}, 
+        {i: 40}, {i: 41}, {i: 42}, {i: 43}, {i: 44},
+        {i: 45}, {i: 46}, {i: 47}, {i: 48}, {i: 49},
+        {i: 50}
+    };
+
+    jboolean result;
+
+    switch (ct) {
+        case VIRTUAL_PLAIN: {
+            result = CALL(CallBooleanMethod, o, method,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                    40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                    50);
+            break;
+        }
+        case VIRTUAL_ARRAY: {
+            result = CALL(CallBooleanMethodA, o, method, jargs);
+            break;
+        }
+        case VIRTUAL_VA: {
+            result = CALL(CallBooleanMethodV, o, method, args);
+            break;
+        }
+        case DIRECT_PLAIN: {
+            result = CALL(CallNonvirtualBooleanMethod, o, InstanceFromNative,
+                    method,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                    40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                    50);
+            break;
+        }
+        case DIRECT_ARRAY: {
+            result = CALL(CallNonvirtualBooleanMethodA, o, InstanceFromNative,
+                    method, jargs);
+            break;
+        }
+        case DIRECT_VA: {
+            result = CALL(CallNonvirtualBooleanMethodV, o, InstanceFromNative,
+                    method, args);
+            break;
+        }
+        case STATIC_PLAIN: {
+            result = CALL(CallStaticBooleanMethod, StaticFromNative, method,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                    40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                    50);
+            break;
+        }
+        case STATIC_ARRAY: {
+            result = CALL(CallStaticBooleanMethodA, StaticFromNative, method,
+                    jargs);
+            break;
+        }
+        case STATIC_VA: {
+            result = CALL(CallStaticBooleanMethodV, StaticFromNative, method,
+                    args);
+            break;
+        }
+        default: {
+            return failure("shouldn't happen");
+        }
+    }
+
+    va_end(args);
+
+    return FAIL_IF_UNEQUAL("%d", true, result);
+}
+
+TEST_DECLARATION(TakeCoolHandLuke) {
+    return help_TakeCoolHandLuke(env, VIRTUAL_PLAIN);
+}
+
+TEST_DECLARATION(TakeCoolHandLukeA) {
+    return help_TakeCoolHandLuke(env, VIRTUAL_ARRAY);
+}
+
+TEST_DECLARATION(TakeCoolHandLukeV) {
+    return help_TakeCoolHandLuke(env, VIRTUAL_VA,
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+            50);
+}
+
+TEST_DECLARATION(NonvirtualTakeCoolHandLuke) {
+    return help_TakeCoolHandLuke(env, DIRECT_PLAIN);
+}
+
+TEST_DECLARATION(NonvirtualTakeCoolHandLukeA) {
+    return help_TakeCoolHandLuke(env, DIRECT_ARRAY);
+}
+
+TEST_DECLARATION(NonvirtualTakeCoolHandLukeV) {
+    return help_TakeCoolHandLuke(env, DIRECT_VA,
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+            50);
+}
+
+TEST_DECLARATION(StaticTakeCoolHandLuke) {
+    return help_TakeCoolHandLuke(env, STATIC_PLAIN);
+}
+
+TEST_DECLARATION(StaticTakeCoolHandLukeA) {
+    return help_TakeCoolHandLuke(env, STATIC_ARRAY);
+}
+
+TEST_DECLARATION(StaticTakeCoolHandLukeV) {
+    return help_TakeCoolHandLuke(env, STATIC_VA,
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+            50);
+}
 
 TEST_DECLARATION(DefineClass) {
     // Android implementations should always return NULL.
@@ -1641,6 +1790,16 @@ static jstring runAllTests(JNIEnv *env) {
                 RUN_TEST(StaticTakeOneOfEach),
                 RUN_TEST(StaticTakeOneOfEachA),
                 RUN_TEST(StaticTakeOneOfEachV),
+
+                RUN_TEST(TakeCoolHandLuke),
+                RUN_TEST(TakeCoolHandLukeA),
+                RUN_TEST(TakeCoolHandLukeV),
+                RUN_TEST(NonvirtualTakeCoolHandLuke),
+                RUN_TEST(NonvirtualTakeCoolHandLukeA),
+                RUN_TEST(NonvirtualTakeCoolHandLukeV),
+                RUN_TEST(StaticTakeCoolHandLuke),
+                RUN_TEST(StaticTakeCoolHandLukeA),
+                RUN_TEST(StaticTakeCoolHandLukeV),
 
                 RUN_TEST(DefineClass),
                 RUN_TEST(GetVersion),
