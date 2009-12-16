@@ -191,7 +191,7 @@ public class JDiffClassDescription {
                 sb.append(" ");
             }
             sb.append("transient");
-        } 
+        }
         if ((modifiers & Modifier.VOLATILE) != 0) {
             if (isFirst) {
                 isFirst = false;
@@ -199,7 +199,7 @@ public class JDiffClassDescription {
                 sb.append(" ");
             }
             sb.append("volatile");
-        }         
+        }
         if ((modifiers & Modifier.SYNCHRONIZED) != 0) {
             if (isFirst) {
                 isFirst = false;
@@ -223,7 +223,7 @@ public class JDiffClassDescription {
                 sb.append(" ");
             }
             sb.append("strictfp");
-        }        
+        }
 
         return sb.toString();
     }
@@ -267,15 +267,15 @@ public class JDiffClassDescription {
             String accesLevel = convertModifiersToAccessLevel(mModifier);
             if (!"".equals(accesLevel)) {
                 sb.append(accesLevel).append(" ");
-            }            
-            
+            }
+
             String modifierString = convertModifersToModifierString(mModifier);
             if (!"".equals(modifierString)) {
                 sb.append(modifierString).append(" ");
             }
-            
+
             sb.append(mFieldType).append(" ");
-            
+
             sb.append(mName);
 
             return sb.toString();
@@ -360,18 +360,18 @@ public class JDiffClassDescription {
             String accesLevel = convertModifiersToAccessLevel(mModifier);
             if (!"".equals(accesLevel)) {
                 sb.append(accesLevel).append(" ");
-            }            
-            
+            }
+
             String modifierString = convertModifersToModifierString(mModifier);
             if (!"".equals(modifierString)) {
                 sb.append(modifierString).append(" ");
             }
-            
+
             String returnType = getReturnType();
             if (!"".equals(returnType)) {
                 sb.append(returnType).append(" ");
             }
-            
+
             sb.append(mName);
             sb.append("(");
             for (int x = 0; x < mParamList.size(); x++) {
@@ -381,13 +381,13 @@ public class JDiffClassDescription {
                 }
             }
             sb.append(")");
-            
+
             // does it throw?
             if (mExceptionList.size() > 0) {
                 sb.append(" throws ");
                 for (int x = 0; x < mExceptionList.size(); x++) {
                     sb.append(mExceptionList.get(x));
-                    if (x + 1 != mExceptionList.size()) {                    
+                    if (x + 1 != mExceptionList.size()) {
                         sb.append(", ");
                     }
                 }
@@ -398,7 +398,7 @@ public class JDiffClassDescription {
 
         /**
          * Gets the return type.
-         * 
+         *
          * @return the return type of this method.
          */
         protected String getReturnType() {
@@ -421,17 +421,17 @@ public class JDiffClassDescription {
                 addParam(param[i]);
             }
         }
-        
+
         /**
          * Gets the return type.
-         * 
+         *
          * @return the return type of this method.
          */
         @Override
         protected String getReturnType() {
             // Constructors have no return type.
             return "";
-        }        
+        }
     }
 
     /**
@@ -470,17 +470,17 @@ public class JDiffClassDescription {
             return false;
         }
 
-        // Mask off NATIVE since it is a don't care.  Also mask off 
+        // Mask off NATIVE since it is a don't care.  Also mask off
         // SYNCHRONIZED since we've already handled that check.
         int mod1 = reflectedMethod.getModifiers() & ~(Modifier.NATIVE | Modifier.SYNCHRONIZED);
         int mod2 = apiMethod.mModifier & ~(Modifier.NATIVE | Modifier.SYNCHRONIZED);
-        
+
         // We can ignore FINAL for final classes
         if ((mModifier & Modifier.FINAL) != 0) {
             mod1 &= ~Modifier.FINAL;
             mod2 &= ~Modifier.FINAL;
         }
-        
+
         return mod1 == mod2;
     }
 
@@ -708,6 +708,7 @@ public class JDiffClassDescription {
      * Checks all fields in test class for compliance with the API
      * xml.
      */
+    @SuppressWarnings("unchecked")
     private void checkFieldsCompliance() {
         for (JDiffField field : jDiffFields) {
             try {
@@ -717,15 +718,28 @@ public class JDiffClassDescription {
                             field.toReadableString(mAbsoluteClassName),
                             "No field with correct signature found:" +
                             field.toSignatureString());
-                } else {
-                    if (f.getModifiers() != field.mModifier
-                            || !f.getType().getCanonicalName().equals(field.mFieldType)) {
-                        mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
+                } else if (f.getModifiers() != field.mModifier) {
+                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
+                            field.toReadableString(mAbsoluteClassName),
+                            "Non-compatible field modifiers found when looking for " +
+                            field.toSignatureString());
+                } else if (!f.getType().getCanonicalName().equals(field.mFieldType)) {
+                    // type name does not match, but this might be a generic
+                    String genericTypeName = null;
+                    Type type = f.getGenericType();
+                    if (type != null) {
+                        genericTypeName = type instanceof Class ? ((Class) type).getName() :
+                            type.toString();
+                    }
+                    if (genericTypeName == null || !genericTypeName.equals(field.mFieldType)) {
+                        mResultObserver.notifyFailure(
+                                SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
                                 field.toReadableString(mAbsoluteClassName),
-                                "Non-compatible field found when looking for " +
+                                "Non-compatible field type found when looking for " +
                                 field.toSignatureString());
                     }
                 }
+
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking field compliance", e);
                 mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
@@ -759,18 +773,20 @@ public class JDiffClassDescription {
     private boolean checkClassModifiersCompliance() {
         int reflectionModifier = mClass.getModifiers();
         int apiModifier = mModifier;
-        
+
         // If the api class isn't abstract
         if (((apiModifier & Modifier.ABSTRACT) == 0) &&
                 // but the reflected class is
-                ((reflectionModifier & Modifier.ABSTRACT) != 0)) {
+                ((reflectionModifier & Modifier.ABSTRACT) != 0) &&
+                // and it isn't an enum
+                !isEnumType()) {
             // that is a problem
             return false;
         }
         // ABSTRACT check passed, so mask off ABSTRACT
         reflectionModifier &= ~Modifier.ABSTRACT;
         apiModifier &= ~Modifier.ABSTRACT;
-        
+
         if (isAnnotation()) {
             reflectionModifier &= ~CLASS_MODIFIER_ANNOTATION;
         }
@@ -780,7 +796,8 @@ public class JDiffClassDescription {
         if (isEnumType() && mClass.isEnum()) {
             reflectionModifier &= ~CLASS_MODIFIER_ENUM;
         }
-        return ((reflectionModifier == apiModifier) && 
+
+        return ((reflectionModifier == apiModifier) &&
                 (isEnumType() == mClass.isEnum()));
     }
 
@@ -916,7 +933,7 @@ public class JDiffClassDescription {
 
     /**
      * Convert the class into a printable signature string.
-     * 
+     *
      * @return the signature string
      */
     public String toSignatureString() {
