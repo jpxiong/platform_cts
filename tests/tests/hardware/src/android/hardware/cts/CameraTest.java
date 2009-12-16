@@ -221,14 +221,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Thread.sleep(WAIT_LONG);
     }
 
-    private void checkPreviewCallback() throws Exception {
-        SurfaceHolder mSurfaceHolder;
-
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
-        if (LOGV)
-            Log.v(TAG, "check preview callback");
-        mCamera.startPreview();
+    private void waitForPreviewDone() {
         synchronized (mPreviewDone) {
             try {
                 mPreviewDone.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
@@ -239,6 +232,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     Log.v(TAG, "wait was interrupted.");
             }
         }
+    }
+
+    private void checkPreviewCallback() throws Exception {
+        SurfaceHolder mSurfaceHolder;
+
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        if (LOGV) Log.v(TAG, "check preview callback");
+        mCamera.startPreview();
+        waitForPreviewDone();
         mCamera.setPreviewCallback(null);
     }
 
@@ -370,6 +373,48 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         checkPreviewCallback();
         terminateMessageLooper();
         assertFalse(mRawPreviewCallbackResult);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setPreviewDisplay",
+        args = {SurfaceHolder.class}
+    )
+    public void testSetPreviewDisplay() throws Exception {
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        initializeMessageLooper();
+        syncLock();
+
+        // Check the order: startPreview->setPreviewDisplay.
+        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mCamera.startPreview();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        waitForPreviewDone();
+        terminateMessageLooper();
+        assertTrue(mRawPreviewCallbackResult);
+
+        // Check the order: setPreviewDisplay->startPreview.
+        initializeMessageLooper();
+        syncLock();
+        mRawPreviewCallbackResult = false;
+        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        waitForPreviewDone();
+        mCamera.stopPreview();
+        assertTrue(mRawPreviewCallbackResult);
+
+        // Check the order: setting preview display to null->startPreview->
+        // setPreviewDisplay.
+        mRawPreviewCallbackResult = false;
+        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mCamera.setPreviewDisplay(null);
+        mCamera.startPreview();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        waitForPreviewDone();
+        terminateMessageLooper();
+        assertTrue(mRawPreviewCallbackResult);
     }
 
     @TestTargets({
