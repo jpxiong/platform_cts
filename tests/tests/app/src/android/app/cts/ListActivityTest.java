@@ -41,6 +41,7 @@ public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActiv
     protected void setUp() throws Exception {
         super.setUp();
         mStubListActivity = getActivity();
+        assertNotNull(mStubListActivity);
         mScreenOrientation = mStubListActivity.getRequestedOrientation();
     }
 
@@ -103,6 +104,9 @@ public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActiv
     public void testListActivity() throws Throwable {
         waitForAction();
         sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+        getInstrumentation().waitForIdleSync();
+        // view should get created on list item click
+        assertNotNull(mStubListActivity.view);
         String s = (String) ((TextView) mStubListActivity.view).getText();
         int pos = mStubListActivity.itemPosition;
         long id = mStubListActivity.itemId;
