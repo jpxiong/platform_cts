@@ -776,7 +776,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         String pluginPath = "pluginPath";
         mSettings.setPluginsPath(pluginPath);
-        assertEquals(pluginPath, mSettings.getPluginsPath());
+        // plugin path always empty
+        assertEquals("", mSettings.getPluginsPath());
     }
 
     @TestTargets({
@@ -868,7 +869,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getUseDoubleTree());
 
         mSettings.setUseDoubleTree(true);
-        assertTrue(mSettings.getUseDoubleTree());
+        // setUseDoubleTree is a no-op
+        assertFalse(mSettings.getUseDoubleTree());
     }
 
     @TestTargets({
