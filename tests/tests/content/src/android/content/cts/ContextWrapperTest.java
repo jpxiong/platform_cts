@@ -390,8 +390,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         filePath = mContextWrapper.getFilesDir().toString();
         assertNotNull(filePath);
 
-        // FIXME: Move cleanup into tearDown()
-        clearFilesPath(mContextWrapper, filePath);
+        int originalNumFiles = mContextWrapper.fileList().length;
 
         // Build test datum
         byte[][] buffers = new byte[3][];
@@ -443,7 +442,7 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         // Test fileList()
         fileLst = mContextWrapper.fileList();
-        assertEquals(3, fileLst.length);
+        assertEquals(originalNumFiles + 3, fileLst.length);
 
         List<String> list = Arrays.asList(fileLst);
         assertTrue(list.contains("contexttest1"));
@@ -455,9 +454,7 @@ public class ContextWrapperTest extends AndroidTestCase {
             mContextWrapper.deleteFile(file);
         }
         fileLst = mContextWrapper.fileList();
-        assertEquals(0, fileLst.length);
-
-        clearFilesPath(mContextWrapper, filePath);
+        assertEquals(originalNumFiles, fileLst.length);
     }
 
     @TestTargetNew(
@@ -1087,10 +1084,9 @@ public class ContextWrapperTest extends AndroidTestCase {
         args = {String.class, int.class}
     )
     public void testGetDir() {
-        String dirString = mContextWrapper.getDir("testpath", Context.MODE_WORLD_WRITEABLE)
-                .toString();
-        assertNotNull(dirString);
-        clearFilesPath(mContextWrapper, dirString);
+        File dir = mContextWrapper.getDir("testpath", Context.MODE_WORLD_WRITEABLE);
+        assertNotNull(dir);
+        dir.delete();
     }
 
     @TestTargetNew(
@@ -1264,27 +1260,6 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         synchronized (this) {
             wait(1000);
-        }
-    }
-
-    private void clearFilesPath(ContextWrapper context, String pathname) {
-        File path = new File(pathname);
-        ArrayList<String> filenameList = new ArrayList<String>();
-
-        int count = context.fileList().length;
-
-        for (int i = 0; i < count; i ++) {
-            filenameList.add(context.fileList()[i]);
-        }
-
-        for (int i = 0; i < count; i ++) {
-            File file = new File(path, filenameList.get(i));
-            if (file.exists()) {
-                file.delete();
-            }
-        }
-        if (!path.exists()) {
-            path.mkdir();
         }
     }
 
