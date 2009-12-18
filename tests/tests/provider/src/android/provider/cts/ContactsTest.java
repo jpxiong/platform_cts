@@ -16,6 +16,10 @@
 
 package android.provider.cts;
 
+import dalvik.annotation.BrokenTest;
+import dalvik.annotation.KnownFailure;
+import dalvik.annotation.TestTargetClass;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -43,9 +47,6 @@ import android.provider.Contacts.Photos;
 import android.provider.Contacts.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.test.InstrumentationTestCase;
-
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestTargetClass;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -868,6 +869,7 @@ public class ContactsTest extends InstrumentationTestCase {
      * Test case for the behavior of the ContactsProvider's groupmembership table
      * It does not test any APIs in android.provider.Contacts.java
      */
+    @KnownFailure(value="bug 2258907, needs investigation")
     public void testGroupMembershipTable() {
         final String[] GROUP_MEMBERSHIP_PROJECTION = new String[] {
                 GroupMembership._ID, GroupMembership.PERSON_ID,

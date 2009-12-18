@@ -16,6 +16,7 @@
 
 package android.text.method.cts;
 
+import dalvik.annotation.KnownFailure;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -893,6 +894,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             + "ScrollingMovementMethod#left(TextView, Spannable) and "
             + "ScrollingMovementMethod#right(TextView, Spannable)"
             + "when the param widget or buffer is null")
+    @KnownFailure(value="bug 2323405, needs investigation")
     public void testHorizontalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not

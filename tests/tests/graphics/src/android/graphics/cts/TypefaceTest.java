@@ -18,6 +18,7 @@ package android.graphics.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.KnownFailure;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -162,6 +163,7 @@ public class TypefaceTest extends AndroidTestCase {
         method = "createFromAsset",
         args = {android.content.res.AssetManager.class, java.lang.String.class}
     )
+    @KnownFailure(value="bug 2136234")
     public void testCreateFromAsset() {
         // input abnormal params.
         try {
