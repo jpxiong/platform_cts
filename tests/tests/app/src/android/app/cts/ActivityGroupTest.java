@@ -16,14 +16,16 @@
 
 package android.app.cts;
 
-import android.app.ActivityGroup;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.os.Bundle;
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
+
+import android.app.ActivityGroup;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Bundle;
 
 @TestTargetClass(ActivityGroup.class)
 public class ActivityGroupTest extends ActivityTestsBase {
@@ -165,6 +167,7 @@ public class ActivityGroupTest extends ActivityTestsBase {
             args = {}
         )
     })
+    @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabScreen() throws Exception {
         mIntent = mTabIntent;
         runLaunchpad(LaunchpadActivity.LIFECYCLE_SCREEN);
