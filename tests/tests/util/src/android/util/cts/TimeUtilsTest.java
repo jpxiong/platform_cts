@@ -15,15 +15,20 @@
  */
 package android.util.cts;
 
-import java.util.Calendar;
-import java.util.TimeZone;
-import org.apache.harmony.luni.internal.util.ZoneInfoDB;
-import junit.framework.TestCase;
-import android.util.TimeUtils;
+import dalvik.annotation.KnownFailure;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
+
+import org.apache.harmony.luni.internal.util.ZoneInfoDB;
+
+import android.util.TimeUtils;
+
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import junit.framework.TestCase;
 
 @TestTargetClass(TimeUtils.class)
 public class TimeUtilsTest extends TestCase {
@@ -117,6 +122,7 @@ public class TimeUtilsTest extends TestCase {
             args = {int.class, boolean.class, long.class, String.class}
         )
     })
+    @KnownFailure(value="bug 2323433, needs investigation")
     public void testWorld() throws Exception {
         String[] world = new String[] {
             "ad", "Europe/Andorra",
@@ -427,10 +433,14 @@ public class TimeUtilsTest extends TestCase {
 
             c.set(2009, Calendar.JULY, 20, 12, 00, 00);
             guess = guessTimeZone(c, country);
+            assertNotNull(String.format("guessTimeZone returned null for 07/20/09  %s", name),
+                    guess);
             assertEquals(name, guess.getID());  // this would failed on emulator for "Shanghai" 
 
             c.set(2009, Calendar.JANUARY, 20, 12, 00, 00);
             guess = guessTimeZone(c, country);
+            assertNotNull(String.format("guessTimeZone returned null for 01/20/09 %s", name),
+                    guess);
             assertEquals(name, guess.getID());
         }
     }

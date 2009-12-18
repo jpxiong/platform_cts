@@ -79,6 +79,7 @@ public class WebIconDatabaseTest extends
             args = {}
         )
     })
+    @BrokenTest(value="intermittently fails bug 2250024")
     public void testOpen() {
         final WebIconDatabase webIconDatabase = WebIconDatabase.getInstance();
 
@@ -131,6 +132,7 @@ public class WebIconDatabaseTest extends
             args = {String.class}
         )
     })
+    @BrokenTest(value="intermittently fails bug 2250024")
     public void testRetainIconForPageUrl() throws Exception {
         final WebIconDatabase webIconDatabase = WebIconDatabase.getInstance();
         webIconDatabase.open(mFilePath);

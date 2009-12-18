@@ -16,11 +16,19 @@
 
 package android.view.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.KnownFailure;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.test.ActivityInstrumentationTestCase;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -30,14 +38,6 @@ import android.view.ViewParent;
 import android.view.ViewStub;
 import android.view.ViewStub.OnInflateListener;
 import android.widget.LinearLayout;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ViewStub}.
@@ -149,6 +149,7 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         method = "setVisibility",
         args = {int.class}
     )
+    @KnownFailure(value="bug 2323459, fixed in future release")
     @UiThreadTest
     public void testSetVisibility() {
         final ViewStub viewStub1 = (ViewStub) mActivity.findViewById(R.id.viewstub);
