@@ -869,7 +869,8 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             ImageView imageView;
             if (convertView == null) {
                 imageView = new ImageView(mContext);
-                imageView.setLayoutParams(new GridView.LayoutParams(50, 50));
+                int layoutSize = (int)(50 * mContext.getResources().getDisplayMetrics().density);
+                imageView.setLayoutParams(new GridView.LayoutParams(layoutSize, layoutSize));
                 imageView.setAdjustViewBounds(false);
                 imageView.setScaleType(ImageView.ScaleType.CENTER);
                 imageView.setPadding(0, 0, 0, 0);
