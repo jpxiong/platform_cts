@@ -207,37 +207,6 @@ public class ResourcesTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getText",
-        args = {int.class}
-    )
-    public void testGetText1() {
-        try {
-            mResources.getText(0);
-            fail("Failed at testGetText1");
-        } catch (NotFoundException e) {
-            //expected
-        }
-
-        final Configuration config = new Configuration();
-        final Resources res = getResources(config, 0, 0, 0, 0, 0, 0, 0, 0);
-        checkGetText1(res, R.configVarying.simple, "simple default");
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getText",
-        args = {int.class, java.lang.CharSequence.class}
-    )
-    public void testGetText2() {
-        assertNull(mResources.getText(0, null));
-
-        final Configuration config = new Configuration();
-        final Resources res = getResources(config, 0, 0, 0, 0, 0, 0, 0, 0);
-        checkGetText2(res, R.configVarying.simple, "simple default");
-    }
-
-    @TestTargetNew(
         level = TestLevel.PARTIAL,
         method = "getMovie",
         args = {int.class}
