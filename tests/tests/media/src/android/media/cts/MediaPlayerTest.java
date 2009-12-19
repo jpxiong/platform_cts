@@ -36,10 +36,12 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.SurfaceHolder;
 import android.webkit.cts.CtsTestServer;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -47,6 +49,7 @@ import java.io.FileDescriptor;
 @TestTargetClass(MediaPlayer.class)
 public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
 
+    private static String TAG = "CtsMediaPlayerTest";
     private static final int SLEEP_TIME = 1000;
     private final String mSourceMediaOnSdcard;
     private Monitor mOnVideoSizeChangedCalled = new Monitor();
@@ -59,6 +62,10 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
     private Context mContext;
     private Resources mResources;
     private CtsTestServer mServer;
+    private static final Object sVideoSizeChanged = new Object();
+    private static final Object sLock = new Object();
+    private static Looper sLooper = null;
+    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 60000;  //1 min max.
 
     /*
      * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
@@ -69,6 +76,15 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
      */
     private MediaPlayer mMediaPlayer = new MediaPlayer();
 
+    static MediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener =
+        new MediaPlayer.OnVideoSizeChangedListener() {
+            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                synchronized (sVideoSizeChanged) {
+                    Log.v(TAG, "sizechanged notification received ...");
+                    sVideoSizeChanged.notify();
+                }
+            }
+        };
 
     private static class Monitor {
         private boolean signalled;
@@ -284,9 +300,39 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
             args = {FileDescriptor.class}
         )
     })
+
+    /*
+     * Initializes the message looper so that the mediaPlayer object can
+     * receive the callback messages.
+     */
+    private static void initializeMessageLooper() {
+        new Thread() {
+            @Override
+            public void run() {
+                // Set up a looper to be used by camera.
+                Looper.prepare();
+                // Save the looper so that we can terminate this thread
+                // after we are done with it.
+                sLooper = Looper.myLooper();
+                synchronized (sLock) {
+                    sLock.notify();
+                }
+                Looper.loop();  // Blocks forever until Looper.quit() is called.
+                Log.v(TAG, "initializeMessageLooper: quit.");
+            }
+        }.start();
+    }
+
+    /*
+     * Terminates the message looper thread.
+     */
+    private static void terminateMessageLooper() {
+        sLooper.quit();
+    }
+
     public void testPlayVideo() throws Exception {
-        final int expectedVideoWidth = 0;
-        final int expectedVideoHeight = 0;
+        final int expectedVideoWidth = 352; // width of R.raw.testvideo
+        final int expectedVideoHeight = 288; // height of R.raw.testvideo
         final float leftVolume = 0.5f;
         final float rightVolume = 0.5f;
         final int resid = R.raw.testvideo;
@@ -298,8 +344,36 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mp.setDisplay(getActivity().getSurfaceHolder());
         mp.setScreenOnWhilePlaying(true);
         mp.prepare();
-        assertEquals(expectedVideoWidth, mp.getVideoWidth());
-        assertEquals(expectedVideoHeight, mp.getVideoHeight());
+
+        int videoWidth = 0;
+        int videoHeight = 0;
+        synchronized (sLock) {
+            initializeMessageLooper();
+            try {
+                sLock.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
+            } catch(Exception e) {
+                Log.v(TAG, "looper was interrupted.");
+                return;
+            }
+        }
+        try {
+             mp.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+             synchronized (sVideoSizeChanged) {
+                 try {
+                     sVideoSizeChanged.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
+                 } catch (Exception e) {
+                     Log.v(TAG, "wait was interrupted");
+                 }
+             }
+             videoWidth = mp.getVideoWidth();
+             videoHeight = mp.getVideoHeight();
+             terminateMessageLooper();
+        } catch (Exception e) {
+             Log.e(TAG, e.getMessage());
+        }
+        assertEquals(expectedVideoWidth, videoWidth);
+        assertEquals(expectedVideoHeight, videoHeight);
+
         mp.start();
         mp.setVolume(leftVolume, rightVolume);
 
