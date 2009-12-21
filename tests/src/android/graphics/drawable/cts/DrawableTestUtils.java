@@ -22,7 +22,7 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

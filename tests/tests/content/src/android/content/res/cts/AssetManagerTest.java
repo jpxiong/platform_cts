@@ -31,7 +31,7 @@ import android.test.AndroidTestCase;
 import android.util.TypedValue;
 
 import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;

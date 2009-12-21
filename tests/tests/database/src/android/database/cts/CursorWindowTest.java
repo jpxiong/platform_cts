@@ -16,7 +16,7 @@
 
 package android.database.cts;
 
-import com.android.internal.database.ArrayListCursor;
+import com.android.common.ArrayListCursor;
 import com.google.android.collect.Lists;
 
 import dalvik.annotation.TestLevel;
