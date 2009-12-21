@@ -74,11 +74,17 @@ static_res_deps := $(call find-subdir-assets,$(LOCAL_PATH)/res)
 $(copied_res_stamp): PRIVATE_PATH := $(LOCAL_PATH)
 $(copied_res_stamp): PRIVATE_MODULE := $(LOCAL_MODULE)
 $(copied_res_stamp): PRIVATE_RES_DIR := $(signature_res_dir)
+$(copied_res_stamp): FAKE_RESOURCE_DIR := $(dir $(fake_resource_check))
+$(copied_res_stamp): FAKE_RESOURCE_CHECK := $(fake_resource_check)
 $(copied_res_stamp): $(foreach res,$(static_res_deps),$(LOCAL_PATH)/res/${res}) | $(ACP)
 	@echo "Copy resources: $(PRIVATE_MODULE)"
 	@rm -f $@
 	@rm -rf $(PRIVATE_RES_DIR)
 	@mkdir -p $(PRIVATE_RES_DIR)
+	@if [ ! -f $(FAKE_RESOURCE_CHECK) ]; \
+	  then mkdir -p $(FAKE_RESOURCE_DIR); \
+	  touch $(FAKE_RESOURCE_CHECK); \
+	fi
 	$(hide) $(ACP) -rd $(PRIVATE_PATH)/res/* $(PRIVATE_RES_DIR)/
 	$(hide) touch $@
 
