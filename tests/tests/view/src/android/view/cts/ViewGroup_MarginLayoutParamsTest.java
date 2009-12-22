@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 import com.android.cts.stub.R;
 
 import dalvik.annotation.TestTargets;

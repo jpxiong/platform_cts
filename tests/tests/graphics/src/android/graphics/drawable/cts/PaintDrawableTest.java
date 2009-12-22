@@ -212,7 +212,7 @@ public class PaintDrawableTest extends AndroidTestCase {
             IOException {
         int type;
         // FIXME: this come from
-        // com.android.internal.util.XmlUtils.beginDocument. It's better put
+        // com.android.common.XmlUtils.beginDocument. It's better put
         // it up as a utility method of CTS test cases.
         type = parser.next();
         while (type != XmlPullParser.START_TAG && type != XmlPullParser.END_DOCUMENT) {

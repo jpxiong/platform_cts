@@ -17,7 +17,7 @@
 package android.widget.cts;
 
 import com.android.cts.stub.R;
-import com.android.internal.database.ArrayListCursor;
+import com.android.common.ArrayListCursor;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;

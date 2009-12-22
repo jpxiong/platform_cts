@@ -46,7 +46,7 @@ import android.util.AttributeSet;
 import android.util.Xml;
 
 import com.android.internal.app.ResolverActivity;
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;

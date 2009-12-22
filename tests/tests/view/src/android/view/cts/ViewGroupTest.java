@@ -55,7 +55,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.widget.TextView;
 import android.widget.cts.ViewGroupStubActivity;
 
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;

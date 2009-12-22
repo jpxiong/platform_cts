@@ -29,7 +29,7 @@ import android.util.AttributeSet;
 import android.util.Xml;
 
 import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
+import com.android.common.XmlUtils;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
