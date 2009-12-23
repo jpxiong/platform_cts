@@ -115,10 +115,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
 
         CellLocation.requestLocationUpdate();
         synchronized (mLock) {
-            while (!mOnCellLocationChangedCalled) {
-                mLock.wait(TOLERANCE);
-                break;
-            }
+            mLock.wait(TOLERANCE);
         }
         mLooper.quit();
         assertFalse(mOnCellLocationChangedCalled);

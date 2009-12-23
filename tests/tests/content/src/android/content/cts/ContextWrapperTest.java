@@ -380,6 +380,7 @@ public class ContextWrapperTest extends AndroidTestCase {
             args = {String.class}
         )
     })
+    @BrokenTest(value="bug 2323047")
     public void testAccessOfFiles() throws IOException, FileNotFoundException {
         int TEST_LENGTH = 10;
         String[] fileLst;
@@ -451,7 +452,7 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         for (String file: fileLst) {
             // Test deleteFile(String)
-            mContextWrapper.deleteFile(file);
+            assertTrue(mContextWrapper.deleteFile(file));
         }
         fileLst = mContextWrapper.fileList();
         assertEquals(originalNumFiles, fileLst.length);

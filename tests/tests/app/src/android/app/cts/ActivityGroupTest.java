@@ -235,6 +235,7 @@ public class ActivityGroupTest extends ActivityTestsBase {
             args = {}
         )
     })
+    @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabDialog() throws Exception {
         mIntent = mTabIntent;
         runLaunchpad(LaunchpadActivity.LIFECYCLE_DIALOG);

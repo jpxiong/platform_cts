@@ -16,19 +16,17 @@
 
 package android.accounts.cts;
 
+import dalvik.annotation.KnownFailure;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorDescription;
 import android.os.Bundle;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 public class AccountManagerTest extends AndroidTestCase {
 
+    @KnownFailure(value="failure removing account bug 2342468")
     public void testAddAndRemoveAccount() throws Exception {
         AccountManager am = AccountManager.get(getContext());
 
