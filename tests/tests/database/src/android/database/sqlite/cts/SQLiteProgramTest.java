@@ -73,7 +73,7 @@ public class SQLiteProgramTest extends AndroidTestCase {
         statementOne.close();
         statementTwo.close();
     }
-    
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test onAllReferencesReleased(). set compiled-sql-cache size in SQLiteDatabase " +
@@ -92,7 +92,7 @@ public class SQLiteProgramTest extends AndroidTestCase {
         assertTrue(statementOne.getUniqueId() == 0);
         statementOne.close();
     }
-    
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
@@ -132,8 +132,12 @@ public class SQLiteProgramTest extends AndroidTestCase {
         statementOne.releaseReference();
         assertTrue(statementOne.getUniqueId() == nStatement);
         statementOne.close();
+
+        // Close the database here, because this test creates an
+        // orphaned statement
+        closeDatabaseWithOrphanedStatement();
     }
-    
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
@@ -154,8 +158,12 @@ public class SQLiteProgramTest extends AndroidTestCase {
         statementOne.releaseReferenceFromContainer();
         assertTrue(statementOne.getUniqueId() == nStatement);
         statementOne.close();
+
+        // Close the database here, because this test creates an
+        // orphaned statement
+        closeDatabaseWithOrphanedStatement();
     }
-    
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -376,5 +384,17 @@ public class SQLiteProgramTest extends AndroidTestCase {
         " is private.")
     public void testProtectedMethods() {
         // cannot test
+    }
+
+    private void closeDatabaseWithOrphanedStatement(){
+        try {
+            mDatabase.close();
+        } catch (SQLiteException e) {
+            // A SQLiteException is thrown if there are some unfinialized exceptions
+            // This is expected as some tests explicitly leave statements in this state
+            if (!e.getMessage().equals("Unable to close due to unfinalised statements")) {
+                throw e;
+            }
+        }
     }
 }
