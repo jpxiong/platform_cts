@@ -34,6 +34,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteQuery;
 import android.database.sqlite.SQLiteStatement;
+import android.database.sqlite.SQLiteTransactionListener;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import dalvik.annotation.TestTargets;
@@ -48,6 +49,10 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
     private File mDatabaseFile;
     private String mDatabaseFilePath;
     private String mDatabaseDir;
+
+    private boolean mTransactionListenerOnBeginCalled;
+    private boolean mTransactionListenerOnCommitCalled;
+    private boolean mTransactionListenerOnRollbackCalled;
 
     private static final String DATABASE_FILE_NAME = "database_test.db";
     private static final String TABLE_NAME = "test";
@@ -73,6 +78,10 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         mDatabaseFile.getParentFile().mkdirs(); // directory may not exist
         mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile, null);
         assertNotNull(mDatabase);
+
+        mTransactionListenerOnBeginCalled = false;
+        mTransactionListenerOnCommitCalled = false;
+        mTransactionListenerOnRollbackCalled = false;
     }
 
     @Override
@@ -1265,5 +1274,92 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertTrue(mDatabase.isOpen());
         mDatabase.releaseReference();
         assertFalse(mDatabase.isOpen());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test transaction with SQLTransactionListener()",
+        method = "beginTransactionWithListener",
+        args = {SQLiteTransactionListener.class}
+    )
+    public void testTransactionWithSQLiteTransactionListener() {
+        mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
+        mDatabase.execSQL("INSERT INTO test (num) VALUES (0)");
+
+        assertEquals(mTransactionListenerOnBeginCalled, false);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+        mDatabase.beginTransactionWithListener(new TestSQLiteTransactionListener());
+
+        // Assert that the transcation has started
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+
+        setNum(1);
+
+        // State shouldn't have changed
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+
+        // commit the transaction
+        mDatabase.setTransactionSuccessful();
+        mDatabase.endTransaction();
+
+        // the listener should have been told that commit was called
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, true);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test transaction w/rollback with SQLTransactionListener()",
+        method = "beginTransactionWithListener",
+        args = {SQLiteTransactionListener.class}
+    )
+    public void testRollbackTransactionWithSQLiteTransactionListener() {
+        mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
+        mDatabase.execSQL("INSERT INTO test (num) VALUES (0)");
+
+        assertEquals(mTransactionListenerOnBeginCalled, false);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+        mDatabase.beginTransactionWithListener(new TestSQLiteTransactionListener());
+
+        // Assert that the transcation has started
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+
+        setNum(1);
+
+        // State shouldn't have changed
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, false);
+
+        // commit the transaction
+        mDatabase.endTransaction();
+
+        // the listener should have been told that commit was called
+        assertEquals(mTransactionListenerOnBeginCalled, true);
+        assertEquals(mTransactionListenerOnCommitCalled, false);
+        assertEquals(mTransactionListenerOnRollbackCalled, true);
+    }
+
+    private class TestSQLiteTransactionListener implements SQLiteTransactionListener {
+        public void onBegin() {
+            mTransactionListenerOnBeginCalled = true;
+        }
+
+        public void onCommit() {
+            mTransactionListenerOnCommitCalled = true;
+        }
+
+        public void onRollback() {
+            mTransactionListenerOnRollbackCalled = true;
+        }
     }
 }
