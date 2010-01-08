@@ -88,9 +88,10 @@ public class DateSorterTest extends AndroidTestCase {
 
         for (int i = 0; i < DateSorter.DAY_COUNT; i++) {
             long boundary = dateSorter.getBoundary(i);
-            int nextIndex = Math.min(i + 1, DateSorter.DAY_COUNT - 1);
+            int nextIndex = i + 1;
 
             assertEquals(i, dateSorter.getIndex(boundary + 1));
+            if (i == DateSorter.DAY_COUNT - 1) break;
             assertEquals(nextIndex, dateSorter.getIndex(boundary));
             assertEquals(nextIndex, dateSorter.getIndex(boundary-1));
         }
