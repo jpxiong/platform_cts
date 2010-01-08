@@ -118,28 +118,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "onTooManyRedirects",
-        args = {WebView.class, Message.class, Message.class}
-    )
-    @ToBeFixed(explanation="onTooManyRedirects() is never called")
-    public void testOnTooManyRedirects() throws Exception {
-        final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
-        mWebServer = new CtsTestServer(getActivity());
-
-        assertFalse(webViewClient.hasOnTooManyRedirectsCalled());
-        assertEquals(0, webViewClient.hasOnReceivedErrorCode());
-        String url = mWebServer.getRedirectingAssetUrl(TestHtmlConstants.HELLO_WORLD_URL, 100);
-        assertLoadUrlSuccessfully(mWebView, url);
-        // ToBeFixed: onTooManyRedirects() is meant to give the application the choice of continuing
-        // to follow the redirects, but never gets called. onReceivedError() shadows the callback
-        // and aborts unconditionally.
-        assertEquals(WebViewClient.ERROR_REDIRECT_LOOP, webViewClient.hasOnReceivedErrorCode());
-        assertFalse(webViewClient.hasOnTooManyRedirectsCalled());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "onReceivedError",
         args = {WebView.class, int.class, String.class, String.class}
     )
@@ -292,7 +270,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         private boolean mOnPageStartedCalled;
         private boolean mOnPageFinishedCalled;
         private boolean mOnLoadResourceCalled;
-        private boolean mOnTooManyRedirectsCalled;
         private int mOnReceivedErrorCode;
         private boolean mOnFormResubmissionCalled;
         private boolean mDoUpdateVisitedHistoryCalled;
@@ -310,10 +287,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
         public boolean hasOnLoadResourceCalled() {
             return mOnLoadResourceCalled;
-        }
-
-        public boolean hasOnTooManyRedirectsCalled() {
-            return mOnTooManyRedirectsCalled;
         }
 
         public int hasOnReceivedErrorCode() {
@@ -359,12 +332,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
             super.onLoadResource(view, url);
             assertTrue(mOnPageStartedCalled);
             mOnLoadResourceCalled = true;
-        }
-
-        @Override
-        public void onTooManyRedirects(WebView view, Message cancelMsg, Message continueMsg) {
-            mOnTooManyRedirectsCalled = true;
-            continueMsg.sendToTarget();
         }
 
         @Override
