@@ -684,13 +684,13 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         assertTrue(res instanceof AbsListView.LayoutParams);
 
         MyListView listView = new MyListView(mActivity);
-        ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+        ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                                               ViewGroup.LayoutParams.WRAP_CONTENT);
 
         res = listView.generateLayoutParams(p);
         assertNotNull(res);
         assertTrue(res instanceof AbsListView.LayoutParams);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, res.width);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, res.width);
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, res.height);
     }
 

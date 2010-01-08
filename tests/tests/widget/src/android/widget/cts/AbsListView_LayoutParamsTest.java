@@ -76,15 +76,15 @@ public class AbsListView_LayoutParamsTest extends AndroidTestCase {
         assertEquals(TEST_WIDTH, layoutParams.width);
         assertEquals(TEST_HEIGHT, layoutParams.height);
 
-        layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        layoutParams = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
 
-        layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT, 0);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        layoutParams = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT, 0);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
 
         AbsListView.LayoutParams tmpParams = new AbsListView.LayoutParams(TEST_WIDTH, TEST_HEIGHT2);
         layoutParams = new AbsListView.LayoutParams(tmpParams);

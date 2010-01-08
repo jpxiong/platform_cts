@@ -188,19 +188,19 @@ public class TableRow_LayoutParamsTest
         assertEquals(400, mockLayoutParams.height);
 
         a.recycle();
-        // base_attr_fillwrap: layout_width = "fill_parent", layout_height = "wrap_content"
+        // base_attr_fillwrap: layout_width = "match_parent", layout_height = "wrap_content"
         attrs = getAttrs("base_attr_fillwrap");
         a = mTargetContext.obtainStyledAttributes(attrs, R.styleable.ViewGroup_Layout);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_width,
                 R.styleable.ViewGroup_Layout_layout_height);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(TableLayout.LayoutParams.WRAP_CONTENT, mockLayoutParams.height);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_height,
                 R.styleable.ViewGroup_Layout_layout_width);
         assertEquals(TableLayout.LayoutParams.WRAP_CONTENT, mockLayoutParams.width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.height);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.height);
 
         a.recycle();
         // base_attr_noheight: layout_width = 600px, no layout_height.
@@ -214,7 +214,7 @@ public class TableRow_LayoutParamsTest
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_height,
                 R.styleable.ViewGroup_Layout_layout_width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(600, mockLayoutParams.height);
 
         try {

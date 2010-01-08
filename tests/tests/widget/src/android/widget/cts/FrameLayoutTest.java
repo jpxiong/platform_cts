@@ -276,13 +276,13 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
     )
     public void testGenerateLayoutParams1() {
         MyFrameLayout myFrameLayout = new MyFrameLayout(mActivity);
-        ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+        ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         ViewGroup.LayoutParams params = myFrameLayout.generateLayoutParams(p);
         assertNotNull(params);
         assertTrue(params instanceof FrameLayout.LayoutParams);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, params.width);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, params.width);
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, params.height);
     }
 
@@ -296,8 +296,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
 
         FrameLayout.LayoutParams params = mFrameLayout.generateLayoutParams(attrs);
         assertNotNull(params);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, params.width);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, params.height);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, params.width);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, params.height);
         assertEquals(Gravity.BOTTOM, params.gravity);
     }
 
@@ -339,8 +339,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         FrameLayout.LayoutParams params = frameLayout.generateDefaultLayoutParams();
 
         assertNotNull(params);
-        assertEquals(LayoutParams.FILL_PARENT, params.width);
-        assertEquals(LayoutParams.FILL_PARENT, params.height);
+        assertEquals(LayoutParams.MATCH_PARENT, params.width);
+        assertEquals(LayoutParams.MATCH_PARENT, params.height);
     }
 
     @TestTargetNew(

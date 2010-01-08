@@ -250,7 +250,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
     @ToBeFixed(bug="1417734", explanation="generateLayoutParams(AttributeSet)" +
             " will throw a RuntimeException:" +
             " Binary XML file line #-1: You must supply a layout_width attribute." +
-            " But 'layout_width' attribute have been assigned to be 'fill_parent'.")
+            " But 'layout_width' attribute have been assigned to be 'match_parent'.")
     public void testGenerateLayoutParams() {
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(320, 240);
         MockLinearLayout mockLinearLayout = new MockLinearLayout(mContext);
@@ -263,7 +263,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 //        AttributeSet attrs = Xml.asAttributeSet(parser);
 //        LinearLayout linearLayout = new LinearLayout(mContext, attrs);
 //        LayoutParams layoutParams2 = linearLayout.generateLayoutParams(attrs);
-//        assertEquals(LayoutParams.FILL_PARENT, layoutParams2.width);
+//        assertEquals(LayoutParams.MATCH_PARENT, layoutParams2.width);
 //        assertEquals(LayoutParams.WRAP_CONTENT, layoutParams2.height);
     }
 
@@ -303,7 +303,7 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         param = mockLinearLayout.generateDefaultLayoutParams();
         assertNotNull(param);
         assertTrue(param instanceof LinearLayout.LayoutParams);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, param.width);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, param.width);
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, param.height);
 
         mockLinearLayout.setOrientation(-1);

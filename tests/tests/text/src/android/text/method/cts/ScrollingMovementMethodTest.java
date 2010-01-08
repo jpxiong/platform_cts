@@ -230,7 +230,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 mTextView.setLines(1);
                 getActivity().setContentView(mTextView,
-                        new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+                        new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -596,7 +596,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 mTextView.setLines(1);
                 getActivity().setContentView(mTextView,
-                        new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+                        new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -833,7 +833,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         runActionOnUiThread(new Runnable() {
             public void run() {
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 LITTLE_SPACE));
             }
         });

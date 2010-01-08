@@ -16,15 +16,15 @@
  -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/screen"
-    android:layout_width="fill_parent" android:layout_height="fill_parent"
+    android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/chronometer_view_group"
-        android:layout_width="fill_parent" android:layout_height="fill_parent"
+        android:layout_width="match_parent" android:layout_height="match_parent"
         android:orientation="vertical">
         <Chronometer
             android:id="@+id/test_chronometer"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/chronometer_text"
             />

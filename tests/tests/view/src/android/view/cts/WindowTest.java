@@ -203,8 +203,8 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
         // default attributes
         WindowManager.LayoutParams attr = mWindow.getAttributes();
-        assertEquals(WindowManager.LayoutParams.FILL_PARENT, attr.width);
-        assertEquals(WindowManager.LayoutParams.FILL_PARENT, attr.height);
+        assertEquals(WindowManager.LayoutParams.MATCH_PARENT, attr.width);
+        assertEquals(WindowManager.LayoutParams.MATCH_PARENT, attr.height);
         assertEquals(WindowManager.LayoutParams.TYPE_APPLICATION, attr.type);
         assertEquals(PixelFormat.OPAQUE, attr.format);
 
@@ -975,7 +975,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
     /**
      * Set the width and height layout parameters of the window.
-     *    1.The default for both of these is FILL_PARENT;
+     *    1.The default for both of these is MATCH_PARENT;
      *    2.You can change them to WRAP_CONTENT to make a window that is not full-screen.
      */
     @TestTargetNew(
@@ -986,8 +986,8 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     public void testSetLayout() throws Exception {
         mWindow = new MockWindow(mContext);
         WindowManager.LayoutParams attrs = mWindow.getAttributes();
-        assertEquals(WindowManager.LayoutParams.FILL_PARENT, attrs.width);
-        assertEquals(WindowManager.LayoutParams.FILL_PARENT, attrs.height);
+        assertEquals(WindowManager.LayoutParams.MATCH_PARENT, attrs.width);
+        assertEquals(WindowManager.LayoutParams.MATCH_PARENT, attrs.height);
 
         MockWindowCallback callback = new MockWindowCallback();
         mWindow.setCallback(callback);

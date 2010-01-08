@@ -658,7 +658,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     public void testScroll() throws Throwable {
         final MockGridView mockGridView= new MockGridView(mActivity);
         final ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         // this test case can not be ran in UI thread.
         runTestOnUiThread(new Runnable() {
             public void run() {

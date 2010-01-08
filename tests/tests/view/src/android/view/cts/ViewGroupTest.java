@@ -1018,7 +1018,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
     public void testGenerateLayoutParams() {
         MockViewGroup vg = new MockViewGroup(mContext);
         LayoutParams p = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.FILL_PARENT);
+                LayoutParams.MATCH_PARENT);
         assertSame(p, vg.generateLayoutParams(p));
     }
 

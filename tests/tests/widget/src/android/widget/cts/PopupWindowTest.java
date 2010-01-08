@@ -1002,7 +1002,7 @@ public class PopupWindowTest extends
         assertEquals(0, p.width);
         assertEquals(0, p.height);
 
-        mPopupWindow.setWindowLayoutMode(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT);
+        mPopupWindow.setWindowLayoutMode(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mPopupWindow.update(20, 50, 50, 50);
@@ -1010,7 +1010,7 @@ public class PopupWindowTest extends
         });
 
         assertEquals(LayoutParams.WRAP_CONTENT, p.width);
-        assertEquals(LayoutParams.FILL_PARENT, p.height);
+        assertEquals(LayoutParams.MATCH_PARENT, p.height);
     }
 
     /**

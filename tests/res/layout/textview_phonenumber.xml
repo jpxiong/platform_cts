@@ -15,21 +15,21 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
     <TextView android:id="@+id/phoneNumber_default"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:editable="true"/>
 
     <TextView android:id="@+id/phoneNumber_true"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:phoneNumber="true"/>
 
     <TextView android:id="@+id/phoneNumber_false"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:phoneNumber="false"
         android:editable="true"/>

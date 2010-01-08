@@ -382,8 +382,8 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(5, layoutParams.topMargin);
         assertEquals(5, layoutParams.rightMargin);
         assertEquals(5, layoutParams.bottomMargin);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
     }
 
     @TestTargetNew(
@@ -398,15 +398,15 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertFalse(mRadioGroupWrapper.checkLayoutParams(null));
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT);
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         assertFalse(mRadioGroupWrapper.checkLayoutParams(relativeParams));
 
         LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         assertFalse(mRadioGroupWrapper.checkLayoutParams(linearParams));
 
         RadioGroup.LayoutParams radioParams = new RadioGroup.LayoutParams(
-                RadioGroup.LayoutParams.FILL_PARENT, RadioGroup.LayoutParams.FILL_PARENT);
+                RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.MATCH_PARENT);
         assertTrue(mRadioGroupWrapper.checkLayoutParams(radioParams));
     }
 

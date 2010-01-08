@@ -15,13 +15,13 @@
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <SlidingDrawer
         android:id="@+id/drawer"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:animateOnClick="false"
 
         android:handle="@+id/handle"
@@ -36,8 +36,8 @@
         <TextView
             android:id="@id/content"
             android:background="#FF0000FF"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="@string/hello_world" />
 
     </SlidingDrawer>

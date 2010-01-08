@@ -18,14 +18,14 @@
 <android.widget.cts.MockLinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:id="@+id/mocklinearlayout">
 
     <!-- view1 goes on top -->
     <TextView
         android:id="@+id/viewgrouptest_stub"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
     />
 

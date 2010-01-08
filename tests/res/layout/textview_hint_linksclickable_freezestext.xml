@@ -15,45 +15,45 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
     <TextView android:id="@+id/hint_linksClickable_freezesText_default"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView android:id="@+id/hint_blank"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint=""/>
 
     <TextView android:id="@+id/hint_string"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/text_view_simple_hint"/>
 
     <TextView android:id="@+id/hint_resid"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/text_view_hint"/>
 
     <TextView android:id="@+id/linksClickable_true"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:linksClickable="true"/>
 
     <TextView android:id="@+id/linksClickable_false"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:linksClickable="false"/>
 
     <TextView android:id="@+id/freezesText_true"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:freezesText="true"/>
 
     <TextView android:id="@+id/freezesText_false"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:freezesText="false"/>
 

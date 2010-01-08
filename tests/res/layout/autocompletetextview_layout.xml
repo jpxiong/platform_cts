@@ -16,7 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
     android:orientation="vertical"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView android:id="@+id/autocompletetv_title"
@@ -27,6 +27,6 @@
     <AutoCompleteTextView android:id="@+id/autocompletetv_edit"
         android:completionThreshold="1"
         android:completionHint="@string/tabs_1"
-        android:layout_width="fill_parent" 
+        android:layout_width="match_parent" 
         android:layout_height="wrap_content" />
 </LinearLayout>

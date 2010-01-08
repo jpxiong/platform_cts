@@ -295,8 +295,8 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         mGallery = new Gallery(mContext, attrs);
 
         layoutParams = mGallery.generateLayoutParams(attrs);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
     }
 
     @TestTargets({

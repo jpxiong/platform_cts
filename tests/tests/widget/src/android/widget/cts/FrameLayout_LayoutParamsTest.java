@@ -78,7 +78,7 @@ public class FrameLayout_LayoutParamsTest extends AndroidTestCase {
         AttributeSet attrs = getAttributeSet();
 
         new LayoutParams(mContext, attrs);
-        new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0);
         new LayoutParams(new ViewGroup.LayoutParams(mContext, attrs));
         new LayoutParams(new LayoutParams(mContext, attrs));

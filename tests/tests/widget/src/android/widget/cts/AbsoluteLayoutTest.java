@@ -159,8 +159,8 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         LayoutParams params = (LayoutParams) layout.generateLayoutParams(getAttributeSet());
 
         assertNotNull(params);
-        assertEquals(LayoutParams.FILL_PARENT, params.width);
-        assertEquals(LayoutParams.FILL_PARENT, params.height);
+        assertEquals(LayoutParams.MATCH_PARENT, params.width);
+        assertEquals(LayoutParams.MATCH_PARENT, params.height);
         assertEquals(0, params.x);
         assertEquals(0, params.y);
 

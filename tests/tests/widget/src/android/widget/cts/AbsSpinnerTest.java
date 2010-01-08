@@ -369,7 +369,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
     public void testGenerateDefaultLayoutParams() {
 //        final MockSpinner absSpinner = new MockSpinner(mContext);
 //        LayoutParams layoutParams = (LayoutParams) absSpinner.generateDefaultLayoutParams();
-//        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
+//        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
 //        assertEquals(LayoutParams.WRAP_CONTENT, layoutParams.height);
     }
 

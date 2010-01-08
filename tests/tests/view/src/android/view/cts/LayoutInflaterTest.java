@@ -304,8 +304,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
         mLayout.setOrientation(LinearLayout.VERTICAL);
         mLayout.setHorizontalGravity(Gravity.LEFT);
         mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         assertEquals(0, mLayout.getChildCount());
         view = mLayoutInflater.inflate(R.layout.inflater_layout,
                 mLayout);
@@ -343,8 +343,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
         mLayout.setOrientation(LinearLayout.VERTICAL);
         mLayout.setHorizontalGravity(Gravity.LEFT);
         mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         assertEquals(0, mLayout.getChildCount());
         view = mLayoutInflater.inflate(R.layout.inflater_layout,
                 mLayout, false);
@@ -388,8 +388,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
         mLayout.setOrientation(LinearLayout.VERTICAL);
         mLayout.setHorizontalGravity(Gravity.LEFT);
         mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         assertEquals(0, mLayout.getChildCount());
 
         try {
@@ -447,8 +447,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
        mLayout.setOrientation(LinearLayout.VERTICAL);
        mLayout.setHorizontalGravity(Gravity.LEFT);
        mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-               ViewGroup.LayoutParams.FILL_PARENT,
-               ViewGroup.LayoutParams.FILL_PARENT));
+               ViewGroup.LayoutParams.MATCH_PARENT,
+               ViewGroup.LayoutParams.MATCH_PARENT));
        assertEquals(0, mLayout.getChildCount());
 
        try {

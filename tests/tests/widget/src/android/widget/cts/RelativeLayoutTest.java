@@ -325,8 +325,8 @@ public class RelativeLayoutTest extends
         XmlResourceParser parser = mActivity.getResources().getLayout(R.layout.relative_layout);
         XmlUtils.beginDocument(parser, "RelativeLayout");
         LayoutParams layoutParams = relativeLayout.generateLayoutParams(parser);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
 
         // exceptional value
         try {

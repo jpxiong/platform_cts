@@ -953,7 +953,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         runTestOnUiThread(new Runnable() {
             public void run() {
                 d.addContentView(parent, new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.FILL_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 d.registerForContextMenu(v);
                 d.openContextMenu(v);

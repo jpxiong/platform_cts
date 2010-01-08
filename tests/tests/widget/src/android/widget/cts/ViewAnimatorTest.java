@@ -391,7 +391,7 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
 
         LayoutParams p =
-            new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         mViewAnimator.addView(v1, 0, p);
         assertEquals(1, mViewAnimator.getChildCount());
         assertEquals(0, mViewAnimator.indexOfChild(v1));

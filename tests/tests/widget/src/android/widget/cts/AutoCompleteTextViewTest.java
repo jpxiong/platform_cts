@@ -859,8 +859,8 @@ public class AutoCompleteTextViewTest extends
         mAutoCompleteTextView.setDropDownWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, mAutoCompleteTextView.getDropDownWidth());
 
-        mAutoCompleteTextView.setDropDownWidth(ViewGroup.LayoutParams.FILL_PARENT);
-        assertEquals(ViewGroup.LayoutParams.FILL_PARENT, mAutoCompleteTextView.getDropDownWidth());
+        mAutoCompleteTextView.setDropDownWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, mAutoCompleteTextView.getDropDownWidth());
     }
 
     private static class MockOnItemClickListener implements AdapterView.OnItemClickListener {

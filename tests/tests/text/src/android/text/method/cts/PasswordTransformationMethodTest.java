@@ -78,9 +78,9 @@ public class PasswordTransformationMethodTest extends
                     Button button = new Button(mActicity);
                     LinearLayout layout = new LinearLayout(mActicity);
                     layout.setOrientation(LinearLayout.VERTICAL);
-                    layout.addView(editText, new LayoutParams(LayoutParams.FILL_PARENT,
+                    layout.addView(editText, new LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
-                    layout.addView(button, new LayoutParams(LayoutParams.FILL_PARENT,
+                    layout.addView(button, new LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
                     mActicity.setContentView(layout);
                     editText.requestFocus();

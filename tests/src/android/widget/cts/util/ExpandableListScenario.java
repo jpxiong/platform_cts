@@ -255,7 +255,7 @@ public abstract class ExpandableListScenario extends ListScenario {
         result.setHeight(desiredHeight);
         result.setText(getValueAtPosition(packedPosition));
         final ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         result.setLayoutParams(lp);
         result.setGravity(Gravity.CENTER_VERTICAL);

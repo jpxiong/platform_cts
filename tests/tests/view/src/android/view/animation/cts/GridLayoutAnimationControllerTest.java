@@ -393,7 +393,7 @@ public class GridLayoutAnimationControllerTest
         animationParams.index = index;
         animationParams.count = 9;
         final AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(
-                LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.layoutAnimationParameters = animationParams;
         return layoutParams;
     }

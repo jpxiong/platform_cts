@@ -228,7 +228,7 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         LayoutParams defaultLayoutParam = mockTabWidget.generateDefaultLayoutParams();
         if (mockTabWidget.getOrientation() == LinearLayout.VERTICAL) {
             assertEquals(defaultLayoutParam.height, LayoutParams.WRAP_CONTENT);
-            assertEquals(defaultLayoutParam.width, LayoutParams.FILL_PARENT);
+            assertEquals(defaultLayoutParam.width, LayoutParams.MATCH_PARENT);
         } else if (mockTabWidget.getOrientation() == LinearLayout.HORIZONTAL) {
             assertEquals(defaultLayoutParam.height, LayoutParams.WRAP_CONTENT);
             assertEquals(defaultLayoutParam.width, LayoutParams.WRAP_CONTENT);

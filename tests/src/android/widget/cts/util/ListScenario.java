@@ -314,8 +314,8 @@ public abstract class ListScenario extends Activity {
 
         mListView = createListView();
         mListView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         mListView.setDrawSelectorOnTop(false);
 
         for (int i=0; i<mHeaderViewCount; i++) {
@@ -374,16 +374,16 @@ public abstract class ListScenario extends Activity {
             mHeaderTextView = new TextView(this);
             mHeaderTextView.setText("hi");
             mHeaderTextView.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
             mLinearLayout.addView(mHeaderTextView);
 
             mLinearLayout.setOrientation(LinearLayout.VERTICAL);
             mLinearLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT,
-                    ViewGroup.LayoutParams.FILL_PARENT));
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
             mListView.setLayoutParams((new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     0,
                     1f)));
 
@@ -393,10 +393,10 @@ public abstract class ListScenario extends Activity {
             mLinearLayout = new LinearLayout(this);
             mLinearLayout.setOrientation(LinearLayout.VERTICAL);
             mLinearLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT,
-                    ViewGroup.LayoutParams.FILL_PARENT));
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
             mListView.setLayoutParams((new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     0,
                     1f)));
             mLinearLayout.addView(mListView);

@@ -15,52 +15,52 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
     <TextView android:id="@+id/numeric_default"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:editable="true"/>
 
     <TextView android:id="@+id/numeric_integer"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="integer"/>
 
     <TextView android:id="@+id/numeric_signed"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="signed"/>
 
     <TextView android:id="@+id/numeric_decimal"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="decimal"/>
 
     <TextView android:id="@+id/numeric_signed_integer"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="signed|integer"/>
 
     <TextView android:id="@+id/numeric_integer_decimal"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="integer|decimal"/>
 
     <TextView android:id="@+id/numeric_signed_decimal"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="signed|decimal"/>
 
     <TextView android:id="@+id/numeric_signed_decimal_integer"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="signed|integer|decimal"/>
 
      <android.view.cts.MockViewStub class="android.view.cts.MockViewStub"
         android:id="@+id/autotext_default"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
 </LinearLayout>

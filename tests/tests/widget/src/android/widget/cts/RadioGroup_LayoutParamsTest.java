@@ -167,8 +167,8 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
         assertEquals(5, mLayoutParams.topMargin);
         assertEquals(5, mLayoutParams.rightMargin);
         assertEquals(5, mLayoutParams.bottomMargin);
-        assertEquals(LayoutParams.FILL_PARENT, mLayoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, mLayoutParams.height);
+        assertEquals(LayoutParams.MATCH_PARENT, mLayoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, mLayoutParams.height);
 
         mLayoutParams = new RadioGroup.LayoutParams(getContext(), null);
         assertEquals(RadioGroup.LayoutParams.WRAP_CONTENT, mLayoutParams.width);
@@ -199,8 +199,8 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
                 R.styleable.ViewGroup_MarginLayout_layout_width,
                 R.styleable.ViewGroup_MarginLayout_layout_height);
         // check the attributes from the layout file
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.width);
-        assertEquals(LayoutParams.FILL_PARENT, layoutParams.height);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
+        assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
     }
 
     private AttributeSet getAttributeSet(int resId) {

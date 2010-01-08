@@ -22,8 +22,6 @@ import android.content.res.XmlResourceParser;
 import android.test.InstrumentationTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.TableLayout;
 
 import com.android.internal.R;
@@ -92,12 +90,12 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         new TableLayout.LayoutParams(mTargetContext, null);
 
         TableLayout.LayoutParams layoutParams = new TableLayout.LayoutParams(200, 300);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, layoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, layoutParams.width);
         assertEquals(300, layoutParams.height);
         TableLayout.LayoutParams oldParams = layoutParams;
 
         layoutParams = new TableLayout.LayoutParams(200, 300, 1.2f);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, layoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, layoutParams.width);
         assertEquals(300, layoutParams.height);
         assertEquals(1.2f, layoutParams.weight);
         TableLayout.LayoutParams oldMarginParams = layoutParams;
@@ -105,11 +103,11 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         new TableLayout.LayoutParams();
 
         layoutParams = new TableLayout.LayoutParams(oldParams);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, layoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, layoutParams.width);
         assertEquals(300, layoutParams.height);
 
         layoutParams = new TableLayout.LayoutParams(oldMarginParams);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, layoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, layoutParams.width);
         assertEquals(300, layoutParams.height);
     }
 
@@ -122,7 +120,7 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
     @ToBeFixed( bug = "1417734", explanation = "NullPointerException issue")
     public void testSetBaseAttributes() {
         MockTableLayout_LayoutParams mockLayoutParams = new MockTableLayout_LayoutParams(200, 300);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(300, mockLayoutParams.height);
 
         // base_attr_pixel: layout_width = 400px, layout_height = 600px
@@ -131,28 +129,28 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_width,
                 R.styleable.ViewGroup_Layout_layout_height);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(600, mockLayoutParams.height);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_height,
                 R.styleable.ViewGroup_Layout_layout_width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(400, mockLayoutParams.height);
 
         a.recycle();
-        // base_attr_fillwrap: layout_width = "fill_parent", layout_height = "wrap_content"
+        // base_attr_fillwrap: layout_width = "match_parent", layout_height = "wrap_content"
         attrs = getAttrs("base_attr_fillwrap");
         a = mTargetContext.obtainStyledAttributes(attrs, R.styleable.ViewGroup_Layout);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_width,
                 R.styleable.ViewGroup_Layout_layout_height);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(TableLayout.LayoutParams.WRAP_CONTENT, mockLayoutParams.height);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_height,
                 R.styleable.ViewGroup_Layout_layout_width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.height);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.height);
 
         a.recycle();
         // base_attr_noheight: layout_width = 600px, no layout_height.
@@ -161,12 +159,12 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_width,
                 R.styleable.ViewGroup_Layout_layout_height);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(TableLayout.LayoutParams.WRAP_CONTENT, mockLayoutParams.height);
 
         mockLayoutParams.setBaseAttributes(a, R.styleable.ViewGroup_Layout_layout_height,
                 R.styleable.ViewGroup_Layout_layout_width);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(600, mockLayoutParams.height);
 
         try {
@@ -177,7 +175,7 @@ public class TableLayout_LayoutParamsTest extends InstrumentationTestCase {
         }
 
         mockLayoutParams.setBaseAttributes(a, -1, R.styleable.ViewGroup_Layout_layout_height);
-        assertEquals(TableLayout.LayoutParams.FILL_PARENT, mockLayoutParams.width);
+        assertEquals(TableLayout.LayoutParams.MATCH_PARENT, mockLayoutParams.width);
         assertEquals(TableLayout.LayoutParams.WRAP_CONTENT, mockLayoutParams.height);
 
         try {
