@@ -17,6 +17,7 @@
 package android.text.format.cts;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import android.test.AndroidTestCase;
 import android.text.format.Time;
@@ -653,7 +654,7 @@ public class TimeTest extends AndroidTestCase {
     public void testSet0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         long time = System.currentTimeMillis();
-        Calendar date = Calendar.getInstance();
+        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         date.setTimeInMillis(time);
         t.set(time);
         assertEquals(date.get(Calendar.YEAR), t.year);
