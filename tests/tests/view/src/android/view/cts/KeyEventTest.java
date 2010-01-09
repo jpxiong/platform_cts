@@ -532,35 +532,6 @@ public class KeyEventTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getMatch(char[], int)}",
-        method = "getMatch",
-        args = {char[].class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add NPE description in javadoc.")
-    public void testGetMatch2() {
-        char[] codes1 = { '0', '1', '2' };
-        assertEquals('\0', mKeyEvent.getMatch(codes1, KeyEvent.KEYCODE_SHIFT_LEFT));
-
-        char[] codes2 = { 'A', 'B', 'C' };
-        assertEquals('\0', mKeyEvent.getMatch(codes2, KeyEvent.KEYCODE_SHIFT_LEFT));
-        assertEquals('\0', mKeyEvent.getMatch(codes2, 0));
-
-        char[] codes3 = { '2', 's' };
-        mKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_S);
-        assertEquals('\0', mKeyEvent.getMatch(codes3, KeyEvent.KEYCODE_ALT_LEFT));
-        assertEquals('s', mKeyEvent.getMatch(codes3, 0));
-
-        try {
-            mKeyEvent.getMatch(null, 0);
-            fail("Should throw NullPointerException ");
-        } catch (NullPointerException e) {
-            // empty
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         notes = "Test {@link KeyEvent#getAction()}",
         method = "getAction",
         args = {}
