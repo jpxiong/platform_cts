@@ -1,0 +1,324 @@
+#!/bin/bash
+#
+# Copyright (C) 2008 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Set up prog to be the path of this script, including following symlinks,
+# and set up progdir to be the fully-qualified pathname of its directory.
+prog="$0"
+while [ -h "${prog}" ]; do
+    newProg=`/bin/ls -ld "${prog}"`
+    newProg=`expr "${newProg}" : ".* -> \(.*\)$"`
+    if expr "x${newProg}" : 'x/' >/dev/null; then
+        prog="${newProg}"
+    else
+        progdir=`dirname "${prog}"`
+        prog="${progdir}/${newProg}"
+    fi
+done
+oldwd=`pwd`
+progdir=`dirname "${prog}"`
+cd "${progdir}"
+progdir=`pwd`
+prog="${progdir}"/`basename "${prog}"`
+cd "${oldwd}"
+
+libdir=`dirname $progdir`/framework
+
+javaOpts=""
+while expr "x$1" : 'x-J' >/dev/null; do
+    opt=`expr "$1" : '-J\(.*\)'`
+    javaOpts="${javaOpts} -${opt}"
+    shift
+done
+
+#exec java $javaOpts -jar $libdir/hat.jar "$@"
+
+#######################################################################
+# Original content of invocation script follows. Uses values cleverly
+# deduced by the above code. If you want to use this for a different
+# set of packages, adjust both the list of source directories and the
+# list of packages.
+#######################################################################
+export CLASSES=$progdir/../framework/test-progress.jar
+export INPUT=$ANDROID_BUILD_TOP
+export OUTPUT=$ANDROID_BUILD_TOP/out/target/common/cts/test-progress
+
+if [ "$1" != "" ]; then
+   export OUTPUT=$1
+fi
+
+# These two variables are defined for run the coverage tool for Dalvik or CTS
+DALVIK_SOURCE_PATH="\
+${INPUT}/dalvik/libcore/junit/src/main/java:\
+${INPUT}/dalvik/libcore/icu/src/main/java:\
+${INPUT}/dalvik/libcore/openssl/src/main/java:\
+${INPUT}/dalvik/libcore/android/src/main/java:\
+${INPUT}/dalvik/libcore/annotation/src/main/java:\
+${INPUT}/dalvik/libcore/archive/src/main/java:\
+${INPUT}/dalvik/libcore/auth/src/main/java:\
+${INPUT}/dalvik/libcore/awt/src/main/java:\
+${INPUT}/dalvik/libcore/beans/src/main/java:\
+${INPUT}/dalvik/libcore/concurrent/src/main/java:\
+${INPUT}/dalvik/libcore/crypto/src/main/java:\
+${INPUT}/dalvik/libcore/instrument/src/main/java:\
+${INPUT}/dalvik/libcore/logging/src/main/java:\
+${INPUT}/dalvik/libcore/luni/src/main/java:\
+${INPUT}/dalvik/libcore/luni-kernel/src/main/java:\
+${INPUT}/dalvik/libcore/math/src/main/java:\
+${INPUT}/dalvik/libcore/nio/src/main/java:\
+${INPUT}/dalvik/libcore/nio_char/src/main/java:\
+${INPUT}/dalvik/libcore/prefs/src/main/java:\
+${INPUT}/dalvik/libcore/regex/src/main/java:\
+${INPUT}/dalvik/libcore/security/src/main/java:\
+${INPUT}/dalvik/libcore/security-kernel/src/main/java:\
+${INPUT}/dalvik/libcore/sound/src/main/java:\
+${INPUT}/dalvik/libcore/sql/src/main/java:\
+${INPUT}/dalvik/libcore/text/src/main/java:\
+${INPUT}/dalvik/libcore/xml/src/main/java:\
+${INPUT}/dalvik/libcore/x-net/src/main/java:\
+${INPUT}/java/android:\
+${INPUT}/tests/framework-tests/src:\
+${INPUT}/apps/AndroidTests/src:\
+${INPUT}/apps/TestHarness/tests:\
+${INPUT}/apps/TestHarness/src:\
+${INPUT}/java/tests:\
+${INPUT}/dalvik/libcore/text/src/test/java:\
+${INPUT}/dalvik/libcore/support/src/test/java:\
+${INPUT}/dalvik/libcore/nio_char/src/test/java:\
+${INPUT}/dalvik/libcore/nio/src/test/java:\
+${INPUT}/dalvik/libcore/regex/src/test/java:\
+${INPUT}/dalvik/libcore/xml/src/test/java:\
+${INPUT}/dalvik/libcore/prefs/src/test/java:\
+${INPUT}/dalvik/libcore/x-net/src/test/java:\
+${INPUT}/dalvik/libcore/luni-kernel/src/test/java:\
+${INPUT}/dalvik/libcore/sql/src/test/java:\
+${INPUT}/dalvik/libcore/security/src/test/java:\
+${INPUT}/dalvik/libcore/math/src/test/java:\
+${INPUT}/dalvik/libcore/logging/src/test/java:\
+${INPUT}/dalvik/libcore/luni/src/test/java:\
+${INPUT}/dalvik/libcore/archive/src/test/java:\
+${INPUT}/dalvik/libcore/annotation/src/test/java:\
+${INPUT}/dalvik/libcore/dalvik/src/main/java:\
+${INPUT}/tests/HttpClient:\
+${INPUT}/apps/Mms/tests:\
+ \
+SQLite \
+junit.framework \
+org.apache.harmony.logging.tests.java.util.logging \
+org.apache.harmony.luni.tests.java.io \
+org.apache.harmony.luni.tests.java.lang \
+org.apache.harmony.luni.tests.java.lang.ref \
+org.apache.harmony.luni.tests.java.net \
+org.apache.harmony.luni.tests.java.util \
+org.apache.harmony.nio.tests.java.nio \
+org.apache.harmony.nio.tests.java.nio.channels \
+org.apache.harmony.nio.tests.java.nio.channels.spi \
+org.apache.harmony.nio_char.tests.java.nio.charset \
+org.apache.harmony.nio_char.tests.java.nio.charset.spi \
+org.apache.harmony.prefs.tests.java.util.prefs \
+org.apache.harmony.sql.tests.java.sql \
+org.apache.harmony.sql.tests.javax.sql \
+org.apache.harmony.tests.java.math \
+org.apache.harmony.tests.java.util.regex \
+org.apache.harmony.text.tests.java.text \
+tests.api.android.dalvik \
+tests.api.java.io \
+tests.api.java.lang \
+tests.api.java.lang.ref \
+tests.api.java.lang.reflect \
+tests.api.java.math \
+tests.api.java.net \
+tests.api.java.nio.charset \
+tests.api.java.util \
+tests.api.javax.net \
+tests.api.javax.net.ssl \
+tests.api.javax.xml.parsers \
+tests.java.lang.StrictMath \
+tests.java.sql \
+tests.sql \
+tests.xml \
+java.awt \
+java.awt.color \
+java.awt.event \
+java.awt.font \
+java.awt.geom \
+java.awt.im \
+java.awt.im.spi \
+java.awt.image \
+java.awt.image.renderable \
+javax.imageio \
+javax.imageio.event \
+javax.imageio.metadata \
+javax.imageio.plugins.bmp \
+javax.imageio.plugins.jpeg \
+javax.imageio.spi \
+javax.imageio.stream \
+java.io \
+java.lang \
+java.lang.annotation \
+java.lang.instrument \
+java.lang.ref \
+java.lang.reflect \
+java.math \ 
+java.net \
+java.nio \
+java.nio.channels \
+java.nio.channels.spi \
+java.nio.charset \
+java.nio.charset.spi \
+java.security \
+java.security.acl \
+java.security.cert \
+java.security.interfaces \
+java.security.spec \
+java.sql \
+java.text \
+java.util \
+java.util.concurrent \
+java.util.concurrent.atomic \
+java.util.concurrent.locks \
+java.util.jar \
+java.util.logging \
+java.util.prefs \
+java.util.regex \
+java.util.zip \
+javax.crypto \
+javax.crypto.interfaces \
+javax.crypto.spec \
+javax.net \
+javax.net.ssl \
+javax.security.auth \
+javax.security.auth.callback \
+javax.security.auth.login \
+javax.security.auth.x500 \
+javax.security.cert \
+javax.sound.midi \
+javax.sound.midi.spi \
+javax.sound.sampled \
+javax.sound.sampled.spi \
+javax.sql \
+javax.xml.parsers \
+org.w3c.dom \
+org.xml.sax \
+org.xml.sax.ext \
+org.xml.sax.helpers"
+
+CTS_SOURCE_PATH="\
+${INPUT}/frameworks/base/core/java:\
+${INPUT}/frameworks/base/graphics/java:\
+${INPUT}/frameworks/base/location/java:\
+${INPUT}/frameworks/base/media/java:\
+${INPUT}/frameworks/base/opengl/java:\
+${INPUT}/frameworks/base/sax/java:\
+${INPUT}/frameworks/base/telephony/java:\
+${INPUT}/frameworks/base/wifi/java:\
+${INPUT}/cts/tests/tests/app/src:\
+${INPUT}/cts/tests/tests/content/src:\
+${INPUT}/cts/tests/tests/database/src:\
+${INPUT}/cts/tests/tests/graphics/src:\
+${INPUT}/cts/tests/tests/hardware/src:\
+${INPUT}/cts/tests/tests/location/src:\
+${INPUT}/cts/tests/tests/media/src:\
+${INPUT}/cts/tests/tests/net/src:\
+${INPUT}/cts/tests/tests/os/src:\
+${INPUT}/cts/tests/tests/provider/src:\
+${INPUT}/cts/tests/tests/preference/src:\
+${INPUT}/cts/tests/tests/telephony/src:\
+${INPUT}/cts/tests/tests/text/src:\
+${INPUT}/cts/tests/tests/util/src:\
+${INPUT}/cts/tests/tests/view/src:\
+${INPUT}/cts/tests/tests/widget/src:\
+${INPUT}/cts/tests/src:\
+${INPUT}/frameworks/base/test-runner:\
+${INPUT}/dalvik/libcore/dalvik/src/main/java:\
+${INPUT}/dalvik/libcore/xml/src/main/java:\
+${INPUT}/dalvik/libcore/junit/src/main/java:\
+ \
+android.app \
+android.app.cts \
+android.content \
+android.content.cts \
+android.content.pm \
+android.content.pm.cts \
+android.content.res \
+android.content.res.cts \
+android.location \
+android.location.cts \
+android.os \
+android.os.cts \
+android.text \
+android.text.cts \
+android.text.method \
+android.text.method.cts \
+android.text.style \
+android.text.style.cts \
+android.text.util \
+android.text.util.cts \
+android.util \
+android.util.cts \
+android.view \
+android.view.cts \
+android.view.animation \
+android.view.animation.cts \
+android.view.inputmethod \
+android.view.inputmethod.cts \
+android.widget \
+android.widget.cts \
+android.hardware \
+android.hardware.cts \
+android.net \
+android.net.cts \
+android.net.http \
+android.net.http.cts \
+android.net.wifi \
+android.net.wifi.cts \
+android.provider \
+android.provider.cts \
+android.bluetooth \
+android.bluetooth.cts \
+android.database \
+android.database.cts \
+android.database.sqlite \
+android.database.sqlite.cts \
+android.graphics \
+android.graphics.cts \
+android.graphics.drawable \
+android.graphics.drawable.cts \
+android.graphics.drawable.shapes \
+android.graphics.drawable.shapes.cts \
+android.media \
+android.media.cts \
+android.telephony \
+android.telephony.cts \
+android.telephony.gsm \
+android.telephony.gsm.cts \
+android.accounts \
+android.accounts.cts \
+android.opengl \
+android.opengl.cts \
+android.preference \
+android.preference.cts \
+android.sax \
+android.sax.cts \
+android.security \
+android.security.cts \
+android.speech.srec \
+android.speech.srec.cts \
+android.webkit \
+android.webkit.cts \
+android.webkit.gears \
+android.webkit.gears.cts"
+
+javadoc -J-Xmx512m -docletpath $CLASSES -doclet TestCoverageDoclet -d $OUTPUT -sourcepath ${CTS_SOURCE_PATH}

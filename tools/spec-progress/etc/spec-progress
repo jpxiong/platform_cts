@@ -1,0 +1,154 @@
+#!/bin/bash
+#
+# Copyright (C) 2008 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Set up prog to be the path of this script, including following symlinks,
+# and set up progdir to be the fully-qualified pathname of its directory.
+prog="$0"
+while [ -h "${prog}" ]; do
+    newProg=`/bin/ls -ld "${prog}"`
+    newProg=`expr "${newProg}" : ".* -> \(.*\)$"`
+    if expr "x${newProg}" : 'x/' >/dev/null; then
+        prog="${newProg}"
+    else
+        progdir=`dirname "${prog}"`
+        prog="${progdir}/${newProg}"
+    fi
+done
+oldwd=`pwd`
+progdir=`dirname "${prog}"`
+cd "${progdir}"
+progdir=`pwd`
+prog="${progdir}"/`basename "${prog}"`
+cd "${oldwd}"
+
+libdir=`dirname $progdir`/framework
+
+javaOpts=""
+while expr "x$1" : 'x-J' >/dev/null; do
+    opt=`expr "$1" : '-J\(.*\)'`
+    javaOpts="${javaOpts} -${opt}"
+    shift
+done
+
+#exec java $javaOpts -jar $libdir/hat.jar "$@"
+
+#######################################################################
+# Original content of invocation script follows. Uses values cleverly
+# deduced by the above code. If you want to use this for a different
+# set of packages, adjust both the list of source directories and the
+# list of packages.
+#######################################################################
+export CLASSES=$progdir/../framework/spec-progress.jar
+export INPUT=$ANDROID_BUILD_TOP
+export OUTPUT=$ANDROID_BUILD_TOP/out/target/common/cts/spec-progress
+
+if [ "$1" != "" ]; then
+   export OUTPUT=$1
+fi
+
+javadoc -J-Xmx512m -docletpath $CLASSES -doclet SpecProgressDoclet -d $OUTPUT -sourcepath \
+$INPUT/dalvik/libcore/dalvik/src/main/java:\
+$INPUT/dalvik/libcore/annotation/src/main/java:\
+$INPUT/dalvik/libcore/archive/src/main/java:\
+$INPUT/dalvik/libcore/auth/src/main/java:\
+$INPUT/dalvik/libcore/awt-kernel/src/main/java:\
+$INPUT/dalvik/libcore/beans/src/main/java:\
+$INPUT/dalvik/libcore/crypto/src/main/java:\
+$INPUT/dalvik/libcore/logging/src/main/java:\
+$INPUT/dalvik/libcore/luni/src/main/java:\
+$INPUT/dalvik/libcore/luni-kernel/src/main/java:\
+$INPUT/dalvik/libcore/math/src/main/java:\
+$INPUT/dalvik/libcore/nio/src/main/java:\
+$INPUT/dalvik/libcore/nio_char/src/main/java:\
+$INPUT/dalvik/libcore/prefs/src/main/java:\
+$INPUT/dalvik/libcore/regex/src/main/java:\
+$INPUT/dalvik/libcore/security/src/main/java:\
+$INPUT/dalvik/libcore/security-kernel/src/main/java:\
+$INPUT/dalvik/libcore/sql/src/main/java:\
+$INPUT/dalvik/libcore/text/src/main/java:\
+$INPUT/dalvik/libcore/xml/src/main/java:\
+$INPUT/dalvik/libcore/x-net/src/main/java:\
+ \
+dalvik.annotation \
+dalvik.bytecode \
+dalvik.system \
+java.io \
+java.lang \
+java.lang.annotation \
+java.lang.ref \
+java.lang.reflect \
+java.math \
+java.net \
+java.nio \
+java.nio.channels \
+java.nio.channels.spi \
+java.nio.charset \
+java.nio.charset.spi \
+java.security \
+java.security.acl \
+java.security.cert \
+java.security.interfaces \
+java.security.spec \
+java.sql \
+java.text \
+java.util \
+java.util.jar \
+java.util.logging \
+java.util.prefs \
+java.util.regex \
+java.util.zip \
+javax.crypto \
+javax.crypto.interfaces \
+javax.crypto.spec \
+javax.net \
+javax.net.ssl \
+javax.security.auth \
+javax.security.auth.callback \
+javax.security.auth.login \
+javax.security.auth.x500 \
+javax.security.cert \
+javax.sql \
+javax.xml.parsers \
+org.w3c.dom \
+org.xml.sax \
+org.xml.sax.ext \
+org.xml.sax.helpers \
+
+# Not part of core libs any more:
+# java.lang.instrument \
+# javax.sound.midi \
+# javax.sound.midi.spi \
+# javax.sound.sampled \
+# javax.sound.sampled.spi \
+# java.awt \
+# java.awt.color \
+# java.awt.event \
+# java.awt.font \
+# java.awt.geom \
+# java.awt.im \
+# java.awt.im.spi \
+# java.awt.image \
+# java.awt.image.renderable \
+# javax.imageio \
+# javax.imageio.event \
+# javax.imageio.metadata \
+# javax.imageio.plugins.bmp \
+# javax.imageio.plugins.jpeg \
+# javax.imageio.spi \
+# javax.imageio.stream \
+# java.util.concurrent \
+# java.util.concurrent.atomic \
+# java.util.concurrent.locks \
