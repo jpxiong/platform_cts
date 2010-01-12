@@ -25,15 +25,8 @@ import android.os.IBinder;
  */
 public class MockAccountService extends Service {
 
-    private MockAccountAuthenticator mAuthenticator;
-
     @Override
     public IBinder onBind(Intent intent) {
-        return mAuthenticator.getIBinder();
-    }
-
-    @Override
-    public void onCreate() {
-        mAuthenticator = new MockAccountAuthenticator(this);
+        return AccountManagerTest.getMockAuthenticator(this).getIBinder();
     }
 }
