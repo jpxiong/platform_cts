@@ -19,5 +19,5 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Label for this package -->
-    <string name="label">Android CTS</string>
+    <string name="label">Android CTS - Account</string>
 </resources>
