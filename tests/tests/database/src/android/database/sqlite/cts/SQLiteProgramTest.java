@@ -69,15 +69,25 @@ public class SQLiteProgramTest extends AndroidTestCase {
         final String statement = "DELETE FROM test WHERE _id=?;";
         SQLiteStatement statementOne = mDatabase.compileStatement(statement);
         SQLiteStatement statementTwo = mDatabase.compileStatement(statement);
-        assertTrue(statementOne.getUniqueId() != statementTwo.getUniqueId());
+        // both the statements should have the same uniqueId because they both should refer to
+        // the same compiled-sql statement in cache
+        assertTrue(statementOne.getUniqueId() == statementTwo.getUniqueId());
         statementOne.close();
         statementTwo.close();
+        
+        // now try to compile 2 different statements and they should have different uniquerIds.
+        SQLiteStatement statement1 = mDatabase.compileStatement("DELETE FROM test WHERE _id=1;");
+        SQLiteStatement statement2 = mDatabase.compileStatement("DELETE FROM test WHERE _id=2;");
+        assertTrue(statement1.getUniqueId() != statement2.getUniqueId());
+        statement1.close();
+        statement2.close();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleased(). set compiled-sql-cache size in SQLiteDatabase " +
-        		"to zero. compiledSql should be released when onAllReferencesReleased() is called",
+        notes = "Test onAllReferencesReleased(). Since sql statements are always cached in " +
+        		"SQLiteDatabase, compiledSql should NOT be released " +
+        		"when onAllReferencesReleased() is called",
         method = "onAllReferencesReleased",
         args = {}
     )
@@ -85,83 +95,32 @@ public class SQLiteProgramTest extends AndroidTestCase {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
                 "num1 INTEGER, num2 INTEGER, image BLOB);");
         final String statement = "DELETE FROM test WHERE _id=?;";
-        mDatabase.setMaxSqlCacheSize(0); // no compiled-sql cache.
         SQLiteStatement statementOne = mDatabase.compileStatement(statement);
         assertTrue(statementOne.getUniqueId() > 0);
+        int nStatement = statementOne.getUniqueId();
         statementOne.releaseReference();
-        assertTrue(statementOne.getUniqueId() == 0);
+        assertTrue(statementOne.getUniqueId() == nStatement);
         statementOne.close();
     }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
-        		"SQLiteDatabase to zero. compiledSql should be released when " +
-        		"onAllReferencesReleasedFromContainer() is called",
-        method = "onAllReferencesReleasedFromContainer",
+        notes = "Test onAllReferencesReleasedFromContainer(). " +
+        		"Since sql statements are always cached in " +
+                "SQLiteDatabase, compiledSql should NOT be released " +
+                "when onAllReferencesReleasedFromContainer() is called",
         args = {}
     )
     public void testOnAllReferencesReleasedFromContainer() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
                 "num1 INTEGER, num2 INTEGER, image BLOB);");
         final String statement = "DELETE FROM test WHERE _id=?;";
-        mDatabase.setMaxSqlCacheSize(0); // no compiled-sql cache.
-        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
-        assertTrue(statementOne.getUniqueId() > 0);
-        statementOne.releaseReferenceFromContainer();
-        assertTrue(statementOne.getUniqueId() == 0);
-        statementOne.close();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleased(). set compiled-sql-cache size in " +
-                "SQLiteDatabase to non-zero;i.e., compiledSql will be cached." +
-                "compiledSql should NOT be released when onAllReferencesReleased() is called",
-        method = "onAllReferencesReleasedFromContainer",
-        args = {}
-    )
-    public void testOnAllReferencesReleasedNOreleaseOfCompiledSql() {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
-                "num1 INTEGER, num2 INTEGER, image BLOB);");
-        final String statement = "DELETE FROM test WHERE _id=?;";
-        mDatabase.setMaxSqlCacheSize(10); // compiled-sql cache enabled for this database.
-        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
-        assertTrue(statementOne.getUniqueId() > 0);
-        int nStatement = statementOne.getUniqueId();
-        statementOne.releaseReference();
-        assertTrue(statementOne.getUniqueId() == nStatement);
-        statementOne.close();
-
-        // Close the database here, because this test creates an
-        // orphaned statement
-        closeDatabaseWithOrphanedStatement();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleasedFromContainer(). set compiled-sql-cache size in " +
-                "SQLiteDatabase to non-zero;i.e., compiledSql will be cached." +
-                "compiledSql should NOT be released when onAllReferencesReleasedFromContainer() " +
-                "is called",
-        method = "onAllReferencesReleasedFromContainer",
-        args = {}
-    )
-    public void testOnAllReferencesReleasedFromContainerNOreleaseOfCompiledSql() {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
-                "num1 INTEGER, num2 INTEGER, image BLOB);");
-        final String statement = "DELETE FROM test WHERE _id=?;";
-        mDatabase.setMaxSqlCacheSize(10); // compiled-sql cache enabled for this database.
         SQLiteStatement statementOne = mDatabase.compileStatement(statement);
         assertTrue(statementOne.getUniqueId() > 0);
         int nStatement = statementOne.getUniqueId();
         statementOne.releaseReferenceFromContainer();
         assertTrue(statementOne.getUniqueId() == nStatement);
         statementOne.close();
-
-        // Close the database here, because this test creates an
-        // orphaned statement
-        closeDatabaseWithOrphanedStatement();
     }
 
     @TestTargets({
