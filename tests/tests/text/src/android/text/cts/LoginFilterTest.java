@@ -75,7 +75,7 @@ public class LoginFilterTest extends TestCase {
                 dest1, 0, dest1.length()));
         assertTrue(loginFilter.isStarted());
         assertTrue(loginFilter.isStopped());
-        assertEquals(4, loginFilter.getInvalidCharacterCount());
+        assertEquals(3, loginFilter.getInvalidCharacterCount());
 
         loginFilter.reset();
         assertNull(loginFilter.filter(spannedSource, 0, spannedSource.length(),
@@ -87,10 +87,10 @@ public class LoginFilterTest extends TestCase {
         loginFilter = new MockLoginFilter(false);
         result = loginFilter.filter(source2, 0, source2.length(), dest1, 0, dest1.length());
         assertFalse(result instanceof SpannableString);
-        assertEquals("source_with_invalid_char", result.toString());
+        assertEquals("+source_with_invalid_char", result.toString());
         assertTrue(loginFilter.isStarted());
         assertTrue(loginFilter.isStopped());
-        assertEquals(4, loginFilter.getInvalidCharacterCount());
+        assertEquals(3, loginFilter.getInvalidCharacterCount());
 
         loginFilter.reset();
         result = loginFilter.filter(spannedSource, 0, spannedSource.length(),
