@@ -27,6 +27,6 @@ public class MockAccountService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return ContentResolverSyncTestCase.getMockAuthenticator(this).getIBinder();
+        return MockAccountAuthenticator.getMockAuthenticator(this).getIBinder();
     }
 }
