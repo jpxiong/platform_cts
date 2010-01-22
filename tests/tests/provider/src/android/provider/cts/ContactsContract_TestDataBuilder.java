@@ -37,7 +37,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.Arrays;
+
 import junit.framework.Assert;
+import junit.framework.ComparisonFailure;
 
 /**
  * A test data builder for ContactsContract tests.
@@ -106,6 +109,12 @@ public class ContactsContract_TestDataBuilder {
 
         @SuppressWarnings("unchecked")
         public T with(String key, long value) {
+            mValues.put(key, value);
+            return (T)this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T with(String key, byte[] value) {
             mValues.put(key, value);
             return (T)this;
         }
@@ -195,6 +204,22 @@ public class ContactsContract_TestDataBuilder {
 
         public void assertColumn(String columnName, String value) {
             assertEquals(value, mCursor.getString(getColumnIndex(columnName)));
+        }
+
+        public void assertColumn(String columnName, byte[] value) {
+            assertEquals(value, mCursor.getBlob(getColumnIndex(columnName)));
+        }
+
+        public void assertEquals(byte[] expected, byte[] actual) {
+            assertEquals(null, expected, actual);
+        }
+
+        public void assertEquals(String message, byte[] expected, byte[] actual) {
+            if (expected == null && actual == null)
+                return;
+            if (expected != null && Arrays.equals(actual, expected))
+                return;
+            throw new ComparisonFailure(message, expected.toString(), actual.toString());
         }
 
         private int getColumnIndex(String columnName) {
@@ -291,6 +316,14 @@ public class ContactsContract_TestDataBuilder {
         public TestData insert() throws Exception {
             mValues.put(Data.RAW_CONTACT_ID, mRawContact.getId());
             return super.insertDependent();
+        }
+
+        public long getRawContactId() {
+            return getLong(Data.RAW_CONTACT_ID);
+        }
+
+        public TestRawContact getRawContact() throws Exception {
+            return mRawContact;
         }
     }
 

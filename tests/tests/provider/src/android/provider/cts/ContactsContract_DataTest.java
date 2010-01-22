@@ -24,14 +24,16 @@ import android.content.ContentResolver;
 import android.content.IContentProvider;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
+import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(ContactsContract.RawContacts.class)
-public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
+@TestTargetClass(ContactsContract.Data.class)
+public class ContactsContract_DataTest extends InstrumentationTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
 
@@ -51,9 +53,9 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
 
     @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test RawContacts#getContactLookupUri(ContentResolver resolver, Uri " +
-                    "rawContactUri) using source id",
-            method = "RawContacts#getContactLookupUri",
+            notes = "Test Data#getContactLookupUri(ContentResolver resolver, Uri dataUri) " +
+                    "using source id",
+            method = "Data#getContactLookupUri",
             args = {android.content.ContentResolver.class, Uri.class}
     )
     public void testGetLookupUriBySourceId() throws Exception {
@@ -65,23 +67,23 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
 
         // TODO remove this. The method under test is currently broken: it will not
         // work without at least one data row in the raw contact.
-        rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
+        TestData data = rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
                 .with(StructuredName.DISPLAY_NAME, "test name")
                 .insert();
 
-        Uri lookupUri = RawContacts.getContactLookupUri(mResolver, rawContact.getUri());
+        Uri lookupUri = Data.getContactLookupUri(mResolver, data.getUri());
         assertNotNull("Could not produce a lookup URI", lookupUri);
 
         TestContact lookupContact = mBuilder.newContact().setUri(lookupUri).load();
         assertEquals("Lookup URI matched the wrong contact",
-                lookupContact.getId(), rawContact.load().getContactId());
+                lookupContact.getId(), data.load().getRawContact().load().getContactId());
     }
 
     @TestTargetNew(
             level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test RawContacts#getContactLookupUri(ContentResolver resolver, Uri " +
-                    "rawContactUri) using display name",
-            method = "RawContacts#getContactLookupUri",
+            notes = "Test Data#getContactLookupUri(ContentResolver resolver, Uri dataUri) " +
+                    "using display name",
+            method = "Data#getContactLookupUri",
             args = {android.content.ContentResolver.class, Uri.class}
     )
     public void testGetLookupUriByDisplayName() throws Exception {
@@ -89,16 +91,16 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")
                 .with(RawContacts.ACCOUNT_NAME, "test_name")
                 .insert();
-        rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
+        TestData data = rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
                 .with(StructuredName.DISPLAY_NAME, "test name")
                 .insert();
 
-        Uri lookupUri = RawContacts.getContactLookupUri(mResolver, rawContact.getUri());
+        Uri lookupUri = Data.getContactLookupUri(mResolver, data.getUri());
         assertNotNull("Could not produce a lookup URI", lookupUri);
 
         TestContact lookupContact = mBuilder.newContact().setUri(lookupUri).load();
         assertEquals("Lookup URI matched the wrong contact",
-                lookupContact.getId(), rawContact.load().getContactId());
+                lookupContact.getId(), data.load().getRawContact().load().getContactId());
     }
 }
 
