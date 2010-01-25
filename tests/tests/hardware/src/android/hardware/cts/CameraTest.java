@@ -22,6 +22,8 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -31,6 +33,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
+import android.media.ExifInterface;
 import android.os.ConditionVariable;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
@@ -50,6 +53,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.stub";
     private static final boolean LOGV = false;
+    private final String JPEG_PATH = "/sdcard/test.jpg";
 
     private boolean mRawPreviewCallbackResult = false;
     private boolean mShutterCallbackResult = false;
@@ -170,7 +174,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     mJpegPictureCallbackResult = true;
 
                     // try to store the picture on the SD card
-                    File rawoutput = new File("/sdcard/test.bmp");
+                    File rawoutput = new File(JPEG_PATH);
                     FileOutputStream outStream = new FileOutputStream(rawoutput);
                     outStream.write(rawData);
                     outStream.close();
@@ -542,5 +546,59 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private boolean isValidPixelFormat(int format) {
         return (format == PixelFormat.RGB_565) || (format == PixelFormat.YCbCr_420_SP)
                 || (format == PixelFormat.JPEG) || (format == PixelFormat.YCbCr_422_I);
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setJpegThumbnailSize",
+            args = {android.hardware.Camera.Size.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getJpegThumbnailSize",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getJpegSupportedThumbnailSizes",
+            args = {}
+        )
+    })
+    public void testJpegThumbnailSize() throws Exception {
+        initializeMessageLooper();
+        // Thumbnail size parameters should have valid values.
+        Parameters p = mCamera.getParameters();
+        Size size = p.getJpegThumbnailSize();
+        assertTrue(size.width > 0 && size.height > 0);
+        List<Size> sizes = p.getSupportedJpegThumbnailSizes();
+        assertTrue(sizes.size() >= 2);
+        assertTrue(sizes.contains(size));
+        assertTrue(sizes.contains(mCamera.new Size(0, 0)));
+
+        // Test if the thumbnail size matches the setting.
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        mCamera.takePicture(null, null, mJpegPictureCallback);
+        Thread.sleep(WAIT_LONG);
+        ExifInterface exif = new ExifInterface(JPEG_PATH);
+        assertTrue(exif.hasThumbnail());
+        byte[] thumb = exif.getThumbnail();
+        Bitmap b = BitmapFactory.decodeByteArray(thumb, 0, thumb.length);
+        assertEquals(b.getWidth(), size.width);
+        assertEquals(b.getHeight(), size.height);
+
+        // Test no thumbnail case.
+        p.setJpegThumbnailSize(0, 0);
+        mCamera.setParameters(p);
+        mCamera.startPreview();
+        mCamera.takePicture(null, null, mJpegPictureCallback);
+        Thread.sleep(WAIT_LONG);
+        exif = new ExifInterface(JPEG_PATH);
+        assertTrue(!exif.hasThumbnail());
+
+        terminateMessageLooper();
     }
 }
