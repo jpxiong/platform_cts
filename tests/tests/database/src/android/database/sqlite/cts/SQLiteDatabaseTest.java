@@ -1362,4 +1362,46 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             mTransactionListenerOnRollbackCalled = true;
         }
     }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "removed the android-provided group_concat built-in function." +
+                    "Instead we are now using the sqlite3.c provided group_concat function." +
+                    "and it returns NULL if the columnds to be concatenated have null values" +
+                    " in them",
+            method = "sqlite3::group_concat built-in function",
+            args = {java.lang.String.class}
+        )
+    public void testGroupConcat() {
+        mDatabase.execSQL("CREATE TABLE test (i INT, j TEXT);");
+
+        // insert 2 rows
+        String sql = "INSERT INTO test (i) VALUES (?);";
+        SQLiteStatement insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 1);
+        insertStatement.execute();
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 2);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // make sure there are 2 rows in the table
+        Cursor cursor = mDatabase.rawQuery("SELECT count(*) FROM test;", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(2, cursor.getInt(0));
+        cursor.close();
+
+        // concatenate column j from all the rows. should return NULL
+        cursor = mDatabase.rawQuery("SELECT group_concat(j, ' ') FROM test;", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertNull(cursor.getString(0));
+        cursor.close();
+
+        // drop the table
+        mDatabase.execSQL("DROP TABLE test;");
+        // should get no exceptions
+    }
 }
