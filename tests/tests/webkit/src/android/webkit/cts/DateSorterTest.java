@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -83,6 +84,7 @@ public class DateSorterTest extends AndroidTestCase {
             args = {long.class}
         )
     })
+    @BrokenTest(value="time-based test, fixed in next release. bug 2361382")
     public void testGetIndex() {
         DateSorter dateSorter = new DateSorter(mContext);
 
@@ -103,6 +105,7 @@ public class DateSorterTest extends AndroidTestCase {
             args = {int.class}
         )
     })
+    @BrokenTest(value="time-based test, fixed in next release. bug 2361382")
     public void testGetBoundary() {
         DateSorter dateSorter = new DateSorter(mContext);
 
