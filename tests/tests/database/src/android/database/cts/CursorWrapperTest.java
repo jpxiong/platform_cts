@@ -300,6 +300,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertEquals(DEFAULT_COLUMN_COUNT, cursorWrapper.getColumnCount());
         assertEquals("_id", columnNames[0]);
         assertEquals("number", columnNames[1]);
+        cursorWrapper.close();
     }
 
     @TestTargets({
@@ -444,6 +445,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         assertTrue(cursorWrapper.moveToFirst());
         assertEquals(0, cursorWrapper.getPosition());
         assertTrue(cursorWrapper.isFirst());
+        cursorWrapper.close();
     }
 
     @TestTargets({
@@ -619,6 +621,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         string = new String(charArrayBuffer.data);
         assertTrue(charArrayBuffer.sizeCopied > 0);
         assertEquals(SECOND_NUMBER, string.substring(0, charArrayBuffer.sizeCopied));
+        cursorWrapper.close();
     }
 
     @TestTargetNew(
@@ -632,6 +635,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         CursorWrapper cursorWrapper = new CursorWrapper(getCursor());
         Bundle bundle = cursorWrapper.respond(b);
         assertSame(Bundle.EMPTY, bundle);
+        cursorWrapper.close();
     }
 
     @TestTargetNew(
@@ -643,6 +647,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
     public void testGetWantsAllOnMoveCalls() {
         CursorWrapper cursorWrapper = new CursorWrapper(getCursor());
         assertFalse(cursorWrapper.getWantsAllOnMoveCalls());
+        cursorWrapper.close();
     }
 
     @TestTargets({
@@ -691,6 +696,7 @@ public class CursorWrapperTest extends DatabaseCursorTest {
             fail("testUnregisterContentObserver failed");
         }catch(IllegalStateException e){
         }
+        cursorWrapper.close();
     }
 
     @TestTargetNew(
@@ -743,7 +749,8 @@ public class CursorWrapperTest extends DatabaseCursorTest {
     }
 
     private void setupDatabase() {
-        mDatabaseFile = new File("/sqlite_stmt_journals", "database_test.db");
+        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+        mDatabaseFile = new File(dbDir, "database_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
         }

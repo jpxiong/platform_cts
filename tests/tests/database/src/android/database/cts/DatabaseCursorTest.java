@@ -24,6 +24,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.CursorWrapper;
@@ -35,13 +36,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQuery;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Looper;
+import android.test.AndroidTestCase;
 import android.test.PerformanceTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
-public class DatabaseCursorTest extends TestCase implements PerformanceTestCase {
+public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTestCase {
     private static final String sString1 = "this is a test";
     private static final String sString2 = "and yet another test";
     private static final String sString3 = "this string is a little longer, but still a test";
@@ -56,7 +58,8 @@ public class DatabaseCursorTest extends TestCase implements PerformanceTestCase 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mDatabaseFile = new File("/sqlite_stmt_journals", "database_test.db");
+        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+        mDatabaseFile = new File(dbDir, "database_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
         }

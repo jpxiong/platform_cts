@@ -22,6 +22,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.content.Context;
 import android.database.AbstractCursor;
 import android.database.CharArrayBuffer;
 import android.database.ContentObserver;
@@ -65,6 +66,15 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         setupDatabase();
         ArrayList<ArrayList> list = createTestList(ROW_MAX, COLUMN_NAMES.length);
         mTestAbstractCursor = new TestAbstractCursor(COLUMN_NAMES, list);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        mDatabaseCursor.close();
+        mTestAbstractCursor.close();
+        mDatabase.close();
+        mDatabaseFile.delete();
+        super.tearDown();
     }
 
     @TestTargetNew(
@@ -642,7 +652,9 @@ public class AbstractCursorTest extends InstrumentationTestCase {
     }
 
     private void setupDatabase() {
-        mDatabaseFile = new File("/sqlite_stmt_journals", "database_test.db");
+        File dbDir = getInstrumentation().getTargetContext().getDir("tests",
+                Context.MODE_WORLD_WRITEABLE);
+        mDatabaseFile = new File(dbDir, "database_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
         }

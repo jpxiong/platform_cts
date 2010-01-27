@@ -66,7 +66,8 @@ public class CursorAdapterTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mDatabaseFile = new File("/sqlite_stmt_journals", "database_test.db");
+        File dbDir = getContext().getDir("tests", Context.MODE_WORLD_WRITEABLE);
+        mDatabaseFile = new File(dbDir, "database_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
         }

@@ -47,6 +47,13 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         mWindow = new CursorWindow(false);
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        mCursor.close();
+        mWindow.close();
+        super.tearDown();
+    }
+    
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "isNull",
