@@ -31,6 +31,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
+import android.os.ConditionVariable;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
@@ -69,8 +70,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private TestAutoFocusCallback mAutoFocusCallback = new TestAutoFocusCallback();
 
     private Looper mLooper = null;
-    private final Object mLock = new Object();
-    private final Object mPreviewDone = new Object();
+    private final ConditionVariable mPreviewDone = new ConditionVariable();
 
     Camera mCamera;
 
@@ -92,6 +92,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      */
     private void initializeMessageLooper() {
         if (LOGV) Log.v(TAG, "start looper");
+        final ConditionVariable startDone = new ConditionVariable();
         new Thread() {
             @Override
             public void run() {
@@ -102,13 +103,15 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // after we are done with it.
                 mLooper = Looper.myLooper();
                 mCamera = Camera.open();
-                synchronized (mLock) {
-                    mLock.notify();
-                }
+                startDone.open();
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
                 if (LOGV) Log.v(TAG, "initializeMessageLooper: quit.");
             }
         }.start();
+
+        if (!startDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
+            fail("initializeMessageLooper: start timeout");
+        }
     }
 
     /*
@@ -133,11 +136,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 mRawPreviewCallbackResult = false;
             }
             mCamera.stopPreview();
-            synchronized (mPreviewDone) {
-                if (LOGV) Log.v(TAG, "notify the preview callback");
-                mPreviewDone.notify();
-            }
-
+            if (LOGV) Log.v(TAG, "notify the preview callback");
+            mPreviewDone.open();
             if (LOGV) Log.v(TAG, "Preview callback stop");
         }
     }
@@ -222,16 +222,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void waitForPreviewDone() {
-        synchronized (mPreviewDone) {
-            try {
-                mPreviewDone.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
-                if (LOGV)
-                    Log.v(TAG, "Wait for preview callback");
-            } catch (Exception e) {
-                if (LOGV)
-                    Log.v(TAG, "wait was interrupted.");
-            }
+        if (LOGV) Log.v(TAG, "Wait for preview callback");
+        if (!mPreviewDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
+            // timeout could be expected or unexpected. The caller will decide.
+            if (LOGV) Log.v(TAG, "waitForPreviewDone: timeout");
         }
+        mPreviewDone.close();
     }
 
     private void checkPreviewCallback() throws Exception {
@@ -291,7 +287,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     // There is some problems in testing autoFocus, setErrorCallback
     public void testTakePicture() throws Exception {
         initializeMessageLooper();
-        syncLock();
         checkTakePicture();
         terminateMessageLooper();
         assertTrue(mShutterCallbackResult);
@@ -346,7 +341,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @BrokenTest("Flaky test. Occasionally fails without a stack trace.")
     public void testCheckPreview() throws Exception {
         initializeMessageLooper();
-        syncLock();
         mCamera.setPreviewCallback(mRawPreviewCallback);
         mCamera.setErrorCallback(mErrorCallback);
         checkPreviewCallback();
@@ -361,7 +355,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     )
     public void testSetOneShotPreviewCallback() throws Exception {
         initializeMessageLooper();
-        syncLock();
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
         checkPreviewCallback();
         terminateMessageLooper();
@@ -369,7 +362,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         mRawPreviewCallbackResult = false;
         initializeMessageLooper();
-        syncLock();
         checkPreviewCallback();
         terminateMessageLooper();
         assertFalse(mRawPreviewCallbackResult);
@@ -384,7 +376,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
         initializeMessageLooper();
-        syncLock();
 
         // Check the order: startPreview->setPreviewDisplay.
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
@@ -396,7 +387,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Check the order: setPreviewDisplay->startPreview.
         initializeMessageLooper();
-        syncLock();
         mRawPreviewCallbackResult = false;
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
         mCamera.setPreviewDisplay(mSurfaceHolder);
@@ -431,16 +421,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     })
     public void testAccessParameters() throws Exception {
         initializeMessageLooper();
-        syncLock();
         // we can get parameters just by getxxx method due to the private constructor
         Parameters pSet = mCamera.getParameters();
         assertParameters(pSet);
-    }
-
-    private void syncLock() throws Exception {
-        synchronized (mLock) {
-            mLock.wait(WAIT_FOR_COMMAND_TO_COMPLETE);
-        }
+        terminateMessageLooper();
     }
 
     // Also test Camera.Parameters
