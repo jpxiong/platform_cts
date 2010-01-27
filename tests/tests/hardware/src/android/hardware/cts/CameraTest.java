@@ -407,6 +407,45 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(mRawPreviewCallbackResult);
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setDisplayOrientation",
+        args = {int.class}
+    )
+    public void testDisplayOrientation() throws Exception {
+        initializeMessageLooper();
+
+        // Check valid arguments.
+        mCamera.setDisplayOrientation(0);
+        mCamera.setDisplayOrientation(90);
+        mCamera.setDisplayOrientation(180);
+        mCamera.setDisplayOrientation(270);
+
+        // Check invalid arguments.
+        try {
+            mCamera.setDisplayOrientation(45);
+            fail("Should throw exception for invalid arguments");
+        } catch (RuntimeException ex) {
+            // expected
+        }
+
+        // Start preview.
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+
+        // Check setting orientation during preview is not allowed.
+        try {
+            mCamera.setDisplayOrientation(90);
+            fail("Should throw exception for setting orientation during preview.");
+        } catch (RuntimeException ex) {
+            // expected
+        }
+
+        terminateMessageLooper();
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
