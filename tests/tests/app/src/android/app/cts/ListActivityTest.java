@@ -16,6 +16,12 @@
 
 package android.app.cts;
 
+import dalvik.annotation.BrokenTest;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.ListActivity;
 import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
@@ -24,10 +30,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(ListActivity.class)
 public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActivityTestHelper> {
@@ -101,6 +103,7 @@ public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActiv
             args = {android.os.Bundle.class}
         )
     })
+    @BrokenTest(value="flaky test. bug 2334738")
     public void testListActivity() throws Throwable {
         waitForAction();
         sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
