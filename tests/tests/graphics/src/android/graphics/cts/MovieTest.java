@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.app.cts.MockActivity;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
@@ -85,7 +86,9 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     @BrokenTest("mMovie is null")
     public void testDecodeFile() throws Exception {
         mMovie = null;
-        File imagefile = new File("/sqlite_stmt_journals", "animated.gif");
+        File dbDir = getInstrumentation().getTargetContext().getDir("tests",
+                Context.MODE_PRIVATE);
+        File imagefile = new File(dbDir, "animated.gif");
         if (imagefile.exists()) {
             imagefile.delete();
         }
