@@ -26,6 +26,7 @@ import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -131,9 +132,8 @@ public class ImageSwitcherTest extends AndroidTestCase {
         ImageView iv1 = new ImageView(getContext());
         imageSwitcher.addView(iv1);
 
-        // because I can not write file in /data/data/com.android, it will throw IOException.
-        // I just write the image file into database test path.
-        File imagefile = new File("/sqlite_stmt_journals", "tempimage.jpg");
+        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+        File imagefile = new File(dbDir, "tempimage.jpg");
         if (imagefile.exists()) {
             imagefile.delete();
         }

@@ -227,7 +227,9 @@ public class ContentResolverTest extends AndroidTestCase {
         )
     })
     public void testOpenOutputStream() throws IOException {
-        Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + ":///sqlite_stmt_journals/temp.jpg");
+        Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + "://" +
+                getContext().getCacheDir().getAbsolutePath() +
+                "/temp.jpg");
         OutputStream os = mContentResolver.openOutputStream(uri);
         assertNotNull(os);
         os.close();
@@ -303,7 +305,9 @@ public class ContentResolverTest extends AndroidTestCase {
         args = {android.net.Uri.class, java.lang.String.class}
     )
     public void testOpenFileDescriptor() throws IOException {
-        Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + ":///sqlite_stmt_journals/temp.jpg");
+        Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + "://" +
+                getContext().getCacheDir().getAbsolutePath() +
+                "/temp.jpg");
         ParcelFileDescriptor pfd = mContentResolver.openFileDescriptor(uri, "w");
         assertNotNull(pfd);
         pfd.close();

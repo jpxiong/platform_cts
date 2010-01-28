@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.PrintWriterPrinter;
 import dalvik.annotation.TestTargets;
@@ -37,7 +38,8 @@ public class PrintWriterPrinterTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mFile = new File("sqlite_stmt_journals","print.log");
+        File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
+        mFile = new File(dbDir,"print.log");
         if (!mFile.exists())
             mFile.createNewFile();
     }
