@@ -27,6 +27,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class MockSyncAdapter extends ISyncAdapter.Stub {
 
+    private static MockSyncAdapter sSyncAdapter = null;
+
     private Account mAccount;
     private String mAuthority;
     private Bundle mExtras;
@@ -122,5 +124,12 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
         if (null != mLatch) {
             mLatch.countDown();
         }
+    }
+
+    public static MockSyncAdapter getMockSyncAdapter() {
+        if (null == sSyncAdapter) {
+            sSyncAdapter = new MockSyncAdapter();
+        }
+        return sSyncAdapter;
     }
 }

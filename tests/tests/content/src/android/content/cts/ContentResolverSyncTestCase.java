@@ -34,22 +34,14 @@ import java.util.concurrent.TimeUnit;
 
 public class ContentResolverSyncTestCase extends AndroidTestCase {
 
-    public static final String ACCOUNT_NAME = "android.content.cts.account.name";
-    public static final String ACCOUNT_TYPE = "android.content.cts.account.type";
-    public static final String ACCOUNT_PASSWORD = "android.content.cts.account.password";
-
-    public static final String AUTH_TOKEN = "mockAuthToken";
-    public static final String AUTH_TOKEN_LABEL = "mockAuthTokenLabel";
-
     private static final String AUTHORITY = "android.content.cts.authority";
 
-    private static final Account ACCOUNT = new Account(ACCOUNT_NAME, ACCOUNT_TYPE);
+    private static final Account ACCOUNT = new Account(MockAccountAuthenticator.ACCOUNT_NAME,
+            MockAccountAuthenticator.ACCOUNT_TYPE);
 
     private static final int LATCH_TIMEOUT_MS = 5000;
 
-    private static MockSyncAdapter sSyncAdapter;
     private static AccountManager sAccountManager;
-    private static MockAccountAuthenticator sMockAuthenticator;
 
     @Override
     public void setUp() throws Exception {
@@ -60,7 +52,7 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
 
     @Override
     public void tearDown() throws Exception {
-        sSyncAdapter.clearData();
+        getMockSyncAdapter().clearData();
 
         // Need to clean up created account
         removeAccount(sAccountManager, ACCOUNT, null /* callback */);
@@ -69,17 +61,12 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
     }
 
     public static synchronized MockSyncAdapter getMockSyncAdapter() {
-        if (null == sSyncAdapter) {
-            sSyncAdapter = new MockSyncAdapter();
-        }
-        return sSyncAdapter;
+        return MockSyncAdapter.getMockSyncAdapter();
+
     }
 
     public static synchronized MockAccountAuthenticator getMockAuthenticator(Context context) {
-        if (null == sMockAuthenticator) {
-            sMockAuthenticator = new MockAccountAuthenticator(context);
-        }
-        return sMockAuthenticator;
+        return MockAccountAuthenticator.getMockAuthenticator(context);
     }
 
     private void addAccountExplicitly(Account account, String password, Bundle userdata) {
@@ -100,8 +87,8 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
     }
 
     private CountDownLatch setNewLatch(CountDownLatch latch) {
-        sSyncAdapter.setLatch(latch);
-        sSyncAdapter.clearData();
+        getMockSyncAdapter().setLatch(latch);
+        getMockSyncAdapter().clearData();
         return latch;
     }
 
@@ -119,11 +106,11 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
             fail("should not throw an InterruptedException");
         }
 
-        assertFalse(sSyncAdapter.isStartSync());
-        assertFalse(sSyncAdapter.isCancelSync());
-        assertTrue(sSyncAdapter.isInitialized());
-        assertEquals(account, sSyncAdapter.getAccount());
-        assertEquals(authority, sSyncAdapter.getAuthority());
+        assertFalse(getMockSyncAdapter().isStartSync());
+        assertFalse(getMockSyncAdapter().isCancelSync());
+        assertTrue(getMockSyncAdapter().isInitialized());
+        assertEquals(account, getMockSyncAdapter().getAccount());
+        assertEquals(authority, getMockSyncAdapter().getAuthority());
     }
 
     private void cancelSync(Account account, String authority, int latchTimeoutMillis) {
@@ -172,22 +159,23 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
 
-        addAccountAndVerifyInitSync(ACCOUNT, ACCOUNT_PASSWORD, AUTHORITY, LATCH_TIMEOUT_MS);
+        addAccountAndVerifyInitSync(ACCOUNT, MockAccountAuthenticator.ACCOUNT_PASSWORD, AUTHORITY,
+                LATCH_TIMEOUT_MS);
 
-        sSyncAdapter.clearData();
+        getMockSyncAdapter().clearData();
 
         setIsSyncable(ACCOUNT, AUTHORITY, true);
         cancelSync(ACCOUNT, AUTHORITY, LATCH_TIMEOUT_MS);
 
-        sSyncAdapter.clearData();
+        getMockSyncAdapter().clearData();
 
         requestSync(ACCOUNT, AUTHORITY, LATCH_TIMEOUT_MS);
 
-        assertTrue(sSyncAdapter.isStartSync());
-        assertFalse(sSyncAdapter.isCancelSync());
-        assertFalse(sSyncAdapter.isInitialized());
-        assertEquals(ACCOUNT, sSyncAdapter.getAccount());
-        assertEquals(AUTHORITY, sSyncAdapter.getAuthority());
+        assertTrue(getMockSyncAdapter().isStartSync());
+        assertFalse(getMockSyncAdapter().isCancelSync());
+        assertFalse(getMockSyncAdapter().isInitialized());
+        assertEquals(ACCOUNT, getMockSyncAdapter().getAccount());
+        assertEquals(AUTHORITY, getMockSyncAdapter().getAuthority());
     }
 
     /**
@@ -200,15 +188,16 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
 
-        addAccountAndVerifyInitSync(ACCOUNT, ACCOUNT_PASSWORD, AUTHORITY, LATCH_TIMEOUT_MS);
+        addAccountAndVerifyInitSync(ACCOUNT, MockAccountAuthenticator.ACCOUNT_PASSWORD, AUTHORITY,
+                LATCH_TIMEOUT_MS);
 
-        sSyncAdapter.clearData();
+        getMockSyncAdapter().clearData();
 
         cancelSync(ACCOUNT, AUTHORITY, LATCH_TIMEOUT_MS);
 
-        assertFalse(sSyncAdapter.isStartSync());
-        assertTrue(sSyncAdapter.isCancelSync());
-        assertFalse(sSyncAdapter.isInitialized());
+        assertFalse(getMockSyncAdapter().isStartSync());
+        assertTrue(getMockSyncAdapter().isCancelSync());
+        assertFalse(getMockSyncAdapter().isInitialized());
 
         assertFalse(ContentResolver.isSyncActive(ACCOUNT, AUTHORITY));
         assertFalse(ContentResolver.isSyncPending(ACCOUNT, AUTHORITY));
@@ -248,7 +237,7 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
 
-        addAccountExplicitly(ACCOUNT, ACCOUNT_PASSWORD, null /* userData */);
+        addAccountExplicitly(ACCOUNT, MockAccountAuthenticator.ACCOUNT_PASSWORD, null /* userData */);
 
         ContentResolver.setIsSyncable(ACCOUNT, AUTHORITY, 2);
         assertTrue(ContentResolver.getIsSyncable(ACCOUNT, AUTHORITY) > 0);
@@ -277,7 +266,8 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         boolean found = false;
         for (int n=0; n < length; n++) {
             SyncAdapterType type = types[n];
-            if (ACCOUNT_TYPE.equals(type.accountType) && AUTHORITY.equals(type.authority)) {
+            if (MockAccountAuthenticator.ACCOUNT_TYPE.equals(type.accountType) &&
+                    AUTHORITY.equals(type.authority)) {
                 found = true;
                 break;
             }
@@ -307,7 +297,7 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         extras.putBoolean("Boolean", true);
         extras.putFloat("Float", 5.5f);
         extras.putDouble("Double", 2.5);
-        extras.putString("String", ACCOUNT_NAME);
+        extras.putString("String", MockAccountAuthenticator.ACCOUNT_NAME);
         extras.putCharSequence("CharSequence", null);
 
         ContentResolver.validateSyncExtrasBundle(extras);

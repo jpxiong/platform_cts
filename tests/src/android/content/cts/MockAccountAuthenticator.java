@@ -26,15 +26,22 @@ import android.os.Bundle;
 
 public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
 
+    private static MockAccountAuthenticator sMockAuthenticator = null;
+    public static final String ACCOUNT_NAME = "android.content.cts.account.name";
+    public static final String ACCOUNT_TYPE = "android.content.cts.account.type";
+    public static final String ACCOUNT_PASSWORD = "android.content.cts.account.password";
+    public static final String AUTH_TOKEN = "mockAuthToken";
+    public static final String AUTH_TOKEN_LABEL = "mockAuthTokenLabel";
+
     public MockAccountAuthenticator(Context context) {
         super(context);
     }
 
     private Bundle createResultBundle() {
         Bundle result = new Bundle();
-        result.putString(AccountManager.KEY_ACCOUNT_NAME, ContentResolverSyncTestCase.ACCOUNT_NAME);
-        result.putString(AccountManager.KEY_ACCOUNT_TYPE, ContentResolverSyncTestCase.ACCOUNT_TYPE);
-        result.putString(AccountManager.KEY_AUTHTOKEN, ContentResolverSyncTestCase.AUTH_TOKEN);
+        result.putString(AccountManager.KEY_ACCOUNT_NAME, ACCOUNT_NAME);
+        result.putString(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE);
+        result.putString(AccountManager.KEY_AUTHTOKEN, AUTH_TOKEN);
 
         return result;
     }
@@ -74,7 +81,7 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        return ContentResolverSyncTestCase.AUTH_TOKEN_LABEL;
+        return AUTH_TOKEN_LABEL;
     }
 
     @Override
@@ -85,4 +92,12 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
         return result;
     }
+
+    public static synchronized MockAccountAuthenticator getMockAuthenticator(Context context) {
+        if (null == sMockAuthenticator) {
+            sMockAuthenticator = new MockAccountAuthenticator(context);
+        }
+        return sMockAuthenticator;
+    }
+
 }
