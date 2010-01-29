@@ -507,12 +507,18 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         List<Integer> pictureFormats = parameters.getSupportedPictureFormats();
         List<String> focusModes = parameters.getSupportedFocusModes();
         String focusMode = parameters.getFocusMode();
+        float focalLength = parameters.getFocalLength();
+        float horizontalViewAngle = parameters.getHorizontalViewAngle();
+        float verticalViewAngle = parameters.getVerticalViewAngle();
         assertTrue(previewSizes != null && previewSizes.size() != 0);
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
         assertTrue(previewFormats != null && previewFormats.size() != 0);
         assertTrue(pictureFormats != null && pictureFormats.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
         assertTrue(focusMode != null);
+        assertTrue(focalLength > 0);
+        assertTrue(horizontalViewAngle > 0 && horizontalViewAngle <= 360);
+        assertTrue(verticalViewAngle > 0 && verticalViewAngle <= 360);
         Size previewSize = previewSizes.get(0);
         Size pictureSize = pictureSizes.get(0);
 
