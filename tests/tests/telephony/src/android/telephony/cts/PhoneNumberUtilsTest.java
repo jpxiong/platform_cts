@@ -61,17 +61,26 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         assertEquals("+17005554141", PhoneNumberUtils.extractNetworkPortion("+17005554141"));
         assertEquals("+17005554141*#N",
                 PhoneNumberUtils.extractNetworkPortion("+1 (700).555-4141*#N"));
-        assertEquals("170055541", PhoneNumberUtils.extractNetworkPortion("1 (700).555-41,1234"));
+        assertEquals("170055541", PhoneNumberUtils.extractNetworkPortion(
+                String.format("1 (700).555-41%c1234", PhoneNumberUtils.PAUSE)));
         assertEquals("**21**17005554141#",
                 PhoneNumberUtils.extractNetworkPortion("**21**+17005554141#"));
 
         // Test extractPostDialPortion
         assertNull(PhoneNumberUtils.extractPostDialPortion(null));
         assertEquals("", PhoneNumberUtils.extractPostDialPortion("+17005554141"));
-        assertEquals(",1234", PhoneNumberUtils.extractPostDialPortion("+1 (700).555-41NN,1234"));
-        assertEquals(";1234", PhoneNumberUtils.extractPostDialPortion("+1 (700).555-41NN;1234"));
-        assertEquals(";1234,;N", PhoneNumberUtils
-                .extractPostDialPortion("+1 (700).555-41NN;1-2.34 ,;N"));
+        assertEquals(String.format("%c1234", PhoneNumberUtils.PAUSE),
+                PhoneNumberUtils.extractPostDialPortion(
+                String.format("+1 (700).555-41NN%c1234", PhoneNumberUtils.PAUSE)));
+        assertEquals(String.format("%c1234", PhoneNumberUtils.WAIT),
+                PhoneNumberUtils.extractPostDialPortion(
+                String.format("+1 (700).555-41NN%c1234", PhoneNumberUtils.WAIT)));
+        assertEquals(String.format("%c1234%c%cN", PhoneNumberUtils.WAIT, PhoneNumberUtils.PAUSE,
+                PhoneNumberUtils.WAIT), PhoneNumberUtils
+                .extractPostDialPortion(
+                        String.format("+1 (700).555-41NN%c1-2.34 %c%cN", PhoneNumberUtils.WAIT,
+                                PhoneNumberUtils.PAUSE,
+                                PhoneNumberUtils.WAIT)));
     }
 
     @TestTargets({
