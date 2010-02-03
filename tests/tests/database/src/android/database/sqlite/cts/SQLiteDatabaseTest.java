@@ -1385,7 +1385,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         insertStatement.close();
 
         // make sure there are 2 rows in the table
-        Cursor cursor = mDatabase.rawQuery("SELECT count(*) FROM test;", null);
+        Cursor cursor = mDatabase.rawQuery("SELECT count(*) FROM test", null);
         assertNotNull(cursor);
         assertEquals(1, cursor.getCount());
         cursor.moveToNext();
@@ -1393,7 +1393,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         cursor.close();
 
         // concatenate column j from all the rows. should return NULL
-        cursor = mDatabase.rawQuery("SELECT group_concat(j, ' ') FROM test;", null);
+        cursor = mDatabase.rawQuery("SELECT group_concat(j, ' ') FROM test", null);
         assertNotNull(cursor);
         assertEquals(1, cursor.getCount());
         cursor.moveToNext();
@@ -1403,5 +1403,179 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         // drop the table
         mDatabase.execSQL("DROP TABLE test;");
         // should get no exceptions
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test schema changes - change existing table.",
+            method = "compileStatement",
+            args = {java.lang.String.class}
+        )
+    public void testSchemaChanges() {
+        mDatabase.execSQL("CREATE TABLE test (i INT, j INT);");
+
+        // at the beginning, there is no record in the database.
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(0, cursor.getCount());
+        cursor.close();
+
+        String sql = "INSERT INTO test VALUES (?, ?);";
+        SQLiteStatement insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 1);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 2);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // read the data from the table and make sure it is correct
+        cursor = mDatabase.rawQuery("SELECT i,j FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
+        cursor.close();
+
+        // alter the table and execute another statement
+        mDatabase.execSQL("ALTER TABLE test ADD COLUMN k int;");
+        sql = "INSERT INTO test VALUES (?, ?, ?);";
+        insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 3);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 4);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 3, 5);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // read the data from the table and make sure it is correct
+        cursor = mDatabase.rawQuery("SELECT i,j,k FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(2, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
+        assertNull(cursor.getString(2));
+        cursor.moveToNext();
+        assertEquals(3, cursor.getInt(0));
+        assertEquals(4, cursor.getInt(1));
+        assertEquals(5, cursor.getInt(2));
+        cursor.close();
+
+        // make sure the old statement - which should *try to reuse* cached query plan -
+        // still works
+        cursor = mDatabase.rawQuery("SELECT i,j FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(2, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
+        cursor.moveToNext();
+        assertEquals(3, cursor.getInt(0));
+        assertEquals(4, cursor.getInt(1));
+        cursor.close();
+
+        SQLiteStatement deleteStatement = mDatabase.compileStatement("DELETE FROM test");
+        deleteStatement.execute();
+        deleteStatement.close();
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test schema changes - add new table.",
+            method = "compileStatement",
+            args = {java.lang.String.class}
+        )
+    public void testSchemaChangesNewTable() {
+        mDatabase.execSQL("CREATE TABLE test (i INT, j INT);");
+
+        // at the beginning, there is no record in the database.
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(0, cursor.getCount());
+        cursor.close();
+
+        String sql = "INSERT INTO test VALUES (?, ?);";
+        SQLiteStatement insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 1);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 2);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // read the data from the table and make sure it is correct
+        cursor = mDatabase.rawQuery("SELECT i,j FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
+        cursor.close();
+
+        // alter the table and execute another statement
+        mDatabase.execSQL("CREATE TABLE test_new (i INT, j INT, k INT);");
+        sql = "INSERT INTO test_new VALUES (?, ?, ?);";
+        insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 3);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 4);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 3, 5);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // read the data from the table and make sure it is correct
+        cursor = mDatabase.rawQuery("SELECT i,j,k FROM test_new", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(3, cursor.getInt(0));
+        assertEquals(4, cursor.getInt(1));
+        assertEquals(5, cursor.getInt(2));
+        cursor.close();
+
+        // make sure the old statement - which should *try to reuse* cached query plan -
+        // still works
+        cursor = mDatabase.rawQuery("SELECT i,j FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
+        cursor.close();
+
+        SQLiteStatement deleteStatement = mDatabase.compileStatement("DELETE FROM test");
+        deleteStatement.execute();
+        deleteStatement.close();
+
+        SQLiteStatement deleteStatement2 = mDatabase.compileStatement("DELETE FROM test_new");
+        deleteStatement2.execute();
+        deleteStatement2.close();
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test schema changes - drop existing table.",
+            method = "compileStatement",
+            args = {java.lang.String.class}
+        )
+    public void testSchemaChangesDropTable() {
+        mDatabase.execSQL("CREATE TABLE test (i INT, j INT);");
+
+        // at the beginning, there is no record in the database.
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(0, cursor.getCount());
+        cursor.close();
+
+        String sql = "INSERT INTO test VALUES (?, ?);";
+        SQLiteStatement insertStatement = mDatabase.compileStatement(sql);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 1, 1);
+        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 2);
+        insertStatement.execute();
+        insertStatement.close();
+
+        // read the data from the table and make sure it is correct
+        cursor = mDatabase.rawQuery("SELECT i,j FROM test", null);
+        assertNotNull(cursor);
+        assertEquals(1, cursor.getCount());
+        cursor.moveToNext();
+        assertEquals(1, cursor.getInt(0));
+        assertEquals(2, cursor.getInt(1));
     }
 }
