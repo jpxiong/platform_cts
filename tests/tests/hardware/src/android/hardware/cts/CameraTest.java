@@ -607,4 +607,49 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         terminateMessageLooper();
     }
+
+    public void testJpegExif() throws Exception {
+        initializeMessageLooper();
+        Camera.Parameters parameters = mCamera.getParameters();
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        double focalLength = (double)parameters.getFocalLength();
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        Thread.sleep(WAIT_LONG);
+        ExifInterface exif = new ExifInterface(JPEG_PATH);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_MAKE) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_MODEL) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_DATETIME) != null);
+        assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
+        assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP), null);
+        double exifFocalLength = (double)exif.getAttributeDouble(
+                ExifInterface.TAG_FOCAL_LENGTH, -1);
+        assertEquals(focalLength, exifFocalLength, 0.001);
+
+        // Test gps exif tags.
+        mCamera.startPreview();
+        parameters.setGpsLatitude(37.736071);
+        parameters.setGpsLongitude(-122.441983);
+        parameters.setGpsAltitude(21);
+        parameters.setGpsTimestamp(1199145600);
+        mCamera.setParameters(parameters);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        Thread.sleep(WAIT_LONG);
+        exif = new ExifInterface(JPEG_PATH);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP) != null);
+        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP) != null);
+        terminateMessageLooper();
+    }
 }
