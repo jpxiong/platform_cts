@@ -62,8 +62,8 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
     private Context mContext;
     private Resources mResources;
     private CtsTestServer mServer;
-    private static final Object sVideoSizeChanged = new Object();
-    private static final Object sLock = new Object();
+    private static Object sVideoSizeChanged;
+    private static Object sLock;
     private static Looper sLooper = null;
     private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 60000;  //1 min max.
 
@@ -337,6 +337,8 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         final float rightVolume = 0.5f;
         final int resid = R.raw.testvideo;
 
+        sLock = new Object();
+        sVideoSizeChanged = new Object();
         MediaPlayer mp = new MediaPlayer();
         AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
         mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
