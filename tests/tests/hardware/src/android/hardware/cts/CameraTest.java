@@ -63,8 +63,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private boolean mAutoFocusCallbackResult = false;
 
     private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1000;  // Milliseconds.
-    private static final int WAIT_TIME = 2000;
-    private static final int WAIT_LONG = 4000;
+    private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
+    private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 4000;
 
     private RawPreviewCallback mRawPreviewCallback = new RawPreviewCallback();
     private TestShutterCallback mShutterCallback = new TestShutterCallback();
@@ -75,6 +75,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private Looper mLooper = null;
     private final ConditionVariable mPreviewDone = new ConditionVariable();
+    private final ConditionVariable mFocusDone = new ConditionVariable();
+    private final ConditionVariable mSnapshotDone = new ConditionVariable();
 
     Camera mCamera;
 
@@ -185,14 +187,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 } else {
                     mJpegPictureCallbackResult = false;
                 }
-                if (LOGV) {
-                    Log.v(TAG, "Jpeg Picture callback");
-                }
+                mSnapshotDone.open();
+                if (LOGV) Log.v(TAG, "Jpeg Picture callback");
             } catch (IOException e) {
                 // no need to fail here; callback worked fine
-                if (LOGV) {
-                    Log.v(TAG, "Error writing picture to sd card.");
-                }
+                if (LOGV) Log.v(TAG, "Error writing picture to sd card.");
             }
         }
     }
@@ -209,6 +208,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class TestAutoFocusCallback implements AutoFocusCallback {
         public void onAutoFocus(boolean success, Camera camera) {
             mAutoFocusCallbackResult = true;
+            mFocusDone.open();
             if (LOGV) Log.v(TAG, "AutoFocus " + success);
         }
     }
@@ -220,9 +220,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setPreviewDisplay(mSurfaceHolder);
         mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
-        Thread.sleep(WAIT_TIME);
+        waitForFocusDone();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        Thread.sleep(WAIT_LONG);
+        waitForSnapshotDone();
     }
 
     private void waitForPreviewDone() {
@@ -232,6 +232,22 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             if (LOGV) Log.v(TAG, "waitForPreviewDone: timeout");
         }
         mPreviewDone.close();
+    }
+
+    private void waitForFocusDone() {
+        if (!mFocusDone.block(WAIT_FOR_FOCUS_TO_COMPLETE)) {
+            // timeout could be expected or unexpected. The caller will decide.
+            if (LOGV) Log.v(TAG, "waitForFocusDone: timeout");
+        }
+        mFocusDone.close();
+    }
+
+    private void waitForSnapshotDone() {
+        if (!mSnapshotDone.block(WAIT_FOR_SNAPSHOT_TO_COMPLETE)) {
+            // timeout could be expected or unexpected. The caller will decide.
+            if (LOGV) Log.v(TAG, "waitForSnapshotDone: timeout");
+        }
+        mSnapshotDone.close();
     }
 
     private void checkPreviewCallback() throws Exception {
@@ -587,8 +603,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
         mCamera.setPreviewDisplay(mSurfaceHolder);
         mCamera.startPreview();
-        mCamera.takePicture(null, null, mJpegPictureCallback);
-        Thread.sleep(WAIT_LONG);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.hasThumbnail());
         byte[] thumb = exif.getThumbnail();
@@ -600,8 +616,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         p.setJpegThumbnailSize(0, 0);
         mCamera.setParameters(p);
         mCamera.startPreview();
-        mCamera.takePicture(null, null, mJpegPictureCallback);
-        Thread.sleep(WAIT_LONG);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
         exif = new ExifInterface(JPEG_PATH);
         assertTrue(!exif.hasThumbnail());
 
@@ -617,7 +633,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startPreview();
         double focalLength = (double)parameters.getFocalLength();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        Thread.sleep(WAIT_LONG);
+        waitForSnapshotDone();
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.getAttribute(ExifInterface.TAG_MAKE) != null);
         assertTrue(exif.getAttribute(ExifInterface.TAG_MODEL) != null);
@@ -642,7 +658,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         parameters.setGpsTimestamp(1199145600);
         mCamera.setParameters(parameters);
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        Thread.sleep(WAIT_LONG);
+        waitForSnapshotDone();
         exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) != null);
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) != null);
