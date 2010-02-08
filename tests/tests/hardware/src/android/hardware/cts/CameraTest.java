@@ -54,6 +54,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private static final String PACKAGE = "com.android.cts.stub";
     private static final boolean LOGV = false;
     private final String JPEG_PATH = "/sdcard/test.jpg";
+    private byte[] mJpegData;
 
     private boolean mRawPreviewCallbackResult = false;
     private boolean mShutterCallbackResult = false;
@@ -172,6 +173,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class JpegPictureCallback implements PictureCallback {
         public void onPictureTaken(byte[] rawData, Camera camera) {
             try {
+                mJpegData = rawData;
                 if (rawData != null) {
                     mJpegPictureCallbackResult = true;
 
@@ -295,26 +297,30 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setErrorCallback",
-            args = {android.hardware.Camera.ErrorCallback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "autoFocus",
             args = {android.hardware.Camera.AutoFocusCallback.class}
         )
     })
-    // There is some problems in testing autoFocus, setErrorCallback
     public void testTakePicture() throws Exception {
         initializeMessageLooper();
-        checkTakePicture();
+        Size pictureSize = mCamera.getParameters().getPictureSize();
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        mCamera.autoFocus(mAutoFocusCallback);
+        waitForFocusDone();
+        mJpegData = null;
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
         terminateMessageLooper();
+        assertTrue(mAutoFocusCallbackResult);
         assertTrue(mShutterCallbackResult);
         assertTrue(mJpegPictureCallbackResult);
-        // Here system failed to call the onAutoFocus(boolean success, Camera camera),
-        // while the autoFocus is available according to Log.
-
-        // How to create an error situation with no influence on test running to test
+        assertTrue(mJpegData != null);
+        Bitmap b = BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length);
+        assertEquals(b.getWidth(), pictureSize.width);
+        assertEquals(b.getHeight(), pictureSize.height);
     }
 
     /*
@@ -502,7 +508,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         final int origPreviewHeight = parameters.getPreviewSize().height;
         final int origPreviewFrameRate = parameters.getPreviewFrameRate();
 
-        assertTrue(isValidPixelFormat(origPictureFormat));
         assertTrue(origPictureWidth > 0);
         assertTrue(origPictureHeight > 0);
         assertTrue(origPreviewWidth > 0);
@@ -511,6 +516,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // The default preview format must be yuv420 (NV21).
         assertTrue(origPreviewFormat == PixelFormat.YCbCr_420_SP);
+
+        // The default picture format must be Jpeg.
+        assertTrue(origPictureFormat == PixelFormat.JPEG);
 
         // If camera supports flash, the default flash mode must be off.
         String flashMode = parameters.getFlashMode();
@@ -521,6 +529,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         List<Size> pictureSizes = parameters.getSupportedPictureSizes();
         List<Integer> previewFormats = parameters.getSupportedPreviewFormats();
         List<Integer> pictureFormats = parameters.getSupportedPictureFormats();
+        List<Integer> frameRates = parameters.getSupportedPreviewFrameRates();
         List<String> focusModes = parameters.getSupportedFocusModes();
         String focusMode = parameters.getFocusMode();
         float focalLength = parameters.getFocalLength();
@@ -530,6 +539,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
         assertTrue(previewFormats != null && previewFormats.size() != 0);
         assertTrue(pictureFormats != null && pictureFormats.size() != 0);
+        assertTrue(frameRates != null && frameRates.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
         assertTrue(focusMode != null);
         assertTrue(focalLength > 0);
@@ -538,6 +548,40 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Size previewSize = previewSizes.get(0);
         Size pictureSize = pictureSizes.get(0);
 
+        // If a parameter is supported, both getXXX and getSupportedXXX have to
+        // be non null.
+        if (parameters.getWhiteBalance() != null) {
+            assertTrue(parameters.getSupportedWhiteBalance() != null);
+        }
+        if (parameters.getSupportedWhiteBalance() != null) {
+            assertTrue(parameters.getWhiteBalance() != null);
+        }
+        if (parameters.getColorEffect() != null) {
+            assertTrue(parameters.getSupportedColorEffects() != null);
+        }
+        if (parameters.getSupportedColorEffects() != null) {
+            assertTrue(parameters.getColorEffect() != null);
+        }
+        if (parameters.getAntibanding() != null) {
+            assertTrue(parameters.getSupportedAntibanding() != null);
+        }
+        if (parameters.getSupportedAntibanding() != null) {
+            assertTrue(parameters.getAntibanding() != null);
+        }
+        if (parameters.getSceneMode() != null) {
+            assertTrue(parameters.getSupportedSceneModes() != null);
+        }
+        if (parameters.getSupportedSceneModes() != null) {
+            assertTrue(parameters.getSceneMode() != null);
+        }
+        if (parameters.getFlashMode() != null) {
+            assertTrue(parameters.getSupportedFlashModes() != null);
+        }
+        if (parameters.getSupportedFlashModes() != null) {
+            assertTrue(parameters.getFlashMode() != null);
+        }
+
+        // Set the parameters.
         parameters.setPictureFormat(PICTURE_FORMAT);
         assertEquals(PICTURE_FORMAT, parameters.getPictureFormat());
         parameters.setPictureSize(pictureSize.width, pictureSize.height);
@@ -545,8 +589,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(pictureSize.height, parameters.getPictureSize().height);
         parameters.setPreviewFormat(PREVIEW_FORMAT);
         assertEquals(PREVIEW_FORMAT, parameters.getPreviewFormat());
-        parameters.setPreviewFrameRate(PREVIEW_FRAMERATE);
-        assertEquals(PREVIEW_FRAMERATE, parameters.getPreviewFrameRate());
+        parameters.setPreviewFrameRate(frameRates.get(0));
+        assertEquals(frameRates.get(0).intValue(), parameters.getPreviewFrameRate());
         parameters.setPreviewSize(previewSize.width, previewSize.height);
         assertEquals(previewSize.width, parameters.getPreviewSize().width);
         assertEquals(previewSize.height, parameters.getPreviewSize().height);
@@ -562,7 +606,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(paramActual.getPreviewSize().width, previewSize.width);
         assertEquals(paramActual.getPreviewSize().height, previewSize.height);
         assertTrue(paramActual.getPreviewFrameRate() > 0);
-
     }
 
     private boolean isValidPixelFormat(int format) {
