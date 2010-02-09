@@ -34,6 +34,7 @@ import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
 import android.media.ExifInterface;
+import android.media.MediaRecorder;
 import android.os.ConditionVariable;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
@@ -710,5 +711,71 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP) != null);
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP) != null);
         terminateMessageLooper();
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "lock",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "unlock",
+            args = {}
+        )
+    })
+    public void testLockUnlock() throws Exception {
+        initializeMessageLooper();
+        Camera.Parameters parameters = mCamera.getParameters();
+        SurfaceHolder surfaceHolder;
+        surfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        Size size = parameters.getPreviewSize();
+        mCamera.setParameters(parameters);
+        mCamera.setPreviewDisplay(surfaceHolder);
+        mCamera.startPreview();
+        mCamera.lock();  // Locking again from the same process has no effect.
+        try {
+            recordVideo(size, surfaceHolder);
+            fail("Recording should not succeed because camera is locked.");
+        } catch (Exception e) {
+            // expected
+        }
+
+        mCamera.unlock();  // Unlock the camera so media recorder can use it.
+        try {
+            mCamera.setParameters(parameters);
+            fail("setParameters should not succeed because camera is unlocked.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+
+        try {
+            recordVideo(size, surfaceHolder);
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
+        mCamera.lock();  // should not fail
+        mCamera.setParameters(parameters);  // should not fail
+        terminateMessageLooper();
+    }
+
+    private void recordVideo(Size size, SurfaceHolder surfaceHolder) throws Exception {
+        MediaRecorder recorder = new MediaRecorder();
+        try {
+            recorder.setCamera(mCamera);
+            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            recorder.setOutputFile("/dev/null");
+            recorder.setVideoSize(size.width, size.height);
+            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            recorder.setPreviewDisplay(surfaceHolder.getSurface());
+            recorder.prepare();
+            recorder.start();
+            Thread.sleep(5000);
+            recorder.stop();
+        } finally {
+            recorder.release();
+        }
     }
 }
