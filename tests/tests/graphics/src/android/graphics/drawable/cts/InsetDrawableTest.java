@@ -18,6 +18,7 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -304,6 +305,7 @@ public class InsetDrawableTest extends AndroidTestCase {
         method = "getOpacity",
         args = {}
     )
+    @BrokenTest(value="bug 2397630 - needs investigation")
     public void testGetOpacity() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
