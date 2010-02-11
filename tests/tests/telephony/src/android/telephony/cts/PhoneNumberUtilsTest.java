@@ -525,7 +525,10 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         assertFalse(PhoneNumberUtils.isStartsPostDial(c));
 
         // Test isEmergencyNumber, now only know US emergency number
-        if (Locale.getDefault().getCountry().equals("US")) {
+        TelephonyManager tm = (TelephonyManager)getContext().getSystemService(
+                 Context.TELEPHONY_SERVICE);
+        // Test isEmergencyNumber, now only know US emergency number
+        if ("US".equals(tm.getSimCountryIso())) {
             assertTrue(PhoneNumberUtils.isEmergencyNumber("911"));
             assertFalse(PhoneNumberUtils.isEmergencyNumber("119"));
         }
