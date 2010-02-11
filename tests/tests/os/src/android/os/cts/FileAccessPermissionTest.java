@@ -16,6 +16,7 @@
 
 package android.os.cts;
 
+import android.os.Environment;
 import android.test.AndroidTestCase;
 
 import java.io.File;
@@ -110,7 +111,7 @@ public class FileAccessPermissionTest extends AndroidTestCase {
         }
 
         // test /sdcard dir.
-        File sdcardDir = new File("/sdcard");
+        File sdcardDir = Environment.getExternalStorageDirectory();
         assertTrue(sdcardDir.exists());
         File sdcardFile = new File(sdcardDir, System.currentTimeMillis() + "test.txt");
         try {

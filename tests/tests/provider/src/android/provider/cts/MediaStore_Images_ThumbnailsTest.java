@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
@@ -190,12 +191,16 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
     }
 
     public void testStoreImagesMediaExternal() {
+        final String externalImgPath = Environment.getExternalStorageDirectory() +
+                "/testimage.jpg";
+        final String externalImgPath2 = Environment.getExternalStorageDirectory() +
+                "/testimage1.jpg";
         ContentValues values = new ContentValues();
         values.put(Thumbnails.KIND, Thumbnails.FULL_SCREEN_KIND);
         values.put(Thumbnails.IMAGE_ID, 0);
         values.put(Thumbnails.HEIGHT, 480);
         values.put(Thumbnails.WIDTH, 320);
-        values.put(Thumbnails.DATA, "/sdcard/testimage.jpg");
+        values.put(Thumbnails.DATA, externalImgPath);
 
         // insert
         Uri uri = mContentResolver.insert(Thumbnails.EXTERNAL_CONTENT_URI, values);
@@ -211,7 +216,7 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         assertEquals(0, c.getLong(c.getColumnIndex(Thumbnails.IMAGE_ID)));
         assertEquals(480, c.getInt(c.getColumnIndex(Thumbnails.HEIGHT)));
         assertEquals(320, c.getInt(c.getColumnIndex(Thumbnails.WIDTH)));
-        assertEquals("/sdcard/testimage.jpg", c.getString(c.getColumnIndex(Thumbnails.DATA)));
+        assertEquals(externalImgPath, c.getString(c.getColumnIndex(Thumbnails.DATA)));
         c.close();
 
         // update
@@ -220,7 +225,7 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         values.put(Thumbnails.IMAGE_ID, 1);
         values.put(Thumbnails.HEIGHT, 50);
         values.put(Thumbnails.WIDTH, 50);
-        values.put(Thumbnails.DATA, "/sdcard/testimage1.jpg");
+        values.put(Thumbnails.DATA, externalImgPath2);
         assertEquals(1, mContentResolver.update(uri, values, null, null));
 
         // delete
