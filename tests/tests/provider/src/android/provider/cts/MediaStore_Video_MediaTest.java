@@ -24,6 +24,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Media;
 import android.test.InstrumentationTestCase;
@@ -56,6 +57,10 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
     }
 
     public void testStoreVideoMediaExternal() {
+        final String externalVideoPath = Environment.getExternalStorageDirectory().getPath() +
+                 "/video/testvideo.3gp";
+        final String externalVideoPath2 = Environment.getExternalStorageDirectory().getPath() +
+                "/video/testvideo1.3gp";
         ContentValues values = new ContentValues();
         values.put(Media.ALBUM, "cts");
         values.put(Media.ARTIST, "cts team");
@@ -71,7 +76,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
         values.put(Media.MINI_THUMB_MAGIC, 0);
         values.put(Media.RESOLUTION, "176x144");
         values.put(Media.TAGS, "cts, test");
-        values.put(Media.DATA, "/sdcard/video/testvideo.3gp");
+        values.put(Media.DATA, externalVideoPath);
         values.put(Media.DISPLAY_NAME, "testvideo");
         values.put(Media.MIME_TYPE, "video/3gpp");
         values.put(Media.SIZE, 86853);
@@ -106,7 +111,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
             assertEquals(0, c.getLong(c.getColumnIndex(Media.MINI_THUMB_MAGIC)));
             assertEquals("176x144", c.getString(c.getColumnIndex(Media.RESOLUTION)));
             assertEquals("cts, test", c.getString(c.getColumnIndex(Media.TAGS)));
-            assertEquals("/sdcard/video/testvideo.3gp", c.getString(c.getColumnIndex(Media.DATA)));
+            assertEquals(externalVideoPath, c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals("testvideo.3gp", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("video/3gpp", c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals("testvideo", c.getString(c.getColumnIndex(Media.TITLE)));
@@ -132,7 +137,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
             values.put(Media.MINI_THUMB_MAGIC, 2);
             values.put(Media.RESOLUTION, "320x240");
             values.put(Media.TAGS, "cts1, test1");
-            values.put(Media.DATA, "/sdcard/video/testvideo1.3gp");
+            values.put(Media.DATA, externalVideoPath2);
             values.put(Media.DISPLAY_NAME, "testvideo1");
             values.put(Media.MIME_TYPE, "video/3gpp");
             values.put(Media.SIZE, 86854);
@@ -159,7 +164,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
             assertEquals(2, c.getLong(c.getColumnIndex(Media.MINI_THUMB_MAGIC)));
             assertEquals("320x240", c.getString(c.getColumnIndex(Media.RESOLUTION)));
             assertEquals("cts1, test1", c.getString(c.getColumnIndex(Media.TAGS)));
-            assertEquals("/sdcard/video/testvideo1.3gp",
+            assertEquals(externalVideoPath2,
                     c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals("testvideo1", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("video/3gpp", c.getString(c.getColumnIndex(Media.MIME_TYPE)));

@@ -26,6 +26,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore.Audio.Playlists;
 import android.test.InstrumentationTestCase;
 
@@ -68,9 +69,11 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
     }
 
     public void testStoreAudioPlaylistsExternal() {
+        final String externalPlaylistPath = Environment.getExternalStorageDirectory().getPath() +
+            "/my_favorites.pl";
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");
-        values.put(Playlists.DATA, "/sdcard/my_favorites.pl");
+        values.put(Playlists.DATA, externalPlaylistPath);
         long dateAdded = System.currentTimeMillis();
         values.put(Playlists.DATE_ADDED, dateAdded);
         long dateModified = System.currentTimeMillis();
@@ -85,7 +88,7 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
             assertEquals(1, c.getCount());
             c.moveToFirst();
             assertEquals("My favourites", c.getString(c.getColumnIndex(Playlists.NAME)));
-            assertEquals("/sdcard/my_favorites.pl",
+            assertEquals(externalPlaylistPath,
                     c.getString(c.getColumnIndex(Playlists.DATA)));
 
             assertEquals(dateAdded, c.getLong(c.getColumnIndex(Playlists.DATE_ADDED)));
@@ -102,7 +105,7 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
             c = mContentResolver.query(uri, null, null, null, null);
             c.moveToFirst();
             assertEquals("xxx", c.getString(c.getColumnIndex(Playlists.NAME)));
-            assertEquals("/sdcard/my_favorites.pl",
+            assertEquals(externalPlaylistPath,
                     c.getString(c.getColumnIndex(Playlists.DATA)));
 
             assertEquals(dateAdded, c.getLong(c.getColumnIndex(Playlists.DATE_ADDED)));

@@ -19,6 +19,7 @@ package android.provider.cts;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
 
@@ -103,12 +104,13 @@ public class MediaStoreAudioTestHelper {
 
         public static final String DISPLAY_NAME = "Jam -Michael Jackson";
 
-        public static final String EXTERNAL_DATA = "/sdcard/Jam.mp3";
-
         public static final String INTERNAL_DATA =
             "/data/data/com.android.cts.stub/files/Jam.mp3";
 
         public static final String FILE_NAME = "Jam.mp3";
+
+        public static final String EXTERNAL_DATA = Environment.getExternalStorageDirectory() +
+                "/" + FILE_NAME;
 
         public static final long DATE_MODIFIED = System.currentTimeMillis();
 
@@ -177,12 +179,15 @@ public class MediaStoreAudioTestHelper {
 
         public static final String DISPLAY_NAME = "Jam(Live)-Michael Jackson";
 
-        public static final String EXTERNAL_DATA = "/sdcard/Jam_live.mp3";
+        public static final String FILE_NAME = "Jam_live.mp3";
+
+        public static final String EXTERNAL_DATA =
+            Environment.getExternalStorageDirectory().getPath() + "/" + FILE_NAME;
 
         public static final String INTERNAL_DATA =
             "/data/data/com.android.cts.stub/files/Jam_live.mp3";
 
-        public static final String FILE_NAME = "Jam_live.mp3";
+
 
         public static final long DATE_MODIFIED = System.currentTimeMillis();
 

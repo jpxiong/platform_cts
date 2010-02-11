@@ -36,6 +36,7 @@ import android.hardware.Camera.ShutterCallback;
 import android.media.ExifInterface;
 import android.media.MediaRecorder;
 import android.os.ConditionVariable;
+import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
@@ -54,7 +55,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.stub";
     private static final boolean LOGV = false;
-    private final String JPEG_PATH = "/sdcard/test.jpg";
+    private final String JPEG_PATH = Environment.getExternalStorageDirectory().getPath() +
+            "/test.jpg";
     private byte[] mJpegData;
 
     private boolean mRawPreviewCallbackResult = false;
