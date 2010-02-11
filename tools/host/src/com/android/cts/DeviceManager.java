@@ -20,8 +20,6 @@ import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
-import android.os.Environment;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
@@ -345,9 +343,9 @@ public class DeviceManager implements IDeviceChangeListener {
                             ts.setTestDevice(newDevice);
                             if (newDevice != device) {
                                 // the connection was dropped or a second reboot occurred
+                                // TODO: replace the hardcoded /sdcard
                                 String cmd = String.format("adb -s %s shell bugreport -o " +
-                                            "%s/bugreports/doubleReboot", deviceSerialNumber,
-                                             Environment.getExternalStorageDirectory().getPath());
+                                            "/sdcard/bugreports/doubleReboot", deviceSerialNumber);
                                 executeCommand(cmd);
                             }
                         } else {
