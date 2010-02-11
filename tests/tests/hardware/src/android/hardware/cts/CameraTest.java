@@ -31,6 +31,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
+import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
@@ -170,7 +171,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     mJpegPictureCallbackResult = true;
 
                     // try to store the picture on the SD card
-                    File rawoutput = new File("/sdcard/test.bmp");
+                    File rawoutput = new File(Environment.getExternalStorageDirectory(),
+                            "test.bmp");
                     FileOutputStream outStream = new FileOutputStream(rawoutput);
                     outStream.write(rawData);
                     outStream.close();

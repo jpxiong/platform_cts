@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
@@ -246,6 +247,10 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
     }
 
     public void testStoreImagesMediaExternal() {
+        final String externalPath = Environment.getExternalStorageDirectory().getPath() +
+                "/testimage.jpg";
+        final String externalPath2 = Environment.getExternalStorageDirectory().getPath() +
+                "/testimage1.jpg";
         ContentValues values = new ContentValues();
         values.put(Media.ORIENTATION, 0);
         values.put(Media.PICASA_ID, 0);
@@ -256,7 +261,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         values.put(Media.LONGITUDE, -74.044636d);
         values.put(Media.IS_PRIVATE, 1);
         values.put(Media.MINI_THUMB_MAGIC, 0);
-        values.put(Media.DATA, "/sdcard/testimage.jpg");
+        values.put(Media.DATA, externalPath);
         values.put(Media.DISPLAY_NAME, "testimage");
         values.put(Media.MIME_TYPE, "image/jpeg");
         values.put(Media.SIZE, 86853);
@@ -286,7 +291,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             assertEquals(-74.044636d, c.getDouble(c.getColumnIndex(Media.LONGITUDE)), 0d);
             assertEquals(1, c.getInt(c.getColumnIndex(Media.IS_PRIVATE)));
             assertEquals(0, c.getLong(c.getColumnIndex(Media.MINI_THUMB_MAGIC)));
-            assertEquals("/sdcard/testimage.jpg", c.getString(c.getColumnIndex(Media.DATA)));
+            assertEquals(externalPath, c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals("testimage", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("image/jpeg", c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals("testimage", c.getString(c.getColumnIndex(Media.TITLE)));
@@ -307,7 +312,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             values.put(Media.LONGITUDE, -75.044636d);
             values.put(Media.IS_PRIVATE, 0);
             values.put(Media.MINI_THUMB_MAGIC, 2);
-            values.put(Media.DATA, "/sdcard/testimage1.jpg");
+            values.put(Media.DATA, externalPath2);
             values.put(Media.DISPLAY_NAME, "testimage1");
             values.put(Media.MIME_TYPE, "image/jpeg");
             values.put(Media.SIZE, 86854);
@@ -329,7 +334,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             assertEquals(-75.044636d, c.getDouble(c.getColumnIndex(Media.LONGITUDE)), 0d);
             assertEquals(0, c.getInt(c.getColumnIndex(Media.IS_PRIVATE)));
             assertEquals(2, c.getLong(c.getColumnIndex(Media.MINI_THUMB_MAGIC)));
-            assertEquals("/sdcard/testimage1.jpg",
+            assertEquals(externalPath2,
                     c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals("testimage1", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("image/jpeg", c.getString(c.getColumnIndex(Media.MIME_TYPE)));
