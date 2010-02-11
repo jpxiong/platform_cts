@@ -18,6 +18,7 @@ package android.speech.tts.cts;
 import dalvik.annotation.TestTargetClass;
 
 import android.media.MediaPlayer;
+import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
@@ -37,8 +38,8 @@ public class TextToSpeechTest extends AndroidTestCase {
     private TextToSpeech mTts;
 
     private static final String UTTERANCE = "utterance";
-    private static final String SAMPLE_TEXT="This is a sample text to speech string";
-    private static final String SAMPLE_FILE_PATH="/sdcard/mytts.wav";
+    private static final String SAMPLE_TEXT = "This is a sample text to speech string";
+    private static final String SAMPLE_FILE_NAME = "mytts.wav";
     /** maximum time to wait for tts to be initialized */
     private static final int TTS_INIT_MAX_WAIT_TIME = 30 * 1000;
     /** maximum time to wait for speech call to be complete */
@@ -138,24 +139,24 @@ public class TextToSpeechTest extends AndroidTestCase {
      * @throws InterruptedException
      */
     public void testSynthesizeToFile() throws Exception {
-        File file = null;
+        File sampleFile = new File(Environment.getExternalStorageDirectory(), SAMPLE_FILE_NAME);
         try {
+            assertFalse(sampleFile.exists());
             // use an utterance listener to determine when synthesizing is complete
             HashMap<String, String> param = new HashMap<String,String>();
             param.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, UTTERANCE);
             UtteranceWaitListener listener = new UtteranceWaitListener(UTTERANCE);
             mTts.setOnUtteranceCompletedListener(listener);
 
-            int result = mTts.synthesizeToFile(SAMPLE_TEXT, param, SAMPLE_FILE_PATH);
+            int result = mTts.synthesizeToFile(SAMPLE_TEXT, param, sampleFile.getPath());
             assertEquals(TextToSpeech.SUCCESS, result);
 
             assertTrue(listener.waitForComplete());
-            file = new File(SAMPLE_FILE_PATH);
-            assertTrue(file.exists());
-            assertTrue(isMusicFile(SAMPLE_FILE_PATH));
+            assertTrue(sampleFile.exists());
+            assertTrue(isMusicFile(sampleFile.getPath()));
 
         } finally {
-            deleteFile(file);
+            deleteFile(sampleFile);
         }
     }
 
