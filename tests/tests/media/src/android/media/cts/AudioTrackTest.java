@@ -2462,6 +2462,7 @@ public class AudioTrackTest extends AndroidTestCase {
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         MockAudioTrack track = new MockAudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF,
                 TEST_FORMAT, 2 * minBuffSize, TEST_MODE);
+        assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
         assertEquals(TEST_NAME, TEST_FORMAT, track.getAudioFormat());
         assertEquals(TEST_NAME, TEST_CONF, track.getChannelConfiguration());
         assertEquals(TEST_NAME, TEST_SR, track.getSampleRate());
@@ -2480,13 +2481,18 @@ public class AudioTrackTest extends AndroidTestCase {
         assertEquals(TEST_NAME, AudioTrack.SUCCESS,
                 track.setPositionNotificationPeriod(periodInFrames));
         assertEquals(TEST_NAME, periodInFrames, track.getPositionNotificationPeriod());
-        assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
         track.setState(AudioTrack.STATE_NO_STATIC_DATA);
         assertEquals(TEST_NAME, AudioTrack.STATE_NO_STATIC_DATA, track.getState());
         track.setState(AudioTrack.STATE_UNINITIALIZED);
         assertEquals(TEST_NAME, AudioTrack.STATE_UNINITIALIZED, track.getState());
-        final int nativeFrameCount = 2400;
-        assertTrue(TEST_NAME, track.getNativeFrameCount() >= nativeFrameCount);
+        int frameCount = 2 * minBuffSize;
+        if (TEST_CONF == AudioFormat.CHANNEL_CONFIGURATION_STEREO) {
+            frameCount /= 2;
+        }
+        if (TEST_FORMAT == AudioFormat.ENCODING_PCM_16BIT) {
+            frameCount /= 2;
+        }
+        assertTrue(TEST_NAME, track.getNativeFrameCount() >= frameCount);
     }
 
     @TestTargets({
