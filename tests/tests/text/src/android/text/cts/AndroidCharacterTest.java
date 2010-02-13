@@ -63,6 +63,59 @@ public class AndroidCharacterTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        notes = "Test getEastAsianWidth(char input)",
+        method = "getEastAsianWidth",
+        args = {char.class}
+    )
+    public void testGetEastAsianWidth() {
+        // LATIN CAPITAL LETTER U WITH CARON (U+01D3)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_NEUTRAL,
+                AndroidCharacter.getEastAsianWidth((char)0x01D3));
+
+        // REPLACEMENT CHARACTER (U+FFFD)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_AMBIGUOUS,
+                AndroidCharacter.getEastAsianWidth((char)0xFFFD));
+
+        // HALFWIDTH KATAKANA LETTER NI (U+FF86)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_HALF_WIDTH,
+                AndroidCharacter.getEastAsianWidth((char)0xFF86));
+
+        // FULLWIDTH LATIN SMALL LETTER A (U+FF41)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_FULL_WIDTH,
+                AndroidCharacter.getEastAsianWidth((char)0xFF41));
+
+        // LATIN CAPITAL LETTER A (U+0041)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_NARROW,
+                AndroidCharacter.getEastAsianWidth((char)0x0041));
+
+        // IDEOGRAPHIC ANNOTATION MAN MARK (U+319F)
+        assertEquals(AndroidCharacter.EAST_ASIAN_WIDTH_WIDE,
+                AndroidCharacter.getEastAsianWidth((char)0x319F));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test getEastAsianWidths(char[] src, byte[] dest, int count)",
+        method = "getEastAsianWidths",
+        args = {char[].class, byte[].class, int.class}
+    )
+    public void testGetEastAsianWidths() {
+        char[] src = {
+                0x01D3, 0xFFFD, 0xFF86, 0xFF41, 0x0041, 0x319f,
+                0x319F, 0x0041, 0xFF41, 0xFF86, 0xFFFD, 0x01D3,
+        };
+        int start = 2;
+        int count = 8;
+        byte[] dest = new byte[count];
+        AndroidCharacter.getEastAsianWidths(src, start, count, dest);
+        byte[] expected = {2, 3, 4, 5, 5, 4, 3, 2};
+        for (int i = 0; i < dest.length; i++) {
+            assertEquals(expected[i], dest[i]);
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         notes = "Test getMirror(char ch)",
         method = "getMirror",
         args = {char.class}
