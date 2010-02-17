@@ -112,6 +112,24 @@ public class AndroidCharacterTest extends AndroidTestCase {
         for (int i = 0; i < dest.length; i++) {
             assertEquals(expected[i], dest[i]);
         }
+        try {
+            AndroidCharacter.getEastAsianWidths(src, 24, 8, dest);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
+        try {
+            AndroidCharacter.getEastAsianWidths(src, -1024, 1, dest);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
+        try {
+            AndroidCharacter.getEastAsianWidths(src, 0, -1, dest);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
     }
 
     @TestTargetNew(
@@ -142,9 +160,27 @@ public class AndroidCharacterTest extends AndroidTestCase {
         }
 
         assertFalse(AndroidCharacter.mirror(src, 0, 0));
-        assertTrue(AndroidCharacter.mirror(src, 40, 50));
+        assertTrue(AndroidCharacter.mirror(src, 40, 24));
         try {
-            AndroidCharacter.mirror(src, 65, 90);
+            AndroidCharacter.mirror(src, 65, 1);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
+        try {
+            AndroidCharacter.mirror(src, 60, 10);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
+        try {
+            AndroidCharacter.mirror(src, -1024, 1);
+            fail("Should throw ArrayIndexOutOfBoundsException.");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected.
+        }
+        try {
+            AndroidCharacter.mirror(src, 0, -1);
             fail("Should throw ArrayIndexOutOfBoundsException.");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected.
