@@ -94,14 +94,6 @@ public class PixelFormatTest extends TestCase {
         assertEquals(1, mPixelFormat.bytesPerPixel);
         assertEquals(8, mPixelFormat.bitsPerPixel);
 
-        PixelFormat.getPixelFormatInfo(PixelFormat.YCbCr_422_SP, mPixelFormat);
-        assertEquals(1, mPixelFormat.bytesPerPixel);
-        assertEquals(16, mPixelFormat.bitsPerPixel);
-
-        PixelFormat.getPixelFormatInfo(PixelFormat.YCbCr_420_SP, mPixelFormat);
-        assertEquals(1, mPixelFormat.bytesPerPixel);
-        assertEquals(12, mPixelFormat.bitsPerPixel);
-
         try {
             PixelFormat.getPixelFormatInfo(PixelFormat.UNKNOWN, mPixelFormat);
             fail("Should throw IllegalArgumentException!");
@@ -155,8 +147,6 @@ public class PixelFormatTest extends TestCase {
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.L_8));
         assertTrue(PixelFormat.formatHasAlpha(PixelFormat.LA_88));
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.RGB_332));
-        assertFalse(PixelFormat.formatHasAlpha(PixelFormat.YCbCr_422_SP));
-        assertFalse(PixelFormat.formatHasAlpha(PixelFormat.YCbCr_420_SP));
         assertFalse(PixelFormat.formatHasAlpha(PixelFormat.UNKNOWN));
     }
 

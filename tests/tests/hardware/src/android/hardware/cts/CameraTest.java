@@ -24,7 +24,7 @@ import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PixelFormat;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.ErrorCallback;
@@ -498,8 +498,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     // Also test Camera.Parameters
     private void assertParameters(Parameters parameters) {
         // Parameters constants
-        final int PICTURE_FORMAT = PixelFormat.JPEG;
-        final int PREVIEW_FORMAT = PixelFormat.YCbCr_420_SP;
+        final int PICTURE_FORMAT = ImageFormat.JPEG;
+        final int PREVIEW_FORMAT = ImageFormat.NV21;
         final int PREVIEW_FRAMERATE = 10;
 
         // Before setting Parameters
@@ -518,10 +518,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(origPreviewFrameRate > 0);
 
         // The default preview format must be yuv420 (NV21).
-        assertTrue(origPreviewFormat == PixelFormat.YCbCr_420_SP);
+        assertTrue(origPreviewFormat == ImageFormat.NV21);
 
         // The default picture format must be Jpeg.
-        assertTrue(origPictureFormat == PixelFormat.JPEG);
+        assertTrue(origPictureFormat == ImageFormat.JPEG);
 
         // If camera supports flash, the default flash mode must be off.
         String flashMode = parameters.getFlashMode();
@@ -612,8 +612,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private boolean isValidPixelFormat(int format) {
-        return (format == PixelFormat.RGB_565) || (format == PixelFormat.YCbCr_420_SP)
-                || (format == PixelFormat.JPEG) || (format == PixelFormat.YCbCr_422_I);
+        return (format == ImageFormat.RGB_565) || (format == ImageFormat.NV21)
+                || (format == ImageFormat.JPEG) || (format == ImageFormat.YUY2);
     }
 
     @TestTargets({
