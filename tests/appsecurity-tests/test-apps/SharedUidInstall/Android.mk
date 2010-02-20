@@ -27,4 +27,6 @@ LOCAL_PACKAGE_NAME := CtsSharedUidInstall
 # sign this app with a different cert than CtsSharedUidInstallDiffCert
 LOCAL_CERTIFICATE := cts/tests/appsecurity-tests/certs/cts-testkey1
 
+LOCAL_PROGUARD_ENABLED := disabled
+
 include $(BUILD_PACKAGE)

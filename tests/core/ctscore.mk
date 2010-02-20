@@ -19,6 +19,8 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
+LOCAL_PROGUARD_ENABLED := disabled
+
 include $(BUILD_PACKAGE)
 
 CORETESTS_INTERMEDIATES := $(call intermediates-dir-for,JAVA_LIBRARIES,core-tests,,COMMON)

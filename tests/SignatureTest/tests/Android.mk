@@ -15,4 +15,6 @@ LOCAL_PACKAGE_NAME := SignatureTestTests
 
 LOCAL_INSTRUMENTATION_FOR := SignatureTest
 
+LOCAL_PROGUARD_FLAGS := -ignorewarnings
+
 include $(BUILD_PACKAGE)
