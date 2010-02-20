@@ -609,6 +609,22 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(paramActual.getPreviewSize().width, previewSize.width);
         assertEquals(paramActual.getPreviewSize().height, previewSize.height);
         assertTrue(paramActual.getPreviewFrameRate() > 0);
+
+        checkExposureCompensation(parameters);
+    }
+
+    private void checkExposureCompensation(Parameters parameters) {
+        assertEquals(parameters.getExposureCompensation(), 0);
+        int max = parameters.getMaxExposureCompensation();
+        int min = parameters.getMinExposureCompensation();
+        float step = parameters.getExposureCompensationStep();
+        if (max == 0 && min == 0) {
+            assertEquals(step, 0);
+            return;
+        }
+        assertTrue(step > 0);
+        assertTrue(max >= 0);
+        assertTrue(min <= 0);
     }
 
     private boolean isValidPixelFormat(int format) {
