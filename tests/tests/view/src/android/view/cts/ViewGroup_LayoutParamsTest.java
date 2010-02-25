@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import com.android.cts.stub.R;
-import com.android.common.XmlUtils;
+import com.android.internal.util.XmlUtils;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;

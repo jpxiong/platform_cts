@@ -25,7 +25,7 @@ import android.util.Xml;
 import android.widget.TableLayout;
 
 import com.android.internal.R;
-import com.android.common.XmlUtils;
+import com.android.internal.util.XmlUtils;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;

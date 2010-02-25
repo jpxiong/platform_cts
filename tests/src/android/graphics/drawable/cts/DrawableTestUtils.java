@@ -22,8 +22,6 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-import com.android.common.XmlUtils;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -31,6 +29,17 @@ import org.xmlpull.v1.XmlPullParserException;
  * The useful methods for graphics.drawable test.
  */
 public class DrawableTestUtils {
+
+    public static void skipCurrentTag(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        int outerDepth = parser.getDepth();
+        int type;
+        while ((type=parser.next()) != XmlPullParser.END_DOCUMENT
+               && (type != XmlPullParser.END_TAG
+                       || parser.getDepth() > outerDepth)) {
+        }
+    }
+    
     /**
      * Retrieve an AttributeSet from a XML.
      *
@@ -71,7 +80,7 @@ public class DrawableTestUtils {
                 }
                 break;
             } else {
-                XmlUtils.skipCurrentTag(parser);
+                skipCurrentTag(parser);
             }
         }
         return attrs;

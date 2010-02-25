@@ -17,7 +17,7 @@
 package android.content.res.cts;
 
 import com.android.cts.stub.R;
-import com.android.common.XmlUtils;
+import com.android.internal.util.XmlUtils;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;

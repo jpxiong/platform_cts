@@ -30,7 +30,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import com.android.internal.R;
-import com.android.common.XmlUtils;
+import com.android.internal.util.XmlUtils;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;

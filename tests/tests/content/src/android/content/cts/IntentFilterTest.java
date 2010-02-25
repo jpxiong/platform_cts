@@ -51,7 +51,7 @@ import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.util.StringBuilderPrinter;
 
-import com.android.common.FastXmlSerializer;
+import com.android.internal.util.FastXmlSerializer;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
