@@ -25,9 +25,12 @@ import dalvik.annotation.ToBeFixed;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
 import android.test.AndroidTestCase;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.SparseArray;
 
 import java.io.File;
@@ -47,6 +50,10 @@ public class BundleTest extends AndroidTestCase {
 
     public static final String KEY = "Bruce Lee";
 
+    private static final String KEY2 = "key2";
+
+    private Spannable mSpannable;
+
     private Bundle mBundle;
 
     @Override
@@ -54,6 +61,8 @@ public class BundleTest extends AndroidTestCase {
         super.setUp();
 
         mBundle = new Bundle();
+        mSpannable = new SpannableString("foo bar");
+        mSpannable.setSpan(new ForegroundColorSpan(0x123456), 0, 3, 0);
     }
 
     @TestTargets({
@@ -143,6 +152,8 @@ public class BundleTest extends AndroidTestCase {
         assertFalse(mBundle.containsKey(KEY));
         mBundle.putBoolean(KEY, true);
         assertTrue(mBundle.containsKey(KEY));
+        roundtrip();
+        assertTrue(mBundle.containsKey(KEY));
     }
 
     // get would return null if nothing has been put into the Bundle,else get
@@ -155,6 +166,8 @@ public class BundleTest extends AndroidTestCase {
     public void testGet() {
         assertNull(mBundle.get(KEY));
         mBundle.putBoolean(KEY, true);
+        assertNotNull(mBundle.get(KEY));
+        roundtrip();
         assertNotNull(mBundle.get(KEY));
     }
 
@@ -176,6 +189,8 @@ public class BundleTest extends AndroidTestCase {
         assertFalse(mBundle.getBoolean(KEY));
         mBundle.putBoolean(KEY, true);
         assertTrue(mBundle.getBoolean(KEY));
+        roundtrip();
+        assertTrue(mBundle.getBoolean(KEY));
     }
 
     @TestTargets({
@@ -195,6 +210,8 @@ public class BundleTest extends AndroidTestCase {
     public void testGetBoolean2() {
         assertTrue(mBundle.getBoolean(KEY, true));
         mBundle.putBoolean(KEY, false);
+        assertFalse(mBundle.getBoolean(KEY, true));
+        roundtrip();
         assertFalse(mBundle.getBoolean(KEY, true));
     }
 
@@ -217,7 +234,14 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putBooleanArray(KEY, new boolean[] {
                 true, false, true
         });
-        final boolean[] booleanArray = mBundle.getBooleanArray(KEY);
+        boolean[] booleanArray = mBundle.getBooleanArray(KEY);
+        assertNotNull(booleanArray);
+        assertEquals(3, booleanArray.length);
+        assertEquals(true, booleanArray[0]);
+        assertEquals(false, booleanArray[1]);
+        assertEquals(true, booleanArray[2]);
+        roundtrip();
+        booleanArray = mBundle.getBooleanArray(KEY);
         assertNotNull(booleanArray);
         assertEquals(3, booleanArray.length);
         assertEquals(true, booleanArray[0]);
@@ -244,6 +268,8 @@ public class BundleTest extends AndroidTestCase {
         final Bundle bundle = new Bundle();
         mBundle.putBundle(KEY, bundle);
         assertTrue(bundle.equals(mBundle.getBundle(KEY)));
+        roundtrip();
+        assertBundleEquals(bundle, mBundle.getBundle(KEY));
     }
 
     @TestTargets({
@@ -265,6 +291,8 @@ public class BundleTest extends AndroidTestCase {
 
         assertEquals(0, mBundle.getByte(KEY));
         mBundle.putByte(KEY, b);
+        assertEquals(b, mBundle.getByte(KEY));
+        roundtrip();
         assertEquals(b, mBundle.getByte(KEY));
     }
 
@@ -289,6 +317,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals((Byte)b1, mBundle.getByte(KEY, b1));
         mBundle.putByte(KEY, b2);
         assertEquals((Byte)b2, mBundle.getByte(KEY, b1));
+        roundtrip();
+        assertEquals((Byte)b2, mBundle.getByte(KEY, b1));
     }
 
     @TestTargets({
@@ -310,7 +340,14 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putByteArray(KEY, new byte[] {
                 1, 2, 3
         });
-        final byte[] byteArray = mBundle.getByteArray(KEY);
+        byte[] byteArray = mBundle.getByteArray(KEY);
+        assertNotNull(byteArray);
+        assertEquals(3, byteArray.length);
+        assertEquals(1, byteArray[0]);
+        assertEquals(2, byteArray[1]);
+        assertEquals(3, byteArray[2]);
+        roundtrip();
+        byteArray = mBundle.getByteArray(KEY);
         assertNotNull(byteArray);
         assertEquals(3, byteArray.length);
         assertEquals(1, byteArray[0]);
@@ -338,6 +375,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals((char)0, mBundle.getChar(KEY));
         mBundle.putChar(KEY, c);
         assertEquals(c, mBundle.getChar(KEY));
+        roundtrip();
+        assertEquals(c, mBundle.getChar(KEY));
     }
 
     @TestTargets({
@@ -361,6 +400,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(c1, mBundle.getChar(KEY, c1));
         mBundle.putChar(KEY, c2);
         assertEquals(c2, mBundle.getChar(KEY, c1));
+        roundtrip();
+        assertEquals(c2, mBundle.getChar(KEY, c1));
     }
 
     @TestTargets({
@@ -382,7 +423,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putCharArray(KEY, new char[] {
                 'h', 'i'
         });
-        final char[] charArray = mBundle.getCharArray(KEY);
+        char[] charArray = mBundle.getCharArray(KEY);
+        assertEquals('h', charArray[0]);
+        assertEquals('i', charArray[1]);
+        roundtrip();
+        charArray = mBundle.getCharArray(KEY);
         assertEquals('h', charArray[0]);
         assertEquals('i', charArray[1]);
     }
@@ -405,8 +450,82 @@ public class BundleTest extends AndroidTestCase {
         final CharSequence cS = "Bruce Lee";
 
         assertNull(mBundle.getCharSequence(KEY));
+        assertNull(mBundle.getCharSequence(KEY2));
         mBundle.putCharSequence(KEY, cS);
+        mBundle.putCharSequence(KEY2, mSpannable);
         assertEquals(cS, mBundle.getCharSequence(KEY));
+        assertSpannableEquals(mSpannable, mBundle.getCharSequence(KEY2));
+        roundtrip();
+        assertEquals(cS, mBundle.getCharSequence(KEY));
+        assertSpannableEquals(mSpannable, mBundle.getCharSequence(KEY2));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCharSequenceArray",
+            args = {java.lang.String.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "putCharSequenceArray",
+            args = {java.lang.String.class, java.lang.CharSequence[].class}
+        )
+    })
+    public void testGetCharSequenceArray() {
+        assertNull(mBundle.getCharSequenceArray(KEY));
+        mBundle.putCharSequenceArray(KEY, new CharSequence[] {
+                "one", "two", "three", mSpannable
+        });
+        CharSequence[] ret = mBundle.getCharSequenceArray(KEY);
+        assertEquals(4, ret.length);
+        assertEquals("one", ret[0]);
+        assertEquals("two", ret[1]);
+        assertEquals("three", ret[2]);
+        assertSpannableEquals(mSpannable, ret[3]);
+        roundtrip();
+        ret = mBundle.getCharSequenceArray(KEY);
+        assertEquals(4, ret.length);
+        assertEquals("one", ret[0]);
+        assertEquals("two", ret[1]);
+        assertEquals("three", ret[2]);
+        assertSpannableEquals(mSpannable, ret[3]);
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCharSequenceArrayList",
+            args = {java.lang.String.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "putCharSequenceArrayList",
+            args = {java.lang.String.class, java.util.ArrayList.class}
+        )
+    })
+    public void testGetCharSequenceArrayList() {
+        assertNull(mBundle.getCharSequenceArrayList(KEY));
+        final ArrayList<CharSequence> list = new ArrayList<CharSequence>();
+        list.add("one");
+        list.add("two");
+        list.add("three");
+        list.add(mSpannable);
+        mBundle.putCharSequenceArrayList(KEY, list);
+        roundtrip();
+        ArrayList<CharSequence> ret = mBundle.getCharSequenceArrayList(KEY);
+        assertEquals(4, ret.size());
+        assertEquals("one", ret.get(0));
+        assertEquals("two", ret.get(1));
+        assertEquals("three", ret.get(2));
+        assertSpannableEquals(mSpannable, ret.get(3));
+        roundtrip();
+        ret = mBundle.getCharSequenceArrayList(KEY);
+        assertEquals(4, ret.size());
+        assertEquals("one", ret.get(0));
+        assertEquals("two", ret.get(1));
+        assertEquals("three", ret.get(2));
+        assertSpannableEquals(mSpannable, ret.get(3));
     }
 
     @TestTargets({
@@ -428,6 +547,8 @@ public class BundleTest extends AndroidTestCase {
 
         assertEquals(0.0, mBundle.getDouble(KEY));
         mBundle.putDouble(KEY, d);
+        assertEquals(d, mBundle.getDouble(KEY));
+        roundtrip();
         assertEquals(d, mBundle.getDouble(KEY));
     }
 
@@ -452,6 +573,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(d1, mBundle.getDouble(KEY, d1));
         mBundle.putDouble(KEY, d2);
         assertEquals(d2, mBundle.getDouble(KEY, d1));
+        roundtrip();
+        assertEquals(d2, mBundle.getDouble(KEY, d1));
     }
 
     @TestTargets({
@@ -473,7 +596,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putDoubleArray(KEY, new double[] {
                 10.06, 10.07
         });
-        final double[] doubleArray = mBundle.getDoubleArray(KEY);
+        double[] doubleArray = mBundle.getDoubleArray(KEY);
+        assertEquals(10.06, doubleArray[0]);
+        assertEquals(10.07, doubleArray[1]);
+        roundtrip();
+        doubleArray = mBundle.getDoubleArray(KEY);
         assertEquals(10.06, doubleArray[0]);
         assertEquals(10.07, doubleArray[1]);
     }
@@ -498,6 +625,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(0.0f, mBundle.getFloat(KEY));
         mBundle.putFloat(KEY, f);
         assertEquals(f, mBundle.getFloat(KEY));
+        roundtrip();
+        assertEquals(f, mBundle.getFloat(KEY));
     }
 
     @TestTargets({
@@ -521,6 +650,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(f1, mBundle.getFloat(KEY, f1));
         mBundle.putFloat(KEY, f2);
         assertEquals(f2, mBundle.getFloat(KEY, f1));
+        roundtrip();
+        assertEquals(f2, mBundle.getFloat(KEY, f1));
     }
 
     @TestTargets({
@@ -542,7 +673,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putFloatArray(KEY, new float[] {
                 10.06f, 10.07f
         });
-        final float[] floatArray = mBundle.getFloatArray(KEY);
+        float[] floatArray = mBundle.getFloatArray(KEY);
+        assertEquals(10.06f, floatArray[0]);
+        assertEquals(10.07f, floatArray[1]);
+        roundtrip();
+        floatArray = mBundle.getFloatArray(KEY);
         assertEquals(10.06f, floatArray[0]);
         assertEquals(10.07f, floatArray[1]);
     }
@@ -567,6 +702,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(0, mBundle.getInt(KEY));
         mBundle.putInt(KEY, i);
         assertEquals(i, mBundle.getInt(KEY));
+        roundtrip();
+        assertEquals(i, mBundle.getInt(KEY));
     }
 
     @TestTargets({
@@ -590,6 +727,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(i1, mBundle.getInt(KEY, i1));
         mBundle.putInt(KEY, i2);
         assertEquals(i2, mBundle.getInt(KEY, i2));
+        roundtrip();
+        assertEquals(i2, mBundle.getInt(KEY, i2));
     }
 
     @TestTargets({
@@ -611,7 +750,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putIntArray(KEY, new int[] {
                 1006, 1007
         });
-        final int[] intArray = mBundle.getIntArray(KEY);
+        int[] intArray = mBundle.getIntArray(KEY);
+        assertEquals(1006, intArray[0]);
+        assertEquals(1007, intArray[1]);
+        roundtrip();
+        intArray = mBundle.getIntArray(KEY);
         assertEquals(1006, intArray[0]);
         assertEquals(1007, intArray[1]);
     }
@@ -638,7 +781,13 @@ public class BundleTest extends AndroidTestCase {
         arrayList.add(i1);
         arrayList.add(i2);
         mBundle.putIntegerArrayList(KEY, arrayList);
-        final ArrayList<Integer> retArrayList = mBundle.getIntegerArrayList(KEY);
+        ArrayList<Integer> retArrayList = mBundle.getIntegerArrayList(KEY);
+        assertNotNull(retArrayList);
+        assertEquals(2, retArrayList.size());
+        assertEquals((Integer)i1, retArrayList.get(0));
+        assertEquals((Integer)i2, retArrayList.get(1));
+        roundtrip();
+        retArrayList = mBundle.getIntegerArrayList(KEY);
         assertNotNull(retArrayList);
         assertEquals(2, retArrayList.size());
         assertEquals((Integer)i1, retArrayList.get(0));
@@ -665,6 +814,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(0, mBundle.getLong(KEY));
         mBundle.putLong(KEY, l);
         assertEquals(l, mBundle.getLong(KEY));
+        roundtrip();
+        assertEquals(l, mBundle.getLong(KEY));
     }
 
     @TestTargets({
@@ -688,6 +839,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(l1, mBundle.getLong(KEY, l1));
         mBundle.putLong(KEY, l2);
         assertEquals(l2, mBundle.getLong(KEY, l2));
+        roundtrip();
+        assertEquals(l2, mBundle.getLong(KEY, l2));
     }
 
     @TestTargets({
@@ -709,7 +862,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putLongArray(KEY, new long[] {
                 1006, 1007
         });
-        final long[] longArray = mBundle.getLongArray(KEY);
+        long[] longArray = mBundle.getLongArray(KEY);
+        assertEquals(1006, longArray[0]);
+        assertEquals(1007, longArray[1]);
+        roundtrip();
+        longArray = mBundle.getLongArray(KEY);
         assertEquals(1006, longArray[0]);
         assertEquals(1007, longArray[1]);
     }
@@ -733,6 +890,8 @@ public class BundleTest extends AndroidTestCase {
         final Bundle bundle = new Bundle();
         mBundle.putParcelable(KEY, bundle);
         assertTrue(bundle.equals(mBundle.getParcelable(KEY)));
+        roundtrip();
+        assertBundleEquals(bundle, (Bundle) mBundle.getParcelable(KEY));
     }
 
     // getParcelableArray should only return the ParcelableArray set by putParcelableArray
@@ -755,10 +914,15 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putParcelableArray(KEY, new Bundle[] {
                 bundle1, bundle2
         });
-        final Parcelable[] parcelableArray = mBundle.getParcelableArray(KEY);
+        Parcelable[] parcelableArray = mBundle.getParcelableArray(KEY);
         assertEquals(2, parcelableArray.length);
         assertTrue(bundle1.equals(parcelableArray[0]));
         assertTrue(bundle2.equals(parcelableArray[1]));
+        roundtrip();
+        parcelableArray = mBundle.getParcelableArray(KEY);
+        assertEquals(2, parcelableArray.length);
+        assertBundleEquals(bundle1, (Bundle) parcelableArray[0]);
+        assertBundleEquals(bundle2, (Bundle) parcelableArray[1]);
     }
 
     // getParcelableArrayList should only return the parcelableArrayList set by putParcelableArrayList
@@ -782,10 +946,15 @@ public class BundleTest extends AndroidTestCase {
         parcelableArrayList.add(bundle1);
         parcelableArrayList.add(bundle2);
         mBundle.putParcelableArrayList(KEY, parcelableArrayList);
-        final ArrayList<Parcelable> ret = mBundle.getParcelableArrayList(KEY);
+        ArrayList<Parcelable> ret = mBundle.getParcelableArrayList(KEY);
         assertEquals(2, ret.size());
         assertTrue(bundle1.equals(ret.get(0)));
         assertTrue(bundle2.equals(ret.get(1)));
+        roundtrip();
+        ret = mBundle.getParcelableArrayList(KEY);
+        assertEquals(2, ret.size());
+        assertBundleEquals(bundle1, (Bundle) ret.get(0));
+        assertBundleEquals(bundle2, (Bundle) ret.get(1));
     }
 
     @TestTargets({
@@ -805,6 +974,8 @@ public class BundleTest extends AndroidTestCase {
     public void testGetSerializable() {
         assertNull(mBundle.getSerializable(KEY));
         mBundle.putSerializable(KEY, "android");
+        assertEquals("android", mBundle.getSerializable(KEY));
+        roundtrip();
         assertEquals("android", mBundle.getSerializable(KEY));
     }
 
@@ -828,6 +999,8 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(0, mBundle.getShort(KEY));
         mBundle.putShort(KEY, s);
         assertEquals(s, mBundle.getShort(KEY));
+        roundtrip();
+        assertEquals(s, mBundle.getShort(KEY));
     }
 
     @TestTargets({
@@ -850,6 +1023,8 @@ public class BundleTest extends AndroidTestCase {
 
         assertEquals(s1, mBundle.getShort(KEY, s1));
         mBundle.putShort(KEY, s2);
+        assertEquals(s2, mBundle.getShort(KEY, s1));
+        roundtrip();
         assertEquals(s2, mBundle.getShort(KEY, s1));
     }
 
@@ -875,7 +1050,11 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putShortArray(KEY, new short[] {
                 s1, s2
         });
-        final short[] shortArray = mBundle.getShortArray(KEY);
+        short[] shortArray = mBundle.getShortArray(KEY);
+        assertEquals(s1, shortArray[0]);
+        assertEquals(s2, shortArray[1]);
+        roundtrip();
+        shortArray = mBundle.getShortArray(KEY);
         assertEquals(s1, shortArray[0]);
         assertEquals(s2, shortArray[1]);
     }
@@ -902,11 +1081,17 @@ public class BundleTest extends AndroidTestCase {
         sparseArray.put(1006, bundle);
         sparseArray.put(1007, intent);
         mBundle.putSparseParcelableArray(KEY, sparseArray);
-        final SparseArray<Parcelable> ret = mBundle.getSparseParcelableArray(KEY);
+        SparseArray<Parcelable> ret = mBundle.getSparseParcelableArray(KEY);
         assertEquals(2, ret.size());
         assertNull(ret.get(1008));
         assertTrue(bundle.equals(ret.get(1006)));
         assertTrue(intent.equals(ret.get(1007)));
+        roundtrip();
+        ret = mBundle.getSparseParcelableArray(KEY);
+        assertEquals(2, ret.size());
+        assertNull(ret.get(1008));
+        assertBundleEquals(bundle, (Bundle) ret.get(1006));
+        assertIntentEquals(intent, (Intent) ret.get(1007));
     }
 
     @TestTargets({
@@ -926,6 +1111,8 @@ public class BundleTest extends AndroidTestCase {
     public void testGetString() {
         assertNull(mBundle.getString(KEY));
         mBundle.putString(KEY, "android");
+        assertEquals("android", mBundle.getString(KEY));
+        roundtrip();
         assertEquals("android", mBundle.getString(KEY));
     }
 
@@ -948,7 +1135,12 @@ public class BundleTest extends AndroidTestCase {
         mBundle.putStringArray(KEY, new String[] {
                 "one", "two", "three"
         });
-        final String[] ret = mBundle.getStringArray(KEY);
+        String[] ret = mBundle.getStringArray(KEY);
+        assertEquals("one", ret[0]);
+        assertEquals("two", ret[1]);
+        assertEquals("three", ret[2]);
+        roundtrip();
+        ret = mBundle.getStringArray(KEY);
         assertEquals("one", ret[0]);
         assertEquals("two", ret[1]);
         assertEquals("three", ret[2]);
@@ -974,7 +1166,13 @@ public class BundleTest extends AndroidTestCase {
         stringArrayList.add("two");
         stringArrayList.add("three");
         mBundle.putStringArrayList(KEY, stringArrayList);
-        final ArrayList<String> ret = mBundle.getStringArrayList(KEY);
+        ArrayList<String> ret = mBundle.getStringArrayList(KEY);
+        assertEquals(3, ret.size());
+        assertEquals("one", ret.get(0));
+        assertEquals("two", ret.get(1));
+        assertEquals("three", ret.get(2));
+        roundtrip();
+        ret = mBundle.getStringArrayList(KEY);
         assertEquals(3, ret.size());
         assertEquals("one", ret.get(0));
         assertEquals("two", ret.get(1));
@@ -993,6 +1191,12 @@ public class BundleTest extends AndroidTestCase {
         assertFalse(setKey.contains("two"));
         mBundle.putBoolean("one", true);
         mBundle.putChar("two", 't');
+        setKey = mBundle.keySet();
+        assertEquals(2, setKey.size());
+        assertTrue(setKey.contains("one"));
+        assertTrue(setKey.contains("two"));
+        assertFalse(setKey.contains("three"));
+        roundtrip();
         setKey = mBundle.keySet();
         assertEquals(2, setKey.size());
         assertTrue(setKey.contains("one"));
@@ -1173,6 +1377,44 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(1, map.size());
         mBundle.putAll(map);
         assertEquals(1, mBundle.size());
+    }
+
+    private void roundtrip() {
+        Parcel out = Parcel.obtain();
+        mBundle.writeToParcel(out, 0);
+        Parcel in = roundtripParcel(out);
+        mBundle = in.readBundle();
+    }
+
+    private Parcel roundtripParcel(Parcel out) {
+        byte[] buf = out.marshall();
+        Parcel in = Parcel.obtain();
+        in.unmarshall(buf, 0, buf.length);
+        in.setDataPosition(0);
+        return in;
+    }
+
+    private void assertBundleEquals(Bundle expected, Bundle observed) {
+        assertEquals(expected.size(), observed.size());
+        for (String key : expected.keySet()) {
+            assertEquals(expected.get(key), observed.get(key));
+        }
+    }
+
+    private void assertIntentEquals(Intent expected, Intent observed) {
+        assertEquals(expected.toUri(0), observed.toUri(0));
+    }
+
+    private void assertSpannableEquals(Spannable expected, CharSequence observed) {
+        Spannable s = (Spannable) observed;
+        assertEquals(expected.toString(), observed.toString());
+        Object[] expectedSpans = expected.getSpans(0, expected.length(), Object.class);
+        Object[] observedSpans = expected.getSpans(0, expected.length(), Object.class);
+        assertEquals(expectedSpans.length, observedSpans.length);
+        for (int i = 0; i < expectedSpans.length; i++) {
+            // Can't compare values of arbitrary objects
+            assertEquals(expectedSpans[i].getClass(), observedSpans[i].getClass());
+        }
     }
 
     class MockClassLoader extends ClassLoader {

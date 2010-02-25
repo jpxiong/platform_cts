@@ -1104,6 +1104,18 @@ public class IntentTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "getCharSequenceArrayListExtra",
+        args = {java.lang.String.class}
+    )
+    public void testGetCharSequenceArrayListExtra() {
+        final ArrayList<CharSequence> expected = new ArrayList<CharSequence>();
+        expected.add("testCharSequence");
+        mIntent.putCharSequenceArrayListExtra(TEST_EXTRA_NAME, expected);
+        assertEquals(expected, mIntent.getCharSequenceArrayListExtra(TEST_EXTRA_NAME));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "resolveActivityInfo",
         args = {android.content.pm.PackageManager.class, int.class}
     )
@@ -1948,6 +1960,17 @@ public class IntentTest extends AndroidTestCase {
         final String[] expected = { "1d", "2d", "3d" };
         mIntent.putExtra(TEST_EXTRA_NAME, expected);
         assertEquals(expected, mIntent.getStringArrayExtra(TEST_EXTRA_NAME));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getCharSequenceArrayExtra",
+        args = {java.lang.String.class}
+    )
+    public void testGetCharSequenceArrayExtra() {
+        final String[] expected = { "1d", "2d", "3d" };
+        mIntent.putExtra(TEST_EXTRA_NAME, expected);
+        assertEquals(expected, mIntent.getCharSequenceArrayExtra(TEST_EXTRA_NAME));
     }
 
     @TestTargetNew(
