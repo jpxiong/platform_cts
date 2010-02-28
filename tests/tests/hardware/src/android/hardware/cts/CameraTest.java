@@ -68,7 +68,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1000;  // Milliseconds.
     private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
-    private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 4000;
+    private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 5000;
 
     private RawPreviewCallback mRawPreviewCallback = new RawPreviewCallback();
     private TestShutterCallback mShutterCallback = new TestShutterCallback();
@@ -178,13 +178,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             try {
                 mJpegData = rawData;
                 if (rawData != null) {
-                    mJpegPictureCallbackResult = true;
-
                     // try to store the picture on the SD card
                     File rawoutput = new File(JPEG_PATH);
                     FileOutputStream outStream = new FileOutputStream(rawoutput);
                     outStream.write(rawData);
                     outStream.close();
+                    mJpegPictureCallbackResult = true;
 
                     if (LOGV) {
                         Log.v(TAG, "JpegPictureCallback rawDataLength = " + rawData.length);
@@ -196,7 +195,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 if (LOGV) Log.v(TAG, "Jpeg Picture callback");
             } catch (IOException e) {
                 // no need to fail here; callback worked fine
-                if (LOGV) Log.v(TAG, "Error writing picture to sd card.");
+                Log.w(TAG, "Error writing picture to sd card.");
             }
         }
     }
@@ -667,6 +666,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
+        assertEquals(mJpegPictureCallbackResult, true);
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.hasThumbnail());
         byte[] thumb = exif.getThumbnail();
@@ -680,6 +680,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
+        assertEquals(mJpegPictureCallbackResult, true);
         exif = new ExifInterface(JPEG_PATH);
         assertTrue(!exif.hasThumbnail());
 
