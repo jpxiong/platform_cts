@@ -223,8 +223,7 @@ public class SslCertificateTest extends TestCase {
 
         Date date1 = new Date(System.currentTimeMillis() - 1000);
         Date date2 = new Date(System.currentTimeMillis());
-        SslCertificate ssl = new SslCertificate("c=129", "e=weji", DateFormat.getInstance().format(
-                date1), DateFormat.getInstance().format(date2));
+        SslCertificate ssl = new SslCertificate("c=129", "e=weji", date1, date2);
         Bundle saved = SslCertificate.saveState(ssl);
         assertTrue(saved.size() == 4);
 
@@ -255,13 +254,13 @@ public class SslCertificateTest extends TestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
-            method = "getValidNotAfter",
+            method = "getValidNotAfterDate",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             notes = "Test getIssuedTo().",
-            method = "getValidNotBefore",
+            method = "getValidNotBeforeDate",
             args = {}
         ),
         @TestTargetNew(
@@ -278,8 +277,7 @@ public class SslCertificateTest extends TestCase {
         // new the SslCertificate instance
         Date date1 = new Date(System.currentTimeMillis() - 1000);
         Date date2 = new Date(System.currentTimeMillis());
-        SslCertificate ssl = new SslCertificate(TO, BY, DateFormat.getInstance().format(
-                date1), DateFormat.getInstance().format(date2));
+        SslCertificate ssl = new SslCertificate(TO, BY, date1, date2);
         DName issuedTo = ssl.getIssuedTo();
         DName issuedBy = ssl.getIssuedBy();
 
@@ -293,8 +291,8 @@ public class SslCertificateTest extends TestCase {
         assertEquals("testOName", issuedBy.getOName());
         assertEquals("testUName", issuedBy.getUName());
 
-        assertEquals(DateFormat.getInstance().format(date1), ssl.getValidNotBefore());
-        assertEquals(DateFormat.getInstance().format(date2), ssl.getValidNotAfter());
+        assertEquals(date1, ssl.getValidNotBeforeDate());
+        assertEquals(date2, ssl.getValidNotAfterDate());
         final String EXPECTED = "Issued to: c=ccc,o=testOName,ou=testUName,cn=testCName;\n"
             + "Issued by: e=aeei,c=adb,o=testOName,ou=testUName,cn=testCName;\n";
         assertEquals(EXPECTED, ssl.toString());
