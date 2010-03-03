@@ -64,7 +64,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         String tag = "tag";
         String shortMsg = "shortMsg";
         String longMsg = "longMsg";
-        byte[] crashData = { 1, 2, 3 };
 
         mErrorStateInfo.condition = condition;
         mErrorStateInfo.processName = processName;
@@ -73,8 +72,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         mErrorStateInfo.tag = tag;
         mErrorStateInfo.shortMsg = shortMsg;
         mErrorStateInfo.longMsg = longMsg;
-        // test crashData is not null
-        mErrorStateInfo.crashData = crashData;
 
         Parcel parcel = Parcel.obtain();
         mErrorStateInfo.writeToParcel(parcel, 0);
@@ -90,17 +87,7 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         // null?
         assertEquals(shortMsg, values.shortMsg);
         assertEquals(longMsg, values.longMsg);
-        assertEquals(1, values.crashData[0]);
-        assertEquals(2, values.crashData[1]);
-        assertEquals(3, values.crashData[2]);
-        // test crashData is null
-        mErrorStateInfo.crashData = null;
-        parcel = Parcel.obtain();
-        mErrorStateInfo.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        values = ActivityManager.ProcessErrorStateInfo.CREATOR.createFromParcel(parcel);
-        assertNull(values.crashData);
-
+        assertNull(values.crashData);  // Deprecated field: always null
     }
 
     @TestTargetNew(
@@ -117,7 +104,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         String tag = "tag";
         String shortMsg = "shortMsg";
         String longMsg = "longMsg";
-        byte[] crashData = { 1, 2, 3 };
 
         mErrorStateInfo.condition = condition;
         mErrorStateInfo.processName = processName;
@@ -126,8 +112,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         mErrorStateInfo.tag = tag;
         mErrorStateInfo.shortMsg = shortMsg;
         mErrorStateInfo.longMsg = longMsg;
-        // test crashData is not null
-        mErrorStateInfo.crashData = crashData;
 
         Parcel parcel = Parcel.obtain();
         mErrorStateInfo.writeToParcel(parcel, 0);
@@ -142,18 +126,7 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         assertEquals(tag, values.tag);
         assertEquals(shortMsg, values.shortMsg);
         assertEquals(longMsg, values.longMsg);
-        assertEquals(1, values.crashData[0]);
-        assertEquals(2, values.crashData[1]);
-        assertEquals(3, values.crashData[2]);
-
-        // test crashData is null
-        mErrorStateInfo.crashData = null;
-        parcel = Parcel.obtain();
-        mErrorStateInfo.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        values = new ActivityManager.ProcessErrorStateInfo();
-        values.readFromParcel(parcel);
-        assertNull(values.crashData);
+        assertNull(values.crashData);  // Deprecated field: always null
     }
 
 }
