@@ -69,12 +69,19 @@ public class SQLiteProgramTest extends AndroidTestCase {
         final String statement = "DELETE FROM test WHERE _id=?;";
         SQLiteStatement statementOne = mDatabase.compileStatement(statement);
         SQLiteStatement statementTwo = mDatabase.compileStatement(statement);
-        // both the statements should have the same uniqueId because they both should refer to
-        // the same compiled-sql statement in cache
-        assertTrue(statementOne.getUniqueId() == statementTwo.getUniqueId());
+        // since the same compiled statement is being accessed at the same time by 2 different
+        // objects, they each get their own statement id
+        assertTrue(statementOne.getUniqueId() != statementTwo.getUniqueId());
         statementOne.close();
         statementTwo.close();
         
+        statementOne = mDatabase.compileStatement(statement);
+        int n = statementOne.getUniqueId();
+        statementOne.close();
+        statementTwo = mDatabase.compileStatement(statement);
+        assertEquals(n, statementTwo.getUniqueId());
+        statementTwo.close();
+
         // now try to compile 2 different statements and they should have different uniquerIds.
         SQLiteStatement statement1 = mDatabase.compileStatement("DELETE FROM test WHERE _id=1;");
         SQLiteStatement statement2 = mDatabase.compileStatement("DELETE FROM test WHERE _id=2;");
