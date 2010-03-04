@@ -296,11 +296,10 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         assertEquals(100, ((BitmapDrawable) d2.getCurrent()).getPaint().getAlpha());
         assertEquals(100, ((BitmapDrawable) d3.getCurrent()).getPaint().getAlpha());
 
-        try {
-            d1.mutate();
-            fail("Should throw NullPointerException.");
-        } catch (NullPointerException e) {
-        }
+        d1.mutate();
+
+        // TODO: add verification
+
     }
 
     private XmlResourceParser getResourceParser(int resId) throws XmlPullParserException,
