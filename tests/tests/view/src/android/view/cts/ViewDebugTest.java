@@ -62,7 +62,7 @@ public class ViewDebugTest extends AndroidTestCase {
     public void testRecyclerTracing() {
         final String recyclerTracePrefix = "ViewDebugTest";
         View ownerView = new View(getContext());
-        View view = new View(null);
+        View view = new View(getContext());
 
         // debugging should be disabled on production devices
         assertFalse(ViewDebug.TRACE_RECYCLER);

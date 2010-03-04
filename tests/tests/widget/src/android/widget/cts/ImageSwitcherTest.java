@@ -72,14 +72,6 @@ public class ImageSwitcherTest extends AndroidTestCase {
         AttributeSet attrs = Xml.asAttributeSet(parser);
         assertNotNull(attrs);
         new ImageSwitcher(getContext(), attrs);
-
-        new ImageSwitcher(null);
-
-        try {
-            new ImageSwitcher(null, null);
-            fail("should throw NullPointerException.");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
