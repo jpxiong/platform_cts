@@ -32,7 +32,7 @@ public class NetworkInfoTest extends AndroidTestCase {
 
     public static final int TYPE_MOBILE = ConnectivityManager.TYPE_MOBILE;
     public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
-    public static final String MOBILE_TYPE_NAME = "MOBILE";
+    public static final String MOBILE_TYPE_NAME = "mobile";
     public static final String WIFI_TYPE_NAME = "WIFI";
 
     @TestTargets({
