@@ -24,13 +24,12 @@ import dalvik.annotation.TestTargets;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
 @TestTargetClass(ConfigurationInfo.class)
 public class ConfigurationInfoTest extends AndroidTestCase {
-    private static final String APK_ROUTE = "/data/app/com.android.cts.stub.apk";
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -63,13 +62,13 @@ public class ConfigurationInfoTest extends AndroidTestCase {
             args = {}
         )
     })
-    public void testConfigPreferences() {
+    public void testConfigPreferences() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
 
         // Test constructors
         new ConfigurationInfo();
-        PackageInfo pkgInfo = pm.getPackageArchiveInfo(
-                APK_ROUTE, PackageManager.GET_CONFIGURATIONS);
+        PackageInfo pkgInfo = pm.getPackageInfo(getContext().getPackageName(),
+                PackageManager.GET_CONFIGURATIONS);
         ConfigurationInfo[] configInfoArray = pkgInfo.configPreferences;
         assertTrue(configInfoArray.length > 0);
         ConfigurationInfo configInfo = configInfoArray[0];

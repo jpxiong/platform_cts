@@ -569,8 +569,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         String DATABASE_NAME2 = DATABASE_NAME + "2";
         SQLiteDatabase mDatabase;
         File mDatabaseFile;
-        String databasePath;
-        boolean needRemovePath = false;
 
         SQLiteDatabase.CursorFactory factory = new SQLiteDatabase.CursorFactory() {
             public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery,
@@ -584,15 +582,6 @@ public class ContextWrapperTest extends AndroidTestCase {
                 };
             }
         };
-
-        databasePath = mContextWrapper.getDatabasePath("").toString();
-        assertNotSame(null, databasePath);
-        File path = new File(databasePath);
-        if (!path.exists()) {
-            // Path not created, then create it.
-            path.mkdir();
-            needRemovePath = true;
-        }
 
         // FIXME: Move cleanup into tearDown()
         for (String db : mContextWrapper.databaseList()) {
@@ -614,7 +603,6 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         // Test getDatabasePath
         File actualDBPath = mContextWrapper.getDatabasePath(DATABASE_NAME1);
-        assertEquals(databasePath + "/" + DATABASE_NAME1, actualDBPath.toString());
 
         // Test databaseList()
         assertEquals(2, mContextWrapper.databaseList().length);
@@ -631,12 +619,6 @@ public class ContextWrapperTest extends AndroidTestCase {
             mContextWrapper.deleteDatabase(DATABASE_NAME + i);
             mDatabaseFile = new File(actualDBPath, DATABASE_NAME + i);
             assertFalse(mDatabaseFile.exists());
-        }
-
-        // Delete Database path
-        if (needRemovePath) {
-            // If at the beginning there is no database path exists, delete it at the end.
-            path.delete();
         }
     }
 

@@ -398,8 +398,8 @@ public class PackageManagerTest extends AndroidTestCase {
         assertEquals(RECEIVER_NAME, mPackageManager.getReceiverInfo(receiverName, 0).name);
 
         // Test getPackageArchiveInfo
-        String apkRoute = "/data/app/com.android.cts.stub.apk";
-        String apkName = "com.android.cts.stub";
+        final String apkRoute = getContext().getPackageCodePath();
+        final String apkName = getContext().getPackageName();
         assertEquals(apkName, mPackageManager.getPackageArchiveInfo(apkRoute, 0).packageName);
 
         // Test getPackagesForUid, getNameForUid
