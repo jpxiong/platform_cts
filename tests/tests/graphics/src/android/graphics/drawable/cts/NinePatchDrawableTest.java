@@ -228,22 +228,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertTrue(r.top > 0);
         assertTrue(r.right > 0);
         assertTrue(r.bottom > 0);
-
-        try {
-            // drawable constructed from a bitmap has no padding set
-            mNinePatchDrawable.getPadding(r);
-            fail("The method should check whether the padding field is null.");
-        } catch (NullPointerException e) {
-            // expected
-        }
-
-        // passed in a null rect
-        try {
-            mNinePatchDrawable.getPadding(null);
-            fail("The method should check whether the rect is null.");
-        } catch (NullPointerException e) {
-            // expected
-        }
     }
 
     @TestTargetNew(
