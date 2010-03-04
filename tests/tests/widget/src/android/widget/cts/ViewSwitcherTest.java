@@ -73,14 +73,6 @@ public class ViewSwitcherTest extends AndroidTestCase {
         XmlPullParser parser = getContext().getResources().getXml(R.layout.viewswitcher_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);
         new ViewSwitcher(getContext(), attrs);
-
-        new ViewSwitcher(null);
-
-        try {
-            new ViewSwitcher(null, null);
-            fail("should throw NullPointerException.");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(

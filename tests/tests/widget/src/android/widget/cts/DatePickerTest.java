@@ -117,14 +117,6 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(2000, datePicker.getYear());
         assertEquals(10, datePicker.getMonth());
         assertEquals(15, datePicker.getDayOfMonth());
-
-        // test invalid input values
-        datePicker = createDatePicker();
-        try {
-            datePicker.init(-1, 13, 315, onDateChangedListener);
-            fail("should throw ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargets({
@@ -184,14 +176,6 @@ public class DatePickerTest extends AndroidTestCase {
         assertEquals(1989, datePicker.getYear());
         assertEquals(9, datePicker.getMonth());
         assertEquals(19, datePicker.getDayOfMonth());
-
-        // Test invalid input values.
-        try {
-            datePicker.updateDate(1989, 29, 19);
-            fail("should throw ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
-
     }
 
     @TestTargets({

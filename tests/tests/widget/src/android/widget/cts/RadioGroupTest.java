@@ -89,15 +89,9 @@ public class RadioGroupTest extends InstrumentationTestCase {
             + "RadioGroup#RadioGroup(Context, AttributeSet) when param Context is null")
     public void testConstructors() {
         new RadioGroup(mContext);
-        new RadioGroup(null);
 
         AttributeSet attrs = getAttributeSet(R.layout.radiogroup_1);
         new RadioGroup(mContext, attrs);
-        try {
-            new RadioGroup(null, attrs);
-            fail("The constructor should throw NullPointerException when param Context is null.");
-        } catch (NullPointerException e) {
-        }
         new RadioGroup(mContext, null);
     }
 
