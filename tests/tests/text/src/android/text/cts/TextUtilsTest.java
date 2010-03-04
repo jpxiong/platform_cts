@@ -1265,7 +1265,7 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(searchString, 'r', INDEX_OF_FIRST_R + 1));
         assertEquals(-1, TextUtils.indexOf(searchString, 'r', searchString.length()));
         assertEquals(INDEX_OF_FIRST_R, TextUtils.indexOf(searchString, 'r', Integer.MIN_VALUE));
-        assertEquals(-1, TextUtils.indexOf(searchString, 'r', Integer.MAX_VALUE));
+        assertEquals(2, TextUtils.indexOf(searchString, 'r', Integer.MAX_VALUE));
 
         StringBuffer stringBuffer = new StringBuffer(searchString);
         assertEquals(INDEX_OF_SECOND_R, TextUtils.indexOf(stringBuffer, 'r', INDEX_OF_FIRST_R + 1));
@@ -1387,7 +1387,7 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(-1, TextUtils.indexOf(searchString, "string", INDEX_OF_SECOND_STRING + 1));
         assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string",
                 Integer.MIN_VALUE));
-        assertEquals(-1, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE));
+        assertEquals(0, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE));
 
         assertEquals(1, TextUtils.indexOf(searchString, "", 1));
         assertEquals(Integer.MAX_VALUE, TextUtils.indexOf(searchString, "", Integer.MAX_VALUE));
@@ -1439,7 +1439,7 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_SECOND_STRING - 1));
         assertEquals(INDEX_OF_FIRST_STRING, TextUtils.indexOf(searchString, "string",
                 Integer.MIN_VALUE, INDEX_OF_SECOND_STRING - 1));
-        assertEquals(-1, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE,
+        assertEquals(0, TextUtils.indexOf(searchString, "string", Integer.MAX_VALUE,
                 INDEX_OF_SECOND_STRING - 1));
 
         assertEquals(INDEX_OF_SECOND_STRING, TextUtils.indexOf(searchString, "string",
@@ -2254,12 +2254,7 @@ public class TextUtilsTest extends AndroidTestCase {
             // expected
         }
 
-        try {
-            TextUtils.getCapsMode(testString, -1, TextUtils.CAP_MODE_SENTENCES);
-            fail("Should throw IndexOutOfBoundsException!");
-        } catch (IndexOutOfBoundsException e) {
-            // expected
-        }
+        assertEquals(0, TextUtils.getCapsMode(testString, -1, TextUtils.CAP_MODE_SENTENCES));
 
         try {
             TextUtils.getCapsMode(testString, testString.length() + 1,
