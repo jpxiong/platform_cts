@@ -23,7 +23,7 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/archive/src/test/java) \
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/archive/src/test/java/org) \
 	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
 	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java) \
 	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
