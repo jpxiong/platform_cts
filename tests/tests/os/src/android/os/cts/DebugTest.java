@@ -16,8 +16,10 @@
 package android.os.cts;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import android.content.Context;
 import android.os.Debug;
 import android.test.AndroidTestCase;
 import dalvik.annotation.TestLevel;
@@ -521,5 +523,27 @@ public class DebugTest extends AndroidTestCase {
 
         Debug.resetAllCounts();
         Debug.dumpHprofData(dumpFile);
+    }
+
+    public void testDumpService() throws Exception {
+        File file = getContext().getFileStreamPath("dump.out");
+        file.delete();
+        assertFalse(file.exists());
+
+        FileOutputStream out = getContext().openFileOutput("dump.out", Context.MODE_PRIVATE);
+        assertFalse(Debug.dumpService("xyzzy -- not a valid service name", out.getFD(), null));
+        out.close();
+
+        // File was opened, but nothing was written
+        assertTrue(file.exists());
+        assertEquals(0, file.length());
+
+        out = getContext().openFileOutput("dump.out", Context.MODE_PRIVATE);
+        assertTrue(Debug.dumpService(Context.POWER_SERVICE, out.getFD(), null));
+        out.close();
+
+        // Don't require any specific content, just that something was written
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
     }
 }

@@ -64,6 +64,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.DUMP" />
 
     <!-- Used for PackageManager test, don't delete this INTERNET permission -->
     <uses-permission android:name="android.permission.INTERNET" />
