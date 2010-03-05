@@ -40,6 +40,7 @@ import android.database.IBulkCursor;
 import android.database.IContentObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -387,6 +388,12 @@ public class ContentProviderTest extends AndroidTestCase {
                 return null;
             }
 
+            /**
+             * @hide
+             */
+            public Bundle call(String method, String request, Bundle args) {
+                return null;
+            }
         };
         assertNull(ContentProvider.coerceToLocalContentProvider(iContentProvider));
     }
