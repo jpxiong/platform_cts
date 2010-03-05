@@ -207,4 +207,29 @@ public class CookieTest extends AndroidTestCase {
         cookie = mCookieManager.getCookie(url + "/wee");
         assertTrue(cookie.equals("a=b; a=d"));
     }
+
+    public void testEmptyValue() {
+        String url = "http://www.foobar.com";
+
+        mCookieManager.setCookie(url, "foo;");
+        String cookie = mCookieManager.getCookie(url);
+        assertTrue(cookie.equals("foo"));
+
+        mCookieManager.setCookie(url, "bar");
+        cookie = mCookieManager.getCookie(url);
+        assertTrue(cookie.equals("bar; foo"));
+
+        mCookieManager.setCookie(url, "bar=");
+        cookie = mCookieManager.getCookie(url);
+        assertTrue(cookie.equals("bar=; bar; foo"));
+
+        mCookieManager.setCookie(url, "foobar=;");
+        cookie = mCookieManager.getCookie(url);
+        android.util.Log.e("xxx", cookie);
+        assertTrue(cookie.equals("bar=; foobar=; bar; foo"));
+
+        mCookieManager.setCookie(url, "baz=; path=/wee");
+        cookie = mCookieManager.getCookie(url + "/wee");
+        assertTrue(cookie.equals("baz=; bar=; foobar=; bar; foo"));
+    }
 }
