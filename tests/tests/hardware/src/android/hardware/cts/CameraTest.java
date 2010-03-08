@@ -610,6 +610,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(paramActual.getPreviewFrameRate() > 0);
 
         checkExposureCompensation(parameters);
+
+        checkZoom(parameters);
     }
 
     private void checkExposureCompensation(Parameters parameters) {
@@ -624,6 +626,21 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(step > 0);
         assertTrue(max >= 0);
         assertTrue(min <= 0);
+    }
+
+    private void checkZoom(Parameters parameters) {
+        if (!parameters.isZoomSupported()) return;
+        assertEquals(parameters.getZoom(), 0);
+        int maxZoom = parameters.getMaxZoom();
+        assertTrue(maxZoom >= 0);
+        if (maxZoom > 0) {
+            List<Integer> ratios = parameters.getZoomRatios();
+            assertEquals(ratios.size(), maxZoom + 1);
+            assertEquals(ratios.get(0).intValue(), 100);
+            for (int i = 0; i < ratios.size() - 1; i++) {
+                assertTrue(ratios.get(i) < ratios.get(i + 1));
+            }
+        }
     }
 
     private boolean isValidPixelFormat(int format) {
