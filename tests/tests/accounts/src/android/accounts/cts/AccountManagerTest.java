@@ -112,10 +112,16 @@ public class AccountManagerTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    private void validateNonNullResult(Bundle result) {
+    private void validateAccountAndAuthTokenResult(Bundle result) {
         assertEquals(ACCOUNT_NAME, result.get(AccountManager.KEY_ACCOUNT_NAME));
         assertEquals(ACCOUNT_TYPE, result.get(AccountManager.KEY_ACCOUNT_TYPE));
         assertEquals(AUTH_TOKEN, result.get(AccountManager.KEY_AUTHTOKEN));
+    }
+
+    private void validateAccountAndNoAuthTokenResult(Bundle result) {
+        assertEquals(ACCOUNT_NAME, result.get(AccountManager.KEY_ACCOUNT_NAME));
+        assertEquals(ACCOUNT_TYPE, result.get(AccountManager.KEY_ACCOUNT_TYPE));
+        assertNull(result.get(AccountManager.KEY_AUTHTOKEN));
     }
 
     private void validateNullResult(Bundle resultBundle) {
@@ -134,17 +140,18 @@ public class AccountManagerTest extends AndroidTestCase {
         assertEquals(REQUIRED_FEATURES[1], mockAuthenticator.getRequiredFeatures()[1]);
     }
 
-    private void validateOptions() {
-        assertNotNull(mockAuthenticator.getOptions());
-        assertEquals(OPTION_VALUE_1, mockAuthenticator.getOptions().get(OPTION_NAME_1));
-        assertEquals(OPTION_VALUE_2, mockAuthenticator.getOptions().get(OPTION_NAME_2));
+    private void validateOptions(Bundle expectedOptions, Bundle actualOptions) {
+        if (expectedOptions == null) {
+            assertNull(actualOptions);
+        } else {
+            assertNotNull(actualOptions);
+            assertEquals(expectedOptions.get(OPTION_NAME_1), actualOptions.get(OPTION_NAME_1));
+            assertEquals(expectedOptions.get(OPTION_NAME_2), actualOptions.get(OPTION_NAME_2));
+        }
     }
 
     private void validateCredentials() {
         assertEquals(ACCOUNT, mockAuthenticator.getAccount());
-
-        assertEquals(OPTION_VALUE_1, mockAuthenticator.getOptions().get(OPTION_NAME_1));
-        assertEquals(OPTION_VALUE_2, mockAuthenticator.getOptions().get(OPTION_NAME_2));
     }
 
     private int getAccountsCount() {
@@ -252,10 +259,13 @@ public class AccountManagerTest extends AndroidTestCase {
         // Assert parameters has been passed correctly
         validateAccountAndAuthTokenType();
         validateFeatures();
-        validateOptions();
+        validateOptions(OPTIONS_BUNDLE, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndNoAuthTokenResult(resultBundle);
     }
 
     /**
@@ -289,16 +299,19 @@ public class AccountManagerTest extends AndroidTestCase {
                 // Assert parameters has been passed correctly
                 validateAccountAndAuthTokenType();
                 validateFeatures();
-                validateOptions();
+                validateOptions(OPTIONS_BUNDLE, mockAuthenticator.mOptionsAddAccount);
+                validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+                validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+                validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
 
                 // Assert return result
-                validateNonNullResult(resultBundle);
+                validateAccountAndNoAuthTokenResult(resultBundle);
 
                 latch.countDown();
             }
         };
 
-        Bundle resultBundle = addAccount(am,
+        addAccount(am,
                 ACCOUNT_TYPE,
                 AUTH_TOKEN_TYPE,
                 REQUIRED_FEATURES,
@@ -607,7 +620,7 @@ public class AccountManagerTest extends AndroidTestCase {
         assertNotNull(resultBundle);
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndAuthTokenResult(resultBundle);
     }
 
     /**
@@ -635,7 +648,7 @@ public class AccountManagerTest extends AndroidTestCase {
                     resultBundle = bundleFuture.getResult();
 
                     // Assert returned result
-                    validateNonNullResult(resultBundle);
+                    validateAccountAndAuthTokenResult(resultBundle);
 
                 } catch (OperationCanceledException e) {
                     fail("should not throw an OperationCanceledException");
@@ -692,9 +705,13 @@ public class AccountManagerTest extends AndroidTestCase {
         assertNotNull(resultBundle);
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndAuthTokenResult(resultBundle);
 
-        validateOptions();
+        validateOptions(null, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(OPTIONS_BUNDLE, mockAuthenticator.mOptionsGetAuthToken);
+
     }
 
     /**
@@ -722,7 +739,7 @@ public class AccountManagerTest extends AndroidTestCase {
                     resultBundle = bundleFuture.getResult();
 
                     // Assert returned result
-                    validateNonNullResult(resultBundle);
+                    validateAccountAndAuthTokenResult(resultBundle);
 
                 } catch (OperationCanceledException e) {
                     fail("should not throw an OperationCanceledException");
@@ -774,7 +791,11 @@ public class AccountManagerTest extends AndroidTestCase {
         // Assert returned result
         validateNullResult(resultBundle);
 
-        assertNull(mockAuthenticator.getOptions());
+        validateOptions(null, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
+
         mockAuthenticator.clearData();
 
         // Now test with existing features and an activity
@@ -784,9 +805,13 @@ public class AccountManagerTest extends AndroidTestCase {
         );
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndAuthTokenResult(resultBundle);
 
-        validateOptions();
+        validateOptions(OPTIONS_BUNDLE, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
+
         mockAuthenticator.clearData();
 
         // Now test with existing features and no activity
@@ -796,9 +821,13 @@ public class AccountManagerTest extends AndroidTestCase {
         );
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndAuthTokenResult(resultBundle);
 
-        assertNull(mockAuthenticator.getOptions());
+        validateOptions(null, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
+
         mockAuthenticator.clearData();
 
         // Now test with existing features and an activity
@@ -808,9 +837,13 @@ public class AccountManagerTest extends AndroidTestCase {
         );
 
         // Assert returned result
-        validateNonNullResult(resultBundle);
+        validateAccountAndAuthTokenResult(resultBundle);
 
-        assertNull(mockAuthenticator.getOptions());
+        validateOptions(null, mockAuthenticator.mOptionsAddAccount);
+        validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
+        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
+
     }
 
     /**
@@ -860,6 +893,7 @@ public class AccountManagerTest extends AndroidTestCase {
                     // Assert returned result
                     validateCredentials();
 
+                    assertNull(resultBundle.get(AccountManager.KEY_AUTHTOKEN));
                 } catch (OperationCanceledException e) {
                     fail("should not throw an OperationCanceledException");
                 } catch (IOException e) {
@@ -904,7 +938,9 @@ public class AccountManagerTest extends AndroidTestCase {
                 null /* callback*/,
                 null /* handler */);
 
-        futureBundle.getResult();
+        Bundle result = futureBundle.getResult();
+
+        validateAccountAndNoAuthTokenResult(result);
 
         // Assert returned result
         validateCredentials();
@@ -936,6 +972,7 @@ public class AccountManagerTest extends AndroidTestCase {
 
                     // Assert returned result
                     validateCredentials();
+                    assertNull(resultBundle.get(AccountManager.KEY_AUTHTOKEN));
 
                 } catch (OperationCanceledException e) {
                     fail("should not throw an OperationCanceledException");
@@ -978,7 +1015,9 @@ public class AccountManagerTest extends AndroidTestCase {
                 null /* callback */,
                 null /* handler*/);
 
-        futureBundle.getResult();
+        Bundle result = futureBundle.getResult();
+
+        validateAccountAndNoAuthTokenResult(result);
 
         // Assert returned result
         assertEquals(ACCOUNT_TYPE, mockAuthenticator.getAccountType());

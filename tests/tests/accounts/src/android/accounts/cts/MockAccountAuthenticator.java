@@ -35,7 +35,10 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     private String mAccountType;
     private String mAuthTokenType;
     private String[] mRequiredFeatures;
-    private Bundle mOptions;
+    public Bundle mOptionsUpdateCredentials;
+    public Bundle mOptionsConfirmCredentials;
+    public Bundle mOptionsAddAccount;
+    public Bundle mOptionsGetAuthToken;
     private Account mAccount;
     private String[] mFeatures;
 
@@ -65,10 +68,6 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         return mRequiredFeatures;
     }
 
-    public Bundle getOptions() {
-        return mOptions;
-    }
-
     public Account getAccount() {
         return mAccount;
     }
@@ -82,7 +81,10 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         mAccountType = null;
         mAuthTokenType = null;
         mRequiredFeatures = null;
-        mOptions = null;
+        mOptionsUpdateCredentials = null;
+        mOptionsAddAccount = null;
+        mOptionsGetAuthToken = null;
+        mOptionsConfirmCredentials = null;
         mAccount = null;
         mFeatures = null;
     }
@@ -108,7 +110,7 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         this.mAccountType = accountType;
         this.mAuthTokenType = authTokenType;
         this.mRequiredFeatures = requiredFeatures;
-        this.mOptions = options;
+        this.mOptionsAddAccount = options;
 
         return createResultBundle();
     }
@@ -123,7 +125,7 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         this.mResponse = response;
         this.mAccount = account;
         this.mAuthTokenType = authTokenType;
-        this.mOptions = options;
+        this.mOptionsUpdateCredentials = options;
 
         return createResultBundle();
     }
@@ -151,7 +153,7 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
 
         this.mResponse = response;
         this.mAccount = account;
-        this.mOptions = options;
+        this.mOptionsConfirmCredentials = options;
 
         Bundle result = new Bundle();
         result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
@@ -169,7 +171,7 @@ public class MockAccountAuthenticator extends AbstractAccountAuthenticator {
         this.mResponse = response;
         this.mAccount = account;
         this.mAuthTokenType = authTokenType;
-        this.mOptions = options;
+        this.mOptionsGetAuthToken = options;
 
         return createResultBundle();
     }
