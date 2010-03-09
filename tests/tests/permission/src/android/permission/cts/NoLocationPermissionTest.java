@@ -223,9 +223,10 @@ public class NoLocationPermissionTest extends AndroidTestCase {
     /**
      * Verify that getting the network provider requires permissions.
      * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
+     *   {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}.
      */
-    @SmallTest
+    // TODO: remove from small test suite until network provider can be enabled on test devices
+    //@SmallTest
     public void testGetProviderNetwork() {
         checkGetProvider(LocationManager.NETWORK_PROVIDER);
     }
