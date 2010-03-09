@@ -193,6 +193,11 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
 
         getMockSyncAdapter().clearData();
 
+        setIsSyncable(ACCOUNT, AUTHORITY, true);
+        requestSync(ACCOUNT, AUTHORITY, LATCH_TIMEOUT_MS);
+
+        getMockSyncAdapter().clearData();
+
         cancelSync(ACCOUNT, AUTHORITY, LATCH_TIMEOUT_MS);
 
         assertFalse(getMockSyncAdapter().isStartSync());
