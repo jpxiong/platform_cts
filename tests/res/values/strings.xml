@@ -168,4 +168,5 @@
    <string name="version_old">base</string>
    <string name="version_v3">base</string>
    <string name="authenticator_label">Android CTS</string>
+   <string name="search_label">Android CTS</string>
 </resources>

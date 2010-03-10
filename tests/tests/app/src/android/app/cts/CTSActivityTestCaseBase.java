@@ -23,7 +23,7 @@ public class CTSActivityTestCaseBase extends InstrumentationTestCase implements 
     private Sync mSync;
     static class Sync {
         public boolean mHasNotify;
-        public boolean mResult;
+        public int mResult;
     }
 
     @Override
@@ -35,17 +35,17 @@ public class CTSActivityTestCaseBase extends InstrumentationTestCase implements 
     public void setResult(int resultCode) {
         synchronized (mSync) {
             mSync.mHasNotify = true;
-            mSync.mResult = (CTSResult.RESULT_OK == resultCode);
+            mSync.mResult = resultCode;
             mSync.notify();
         }
     }
 
     protected void waitForResult() throws InterruptedException {
         synchronized (mSync) {
-            if (!mSync.mHasNotify) {
+            while (!mSync.mHasNotify) {
                 mSync.wait();
-                assertTrue(mSync.mResult);
             }
+            assertEquals(CTSResult.RESULT_OK, mSync.mResult);
         }
     }
 }

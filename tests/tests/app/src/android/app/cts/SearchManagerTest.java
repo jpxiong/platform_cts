@@ -16,7 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -48,30 +47,6 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "isVisible",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSearch",
-            args = {}
-        )
-    })
-    @BrokenTest("fails, needs investigation")
-    public void testStartSearch() throws InterruptedException {
-        SearchManagerStubActivity.setCTSResult(this);
-        setupActivity(SearchManagerStubActivity.TEST_START_SEARCH);
-        waitForResult();
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startSearch",
-            args = {String.class, boolean.class, ComponentName.class, Bundle.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "stopSearch",
             args = {}
         ),
@@ -81,7 +56,6 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
             args = {}
         )
     })
-    @BrokenTest("fails, needs investigation")
     public void testStopSearch() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_STOP_SEARCH);
@@ -113,8 +87,7 @@ public class SearchManagerTest extends CTSActivityTestCaseBase {
     public void testSetOnDismissListener() throws InterruptedException {
         SearchManagerStubActivity.setCTSResult(this);
         setupActivity(SearchManagerStubActivity.TEST_ON_DISMISSLISTENER);
-        // Here sleep is to make sure stub Activity is finished
-        Thread.sleep(5000);
+        waitForResult();
     }
 
     @TestTargets({

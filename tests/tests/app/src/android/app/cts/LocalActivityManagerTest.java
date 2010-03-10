@@ -208,4 +208,8 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
         }
     }
 
+    public void setResult(Exception e) {
+        setResult(CTSResult.RESULT_FAIL);
+    }
+
 }

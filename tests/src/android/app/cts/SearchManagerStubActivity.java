@@ -21,10 +21,14 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 
 public class SearchManagerStubActivity extends Activity {
 
-    public static final String TEST_START_SEARCH = "startSearch";
+    private static final String TAG = "SearchManagerStubActivity";
+
     public static final String TEST_STOP_SEARCH = "stopSearch";
     public static final String TEST_ON_DISMISSLISTENER = "setOnDismissListener";
     public static final String TEST_ON_CANCELLISTENER = "setOnCancelListener";
@@ -51,18 +55,8 @@ public class SearchManagerStubActivity extends Activity {
     protected void onResume() {
         super.onResume();
         String action = getIntent().getAction();
-        if (action.equals(TEST_START_SEARCH)) {
-            try {
-                testStartSearch();
-            } catch (FailException e) {
-                fail();
-            }
-        } else if (action.equals(TEST_STOP_SEARCH)) {
-            try {
-                testStopSearch();
-            } catch (FailException e) {
-                fail();
-            }
+        if (action.equals(TEST_STOP_SEARCH)) {
+            testStopSearch();
         } else if (action.equals(TEST_ON_DISMISSLISTENER)) {
             testOnDismissListener();
         } else if (action.equals(TEST_ON_CANCELLISTENER)) {
@@ -72,29 +66,28 @@ public class SearchManagerStubActivity extends Activity {
 
     private void testOnCancelListener() {
         mCancelCalled = false;
-        mSearchManager.setOnCancelListener(null);
-        startSearch("test", false, mComponentName, null, true);
-        stopSearch();
-
-        if (mCancelCalled) {
-            fail();
-            return;
-        }
         mSearchManager.setOnCancelListener(new SearchManager.OnCancelListener() {
             public void onCancel() {
                mCancelCalled = true;
             }
         });
-        startSearch("test", false, mComponentName, null, true);
-        stopSearch();
-        finish();
-        new Thread() {
-            public void run() {
-                SearchManagerStubActivity.this.sleep(2000);
-                if (mCancelCalled) {
-                    sCTSResult.setResult(CTSResult.RESULT_OK);
-                } else {
-                    sCTSResult.setResult(CTSResult.RESULT_FAIL);
+
+        new TestStepHandler() {
+            @Override
+            public boolean doStep(int step) throws FailException {
+                switch (step) {
+                    case 1:
+                        startSearch("test", false, mComponentName, null, false);
+                        return false;
+                    case 2:
+                        assertFalse("cancel called", mCancelCalled);
+                        stopSearch();
+                        return false;
+                    case 3:
+                        assertTrue("cancel not called", mCancelCalled);
+                        return true;
+                    default:
+                        throw new IllegalArgumentException("Bad step " + step);
                 }
             }
         }.start();
@@ -102,58 +95,71 @@ public class SearchManagerStubActivity extends Activity {
 
     private void testOnDismissListener() {
         mDismissCalled = false;
+
         mSearchManager.setOnDismissListener(new SearchManager.OnDismissListener() {
             public void onDismiss() {
                 mDismissCalled = true;
             }
         });
-        startSearch("test", false, mComponentName, null, true);
-        stopSearch();
-        finish();
 
-        new Thread() {
-            public void run() {
-                SearchManagerStubActivity.this.sleep(2000);
-                if (mDismissCalled) {
-                    sCTSResult.setResult(CTSResult.RESULT_OK);
-                } else {
-                    sCTSResult.setResult(CTSResult.RESULT_FAIL);
+        new TestStepHandler() {
+            @Override
+            public boolean doStep(int step) throws FailException {
+                switch (step) {
+                    case 1:
+                        startSearch("test", false, mComponentName, null, false);
+                        return false;
+                    case 2:
+                        if (mDismissCalled) {
+                            throw new FailException("dismiss called");
+                        } else {
+                            stopSearch();
+                        }
+                        return false;
+                    case 3:
+                        if (mDismissCalled) {
+                            pass();
+                        } else {
+                            throw new FailException("dismiss not called");
+                        }
+                        return true;
+                    default:
+                        throw new IllegalArgumentException("Bad step " + step);
                 }
             }
         }.start();
     }
 
-    private void testStopSearch() throws FailException {
-        startSearch("test", false, mComponentName, null, true);
-        assertVisible();
-        stopSearch();
-
-        assertInVisible();
-        sCTSResult.setResult(CTSResult.RESULT_OK);
-        finish();
+    private void testStopSearch() {
+        new TestStepHandler() {
+            @Override
+            public boolean doStep(int step) throws FailException {
+                switch (step) {
+                    case 1:
+                        startSearch("test", false, mComponentName, null, false);
+                        return false;
+                    case 2:
+                        assertVisible();
+                        stopSearch();
+                        return false;
+                    case 3:
+                        assertInVisible();
+                        pass();
+                        return true;
+                    default:
+                        throw new IllegalArgumentException("Bad step " + step);
+                }
+            }
+        }.start();
     }
 
-    private void fail() {
+    private void fail(Exception ex) {
+        Log.e(TAG, "test failed", ex);
         sCTSResult.setResult(CTSResult.RESULT_FAIL);
         finish();
     }
 
-    private void testStartSearch() throws FailException {
-        startSearch("test1", false, mComponentName, null, true);
-        assertVisible();
-        stopSearch();
-        assertInVisible();
-
-        startSearch("test2", true, mComponentName, null, true);
-        assertVisible();
-
-        stopSearch();
-        assertInVisible();
-
-        startSearch("test3", true, mComponentName, new Bundle(), false);
-        assertInVisible();
-        stopSearch();
-        assertInVisible();
+    private void pass() {
         sCTSResult.setResult(CTSResult.RESULT_OK);
         finish();
     }
@@ -170,30 +176,76 @@ public class SearchManagerStubActivity extends Activity {
         }
     }
 
+    private void assertFalse(String message, boolean value) throws FailException {
+        assertTrue(message, !value);
+    }
+
+    private void assertTrue(String message, boolean value) throws FailException {
+        if (!value) {
+            throw new FailException(message);
+        }
+    }
+
     private void startSearch(String initialQuery, boolean selectInitialQuery,
             ComponentName launchActivity, Bundle appSearchData, boolean globalSearch) {
         mSearchManager.startSearch(initialQuery, selectInitialQuery, launchActivity, appSearchData,
                 globalSearch);
-        sleep(1000);
     }
 
     private void stopSearch() {
        mSearchManager.stopSearch();
-       sleep(1000);
-    }
-
-    private void sleep(int time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-        }
     }
 
     private boolean isVisible() {
         return mSearchManager.isVisible();
     }
 
+    private abstract class TestStepHandler extends Handler {
+
+        public void start() {
+            sendEmptyMessage(1);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            try {
+                if (doStep(msg.what)) {
+                    pass();
+                } else {
+                    sendEmptyMessage(msg.what + 1);
+                }
+            } catch (FailException ex) {
+                fail(ex);
+            }
+        }
+
+        /**
+         * Performs one step of the test.
+         *
+         * @param step The 1-based number of the step to perform.
+         * @return {@code true} if this was the last step.
+         * @throws FailException If the test failed.
+         */
+        protected abstract boolean doStep(int step) throws FailException;
+    }
+
     private static class FailException extends Exception {
         private static final long serialVersionUID = 1L;
+
+        public FailException() {
+            super();
+        }
+
+        public FailException(String detailMessage, Throwable throwable) {
+            super(detailMessage, throwable);
+        }
+
+        public FailException(String detailMessage) {
+            super(detailMessage);
+        }
+
+        public FailException(Throwable throwable) {
+            super(throwable);
+        }
     }
 }

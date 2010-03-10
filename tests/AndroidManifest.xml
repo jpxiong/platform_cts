@@ -648,7 +648,13 @@
         <service android:name="android.app.cts.MockService" />
 
         <activity android:name="android.app.cts.SearchManagerStubActivity"
-                android:label="SearchManagerStubActivity" />
+                android:label="SearchManagerStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
 
         <service android:name="android.app.cts.LocalService">
             <intent-filter>
