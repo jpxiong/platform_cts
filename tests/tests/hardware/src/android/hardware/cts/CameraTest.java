@@ -726,6 +726,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF), null);
         assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP), null);
         assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP), null);
+        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD), null);
         double exifFocalLength = (double)exif.getAttributeDouble(
                 ExifInterface.TAG_FOCAL_LENGTH, -1);
         assertEquals(focalLength, exifFocalLength, 0.001);
@@ -736,6 +737,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         parameters.setGpsLongitude(-122.441983);
         parameters.setGpsAltitude(21);
         parameters.setGpsTimestamp(1199145600);
+        String thirtyTwoCharacters = "GPS NETWORK HYBRID ARE ALL FINE.";
+        parameters.setGpsProcessingMethod(thirtyTwoCharacters);
         mCamera.setParameters(parameters);
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
@@ -746,6 +749,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF) != null);
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP) != null);
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP) != null);
+        assertEquals(thirtyTwoCharacters,
+                exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
         terminateMessageLooper();
     }
 
