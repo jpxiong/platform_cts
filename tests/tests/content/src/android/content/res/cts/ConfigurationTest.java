@@ -166,20 +166,115 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(0, mConfigDefault.describeContents());
     }
 
+    void doConfigCompare(int expectedFlags, Configuration c1, Configuration c2) {
+        assertEquals(expectedFlags, c1.diff(c2));
+        Configuration tmpc1 = new Configuration(c1);
+        assertEquals(expectedFlags, tmpc1.updateFrom(c2));
+        assertEquals(0, tmpc1.diff(c2));
+    }
+    
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "diff",
         args = {android.content.res.Configuration.class}
     )
     public void testDiff() {
-        assertEquals(ActivityInfo.CONFIG_FONT_SCALE
-                | ActivityInfo.CONFIG_MCC
+        Configuration config = new Configuration();
+        config.mcc = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC, mConfigDefault, config);
+        config.mnc = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC, mConfigDefault, config);
+        config.locale = Locale.getDefault();
+        doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE, mConfigDefault, config);
+        config.screenLayout = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT, mConfigDefault, config);
+        config.touchscreen = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN, mConfigDefault, config);
+        config.keyboard = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD, mConfigDefault, config);
+        config.keyboardHidden = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN, mConfigDefault, config);
+        config.keyboardHidden = 0;
+        config.hardKeyboardHidden = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN, mConfigDefault, config);
+        config.hardKeyboardHidden = 0;
+        config.navigationHidden = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN, mConfigDefault, config);
+        config.navigation = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
+                | ActivityInfo.CONFIG_NAVIGATION, mConfigDefault, config);
+        config.orientation = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
                 | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
                 | ActivityInfo.CONFIG_NAVIGATION
-                | ActivityInfo.CONFIG_ORIENTATION, mConfigDefault.diff(mConfig));
+                | ActivityInfo.CONFIG_ORIENTATION, mConfigDefault, config);
+        config.uiMode = 1;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
+                | ActivityInfo.CONFIG_NAVIGATION
+                | ActivityInfo.CONFIG_ORIENTATION
+                | ActivityInfo.CONFIG_UI_MODE, mConfigDefault, config);
+        config.fontScale = 2;
+        doConfigCompare(ActivityInfo.CONFIG_MCC
+                | ActivityInfo.CONFIG_MNC
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_SCREEN_LAYOUT
+                | ActivityInfo.CONFIG_TOUCHSCREEN
+                | ActivityInfo.CONFIG_KEYBOARD
+                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
+                | ActivityInfo.CONFIG_NAVIGATION
+                | ActivityInfo.CONFIG_ORIENTATION
+                | ActivityInfo.CONFIG_UI_MODE
+                | ActivityInfo.CONFIG_FONT_SCALE, mConfigDefault, config);
     }
 
     @TestTargets({
@@ -221,18 +316,13 @@ public class ConfigurationTest extends AndroidTestCase {
         )
     })
     public void testNeedNewResources() {
-        final int configChanges = mConfigDefault.updateFrom(mConfig);
-        assertEquals(ActivityInfo.CONFIG_FONT_SCALE
-                | ActivityInfo.CONFIG_MCC
-                | ActivityInfo.CONFIG_MNC
-                | ActivityInfo.CONFIG_TOUCHSCREEN
-                | ActivityInfo.CONFIG_KEYBOARD
-                | ActivityInfo.CONFIG_KEYBOARD_HIDDEN
-                | ActivityInfo.CONFIG_NAVIGATION
-                | ActivityInfo.CONFIG_ORIENTATION, configChanges);
-        final int interestingChanges = 20080917;
-        assertTrue(Configuration.needNewResources(configChanges,
-                interestingChanges));
+        assertTrue(Configuration.needNewResources(ActivityInfo.CONFIG_MCC,
+                ActivityInfo.CONFIG_MCC));
+        assertFalse(Configuration.needNewResources(ActivityInfo.CONFIG_MNC,
+                ActivityInfo.CONFIG_MCC));
+        assertTrue(Configuration.needNewResources(
+                ActivityInfo.CONFIG_MNC|ActivityInfo.CONFIG_FONT_SCALE,
+                ActivityInfo.CONFIG_MCC));
     }
 
     @TestTargetNew(
