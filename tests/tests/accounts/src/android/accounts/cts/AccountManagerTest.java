@@ -34,6 +34,14 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * You can run those unit tests with the following command line:
+ *
+ *  adb shell am instrument
+ *   -e debug false -w
+ *   -e class android.accounts.cts.AccountManagerTest
+ * android.accounts.cts/android.test.InstrumentationTestRunner
+ */
 public class AccountManagerTest extends AndroidTestCase {
 
     public static final String ACCOUNT_NAME = "android.accounts.cts.account.name";
@@ -1155,5 +1163,167 @@ public class AccountManagerTest extends AndroidTestCase {
         } catch (InterruptedException e) {
             fail("should not throw an InterruptedException");
         }
+    }
+
+    /**
+     * Test hasFeature
+     */
+    public void testHasFeature()
+            throws IOException, AuthenticatorException, OperationCanceledException {
+
+        testHasFeature(null /* handler */);
+        testHasFeature(new Handler());
+
+        testHasFeatureWithCallback(null /* handler */);
+        testHasFeatureWithCallback(new Handler());
+    }
+
+    public void testHasFeature(Handler handler)
+            throws IOException, AuthenticatorException, OperationCanceledException {
+        Bundle resultBundle = addAccount(am,
+                ACCOUNT_TYPE,
+                AUTH_TOKEN_TYPE,
+                REQUIRED_FEATURES,
+                OPTIONS_BUNDLE,
+                ACTIVITY,
+                null /* callback */,
+                null /* handler */);
+
+        // Assert parameters has been passed correctly
+        validateAccountAndAuthTokenType();
+        validateFeatures();
+
+        AccountManagerFuture<Boolean> booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_1},
+                null /* callback */,
+                handler);
+        assertTrue(booleanFuture.getResult());
+
+        booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_2},
+                null /* callback */,
+                handler);
+        assertTrue(booleanFuture.getResult());
+
+        booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_1, FEATURE_2},
+                null /* callback */,
+                handler);
+        assertTrue(booleanFuture.getResult());
+
+        booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE},
+                null /* callback */,
+                handler);
+        assertFalse(booleanFuture.getResult());
+
+        booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE, FEATURE_1},
+                null /* callback */,
+                handler);
+        assertFalse(booleanFuture.getResult());
+
+        booleanFuture = am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE, FEATURE_1, FEATURE_2},
+                null /* callback */,
+                handler);
+        assertFalse(booleanFuture.getResult());
+    }
+
+    private AccountManagerCallback<Boolean> getAssertTrueCallback(final CountDownLatch latch) {
+        return new AccountManagerCallback<Boolean>() {
+            public void run(AccountManagerFuture<Boolean> booleanFuture) {
+                try {
+                    // Assert returned result should be TRUE
+                    assertTrue(booleanFuture.getResult());
+                } catch (Exception e) {
+                    fail("Exception: " + e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+        };
+    }
+
+    private AccountManagerCallback<Boolean> getAssertFalseCallback(final CountDownLatch latch) {
+        return new AccountManagerCallback<Boolean>() {
+            public void run(AccountManagerFuture<Boolean> booleanFuture) {
+                try {
+                    // Assert returned result should be FALSE
+                    assertFalse(booleanFuture.getResult());
+                } catch (Exception e) {
+                    fail("Exception: " + e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+        };
+    }
+
+    private void waitForLatch(final CountDownLatch latch) {
+        // Wait with timeout for the callback to do its work
+        try {
+            latch.await(LATCH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            fail("should not throw an InterruptedException");
+        }
+    }
+
+    public void testHasFeatureWithCallback(Handler handler)
+            throws IOException, AuthenticatorException, OperationCanceledException {
+        Bundle resultBundle = addAccount(am,
+                ACCOUNT_TYPE,
+                AUTH_TOKEN_TYPE,
+                REQUIRED_FEATURES,
+                OPTIONS_BUNDLE,
+                ACTIVITY,
+                null /* callback */,
+                null /* handler */);
+
+        // Assert parameters has been passed correctly
+        validateAccountAndAuthTokenType();
+        validateFeatures();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_1},
+                getAssertTrueCallback(latch),
+                handler);
+        waitForLatch(latch);
+
+        latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_2},
+                getAssertTrueCallback(latch),
+                handler);
+        waitForLatch(latch);
+
+        latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{FEATURE_1, FEATURE_2},
+                getAssertTrueCallback(latch),
+                handler);
+        waitForLatch(latch);
+
+        latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE},
+                getAssertFalseCallback(latch),
+                handler);
+        waitForLatch(latch);
+
+        latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE, FEATURE_1},
+                getAssertFalseCallback(latch),
+                handler);
+        waitForLatch(latch);
+
+        latch = new CountDownLatch(1);
+        am.hasFeatures(ACCOUNT,
+                new String[]{NON_EXISTING_FEATURE, FEATURE_1, FEATURE_2},
+                getAssertFalseCallback(latch),
+                handler);
+        waitForLatch(latch);
     }
 }
