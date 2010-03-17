@@ -22,7 +22,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -80,18 +79,9 @@ public class ViewAnimatorTest extends
             args = {android.content.Context.class, android.util.AttributeSet.class}
         )
     })
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException")
     public void testConstructor() {
         new ViewAnimator(mActivity);
         new ViewAnimator(mActivity, mAttributeSet);
-        new ViewAnimator(null);
-
-        try {
-            new ViewAnimator(null, null);
-            fail("There should be a NullPointerException thrown out.");
-        } catch (NullPointerException e) {
-            // expected, test success.
-        }
     }
 
     @TestTargets({
