@@ -560,12 +560,9 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
             if (streams[i] == AudioManager.STREAM_RING) {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
                 assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
-                // lowering the volume should have changed the ringer mode
-                assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
-                assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_SHOW_UI);
-                assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
+                // adjusting the volume to zero should result in either silent or vibrate mode
+                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
+                        mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_SHOW_UI);
                 assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
             } else {
@@ -579,9 +576,9 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                 // lowering the volume should have changed the ringer mode
                 assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_ALLOW_RINGER_MODES);
-                assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
-                assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
+                // adjusting the volume to zero should result in either silent or vibrate mode
+                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
+                        mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
                 assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
             }
