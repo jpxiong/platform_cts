@@ -403,7 +403,8 @@ public class LocationManagerTest extends InstrumentationTestCase {
      */
     public void testReplaceRealProvidersWithMocks() throws InterruptedException {
         for (String providerName : mManager.getAllProviders()) {
-            if (!providerName.equals(TEST_MOCK_PROVIDER_NAME)) {
+            if (!providerName.equals(TEST_MOCK_PROVIDER_NAME) &&
+                !providerName.equals(LocationManager.PASSIVE_PROVIDER)) {
                 addTestProvider(providerName);
                 try {
                     // run the update location test logic to ensure location updates can be injected
