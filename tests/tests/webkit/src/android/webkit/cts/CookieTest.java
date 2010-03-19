@@ -225,7 +225,6 @@ public class CookieTest extends AndroidTestCase {
 
         mCookieManager.setCookie(url, "foobar=;");
         cookie = mCookieManager.getCookie(url);
-        android.util.Log.e("xxx", cookie);
         assertTrue(cookie.equals("bar=; foobar=; bar; foo"));
 
         mCookieManager.setCookie(url, "baz=; path=/wee");
