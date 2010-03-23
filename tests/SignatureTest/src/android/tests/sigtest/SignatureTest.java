@@ -77,7 +77,7 @@ public class SignatureTest {
                 TAG_PACKAGE, TAG_CLASS, TAG_INTERFACE, TAG_IMPLEMENTS, TAG_CONSTRUCTOR,
                 TAG_METHOD, TAG_PARAM, TAG_EXCEPTION, TAG_FIELD }));
     }
-    
+
     public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException
     {
         int type;
@@ -87,7 +87,7 @@ public class SignatureTest {
         if (type != XmlPullParser.START_TAG) {
             throw new XmlPullParserException("No start tag found");
         }
-        
+
         if (!parser.getName().equals(firstElementName)) {
             throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() +
                     ", expected " + firstElementName);
@@ -109,7 +109,7 @@ public class SignatureTest {
             while ((type=parser.next()) != XmlPullParser.START_TAG
                        && type != XmlPullParser.END_DOCUMENT
                        && type != XmlPullParser.END_TAG) {
-                
+
             }
 
             if (type == XmlPullParser.END_TAG) {
@@ -144,14 +144,14 @@ public class SignatureTest {
                 currentClass.addConstructor(constructor);
                 currentMethod = constructor;
             } else if (tagname.equals(TAG_METHOD)) {
-                currentMethod = loadMethodInfo(parser);
+                currentMethod = loadMethodInfo(currentClass.getClassName(), parser);
                 currentClass.addMethod(currentMethod);
             } else if (tagname.equals(TAG_PARAM)) {
                 currentMethod.addParam(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
             } else if (tagname.equals(TAG_EXCEPTION)) {
                 currentMethod.addException(parser.getAttributeValue(null, ATTRIBUTE_TYPE));
             } else if (tagname.equals(TAG_FIELD)) {
-                JDiffField field = loadFieldInfo(parser);
+                JDiffField field = loadFieldInfo(currentClass.getClassName(), parser);
                 currentClass.addField(field);
             } else {
                 throw new RuntimeException(
@@ -179,25 +179,28 @@ public class SignatureTest {
     /**
      * Load field information from xml to memory.
      *
+     * @param className of the class being examined which will be shown in error messages
+     * @param parser The XmlPullParser which carries the xml information.
      * @return the new field
      */
-    private JDiffField loadFieldInfo(XmlPullParser parser) {
+    private JDiffField loadFieldInfo(String className, XmlPullParser parser) {
         String fieldName = parser.getAttributeValue(null, ATTRIBUTE_NAME);
         String fieldType = parser.getAttributeValue(null, ATTRIBUTE_TYPE);
-        int modifier = jdiffModifierToReflectionFormat(parser);
+        int modifier = jdiffModifierToReflectionFormat(className, parser);
         return new JDiffField(fieldName, fieldType, modifier);
     }
 
     /**
      * Load method information from xml to memory.
      *
+     * @param className of the class being examined which will be shown in error messages
      * @param parser The XmlPullParser which carries the xml information.
      * @return the newly loaded method.
      */
-    private JDiffMethod loadMethodInfo(XmlPullParser parser) {
+    private JDiffMethod loadMethodInfo(String className, XmlPullParser parser) {
         String methodName = parser.getAttributeValue(null, ATTRIBUTE_NAME);
         String returnType = parser.getAttributeValue(null, ATTRIBUTE_RETURN);
-        int modifier = jdiffModifierToReflectionFormat(parser);
+        int modifier = jdiffModifierToReflectionFormat(className, parser);
         return new JDiffMethod(methodName, modifier, returnType);
     }
 
@@ -210,10 +213,9 @@ public class SignatureTest {
      */
     private JDiffConstructor loadConstructorInfo(XmlPullParser parser,
                                                  JDiffClassDescription currentClass) {
-        int modifier = jdiffModifierToReflectionFormat(parser);
-        JDiffConstructor constructor = new JDiffConstructor(currentClass.getClassName(), modifier);
-
-        return constructor;
+        String name = currentClass.getClassName();
+        int modifier = jdiffModifierToReflectionFormat(name, parser);
+        return new JDiffConstructor(name, modifier);
     }
 
     /**
@@ -231,7 +233,7 @@ public class SignatureTest {
         JDiffClassDescription currentClass = new JDiffClassDescription(pkg,
                                                                        className,
                                                                        resultObserver);
-        currentClass.setModifier(jdiffModifierToReflectionFormat(parser));
+        currentClass.setModifier(jdiffModifierToReflectionFormat(className, parser));
         currentClass.setType(isInterface ? JDiffClassDescription.JDiffType.INTERFACE :
                              JDiffClassDescription.JDiffType.CLASS);
         currentClass.setExtendsClass(parser.getAttributeValue(null, ATTRIBUTE_EXTENDS));
@@ -241,11 +243,12 @@ public class SignatureTest {
     /**
      * Convert string modifier to int modifier.
      *
+     * @param name of the class/method/field being examined which will be shown in error messages
      * @param key modifier name
      * @param value modifier value
      * @return converted modifier value
      */
-    private static int modifierDescriptionToReflectedType(String key, String value){
+    private static int modifierDescriptionToReflectedType(String name, String key, String value) {
         if (key.equals(MODIFIER_ABSTRACT)) {
             return value.equals("true") ? Modifier.ABSTRACT : 0;
         } else if (key.equals(MODIFIER_FINAL)) {
@@ -262,8 +265,7 @@ public class SignatureTest {
             return value.equals("true") ? Modifier.VOLATILE : 0;
         } else if (key.equals(MODIFIER_VISIBILITY)) {
             if (value.equals(MODIFIER_PRIVATE)) {
-                throw new RuntimeException(
-                        "should not be private method/field here");
+                throw new RuntimeException("Private visibility found in API spec: " + name);
             } else if (value.equals(MODIFIER_PROTECTED)) {
                 return Modifier.PROTECTED;
             } else if (value.equals(MODIFIER_PUBLIC)) {
@@ -273,8 +275,7 @@ public class SignatureTest {
                 // which is package private. We should return 0 for this modifier.
                 return 0;
             } else {
-                throw new RuntimeException(
-                        "Unknow modifier:" + value);
+                throw new RuntimeException("Unknown modifier found in API spec: " + value);
             }
         }
         return 0;
@@ -283,13 +284,14 @@ public class SignatureTest {
     /**
      * Transfer string modifier to int one.
      *
+     * @param name of the class/method/field being examined which will be shown in error messages
      * @param parser XML resource parser
      * @return converted modifier
      */
-    private static int jdiffModifierToReflectionFormat(XmlPullParser parser){
+    private static int jdiffModifierToReflectionFormat(String name, XmlPullParser parser){
         int modifier = 0;
         for (int i = 0;i < parser.getAttributeCount();i++) {
-            modifier |= modifierDescriptionToReflectedType(parser.getAttributeName(i),
+            modifier |= modifierDescriptionToReflectedType(name, parser.getAttributeName(i),
                     parser.getAttributeValue(i));
         }
         return modifier;
