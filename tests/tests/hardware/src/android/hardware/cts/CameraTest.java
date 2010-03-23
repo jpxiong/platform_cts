@@ -233,7 +233,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         if (LOGV) Log.v(TAG, "Wait for preview callback");
         if (!mPreviewDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
-            if (LOGV) Log.v(TAG, "waitForPreviewDone: timeout");
+            Log.v(TAG, "waitForPreviewDone: timeout");
         }
         mPreviewDone.close();
     }
@@ -241,7 +241,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void waitForFocusDone() {
         if (!mFocusDone.block(WAIT_FOR_FOCUS_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
-            if (LOGV) Log.v(TAG, "waitForFocusDone: timeout");
+            Log.v(TAG, "waitForFocusDone: timeout");
         }
         mFocusDone.close();
     }
@@ -249,7 +249,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void waitForSnapshotDone() {
         if (!mSnapshotDone.block(WAIT_FOR_SNAPSHOT_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
-            if (LOGV) Log.v(TAG, "waitForSnapshotDone: timeout");
+            Log.v(TAG, "waitForSnapshotDone: timeout");
         }
         mSnapshotDone.close();
     }
@@ -817,6 +817,71 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             recorder.stop();
         } finally {
             recorder.release();
+        }
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "addCallbackBuffer",
+            args = {byte[].class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setPreviewCallbackWithBuffer",
+            args = {android.hardware.Camera.PreviewCallback.class}
+        )
+    })
+    public void testPreviewCallbackWithBuffer() throws Exception {
+        initializeMessageLooper();
+        SurfaceHolder surfaceHolder;
+        surfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(surfaceHolder);
+        Size size = mCamera.getParameters().getPreviewSize();
+        PreviewCallbackWithBuffer callback = new PreviewCallbackWithBuffer();
+        callback.mBuffer1 = new byte[size.width * size.height * 3 / 2 + 1];
+        callback.mBuffer2 = new byte[size.width * size.height * 3 / 2 + 1];
+        callback.mBuffer3 = new byte[size.width * size.height * 3 / 2 + 1];
+
+        // Test if we can get the preview callbacks with specified buffers.
+        mCamera.addCallbackBuffer(callback.mBuffer1);
+        mCamera.addCallbackBuffer(callback.mBuffer2);
+        mCamera.setPreviewCallbackWithBuffer(callback);
+        mCamera.startPreview();
+        waitForPreviewDone();
+        assertEquals(1, callback.mNumCbWithBuffer1);
+        assertEquals(1, callback.mNumCbWithBuffer2);
+        assertEquals(0, callback.mNumCbWithBuffer3);
+
+        // Test if preview callback with buffer still works during preview.
+        callback.mNumCbWithBuffer1 = callback.mNumCbWithBuffer2 = 0;
+        mCamera.addCallbackBuffer(callback.mBuffer3);
+        waitForPreviewDone();
+        assertEquals(0, callback.mNumCbWithBuffer1);
+        assertEquals(0, callback.mNumCbWithBuffer2);
+        assertEquals(1, callback.mNumCbWithBuffer3);
+        terminateMessageLooper();
+    }
+
+    private final class PreviewCallbackWithBuffer implements PreviewCallback {
+        public int mNumCbWithBuffer1, mNumCbWithBuffer2, mNumCbWithBuffer3;
+        public byte[] mBuffer1, mBuffer2, mBuffer3;
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            assert(data != null);
+            if (data == mBuffer1) {
+                mNumCbWithBuffer1++;
+            } else if (data == mBuffer2) {
+                mNumCbWithBuffer2++;
+            } else if (data == mBuffer3) {
+                mNumCbWithBuffer3++;
+            } else {
+                fail("Invalid byte array.");
+            }
+
+            if ((mNumCbWithBuffer1 == 1 && mNumCbWithBuffer2 == 1)
+                    || mNumCbWithBuffer3 == 1) {
+                mPreviewDone.open();
+            }
         }
     }
 }
