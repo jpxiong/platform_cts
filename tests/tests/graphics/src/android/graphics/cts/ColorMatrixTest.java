@@ -33,6 +33,8 @@ public class ColorMatrixTest extends AndroidTestCase {
         15, 16, 17, 18, 19
     };
 
+    private static final float TOLERANCE = 0.0000001f;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -199,22 +201,22 @@ public class ColorMatrixTest extends AndroidTestCase {
 
         mColorMatrix.setRotate(0, 180);
         float[] ret = mColorMatrix.getArray();
-        assertEquals(-1.0f, ret[6]);
-        assertEquals(-1.0f, ret[12]);
-        assertEquals(-8.742278E-8f, ret[7]);
-        assertEquals(8.742278E-8f, ret[11]);
+        assertEquals(-1.0f, ret[6], TOLERANCE);
+        assertEquals(-1.0f, ret[12], TOLERANCE);
+        assertEquals(0, ret[7], TOLERANCE);
+        assertEquals(0, ret[11], TOLERANCE);
 
         mColorMatrix.setRotate(1, 180);
-        assertEquals(-1.0f, ret[0]);
-        assertEquals(-1.0f, ret[17]);
-        assertEquals(-8.742278E-8f, ret[2]);
-        assertEquals(8.742278E-8f, ret[15]);
+        assertEquals(-1.0f, ret[0], TOLERANCE);
+        assertEquals(-1.0f, ret[12], TOLERANCE);
+        assertEquals(0, ret[2], TOLERANCE);
+        assertEquals(0, ret[10], TOLERANCE);
 
         mColorMatrix.setRotate(2, 180);
-        assertEquals(-1.0f, ret[0]);
-        assertEquals(-1.0f, ret[6]);
-        assertEquals(-8.742278E-8f, ret[1]);
-        assertEquals(8.742278E-8f, ret[5]);
+        assertEquals(-1.0f, ret[0], TOLERANCE);
+        assertEquals(-1.0f, ret[6], TOLERANCE);
+        assertEquals(0, ret[1], TOLERANCE);
+        assertEquals(0, ret[5], TOLERANCE);
     }
 
     @TestTargets({
