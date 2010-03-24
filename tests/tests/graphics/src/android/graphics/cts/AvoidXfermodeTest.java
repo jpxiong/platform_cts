@@ -47,7 +47,6 @@ public class AvoidXfermodeTest extends TestCase {
     )
     @ToBeFixed(bug = "2034547",
                explanation = "AvoidXfermode does not work as expected with tolerance 0.")
-    @KnownFailure(value="bug 2136225")
     public void testAvoidXfermode() {
         Paint greenPaint;
         Paint redAvoidingGreenPaint;
