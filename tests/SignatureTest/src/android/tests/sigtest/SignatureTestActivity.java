@@ -111,16 +111,9 @@ public class SignatureTestActivity extends Activity {
             if (!excludeSet.contains(f.getName())) {
                 try {
                     sigTest.start(r.getXml(f.getInt(rClass)));
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (XmlPullParserException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION, e.getMessage(),
+                            e.getMessage());
                 }
             }
         }
