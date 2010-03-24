@@ -16,6 +16,14 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import android.content.Context;
@@ -36,16 +44,6 @@ import android.widget.ListAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
-import android.widget.ExpandableListView.OnGroupCollapseListener;
-import android.widget.ExpandableListView.OnGroupExpandListener;
-
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(ExpandableListView.class)
 public class ExpandableListViewTest extends AndroidTestCase {
@@ -334,9 +332,19 @@ public class ExpandableListViewTest extends AndroidTestCase {
         expandableListView.setAdapter(new MockExpandableListAdapter());
 
         assertEquals(0, expandableListView.getExpandableListPosition(0));
-        assertEquals(1L<<32, expandableListView.getExpandableListPosition(1));
-        assertEquals(2L<<32, expandableListView.getExpandableListPosition(2));
-        assertEquals(3L<<32, expandableListView.getExpandableListPosition(3));
+
+        // Group 0 is not expanded, position 1 is invalid
+        assertEquals(ExpandableListView.PACKED_POSITION_VALUE_NULL,
+                expandableListView.getExpandableListPosition(1));
+
+        // Position 1 becomes valid when group 0 is expanded
+        expandableListView.expandGroup(0);
+        assertEquals(ExpandableListView.getPackedPositionForChild(0, 0),
+                expandableListView.getExpandableListPosition(1));
+
+        // Position 2 is still invalid (only one child).
+        assertEquals(ExpandableListView.PACKED_POSITION_VALUE_NULL,
+                expandableListView.getExpandableListPosition(2));
     }
 
     @TestTargetNew(
@@ -780,6 +788,7 @@ public class ExpandableListViewTest extends AndroidTestCase {
             super(context, attrs, defStyle);
         }
 
+        @Override
         protected void dispatchDraw(Canvas canvas) {
             super.dispatchDraw(canvas);
         }
