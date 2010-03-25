@@ -131,16 +131,6 @@ public class Settings_SystemTest extends AndroidTestCase {
             assertTrue(System.putString(cr, stringField, stringValue));
             System.setShowGTalkServiceStatus(cr, true);
 
-            // backup fontScale
-            Configuration cfg = new Configuration();
-            System.getConfiguration(cr, cfg);
-            float store = cfg.fontScale;
-
-            // update fontScale row
-            cfg = new Configuration();
-            cfg.fontScale = 10.0f;
-            assertTrue(System.putConfiguration(cr, cfg));
-
             c = cr.query(System.CONTENT_URI, null, null, null, null);
             assertNotNull(c);
             assertEquals(origCount + 5, c.getCount());
@@ -153,13 +143,6 @@ public class Settings_SystemTest extends AndroidTestCase {
 
             assertEquals(stringValue, System.getString(cr, stringField));
             assertTrue(System.getShowGTalkServiceStatus(cr));
-
-            System.getConfiguration(cr, cfg);
-            assertEquals(10.0f, cfg.fontScale);
-
-            // restore the fontScale
-            cfg.fontScale = store;
-            assertTrue(System.putConfiguration(cr, cfg));
 
             // delete these rows
             String selection = System.NAME + "=\"" + intField + "\"";
@@ -180,6 +163,23 @@ public class Settings_SystemTest extends AndroidTestCase {
             c = cr.query(System.CONTENT_URI, null, null, null, null);
             assertNotNull(c);
             assertEquals(origCount, c.getCount());
+
+            // backup fontScale
+            Configuration cfg = new Configuration();
+            System.getConfiguration(cr, cfg);
+            float store = cfg.fontScale;
+
+            // update fontScale row
+            cfg = new Configuration();
+            cfg.fontScale = 10.0f;
+            assertTrue(System.putConfiguration(cr, cfg));
+
+            System.getConfiguration(cr, cfg);
+            assertEquals(10.0f, cfg.fontScale);
+
+            // restore the fontScale
+            cfg.fontScale = store;
+            assertTrue(System.putConfiguration(cr, cfg));
         } finally {
             // TODO should clean up more better
             c.close();
