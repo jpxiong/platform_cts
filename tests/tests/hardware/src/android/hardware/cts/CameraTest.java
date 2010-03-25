@@ -127,8 +127,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     /*
      * Terminates the message looper thread.
      */
-    private void terminateMessageLooper() {
+    private void terminateMessageLooper() throws Exception {
         mLooper.quit();
+        // Looper.quit() is asynchronous. The looper may still has some
+        // preview callbacks in the queue after quit is called. The preview
+        // callback still uses the camera object (setHasPreviewCallback).
+        // After camera is released, RuntimeException will be thrown from
+        // the method. So we need to join the looper thread here.
+        mLooper.getThread().join();
         mCamera.release();
     }
 
