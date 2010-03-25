@@ -102,7 +102,7 @@ public class ScrollerTest extends InstrumentationTestCase {
         mScroller = new Scroller(mTargetContext);
         assertEquals(0, mScroller.getDuration());
 
-        mScroller.fling(0, 0, 3000, 4000, 0, 1, 0, 0);
+        mScroller.fling(0, 0, 10, 4000, 0, 100, 0, 0);
         // the exact duration depends on implementation
         assertTrue(mScroller.getDuration() > 0);
     }
