@@ -474,7 +474,7 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     public void testManyRowsLong() throws Exception {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
 
-        final int count = 36799;
+        final int count = 9000;
         for (int i = 0; i < count; i++) {
             mDatabase.execSQL("INSERT INTO test (data) VALUES (" + i + ");");
         }
