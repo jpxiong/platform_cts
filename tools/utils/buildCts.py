@@ -93,7 +93,7 @@ class CtsBuilder(object):
     # Annotation classes are also required, since test annotations go into the description.
     source_path = [
         'frameworks/base/core/java',            # android test classes
-        'frameworks/base/test-runner',          # test runner
+        'frameworks/base/test-runner/src',      # test runner
         'dalvik/libcore/junit/src/main/java',   # junit classes
         'development/tools/hosttestlib/src',    # hosttestlib TestCase extensions
         'dalvik/libcore/dalvik/src/main/java',  # test annotations
