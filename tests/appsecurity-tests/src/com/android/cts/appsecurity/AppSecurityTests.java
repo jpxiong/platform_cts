@@ -228,8 +228,9 @@ public class AppSecurityTests extends DeviceTestCase {
      *
      * @param pkgName Android application package for tests
      * @return <code>true</code> if all tests passed.
+     * @throws IOException if connection to device was lost
      */
-    private boolean runDeviceTests(String pkgName) {
+    private boolean runDeviceTests(String pkgName) throws IOException {
         CollectingTestRunListener listener = doRunTests(pkgName);
         return listener.didAllTestsPass();
     }
@@ -238,8 +239,9 @@ public class AppSecurityTests extends DeviceTestCase {
      * Helper method to run tests and return the listener that collected the results.
      * @param pkgName Android application package for tests
      * @return the {@link CollectingTestRunListener}
+     * @throws IOException if connection to device was lost
      */
-    private CollectingTestRunListener doRunTests(String pkgName) {
+    private CollectingTestRunListener doRunTests(String pkgName) throws IOException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(pkgName, getDevice());
         CollectingTestRunListener listener = new CollectingTestRunListener();
         testRunner.run(listener);
@@ -251,8 +253,9 @@ public class AppSecurityTests extends DeviceTestCase {
      *
      * @param pkgName Android application package for tests
      * @return the test run error message or <code>null</code> if test run completed.
+     * @throws IOException if connection to device was lost
      */
-    private String runDeviceTestsWithRunResult(String pkgName) {
+    private String runDeviceTestsWithRunResult(String pkgName) throws IOException {
         CollectingTestRunListener listener = doRunTests(pkgName);
         return listener.getTestRunErrorMessage();
     }
