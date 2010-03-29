@@ -163,7 +163,6 @@ public class TypefaceTest extends AndroidTestCase {
         method = "createFromAsset",
         args = {android.content.res.AssetManager.class, java.lang.String.class}
     )
-    @KnownFailure(value="bug 2136234")
     public void testCreateFromAsset() {
         // input abnormal params.
         try {
