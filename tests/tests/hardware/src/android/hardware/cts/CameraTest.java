@@ -45,6 +45,7 @@ import android.view.SurfaceHolder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -616,8 +617,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(paramActual.getPreviewFrameRate() > 0);
 
         checkExposureCompensation(parameters);
-
-        checkZoom(parameters);
     }
 
     private void checkExposureCompensation(Parameters parameters) {
@@ -632,21 +631,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(step > 0);
         assertTrue(max >= 0);
         assertTrue(min <= 0);
-    }
-
-    private void checkZoom(Parameters parameters) {
-        if (!parameters.isZoomSupported()) return;
-        assertEquals(parameters.getZoom(), 0);
-        int maxZoom = parameters.getMaxZoom();
-        assertTrue(maxZoom >= 0);
-        if (maxZoom > 0) {
-            List<Integer> ratios = parameters.getZoomRatios();
-            assertEquals(ratios.size(), maxZoom + 1);
-            assertEquals(ratios.get(0).intValue(), 100);
-            for (int i = 0; i < ratios.size() - 1; i++) {
-                assertTrue(ratios.get(i) < ratios.get(i + 1));
-            }
-        }
     }
 
     private boolean isValidPixelFormat(int format) {
@@ -887,6 +871,168 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             if ((mNumCbWithBuffer1 == 1 && mNumCbWithBuffer2 == 1)
                     || mNumCbWithBuffer3 == 1) {
                 mPreviewDone.open();
+            }
+        }
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "startSmoothZoom",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "stopSmoothZoom",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setZoomCallback",
+            args = {android.hardware.Camera.ZoomCallback.class}
+        )
+    })
+    public void testZoom() throws Exception {
+        initializeMessageLooper();
+        testImmediateZoom();
+        testSmoothZoom();
+        terminateMessageLooper();
+    }
+
+    private void testImmediateZoom() throws Exception {
+        Parameters parameters = mCamera.getParameters();
+        if (!parameters.isZoomSupported()) return;
+
+        // Test the zoom parameters.
+        assertEquals(parameters.getZoom(), 0);  // default zoom should be 0.
+        int maxZoom = parameters.getMaxZoom();
+        assertTrue(maxZoom >= 0);
+        if (maxZoom > 0) {
+            // Zoom ratios should be sorted from small to large.
+            List<Integer> ratios = parameters.getZoomRatios();
+            assertEquals(ratios.size(), maxZoom + 1);
+            assertEquals(ratios.get(0).intValue(), 100);
+            for (int i = 0; i < ratios.size() - 1; i++) {
+                assertTrue(ratios.get(i) < ratios.get(i + 1));
+            }
+        }
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+        waitForPreviewDone();
+
+        // Test each zoom step.
+        for (int i = 0; i <= maxZoom; i++) {
+            parameters.setZoom(i);
+            mCamera.setParameters(parameters);
+            assertEquals(i, parameters.getZoom());
+        }
+
+        // It should throw exception if an invalid value is passed.
+        try {
+            parameters.setZoom(maxZoom + 1);
+            mCamera.setParameters(parameters);
+            fail("setZoom should throw exception.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+        parameters = mCamera.getParameters();
+        assertEquals(maxZoom, parameters.getZoom());
+
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
+    }
+
+    private void testSmoothZoom() throws Exception {
+        Parameters parameters = mCamera.getParameters();
+        if (!parameters.isSmoothZoomSupported()) return;
+        assertTrue(parameters.isZoomSupported());
+
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        ZoomCallback zoomCallback = new ZoomCallback();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setZoomCallback(zoomCallback);
+        mCamera.startPreview();
+        waitForPreviewDone();
+
+        // Immediate zoom should not generate callbacks.
+        int maxZoom = parameters.getMaxZoom();
+        parameters.setZoom(maxZoom);
+        mCamera.setParameters(parameters);
+        parameters.setZoom(0);
+        mCamera.setParameters(parameters);
+        assertFalse(zoomCallback.mZoomDone.block(500));
+
+        // Nothing will happen if zoom is not moving.
+        mCamera.stopSmoothZoom();
+
+        // It should not generate callbacks if zoom value is not changed.
+        mCamera.startSmoothZoom(0);
+        assertFalse(zoomCallback.mZoomDone.block(500));
+
+        // Test startSmoothZoom.
+        mCamera.startSmoothZoom(maxZoom);
+        assertEquals(true, zoomCallback.mZoomDone.block(5000));
+        assertEquals(maxZoom, zoomCallback.mValues.size());
+        for(int i = 0; i < maxZoom; i++) {
+            // Make sure we get all the callbacks in order.
+            assertEquals(i + 1, zoomCallback.mValues.get(i).intValue());
+        }
+
+        // Test startSmoothZoom. Make sure we get all the callbacks.
+        if (maxZoom > 1) {
+            zoomCallback.mValues = new ArrayList<Integer>();
+            zoomCallback.mStopped = false;
+            Log.e(TAG, "zoomCallback.mStopped = " + zoomCallback.mStopped);
+            zoomCallback.mZoomDone.close();
+            mCamera.startSmoothZoom(maxZoom / 2);
+            assertEquals(true, zoomCallback.mZoomDone.block(5000));
+            assertEquals(maxZoom - (maxZoom / 2), zoomCallback.mValues.size());
+            int i = maxZoom - 1;
+            for(Integer value: zoomCallback.mValues) {
+                assertEquals(i, value.intValue());
+                i--;
+            }
+        }
+
+        // It should throw exception if an invalid value is passed.
+        try {
+            mCamera.startSmoothZoom(maxZoom + 1);
+            fail("startSmoothZoom should throw exception.");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        // Test stopSmoothZoom.
+        zoomCallback.mValues = new ArrayList<Integer>();
+        zoomCallback.mStopped = false;
+        zoomCallback.mZoomDone.close();
+        parameters.setZoom(0);
+        mCamera.setParameters(parameters);
+        mCamera.startSmoothZoom(maxZoom);
+        mCamera.stopSmoothZoom();
+        assertTrue(zoomCallback.mZoomDone.block(5000));
+        for(int i = 0; i < zoomCallback.mValues.size() - 1; i++) {
+            // Make sure we get all the callbacks in order (except the last).
+            assertEquals(i + 1, zoomCallback.mValues.get(i).intValue());
+        }
+    }
+
+    private final class ZoomCallback
+            implements android.hardware.Camera.ZoomCallback {
+        public ArrayList<Integer> mValues = new ArrayList<Integer>();
+        public boolean mStopped;
+        public final ConditionVariable mZoomDone = new ConditionVariable();
+
+        public void onZoomUpdate(int value, boolean stopped, Camera camera) {
+            mValues.add(value);
+            assertEquals(value, camera.getParameters().getZoom());
+            assertEquals(false, mStopped);
+            mStopped = stopped;
+            if (stopped) {
+                mZoomDone.open();
             }
         }
     }
