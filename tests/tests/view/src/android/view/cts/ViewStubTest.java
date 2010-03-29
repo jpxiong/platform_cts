@@ -84,9 +84,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
             args = {android.content.Context.class, int.class}
         )
     })
-    @ToBeFixed(bug="1371108", explanation="constructor ViewStub#ViewStub(Context, AttributeSet)" +
-            "and ViewStub#ViewStub(Context, AttributeSet, int)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources().getXml(R.layout.viewstub_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -99,23 +96,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         new ViewStub(mContext, attrs);
 
         new ViewStub(mContext, attrs, 30);
-
-        // test the exceptional conditions
-        new ViewStub(null, -1);
-
-        new ViewStub(null);
-
-        try {
-            new ViewStub(null, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            new ViewStub(null, null, -1);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -133,23 +113,10 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#dispatchDraw(Canvas)}",
-        method = "dispatchDraw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug="1391590", explanation=" ViewStub is final class and dispatchDraw(Canvas)" +
-            " is protected method, we can not do unit test for this method")
-    public void testDispatchDraw() {
-        // empty method
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         notes = "Test {@link ViewStub#setVisibility(int)}",
         method = "setVisibility",
         args = {int.class}
     )
-    @KnownFailure(value="bug 2323459, fixed in future release")
     @UiThreadTest
     public void testSetVisibility() {
         final ViewStub viewStub1 = (ViewStub) mActivity.findViewById(R.id.viewstub);
