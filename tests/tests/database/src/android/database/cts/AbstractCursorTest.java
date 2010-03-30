@@ -409,7 +409,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         )
     })
     public void testGetWindow() {
-        assertNull(mDatabaseCursor.getWindow());
         CursorWindow window = new CursorWindow(false);
         assertEquals(0, window.getNumRows());
         // fill window from position 0
