@@ -28,11 +28,11 @@ import java.util.GregorianCalendar;
 
 @TestTargetClass(GeomagneticField.class)
 public class GeomagneticFieldTest extends AndroidTestCase {
-    private static final float LATITUDE_OF_CHENGDU = 104.06f;
-    private static final float LONGITUDE_OF_CHENGDU = 30.67f;
+    // Chengdu: Latitude 30d 40' 12", Longitude 104d 3' 36"
+    private static final float LATITUDE_OF_CHENGDU = 30.67f;
+    private static final float LONGITUDE_OF_CHENGDU = 104.06f;
     private static final float ALTITUDE_OF_CHENGDU = 500f;
-    private static final float DELTA = 1.0f;
-    private static final long TEST_TIME = new GregorianCalendar(2009, 5, 1).getTimeInMillis();
+    private static final long TEST_TIME = new GregorianCalendar(2010, 5, 1).getTimeInMillis();
 
     @TestTargets({
         @TestTargetNew(
@@ -79,12 +79,16 @@ public class GeomagneticFieldTest extends AndroidTestCase {
     public void testGeomagneticField() {
         GeomagneticField geomagneticField = new GeomagneticField(LATITUDE_OF_CHENGDU,
                 LONGITUDE_OF_CHENGDU, ALTITUDE_OF_CHENGDU, TEST_TIME);
-        assertEquals(16.12f, geomagneticField.getDeclination(), DELTA);
-        assertEquals(88.04f, geomagneticField.getInclination(), DELTA);
-        assertEquals(56768.22f, geomagneticField.getFieldStrength(), DELTA);
-        assertEquals(1943.81f, geomagneticField.getHorizontalStrength(), DELTA);
-        assertEquals(1867.41f, geomagneticField.getX(), DELTA);
-        assertEquals(539.61f, geomagneticField.getY(), DELTA);
-        assertEquals(56734.93f, geomagneticField.getZ(), DELTA);
+
+        // Reference values calculated from NOAA online calculator for WMM 2010,
+        // and cross-checked in Matlab. The expected deltas are proportional to the
+        // magnitude of each value.
+        assertEquals(-1.867f, geomagneticField.getDeclination(), 0.1f);
+        assertEquals(47.133f, geomagneticField.getInclination(), 1.0f);
+        assertEquals(50375.6f, geomagneticField.getFieldStrength(), 100.0f);
+        assertEquals(34269.3f, geomagneticField.getHorizontalStrength(), 100.0f);
+        assertEquals(34251.2f, geomagneticField.getX(), 100.0f);
+        assertEquals(-1113.2f, geomagneticField.getY(), 10.0f);
+        assertEquals(36923.1f, geomagneticField.getZ(), 100.0f);
     }
 }
