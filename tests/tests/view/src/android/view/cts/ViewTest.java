@@ -88,7 +88,7 @@ import java.util.List;
 @TestTargetClass(View.class)
 public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActivity> {
     public ViewTest() {
-        super("com.android.cts.stub", ViewTestStubActivity.class);
+        super(ViewTestStubActivity.class);
     }
 
     private Resources mResources;
@@ -123,12 +123,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
         )
     })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for constructors is incomplete." +
-            "1. not clear what is supposed to happen if context is null.")
     public void testConstructor() {
         new View(mActivity);
-
-        new View(null);
 
         final XmlResourceParser parser = mResources.getLayout(R.layout.view_layout);
         final AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -161,9 +157,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     public void testGetContext() {
         View view = new View(mActivity);
         assertSame(mActivity, view.getContext());
-
-        view = new View(null);
-        assertNull(view.getContext());
     }
 
     @TestTargetNew(
@@ -174,9 +167,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     public void testGetResources() {
         View view = new View(mActivity);
         assertSame(mResources, view.getResources());
-
-        view = new View(null);
-        assertNull(view.getResources());
     }
 
     @TestTargetNew(
