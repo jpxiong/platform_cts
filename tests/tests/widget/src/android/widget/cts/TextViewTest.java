@@ -82,7 +82,6 @@ import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
@@ -974,9 +973,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         setMinHeight(-1);
         assertEquals(originalHeight, mTextView.getHeight());
 
-        setMinHeight(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, mTextView.getHeight());
-
         setMinHeight(0);
         setMaxHeight(Integer.MAX_VALUE);
 
@@ -994,47 +990,23 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         assertEquals(originalWidth >> 3, mTextView.getWidth());
 
-        setMaxWidth(Integer.MAX_VALUE); // MAX
-        assertEquals(1, mTextView.getLineCount());
-        assertEquals(originalWidth, mTextView.getWidth());
         // Min Width
-        // Normal input
         setMinWidth(originalWidth + 1);
         assertEquals(1, mTextView.getLineCount());
         assertEquals(originalWidth + 1, mTextView.getWidth());
 
         setMinWidth(originalWidth - 1);
-        assertEquals(1, mTextView.getLineCount());
-        assertEquals(originalWidth, mTextView.getWidth());
+        assertEquals(2, mTextView.getLineCount());
+        assertEquals(originalWidth - 1, mTextView.getWidth());
 
-        // Edge input
-        setMinWidth(-1);
-        assertEquals(1, mTextView.getLineCount());
-        assertEquals(originalWidth, mTextView.getWidth());
-
-        setMinWidth(Integer.MAX_VALUE);
-        assertEquals(1, mTextView.getLineCount());
-        String name = Context.WINDOW_SERVICE;
-        WindowManager wm = (WindowManager) mActivity.getSystemService(name);
-        assertEquals(wm.getDefaultDisplay().getWidth(), mTextView.getWidth());
         // Width
-        // Normal input
         setWidth(originalWidth + 1);
         assertEquals(1, mTextView.getLineCount());
         assertEquals(originalWidth + 1, mTextView.getWidth());
 
         setWidth(originalWidth - 1);
-        assertTrue(1 < mTextView.getLineCount());
+        assertEquals(2, mTextView.getLineCount());
         assertEquals(originalWidth - 1, mTextView.getWidth());
-
-        // Edge input
-        setWidth(-1);
-        assertTrue(1 < mTextView.getLineCount());
-        assertEquals(0, mTextView.getWidth());
-
-        setWidth(Integer.MAX_VALUE);
-        assertEquals(1, mTextView.getLineCount());
-        assertEquals(wm.getDefaultDisplay().getWidth(), mTextView.getWidth());
     }
 
     @TestTargetNew(
@@ -1045,28 +1017,15 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     public void testSetMinEms() {
         mTextView = findTextView(R.id.textview_text);
         assertEquals(1, mTextView.getLineCount());
+
         int originalWidth = mTextView.getWidth();
         int originalEms = originalWidth / mTextView.getLineHeight();
 
-        // Normal input
         setMinEms(originalEms + 1);
         assertEquals((originalEms + 1) * mTextView.getLineHeight(), mTextView.getWidth());
 
         setMinEms(originalEms - 1);
         assertEquals(originalWidth, mTextView.getWidth());
-
-        // Edge input
-        setMinEms(-1);
-        assertEquals(originalWidth, mTextView.getWidth());
-
-        setMinEms(Integer.MAX_VALUE); // MAX
-        assertEquals(originalWidth, mTextView.getWidth());
-
-        setMinEms(Integer.MAX_VALUE / mTextView.getLineHeight());
-        String name = Context.WINDOW_SERVICE;
-        WindowManager wm = (WindowManager) mActivity.getSystemService(name);
-        int expected = wm.getDefaultDisplay().getWidth();
-        assertEquals(expected, mTextView.getWidth());
     }
 
     @TestTargetNew(
@@ -1080,7 +1039,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         int originalWidth = mTextView.getWidth();
         int originalEms = originalWidth / mTextView.getLineHeight();
 
-        // Normal input
         setMaxEms(originalEms + 1);
         assertEquals(1, mTextView.getLineCount());
         assertEquals(originalWidth, mTextView.getWidth());
@@ -1089,19 +1047,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertTrue(1 < mTextView.getLineCount());
         assertEquals((originalEms - 1) * mTextView.getLineHeight(),
                 mTextView.getWidth());
-
-        // Edge input
-        setMaxEms(-1);
-        assertTrue(1 < mTextView.getLineCount());
-        assertEquals(0, mTextView.getWidth());
-
-        setMaxEms(Integer.MAX_VALUE); // MAX
-        assertTrue(1 < mTextView.getLineCount());
-        assertEquals(0, mTextView.getWidth());
-
-        setMaxEms(Integer.MAX_VALUE / mTextView.getLineHeight());
-        assertEquals(1, mTextView.getLineCount());
-        assertEquals(originalWidth, mTextView.getWidth());
     }
 
     @TestTargetNew(
@@ -1115,7 +1060,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         int originalWidth = mTextView.getWidth();
         int originalEms = originalWidth / mTextView.getLineHeight();
 
-        // Normal input
         setEms(originalEms + 1);
         assertEquals(1, mTextView.getLineCount());
         assertEquals((originalEms + 1) * mTextView.getLineHeight(),
@@ -1125,22 +1069,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertTrue((1 < mTextView.getLineCount()));
         assertEquals((originalEms - 1) * mTextView.getLineHeight(),
                 mTextView.getWidth());
-
-        // Edge input
-        setEms(-1);
-        assertTrue((1 < mTextView.getLineCount()));
-        assertEquals(0, mTextView.getWidth());
-
-        setEms(Integer.MAX_VALUE); // MAX
-        assertTrue((1 < mTextView.getLineCount()));
-        assertEquals(0, mTextView.getWidth());
-
-        setEms(Integer.MAX_VALUE / mTextView.getLineHeight());
-        assertEquals(1, mTextView.getLineCount());
-        String name = Context.WINDOW_SERVICE;
-        WindowManager wm = (WindowManager) mActivity.getSystemService(name);
-        int expected = wm.getDefaultDisplay().getWidth();
-        assertEquals(expected, mTextView.getWidth());
     }
 
     @TestTargetNew(
@@ -2851,19 +2779,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         int originalHeight = mTextView.getHeight();
         int originalLines = mTextView.getLineCount();
 
-        // Normal input
         setMinLines(originalLines - 1);
         assertTrue((originalLines - 1) * mTextView.getLineHeight() <= mTextView.getHeight());
 
         setMinLines(originalLines + 1);
         assertTrue((originalLines + 1) * mTextView.getLineHeight() <= mTextView.getHeight());
-
-        // Edge input
-        setMinLines(-1);
-        assertEquals(originalHeight, mTextView.getHeight());
-
-        setMinLines(Integer.MAX_VALUE);
-        assertEquals(0, mTextView.getHeight());
     }
 
     @TestTargetNew(
