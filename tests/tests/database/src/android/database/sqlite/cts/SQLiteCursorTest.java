@@ -200,12 +200,11 @@ public class SQLiteCursorTest extends AndroidTestCase {
         final String DELETE_1 = DELETE + "1;";
         final String DELETE_2 = DELETE + "2;";
 
+        mDatabase.execSQL(DELETE_1);
+        // when cursor is created, it refreshes CursorWindow and populates cursor count
         SQLiteCursor cursor = getCursor();
         MockObserver observer = new MockObserver();
         cursor.registerDataSetObserver(observer);
-
-        mDatabase.execSQL(DELETE_1);
-        // first time run getCount, it will refresh CursorWindow.
         assertEquals(TEST_COUNT - 1, cursor.getCount());
         assertFalse(observer.hasChanged());
 
