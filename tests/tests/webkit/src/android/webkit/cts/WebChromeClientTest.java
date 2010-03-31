@@ -179,7 +179,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
                 return webChromeClient.hadOnCreateWindow();
             }
         }.run();
-        assertTrue(webChromeClient.hadOnRequestFocus());
+        assertFalse(webChromeClient.hadOnRequestFocus());
         new DelayedCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -449,6 +449,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture,
                 Message resultMsg) {
             WebView childView = new WebView(getActivity());
+            final WebSettings settings = childView.getSettings();
+            settings.setJavaScriptEnabled(true);
             childView.setWebChromeClient(this);
             WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
             transport.setWebView(childView);
