@@ -478,10 +478,10 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
     public void testClearColorFilter() {
         MockDrawable drawable = new MockDrawable();
         ColorFilter cf = new ColorFilter();
-        drawable.setColorFilter(cf);
 
         ImageView imageView = new ImageView(mActivity);
         imageView.setImageDrawable(drawable);
+        imageView.setColorFilter(cf);
 
         imageView.clearColorFilter();
         assertNull(drawable.getColorFilter());
