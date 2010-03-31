@@ -546,8 +546,9 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
                 mScrollView.smoothScrollBy(mScrollRight, mScrollBottom);
             }
         });
-        delayedCheckSmoothScrolling(0, mScrollRight, 0, mScrollBottom);
-        assertEquals(mScrollRight, mScrollView.getScrollX());
+        // smoothScrollBy doesn't scroll in X
+        delayedCheckSmoothScrolling(0, 0, 0, mScrollBottom);
+        assertEquals(0, mScrollView.getScrollX());
         assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         runTestOnUiThread(new Runnable() {
@@ -574,8 +575,9 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
                 mScrollView.smoothScrollTo(mScrollRight, mScrollBottom);
             }
         });
-        delayedCheckSmoothScrolling(0, mScrollRight, 0, mScrollBottom);
-        assertEquals(mScrollRight, mScrollView.getScrollX());
+        // smoothScrollTo doesn't scroll in X
+        delayedCheckSmoothScrolling(0, 0, 0, mScrollBottom);
+        assertEquals(0, mScrollView.getScrollX());
         assertEquals(mScrollBottom, mScrollView.getScrollY());
 
         runTestOnUiThread(new Runnable() {
@@ -583,8 +585,8 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
                 mScrollView.smoothScrollTo(mPageWidth, mPageHeight);
             }
         });
-        delayedCheckSmoothScrolling(mScrollRight, mPageWidth, mScrollBottom, mPageHeight);
-        assertEquals(mPageWidth, mScrollView.getScrollX());
+        delayedCheckSmoothScrolling(0, 0, mScrollBottom, mPageHeight);
+        assertEquals(0, mScrollView.getScrollX());
         assertEquals(mPageHeight, mScrollView.getScrollY());
     }
 
