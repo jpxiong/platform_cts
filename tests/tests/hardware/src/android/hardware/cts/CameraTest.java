@@ -31,14 +31,15 @@ import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
-import android.hardware.Camera.Size;
 import android.hardware.Camera.ShutterCallback;
+import android.hardware.Camera.Size;
 import android.media.ExifInterface;
 import android.media.MediaRecorder;
 import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -51,6 +52,7 @@ import java.util.List;
 /**
  * This test case must run with hardware. It can't be tested in emulator
  */
+@LargeTest
 @TestTargetClass(Camera.class)
 public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActivity> {
     private String TAG = "CameraTest";
