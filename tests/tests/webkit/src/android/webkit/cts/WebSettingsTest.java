@@ -91,7 +91,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
         Matcher patternMatcher = userAgentExpr.matcher(actualUserAgentString);
-        assertTrue("User agent string did not match expected pattern", patternMatcher.find());
+        assertTrue(String.format("User agent string did not match expected pattern. \nExpected " +
+                        "pattern:\n%s\nActual:\n%s", patternString, actualUserAgentString),
+                        patternMatcher.find());
         assertEquals(Build.VERSION.RELEASE, patternMatcher.group(1));
         Locale currentLocale = Locale.getDefault();
         assertEquals(currentLocale.getLanguage().toLowerCase(), patternMatcher.group(2));
