@@ -685,35 +685,6 @@ public class AutoCompleteTextViewTest extends
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "onWindowFocusChanged",
-        args = {boolean.class}
-    )
-    @UiThreadTest
-    public void testOnWindowFocusChanged() {
-        mAutoCompleteTextView.setText(STRING_TEST);
-        windowfocusChange(true);
-        assertEquals(STRING_VALIDATED, mAutoCompleteTextView.getText().toString());
-        assertTrue(mAutoCompleteTextView.isPopupShowing());
-        mAutoCompleteTextView.setValidator(null);
-
-        // If hasWindowFocus has been set as false, popup window will be closed.
-        windowfocusChange(false);
-        assertEquals(STRING_VALIDATED, mAutoCompleteTextView.getText().toString());
-        mAutoCompleteTextView.setValidator(null);
-        assertFalse(mAutoCompleteTextView.isPopupShowing());
-    }
-
-    @UiThreadTest
-    private void windowfocusChange(final Boolean hasWindowFocus) {
-        mAutoCompleteTextView.setValidator(mValidator);
-        mAutoCompleteTextView.setAdapter((ArrayAdapter<String>) null);
-        mAutoCompleteTextView.showDropDown();
-        mAutoCompleteTextView.setText(STRING_TEST);
-        mAutoCompleteTextView.onWindowFocusChanged(hasWindowFocus);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "performValidation",
         args = {}
     )
