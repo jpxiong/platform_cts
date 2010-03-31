@@ -151,6 +151,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.startAnimation(mAnimation);
+                assertNotNull(view.getAnimation());
             }
         });
 
@@ -164,6 +165,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         view.clearAnimation();
         Thread.sleep(TIME_OUT);
         assertTrue(mAnimation.hasStarted());
-        assertFalse(mAnimation.hasEnded());
+        assertTrue(mAnimation.hasEnded());
+        assertNull(view.getAnimation());
     }
 }
