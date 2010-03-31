@@ -22,13 +22,10 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.view.View.MeasureSpec;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 
@@ -285,40 +282,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertEquals(currentMax, ratingBar.getMax());
         assertEquals(currentProgress, ratingBar.getProgress());
         assertEquals(currentStepSize, ratingBar.getStepSize());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onMeasure(int widthMeasureSpec, int heightMeasureSpec)",
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed( bug = "1400249", explanation = "hard to test call back in unit test," +
-            " will be tested by functional test.")
-    public void testOnMeasure() {
-        MockRatingBar mRatingBar = new MockRatingBar(mContext);
-
-        mRatingBar.onMeasure(MeasureSpec.EXACTLY, MeasureSpec.EXACTLY);
-        assertEquals(MeasureSpec.getSize(MeasureSpec.EXACTLY),
-                mRatingBar.getMeasuredWidth());
-        assertEquals(MeasureSpec.getSize(MeasureSpec.EXACTLY),
-                mRatingBar.getMeasuredHeight());
-
-        Drawable d = getActivity().getResources().getDrawable(R.drawable.blue);
-        mRatingBar.setIndeterminateDrawable(d);
-        mRatingBar.onMeasure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-
-        // TODO: this line appears to fail when density < 1. Need a cleaner way to handle this
-        if (getActivity().getResources().getDisplayMetrics().density >= 1) {
-            WidgetTestUtils.assertScaledPixels(285, mRatingBar.getMeasuredWidth(), getActivity());
-        } else {
-            assertEquals(285, mRatingBar.getMeasuredWidth());
-        }
-        assertEquals(57, mRatingBar.getMeasuredHeight());
-
-        mRatingBar.onMeasure(MeasureSpec.AT_MOST, MeasureSpec.AT_MOST);
-        assertEquals(0, mRatingBar.getMeasuredWidth());
-        assertEquals(0, mRatingBar.getMeasuredHeight());
     }
 
     /**
