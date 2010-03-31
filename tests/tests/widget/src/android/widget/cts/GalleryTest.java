@@ -349,37 +349,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
 
     @TestTargetNew(
         level = TestLevel.NOT_FEASIBLE,
-        method = "dispatchSetSelected",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are not right, "
-            + "dispatchSetSelected() does not dispatch setSelected to all child views.")
-    public void testDispatchSetSelected() {
-        int count = mGallery.getChildCount();
-
-        mGallery.dispatchSetSelected(false);
-        for (int i = 0; i < count; i++) {
-            // the child view should not be selected, but a item still is selected.
-            if (i == mGallery.getSelectedItemPosition()) {
-                assertTrue(mGallery.getChildAt(i).isSelected());
-            } else {
-                assertFalse(mGallery.getChildAt(i).isSelected());
-            }
-        }
-
-        mGallery.dispatchSetSelected(true);
-        for (int i = 0; i < count; i++) {
-            // the child view should be selected, but some items still are selected.
-            if (i == mGallery.getSelectedItemPosition()) {
-                assertTrue(mGallery.getChildAt(i).isSelected());
-            } else {
-                assertFalse(mGallery.getChildAt(i).isSelected());
-            }
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
         method = "showContextMenuForChild",
         args = {android.view.View.class}
     )
