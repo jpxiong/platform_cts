@@ -94,22 +94,6 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         new FrameLayout(mActivity);
         new FrameLayout(mActivity, attrs);
         new FrameLayout(mActivity, attrs, 0);
-
-        new FrameLayout(null);
-
-        try {
-            new FrameLayout(null, null);
-            fail("did not throw NullPointerException when context and attrs are null.");
-        } catch (NullPointerException e) {
-            // expected, test success
-        }
-
-        try {
-            new FrameLayout(null, null, -1);
-            fail("did not throw NullPointerException when context and attrs are null.");
-        } catch (NullPointerException e) {
-            // expected, test success
-        }
     }
 
     @TestTargets({
