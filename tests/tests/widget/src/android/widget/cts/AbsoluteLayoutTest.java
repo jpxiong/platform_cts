@@ -93,21 +93,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         new AbsoluteLayout(mActivity);
         new AbsoluteLayout(mActivity, attrs);
         new AbsoluteLayout(mActivity, attrs, 0);
-
-        new AbsoluteLayout(null);
-
-        try {
-            new AbsoluteLayout(null, attrs);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            new AbsoluteLayout(null, attrs, 1);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
         new AbsoluteLayout(mActivity, null, 1);
         new AbsoluteLayout(mActivity, attrs, -1);
     }
