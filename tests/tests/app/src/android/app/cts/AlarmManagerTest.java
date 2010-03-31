@@ -162,7 +162,7 @@ public class AlarmManagerTest extends AndroidTestCase {
     )
     @ToBeFixed(bug = "1475410", explanation = "currently if make a device sleep android"
             + "framework will throw out exception")
-   public void testSetTypes() throws Exception {
+    public void testSetTypes() throws Exception {
         // TODO: try to find a way to make device sleep then test whether
         // AlarmManager perform the expected way
 
@@ -199,6 +199,24 @@ public class AlarmManagerTest extends AndroidTestCase {
         assertEquals(mMockAlarmReceiver.elapsedTime, mWakeupTime, TIME_DELTA);
     }
 
+    @TestTargetNew(
+        level = TestLevel.PARTIAL,
+        method = "set",
+        args = {int.class, long.class, android.app.PendingIntent.class}
+    )
+    @ToBeFixed(bug = "1475410", explanation = "currently if make a device sleep android"
+            + "framework will throw out exception")
+    public void testAlarmTriggersImmediatelyIfSetTimeIsNegative() throws Exception {
+        // An alarm with a negative wakeup time should be triggered immediately.
+        // This exercises a workaround for a limitation of the /dev/alarm driver
+        // that would instead cause such alarms to never be triggered.
+        mMockAlarmReceiver.setAlarmedFalse();
+        mWakeupTime = -1000;
+        mAlarmManager.set(AlarmManager.RTC, mWakeupTime, mSender);
+        Thread.sleep(TIME_DELAY);
+        assertTrue(mMockAlarmReceiver.alarmed);
+    }
+    
     @TestTargetNew(
         level = TestLevel.PARTIAL,
         method = "setRepeating",
