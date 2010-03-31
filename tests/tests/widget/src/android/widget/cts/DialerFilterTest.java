@@ -81,14 +81,6 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
 
         new DialerFilter(mActivity);
         new DialerFilter(mActivity, attrs);
-
-        new DialerFilter(null);
-        try {
-            new DialerFilter(null, null);
-            fail("There should be a NullPointerException thrown out.");
-        } catch (final NullPointerException e) {
-            // expected, test success
-        }
     }
 
     @TestTargetNew(
