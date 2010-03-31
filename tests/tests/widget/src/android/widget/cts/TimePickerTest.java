@@ -300,8 +300,8 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
     public void testOnSaveInstanceStateAndOnRestoreInstanceState() {
         MyTimePicker source = new MyTimePicker(mContext);
         MyTimePicker dest = new MyTimePicker(mContext);
-        int expectHour = dest.getCurrentHour() + 10;
-        int expectMinute = dest.getCurrentMinute() + 10;
+        int expectHour = (dest.getCurrentHour() + 10) % 24;
+        int expectMinute = (dest.getCurrentMinute() + 10) % 60;
         source.setCurrentHour(expectHour);
         source.setCurrentMinute(expectMinute);
 
