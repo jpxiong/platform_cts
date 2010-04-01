@@ -885,7 +885,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // check that image was retrieved from the server
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
         // no history item saved, URL is still the last one
-        assertEquals(failUrl, mWebView.getUrl());
+        assertEquals("about:blank", mWebView.getUrl());
     }
 
     @TestTargetNew(
