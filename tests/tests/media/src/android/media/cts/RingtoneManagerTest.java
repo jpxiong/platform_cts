@@ -238,7 +238,8 @@ public class RingtoneManagerTest
 
         mRingtoneManager.setStopPreviousRingtone(true);
         assertTrue(mRingtoneManager.getStopPreviousRingtone());
-        Ringtone ringtone = mRingtoneManager.getRingtone(0);
+        Uri uri = Uri.parse("android.resource://android.media.cts/raw/John_Cage.ogg");
+        Ringtone ringtone = RingtoneManager.getRingtone(mContext, uri);
         ringtone.play();
         assertTrue(ringtone.isPlaying());
         Ringtone newRingtone = mRingtoneManager.getRingtone(0);
