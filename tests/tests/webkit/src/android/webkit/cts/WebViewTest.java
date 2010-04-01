@@ -268,7 +268,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             currScale = mWebView.getScale();
         }
 
-        // can not zoom out further
+        // can not zoom out furtherholiday
         assertFalse(mWebView.zoomOut());
         previousScale = currScale;
         currScale = mWebView.getScale();
@@ -2175,9 +2175,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
     }
 
+    // Find b1 inside b2
     private boolean checkBitmapInsideAnother(Bitmap b1, Bitmap b2) {
-        for (int i = 0; i < b2.getWidth(); i++) {
-            for (int j = 0; j < b2.getHeight(); j++) {
+        int w = b1.getWidth();
+        int h = b1.getHeight();
+
+        for (int i = 0; i < (b2.getWidth()-w+1); i++) {
+            for (int j = 0; j < (b2.getHeight()-h+1); j++) {
                 if (checkBitmapInsideAnother(b1, b2, i, j))
                     return true;
             }
@@ -2185,16 +2189,31 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         return false;
     }
 
-    private boolean checkBitmapInsideAnother(Bitmap b1, Bitmap b2, int x, int y) {
-        int w = b1.getWidth();
-        int h = b1.getHeight();
-
-        if ((x + w > b2.getWidth()) || (x + h > b2.getHeight())) {
+    private boolean comparePixel(int p1, int p2, int maxError) {
+        int err;
+        err = Math.abs(((p1&0xff000000)>>>24) - ((p2&0xff000000)>>>24));
+        if (err > maxError)
             return false;
-        }
-        for (int i = 0; i < w; i++)
-            for (int j = 0; j < h; j++) {
-                if (b1.getPixel(i, j) != b2.getPixel(x + i, y + j)) {
+
+        err = Math.abs(((p1&0x00ff0000)>>>16) - ((p2&0x00ff0000)>>>16));
+        if (err > maxError)
+            return false;
+
+        err = Math.abs(((p1&0x0000ff00)>>>8) - ((p2&0x0000ff00)>>>8));
+        if (err > maxError)
+            return false;
+
+        err = Math.abs(((p1&0x000000ff)>>>0) - ((p2&0x000000ff)>>>0));
+        if (err > maxError)
+            return false;
+
+        return true;
+    }
+
+    private boolean checkBitmapInsideAnother(Bitmap b1, Bitmap b2, int x, int y) {
+        for (int i = 0; i < b1.getWidth(); i++)
+            for (int j = 0; j < b1.getHeight(); j++) {
+                if (!comparePixel(b1.getPixel(i, j), b2.getPixel(x + i, y + j), 10)) {
                     return false;
                 }
             }
