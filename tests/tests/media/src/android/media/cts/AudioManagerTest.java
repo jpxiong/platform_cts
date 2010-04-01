@@ -553,18 +553,19 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                 assertEquals(k - 1, mAudioManager.getStreamVolume(streams[i]));
             }
 
-            mAudioManager.setStreamVolume(streams[i], 1, FLAG_SHOW_UI);
-            assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
             mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
             assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
+            mAudioManager.setStreamVolume(streams[i], 1, FLAG_SHOW_UI);
+            assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
             if (streams[i] == AudioManager.STREAM_RING) {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
                 assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
                 // adjusting the volume to zero should result in either silent or vibrate mode
                 assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
                         mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_SHOW_UI);
+                mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
                 assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
+                assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
             } else {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
                 assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
