@@ -34,6 +34,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.Suppress;
 
 @TestTargetClass(NinePatch.class)
 public class NinePatchTest extends AndroidTestCase {
@@ -173,6 +174,7 @@ public class NinePatchTest extends AndroidTestCase {
         method = "hasAlpha",
         args = {}
     )
+    @Suppress // Suppressed for current release
     public void testHasAlpha() {
         assertFalse(mNinePatch.hasAlpha());
         assertEquals(mNinePatch.hasAlpha(), mBitmap.hasAlpha());
