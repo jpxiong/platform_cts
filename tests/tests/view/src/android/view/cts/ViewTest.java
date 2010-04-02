@@ -43,6 +43,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.Xml;
 import android.view.ContextMenu;
@@ -97,6 +98,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
 
     /** timeout delta when wait in case the system is sluggish */
     private static final long TIMEOUT_DELTA = 1000;
+
+    private static final String LOG_TAG = "ViewTest";
 
     @Override
     protected void setUp() throws Exception {
@@ -3645,6 +3648,21 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
     }
 
+    /**
+     * For the duration of the tap timeout we are in a 'prepressed' state
+     * to differentiate between taps and touch scrolls.
+     * Wait at least this long before testing if the view is pressed
+     * by calling this function.
+     */
+    private void waitPrepressedTimeout() {
+        try {
+            Thread.sleep(ViewConfiguration.getTapTimeout() + 10);
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "waitPrepressedTimeout() interrupted! Test may fail!", e);
+        }
+        getInstrumentation().waitForIdleSync();
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "onTouchEvent",
@@ -3687,6 +3705,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 x, y, 0);
         assertFalse(view.isPressed());
         getInstrumentation().sendPointerSync(event);
+        waitPrepressedTimeout();
         assertTrue(view.hasCalledOnTouchEvent());
         assertTrue(view.isPressed());
 
@@ -3711,8 +3730,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         y = xy[1] + viewHeight - 1;
         event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 0);
         getInstrumentation().sendPointerSync(event);
+        waitPrepressedTimeout();
         assertTrue(view.hasCalledOnTouchEvent());
-        assertTrue(view.isPressed());
+        assertFalse(view.isPressed());
 
         // MotionEvent.ACTION_UP
         OnClickListenerImpl listener = new OnClickListenerImpl();
@@ -3723,7 +3743,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 0);
         getInstrumentation().sendPointerSync(event);
         assertTrue(view.hasCalledOnTouchEvent());
-        assertTrue(listener.hasOnClick());
+        assertFalse(listener.hasOnClick());
 
         view.reset();
         x = xy[0] + viewWidth / 2.0f;
