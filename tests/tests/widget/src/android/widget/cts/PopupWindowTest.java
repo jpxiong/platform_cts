@@ -713,7 +713,7 @@ public class PopupWindowTest extends
             args = {}
         )
     })
-    public void testUpdateDimentionAndAlignAnchorView() {
+    public void testUpdateDimensionAndAlignAnchorView() {
         mPopupWindow = createPopupWindow(createPopupContent());
 
         View anchorView = mActivity.findViewById(R.id.anchor_upper);
@@ -752,8 +752,8 @@ public class PopupWindowTest extends
             args = {}
         )
     })
-    public void testUpdateDimentionAndAlignAnchorViewWithOffsets() {
-        int[] AnchorXY = new int[2];
+    public void testUpdateDimensionAndAlignAnchorViewWithOffsets() {
+        int[] anchorXY = new int[2];
         int[] viewInWindowOff = new int[2];
         int[] viewXY = new int[2];
 
@@ -765,13 +765,13 @@ public class PopupWindowTest extends
         assertEquals(100, mPopupWindow.getHeight());
 
         showPopup();
-        anchorView.getLocationOnScreen(AnchorXY);
+        anchorView.getLocationOnScreen(anchorXY);
         mPopupWindow.getContentView().getLocationInWindow(viewInWindowOff);
 
         // update if it is not shown
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
-                mPopupWindow.update(anchorView,20, 50, 50, 50);
+                mPopupWindow.update(anchorView, 20, 50, 50, 50);
             }
         });
 
@@ -783,13 +783,13 @@ public class PopupWindowTest extends
 
         mPopupWindow.getContentView().getLocationOnScreen(viewXY);
         // the position should be changed
-        assertEquals(AnchorXY[0] + 20 + viewInWindowOff[0], viewXY[0]);
-        assertEquals(AnchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
+        assertEquals(anchorXY[0] + 20 + viewInWindowOff[0], viewXY[0]);
+        assertEquals(anchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
 
-        // ignore if width or height is -1
+        // ignore width and height but change location
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
-                mPopupWindow.update(anchorView, 4, 6, -1, -1);
+                mPopupWindow.update(anchorView, 10, 50, -1, -1);
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -800,8 +800,8 @@ public class PopupWindowTest extends
 
         mPopupWindow.getContentView().getLocationOnScreen(viewXY);
         // the position should be changed
-        assertEquals(AnchorXY[0] + 20 + viewInWindowOff[0], viewXY[0]);
-        assertEquals(AnchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
+        assertEquals(anchorXY[0] + 10 + viewInWindowOff[0], viewXY[0]);
+        assertEquals(anchorXY[1] + anchorView.getHeight() + 50 + viewInWindowOff[1], viewXY[1]);
 
         final View anthoterView = mActivity.findViewById(R.id.anchor_middle_right);
         mInstrumentation.runOnMainSync(new Runnable() {
