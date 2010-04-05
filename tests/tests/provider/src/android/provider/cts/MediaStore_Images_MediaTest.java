@@ -35,6 +35,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -364,11 +365,15 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         // check whether the thumbnails are generated
         Cursor c = mContentResolver.query(Uri.parse(stringUrl), new String[]{ Media._ID }, null,
                 null, null);
-        c.moveToFirst();
+        assertTrue(c.moveToFirst());
         long imageId = c.getLong(c.getColumnIndex(Media._ID));
         c.close();
+        assertNotNull(Thumbnails.getThumbnail(mContentResolver, imageId,
+                Thumbnails.MINI_KIND, null));
+        assertNotNull(Thumbnails.getThumbnail(mContentResolver, imageId,
+                Thumbnails.MICRO_KIND, null));
         c = mContentResolver.query(Thumbnails.EXTERNAL_CONTENT_URI, null,
-                    Thumbnails.IMAGE_ID + "=" + imageId, null, null);
+                Thumbnails.IMAGE_ID + "=" + imageId, null, null);
         assertEquals(2, c.getCount());
         c.close();
     }
