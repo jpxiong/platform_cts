@@ -160,15 +160,13 @@ public class Rfc822TokenizerTest extends AndroidTestCase {
         tokens = Rfc822Tokenizer.tokenize(text);
         assertEquals(2, tokens.length);
         localAssertEquals(tokens[0], "Berg", "berg\\@google.com", "home");
-        // issue, the comment in converted result token is wrong.
-        localAssertEquals(tokens[1], null, "tom\\@google.com", "homework");
+        localAssertEquals(tokens[1], null, "tom\\@google.com", "work");
 
         text = "Foo Bar (something) <foo\\@google.com>, blah\\@google.com (something)";
         tokens = Rfc822Tokenizer.tokenize(text);
         assertEquals(2, tokens.length);
         localAssertEquals(tokens[0], "Foo Bar", "foo\\@google.com", "something");
-        // issue, the comment in converted result token is wrong.
-        localAssertEquals(tokens[1], null, "blah\\@google.com", "somethingsomething");
+        localAssertEquals(tokens[1], null, "blah\\@google.com", "something");
 
         try {
             Rfc822Tokenizer.tokenize(null);
