@@ -890,8 +890,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setZoomCallback",
-            args = {android.hardware.Camera.ZoomCallback.class}
+            method = "setZoomChangeListener",
+            args = {android.hardware.Camera.OnZoomChangeListener.class}
         )
     })
     public void testZoom() throws Exception {
@@ -953,9 +953,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        ZoomCallback zoomCallback = new ZoomCallback();
+        ZoomListener zoomListener = new ZoomListener();
         mCamera.setPreviewDisplay(mSurfaceHolder);
-        mCamera.setZoomCallback(zoomCallback);
+        mCamera.setZoomChangeListener(zoomListener);
         mCamera.startPreview();
         waitForPreviewDone();
 
@@ -965,35 +965,35 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setParameters(parameters);
         parameters.setZoom(0);
         mCamera.setParameters(parameters);
-        assertFalse(zoomCallback.mZoomDone.block(500));
+        assertFalse(zoomListener.mZoomDone.block(500));
 
         // Nothing will happen if zoom is not moving.
         mCamera.stopSmoothZoom();
 
         // It should not generate callbacks if zoom value is not changed.
         mCamera.startSmoothZoom(0);
-        assertFalse(zoomCallback.mZoomDone.block(500));
+        assertFalse(zoomListener.mZoomDone.block(500));
 
         // Test startSmoothZoom.
         mCamera.startSmoothZoom(maxZoom);
-        assertEquals(true, zoomCallback.mZoomDone.block(5000));
-        assertEquals(maxZoom, zoomCallback.mValues.size());
+        assertEquals(true, zoomListener.mZoomDone.block(5000));
+        assertEquals(maxZoom, zoomListener.mValues.size());
         for(int i = 0; i < maxZoom; i++) {
             // Make sure we get all the callbacks in order.
-            assertEquals(i + 1, zoomCallback.mValues.get(i).intValue());
+            assertEquals(i + 1, zoomListener.mValues.get(i).intValue());
         }
 
         // Test startSmoothZoom. Make sure we get all the callbacks.
         if (maxZoom > 1) {
-            zoomCallback.mValues = new ArrayList<Integer>();
-            zoomCallback.mStopped = false;
-            Log.e(TAG, "zoomCallback.mStopped = " + zoomCallback.mStopped);
-            zoomCallback.mZoomDone.close();
+            zoomListener.mValues = new ArrayList<Integer>();
+            zoomListener.mStopped = false;
+            Log.e(TAG, "zoomListener.mStopped = " + zoomListener.mStopped);
+            zoomListener.mZoomDone.close();
             mCamera.startSmoothZoom(maxZoom / 2);
-            assertEquals(true, zoomCallback.mZoomDone.block(5000));
-            assertEquals(maxZoom - (maxZoom / 2), zoomCallback.mValues.size());
+            assertEquals(true, zoomListener.mZoomDone.block(5000));
+            assertEquals(maxZoom - (maxZoom / 2), zoomListener.mValues.size());
             int i = maxZoom - 1;
-            for(Integer value: zoomCallback.mValues) {
+            for(Integer value: zoomListener.mValues) {
                 assertEquals(i, value.intValue());
                 i--;
             }
@@ -1008,27 +1008,27 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
 
         // Test stopSmoothZoom.
-        zoomCallback.mValues = new ArrayList<Integer>();
-        zoomCallback.mStopped = false;
-        zoomCallback.mZoomDone.close();
+        zoomListener.mValues = new ArrayList<Integer>();
+        zoomListener.mStopped = false;
+        zoomListener.mZoomDone.close();
         parameters.setZoom(0);
         mCamera.setParameters(parameters);
         mCamera.startSmoothZoom(maxZoom);
         mCamera.stopSmoothZoom();
-        assertTrue(zoomCallback.mZoomDone.block(5000));
-        for(int i = 0; i < zoomCallback.mValues.size() - 1; i++) {
+        assertTrue(zoomListener.mZoomDone.block(5000));
+        for(int i = 0; i < zoomListener.mValues.size() - 1; i++) {
             // Make sure we get all the callbacks in order (except the last).
-            assertEquals(i + 1, zoomCallback.mValues.get(i).intValue());
+            assertEquals(i + 1, zoomListener.mValues.get(i).intValue());
         }
     }
 
-    private final class ZoomCallback
-            implements android.hardware.Camera.ZoomCallback {
+    private final class ZoomListener
+            implements android.hardware.Camera.OnZoomChangeListener {
         public ArrayList<Integer> mValues = new ArrayList<Integer>();
         public boolean mStopped;
         public final ConditionVariable mZoomDone = new ConditionVariable();
 
-        public void onZoomUpdate(int value, boolean stopped, Camera camera) {
+        public void onZoomChange(int value, boolean stopped, Camera camera) {
             mValues.add(value);
             assertEquals(value, camera.getParameters().getZoom());
             assertEquals(false, mStopped);
