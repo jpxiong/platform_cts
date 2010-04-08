@@ -103,6 +103,12 @@ public class WidgetTestUtils {
                 actual, 3);
     }
 
+    /** Converts dips into pixels using the {@link Context}'s density. */
+    public static int convertDipToPixels(Context context, int dip) {
+      float density = context.getResources().getDisplayMetrics().density;
+      return Math.round(density * dip);
+    }
+
     /**
      * Retrieve a bitmap that can be used for comparison on any density
      * @param resources
