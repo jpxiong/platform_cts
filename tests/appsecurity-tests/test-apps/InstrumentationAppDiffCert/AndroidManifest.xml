@@ -26,7 +26,15 @@
     </application>
 
     <!-- assumes com.android.cts.targetinstrumentationapp is signed with diff cert -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.app.Instrumentation"
                      android:targetPackage="com.android.cts.targetinstrumentationapp"
+                     android:label="Instrumentation that targets app with different cert" />
+
+    <!--
+    A self-instrumenting test runner, that will try to start the above instrumentation and
+    verify it fails.
+     -->
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:targetPackage="com.android.cts.instrumentationdiffcertapp"
                      android:label="Test for instrumentation with different cert" />
 </manifest>
