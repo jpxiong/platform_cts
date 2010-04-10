@@ -92,7 +92,7 @@ public class AppSecurityTests extends DeviceTestCase {
                     false);
             assertNotNull("shared uid app with different cert than existing app installed " +
                     "successfully", installResult);
-            assertEquals("INSTALL_FAILED_UPDATE_INCOMPATIBLE", installResult);
+            assertEquals("INSTALL_FAILED_SHARED_USER_INCOMPATIBLE", installResult);
         }
         finally {
             getDevice().uninstallPackage(SHARED_UI_PKG);
