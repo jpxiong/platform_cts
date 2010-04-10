@@ -22,7 +22,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -35,8 +34,14 @@ import android.util.StringBuilderPrinter;
  */
 @TestTargetClass(ApplicationInfo.class)
 public class ApplicationInfoTest extends AndroidTestCase {
-    private final String PACKAGE_NAME = "com.android.cts.stub";
     private ApplicationInfo mApplicationInfo;
+    private String mPackageName;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mPackageName = getContext().getPackageName();
+    }
 
     @TestTargets({
         @TestTargetNew(
@@ -50,19 +55,13 @@ public class ApplicationInfoTest extends AndroidTestCase {
             args = {android.content.pm.ApplicationInfo.class}
         )
     })
-    @ToBeFixed(bug = "1695243", explanation = "ApplicationInfo#ApplicationInfo(ApplicationInfo)," +
-            " should check whether the input ApplicationInfo is null")
     public void testConstructor() {
-        new ApplicationInfo();
-
-        new ApplicationInfo(new ApplicationInfo());
-
-        try {
-            new ApplicationInfo(null);
-            fail("should throw NullPointerException.");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        ApplicationInfo info = new ApplicationInfo();
+        // simple test to ensure packageName is copied by copy constructor
+        // TODO: consider expanding to check all member variables
+        info.packageName = mPackageName;
+        ApplicationInfo copy = new ApplicationInfo(info);
+        assertEquals(info.packageName, copy.packageName);
     }
 
     @TestTargetNew(
@@ -70,12 +69,8 @@ public class ApplicationInfoTest extends AndroidTestCase {
         method = "writeToParcel",
         args = {android.os.Parcel.class, int.class}
     )
-    public void testWriteToParcel() {
-        try {
-            mApplicationInfo = mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
-        } catch (NameNotFoundException e) {
-            mApplicationInfo = new ApplicationInfo();
-        }
+    public void testWriteToParcel() throws NameNotFoundException {
+        mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
 
         Parcel p = Parcel.obtain();
         mApplicationInfo.writeToParcel(p, 0);
@@ -113,12 +108,8 @@ public class ApplicationInfoTest extends AndroidTestCase {
         method = "describeContents",
         args = {}
     )
-    public void testDescribeContents() {
-        try {
-            mApplicationInfo = mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
-        } catch (NameNotFoundException e) {
-            mApplicationInfo = new ApplicationInfo();
-        }
+    public void testDescribeContents() throws NameNotFoundException {
+       mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
 
         assertEquals(0, mApplicationInfo.describeContents());
     }
@@ -146,25 +137,13 @@ public class ApplicationInfoTest extends AndroidTestCase {
         method = "loadDescription",
         args = {android.content.pm.PackageManager.class}
     )
-    public void testLoadDescription() {
-        try {
-            mApplicationInfo = mContext.getPackageManager().getApplicationInfo(PACKAGE_NAME, 0);
-        } catch (NameNotFoundException e) {
-            mApplicationInfo = new ApplicationInfo();
-        }
+    public void testLoadDescription() throws NameNotFoundException {
+        mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
+
         assertNull(mApplicationInfo.loadDescription(mContext.getPackageManager()));
 
-        mApplicationInfo = new ApplicationInfo();
         mApplicationInfo.descriptionRes = R.string.hello_world;
-        mApplicationInfo.packageName = PACKAGE_NAME;
         assertEquals(mContext.getResources().getString(R.string.hello_world),
                 mApplicationInfo.loadDescription(mContext.getPackageManager()));
-
-        try {
-            mApplicationInfo.loadDescription(null);
-            fail("ApplicationInfo#loadDescription: Should throw NullPointerException");
-        } catch (NullPointerException e){
-            // expected
-        }
     }
 }
