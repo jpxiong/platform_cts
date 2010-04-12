@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+import android.widget.cts.WidgetTestUtils;
 
 /**
  * Test {@link ScrollingMovementMethod}. The class is an implementation of interface
@@ -117,9 +118,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
                 mTextView.setText("hello world", BufferType.SPANNABLE);
                 mTextView.setSingleLine();
                 mSpannable = (Spannable) mTextView.getText();
+                int width = WidgetTestUtils.convertDipToPixels(getActivity(), LITTLE_SPACE);
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(LITTLE_SPACE,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -340,9 +341,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
          */
         runActionOnUiThread(new Runnable() {
             public void run() {
+                int width = WidgetTestUtils.convertDipToPixels(getActivity(), LITTLE_SPACE);
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(LITTLE_SPACE,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -474,9 +475,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 mTextView.setText("short");
                 mTextView.setSingleLine();
+                int width = WidgetTestUtils.convertDipToPixels(getActivity(), LITTLE_SPACE);
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(LITTLE_SPACE,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -832,9 +833,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
 
         runActionOnUiThread(new Runnable() {
             public void run() {
+                int height = WidgetTestUtils.convertDipToPixels(getActivity(), LITTLE_SPACE);
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                                LITTLE_SPACE));
+                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, height));
             }
         });
         Layout layout = mTextView.getLayout();
@@ -889,12 +890,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             args = {TextView.class, Spannable.class}
         )
     })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ScrollingMovementMethod#left(TextView, Spannable) and "
-            + "ScrollingMovementMethod#right(TextView, Spannable)"
-            + "when the param widget or buffer is null")
-    @KnownFailure(value="bug 2323405, needs investigation")
     public void testHorizontalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -909,9 +904,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             public void run() {
                 mTextView.setText("short");
                 mTextView.setSingleLine();
+                int width = WidgetTestUtils.convertDipToPixels(getActivity(), LITTLE_SPACE);
                 getActivity().setContentView(mTextView,
-                        new ViewGroup.LayoutParams(LITTLE_SPACE,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
         assertNotNull(mTextView.getLayout());
@@ -948,34 +943,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             }
         }));
         assertEquals(previousScrollX, mTextView.getScrollX());
-
-        runActionOnUiThread(new Runnable() {
-            public void run() {
-                try {
-                    method.right(null, mSpannable);
-                } catch (NullPointerException e) {
-                    // NPE is acceptable
-                }
-
-                try {
-                    method.right(mTextView, null);
-                } catch (NullPointerException e) {
-                    // NPE is acceptable
-                }
-
-                try {
-                    method.left(null, mSpannable);
-                } catch (NullPointerException e) {
-                    // NPE is acceptable
-                }
-
-                try {
-                    method.left(mTextView, null);
-                } catch (NullPointerException e) {
-                    // NPE is acceptable
-                }
-            }
-        });
     }
 
     @TestTargetNew(
