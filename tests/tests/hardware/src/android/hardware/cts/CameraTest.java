@@ -40,6 +40,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.test.UiThreadTest;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -99,6 +100,15 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         getActivity();
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        if (mCamera != null) {
+            mCamera.release();
+            mCamera = null;
+        }
+        super.tearDown();
+    }
+
     /*
      * Initializes the message looper so that the Camera object can
      * receive the callback messages.
@@ -139,6 +149,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // the method. So we need to join the looper thread here.
         mLooper.getThread().join();
         mCamera.release();
+        mCamera = null;
     }
 
     //Implement the previewCallback
@@ -312,6 +323,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.AutoFocusCallback.class}
         )
     })
+    @UiThreadTest
     public void testTakePicture() throws Exception {
         initializeMessageLooper();
         Size pictureSize = mCamera.getParameters().getPictureSize();
@@ -375,7 +387,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.ErrorCallback.class}
         )
     })
-    @BrokenTest("Flaky test. Occasionally fails without a stack trace.")
+    @UiThreadTest
     public void testCheckPreview() throws Exception {
         initializeMessageLooper();
         mCamera.setPreviewCallback(mRawPreviewCallback);
@@ -390,6 +402,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         method = "setOneShotPreviewCallback",
         args = {PreviewCallback.class}
     )
+    @UiThreadTest
     public void testSetOneShotPreviewCallback() throws Exception {
         initializeMessageLooper();
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
@@ -409,6 +422,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         method = "setPreviewDisplay",
         args = {SurfaceHolder.class}
     )
+    @UiThreadTest
     public void testSetPreviewDisplay() throws Exception {
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
@@ -449,6 +463,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         method = "setDisplayOrientation",
         args = {int.class}
     )
+    @UiThreadTest
     public void testDisplayOrientation() throws Exception {
         initializeMessageLooper();
 
@@ -495,6 +510,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.Parameters.class}
         )
     })
+    @UiThreadTest
     public void testAccessParameters() throws Exception {
         initializeMessageLooper();
         // we can get parameters just by getxxx method due to the private constructor
@@ -657,6 +673,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {}
         )
     })
+    @UiThreadTest
     public void testJpegThumbnailSize() throws Exception {
         initializeMessageLooper();
         // Thumbnail size parameters should have valid values.
@@ -696,6 +713,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         terminateMessageLooper();
     }
 
+    @UiThreadTest
     public void testJpegExif() throws Exception {
         initializeMessageLooper();
         Camera.Parameters parameters = mCamera.getParameters();
@@ -758,6 +776,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {}
         )
     })
+    @UiThreadTest
     public void testLockUnlock() throws Exception {
         initializeMessageLooper();
         Camera.Parameters parameters = mCamera.getParameters();
@@ -824,6 +843,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.PreviewCallback.class}
         )
     })
+    @UiThreadTest
     public void testPreviewCallbackWithBuffer() throws Exception {
         initializeMessageLooper();
         SurfaceHolder surfaceHolder;
@@ -894,6 +914,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             args = {android.hardware.Camera.OnZoomChangeListener.class}
         )
     })
+    @UiThreadTest
     public void testZoom() throws Exception {
         initializeMessageLooper();
         testImmediateZoom();
