@@ -26,7 +26,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
@@ -68,7 +67,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private boolean mRawPictureCallbackResult = false;
     private boolean mJpegPictureCallbackResult = false;
     private boolean mErrorCallbackResult = false;
-    private boolean mAutoFocusCallbackResult = false;
+    private boolean mAutoFocusSucceeded = false;
 
     private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1000;  // Milliseconds.
     private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
@@ -79,7 +78,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private RawPictureCallback mRawPictureCallback = new RawPictureCallback();
     private JpegPictureCallback mJpegPictureCallback = new JpegPictureCallback();
     private TestErrorCallback mErrorCallback = new TestErrorCallback();
-    private TestAutoFocusCallback mAutoFocusCallback = new TestAutoFocusCallback();
+    private AutoFocusCallback mAutoFocusCallback = new AutoFocusCallback();
 
     private Looper mLooper = null;
     private final ConditionVariable mPreviewDone = new ConditionVariable();
@@ -228,25 +227,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
-    // Implement the AutoFocusCallback
-    private final class TestAutoFocusCallback implements AutoFocusCallback {
+    private final class AutoFocusCallback
+            implements android.hardware.Camera.AutoFocusCallback {
         public void onAutoFocus(boolean success, Camera camera) {
-            mAutoFocusCallbackResult = true;
+            mAutoFocusSucceeded = success;
+            Log.v(TAG, "AutoFocusCallback success=" + success);
             mFocusDone.open();
-            if (LOGV) Log.v(TAG, "AutoFocus " + success);
         }
-    }
-
-    private void checkTakePicture() throws Exception {
-        SurfaceHolder mSurfaceHolder;
-
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
-        mCamera.startPreview();
-        mCamera.autoFocus(mAutoFocusCallback);
-        waitForFocusDone();
-        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        waitForSnapshotDone();
     }
 
     private void waitForPreviewDone() {
@@ -258,12 +245,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mPreviewDone.close();
     }
 
-    private void waitForFocusDone() {
-        if (!mFocusDone.block(WAIT_FOR_FOCUS_TO_COMPLETE)) {
+    private boolean waitForFocusDone() {
+        boolean result = mFocusDone.block(WAIT_FOR_FOCUS_TO_COMPLETE);
+        if (!result) {
             // timeout could be expected or unexpected. The caller will decide.
             Log.v(TAG, "waitForFocusDone: timeout");
         }
         mFocusDone.close();
+        return result;
     }
 
     private void waitForSnapshotDone() {
@@ -318,7 +307,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     android.hardware.Camera.PictureCallback.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "autoFocus",
             args = {android.hardware.Camera.AutoFocusCallback.class}
         )
@@ -332,12 +321,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setPreviewDisplay(mSurfaceHolder);
         mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
-        waitForFocusDone();
+        assertTrue(waitForFocusDone());
         mJpegData = null;
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         terminateMessageLooper();
-        assertTrue(mAutoFocusCallbackResult);
         assertTrue(mShutterCallbackResult);
         assertTrue(mJpegPictureCallbackResult);
         assertTrue(mJpegData != null);
@@ -395,6 +383,49 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         checkPreviewCallback();
         terminateMessageLooper();
         assertTrue(mRawPreviewCallbackResult);
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "autoFocus",
+            args = {android.hardware.Camera.AutoFocusCallback.class}
+        )
+    })
+    public void testAutoFocus() throws Exception {
+        initializeMessageLooper();
+        try {
+            mCamera.autoFocus(mAutoFocusCallback);
+            fail("autoFocus should throw exception if preview is not started.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+
+        // Start the preview.
+        SurfaceHolder mSurfaceHolder;
+        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.startPreview();
+
+        // Test each focus mode.
+        Parameters parameters = mCamera.getParameters();
+        for (String focusMode: parameters.getSupportedFocusModes()) {
+            Log.v(TAG, "Test focus mode: "+focusMode);
+            mAutoFocusSucceeded = false;
+            parameters.setFocusMode(focusMode);
+            mCamera.setParameters(parameters);
+            mCamera.autoFocus(mAutoFocusCallback);
+            assertTrue(waitForFocusDone());
+            if (focusMode.equals(Parameters.FOCUS_MODE_INFINITY)
+                    || focusMode.equals(Parameters.FOCUS_MODE_FIXED)
+                    || focusMode.equals(Parameters.FOCUS_MODE_EDOF)) {
+                // Apps should not call autoFocus in these modes. For backward
+                // compatibility, if AF is called, it should return immediately
+                // with success.
+                assertTrue(mAutoFocusSucceeded);
+            }
+        }
+        terminateMessageLooper();
     }
 
     @TestTargetNew(
