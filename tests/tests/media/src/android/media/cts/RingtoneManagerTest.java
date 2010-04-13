@@ -15,6 +15,8 @@
  */
 package android.media.cts;
 
+import com.android.cts.stub.R;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -238,10 +240,12 @@ public class RingtoneManagerTest
 
         mRingtoneManager.setStopPreviousRingtone(true);
         assertTrue(mRingtoneManager.getStopPreviousRingtone());
-        Uri uri = Uri.parse("android.resource://android.media.cts/raw/John_Cage.ogg");
+        Uri uri = Uri.parse("android.resource://" + PKG + "/" + R.raw.john_cage);
         Ringtone ringtone = RingtoneManager.getRingtone(mContext, uri);
         ringtone.play();
         assertTrue(ringtone.isPlaying());
+        ringtone.stop();
+        assertFalse(ringtone.isPlaying());
         Ringtone newRingtone = mRingtoneManager.getRingtone(0);
         assertFalse(ringtone.isPlaying());
         newRingtone.play();
