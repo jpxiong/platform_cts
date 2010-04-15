@@ -473,50 +473,57 @@ public class PackageManagerTest extends AndroidTestCase {
         assertTrue(isContained);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test addPreferredActivity",
-            method = "addPreferredActivity",
-            args = {android.content.IntentFilter.class, int.class,
-                    android.content.ComponentName[].class, android.content.ComponentName.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test clearPackagePreferredActivities",
-            method = "clearPackagePreferredActivities",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPreferredActivities",
-            method = "getPreferredActivities",
-            args = {java.util.List.class, java.util.List.class, java.lang.String.class}
-        )
-    })
-    public void testOpPackagePreferredActivities() {
-        // Test addPreferredActivity and getPreferredActivities
+
+    /**
+     * Simple test for {@link PackageManager#getPreferredActivities(List, List, String)} that tests
+     * calling it has no effect. The method is essentially a no-op because no preferred activities
+     * can be added.
+     * @see PackageManager#addPreferredActivity(IntentFilter, int, ComponentName[], ComponentName)
+     */
+    public void testGetPreferredActivities() {
+        assertNoPreferredActivities();
+    }
+
+    /**
+     * Helper method to test that {@link PackageManager#getPreferredActivities(List, List, String)}
+     * returns empty lists.
+     */
+    private void assertNoPreferredActivities() {
         List<ComponentName> outActivities = new ArrayList<ComponentName>();
         List<IntentFilter> outFilters = new ArrayList<IntentFilter>();
         mPackageManager.getPreferredActivities(outFilters, outActivities, PACKAGE_NAME);
-        int activitySize = outActivities.size();
-        int filterSize = outFilters.size();
+        assertEquals(0, outActivities.size());
+        assertEquals(0, outFilters.size());
+    }
 
+    /**
+     * Test that calling {@link PackageManager#addPreferredActivity(IntentFilter, int,
+     * ComponentName[], ComponentName)} throws a {@link SecurityException}.
+     * <p/>
+     * The method is protected by the {@link android.permission.SET_PREFERRED_APPLICATIONS}
+     * signature permission. Even though this app declares that permission, it still should not be
+     * able to call this method because it is not signed with the platform certificate.
+     */
+    public void testAddPreferredActivity() {
         IntentFilter intentFilter = new IntentFilter(ACTIVITY_ACTION_NAME);
         ComponentName[] componentName = {new ComponentName(PACKAGE_NAME, ACTIVITY_NAME)};
-        mPackageManager.addPreferredActivity(intentFilter, IntentFilter.MATCH_CATEGORY_HOST,
-                componentName, componentName[0]);
-        mPackageManager.getPreferredActivities(outFilters, outActivities, PACKAGE_NAME);
-        assertTrue(outActivities.size() == 1 + activitySize);
-        assertTrue(outFilters.size() == 1 + filterSize);
-        checkComponentName(ACTIVITY_NAME, outActivities);
-        checkIntentFilterAction(ACTIVITY_ACTION_NAME, outFilters);
+        try {
+            mPackageManager.addPreferredActivity(intentFilter, IntentFilter.MATCH_CATEGORY_HOST,
+                    componentName, componentName[0]);
+            fail("addPreferredActivity unexpectedly succeeded");
+        } catch (SecurityException e) {
+            // expected
+        }
+        assertNoPreferredActivities();
+    }
 
-        // Test clearPackagePreferredActivities
+    /**
+     * Test that calling {@link PackageManager#clearPackagePreferredActivities(String)} has no
+     * effect.
+     */
+    public void testClearPackagePreferredActivities() {
+        // just ensure no unexpected exceptions are thrown, nothing else to do
         mPackageManager.clearPackagePreferredActivities(PACKAGE_NAME);
-        mPackageManager.getPreferredActivities(outFilters, outActivities, PACKAGE_NAME);
-        assertTrue(outFilters.size() == 0);
-        assertTrue(outActivities.size() == 0);
     }
 
     private void checkComponentName(String expectedName, List<ComponentName> componentNames) {
@@ -627,36 +634,49 @@ public class PackageManagerTest extends AndroidTestCase {
         // Can't add permission in dynamic way
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test addPackageToPreferred",
-            method = "addPackageToPreferred",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPreferredPackages",
-            method = "getPreferredPackages",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test removePackageFromPreferred",
-            method = "removePackageFromPreferred",
-            args = {java.lang.String.class}
-        )
-    })
-    public void testOpPackageToPreferred() {
-
+    /**
+     * Test that calling {@link PackageManager#addPackageToPreferred(String) throws a
+     * {@link SecurityException}.
+     * <p/>
+     * The method is protected by the {@link android.permission.SET_PREFERRED_APPLICATIONS}
+     * signature permission. Even though this app declares that permission, it still should not be
+     * able to call this method.
+     */
+    public void testAddPackageToPreferred() {
         // Test addPackageToPreferred, getPreferredPackages
         List<PackageInfo> pkgInfo = null;
         pkgInfo = mPackageManager.getPreferredPackages(0);
         int pkgInfoSize = pkgInfo.size();
-        mPackageManager.addPackageToPreferred(CONTENT_PKG_NAME);
+        try {
+            // addPackageToPreferred is protected by the
+            // android.permission.SET_PREFERRED_APPLICATIONS signature permission.
+            // Even though this app declares that permission, it still should not be able to call
+            // this
+            mPackageManager.addPackageToPreferred(CONTENT_PKG_NAME);
+            fail("addPackageToPreferred unexpectedly succeeded");
+        } catch (SecurityException e) {
+            // expected
+        }
         pkgInfo = mPackageManager.getPreferredPackages(0);
         // addPackageToPreferred should have no effect
         assertEquals(pkgInfo.size(), pkgInfoSize);
+    }
+
+    /**
+     * Test that calling {@link PackageManager#removePackageFromPreferred(String)} throws a
+     * {@link SecurityException}.
+     * <p/>
+     * The method is protected by the {@link android.permission.SET_PREFERRED_APPLICATIONS}
+     * signature permission. Even though this app declares that permission, it still should not be
+     * able to call this method.
+     */
+    public void testRemovePackageFromPreferred() {
+        try {
+            mPackageManager.removePackageFromPreferred(CONTENT_PKG_NAME);
+            fail("removePackageFromPreferred unexpectedly succeeded");
+        } catch (SecurityException e) {
+            // expected
+        }
     }
 
     @TestTargets({
