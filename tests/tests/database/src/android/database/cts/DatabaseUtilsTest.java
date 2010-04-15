@@ -33,11 +33,15 @@ import android.database.sqlite.SQLiteDoneException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 
 @TestTargetClass(android.database.DatabaseUtils.class)
@@ -63,6 +67,8 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertNotNull(mDatabase);
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, " +
                 "name TEXT, age INTEGER, address TEXT);");
+        mDatabase.execSQL(
+                "CREATE TABLE blob_test (_id INTEGER PRIMARY KEY, name TEXT, data BLOB)");
     }
 
     @Override
@@ -719,11 +725,98 @@ public class DatabaseUtilsTest extends AndroidTestCase {
 
         args = new String[] { "1000" }; // NO people can be older than this.
         try {
-            DatabaseUtils.stringForQuery(statement, args);
+            DatabaseUtils.blobFileDescriptorForQuery(statement, args);
             fail("should throw SQLiteDoneException");
         } catch (SQLiteDoneException e) {
             // expected
         }
         statement.close();
     }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "blobFileDescriptorForQuery",
+            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
+                    java.lang.String[].class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "blobFileDescriptorForQuery",
+            args = {android.database.sqlite.SQLiteStatement.class, java.lang.String[].class}
+        )
+    })
+    public void testBlobFileDescriptorForQuery() throws Exception {
+        String data1 = "5300FEFF";
+        String data2 = "DECAFBAD";
+        mDatabase.execSQL("INSERT INTO blob_test (name, data) VALUES ('Mike', X'" + data1 + "')");
+
+        String query = "SELECT data FROM blob_test";
+        assertFileDescriptorContent(parseBlob(data1),
+                        DatabaseUtils.blobFileDescriptorForQuery(mDatabase, query, null));
+
+        mDatabase.execSQL("INSERT INTO blob_test (name, data) VALUES ('Jack', X'" + data2 + "');");
+        query = "SELECT data FROM blob_test WHERE name = ?";
+        String[] args = new String[] { "Jack" };
+        assertFileDescriptorContent(parseBlob(data2),
+                DatabaseUtils.blobFileDescriptorForQuery(mDatabase, query, args));
+
+        args = new String[] { "No such name" };
+        try {
+            DatabaseUtils.stringForQuery(mDatabase, query, args);
+            fail("should throw SQLiteDoneException");
+        } catch (SQLiteDoneException e) {
+            // expected
+        }
+
+        query = "SELECT data FROM blob_test WHERE name = ?;";
+        SQLiteStatement statement = mDatabase.compileStatement(query);
+        args = new String[] { "Mike" };
+        assertFileDescriptorContent(parseBlob(data1),
+                DatabaseUtils.blobFileDescriptorForQuery(statement, args));
+
+        args = new String[] { "No such name" };
+        try {
+            DatabaseUtils.blobFileDescriptorForQuery(statement, args);
+            fail("should throw SQLiteDoneException");
+        } catch (SQLiteDoneException e) {
+            // expected
+        }
+        statement.close();
+    }
+
+    private static byte[] parseBlob(String src) {
+        int len = src.length();
+        byte[] result = new byte[len / 2];
+
+        for (int i = 0; i < len/2; i++) {
+            int val;
+            char c1 = src.charAt(i*2);
+            char c2 = src.charAt(i*2+1);
+            int val1 = Character.digit(c1, 16);
+            int val2 = Character.digit(c2, 16);
+            val = (val1 << 4) | val2;
+            result[i] = (byte)val;
+        }
+        return result;
+    }
+
+    private static void assertFileDescriptorContent(byte[] expected, ParcelFileDescriptor fd)
+            throws IOException {
+        assertInputStreamContent(expected, new ParcelFileDescriptor.AutoCloseInputStream(fd));
+    }
+
+    private static void assertInputStreamContent(byte[] expected, InputStream is)
+            throws IOException {
+        try {
+            byte[] observed = new byte[expected.length];
+            int count = is.read(observed);
+            assertEquals(expected.length, count);
+            assertEquals(-1, is.read());
+            MoreAsserts.assertEquals(expected, observed);
+        } finally {
+            is.close();
+        }
+    }
+
 }

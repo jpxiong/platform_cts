@@ -21,6 +21,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -28,12 +29,26 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDoneException;
 import android.database.sqlite.SQLiteStatement;
+import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 @TestTargetClass(android.database.sqlite.SQLiteStatement.class)
 public class SQLiteStatementTest extends AndroidTestCase {
     private static final String STRING1 = "this is a test";
     private static final String STRING2 = "another test";
+
+    private static final byte[][] BLOBS = new byte [][] {
+        parseBlob("86FADCF1A820666AEBD0789F47932151A2EF734269E8AC4E39630AB60519DFD8"),
+        new byte[0],
+        null,
+        parseBlob("00"),
+        parseBlob("FF"),
+        parseBlob("D7B500FECF25F7A4D83BF823D3858690790F2526013DE6CAE9A69170E2A1E47238"),
+    };
 
     private static final String DATABASE_NAME = "database_test.db";
 
@@ -59,6 +74,16 @@ public class SQLiteStatementTest extends AndroidTestCase {
 
     private void populateDefaultTable() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);");
+    }
+
+    private void populateBlobTable() {
+        mDatabase.execSQL("CREATE TABLE blob_test (_id INTEGER PRIMARY KEY, data BLOB)");
+        for (int i = 0; i < BLOBS.length; i++) {
+            ContentValues values = new ContentValues();
+            values.put("_id", i);
+            values.put("data", BLOBS[i]);
+            mDatabase.insert("blob_test", null, values);
+        }
     }
 
     @TestTargetNew(
@@ -216,5 +241,178 @@ public class SQLiteStatementTest extends AndroidTestCase {
         }
 
         statement.close();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessNormal() throws IOException {
+        doTestSimpleQueryForBlobFileDescriptorSuccess(0);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessEmpty() throws IOException {
+        doTestSimpleQueryForBlobFileDescriptorSuccess(1);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessNull() {
+        populateBlobTable();
+
+        String sql = "SELECT data FROM blob_test WHERE _id = " + 2;
+        SQLiteStatement stm = mDatabase.compileStatement(sql);
+        assertNull(stm.simpleQueryForBlobFileDescriptor());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccess00() throws IOException {
+        doTestSimpleQueryForBlobFileDescriptorSuccess(3);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessFF() throws IOException {
+        doTestSimpleQueryForBlobFileDescriptorSuccess(4);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessEmbeddedNul() throws IOException {
+        doTestSimpleQueryForBlobFileDescriptorSuccess(5);
+    }
+
+    private void doTestSimpleQueryForBlobFileDescriptorSuccess(int i) throws IOException {
+        populateBlobTable();
+
+        String sql = "SELECT data FROM blob_test WHERE _id = " + i;
+        SQLiteStatement stm = mDatabase.compileStatement(sql);
+        ParcelFileDescriptor fd = stm.simpleQueryForBlobFileDescriptor();
+        assertFileDescriptorContent(BLOBS[i], fd);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testSimpleQueryForBlobFileDescriptorSuccessParam() throws IOException {
+        populateBlobTable();
+
+        String sql = "SELECT data FROM blob_test WHERE _id = ?";
+        SQLiteStatement stm = mDatabase.compileStatement(sql);
+        stm.bindLong(1, 0);
+        ParcelFileDescriptor fd = stm.simpleQueryForBlobFileDescriptor();
+        assertFileDescriptorContent(BLOBS[0], fd);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testGetBlobFailureNoParam() throws Exception {
+        populateBlobTable();
+
+        String sql = "SELECT data FROM blob_test WHERE _id = 100";
+        SQLiteStatement stm = mDatabase.compileStatement(sql);
+        ParcelFileDescriptor fd = null;
+        SQLiteDoneException expectedException = null;
+        try {
+            fd = stm.simpleQueryForBlobFileDescriptor();
+        } catch (SQLiteDoneException ex) {
+            expectedException = ex;
+        } finally {
+            if (fd != null) {
+                fd.close();
+                fd = null;
+            }
+        }
+        assertNotNull("Should have thrown SQLiteDoneException", expectedException);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL_COMPLETE,
+        method = "simpleQueryForBlobFileDescriptor",
+        args = {}
+    )
+    public void testGetBlobFailureParam() throws Exception {
+        populateBlobTable();
+
+        String sql = "SELECT data FROM blob_test WHERE _id = ?";
+        SQLiteStatement stm = mDatabase.compileStatement(sql);
+        stm.bindLong(1, 100);
+        ParcelFileDescriptor fd = null;
+        SQLiteDoneException expectedException = null;
+        try {
+            fd = stm.simpleQueryForBlobFileDescriptor();
+        } catch (SQLiteDoneException ex) {
+            expectedException = ex;
+        } finally {
+            if (fd != null) {
+                fd.close();
+                fd = null;
+            }
+        }
+        assertNotNull("Should have thrown SQLiteDoneException", expectedException);
+    }
+
+    /*
+     * Convert string of hex digits to byte array.
+     * Results are undefined for poorly formed string.
+     *
+     * @param src hex string
+     */
+    private static byte[] parseBlob(String src) {
+        int len = src.length();
+        byte[] result = new byte[len / 2];
+
+        for (int i = 0; i < len/2; i++) {
+            int val;
+            char c1 = src.charAt(i*2);
+            char c2 = src.charAt(i*2+1);
+            int val1 = Character.digit(c1, 16);
+            int val2 = Character.digit(c2, 16);
+            val = (val1 << 4) | val2;
+            result[i] = (byte)val;
+        }
+        return result;
+    }
+
+    private static void assertFileDescriptorContent(byte[] expected, ParcelFileDescriptor fd)
+            throws IOException {
+        assertInputStreamContent(expected, new ParcelFileDescriptor.AutoCloseInputStream(fd));
+    }
+
+    private static void assertInputStreamContent(byte[] expected, InputStream is)
+            throws IOException {
+        try {
+            byte[] observed = new byte[expected.length];
+            int count = is.read(observed);
+            assertEquals(expected.length, count);
+            assertEquals(-1, is.read());
+            MoreAsserts.assertEquals(expected, observed);
+        } finally {
+            is.close();
+        }
     }
 }
