@@ -307,7 +307,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     android.hardware.Camera.PictureCallback.class}
         ),
         @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
+            level = TestLevel.COMPLETE,
             method = "autoFocus",
             args = {android.hardware.Camera.AutoFocusCallback.class}
         )
@@ -383,49 +383,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         checkPreviewCallback();
         terminateMessageLooper();
         assertTrue(mRawPreviewCallbackResult);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "autoFocus",
-            args = {android.hardware.Camera.AutoFocusCallback.class}
-        )
-    })
-    public void testAutoFocus() throws Exception {
-        initializeMessageLooper();
-        try {
-            mCamera.autoFocus(mAutoFocusCallback);
-            fail("autoFocus should throw exception if preview is not started.");
-        } catch (RuntimeException e) {
-            // expected
-        }
-
-        // Start the preview.
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
-        mCamera.startPreview();
-
-        // Test each focus mode.
-        Parameters parameters = mCamera.getParameters();
-        for (String focusMode: parameters.getSupportedFocusModes()) {
-            Log.v(TAG, "Test focus mode: "+focusMode);
-            mAutoFocusSucceeded = false;
-            parameters.setFocusMode(focusMode);
-            mCamera.setParameters(parameters);
-            mCamera.autoFocus(mAutoFocusCallback);
-            assertTrue(waitForFocusDone());
-            if (focusMode.equals(Parameters.FOCUS_MODE_INFINITY)
-                    || focusMode.equals(Parameters.FOCUS_MODE_FIXED)
-                    || focusMode.equals(Parameters.FOCUS_MODE_EDOF)) {
-                // Apps should not call autoFocus in these modes. For backward
-                // compatibility, if AF is called, it should return immediately
-                // with success.
-                assertTrue(mAutoFocusSucceeded);
-            }
-        }
-        terminateMessageLooper();
     }
 
     @TestTargetNew(
