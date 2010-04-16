@@ -789,7 +789,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         getInstrumentation().waitForIdleSync();
         assertFalse(view.getGlobalVisibleRect(rect, point));
 
-        final LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(200, 300);
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        int halfWidth = display.getWidth() / 2;
+        int halfHeight = display.getHeight() /2;
+
+        final LinearLayout.LayoutParams layoutParams3 =
+                new LinearLayout.LayoutParams(halfWidth, halfHeight);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.setLayoutParams(layoutParams3);
@@ -799,8 +804,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertTrue(view.getGlobalVisibleRect(rect, point));
         assertEquals(rcParent.left, rect.left);
         assertEquals(rcParent.top, rect.top);
-        assertEquals(rect.left + 200, rect.right);
-        assertEquals(rect.top + 300, rect.bottom);
+        assertEquals(rect.left + halfWidth, rect.right);
+        assertEquals(rect.top + halfHeight, rect.bottom);
         assertEquals(ptParent.x, point.x);
         assertEquals(ptParent.y, point.y);
     }
@@ -843,7 +848,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         getInstrumentation().waitForIdleSync();
         assertFalse(view.getGlobalVisibleRect(rect));
 
-        final LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(200, 300);
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        int halfWidth = display.getWidth() / 2;
+        int halfHeight = display.getHeight() /2;
+
+        final LinearLayout.LayoutParams layoutParams3 =
+                new LinearLayout.LayoutParams(halfWidth, halfHeight);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.setLayoutParams(layoutParams3);
@@ -853,8 +863,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertTrue(view.getGlobalVisibleRect(rect));
         assertEquals(rcParent.left, rect.left);
         assertEquals(rcParent.top, rect.top);
-        assertEquals(rect.left + 200, rect.right);
-        assertEquals(rect.top + 300, rect.bottom);
+        assertEquals(rect.left + halfWidth, rect.right);
+        assertEquals(rect.top + halfHeight, rect.bottom);
     }
 
     @TestTargets({
@@ -2900,9 +2910,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         method = "getLocalVisibleRect",
         args = {android.graphics.Rect.class}
     )
-    @ToBeFixed(bug = "1695243", explanation =
-            "the javadoc for getLocalVisibleRect() is incomplete." +
-            "1. not clear what is supposed to happen if the input Rect is null.")
     public void testGetLocalVisibleRect() throws Throwable {
         final View view = mActivity.findViewById(R.id.mock_view);
         Rect rect = new Rect();
@@ -2931,7 +2938,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         getInstrumentation().waitForIdleSync();
         assertFalse(view.getLocalVisibleRect(rect));
 
-        final LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(200, 300);
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        int halfWidth = display.getWidth() / 2;
+        int halfHeight = display.getHeight() /2;
+
+        final LinearLayout.LayoutParams layoutParams3 =
+                new LinearLayout.LayoutParams(halfWidth, halfHeight);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.setLayoutParams(layoutParams3);
@@ -2942,8 +2954,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertTrue(view.getLocalVisibleRect(rect));
         assertEquals(20, rect.left);
         assertEquals(-30, rect.top);
-        assertEquals(200 + 20, rect.right);
-        assertEquals(300 - 30, rect.bottom);
+        assertEquals(halfWidth + 20, rect.right);
+        assertEquals(halfHeight - 30, rect.bottom);
 
         try {
             view.getLocalVisibleRect(null);
@@ -4794,10 +4806,10 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         public String tag;
         public View firstChild;
     }
-    
+
     private static final class MockRunnable implements Runnable {
         public boolean hasRun = false;
-        
+
         public void run() {
             hasRun = true;
         }
