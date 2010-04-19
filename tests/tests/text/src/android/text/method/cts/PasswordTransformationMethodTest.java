@@ -60,6 +60,8 @@ public class PasswordTransformationMethodTest extends
 
     private EditText mEditText;
 
+    private CharSequence mTransformedText;
+
     public PasswordTransformationMethodTest() {
         super("com.android.cts.stub", StubActivity.class);
     }
@@ -136,6 +138,12 @@ public class PasswordTransformationMethodTest extends
         )
     })
     public void testTextChangedCallBacks() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mTransformedText = mMethod.getTransformation(mEditText.getText(), mEditText);
+            }
+        });
+
         mMethod.reset();
         sendKeys("H E 2*L O");
         assertTrue(mMethod.hasCalledBeforeTextChanged());
@@ -152,8 +160,7 @@ public class PasswordTransformationMethodTest extends
 
         // the appended string will not get transformed immediately
         // "***** "
-        assertEquals("\u2022\u2022\u2022\u2022\u2022 ",
-                mMethod.getTransformation(mEditText.getText(), mEditText).toString());
+        assertEquals("\u2022\u2022\u2022\u2022\u2022 ", mTransformedText.toString());
         assertTrue(mMethod.hasCalledBeforeTextChanged());
         assertTrue(mMethod.hasCalledOnTextChanged());
         assertTrue(mMethod.hasCalledAfterTextChanged());
@@ -162,12 +169,10 @@ public class PasswordTransformationMethodTest extends
         new DelayedCheck() {
             @Override
             protected boolean check() {
-                String transformed =
-                    mMethod.getTransformation(mEditText.getText(), mEditText).toString();
                 // "******"
-                return transformed.equals("\u2022\u2022\u2022\u2022\u2022\u2022");
+                return mTransformedText.toString()
+                        .equals("\u2022\u2022\u2022\u2022\u2022\u2022");
             }
-
         }.run();
     }
 
