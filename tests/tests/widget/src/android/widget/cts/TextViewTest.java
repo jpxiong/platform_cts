@@ -108,6 +108,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     private static final String LONG_TEXT = "This is a really long string which exceeds "
             + "the width of the view.";
     private static final long TIMEOUT = 5000;
+    private CharSequence mTransformedText;
 
     public TextViewTest() {
         super("com.android.cts.stub", TextViewStubActivity.class);
@@ -2506,6 +2507,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             public void run() {
                 mTextView.setKeyListener(qwertyKeyListener);
                 mTextView.setTransformationMethod(method);
+                mTransformedText = method.getTransformation(mTextView.getText(), mTextView);
 
                 mTextView.requestFocus();
             }
@@ -2526,10 +2528,9 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         new DelayedCheck(TIMEOUT) {
             @Override
             protected boolean check() {
-                String transformed =
-                    method.getTransformation(mTextView.getText(), mTextView).toString();
                 // "******"
-                return transformed.equals("\u2022\u2022\u2022\u2022\u2022\u2022");
+                return mTransformedText.toString()
+                        .equals("\u2022\u2022\u2022\u2022\u2022\u2022");
             }
         }.run();
 
