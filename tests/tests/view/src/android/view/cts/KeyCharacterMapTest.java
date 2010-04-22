@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.KeyCharacterMap.KeyData;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -182,9 +183,17 @@ public class KeyCharacterMapTest extends AndroidTestCase {
             fail("should throw exception");
         } catch (Exception e) {
         }
-        assertEquals('\0', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_E, chars));
-        assertEquals('A', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_A, chars));
-        assertEquals('B', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_B, chars));
+
+        assertEquals('\0', mKeyCharacterMap.getMatch(getCharacterKeyCode('E'), chars));
+        assertEquals('A', mKeyCharacterMap.getMatch(getCharacterKeyCode('A'), chars));
+        assertEquals('B', mKeyCharacterMap.getMatch(getCharacterKeyCode('B'), chars));
+    }
+
+    private int getCharacterKeyCode(char oneChar) {
+        // Lowercase the character to avoid getting modifiers in the KeyEvent array.
+        char[] chars = new char[] {Character.toLowerCase(oneChar)};
+        KeyEvent[] events = mKeyCharacterMap.getEvents(chars);
+        return events[0].getKeyCode();
     }
 
     @TestTargetNew(
@@ -200,9 +209,9 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         }
         assertEquals('\0', mKeyCharacterMap.getMatch(1000, chars, 2));
         assertEquals('\0', mKeyCharacterMap.getMatch(10000, chars, 2));
-        assertEquals('\0', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_E, chars, 0));
-        assertEquals('A', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_A, chars, 0));
-        assertEquals('B', mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_B, chars, 0));
+        assertEquals('\0', mKeyCharacterMap.getMatch(getCharacterKeyCode('E'), chars));
+        assertEquals('A', mKeyCharacterMap.getMatch(getCharacterKeyCode('A'), chars));
+        assertEquals('B', mKeyCharacterMap.getMatch(getCharacterKeyCode('B'), chars));
     }
 
     @TestTargetNew(

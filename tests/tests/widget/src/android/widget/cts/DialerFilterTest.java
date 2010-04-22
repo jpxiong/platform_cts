@@ -125,7 +125,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        sendKeys(KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3);
+        mInstrumentation.sendStringSync("123");
         assertEquals("", mDialerFilter.getLetters().toString());
         assertEquals("123", mDialerFilter.getDigits().toString());
 
@@ -137,7 +137,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        sendKeys(KeyEvent.KEYCODE_A, KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_G);
+        mInstrumentation.sendStringSync("adg");
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         assertEquals("", mDialerFilter.getDigits().toString());
 
@@ -149,7 +149,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        sendKeys(KeyEvent.KEYCODE_A, KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_G);
+        mInstrumentation.sendStringSync("adg");
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         // A, D, K may map to numbers on some keyboards. Don't test.
 
@@ -161,7 +161,7 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        sendKeys(KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_3);
+        mInstrumentation.sendStringSync("123");
         // 1, 2, 3 may map to letters on some keyboards. Don't test.
         assertEquals("123", mDialerFilter.getDigits().toString());
     }

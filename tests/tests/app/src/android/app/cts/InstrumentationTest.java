@@ -36,6 +36,7 @@ import android.os.Debug;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -49,7 +50,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Instrumentation.class)
 public class InstrumentationTest extends InstrumentationTestCase {
@@ -491,12 +491,13 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(text.length(), keyDownList.size());
         assertEquals(text.length(), keyUpList.size());
 
-        for (int i = 0; i < keyDownList.size(); i++) {
-            assertEquals(KeyEvent.KEYCODE_A + i, keyDownList.get(i).getKeyCode());
-        }
+        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        KeyEvent[] keyEvents = kcm.getEvents(text.toCharArray());
 
-        for (int i = 0; i < keyUpList.size(); i++) {
-            assertEquals(KeyEvent.KEYCODE_A + i, keyUpList.get(i).getKeyCode());
+        int i = 0;
+        for (int j = 0; j < keyDownList.size(); j++) {
+            assertEquals(keyEvents[i++].getKeyCode(), keyDownList.get(j).getKeyCode());
+            assertEquals(keyEvents[i++].getKeyCode(), keyUpList.get(j).getKeyCode());
         }
     }
 
