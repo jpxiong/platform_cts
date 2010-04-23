@@ -54,7 +54,6 @@ public class SurfaceViewStubActivity extends Activity {
 
         private SurfaceHolder mHolder;
         private MockCanvas mCanvas;
-        private Thread mSurfaceViewThread;
 
         private boolean mIsDraw;
         private boolean mIsAttachedToWindow;
@@ -171,32 +170,23 @@ public class SurfaceViewStubActivity extends Activity {
         }
 
         public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, start our drawing thread.
-            mSurfaceViewThread = new Thread() {
-                @Override
-                public void run() {
-                    // Use mock canvas listening to the drawColor() calling.
-                    mCanvas = new MockCanvas(Bitmap.createBitmap( BITMAP_WIDTH,
-                                                                  BITMAP_HEIGHT,
-                                                                  Bitmap.Config.ARGB_8888));
-                    draw(mCanvas);
+            // Use mock canvas listening to the drawColor() calling.
+            mCanvas = new MockCanvas(Bitmap.createBitmap( BITMAP_WIDTH,
+                                                          BITMAP_HEIGHT,
+                                                          Bitmap.Config.ARGB_8888));
+            draw(mCanvas);
 
-                    // Lock the surface, this returns a Canvas that can be used to render into.
-                    Canvas canvas = mHolder.lockCanvas();
-                    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    paint.setColor(Color.BLUE);
-                    canvas.drawRect(RECT_LEFT, RECT_TOP, RECT_RIGHT, RECT_BOTTOM, paint);
+            // Lock the surface, this returns a Canvas that can be used to render into.
+            Canvas canvas = mHolder.lockCanvas();
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.BLUE);
+            canvas.drawRect(RECT_LEFT, RECT_TOP, RECT_RIGHT, RECT_BOTTOM, paint);
 
-                    // And finally unlock and post the surface.
-                    mHolder.unlockCanvasAndPost(canvas);
-                }
-            };
-
-            mSurfaceViewThread.start();
+            // And finally unlock and post the surface.
+            mHolder.unlockCanvasAndPost(canvas);
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            mSurfaceViewThread = null;
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
