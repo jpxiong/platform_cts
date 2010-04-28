@@ -69,7 +69,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private boolean mErrorCallbackResult = false;
     private boolean mAutoFocusSucceeded = false;
 
-    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1000;  // Milliseconds.
+    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1500;  // Milliseconds.
     private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
     private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 5000;
 
@@ -113,25 +113,27 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * receive the callback messages.
      */
     private void initializeMessageLooper() {
-        if (LOGV) Log.v(TAG, "start looper");
         final ConditionVariable startDone = new ConditionVariable();
         new Thread() {
             @Override
             public void run() {
+                Log.v(TAG, "start loopRun");
                 // Set up a looper to be used by camera.
                 Looper.prepare();
-                if (LOGV) Log.v(TAG, "start loopRun");
                 // Save the looper so that we can terminate this thread
                 // after we are done with it.
                 mLooper = Looper.myLooper();
                 mCamera = Camera.open();
+                Log.v(TAG, "camera is opened");
                 startDone.open();
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
                 if (LOGV) Log.v(TAG, "initializeMessageLooper: quit.");
             }
         }.start();
 
+        Log.v(TAG, "start waiting for looper");
         if (!startDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
+            Log.v(TAG, "initializeMessageLooper: start timeout");
             fail("initializeMessageLooper: start timeout");
         }
     }
