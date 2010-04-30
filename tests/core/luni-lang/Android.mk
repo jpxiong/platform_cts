@@ -23,11 +23,11 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/lang) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/tests/api/java/lang) \
-	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java/) \
-	../../../../dalvik/libcore/luni/src/test/java/tests/luni/AllTestsLang.java \
-	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/lang) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/java/lang) \
+	$(call all-java-files-under,../../../../libcore/support/src/test/java/) \
+	../../../../libcore/luni/src/test/java/tests/luni/AllTestsLang.java \
+	../../../../libcore/luni/src/test/java/tests/TestSuiteFactory.java
 
 LOCAL_PACKAGE_NAME := android.core.tests.luni.lang
 
