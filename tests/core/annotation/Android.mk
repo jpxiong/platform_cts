@@ -23,9 +23,9 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/annotation/src/test/java) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
-	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/annotation/src/test/java) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/junit) \
+	../../../../libcore/luni/src/test/java/tests/TestSuiteFactory.java
 
 LOCAL_PACKAGE_NAME := android.core.tests.annotation
 
