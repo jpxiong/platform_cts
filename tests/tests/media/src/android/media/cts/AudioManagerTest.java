@@ -436,7 +436,10 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
         assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
+        // Note: as of Froyo, if VIBRATE_TYPE_RINGER is set to OFF, it will
+        // not vibrate, even in RINGER_MODE_VIBRATE. This allows users to
+        // disable the vibration for incoming calls only.
+        assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         // VIBRATE_SETTING_ONLY_SILENT
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ONLY_SILENT);
