@@ -23,10 +23,10 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/archive/src/test/java) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/junit) \
-	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java/tests/support) \
-	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/archive/src/test/java) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/junit) \
+	$(call all-java-files-under,../../../../libcore/support/src/test/java/tests/support) \
+	../../../../libcore/luni/src/test/java/tests/TestSuiteFactory.java
 
 LOCAL_PACKAGE_NAME := android.core.tests.archive
 

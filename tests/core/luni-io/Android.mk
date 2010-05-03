@@ -23,13 +23,13 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/tests/api/java/io) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/io) \
-	$(call all-java-files-under,../../../../dalvik/libcore/support/src/test/java/) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg1) \
-	$(call all-java-files-under,../../../../dalvik/libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg2) \
-	../../../../dalvik/libcore/luni/src/test/java/tests/luni/AllTestsIo.java \
-	../../../../dalvik/libcore/luni/src/test/java/tests/TestSuiteFactory.java
+LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/java/io) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/io) \
+	$(call all-java-files-under,../../../../libcore/support/src/test/java/) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg1) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg2) \
+	../../../../libcore/luni/src/test/java/tests/luni/AllTestsIo.java \
+	../../../../libcore/luni/src/test/java/tests/TestSuiteFactory.java
 
 LOCAL_PACKAGE_NAME := android.core.tests.luni.io
 
