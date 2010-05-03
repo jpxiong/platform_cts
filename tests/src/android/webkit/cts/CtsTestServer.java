@@ -45,19 +45,29 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Simple http test server for testing webkit client functionality.
@@ -76,6 +86,7 @@ public class CtsTestServer {
     public static final String BINARY_PREFIX = "/binary";
     public static final String COOKIE_PREFIX = "/cookie";
     public static final String AUTH_PREFIX = "/auth";
+    public static final String SHUTDOWN_PREFIX = "/shutdown";
     public static final int DELAY_MILLIS = 2000;
 
     public static final String AUTH_REALM = "Android CTS";
@@ -95,6 +106,7 @@ public class CtsTestServer {
     private String mServerUri;
     private AssetManager mAssets;
     private Context mContext;
+    private boolean mSsl;
     private MimeTypeMap mMap;
     private String mLastQuery;
     private int mRequestCount;
@@ -136,13 +148,14 @@ public class CtsTestServer {
         sInstance = this;
         mContext = context;
         mAssets = mContext.getAssets();
-        if (ssl) {
+        mSsl = ssl;
+        if (mSsl) {
             mServerUri = "https://localhost:" + SSL_SERVER_PORT;
         } else {
             mServerUri = "http://localhost:" + SERVER_PORT;
         }
         mMap = MimeTypeMap.getSingleton();
-        mServerThread = new ServerThread(this, ssl);
+        mServerThread = new ServerThread(this, mSsl);
         mServerThread.start();
     }
 
@@ -150,8 +163,87 @@ public class CtsTestServer {
      * Terminate the http server.
      */
     public void shutdown() {
-        mServerThread.shutdown();
+        try {
+            // Avoid a deadlock between two threads where one is trying to call
+            // close() and the other one is calling accept() by sending a GET
+            // request for shutdown and having the server's one thread
+            // sequentially call accept() and close().
+            URL url = new URL(mServerUri + SHUTDOWN_PREFIX);
+            URLConnection connection = openConnection(url);
+            connection.connect();
+
+            // Read the input from the stream to send the request.
+            InputStream is = connection.getInputStream();
+            is.close();
+
+            // Block until the server thread is done shutting down.
+            mServerThread.join();
+
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        } catch (KeyManagementException e) {
+            throw new IllegalStateException(e);
+        }
+
         sInstance = null;
+    }
+
+    private URLConnection openConnection(URL url)
+            throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        if (mSsl) {
+            // Install hostname verifiers and trust managers that don't do
+            // anything in order to get around the client not trusting
+            // the test server due to a lack of certificates.
+
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setHostnameVerifier(new CtsHostnameVerifier());
+
+            SSLContext context = SSLContext.getInstance("TLS");
+            CtsTrustManager trustManager = new CtsTrustManager();
+            context.init(null, new CtsTrustManager[] {trustManager}, null);
+            connection.setSSLSocketFactory(context.getSocketFactory());
+
+            return connection;
+        } else {
+            return url.openConnection();
+        }
+    }
+
+    /**
+     * {@link X509TrustManager} that trusts everybody. This is used so that
+     * the client calling {@link CtsTestServer#shutdown()} can issue a request
+     * for shutdown by blindly trusting the {@link CtsTestServer}'s
+     * credentials.
+     */
+    private static class CtsTrustManager implements X509TrustManager {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+            // Trust the CtSTestServer...
+        }
+
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+            // Trust the CtSTestServer...
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
+
+    /**
+     * {@link HostnameVerifier} that verifies everybody. This permits
+     * the client to trust the web server and call
+     * {@link CtsTestServer#shutdown()}.
+     */
+    private static class CtsHostnameVerifier implements HostnameVerifier {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
     }
 
     /**
@@ -278,8 +370,9 @@ public class CtsTestServer {
 
     /**
      * Generate a response to the given request.
+     * @throws InterruptedException
      */
-    private HttpResponse getResponse(HttpRequest request) {
+    private HttpResponse getResponse(HttpRequest request) throws InterruptedException {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
         mRequestCount += 1;
@@ -401,6 +494,11 @@ public class CtsTestServer {
             }
             response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
                     "<body>" + agent + "</body></html>"));
+        } else if (path.equals(SHUTDOWN_PREFIX)) {
+            response = createResponse(HttpStatus.SC_OK);
+            // We cannot close the socket here, because we need to respond.
+            // Status must be set to OK, or else the test will fail due to
+            // a RunTimeException.
         }
         if (response == null) {
             response = createResponse(HttpStatus.SC_NOT_FOUND);
@@ -519,6 +617,7 @@ public class CtsTestServer {
 
 
         public ServerThread(CtsTestServer server, boolean ssl) throws Exception {
+            super("ServerThread");
             mServer = server;
             mIsSsl = ssl;
             int retry = 3;
@@ -547,20 +646,36 @@ public class CtsTestServer {
         public void run() {
             HttpParams params = new BasicHttpParams();
             params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
-            while(!mIsCancelled) {
+            while (!mIsCancelled) {
                 try {
                     Socket socket = mSocket.accept();
                     DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
                     conn.bind(socket, params);
+
+                    // Determine whether we need to shutdown early before
+                    // parsing the response since conn.close() will crash
+                    // for SSL requests due to UnsupportedOperationException.
                     HttpRequest request = conn.receiveRequestHeader();
+                    if (isShutdownRequest(request)) {
+                        mIsCancelled = true;
+                    }
+
                     HttpResponse response = mServer.getResponse(request);
                     conn.sendResponseHeader(response);
                     conn.sendResponseEntity(response);
                     conn.close();
+
                 } catch (IOException e) {
                     // normal during shutdown, ignore
-                } catch (HttpException h) {
-                    Log.w(TAG, h);
+                    Log.w(TAG, e);
+                } catch (HttpException e) {
+                    Log.w(TAG, e);
+                } catch (InterruptedException e) {
+                    Log.w(TAG, e);
+                } catch (UnsupportedOperationException e) {
+                    // DefaultHttpServerConnection's close() throws an
+                    // UnsupportedOperationException.
+                    Log.w(TAG, e);
                 }
             }
             try {
@@ -570,13 +685,12 @@ public class CtsTestServer {
             }
         }
 
-        public void shutdown() {
-            mIsCancelled = true;
-            try {
-                mSocket.close();
-            } catch (IOException ignored) {
-                // safe to ignore
-            }
+        private boolean isShutdownRequest(HttpRequest request) {
+            RequestLine requestLine = request.getRequestLine();
+            String uriString = requestLine.getUri();
+            URI uri = URI.create(uriString);
+            String path = uri.getPath();
+            return path.equals(SHUTDOWN_PREFIX);
         }
     }
 }
