@@ -43,7 +43,8 @@ public class ConfigTest extends AndroidTestCase {
         ORIENTATION,
         WIDTH,
         HEIGHT,
-        DENSITY
+        DENSITY,
+        SCREENLAYOUT
     }
 
     private static void checkValue(final Resources res, final int resId,
@@ -129,8 +130,10 @@ public class ConfigTest extends AndroidTestCase {
                     break;
                 case DENSITY:
                     // this is the ratio from the standard
-
                     mMetrics.density = (((float)value)/((float)DisplayMetrics.DENSITY_DEFAULT));
+                    break;
+                case SCREENLAYOUT:
+                    mConfig.screenLayout = value;
                     break;
                 default:
                     assert(false);
@@ -303,6 +306,34 @@ public class ConfigTest extends AndroidTestCase {
         checkValue(res, R.configVarying.simple, "simple square");
         checkValue(res, R.configVarying.bag,
                 R.styleable.TestConfig, new String[]{"bag square"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_SMALL);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple small");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag small"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_NORMAL);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple normal");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag normal"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_LARGE);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple large");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag large"});
+
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_XLARGE);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple xlarge");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag xlarge"});
     }
     
     @MediumTest
@@ -378,6 +409,47 @@ public class ConfigTest extends AndroidTestCase {
                 R.styleable.TestConfig, new String[]{"bag 240dpi"});
     }
 
+    @MediumTest
+    public void testScreenSize() throws Exception {
+        // ensure that we fall back to the best available screen size
+        // for a given configuration.
+        TotalConfig config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_SMALL);
+        Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple small");
+        checkValue(res, R.configVarying.small, "small");
+        checkValue(res, R.configVarying.normal, "default");
+        checkValue(res, R.configVarying.large, "default");
+        checkValue(res, R.configVarying.xlarge, "default");
+        
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_NORMAL);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple normal");
+        checkValue(res, R.configVarying.small, "default");
+        checkValue(res, R.configVarying.normal, "normal");
+        checkValue(res, R.configVarying.large, "default");
+        checkValue(res, R.configVarying.xlarge, "default");
+        
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_LARGE);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple large");
+        checkValue(res, R.configVarying.small, "default");
+        checkValue(res, R.configVarying.normal, "normal");
+        checkValue(res, R.configVarying.large, "large");
+        checkValue(res, R.configVarying.xlarge, "default");
+        
+        config = new TotalConfig();
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_XLARGE);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple xlarge");
+        checkValue(res, R.configVarying.small, "default");
+        checkValue(res, R.configVarying.normal, "normal");
+        checkValue(res, R.configVarying.large, "large");
+        checkValue(res, R.configVarying.xlarge, "xlarge");
+    }
+
 // TODO - add tests for special cases - ie, other key params seem ignored if 
 // nokeys is set
 
@@ -421,7 +493,8 @@ public class ConfigTest extends AndroidTestCase {
          */
 
         /**
-         * Precidence order: mcc, mnc, locale, orientation, density,
+         * Precidence order: mcc, mnc, locale, screenlayout-size,
+         * screenlayout-long, orientation, density,
          * touchscreen, hidden, keyboard, navigation, width-height
          */
 

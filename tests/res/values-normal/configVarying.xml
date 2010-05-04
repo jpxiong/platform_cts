@@ -15,12 +15,9 @@
 -->
 
 <resources>
-    <item type="configVarying" name="simple">simple default</item>
+    <item type="configVarying" name="simple">simple normal</item>
     <bag type="configVarying" name="bag">
-        <item name="testString">bag default</item>
+        <item name="testString">bag normal</item>
     </bag>
-    <item type="configVarying" name="small">default</item>
-    <item type="configVarying" name="normal">default</item>
-    <item type="configVarying" name="large">default</item>
-    <item type="configVarying" name="xlarge">default</item>
+    <item type="configVarying" name="normal">normal</item>
 </resources>
