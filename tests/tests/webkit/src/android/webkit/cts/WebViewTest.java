@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.net.http.SslError;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -47,6 +48,7 @@ import android.view.View;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
 import android.webkit.DownloadListener;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -268,7 +270,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             currScale = mWebView.getScale();
         }
 
-        // can not zoom out furtherholiday
+        // can not zoom out further
         assertFalse(mWebView.zoomOut());
         previousScale = currScale;
         currScale = mWebView.getScale();
@@ -1625,14 +1627,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         final MockWebView mockWebView = (MockWebView) mWebView;
         // need the client to handle error
-        mockWebView.setWebViewClient(new WebViewClient());
+        mockWebView.setWebViewClient(new MockWebViewClient());
 
         mockWebView.reset();
         startWebServer(true);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        // attempt to load the url. This will fail during certificate verification, but the
-        // certificate will still be set. WebViewClient.onReceivedSslError() is a hidden API,
-        // so we cannot ignore the error.
+        // attempt to load the url.
         mockWebView.loadUrl(url);
         new DelayedCheck(TEST_TIMEOUT) {
             @Override
@@ -1983,6 +1983,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         public void onScaleChanged(WebView view, float oldScale, float newScale) {
             super.onScaleChanged(view, oldScale, newScale);
             mOnScaleChangedCalled = true;
+        }
+
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler,
+                                       SslError error) {
+            handler.proceed();
         }
     }
 
