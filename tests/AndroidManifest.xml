@@ -879,7 +879,9 @@
         </service>
         <service android:name="android.app.cts.IntentServiceStub"/>
 
-        <activity android:name="android.app.cts.LaunchpadActivity" android:multiprocess="true">
+        <activity android:name="android.app.cts.LaunchpadActivity" 
+                  android:configChanges="keyboardHidden|orientation"
+                  android:multiprocess="true">
         </activity>
 
         <service android:name="android.content.cts.MockSyncAdapterService" android:exported="true">
