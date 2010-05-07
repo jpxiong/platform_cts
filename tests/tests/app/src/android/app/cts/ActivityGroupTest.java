@@ -170,7 +170,9 @@ public class ActivityGroupTest extends ActivityTestsBase {
     @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabScreen() throws Exception {
         mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_SCREEN);
+        runMultipleLaunchpads("testTabScreen", getClass(),
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_STOP,
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_RESUME);
     }
 
     @TestTargets({
@@ -238,7 +240,9 @@ public class ActivityGroupTest extends ActivityTestsBase {
     @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabDialog() throws Exception {
         mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_DIALOG);
+        runMultipleLaunchpads("testTabDialog", getClass(),
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_RESUME,
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_STOP);
     }
 
     @TestTargets({
