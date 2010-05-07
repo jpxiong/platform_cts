@@ -114,22 +114,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
 
         } catch (SAXException e) {
@@ -234,22 +234,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
         } catch (SAXException e) {
             fail(e.getMessage());
@@ -276,22 +276,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
         } catch (SAXException e) {
             fail(e.getMessage());
@@ -308,22 +308,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
         } catch (SAXException e) {
             fail(e.getMessage());
@@ -340,22 +340,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
         } catch (SAXException e) {
             fail(e.getMessage());
@@ -372,22 +372,22 @@ public class XmlTest extends AndroidTestCase {
             assertEquals(STR_START_DOCUMENT, dc.mVec.elementAt(1));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(2));
             assertEquals(TAG_TEST, dc.mVec.elementAt(3));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(4));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(4));
             assertEquals(STR_0_NUMBER, dc.mVec.elementAt(5));
             assertEquals(STR_START_ELEMENT, dc.mVec.elementAt(6));
             assertEquals(TAG_SON, dc.mVec.elementAt(7));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(8));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(8));
             assertEquals(STR_1_NUMBER, dc.mVec.elementAt(9));
             assertEquals(ATT_NAME, dc.mVec.elementAt(10));
             assertEquals(STR_ABC, dc.mVec.elementAt(11));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(12));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(13));
             assertEquals(TAG_SON, dc.mVec.elementAt(14));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(15));
+            assertEqualsOrEmpty(TAG_SON, dc.mVec.elementAt(15));
             assertEquals(STR_END_ELEMENT, dc.mVec.elementAt(16));
             assertEquals(STR_EMPTY, dc.mVec.elementAt(17));
             assertEquals(TAG_TEST, dc.mVec.elementAt(18));
-            assertEquals(STR_EMPTY, dc.mVec.elementAt(19));
+            assertEqualsOrEmpty(TAG_TEST, dc.mVec.elementAt(19));
             assertEquals(STR_END_DOCUMENT, dc.mVec.elementAt(20));
         } catch (SAXException e) {
             fail(e.getMessage());
@@ -483,4 +483,9 @@ public class XmlTest extends AndroidTestCase {
         }
     }
 
+    private void assertEqualsOrEmpty(String expected, String actual) {
+        if (actual.length() != 0) {
+            assertEquals(expected, actual);
+        }
+    }
 }
