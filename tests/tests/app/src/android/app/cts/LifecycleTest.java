@@ -3466,7 +3466,9 @@ public class LifecycleTest extends ActivityTestsBase {
     })
     public void testTabDialog() {
         mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_DIALOG);
+        runMultipleLaunchpads("testTabDialog", getClass(),
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_RESUME,
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_STOP);
     }
 
     @TestTargets({
@@ -4148,7 +4150,9 @@ public class LifecycleTest extends ActivityTestsBase {
     })
     public void testDialog() {
         mIntent = mTopIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_DIALOG);
+        runMultipleLaunchpads("testDialog", getClass(),
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_RESUME,
+                LaunchpadActivity.LIFECYCLE_DIALOG_ON_STOP);
     }
 
     @TestTargets({
@@ -4830,7 +4834,9 @@ public class LifecycleTest extends ActivityTestsBase {
     })
     public void testTabScreen() {
         mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_SCREEN);
+        runMultipleLaunchpads("testTabScreen", getClass(),
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_RESUME,
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_STOP);
     }
 
     @TestTargets({
@@ -5513,7 +5519,9 @@ public class LifecycleTest extends ActivityTestsBase {
     })
     public void testScreen() {
         mIntent = mTopIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_SCREEN);
+        runMultipleLaunchpads("testScreen", getClass(),
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_RESUME,
+                LaunchpadActivity.LIFECYCLE_SCREEN_ON_STOP);
     }
 
     @TestTargets({

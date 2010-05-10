@@ -84,8 +84,10 @@ public class LaunchpadActivity extends Activity {
     public static final int FORWARDED_RESULT = 2;
 
     public static final String LIFECYCLE_BASIC = "android.app.cts.activity.LIFECYCLE_BASIC";
-    public static final String LIFECYCLE_SCREEN = "android.app.cts.activity.LIFECYCLE_SCREEN";
-    public static final String LIFECYCLE_DIALOG = "android.app.cts.activity.LIFECYCLE_DIALOG";
+    public static final String LIFECYCLE_SCREEN_ON_STOP = "android.app.cts.activity.LIFECYCLE_SCREEN_ON_STOP";
+    public static final String LIFECYCLE_SCREEN_ON_RESUME = "android.app.cts.activity.LIFECYCLE_SCREEN_ON_RESUME";
+    public static final String LIFECYCLE_DIALOG_ON_STOP = "android.app.cts.activity.LIFECYCLE_DIALOG_ON_STOP";
+    public static final String LIFECYCLE_DIALOG_ON_RESUME = "android.app.cts.activity.LIFECYCLE_DIALOG_ON_RESUME";
     public static final String LIFECYCLE_FINISH_CREATE = "android.app.cts.activity.LIFECYCLE_FINISH_CREATE";
     public static final String LIFECYCLE_FINISH_START = "android.app.cts.activity.LIFECYCLE_FINISH_START";
 
@@ -162,15 +164,25 @@ public class LaunchpadActivity extends Activity {
             setExpectedLifecycle(new String[] {
                     ON_START, ON_RESUME, DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
             });
-        } else if (LIFECYCLE_SCREEN.equals(action)) {
+        } else if (LIFECYCLE_SCREEN_ON_STOP.equals(action)) {
             setExpectedLifecycle(new String[] {
                     ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE, ON_STOP, ON_RESTART,
                     ON_START, ON_RESUME, DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
             });
-        } else if (LIFECYCLE_DIALOG.equals(action)) {
+        } else if (LIFECYCLE_SCREEN_ON_RESUME.equals(action)) {
+            setExpectedLifecycle(new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE, ON_RESUME, DO_FINISH,
+                    ON_PAUSE, ON_STOP, ON_DESTROY
+            });
+        } else if (LIFECYCLE_DIALOG_ON_RESUME.equals(action)) {
             setExpectedLifecycle(new String[] {
                     ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE, ON_RESUME,
                     DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
+            });
+        } else if (LIFECYCLE_DIALOG_ON_STOP.equals(action)) {
+            setExpectedLifecycle(new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE, ON_STOP, ON_RESTART,
+                    ON_START, ON_RESUME, DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
             });
         } else if (LIFECYCLE_FINISH_CREATE.equals(action)) {
             // This one behaves a little differently when running in a group.
@@ -394,19 +406,22 @@ public class LaunchpadActivity extends Activity {
     }
 
     private void checkLifecycle(String where) {
+        String action = getIntent().getAction();
+
         if (mExpectedLifecycle == null) {
             return;
         }
 
         if (mNextLifecycle >= mExpectedLifecycle.length) {
-            finishBad("Activity lifecycle incorrect: received " + where
+            finishBad("Activity lifecycle for " + action + " incorrect: received " + where
                     + " but don't expect any more calls");
             mExpectedLifecycle = null;
             return;
         }
         if (!mExpectedLifecycle[mNextLifecycle].equals(where)) {
-            finishBad("Activity lifecycle incorrect: received " + where + " but expected "
-                    + mExpectedLifecycle[mNextLifecycle] + " at " + mNextLifecycle);
+            finishBad("Activity lifecycle for " + action + " incorrect: received " + where
+                    + " but expected " + mExpectedLifecycle[mNextLifecycle]
+                    + " at " + mNextLifecycle);
             mExpectedLifecycle = null;
             return;
         }
@@ -420,7 +435,7 @@ public class LaunchpadActivity extends Activity {
 
         final String next = mExpectedLifecycle[mNextLifecycle];
         if (where.equals(ON_DESTROY)) {
-            finishBad("Activity lifecycle incorrect: received " + where
+            finishBad("Activity lifecycle for " + action + " incorrect: received " + where
                     + " but expected more actions (next is " + next + ")");
             mExpectedLifecycle = null;
             return;
