@@ -35,6 +35,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -160,14 +161,14 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         c = Thumbnails.queryMiniThumbnail(mContentResolver, imageId, Thumbnails.MINI_KIND,
                 sizeProjection);
         assertEquals(1, c.getCount());
-        c.moveToFirst();
-        assertEquals(320, c.getLong(c.getColumnIndex(Thumbnails.WIDTH)));
-        assertEquals(240, c.getLong(c.getColumnIndex(Thumbnails.HEIGHT)));
+        assertTrue(c.moveToFirst());
+        assertTrue(c.getLong(c.getColumnIndex(Thumbnails.WIDTH)) >= Math.min(src.getWidth(), 240));
+        assertTrue(c.getLong(c.getColumnIndex(Thumbnails.HEIGHT)) >= Math.min(src.getHeight(), 240));
         c.close();
         c = Thumbnails.queryMiniThumbnail(mContentResolver, imageId, Thumbnails.MICRO_KIND,
                 sizeProjection);
         assertEquals(1, c.getCount());
-        c.moveToFirst();
+        assertTrue(c.moveToFirst());
         assertEquals(50, c.getLong(c.getColumnIndex(Thumbnails.WIDTH)));
         assertEquals(50, c.getLong(c.getColumnIndex(Thumbnails.HEIGHT)));
         c.close();
