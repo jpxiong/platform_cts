@@ -83,6 +83,7 @@ import android.view.Gravity;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
@@ -92,6 +93,8 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
+import android.widget.AbsoluteLayout;
+import android.widget.FrameLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
@@ -3410,17 +3413,23 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             args = {boolean.class}
         )
     })
+
     public void testMarquee() {
         final MockTextView textView = new MockTextView(mActivity);
         textView.setText(LONG_TEXT);
         textView.setSingleLine();
         textView.setEllipsize(TruncateAt.MARQUEE);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
+
+        final FrameLayout layout = new FrameLayout(mActivity);
+        layout.addView(textView);
+
         // make the fading to be shown
         textView.setHorizontalFadingEdgeEnabled(true);
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mActivity.setContentView(textView);
+                mActivity.setContentView(layout);
             }
         });
         mInstrumentation.waitForIdleSync();
