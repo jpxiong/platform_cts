@@ -28,6 +28,8 @@ import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.cts.WidgetTestUtils;
+
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
@@ -199,11 +201,14 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     public void testGetMovieProperties() {
         assertEquals(1000, mMovie.duration());
         assertFalse(mMovie.isOpaque());
-        int expectedHeight = getActivity().getResources().getDrawable(MOVIE)
-                .getIntrinsicHeight();
-        assertEquals(expectedHeight, mMovie.height());
-        int expectedWidth = getActivity().getResources().getDrawable(MOVIE)
-                .getIntrinsicWidth();
-        assertEquals(expectedWidth, mMovie.width());
+
+        int expectedHeight = getActivity().getResources().getDrawable(MOVIE).getIntrinsicHeight();
+        int scaledHeight = WidgetTestUtils.convertDipToPixels(getActivity(), mMovie.height());
+        assertEquals(expectedHeight, scaledHeight);
+
+        int expectedWidth = getActivity().getResources().getDrawable(MOVIE).getIntrinsicWidth();
+        int scaledWidth = WidgetTestUtils.convertDipToPixels(getActivity(), mMovie.width());
+        assertEquals(expectedWidth, scaledWidth);
+
     }
 }
