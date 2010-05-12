@@ -720,13 +720,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.getAttribute(ExifInterface.TAG_DATETIME) != null);
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP), null);
-        assertEquals(exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD), null);
+        checkGpsDataNull(exif);
         double exifFocalLength = (double)exif.getAttributeDouble(
                 ExifInterface.TAG_FOCAL_LENGTH, -1);
         assertEquals(focalLength, exifFocalLength, 0.001);
@@ -751,7 +745,26 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP) != null);
         assertEquals(thirtyTwoCharacters,
                 exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
+
+        // Test gps tags do not exist after calling removeGpsData.
+        mCamera.startPreview();
+        parameters.removeGpsData();
+        mCamera.setParameters(parameters);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
+        exif = new ExifInterface(JPEG_PATH);
+        checkGpsDataNull(exif);
         terminateMessageLooper();
+    }
+
+    private void checkGpsDataNull(ExifInterface exif) {
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP));
+        assertNull(exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
     }
 
     @TestTargets({
