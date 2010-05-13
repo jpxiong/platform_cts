@@ -330,10 +330,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         terminateMessageLooper();
         assertTrue(mShutterCallbackResult);
         assertTrue(mJpegPictureCallbackResult);
-        assertTrue(mJpegData != null);
+        assertNotNull(mJpegData);
         Bitmap b = BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length);
-        assertEquals(b.getWidth(), pictureSize.width);
-        assertEquals(b.getHeight(), pictureSize.height);
+        assertEquals(pictureSize.width, b.getWidth());
+        assertEquals(pictureSize.height, b.getHeight());
     }
 
     /*
@@ -532,10 +532,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(origPreviewFrameRate > 0);
 
         // The default preview format must be yuv420 (NV21).
-        assertTrue(origPreviewFormat == ImageFormat.NV21);
+        assertEquals(ImageFormat.NV21, origPreviewFormat);
 
         // The default picture format must be Jpeg.
-        assertTrue(origPictureFormat == ImageFormat.JPEG);
+        assertEquals(ImageFormat.JPEG, origPictureFormat);
 
         // If camera supports flash, the default flash mode must be off.
         String flashMode = parameters.getFlashMode();
@@ -558,7 +558,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(pictureFormats != null && pictureFormats.size() != 0);
         assertTrue(frameRates != null && frameRates.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
-        assertTrue(focusMode != null);
+        assertNotNull(focusMode);
         assertTrue(focalLength > 0);
         assertTrue(horizontalViewAngle > 0 && horizontalViewAngle <= 360);
         assertTrue(verticalViewAngle > 0 && verticalViewAngle <= 360);
@@ -568,34 +568,34 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // If a parameter is supported, both getXXX and getSupportedXXX have to
         // be non null.
         if (parameters.getWhiteBalance() != null) {
-            assertTrue(parameters.getSupportedWhiteBalance() != null);
+            assertNotNull(parameters.getSupportedWhiteBalance());
         }
         if (parameters.getSupportedWhiteBalance() != null) {
-            assertTrue(parameters.getWhiteBalance() != null);
+            assertNotNull(parameters.getWhiteBalance());
         }
         if (parameters.getColorEffect() != null) {
-            assertTrue(parameters.getSupportedColorEffects() != null);
+            assertNotNull(parameters.getSupportedColorEffects());
         }
         if (parameters.getSupportedColorEffects() != null) {
-            assertTrue(parameters.getColorEffect() != null);
+            assertNotNull(parameters.getColorEffect());
         }
         if (parameters.getAntibanding() != null) {
-            assertTrue(parameters.getSupportedAntibanding() != null);
+            assertNotNull(parameters.getSupportedAntibanding());
         }
         if (parameters.getSupportedAntibanding() != null) {
-            assertTrue(parameters.getAntibanding() != null);
+            assertNotNull(parameters.getAntibanding());
         }
         if (parameters.getSceneMode() != null) {
-            assertTrue(parameters.getSupportedSceneModes() != null);
+            assertNotNull(parameters.getSupportedSceneModes());
         }
         if (parameters.getSupportedSceneModes() != null) {
-            assertTrue(parameters.getSceneMode() != null);
+            assertNotNull(parameters.getSceneMode());
         }
         if (parameters.getFlashMode() != null) {
-            assertTrue(parameters.getSupportedFlashModes() != null);
+            assertNotNull(parameters.getSupportedFlashModes());
         }
         if (parameters.getSupportedFlashModes() != null) {
-            assertTrue(parameters.getFlashMode() != null);
+            assertNotNull(parameters.getFlashMode());
         }
 
         // Set the parameters.
@@ -617,11 +617,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // camera may not accept exact parameters, but values must be in valid range
         assertTrue(isValidPixelFormat(paramActual.getPictureFormat()));
-        assertEquals(paramActual.getPictureSize().width, pictureSize.width);
-        assertEquals(paramActual.getPictureSize().height, pictureSize.height);
+        assertEquals(pictureSize.width, paramActual.getPictureSize().width);
+        assertEquals(pictureSize.height, paramActual.getPictureSize().height);
         assertTrue(isValidPixelFormat(paramActual.getPreviewFormat()));
-        assertEquals(paramActual.getPreviewSize().width, previewSize.width);
-        assertEquals(paramActual.getPreviewSize().height, previewSize.height);
+        assertEquals(previewSize.width, paramActual.getPreviewSize().width);
+        assertEquals(previewSize.height, paramActual.getPreviewSize().height);
         assertTrue(paramActual.getPreviewFrameRate() > 0);
 
         checkExposureCompensation(parameters);
@@ -687,8 +687,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.hasThumbnail());
         byte[] thumb = exif.getThumbnail();
         Bitmap b = BitmapFactory.decodeByteArray(thumb, 0, thumb.length);
-        assertEquals(b.getWidth(), size.width);
-        assertEquals(b.getHeight(), size.height);
+        assertEquals(size.width, b.getWidth());
+        assertEquals(size.height, b.getHeight());
 
         // Test no thumbnail case.
         p.setJpegThumbnailSize(0, 0);
@@ -696,9 +696,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
-        assertEquals(mJpegPictureCallbackResult, true);
+        assertTrue(mJpegPictureCallbackResult);
         exif = new ExifInterface(JPEG_PATH);
-        assertTrue(!exif.hasThumbnail());
+        assertFalse(exif.hasThumbnail());
 
         terminateMessageLooper();
     }
@@ -715,9 +715,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         ExifInterface exif = new ExifInterface(JPEG_PATH);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_MAKE) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_MODEL) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_DATETIME) != null);
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_MAKE));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_MODEL));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_DATETIME));
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
         checkGpsDataNull(exif);
@@ -737,12 +737,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         exif = new ExifInterface(JPEG_PATH);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP) != null);
-        assertTrue(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP) != null);
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP));
         assertEquals(thirtyTwoCharacters,
                 exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
 
@@ -882,7 +882,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         public int mNumCbWithBuffer1, mNumCbWithBuffer2, mNumCbWithBuffer3;
         public byte[] mBuffer1, mBuffer2, mBuffer3;
         public void onPreviewFrame(byte[] data, Camera camera) {
-            assert(data != null);
+            assertNotNull(data);
             if (data == mBuffer1) {
                 mNumCbWithBuffer1++;
             } else if (data == mBuffer2) {
@@ -930,14 +930,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         if (!parameters.isZoomSupported()) return;
 
         // Test the zoom parameters.
-        assertEquals(parameters.getZoom(), 0);  // default zoom should be 0.
+        assertEquals(0, parameters.getZoom());  // default zoom should be 0.
         int maxZoom = parameters.getMaxZoom();
         assertTrue(maxZoom >= 0);
         if (maxZoom > 0) {
             // Zoom ratios should be sorted from small to large.
             List<Integer> ratios = parameters.getZoomRatios();
-            assertEquals(ratios.size(), maxZoom + 1);
-            assertEquals(ratios.get(0).intValue(), 100);
+            assertEquals(maxZoom + 1, ratios.size());
+            assertEquals(100, ratios.get(0).intValue());
             for (int i = 0; i < ratios.size() - 1; i++) {
                 assertTrue(ratios.get(i) < ratios.get(i + 1));
             }
@@ -1014,7 +1014,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Log.e(TAG, "zoomListener.mStopped = " + zoomListener.mStopped);
             zoomListener.mZoomDone.close();
             mCamera.startSmoothZoom(maxZoom / 2);
-            assertEquals(true, zoomListener.mZoomDone.block(5000));
+            assertTrue(zoomListener.mZoomDone.block(5000));
             assertEquals(maxZoom - (maxZoom / 2), zoomListener.mValues.size());
             int i = maxZoom - 1;
             for(Integer value: zoomListener.mValues) {
@@ -1055,7 +1055,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         public void onZoomChange(int value, boolean stopped, Camera camera) {
             mValues.add(value);
             assertEquals(value, camera.getParameters().getZoom());
-            assertEquals(false, mStopped);
+            assertFalse(mStopped);
             mStopped = stopped;
             if (stopped) {
                 mZoomDone.open();
