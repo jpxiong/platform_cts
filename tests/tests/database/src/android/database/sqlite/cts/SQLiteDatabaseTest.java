@@ -370,14 +370,9 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertFalse(iterator.hasNext());
 
         // test sync
-        mDatabase.execSQL("INSERT INTO people VALUES (0, \"foo\", 0);");
-        Cursor c = mDatabase.query("people", new String[] {"_id", "name" },
-                "_id = 0", null, null, null, null);
-        assertTrue(c.moveToFirst());
-        c.updateString(1, "updated");
-        c.commitUpdates();
-        c.close();
-        c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
+        mDatabase.execSQL("INSERT INTO people VALUES (0, 'foo', 0);");
+        mDatabase.execSQL("UPDATE people SET name = 'updated' WHERE _id = 0;");
+        Cursor c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
                 "_id = 0", null, null, null, null);
         assertTrue(c.moveToFirst());
         // _sync_dirty flag has been set
@@ -404,15 +399,10 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertEquals(0, tableMap.size());
 
         // test sync
-        mDatabase.execSQL("INSERT INTO people VALUES (13, \"foo\", 0);");
-        mDatabase.execSQL("INSERT INTO phone VALUES (0, 13, \"bar\");");
-        Cursor c = mDatabase.query("phone", new String[] {"_id", "name" },
-                "_id = 0", null, null, null, null);
-        assertTrue(c.moveToFirst());
-        c.updateString(1, "updated");
-        c.commitUpdates();
-        c.close();
-        c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
+        mDatabase.execSQL("INSERT INTO people VALUES (13, 'foo', 0);");
+        mDatabase.execSQL("INSERT INTO phone VALUES (0, 13, 'bar');");
+        mDatabase.execSQL("UPDATE phone SET name = 'updated' WHERE _id = 0;");
+        Cursor c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
                 "_id = 13", null, null, null, null);
         assertTrue(c.moveToFirst());
         // _sync_dirty flag has been set

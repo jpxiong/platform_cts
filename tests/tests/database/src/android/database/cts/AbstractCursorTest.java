@@ -744,12 +744,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
             return mRows.length;
         }
 
-        @Deprecated
-        @Override
-        public boolean deleteRow() {
-            return false;
-        }
-
         @Override
         public String[] getColumnNames() {
             return mColumnNames;
