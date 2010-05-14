@@ -114,7 +114,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_TAB));
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_SPACE));
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_NUM));
-        assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_SYM));
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_EXPLORER));
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_ENVELOPE));
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_ENTER));
