@@ -531,6 +531,48 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             assertEquals(0, child.getLeft() - mGridView.getListPaddingLeft());
         }
     }
+    
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        notes = "Test {@link GridView#getNumColumns()}",
+        method = "getNumColumns"
+    )
+    public void testGetNumColumns() {
+        mGridView = new GridView(mActivity);
+        
+        assertEquals(mGridView.getNumColumns(), GridView.AUTO_FIT);
+        
+        mGridView = findGridViewById(R.id.gridview);
+        
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mGridView.setAdapter(new MockGridViewAdapter(10));
+                mGridView.setNumColumns(10);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        
+        assertEquals(mGridView.getNumColumns(), 10);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mGridView.setNumColumns(1);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        
+        assertEquals(mGridView.getNumColumns(), 1);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mGridView.setNumColumns(0);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        
+        //although setNumColumns(0) was called, the number of columns should be 1
+        assertEquals(mGridView.getNumColumns(), 1);
+    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
