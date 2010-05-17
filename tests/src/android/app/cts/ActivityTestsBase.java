@@ -21,17 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.test.AndroidTestCase;
 import android.test.PerformanceTestCase;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ActivityTestsBase extends AndroidTestCase implements PerformanceTestCase,
         LaunchpadActivity.CallingTest {
     public static final String PERMISSION_GRANTED = "android.app.cts.permission.TEST_GRANTED";
     public static final String PERMISSION_DENIED = "android.app.cts.permission.TEST_DENIED";
-
-    private static final String TAG = "ActivityTestsBase";
 
     private static final int TIMEOUT_MS = 60 * 1000;
 
@@ -197,44 +191,6 @@ public class ActivityTestsBase extends AndroidTestCase implements PerformanceTes
         return mResultCode;
     }
 
-    /**
-     * Runs multiple launch pad activities until successfully finishing one or
-     * exhausting them all and throwing an exception.
-     *
-     * @param testName to make it easier to debug failures
-     * @param testClass to make it easier to debug failures
-     * @param firstAction to run
-     * @param moreActions to run in sequence if the first action fails
-     */
-    public void runMultipleLaunchpads(String testName, Class<?> testClass,
-            String firstAction, String... moreActions) {
-        List<String> actions = new ArrayList<String>();
-        actions.add(firstAction);
-        for (String action : moreActions) {
-            actions.add(action);
-        }
-
-        RuntimeException lastException = null;
-        String testIdentifier = testClass.getSimpleName() + "#" + testName + ":";
-
-        for (String action : actions) {
-            startLaunchpadActivity(action);
-            try {
-                int res = waitForResultOrThrow(TIMEOUT_MS);
-                if (res == Activity.RESULT_OK) {
-                    return;
-                } else {
-                    Log.w(TAG, testIdentifier + action + " returned result " + res);
-                }
-            } catch (RuntimeException e) {
-                Log.w(TAG, testIdentifier + action + " threw exception", e);
-            }
-        }
-
-        if (lastException != null) {
-            throw lastException;
-        }
-    }
 
     public int getResultCode() {
         return mResultCode;
