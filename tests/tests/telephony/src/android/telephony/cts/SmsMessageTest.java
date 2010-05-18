@@ -212,7 +212,7 @@ public class SmsMessageTest extends AndroidTestCase{
         assertEquals(SCA2, sms.getServiceCenterAddress());
         assertEquals(OA2, sms.getOriginatingAddress());
         assertEquals(MESSAGE_BODY2, sms.getMessageBody());
-        CharSequence msgBody = (CharSequence) sms.getMessageBody();
+        CharSequence msgBody = sms.getMessageBody();
         result = SmsMessage.calculateLength(msgBody, false);
         assertEquals(SMS_NUMBER2, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);

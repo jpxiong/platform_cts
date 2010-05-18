@@ -17,12 +17,15 @@
 package android.telephony.cts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.telephony.SmsManager;
 import android.test.AndroidTestCase;
@@ -50,6 +53,12 @@ public class SmsManagerTest extends AndroidTestCase {
     private static final String SMS_SEND_ACTION = "CTS_SMS_SEND_ACTION";
     private static final String SMS_DELIVERY_ACTION = "CTS_SMS_DELIVERY_ACTION";
 
+    // List of network operators that don't support SMS delivery report
+    private static final List<String> NO_DELIVERY_REPORTS =
+            Arrays.asList(
+                    "310410"    // AT&T Mobility
+            );
+
     private TelephonyManager mTelephonyManager;
     private String mDestAddr;
     private String mText;
@@ -59,6 +68,7 @@ public class SmsManagerTest extends AndroidTestCase {
     private PendingIntent mDeliveredIntent;
     private Intent mSendIntent;
     private Intent mDeliveryIntent;
+    private boolean mDeliveryReportSupported;
 
     private static final int TIME_OUT = 1000 * 60 * 4;
 
@@ -69,6 +79,18 @@ public class SmsManagerTest extends AndroidTestCase {
             (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
         mDestAddr = mTelephonyManager.getLine1Number();
         mText = "This is a test message";
+
+        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+            // CDMA supports SMS delivery report
+            mDeliveryReportSupported = true;
+        } else if (mTelephonyManager.getDeviceId().equals("000000000000000")) {
+            // emulator doesn't support SMS delivery report
+            mDeliveryReportSupported = false;
+        } else {
+            // is this a GSM network that doesn't support SMS delivery report?
+            String mccmnc = mTelephonyManager.getSimOperator();
+            mDeliveryReportSupported = !(NO_DELIVERY_REPORTS.contains(mccmnc));
+        }
     }
 
     @TestTargetNew(
@@ -120,8 +142,10 @@ public class SmsManagerTest extends AndroidTestCase {
         // send single text sms
         init();
         sendTextMessage(mDestAddr, mDestAddr, mSentIntent, mDeliveredIntent);
-        mSendReceiver.waitForCalls(1, TIME_OUT);
-        mDeliveryReceiver.waitForCalls(1, TIME_OUT);
+        assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
+        if (mDeliveryReportSupported) {
+            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+        }
 
         if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // TODO: temp workaround, OCTET encoding for EMS not properly supported
@@ -134,8 +158,10 @@ public class SmsManagerTest extends AndroidTestCase {
 
         init();
         sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
-        mSendReceiver.waitForCalls(1, TIME_OUT);
-        mDeliveryReceiver.waitForCalls(1, TIME_OUT);
+        assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
+        if (mDeliveryReportSupported) {
+            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+        }
 
         // send multi parts text sms
         init();
@@ -148,8 +174,10 @@ public class SmsManagerTest extends AndroidTestCase {
             deliveryIntents.add(PendingIntent.getBroadcast(getContext(), 0, mDeliveryIntent, 0));
         }
         sendMultiPartTextMessage(mDestAddr, parts, sentIntents, deliveryIntents);
-        mSendReceiver.waitForCalls(numParts, TIME_OUT);
-        mDeliveryReceiver.waitForCalls(numParts, TIME_OUT);
+        assertTrue(mSendReceiver.waitForCalls(numParts, TIME_OUT));
+        if (mDeliveryReportSupported) {
+            assertTrue(mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
+        }
     }
 
     private void init() {
@@ -220,12 +248,20 @@ public class SmsManagerTest extends AndroidTestCase {
             }
         }
 
-        public void waitForCalls(int expectedCalls, long timeout) throws InterruptedException {
+        public boolean waitForCalls(int expectedCalls, long timeout) throws InterruptedException {
             synchronized(mLock) {
                 mExpectedCalls = expectedCalls;
-                if (mCalls < mExpectedCalls) {
-                    mLock.wait(timeout);
+                long startTime = SystemClock.elapsedRealtime();
+
+                while (mCalls < mExpectedCalls) {
+                    long waitTime = timeout - (SystemClock.elapsedRealtime() - startTime);
+                    if (waitTime > 0) {
+                        mLock.wait(waitTime);
+                    } else {
+                        return false;  // timed out
+                    }
                 }
+                return true;  // success
             }
         }
     }
