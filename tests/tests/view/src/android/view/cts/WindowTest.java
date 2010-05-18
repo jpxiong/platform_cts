@@ -44,6 +44,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -1242,6 +1243,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         @Override
         public void setDefaultWindowFormat(int format) {
             super.setDefaultWindowFormat(format);
+        }
+        
+        @Override
+        public void takeSurface(SurfaceHolder.Callback callback) {
         }
     }
 

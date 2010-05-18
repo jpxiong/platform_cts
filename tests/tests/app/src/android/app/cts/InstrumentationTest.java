@@ -39,6 +39,7 @@ import android.test.InstrumentationTestCase;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
@@ -954,6 +955,10 @@ public class InstrumentationTest extends InstrumentationTestCase {
 
             @Override
             public void togglePanel(int featureId, KeyEvent event) {
+            }
+            
+            @Override
+            public void takeSurface(SurfaceHolder.Callback callback) {
             }
         }
     }
