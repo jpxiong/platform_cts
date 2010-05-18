@@ -28,6 +28,7 @@ import dalvik.annotation.TestTargetNew;
 @TestTargetClass(SmsManager.class)
 public class SmsManagerTest extends android.telephony.cts.SmsManagerTest {
 
+    @Override
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "getDefault",
