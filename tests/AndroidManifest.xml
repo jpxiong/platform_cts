@@ -549,6 +549,22 @@
             android:screenOrientation="landscape">
         </activity>
 
+        <activity android:name="android.view.inputmethod.cts.InputMethodStubActivity"
+            android:label="InputMethodStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+        <service android:name="android.view.inputmethod.cts.InputMethodInfoStub"
+            android:label="InputMethodInfoStub">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
+
         <activity android:name="android.view.cts.MenuInflaterStubActivity"
                                         android:label="MenuInflaterStubActivity">
             <intent-filter>
