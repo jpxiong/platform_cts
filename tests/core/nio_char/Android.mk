@@ -24,7 +24,7 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/nio_char/src/test/java) \
-	$(call all-java-files-under,../../../../libcore/luni/src/test/java/junit) \
+	$(call all-java-files-under,../../../../libcore/junit/src/test/java/junit) \
 	$(call all-java-files-under,../../../../libcore/support/src/test/java)
 
 LOCAL_PACKAGE_NAME := android.core.tests.nio_char
