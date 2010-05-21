@@ -1062,4 +1062,73 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             }
         }
     }
+
+    @UiThreadTest
+    public void testFocusDistances() throws Exception {
+        initializeMessageLooper();
+        mCamera.setPreviewDisplay(CameraStubActivity.mSurfaceView.getHolder());
+        mCamera.startPreview();
+        waitForPreviewDone();
+        Parameters parameters = mCamera.getParameters();
+
+        // Test every supported focus mode.
+        for (String focusMode: parameters.getSupportedFocusModes()) {
+            parameters.setFocusMode(focusMode);
+            mCamera.setParameters(parameters);
+            parameters = mCamera.getParameters();
+            checkFocusDistances(parameters);
+            if (Parameters.FOCUS_MODE_AUTO.equals(focusMode)
+                    || Parameters.FOCUS_MODE_MACRO.equals(focusMode)) {
+                mCamera.autoFocus(mAutoFocusCallback);
+                assertTrue(waitForFocusDone());
+                parameters = mCamera.getParameters();
+                checkFocusDistances(parameters);
+            }
+        }
+
+        // Test if the method throws exception if the argument is invalid.
+        try {
+            parameters.getFocusDistances(null);
+            fail("getFocusDistances should not accept null.");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        try {
+            parameters.getFocusDistances(new float[2]);
+            fail("getFocusDistances should not accept a float array with two elements.");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        try {
+            parameters.getFocusDistances(new float[4]);
+            fail("getFocusDistances should not accept a float array with four elements.");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        terminateMessageLooper();
+    }
+
+    private void checkFocusDistances(Parameters parameters) {
+        float[] distances = new float[3];
+        parameters.getFocusDistances(distances);
+
+        // Focus distances should be greater than 0.
+        assertTrue(distances[Parameters.FOCUS_DISTANCE_NEAR_INDEX] > 0);
+        assertTrue(distances[Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX] > 0);
+        assertTrue(distances[Parameters.FOCUS_DISTANCE_FAR_INDEX] > 0);
+
+        // Make sure far focus distance >= optimal focus distance >= near focus distance.
+        assertTrue(distances[Parameters.FOCUS_DISTANCE_FAR_INDEX] >=
+                   distances[Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX]);
+        assertTrue(distances[Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX] >=
+                   distances[Parameters.FOCUS_DISTANCE_NEAR_INDEX]);
+
+        // Far focus distance should be infinity in infinity focus mode.
+        if (Parameters.FOCUS_MODE_INFINITY.equals(parameters.getFocusMode())) {
+            assertEquals(Float.POSITIVE_INFINITY,
+                         distances[Parameters.FOCUS_DISTANCE_FAR_INDEX]);
+        }
+    }
 }
