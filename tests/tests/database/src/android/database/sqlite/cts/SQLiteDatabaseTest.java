@@ -454,17 +454,26 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
     })
     @ToBeFixed(bug = "1676383", explanation = "setPageSize does not work as javadoc declares.")
     public void testAccessPageSize() {
-        mDatabaseFile = new File(mDatabaseDir, "database.db");
-        if (mDatabaseFile.exists()) {
-            mDatabaseFile.delete();
+        File databaseFile = new File(mDatabaseDir, "database.db");
+        if (databaseFile.exists()) {
+            databaseFile.delete();
         }
-        mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile.getPath(), null);
+        SQLiteDatabase database = null;
+        try {
+            database = SQLiteDatabase.openOrCreateDatabase(databaseFile.getPath(), null);
 
-        long initialValue = mDatabase.getPageSize();
-        // check that this does not throw an exception
-        // setting a different page size may not be supported after the DB has been created
-        mDatabase.setPageSize(initialValue);
-        assertEquals(initialValue, mDatabase.getPageSize());
+            long initialValue = database.getPageSize();
+            // check that this does not throw an exception
+            // setting a different page size may not be supported after the DB has been created
+            database.setPageSize(initialValue);
+            assertEquals(initialValue, database.getPageSize());
+
+        } finally {
+            if (database != null) {
+                database.close();
+                databaseFile.delete();
+            }
+        }
     }
 
     @TestTargetNew(
@@ -827,9 +836,16 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
     public void testIsReadOnly() {
         assertFalse(mDatabase.isReadOnly());
 
-        mDatabase = SQLiteDatabase.openDatabase(mDatabaseFilePath, null,
-                SQLiteDatabase.OPEN_READONLY);
-        assertTrue(mDatabase.isReadOnly());
+        SQLiteDatabase database = null;
+        try {
+            database = SQLiteDatabase.openDatabase(mDatabaseFilePath, null,
+                    SQLiteDatabase.OPEN_READONLY);
+            assertTrue(database.isReadOnly());
+        } finally {
+            if (database != null) {
+                database.close();
+            }
+        }
     }
 
     @TestTargetNew(
