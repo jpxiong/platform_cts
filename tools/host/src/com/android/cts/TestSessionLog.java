@@ -331,6 +331,10 @@ public class TestSessionLog extends XMLResourceHandler {
                         DeviceParameterCollector.BUILD_BOARD, bldInfo.getBuildBoard());
                 setAttribute(doc, devInfoNode,
                         DeviceParameterCollector.BUILD_DEVICE, bldInfo.getBuildDevice());
+                setAttribute(doc, devInfoNode,
+                        DeviceParameterCollector.BUILD_ABI, bldInfo.getBuildAbi());
+                setAttribute(doc, devInfoNode,
+                        DeviceParameterCollector.BUILD_ABI2, bldInfo.getBuildAbi2());
 
                 deviceSettingNode.appendChild(devInfoNode);
 

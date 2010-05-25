@@ -24,6 +24,7 @@ import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -59,6 +60,8 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static final String VERSION_SDK = "version_sdk";
     private static final String VERSION_RELEASE = "version_release";
     private static final String VERSION_INCREMENTAL = "version_incremental";
+    private static final String BUILD_ABI = "build_abi";
+    private static final String BUILD_ABI2 = "build_abi2";
     private static final String BUILD_FINGERPRINT = "build_fingerprint";
     private static final String BUILD_TAGS = "build_tags";
     private static final String BUILD_TYPE = "build_type";
@@ -91,6 +94,12 @@ public class DeviceInfoInstrument extends Instrumentation {
         addResult(BUILD_TYPE, Build.TYPE);
         addResult(BUILD_TAGS, Build.TAGS);
         addResult(BUILD_FINGERPRINT, Build.FINGERPRINT);
+        addResult(BUILD_ABI, Build.CPU_ABI);
+
+        // The property will be replaced by a SDK constant Build.CPU_ABI_2 in future releases.
+        // If you are removing this line, then update the Android.mk to have
+        // LOCAL_SDK_VERSION := current.
+        addResult(BUILD_ABI2, SystemProperties.get("ro.product.cpu.abi2"));
 
         addResult(VERSION_INCREMENTAL, Build.VERSION.INCREMENTAL);
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);

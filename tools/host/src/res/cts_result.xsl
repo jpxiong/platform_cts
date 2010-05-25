@@ -94,6 +94,20 @@
                                         </TD>
                                     </TR>
                                     <TR>
+                                        <TD class="rowtitle">Build ABI</TD>
+                                        <TD>
+                                            <xsl:value-of
+                                              select="TestResult/DeviceInfo/BuildInfo/@build_abi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build ABI2</TD>
+                                        <TD>
+                                            <xsl:value-of
+                                              select="TestResult/DeviceInfo/BuildInfo/@build_abi2"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
                                         <TD class="rowtitle">Android Platform Version</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@androidPlatformVersion"/>
