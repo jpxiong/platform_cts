@@ -401,6 +401,8 @@ public class TestDevice implements DeviceObserver {
         public static final String BUILD_BRAND = "build_brand";
         public static final String BUILD_BOARD = "build_board";
         public static final String BUILD_DEVICE = "build_device";
+        public static final String BUILD_ABI = "build_abi";
+        public static final String BUILD_ABI2 = "build_abi2";
         public static final String SCREEN_HEIGHT = "screen_height";
         public static final String SCREEN_WIDTH = "screen_width";
         public static final String SCREEN_DENSITY = "screen_density";
@@ -506,6 +508,24 @@ public class TestDevice implements DeviceObserver {
         }
 
         /**
+         * Set the build abi
+         *
+         * @param buildAbi The build ABI
+         */
+        public void setBuildAbi(final String buildAbi) {
+            mInfoMap.put(BUILD_ABI, buildAbi);
+        }
+
+        /**
+         * Set the build abi2
+         *
+         * @param buildAbi The build ABI2
+         */
+        public void setBuildAbi2(final String buildAbi2) {
+            mInfoMap.put(BUILD_ABI2, buildAbi2);
+        }
+
+        /**
          * set the serialNumber of this device
          *
          * @param serialNumber The serial number.
@@ -602,6 +622,24 @@ public class TestDevice implements DeviceObserver {
          */
         public String getBuildDevice() {
             return mInfoMap.get(BUILD_DEVICE);
+        }
+
+        /**
+         * Get the build ABI.
+         *
+         * @return The build ABI.
+         */
+        public String getBuildAbi() {
+            return mInfoMap.get(BUILD_ABI);
+        }
+
+        /**
+         * Get the build ABI2.
+         *
+         * @return The build ABI2.
+         */
+        public String getBuildAbi2() {
+            return mInfoMap.get(BUILD_ABI2);
         }
 
         /**
