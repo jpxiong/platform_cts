@@ -30,4 +30,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/luni/src/test
 
 LOCAL_PACKAGE_NAME := android.core.tests.luni.util
 
+# for java.* javax.* support classes in libcore/support/src/test/java
+LOCAL_DX_FLAGS := --core-library
+
 include $(BUILD_CTSCORE_PACKAGE)
