@@ -29,4 +29,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/dom/src/test/
 
 LOCAL_PACKAGE_NAME := android.core.tests.dom
 
+# for java.* javax.* support classes in libcore/support/src/test/java
+LOCAL_DX_FLAGS := --core-library
+
 include $(BUILD_CTSCORE_PACKAGE)
