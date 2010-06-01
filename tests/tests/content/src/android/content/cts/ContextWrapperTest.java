@@ -1203,7 +1203,7 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNull(mContextWrapper.getSystemService("invalid"));
 
         // Test valid service name
-        assertNotNull(mContextWrapper.getSystemService("window"));
+        assertNotNull(mContextWrapper.getSystemService(Context.WINDOW_SERVICE));
     }
 
     @TestTargetNew(
