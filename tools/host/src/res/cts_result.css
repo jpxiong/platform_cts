@@ -79,6 +79,7 @@ table {
 #summaryinfo td {
     padding:1px;
     border-width: 0px 0px 0px 0px;
+    vertical-align: top;
 }
 
 /* The test summary */

@@ -102,7 +102,9 @@
                                     <TR>
                                         <TD class="rowtitle">Supported Locales</TD>
                                         <TD>
-                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@locales"/>
+                                            <xsl:call-template name="formatDelimitedString">
+                                                <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@locales"/>
+                                            </xsl:call-template>
                                         </TD>
                                     </TR>
                                     <TR>
@@ -403,10 +405,31 @@
                     </TABLE>
                 </xsl:for-each> <!-- end test package -->
             </DIV>
+            </body>
+        </html>
+    </xsl:template>
 
-        </body>
-    </html>
-</xsl:template>
+    <!-- Take a delimited string and insert line breaks after a some number of elements. --> 
+    <xsl:template name="formatDelimitedString">
+        <xsl:param name="string" />
+        <xsl:param name="numTokensPerRow" select="10" />
+        <xsl:param name="tokenIndex" select="1" />
+        <xsl:if test="$string">
+            <!-- Requires the last element to also have a delimiter after it. -->
+            <xsl:variable name="token" select="substring-before($string, ';')" />
+            <xsl:value-of select="$token" />
+            <xsl:text>&#160;</xsl:text>
+          
+            <xsl:if test="$tokenIndex mod $numTokensPerRow = 0">
+                <br />
+            </xsl:if>
 
+            <xsl:call-template name="formatDelimitedString">
+                <xsl:with-param name="string" select="substring-after($string, ';')" />
+                <xsl:with-param name="numTokensPerRow" select="$numTokensPerRow" />
+                <xsl:with-param name="tokenIndex" select="$tokenIndex + 1" />
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>
