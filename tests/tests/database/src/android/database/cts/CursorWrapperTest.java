@@ -19,6 +19,8 @@ package android.database.cts;
 import java.io.File;
 import java.util.Arrays;
 
+import junit.framework.TestCase;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.IContentProvider;
@@ -39,7 +41,7 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(android.database.CursorWrapper.class)
-public class CursorWrapperTest extends DatabaseCursorTest {
+public class CursorWrapperTest extends TestCase {
 
     private static final String FIRST_NUMBER = "123";
     private static final String SECOND_NUMBER = "5555";
@@ -61,7 +63,6 @@ public class CursorWrapperTest extends DatabaseCursorTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        setupTestType(TYPE_CURSORWRAPPER);
         setupDatabase();
     }
 

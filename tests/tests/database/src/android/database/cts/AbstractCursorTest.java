@@ -67,6 +67,15 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         mTestAbstractCursor = new TestAbstractCursor(COLUMN_NAMES, list);
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        mDatabase.close();
+        if (mDatabaseFile.exists()) {
+            mDatabaseFile.delete();
+        }
+        super.tearDown();
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "AbstractCursor",
