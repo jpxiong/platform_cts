@@ -44,6 +44,8 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static final String VERSION_SDK = "version_sdk";
     private static final String VERSION_RELEASE = "version_release";
     private static final String VERSION_INCREMENTAL = "version_incremental";
+    private static final String BUILD_ABI = "build_abi";
+    private static final String BUILD_ABI2 = "build_abi2";
     private static final String BUILD_FINGERPRINT = "build_fingerprint";
     private static final String BUILD_TAGS = "build_tags";
     private static final String BUILD_TYPE = "build_type";
@@ -76,6 +78,8 @@ public class DeviceInfoInstrument extends Instrumentation {
         addResult(BUILD_TYPE, Build.TYPE);
         addResult(BUILD_TAGS, Build.TAGS);
         addResult(BUILD_FINGERPRINT, Build.FINGERPRINT);
+        addResult(BUILD_ABI, Build.CPU_ABI);
+        addResult(BUILD_ABI2, Build.CPU_ABI2);
 
         addResult(VERSION_INCREMENTAL, Build.VERSION.INCREMENTAL);
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
