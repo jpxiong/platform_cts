@@ -167,6 +167,26 @@
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imsi"/>
                                         </TD>
                                     </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Features</TD>
+                                        <TD>
+                                            <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature">
+                                                <xsl:text>[</xsl:text>
+                                                <xsl:choose>
+                                                    <xsl:when test="@available = 'true'">
+                                                        <xsl:text>X</xsl:text>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xsl:text>_</xsl:text>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                                <xsl:text>] </xsl:text>
+
+                                                <xsl:value-of select="@name" />
+                                                <br />
+                                            </xsl:for-each>
+                                        </TD>
+                                    </TR>
                                 </TABLE>
                             </div>
                         </TD>

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -28,6 +29,22 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class DeviceInfoInstrument extends Instrumentation {
+
+    // Should use XML files in frameworks/base/data/etc to generate dynamically.
+    private static final String[] FEATURES_TO_CHECK = {
+        PackageManager.FEATURE_CAMERA,
+        PackageManager.FEATURE_CAMERA_AUTOFOCUS,
+        PackageManager.FEATURE_CAMERA_FLASH,
+        PackageManager.FEATURE_SENSOR_LIGHT,
+        PackageManager.FEATURE_SENSOR_PROXIMITY,
+        PackageManager.FEATURE_TELEPHONY,
+        PackageManager.FEATURE_TELEPHONY_CDMA,
+        PackageManager.FEATURE_TELEPHONY_GSM,
+        PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH,
+        PackageManager.FEATURE_LIVE_WALLPAPER,
+    };
+
+    private static final String FEATURES = "features";
     private static final String PHONE_NUMBER = "phoneNumber";
     public static final String LOCALES = "locales";
     private static final String IMSI = "imsi";
@@ -118,6 +135,10 @@ public class DeviceInfoInstrument extends Instrumentation {
         String phoneNumber = tm.getLine1Number();
         addResult(PHONE_NUMBER, phoneNumber);
 
+        // features
+        String features = getFeatures();
+        addResult(FEATURES, features);
+
         finish(Activity.RESULT_OK, mResults);
     }
 
@@ -149,5 +170,21 @@ public class DeviceInfoInstrument extends Instrumentation {
      */
     private void addResult(final String key, final float value){
         mResults.putFloat(key, value);
+    }
+
+    /**
+     * Return a summary of the device's feature as a semi-colon-delimited list of colon separated
+     * name and availability pairs like "feature1:true;feature2:false;feature3;true".
+     */
+    private String getFeatures() {
+        StringBuilder builder = new StringBuilder();
+
+        PackageManager packageManager = getContext().getPackageManager();
+        for (String feature : FEATURES_TO_CHECK) {
+            boolean hasFeature = packageManager.hasSystemFeature(feature);
+            builder.append(feature).append(':').append(hasFeature).append(';');
+        }
+
+        return builder.toString();
     }
 }

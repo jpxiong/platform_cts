@@ -69,6 +69,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_BUILD_NAME = "buildName";
     static final String ATTRIBUTE_ARCH = "arch";
     static final String ATTRIBUTE_VALUE = "value";
+    static final String ATTRIBUTE_AVAILABLE = "available";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -84,6 +85,8 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_SUMMARY = "Summary";
     static final String TAG_SCREEN = "Screen";
     static final String TAG_BUILD_INFO = "BuildInfo";
+    static final String TAG_FEATURE_INFO = "FeatureInfo";
+    static final String TAG_FEATURE = "Feature";
     static final String TAG_PHONE_SUB_INFO = "PhoneSubInfo";
     static final String TAG_TEST_RESULT = "TestResult";
     static final String TAG_TESTPACKAGE = "TestPackage";
@@ -323,8 +326,10 @@ public class TestSessionLog extends XMLResourceHandler {
                         DeviceParameterCollector.BUILD_DEVICE, bldInfo.getBuildDevice());
 
                 deviceSettingNode.appendChild(devInfoNode);
+
+                addFeatureInfo(doc, deviceSettingNode, bldInfo);
             }
-            
+
             Node hostInfo = doc.createElement(TAG_HOSTINFO);
             root.appendChild(hostInfo);
             String hostName = "";
@@ -386,6 +391,39 @@ public class TestSessionLog extends XMLResourceHandler {
             Log.e("create result doc failed", e);
         }
         return null;
+    }
+
+    /**
+     * Creates a {@link #TAG_FEATURE_INFO} tag with {@link #TAG_FEATURE} elements indicating
+     * what features are supported by the device. It parses a string from the deviceInfo argument
+     * that is in the form of "feature1:true;feature2:false;featuer3;true;" with a trailing
+     * semi-colon.
+     *
+     * <pre>
+     *  <FeatureInfo>
+     *     <Feature name="android.name.of.feature" available="true" />
+     *     ...
+     *   </FeatureInfo>
+     * </pre>
+     * @param document used to create elements
+     * @param parentNode to attach the FeatureInfo element to
+     * @param deviceInfo to get the feature data from
+     */
+    private void addFeatureInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        Node featureInfo = document.createElement(TAG_FEATURE_INFO);
+        parentNode.appendChild(featureInfo);
+
+        String features = deviceInfo.getFeatures();
+        String[] featurePairs = features.split(";");
+        for (String featurePair : featurePairs) {
+            Node feature = document.createElement(TAG_FEATURE);
+            featureInfo.appendChild(feature);
+
+            String[] nameAndAvailability = featurePair.split(":");
+            setAttribute(document, feature, ATTRIBUTE_NAME, nameAndAvailability[0]);
+            setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameAndAvailability[1]);
+        }
     }
 
     /**
