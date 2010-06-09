@@ -958,6 +958,10 @@ public class InstrumentationTest extends InstrumentationTestCase {
             }
             
             @Override
+            public void invalidatePanelMenu(int featureId) {
+            }
+            
+            @Override
             public void takeSurface(SurfaceHolder.Callback callback) {
             }
         }

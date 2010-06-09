@@ -1147,6 +1147,9 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         public void togglePanel(int featureId, KeyEvent event) {
         }
 
+        public void invalidatePanelMenu(int featureId) {
+        }
+        
         public boolean performPanelShortcut(int featureId, int keyCode, KeyEvent event, int flags) {
             return true;
         }
