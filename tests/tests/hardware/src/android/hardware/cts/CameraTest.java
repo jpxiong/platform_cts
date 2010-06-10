@@ -266,10 +266,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void checkPreviewCallback() throws Exception {
-        SurfaceHolder mSurfaceHolder;
-
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         if (LOGV) Log.v(TAG, "check preview callback");
         mCamera.startPreview();
         waitForPreviewDone();
@@ -318,9 +315,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     public void testTakePicture() throws Exception {
         initializeMessageLooper();
         Size pictureSize = mCamera.getParameters().getPictureSize();
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
         assertTrue(waitForFocusDone());
@@ -414,14 +409,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     )
     @UiThreadTest
     public void testSetPreviewDisplay() throws Exception {
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
         initializeMessageLooper();
 
         // Check the order: startPreview->setPreviewDisplay.
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
         mCamera.startPreview();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
         assertTrue(mRawPreviewCallbackResult);
@@ -430,7 +424,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         initializeMessageLooper();
         mRawPreviewCallbackResult = false;
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
         waitForPreviewDone();
         mCamera.stopPreview();
@@ -442,7 +436,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
         mCamera.setPreviewDisplay(null);
         mCamera.startPreview();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
         assertTrue(mRawPreviewCallbackResult);
@@ -472,9 +466,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
 
         // Start preview.
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
 
         // Check setting orientation during preview is not allowed.
@@ -676,9 +668,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(sizes.contains(mCamera.new Size(0, 0)));
 
         // Test if the thumbnail size matches the setting.
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
@@ -707,9 +697,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     public void testJpegExif() throws Exception {
         initializeMessageLooper();
         Camera.Parameters parameters = mCamera.getParameters();
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         double focalLength = (double)parameters.getFocalLength();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
@@ -784,7 +772,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         initializeMessageLooper();
         Camera.Parameters parameters = mCamera.getParameters();
         SurfaceHolder surfaceHolder;
-        surfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        surfaceHolder = getActivity().getSurfaceView().getHolder();
         Size size = parameters.getPreviewSize();
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(surfaceHolder);
@@ -850,7 +838,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     public void testPreviewCallbackWithBuffer() throws Exception {
         initializeMessageLooper();
         SurfaceHolder surfaceHolder;
-        surfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
+        surfaceHolder = getActivity().getSurfaceView().getHolder();
         mCamera.setPreviewDisplay(surfaceHolder);
         Size size = mCamera.getParameters().getPreviewSize();
         PreviewCallbackWithBuffer callback = new PreviewCallbackWithBuffer();
@@ -942,9 +930,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 assertTrue(ratios.get(i) < ratios.get(i + 1));
             }
         }
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         waitForPreviewDone();
 
@@ -975,10 +961,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         if (!parameters.isSmoothZoomSupported()) return;
         assertTrue(parameters.isZoomSupported());
 
-        SurfaceHolder mSurfaceHolder;
-        mSurfaceHolder = CameraStubActivity.mSurfaceView.getHolder();
         ZoomListener zoomListener = new ZoomListener();
-        mCamera.setPreviewDisplay(mSurfaceHolder);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.setZoomChangeListener(zoomListener);
         mCamera.startPreview();
         waitForPreviewDone();
@@ -1066,7 +1050,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @UiThreadTest
     public void testFocusDistances() throws Exception {
         initializeMessageLooper();
-        mCamera.setPreviewDisplay(CameraStubActivity.mSurfaceView.getHolder());
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         waitForPreviewDone();
         Parameters parameters = mCamera.getParameters();
@@ -1131,4 +1115,67 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                          distances[Parameters.FOCUS_DISTANCE_FAR_INDEX]);
         }
     }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "cancelAutofocus",
+            args = {}
+        )
+    })
+    @UiThreadTest
+    public void testCancelAutofocus() throws Exception {
+        initializeMessageLooper();
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.startPreview();
+
+        // No op if autofocus is not in progress.
+        mCamera.cancelAutoFocus();
+
+        // Try to cancel autofocus immediately.
+        mCamera.autoFocus(mAutoFocusCallback);
+        mCamera.cancelAutoFocus();
+        checkFocusDistanceNotChanging();
+
+        // Try to cancel autofocus after it starts for some time.
+        mCamera.autoFocus(mAutoFocusCallback);
+        Thread.sleep(500);
+        mCamera.cancelAutoFocus();
+        checkFocusDistanceNotChanging();
+
+        // Try to cancel autofocus after it completes. It should be no op.
+        mCamera.autoFocus(mAutoFocusCallback);
+        assertTrue(waitForFocusDone());
+        mCamera.cancelAutoFocus();
+
+        // Test the case calling cancelAutoFocus and release in a row.
+        mCamera.autoFocus(mAutoFocusCallback);
+        mCamera.cancelAutoFocus();
+        mCamera.release();
+
+        // Ensure the camera can be opened if release is called right after AF.
+        mCamera = Camera.open();
+        mCamera.startPreview();
+        mCamera.autoFocus(mAutoFocusCallback);
+        mCamera.release();
+
+        terminateMessageLooper();
+    }
+
+    private void checkFocusDistanceNotChanging() throws Exception {
+        float[] distances1 = new float[3];
+        float[] distances2 = new float[3];
+        Parameters parameters = mCamera.getParameters();
+        parameters.getFocusDistances(distances1);
+        Thread.sleep(100);
+        parameters = mCamera.getParameters();
+        parameters.getFocusDistances(distances2);
+        assertEquals(distances1[Parameters.FOCUS_DISTANCE_NEAR_INDEX],
+                     distances2[Parameters.FOCUS_DISTANCE_NEAR_INDEX]);
+        assertEquals(distances1[Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX],
+                     distances2[Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX]);
+        assertEquals(distances1[Parameters.FOCUS_DISTANCE_FAR_INDEX],
+                     distances2[Parameters.FOCUS_DISTANCE_FAR_INDEX]);
+    }
+
 }
