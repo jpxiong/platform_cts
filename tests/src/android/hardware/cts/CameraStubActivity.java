@@ -24,9 +24,7 @@ import android.view.ViewGroup;
 import com.android.cts.stub.R;
 
 public class CameraStubActivity extends Activity {
-
-    public static SurfaceView mSurfaceView;
-
+    private SurfaceView mSurfaceView;
     private final int LAYOUT_WIDTH = 480;
     private final int LAYOUT_HEIGHT = 320;
 
@@ -42,5 +40,9 @@ public class CameraStubActivity extends Activity {
         mSurfaceView.setLayoutParams(lp);
         mSurfaceView.getHolder().setFixedSize(LAYOUT_WIDTH, LAYOUT_HEIGHT);
         mSurfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    public SurfaceView getSurfaceView() {
+        return mSurfaceView;
     }
 }
