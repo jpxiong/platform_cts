@@ -23,9 +23,12 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
+ifneq ($(TARGET_SIMULATOR),true)
 LOCAL_JNI_SHARED_LIBRARIES := libbuildtest
-
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
+else
+LOCAL_SRC_FILES := $(filter-out %BuildTest.java,$(call all-java-files-under, src))
+endif
 
 LOCAL_PACKAGE_NAME := CtsOsTestCases
 
@@ -36,5 +39,7 @@ LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
 include $(BUILD_PACKAGE)
 
+ifneq ($(TARGET_SIMULATOR),true)
 # Include the associated library's makefile.
 include $(LOCAL_PATH)/libbuildtest/Android.mk
+endif
