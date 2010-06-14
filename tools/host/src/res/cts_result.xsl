@@ -187,6 +187,16 @@
                                             </xsl:for-each>
                                         </TD>
                                     </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Root Processes</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/ProcessInfo/Process[@uid='0']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
                                 </TABLE>
                             </div>
                         </TD>
