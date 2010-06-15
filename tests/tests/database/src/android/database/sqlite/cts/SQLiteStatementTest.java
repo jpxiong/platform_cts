@@ -82,14 +82,15 @@ public class SQLiteStatementTest extends AndroidTestCase {
         c.moveToFirst();
         assertEquals(STRING1, c.getString(c.getColumnIndex("data")));
 
-        // invalid SQL statement
+        // if the sql statement is something that causes rows of data to
+        // be returned, execute() simply ignores data and
+        // doesn't throw an exception.
         statement = mDatabase.compileStatement(
                 "SELECT * FROM test WHERE data=\"" + STRING1 + "\"");
         try {
             statement.execute();
-            fail("There should be a SQLException thrown out.");
         } catch (SQLException e) {
-            // expected.
+            fail("exception not expected: " + e.getMessage());
         }
 
         c.deactivate();
@@ -125,14 +126,15 @@ public class SQLiteStatementTest extends AndroidTestCase {
         c.moveToFirst();
         assertEquals(STRING2, c.getString(c.getColumnIndex("data")));
 
-        // invalid SQL statement
+        // if the sql statement is something that causes rows of data to
+        // be returned, executeInsert() simply ignores data and
+        // doesn't throw an exception
         statement = mDatabase.compileStatement(
                 "SELECT * FROM test WHERE data=\"" + STRING2 + "\"");
         try {
             statement.executeInsert();
-            fail("There should be a SQLException thrown out.");
         } catch (SQLException e) {
-            // expected.
+            fail("exception not expected: " + e.getMessage());
         }
 
         c.deactivate();
