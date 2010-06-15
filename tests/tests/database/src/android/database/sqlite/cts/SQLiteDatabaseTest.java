@@ -39,7 +39,6 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Pair;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -1584,18 +1583,26 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         // can't set pool size to zero
         try {
             mDatabase.setConnectionPoolSize(0);
-            fail("IllegalStateException expected");
-        } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().contains("less than the current max value"));
+            fail("IllegalArgumentException expected");
+        } catch (IllegalArgumentException e) {
+            // expected
         }
-        // set pool size to a valid value
-        mDatabase.setConnectionPoolSize(10);
+        try {
+            // set pool size to a valid value
+            mDatabase.setConnectionPoolSize(10);
+        } catch (IllegalStateException e) {
+            fail("IllegalStateException NOT expected to be thrown");
+        } catch (IllegalArgumentException e) {
+            fail("IllegalArgumentException NOT expected to be thrown");
+        } catch (Exception e) {
+            fail("Exception NOT expected to be thrown");
+        }
         // can't set pool size to < the value above
         try {
             mDatabase.setConnectionPoolSize(1);
-            fail("IllegalStateException expected");
-        } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().contains("less than the current max value"));
+            fail("IllegalArgumentException expected");
+        } catch (IllegalArgumentException e) {
+            // expected
         }
     }
 
@@ -1606,14 +1613,14 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             args = {}
         )
     /**
-     * With sqlite's write-ahead-logging(WAL) enabled, readers get old version of data
+     * With sqlite's write-ahead-logging (WAL) enabled, readers get old version of data
      * from the table that a writer is modifying at the same time.
      * <p>
      * This method does the following to test this sqlite3 feature
      * <ol>
      *   <li>creates a table in the database and populates it with 5 rows of data</li>
      *   <li>do "select count(*) from this_table" and expect to receive 5</li>
-     *   <li>start a writer thread who BEGINs atransaciton, INSERTs a single row
+     *   <li>start a writer thread who BEGINs a transaction, INSERTs a single row
      *   into this_table</li>
      *   <li>writer stops the transaction at this point, kicks off a reader thread - which will
      *       do  the above SELECT query: "select count(*) from this_table"</li>
@@ -1669,7 +1676,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
 
             // now, have the writer do the select count(*)
             // it should execute on the same connection as this transaction
-            // and count(*) should refelct the newly inserted row
+            // and count(*) should reflect the newly inserted row
             Long l = DatabaseUtils.longForQuery(mDatabase, "select count(*) from t1", null);
             assertEquals(6, l.intValue());
 
@@ -1704,7 +1711,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             method = "enableWriteAheadLogging",
             args = {}
         )
-    public void testExceptionsFromExecQueriesInParallel() {
+    public void testExceptionsFromEnableWriteAheadLogging() {
         // attach a database
         // redo setup to create WAL enabled database
         mDatabase.close();
@@ -1719,7 +1726,6 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             fail("IllegalStateException expected to be thrown.");
         } catch (IllegalStateException e) {
             // expected
-            assertTrue(e.getMessage().contains("has attached databases"));
         }
     }
 }
