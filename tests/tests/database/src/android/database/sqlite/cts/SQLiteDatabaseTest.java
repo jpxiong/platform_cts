@@ -37,6 +37,9 @@ import android.database.sqlite.SQLiteStatement;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.SmallTest;
+import android.util.Pair;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -1567,5 +1570,156 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         cursor.moveToNext();
         assertEquals(1, cursor.getInt(0));
         assertEquals(2, cursor.getInt(1));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test setConnectionPoolSize",
+            method = "setConnectionPoolSize",
+            args = {java.lang.Integer.class}
+    )
+    @SmallTest
+    public void testSetConnectionPoolSize() {
+        mDatabase.enableWriteAheadLogging();
+        // can't set pool size to zero
+        try {
+            mDatabase.setConnectionPoolSize(0);
+            fail("IllegalStateException expected");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("less than the current max value"));
+        }
+        // set pool size to a valid value
+        mDatabase.setConnectionPoolSize(10);
+        // can't set pool size to < the value above
+        try {
+            mDatabase.setConnectionPoolSize(1);
+            fail("IllegalStateException expected");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("less than the current max value"));
+        }
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test enableWriteAheadLogging",
+            method = "enableWriteAheadLogging",
+            args = {}
+        )
+    /**
+     * With sqlite's write-ahead-logging(WAL) enabled, readers get old version of data
+     * from the table that a writer is modifying at the same time.
+     * <p>
+     * This method does the following to test this sqlite3 feature
+     * <ol>
+     *   <li>creates a table in the database and populates it with 5 rows of data</li>
+     *   <li>do "select count(*) from this_table" and expect to receive 5</li>
+     *   <li>start a writer thread who BEGINs atransaciton, INSERTs a single row
+     *   into this_table</li>
+     *   <li>writer stops the transaction at this point, kicks off a reader thread - which will
+     *       do  the above SELECT query: "select count(*) from this_table"</li>
+     *   <li>this query should return value 5 - because writer is still in transaction and
+     *    sqlite returns OLD version of the data</li>
+     *   <li>writer ends the transaction, thus making the extra row now visible to everyone</li>
+     *   <li>reader is kicked off again to do the same query. this time query should
+     *   return value = 6 which includes the newly inserted row into this_table.</li>
+     *</p>
+     * @throws InterruptedException
+     */
+    @LargeTest
+    public void testReaderGetsOldVersionOfDataWhenWriterIsInXact() throws InterruptedException {
+        // redo setup to create WAL enabled database
+        mDatabase.close();
+        new File(mDatabase.getPath()).delete();
+        mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile.getPath(), null, null);
+        mDatabase.enableWriteAheadLogging();
+        assertNotNull(mDatabase);
+
+        // create a new table and insert 5 records into it.
+        mDatabase.execSQL("CREATE TABLE t1 (i int, j int);");
+        mDatabase.beginTransaction();
+        for (int i = 0; i < 5; i++) {
+            mDatabase.execSQL("insert into t1 values(?,?);", new String[] {i+"", i+""});
+        }
+        mDatabase.setTransactionSuccessful();
+        mDatabase.endTransaction();
+
+        // make sure a reader can read the above data
+        ReaderQueryingData r1 = new ReaderQueryingData(5);
+        r1.start();
+        Thread.yield();
+        try {r1.join();} catch (Exception e) {}
+
+        WriterDoingSingleTransaction w = new WriterDoingSingleTransaction();
+        w.start();
+        w.join();
+    }
+
+    private class WriterDoingSingleTransaction extends Thread {
+        @Override public void run() {
+            // start a transaction
+            mDatabase.beginTransactionNonExclusive();
+            mDatabase.execSQL("insert into t1 values(?,?);", new String[] {"11", "11"});
+            assertTrue(mDatabase.isOpen());
+
+            // while the writer is in a transaction, start a reader and make sure it can still
+            // read 5 rows of data (= old data prior to the current transaction)
+            ReaderQueryingData r1 = new ReaderQueryingData(5);
+            r1.start();
+            try {r1.join();} catch (Exception e) {}
+
+            // now, have the writer do the select count(*)
+            // it should execute on the same connection as this transaction
+            // and count(*) should refelct the newly inserted row
+            Long l = DatabaseUtils.longForQuery(mDatabase, "select count(*) from t1", null);
+            assertEquals(6, l.intValue());
+
+            // end transaction
+            mDatabase.setTransactionSuccessful();
+            mDatabase.endTransaction();
+
+            // reader should now be able to read 6 rows = new data AFTER this transaction
+            r1 = new ReaderQueryingData(6);
+            r1.start();
+            try {r1.join();} catch (Exception e) {}
+        }
+    }
+
+    private class ReaderQueryingData extends Thread {
+        private int count;
+        /**
+         * constructor with a param to indicate the number of rows expected to be read
+         */
+        public ReaderQueryingData(int count) {
+            this.count = count;
+        }
+        @Override public void run() {
+            Long l = DatabaseUtils.longForQuery(mDatabase, "select count(*) from t1", null);
+            assertEquals(count, l.intValue());
+        }
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            notes = "test exceptions from enableWriteAheadLogging().",
+            method = "enableWriteAheadLogging",
+            args = {}
+        )
+    public void testExceptionsFromExecQueriesInParallel() {
+        // attach a database
+        // redo setup to create WAL enabled database
+        mDatabase.close();
+        new File(mDatabase.getPath()).delete();
+        mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile.getPath(), null, null);
+
+        // attach a database
+        mDatabase.execSQL("attach database ':memory:' as memoryDb");
+
+        try {
+            mDatabase.enableWriteAheadLogging();
+            fail("IllegalStateException expected to be thrown.");
+        } catch (IllegalStateException e) {
+            // expected
+            assertTrue(e.getMessage().contains("has attached databases"));
+        }
     }
 }
