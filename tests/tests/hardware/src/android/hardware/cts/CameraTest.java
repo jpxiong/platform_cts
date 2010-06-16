@@ -16,7 +16,6 @@
 
 package android.hardware.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -29,7 +28,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.media.ExifInterface;
@@ -62,7 +60,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             "/test.jpg";
     private byte[] mJpegData;
 
-    private boolean mRawPreviewCallbackResult = false;
+    private boolean mPreviewCallbackResult = false;
     private boolean mShutterCallbackResult = false;
     private boolean mRawPictureCallbackResult = false;
     private boolean mJpegPictureCallbackResult = false;
@@ -73,7 +71,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
     private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 5000;
 
-    private RawPreviewCallback mRawPreviewCallback = new RawPreviewCallback();
+    private PreviewCallback mPreviewCallback = new PreviewCallback();
     private TestShutterCallback mShutterCallback = new TestShutterCallback();
     private RawPictureCallback mRawPictureCallback = new RawPictureCallback();
     private JpegPictureCallback mJpegPictureCallback = new JpegPictureCallback();
@@ -154,18 +152,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     //Implement the previewCallback
-    private final class RawPreviewCallback implements PreviewCallback {
-        public void onPreviewFrame(byte [] rawData, Camera camera) {
-            if (LOGV) Log.v(TAG, "Preview callback start");
-            int rawDataLength = 0;
-            if (rawData != null) {
-                rawDataLength = rawData.length;
-            }
-            if (rawDataLength > 0) {
-                mRawPreviewCallbackResult = true;
-            } else {
-                mRawPreviewCallbackResult = false;
-            }
+    private final class PreviewCallback
+            implements android.hardware.Camera.PreviewCallback {
+        public void onPreviewFrame(byte [] data, Camera camera) {
+            assertNotNull(data);
+            Size size = camera.getParameters().getPreviewSize();
+            assertEquals(size.width * size.height * 3 / 2, data.length);
+            mPreviewCallbackResult = true;
             mCamera.stopPreview();
             if (LOGV) Log.v(TAG, "notify the preview callback");
             mPreviewDone.open();
@@ -331,10 +324,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(pictureSize.height, b.getHeight());
     }
 
-    /*
-     * Test case 2: Set the preview and
-     * verify the RawPreviewCallback is called
-     */
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -373,13 +362,34 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         )
     })
     @UiThreadTest
-    public void testCheckPreview() throws Exception {
+    public void testPreviewCallback() throws Exception {
         initializeMessageLooper();
-        mCamera.setPreviewCallback(mRawPreviewCallback);
+        mCamera.setPreviewCallback(mPreviewCallback);
         mCamera.setErrorCallback(mErrorCallback);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertTrue(mRawPreviewCallbackResult);
+        assertTrue(mPreviewCallbackResult);
+
+        mPreviewCallbackResult = false;
+        initializeMessageLooper();
+        checkPreviewCallback();
+        terminateMessageLooper();
+        assertFalse(mPreviewCallbackResult);
+
+        // Test all preview sizes.
+        initializeMessageLooper();
+        Parameters parameters = mCamera.getParameters();
+        for (Size size: parameters.getSupportedPreviewSizes()) {
+            mPreviewCallbackResult = false;
+            mCamera.setPreviewCallback(mPreviewCallback);
+            parameters.setPreviewSize(size.width, size.height);
+            mCamera.setParameters(parameters);
+            mCamera.startPreview();
+            waitForPreviewDone();
+            assertTrue(mPreviewCallbackResult);
+            mCamera.stopPreview();
+        }
+        terminateMessageLooper();
     }
 
     @TestTargetNew(
@@ -390,16 +400,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @UiThreadTest
     public void testSetOneShotPreviewCallback() throws Exception {
         initializeMessageLooper();
-        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mCamera.setOneShotPreviewCallback(mPreviewCallback);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertTrue(mRawPreviewCallbackResult);
+        assertTrue(mPreviewCallbackResult);
 
-        mRawPreviewCallbackResult = false;
+        mPreviewCallbackResult = false;
         initializeMessageLooper();
         checkPreviewCallback();
         terminateMessageLooper();
-        assertFalse(mRawPreviewCallbackResult);
+        assertFalse(mPreviewCallbackResult);
     }
 
     @TestTargetNew(
@@ -413,33 +423,33 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         initializeMessageLooper();
 
         // Check the order: startPreview->setPreviewDisplay.
-        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mCamera.setOneShotPreviewCallback(mPreviewCallback);
         mCamera.startPreview();
         mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
-        assertTrue(mRawPreviewCallbackResult);
+        assertTrue(mPreviewCallbackResult);
 
         // Check the order: setPreviewDisplay->startPreview.
         initializeMessageLooper();
-        mRawPreviewCallbackResult = false;
-        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mPreviewCallbackResult = false;
+        mCamera.setOneShotPreviewCallback(mPreviewCallback);
         mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
         waitForPreviewDone();
         mCamera.stopPreview();
-        assertTrue(mRawPreviewCallbackResult);
+        assertTrue(mPreviewCallbackResult);
 
         // Check the order: setting preview display to null->startPreview->
         // setPreviewDisplay.
-        mRawPreviewCallbackResult = false;
-        mCamera.setOneShotPreviewCallback(mRawPreviewCallback);
+        mPreviewCallbackResult = false;
+        mCamera.setOneShotPreviewCallback(mPreviewCallback);
         mCamera.setPreviewDisplay(null);
         mCamera.startPreview();
         mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
-        assertTrue(mRawPreviewCallbackResult);
+        assertTrue(mPreviewCallbackResult);
     }
 
     @TestTargetNew(
@@ -840,33 +850,43 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         SurfaceHolder surfaceHolder;
         surfaceHolder = getActivity().getSurfaceView().getHolder();
         mCamera.setPreviewDisplay(surfaceHolder);
-        Size size = mCamera.getParameters().getPreviewSize();
+        Parameters parameters = mCamera.getParameters();
         PreviewCallbackWithBuffer callback = new PreviewCallbackWithBuffer();
-        callback.mBuffer1 = new byte[size.width * size.height * 3 / 2 + 1];
-        callback.mBuffer2 = new byte[size.width * size.height * 3 / 2 + 1];
-        callback.mBuffer3 = new byte[size.width * size.height * 3 / 2 + 1];
+        // Test all preview sizes.
+        for (Size size: parameters.getSupportedPreviewSizes()) {
+            parameters.setPreviewSize(size.width, size.height);
+            mCamera.setParameters(parameters);
+            callback.mNumCbWithBuffer1 = 0;
+            callback.mNumCbWithBuffer2 = 0;
+            callback.mNumCbWithBuffer3 = 0;
+            callback.mBuffer1 = new byte[size.width * size.height * 3 / 2];
+            callback.mBuffer2 = new byte[size.width * size.height * 3 / 2];
+            callback.mBuffer3 = new byte[size.width * size.height * 3 / 2];
 
-        // Test if we can get the preview callbacks with specified buffers.
-        mCamera.addCallbackBuffer(callback.mBuffer1);
-        mCamera.addCallbackBuffer(callback.mBuffer2);
-        mCamera.setPreviewCallbackWithBuffer(callback);
-        mCamera.startPreview();
-        waitForPreviewDone();
-        assertEquals(1, callback.mNumCbWithBuffer1);
-        assertEquals(1, callback.mNumCbWithBuffer2);
-        assertEquals(0, callback.mNumCbWithBuffer3);
+            // Test if we can get the preview callbacks with specified buffers.
+            mCamera.addCallbackBuffer(callback.mBuffer1);
+            mCamera.addCallbackBuffer(callback.mBuffer2);
+            mCamera.setPreviewCallbackWithBuffer(callback);
+            mCamera.startPreview();
+            waitForPreviewDone();
+            assertEquals(1, callback.mNumCbWithBuffer1);
+            assertEquals(1, callback.mNumCbWithBuffer2);
+            assertEquals(0, callback.mNumCbWithBuffer3);
 
-        // Test if preview callback with buffer still works during preview.
-        callback.mNumCbWithBuffer1 = callback.mNumCbWithBuffer2 = 0;
-        mCamera.addCallbackBuffer(callback.mBuffer3);
-        waitForPreviewDone();
-        assertEquals(0, callback.mNumCbWithBuffer1);
-        assertEquals(0, callback.mNumCbWithBuffer2);
-        assertEquals(1, callback.mNumCbWithBuffer3);
+            // Test if preview callback with buffer still works during preview.
+            mCamera.addCallbackBuffer(callback.mBuffer3);
+            waitForPreviewDone();
+            assertEquals(1, callback.mNumCbWithBuffer1);
+            assertEquals(1, callback.mNumCbWithBuffer2);
+            assertEquals(1, callback.mNumCbWithBuffer3);
+            mCamera.setPreviewCallbackWithBuffer(null);
+            mCamera.stopPreview();
+        }
         terminateMessageLooper();
     }
 
-    private final class PreviewCallbackWithBuffer implements PreviewCallback {
+    private final class PreviewCallbackWithBuffer
+            implements android.hardware.Camera.PreviewCallback {
         public int mNumCbWithBuffer1, mNumCbWithBuffer2, mNumCbWithBuffer3;
         public byte[] mBuffer1, mBuffer2, mBuffer3;
         public void onPreviewFrame(byte[] data, Camera camera) {
