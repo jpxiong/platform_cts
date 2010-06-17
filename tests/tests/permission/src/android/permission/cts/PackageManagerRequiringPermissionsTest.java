@@ -53,36 +53,6 @@ public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that PackageManager.addPackageToPreferred requires permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#SET_PREFERRED_APPLICATIONS}.
-     */
-    public void testAddPackageToPreferred() {
-        try {
-            mPackageManager.addPackageToPreferred(null);
-            fail("PackageManager.addPackageToPreferred did not throw SecurityException as"
-                    + " expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that PackageManager.removePackageFromPreferred requires permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#SET_PREFERRED_APPLICATIONS}.
-     */
-    public void testRemovePackageFromPreferred() {
-        try {
-            mPackageManager.removePackageFromPreferred(null);
-            fail("PackageManager.removePackageFromPreferred did not throw SecurityException as"
-                    + "expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
      * Verify that PackageManager.addPreferredActivity requires permission.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#SET_PREFERRED_APPLICATIONS}.
