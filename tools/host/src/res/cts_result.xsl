@@ -170,7 +170,7 @@
                                     <TR>
                                         <TD class="rowtitle">Features</TD>
                                         <TD>
-                                            <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature">
+                                            <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
                                                 <xsl:text>[</xsl:text>
                                                 <xsl:choose>
                                                     <xsl:when test="@available = 'true'">
@@ -185,6 +185,16 @@
                                                 <xsl:value-of select="@name" />
                                                 <br />
                                             </xsl:for-each>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Other Features</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='other']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
                                         </TD>
                                     </TR>
                                     <TR>

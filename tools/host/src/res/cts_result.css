@@ -66,6 +66,7 @@ table {
     border-color: gray;
     border-style: inset;
     font-size:1em;
+    vertical-align: top;
 }
 
 #summaryinfo table {

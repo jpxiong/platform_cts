@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DeviceInfoInstrument extends Instrumentation {
 
@@ -182,18 +185,33 @@ public class DeviceInfoInstrument extends Instrumentation {
 
     /**
      * Return a summary of the device's feature as a semi-colon-delimited list of colon separated
-     * name and availability pairs like "feature1:true;feature2:false;feature3;true".
+     * name and availability pairs like "feature1:sdk:true;feature2:sdk:false;feature3:other:true;".
      */
     private String getFeatures() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder features = new StringBuilder();
+
+        Set<String> checkedFeatures = new HashSet<String>();
 
         PackageManager packageManager = getContext().getPackageManager();
-        for (String feature : FEATURES_TO_CHECK) {
-            boolean hasFeature = packageManager.hasSystemFeature(feature);
-            builder.append(feature).append(':').append(hasFeature).append(';');
+        for (String featureName : FEATURES_TO_CHECK) {
+            checkedFeatures.add(featureName);
+            boolean hasFeature = packageManager.hasSystemFeature(featureName);
+            addFeature(features, featureName, "sdk", hasFeature);
         }
 
-        return builder.toString();
+        FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
+        for (FeatureInfo featureInfo : featureInfos) {
+            if (featureInfo.name != null && !checkedFeatures.contains(featureInfo.name)) {
+                addFeature(features, featureInfo.name, "other", true);
+            }
+        }
+
+        return features.toString();
+    }
+
+    private static void addFeature(StringBuilder features, String name, String type,
+            boolean available) {
+        features.append(name).append(':').append(type).append(':').append(available).append(';');
     }
 
     /**

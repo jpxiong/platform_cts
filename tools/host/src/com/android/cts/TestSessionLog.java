@@ -70,6 +70,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_ARCH = "arch";
     static final String ATTRIBUTE_VALUE = "value";
     static final String ATTRIBUTE_AVAILABLE = "available";
+    static final String ATTRIBUTE_TYPE = "type";
     static final String ATTRIBUTE_UID = "uid";
 
     static final String ATTRIBUTE_PASS = "pass";
@@ -424,9 +425,10 @@ public class TestSessionLog extends XMLResourceHandler {
             Node feature = document.createElement(TAG_FEATURE);
             featureInfo.appendChild(feature);
 
-            String[] nameAndAvailability = featurePair.split(":");
-            setAttribute(document, feature, ATTRIBUTE_NAME, nameAndAvailability[0]);
-            setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameAndAvailability[1]);
+            String[] nameTypeAvailability = featurePair.split(":");
+            setAttribute(document, feature, ATTRIBUTE_NAME, nameTypeAvailability[0]);
+            setAttribute(document, feature, ATTRIBUTE_TYPE, nameTypeAvailability[1]);
+            setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameTypeAvailability[2]);
         }
     }
 
