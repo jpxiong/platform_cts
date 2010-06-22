@@ -70,6 +70,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_ARCH = "arch";
     static final String ATTRIBUTE_VALUE = "value";
     static final String ATTRIBUTE_AVAILABLE = "available";
+    static final String ATTRIBUTE_UID = "uid";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -87,6 +88,8 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_BUILD_INFO = "BuildInfo";
     static final String TAG_FEATURE_INFO = "FeatureInfo";
     static final String TAG_FEATURE = "Feature";
+    static final String TAG_PROCESS_INFO = "ProcessInfo";
+    static final String TAG_PROCESS = "Process";
     static final String TAG_PHONE_SUB_INFO = "PhoneSubInfo";
     static final String TAG_TEST_RESULT = "TestResult";
     static final String TAG_TESTPACKAGE = "TestPackage";
@@ -328,6 +331,7 @@ public class TestSessionLog extends XMLResourceHandler {
                 deviceSettingNode.appendChild(devInfoNode);
 
                 addFeatureInfo(doc, deviceSettingNode, bldInfo);
+                addProcessInfo(doc, deviceSettingNode, bldInfo);
             }
 
             Node hostInfo = doc.createElement(TAG_HOSTINFO);
@@ -423,6 +427,46 @@ public class TestSessionLog extends XMLResourceHandler {
             String[] nameAndAvailability = featurePair.split(":");
             setAttribute(document, feature, ATTRIBUTE_NAME, nameAndAvailability[0]);
             setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameAndAvailability[1]);
+        }
+    }
+
+    /**
+     * Creates a {@link #TAG_PROCESS_INFO} tag with {@link #TAG_PROCESS} elements indicating
+     * what particular processes of interest were running on the device. It parses a string from
+     * the deviceInfo argument that is in the form of "processName1;processName2;..." with a
+     * trailing semi-colon.
+     *
+     * <pre>
+     *   <ProcessInfo>
+     *     <Process name="long_cat_viewer" uid="0" />
+     *     ...
+     *   </ProcessInfo>
+     * </pre>
+     *
+     * @param document
+     * @param parentNode
+     * @param deviceInfo
+     */
+    private void addProcessInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        Node processInfo = document.createElement(TAG_PROCESS_INFO);
+        parentNode.appendChild(processInfo);
+
+        String rootProcesses = deviceInfo.getProcesses();
+        if (rootProcesses == null) {
+            rootProcesses = "";
+        }
+
+        String[] processNames = rootProcesses.split(";");
+        for (String processName : processNames) {
+            processName = processName.trim();
+            if (processName.length() > 0) {
+                Node process = document.createElement(TAG_PROCESS);
+                processInfo.appendChild(process);
+
+                setAttribute(document, process, ATTRIBUTE_NAME, processName);
+                setAttribute(document, process, ATTRIBUTE_UID, "0");
+            }
         }
     }
 

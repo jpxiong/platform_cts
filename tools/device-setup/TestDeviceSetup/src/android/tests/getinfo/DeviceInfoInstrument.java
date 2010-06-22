@@ -24,9 +24,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.tests.getinfo.RootProcessScanner.MalformedStatMException;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
+
+import java.io.FileNotFoundException;
 
 public class DeviceInfoInstrument extends Instrumentation {
 
@@ -44,6 +47,7 @@ public class DeviceInfoInstrument extends Instrumentation {
         PackageManager.FEATURE_LIVE_WALLPAPER,
     };
 
+    private static final String PROCESSES = "processes";
     private static final String FEATURES = "features";
     private static final String PHONE_NUMBER = "phoneNumber";
     public static final String LOCALES = "locales";
@@ -139,6 +143,10 @@ public class DeviceInfoInstrument extends Instrumentation {
         String features = getFeatures();
         addResult(FEATURES, features);
 
+        // processes
+        String processes = getProcesses();
+        addResult(PROCESSES, processes);
+
         finish(Activity.RESULT_OK, mResults);
     }
 
@@ -183,6 +191,27 @@ public class DeviceInfoInstrument extends Instrumentation {
         for (String feature : FEATURES_TO_CHECK) {
             boolean hasFeature = packageManager.hasSystemFeature(feature);
             builder.append(feature).append(':').append(hasFeature).append(';');
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Return a semi-colon-delimited list of the root processes that were running on the phone
+     * or an error message.
+     */
+    private static String getProcesses() {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            String[] rootProcesses = RootProcessScanner.getRootProcesses();
+            for (String rootProcess : rootProcesses) {
+                builder.append(rootProcess).append(';');
+            }
+        } catch (FileNotFoundException notFound) {
+            builder.append(notFound.getMessage());
+        } catch (MalformedStatMException malformedStatM) {
+            builder.append(malformedStatM.getMessage());
         }
 
         return builder.toString();

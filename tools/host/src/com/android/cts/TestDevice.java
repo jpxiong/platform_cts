@@ -417,6 +417,7 @@ public class TestDevice implements DeviceObserver {
         public static final String IMSI = "imsi";
         public static final String PHONE_NUMBER = "phoneNumber";
         public static final String FEATURES = "features";
+        public static final String PROCESSES = "processes";
 
         private HashMap<String, String> mInfoMap;
 
@@ -756,6 +757,15 @@ public class TestDevice implements DeviceObserver {
          */
         public String getFeatures() {
             return mInfoMap.get(FEATURES);
+        }
+
+        /**
+         * Get processes.
+         *
+         * @return Processes.
+         */
+        public String getProcesses() {
+            return mInfoMap.get(PROCESSES);
         }
     }
 
