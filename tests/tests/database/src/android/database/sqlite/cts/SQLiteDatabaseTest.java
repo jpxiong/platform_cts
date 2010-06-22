@@ -1579,7 +1579,8 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
     )
     @SmallTest
     public void testSetConnectionPoolSize() {
-        mDatabase.enableWriteAheadLogging();
+        boolean rslt = mDatabase.enableWriteAheadLogging();
+        assertTrue(rslt);
         // can't set pool size to zero
         try {
             mDatabase.setConnectionPoolSize(0);
@@ -1638,7 +1639,8 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         mDatabase.close();
         new File(mDatabase.getPath()).delete();
         mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile.getPath(), null, null);
-        mDatabase.enableWriteAheadLogging();
+        boolean rslt = mDatabase.enableWriteAheadLogging();
+        assertTrue(rslt);
         assertNotNull(mDatabase);
 
         // create a new table and insert 5 records into it.
@@ -1718,14 +1720,14 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         new File(mDatabase.getPath()).delete();
         mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFile.getPath(), null, null);
 
-        // attach a database
+        // attach a database and call enableWriteAheadLogging - should not be allowed
         mDatabase.execSQL("attach database ':memory:' as memoryDb");
-
-        try {
-            mDatabase.enableWriteAheadLogging();
-            fail("IllegalStateException expected to be thrown.");
-        } catch (IllegalStateException e) {
-            // expected
-        }
+        boolean rslt = mDatabase.enableWriteAheadLogging();
+        assertFalse(rslt);
+        // enableWriteAheadLogging on memory database is not allowed
+        SQLiteDatabase db = SQLiteDatabase.create(null);
+        rslt = db.enableWriteAheadLogging();
+        assertFalse(rslt);
+        db.close();
     }
 }
