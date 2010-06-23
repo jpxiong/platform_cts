@@ -39,6 +39,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.Gravity;
+import android.view.InputConsumer;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -1250,6 +1251,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         
         @Override
         public void takeSurface(SurfaceHolder.Callback callback) {
+        }
+        
+        @Override
+        public void takeInputChannel(InputConsumer.Callback callback) {
         }
     }
 

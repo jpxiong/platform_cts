@@ -36,6 +36,7 @@ import android.os.Debug;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
+import android.view.InputConsumer;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -963,6 +964,10 @@ public class InstrumentationTest extends InstrumentationTestCase {
             
             @Override
             public void takeSurface(SurfaceHolder.Callback callback) {
+            }
+            
+            @Override
+            public void takeInputChannel(InputConsumer.Callback callback) {
             }
         }
     }
