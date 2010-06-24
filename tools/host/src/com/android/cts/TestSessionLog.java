@@ -420,15 +420,21 @@ public class TestSessionLog extends XMLResourceHandler {
         parentNode.appendChild(featureInfo);
 
         String features = deviceInfo.getFeatures();
+        if (features == null) {
+            features = "";
+        }
+
         String[] featurePairs = features.split(";");
         for (String featurePair : featurePairs) {
-            Node feature = document.createElement(TAG_FEATURE);
-            featureInfo.appendChild(feature);
-
             String[] nameTypeAvailability = featurePair.split(":");
-            setAttribute(document, feature, ATTRIBUTE_NAME, nameTypeAvailability[0]);
-            setAttribute(document, feature, ATTRIBUTE_TYPE, nameTypeAvailability[1]);
-            setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameTypeAvailability[2]);
+            if (nameTypeAvailability.length >= 3) {
+                Node feature = document.createElement(TAG_FEATURE);
+                featureInfo.appendChild(feature);
+
+                setAttribute(document, feature, ATTRIBUTE_NAME, nameTypeAvailability[0]);
+                setAttribute(document, feature, ATTRIBUTE_TYPE, nameTypeAvailability[1]);
+                setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameTypeAvailability[2]);
+            }
         }
     }
 

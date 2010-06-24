@@ -25,30 +25,20 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.tests.getinfo.RootProcessScanner.MalformedStatMException;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DeviceInfoInstrument extends Instrumentation {
 
-    // Should use XML files in frameworks/base/data/etc to generate dynamically.
-    private static final String[] FEATURES_TO_CHECK = {
-        PackageManager.FEATURE_CAMERA,
-        PackageManager.FEATURE_CAMERA_AUTOFOCUS,
-        PackageManager.FEATURE_CAMERA_FLASH,
-        PackageManager.FEATURE_SENSOR_LIGHT,
-        PackageManager.FEATURE_SENSOR_PROXIMITY,
-        PackageManager.FEATURE_TELEPHONY,
-        PackageManager.FEATURE_TELEPHONY_CDMA,
-        PackageManager.FEATURE_TELEPHONY_GSM,
-        PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH,
-        PackageManager.FEATURE_LIVE_WALLPAPER,
-    };
+    private static final String TAG = "DeviceInfoInstrument";
 
     private static final String PROCESSES = "processes";
     private static final String FEATURES = "features";
@@ -190,20 +180,26 @@ public class DeviceInfoInstrument extends Instrumentation {
     private String getFeatures() {
         StringBuilder features = new StringBuilder();
 
-        Set<String> checkedFeatures = new HashSet<String>();
+        try {
+            Set<String> checkedFeatures = new HashSet<String>();
 
-        PackageManager packageManager = getContext().getPackageManager();
-        for (String featureName : FEATURES_TO_CHECK) {
-            checkedFeatures.add(featureName);
-            boolean hasFeature = packageManager.hasSystemFeature(featureName);
-            addFeature(features, featureName, "sdk", hasFeature);
-        }
-
-        FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
-        for (FeatureInfo featureInfo : featureInfos) {
-            if (featureInfo.name != null && !checkedFeatures.contains(featureInfo.name)) {
-                addFeature(features, featureInfo.name, "other", true);
+            PackageManager packageManager = getContext().getPackageManager();
+            for (String featureName : getPackageManagerFeatures()) {
+                checkedFeatures.add(featureName);
+                boolean hasFeature = packageManager.hasSystemFeature(featureName);
+                addFeature(features, featureName, "sdk", hasFeature);
             }
+
+            FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
+            if (featureInfos != null) {
+                for (FeatureInfo featureInfo : featureInfos) {
+                    if (featureInfo.name != null && !checkedFeatures.contains(featureInfo.name)) {
+                        addFeature(features, featureInfo.name, "other", true);
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            Log.e(TAG, "Error getting features: " + exception.getMessage(), exception);
         }
 
         return features.toString();
@@ -212,6 +208,29 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static void addFeature(StringBuilder features, String name, String type,
             boolean available) {
         features.append(name).append(':').append(type).append(':').append(available).append(';');
+    }
+
+    /**
+     * Use reflection to get the features defined by the SDK. If there are features that do not fit
+     * the convention of starting with "FEATURE_" then they will still be shown under the
+     * "Other Features" section.
+     *
+     * @return list of feature names from sdk
+     */
+    private List<String> getPackageManagerFeatures() {
+        try {
+            List<String> features = new ArrayList<String>();
+            Field[] fields = PackageManager.class.getFields();
+            for (Field field : fields) {
+                if (field.getName().startsWith("FEATURE_")) {
+                    String feature = (String) field.get(null);
+                    features.add(feature);
+                }
+            }
+            return features;
+        } catch (IllegalAccessException illegalAccess) {
+            throw new RuntimeException(illegalAccess);
+        }
     }
 
     /**
@@ -226,10 +245,9 @@ public class DeviceInfoInstrument extends Instrumentation {
             for (String rootProcess : rootProcesses) {
                 builder.append(rootProcess).append(';');
             }
-        } catch (FileNotFoundException notFound) {
-            builder.append(notFound.getMessage());
-        } catch (MalformedStatMException malformedStatM) {
-            builder.append(malformedStatM.getMessage());
+        } catch (Exception exception) {
+            Log.e(TAG, "Error getting processes: " + exception.getMessage(), exception);
+            builder.append(exception.getMessage());
         }
 
         return builder.toString();
