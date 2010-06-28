@@ -488,5 +488,13 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(1, mMotionEvent2.getHistorySize());
 
         mMotionEvent2.recycle();
+        
+        try {
+            mMotionEvent2.recycle();
+            fail("recycle() should throw an exception when the event has already been recycled.");
+        } catch (RuntimeException ex) {
+        }
+        
+        mMotionEvent2 = null; // since it was recycled, don't try to recycle again in tear down
     }
 }
