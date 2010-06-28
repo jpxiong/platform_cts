@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
@@ -1198,4 +1199,64 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                      distances2[Parameters.FOCUS_DISTANCE_FAR_INDEX]);
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getNumberOfCameras",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCameraInfo",
+            args = {int.class, CameraInfo.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "open",
+            args = {int.class}
+        )
+    })
+    @UiThreadTest
+    public void testMultipleCameras() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        Log.v(TAG, "total " + nCameras + " cameras");
+        assertTrue(nCameras > 0);
+
+        for (int id = -1; id <= nCameras; id++) {
+            Log.v(TAG, "testing camera #" + id);
+
+            boolean isBadId = (id < 0 || id >= nCameras);
+
+            CameraInfo info = new CameraInfo();
+            try {
+                Camera.getCameraInfo(id, info);
+                if (isBadId) {
+                    fail("getCameraInfo should not accept bad cameraId (" + id + ")");
+                }
+            } catch (RuntimeException e) {
+                if (!isBadId) throw e;
+            }
+
+            int facing = info.mFacing;
+            int orientation = info.mOrientation;
+            assertTrue(facing == CameraInfo.CAMERA_FACING_BACK ||
+                       facing == CameraInfo.CAMERA_FACING_FRONT);
+            assertTrue(orientation == 0 || orientation == 90 ||
+                       orientation == 180 || orientation == 270);
+
+            Camera camera = null;
+            try {
+                camera = Camera.open(id);
+                if (isBadId) {
+                    fail("open() should not accept bad cameraId (" + id + ")");
+                }
+            } catch (RuntimeException e) {
+                if (!isBadId) throw e;
+            } finally {
+                if (camera != null) {
+                    camera.release();
+                }
+            }
+        }
+    }
 }
