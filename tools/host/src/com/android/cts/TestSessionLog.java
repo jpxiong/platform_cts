@@ -523,7 +523,7 @@ public class TestSessionLog extends XMLResourceHandler {
                     testNode.appendChild(failedMessageNode);
                     setAttribute(doc, failedMessageNode,TAG_FAILED_MESSAGE, failedMessage);
 
-                    String stackTrace = result.getStackTrace();
+                    String stackTrace = sanitizeStackTrace(result.getStackTrace());
                     if (stackTrace != null) {
                         Node stackTraceNode = doc.createElement(TAG_STACK_TRACE);
                         failedMessageNode.appendChild(stackTraceNode);
@@ -539,6 +539,18 @@ public class TestSessionLog extends XMLResourceHandler {
             parentNode.appendChild(testSuiteNode);
         }
         parentNode.appendChild(testSuiteNode);
+    }
+
+    /**
+     * Strip out any invalid XML characters that might cause the report to be unviewable.
+     * http://www.w3.org/TR/REC-xml/#dt-character
+     */
+    private static String sanitizeStackTrace(String trace) {
+        if (trace != null) {
+            return trace.replaceAll("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD]", "");
+        } else {
+            return null;
+        }
     }
 
     /**
