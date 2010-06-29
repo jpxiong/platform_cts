@@ -242,16 +242,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "getDatabase",
-        args = {}
-    )
-    public void testGetDatabase() {
-        SQLiteCursor cursor = getCursor();
-        assertSame(mDatabase, cursor.getDatabase());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "setSelectionArguments",
         args = {java.lang.String[].class}
     )

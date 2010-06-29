@@ -750,7 +750,17 @@ public class CursorWrapperTest extends DatabaseCursorTest {
 
     private void setupDatabase() {
         File dbDir = getContext().getDir("tests", Context.MODE_PRIVATE);
-        mDatabaseFile = new File(dbDir, "database_test.db");
+        /* don't use the same database name as the one in super class
+         * this class's setUp() method deletes a database file just opened by super.setUp().
+         * that can cause corruption in database in the following situation:
+         *    super.setUp() creates the database, inserts some data into it.
+         *    this class setUp() deletes just the database file but not the associated
+         *    database files such as wal, shm files.
+         * solution is to have this class delete the whole database directory.
+         * better yet, this class shouldn't extend DatabaseCursortest at all.
+         * TODO: fix this bogus cts class hierarchy
+         */
+        mDatabaseFile = new File(dbDir, "cursor_test.db");
         if (mDatabaseFile.exists()) {
             mDatabaseFile.delete();
         }
