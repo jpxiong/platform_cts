@@ -451,16 +451,9 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         method = "getUpdatedField",
         args = {int.class}
     )
-    @ToBeFixed(bug = "1569265", explanation = "All other updating-related methods are 'hide' and "
-        + "'deprecated.")
     public void testGetUpdatedField() {
         mTestAbstractCursor.moveToFirst();
-        try {
-            assertEquals("hello", mTestAbstractCursor.getUpdatedField(0));
-            fail("getUpdatedField should throws a NullPointerException here.");
-        } catch (NullPointerException e) {
-            // expected
-        }
+        assertNull(mTestAbstractCursor.getUpdatedField(0));
     }
 
     @TestTargetNew(

@@ -106,7 +106,7 @@ public class SQLiteProgramTest extends AndroidTestCase {
         assertTrue(statementOne.getUniqueId() > 0);
         int nStatement = statementOne.getUniqueId();
         statementOne.releaseReference();
-        assertTrue(statementOne.getUniqueId() == nStatement);
+        assertEquals(0, statementOne.getUniqueId());
         statementOne.close();
     }
 
@@ -126,7 +126,7 @@ public class SQLiteProgramTest extends AndroidTestCase {
         assertTrue(statementOne.getUniqueId() > 0);
         int nStatement = statementOne.getUniqueId();
         statementOne.releaseReferenceFromContainer();
-        assertTrue(statementOne.getUniqueId() == nStatement);
+        assertEquals(0, statementOne.getUniqueId());
         statementOne.close();
     }
 
