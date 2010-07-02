@@ -970,7 +970,7 @@ public class ConsoleUi {
      * @param resultType The result type.
      */
     private void createPlanFromSession(final String name, TestSession ts, final String resultType)
-            throws FileNotFoundException, ParserConfigurationException,
+            throws FileNotFoundException, IOException, ParserConfigurationException,
             TransformerFactoryConfigurationError, TransformerException {
 
         HashMap<String, ArrayList<String>> selectedResult =

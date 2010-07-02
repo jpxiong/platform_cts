@@ -29,12 +29,12 @@ import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.test.ActivityInstrumentationTestCase2;
-import dalvik.annotation.BrokenTest;
+import android.widget.cts.WidgetTestUtils;
+
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Movie.class)
 public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
@@ -54,11 +54,9 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "draw",
-        args = {android.graphics.Canvas.class, float.class, float.class, 
+        args = {android.graphics.Canvas.class, float.class, float.class,
                 android.graphics.Paint.class}
     )
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testDraw1() {
         Canvas c = new Canvas();
         Paint p = new Paint();
@@ -70,8 +68,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         method = "draw",
         args = {android.graphics.Canvas.class, float.class, float.class}
     )
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testDraw2() {
         Canvas c = new Canvas();
         mMovie.draw(c, 100, 200);
@@ -82,8 +78,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         method = "decodeFile",
         args = {java.lang.String.class}
     )
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testDecodeFile() throws Exception {
         mMovie = null;
         File dbDir = getInstrumentation().getTargetContext().getDir("tests",
@@ -143,8 +137,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         method = "decodeByteArray",
         args = {byte[].class, int.class, int.class}
     )
-    @ToBeFixed(bug="1491795", explanation="always return null")
-    @BrokenTest("mMovie is null")
     public void testDecodeByteArray() throws Exception {
         mMovie = null;
         InputStream is = getActivity().getResources().openRawResource(MOVIE);
@@ -160,8 +152,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         method = "decodeStream",
         args = {java.io.InputStream.class}
     )
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testDecodeStream() {
         assertFalse(mMovie.isOpaque());
         mMovie = null;
@@ -182,8 +172,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         method = "setTime",
         args = {int.class}
     )
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testSetTime() {
         assertTrue(mMovie.setTime(1000));
         assertFalse(mMovie.setTime(Integer.MAX_VALUE));
@@ -213,16 +201,17 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
             args = {}
         )
     })
-    @ToBeFixed(bug = "1790416", explanation = "mMovie shouldn't be null")
-    @BrokenTest("mMovie is null")
     public void testGetMovieProperties() {
         assertEquals(1000, mMovie.duration());
         assertFalse(mMovie.isOpaque());
-        int expectedHeight = getActivity().getResources().getDrawable(MOVIE)
-                .getIntrinsicHeight();
-        assertEquals(expectedHeight, mMovie.height());
-        int expectedWidth = getActivity().getResources().getDrawable(MOVIE)
-                .getIntrinsicWidth();
-        assertEquals(expectedWidth, mMovie.width());
+
+        int expectedHeight = getActivity().getResources().getDrawable(MOVIE).getIntrinsicHeight();
+        int scaledHeight = WidgetTestUtils.convertDipToPixels(getActivity(), mMovie.height());
+        assertEquals(expectedHeight, scaledHeight);
+
+        int expectedWidth = getActivity().getResources().getDrawable(MOVIE).getIntrinsicWidth();
+        int scaledWidth = WidgetTestUtils.convertDipToPixels(getActivity(), mMovie.width());
+        assertEquals(expectedWidth, scaledWidth);
+
     }
 }

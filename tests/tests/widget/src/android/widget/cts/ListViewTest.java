@@ -61,6 +61,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     private final String[] mNameList = new String[] {
         "Jacky", "David", "Kevin", "Michael", "Andy"
     };
+    private final String[] mEmptyList = new String[0];
 
     private ListView mListView;
     private Activity mActivity;
@@ -68,6 +69,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     private AttributeSet mAttributeSet;
     private ArrayAdapter<String> mAdapter_countries;
     private ArrayAdapter<String> mAdapter_names;
+    private ArrayAdapter<String> mAdapter_empty;
 
     public ListViewTest() {
         super("com.android.cts.stub", ListViewStubActivity.class);
@@ -85,6 +87,8 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
                 android.R.layout.simple_list_item_1, mCountryList);
         mAdapter_names = new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1,
                 mNameList);
+        mAdapter_empty = new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1,
+                mEmptyList);
 
         mListView = (ListView) mActivity.findViewById(R.id.listview_default);
     }
@@ -147,26 +151,22 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         )
     })
     public void testGetMaxScrollAmount() {
+        setAdapter(mAdapter_empty);
+        int scrollAmount = mListView.getMaxScrollAmount();
+        assertEquals(0, scrollAmount);
+
+        setAdapter(mAdapter_names);
+        scrollAmount = mListView.getMaxScrollAmount();
+        assertTrue(scrollAmount > 0);
+    }
+
+    private void setAdapter(final ArrayAdapter<String> adapter) {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
-                mListView.setAdapter(mAdapter_countries);
+                mListView.setAdapter(adapter);
             }
         });
         mInstrumentation.waitForIdleSync();
-
-        int amount1 = mListView.getMaxScrollAmount();
-        assertTrue(amount1 > 0);
-
-        mInstrumentation.runOnMainSync(new Runnable() {
-            public void run() {
-                mListView.setAdapter(mAdapter_names);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-
-        int amount2 = mListView.getMaxScrollAmount();
-        assertTrue(amount2 > 0);
-        assertTrue(amount2 < amount1); // because NAMES list is shorter than COUNTRIES list
     }
 
     @TestTargets({
