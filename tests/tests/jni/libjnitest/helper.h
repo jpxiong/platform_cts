@@ -47,7 +47,7 @@ typedef char *JniTestFunction(JNIEnv *env);
  * @param ... printf-style arguments
  * @return an allocated (char *) containing the formatted result
  */
-char *failure(const char *format, ...);
+char *failure(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 /**
  * Runs a list of tests. It will run all the tests, collecting as output
