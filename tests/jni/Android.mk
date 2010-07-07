@@ -16,7 +16,7 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libbuildtest
+LOCAL_MODULE := libcts_jni
 
 # Don't include this package in any configuration by default.
 LOCAL_MODULE_TAGS := optional
@@ -24,11 +24,19 @@ LOCAL_MODULE_TAGS := optional
 # This isn't part of the system, so don't prelink it.
 LOCAL_PRELINK_MODULE := false
 
-LOCAL_SRC_FILES := android_os_cts_BuildTest.c
+LOCAL_SRC_FILES := \
+		CtsJniOnLoad.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
-LOCAL_C_INCLUDES += ndk/sources/cpufeatures
 
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog
+
+ifneq ($(TARGET_SIMULATOR),true)
+LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
+LOCAL_C_INCLUDES += ndk/sources/cpufeatures
 LOCAL_STATIC_LIBRARIES := cpufeatures
+else
+LOCAL_CFLAGS += -DCTS_TARGET_SIMULATOR
+endif
 
 include $(BUILD_SHARED_LIBRARY)
