@@ -18,14 +18,29 @@
 #include <jni.h>
 #include <string.h>
 
-jboolean Java_android_os_cts_BuildTest_isArmCpu(JNIEnv* env, jobject thiz)
+jboolean android_os_cts_CpuFeatures_isArmCpu(JNIEnv* env, jobject thiz)
 {
     AndroidCpuFamily cpuFamily = android_getCpuFamily();
     return cpuFamily == ANDROID_CPU_FAMILY_ARM;
 }
 
-jboolean Java_android_os_cts_BuildTest_isArm7Compatible(JNIEnv* env, jobject thiz)
+jboolean android_os_cts_CpuFeatures_isArm7Compatible(JNIEnv* env, jobject thiz)
 {
     uint64_t cpuFeatures = android_getCpuFeatures();
     return (cpuFeatures & ANDROID_CPU_ARM_FEATURE_ARMv7) == ANDROID_CPU_ARM_FEATURE_ARMv7;
+}
+
+static JNINativeMethod gMethods[] = {
+    {  "isArmCpu", "()Z",
+            (void *) android_os_cts_CpuFeatures_isArmCpu  },
+    {  "isArm7Compatible", "()Z",
+            (void *) android_os_cts_CpuFeatures_isArm7Compatible  },
+};
+
+int register_android_os_cts_CpuFeatures(JNIEnv* env)
+{
+    jclass clazz = env->FindClass("android/os/cts/CpuFeatures");
+
+    return env->RegisterNatives(clazz, gMethods,
+            sizeof(gMethods) / sizeof(JNINativeMethod));
 }
