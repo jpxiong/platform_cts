@@ -20,13 +20,13 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDoneException;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteQuery;
 import android.database.sqlite.SQLiteStatement;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
@@ -37,9 +37,6 @@ public class SQLiteProgramTest extends AndroidTestCase {
 
     private SQLiteDatabase mDatabase;
 
-    @ToBeFixed(bug="1448885", explanation="SQLiteProgram is an abstract class and its " +
-            "constructor is package private, so it can not be extended directly to test. " +
-            "For this reason, the test uses SQLiteStatement instead.")
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -55,79 +52,6 @@ public class SQLiteProgramTest extends AndroidTestCase {
         getContext().deleteDatabase(DATABASE_NAME);
 
         super.tearDown();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getUniqueId()",
-        method = "getUniqueId",
-        args = {}
-    )
-    public void testGetUniqueId() {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
-                "num1 INTEGER, num2 INTEGER, image BLOB);");
-        final String statement = "DELETE FROM test WHERE _id=?;";
-        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
-        SQLiteStatement statementTwo = mDatabase.compileStatement(statement);
-        // since the same compiled statement is being accessed at the same time by 2 different
-        // objects, they each get their own statement id
-        assertTrue(statementOne.getUniqueId() != statementTwo.getUniqueId());
-        statementOne.close();
-        statementTwo.close();
-        
-        statementOne = mDatabase.compileStatement(statement);
-        int n = statementOne.getUniqueId();
-        statementOne.close();
-        statementTwo = mDatabase.compileStatement(statement);
-        assertEquals(n, statementTwo.getUniqueId());
-        statementTwo.close();
-
-        // now try to compile 2 different statements and they should have different uniquerIds.
-        SQLiteStatement statement1 = mDatabase.compileStatement("DELETE FROM test WHERE _id=1;");
-        SQLiteStatement statement2 = mDatabase.compileStatement("DELETE FROM test WHERE _id=2;");
-        assertTrue(statement1.getUniqueId() != statement2.getUniqueId());
-        statement1.close();
-        statement2.close();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleased(). Since sql statements are always cached in " +
-        		"SQLiteDatabase, compiledSql should NOT be released " +
-        		"when onAllReferencesReleased() is called",
-        method = "onAllReferencesReleased",
-        args = {}
-    )
-    public void testOnAllReferencesReleased() {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
-                "num1 INTEGER, num2 INTEGER, image BLOB);");
-        final String statement = "DELETE FROM test WHERE _id=?;";
-        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
-        assertTrue(statementOne.getUniqueId() > 0);
-        int nStatement = statementOne.getUniqueId();
-        statementOne.releaseReference();
-        assertEquals(0, statementOne.getUniqueId());
-        statementOne.close();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onAllReferencesReleasedFromContainer(). " +
-        		"Since sql statements are always cached in " +
-                "SQLiteDatabase, compiledSql should NOT be released " +
-                "when onAllReferencesReleasedFromContainer() is called",
-        args = {}
-    )
-    public void testOnAllReferencesReleasedFromContainer() {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
-                "num1 INTEGER, num2 INTEGER, image BLOB);");
-        final String statement = "DELETE FROM test WHERE _id=?;";
-        SQLiteStatement statementOne = mDatabase.compileStatement(statement);
-        assertTrue(statementOne.getUniqueId() > 0);
-        int nStatement = statementOne.getUniqueId();
-        statementOne.releaseReferenceFromContainer();
-        assertEquals(0, statementOne.getUniqueId());
-        statementOne.close();
     }
 
     @TestTargets({
@@ -195,39 +119,36 @@ public class SQLiteProgramTest extends AndroidTestCase {
         }
         statement.close();
 
-        statement = mDatabase.compileStatement("SELECT text1 FROM test;");
+        Cursor cursor = null;
         try {
-            statement.bindString(1, "foo");
+            cursor = mDatabase.query("test", new String[]{"text1"}, "where text1='a'",
+                    new String[]{"foo"}, null, null, null);
             fail("Should throw exception (no value to bind)");
         } catch (SQLiteException expected) {
             // expected
-        }
-
-        statement =
-            mDatabase.compileStatement("SELECT text1 FROM test WHERE text2 = ? AND num2 = ?;");
-
-        try {
-            statement.bindString(0, "Jack");
-            fail("Should throw exception (index is 0)");
-        } catch (SQLiteException expected) {
-            // expected
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
         try {
-            statement.bindLong(-1, 30);
-            fail("Should throw exception (index is negative)");
-        } catch (SQLiteException expected) {
-            // expected
-        }
-        try {
-            statement.bindDouble(3, 589.0);
+            cursor = mDatabase.query("test", new String[]{"text1"}, "where text1='a'",
+                    new String[]{"foo", "bar"}, null, null, null);
             fail("Should throw exception (index too large)");
         } catch (SQLiteException expected) {
             // expected
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
         // test positive case
+        statement = mDatabase.compileStatement(
+                "SELECT text1 FROM test WHERE text2 = ? AND num2 = ?;");
         statement.bindString(1, "Jack");
         statement.bindLong(2, 30);
         assertEquals("Mike", statement.simpleQueryForString());
+        statement.close();
     }
 
     @TestTargetNew(
@@ -302,65 +223,5 @@ public class SQLiteProgramTest extends AndroidTestCase {
         byte[] value = cursor.getBlob(COLUMN_IMAGE_INDEX);
         MoreAsserts.assertEquals(blob, value);
         cursor.close();
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onAllReferencesReleased",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onAllReferencesReleasedFromContainer",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "compile",
-            args = {java.lang.String.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "native_bind_blob",
-            args = {int.class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "native_bind_double",
-            args = {int.class, double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "native_bind_long",
-            args = {int.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "native_bind_null",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "native_compile",
-            args = {java.lang.String.class}
-        )
-    })
-    @ToBeFixed(bug = "1448885", explanation = "Cannot test protected methods, since constructor" +
-        " is private.")
-    public void testProtectedMethods() {
-        // cannot test
-    }
-
-    private void closeDatabaseWithOrphanedStatement(){
-        try {
-            mDatabase.close();
-        } catch (SQLiteException e) {
-            // A SQLiteException is thrown if there are some unfinialized exceptions
-            // This is expected as some tests explicitly leave statements in this state
-            if (!e.getMessage().equals("Unable to close due to unfinalised statements")) {
-                throw e;
-            }
-        }
     }
 }
