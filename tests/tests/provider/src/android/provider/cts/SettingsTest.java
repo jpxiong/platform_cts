@@ -23,10 +23,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.IContentProvider;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 @TestTargetClass(android.provider.Settings.class)
 public class SettingsTest extends AndroidTestCase {
@@ -212,5 +214,78 @@ public class SettingsTest extends AndroidTestCase {
             if (cursor != null)
                 cursor.close();
         }
+    }
+
+    private static final String[] SELECT_VALUE =
+        new String[] { Settings.NameValueTable.VALUE };
+    private static final String NAME_EQ_PLACEHOLDER = "name=?";
+
+    private void tryBadTableAccess(String table, String goodtable, String name) {
+        ContentResolver cr = mContext.getContentResolver();
+
+        Uri uri = Uri.parse("content://settings/" + table);
+        ContentValues cv = new ContentValues();
+        cv.put("name", "name");
+        cv.put("value", "xxxTESTxxx");
+
+        try {
+            cr.insert(uri, cv);
+            fail("SettingsProvider didn't throw IllegalArgumentException for insert name "
+                    + name + " at URI " + uri);
+        } catch (IllegalArgumentException e) {
+        }
+
+
+        try {
+            cr.update(uri, cv, NAME_EQ_PLACEHOLDER, new String[]{name});
+            fail("SettingsProvider didn't throw IllegalArgumentException for update name "
+                    + name + " at URI " + uri);
+        } catch (IllegalArgumentException e) {
+        }
+
+        try {
+            Cursor c = cr.query(uri, SELECT_VALUE, NAME_EQ_PLACEHOLDER,
+                    new String[]{name}, null);
+            fail("SettingsProvider didn't throw IllegalArgumentException for query name "
+                    + name + " at URI " + uri);
+        } catch (IllegalArgumentException e) {
+        }
+
+
+        try {
+            cr.delete(uri, NAME_EQ_PLACEHOLDER, new String[]{name});
+            fail("SettingsProvider didn't throw IllegalArgumentException for delete name "
+                    + name + " at URI " + uri);
+        } catch (IllegalArgumentException e) {
+        }
+
+
+        String mimeType = cr.getType(uri);
+        assertNull("SettingsProvider didn't return null MIME type for getType at URI "
+                + uri, mimeType);
+
+        uri = Uri.parse("content://settings/" + goodtable);
+        try {
+            Cursor c = cr.query(uri, SELECT_VALUE, NAME_EQ_PLACEHOLDER,
+                    new String[]{name}, null);
+            assertNotNull(c);
+            String value = c.moveToNext() ? c.getString(0) : null;
+            if ("xxxTESTxxx".equals(value)) {
+                fail("Successfully modified " + name + " at URI " + uri);
+            }
+            c.close();
+        } catch (SQLiteException e) {
+            // This is fine.
+        }
+    }
+
+    public void testAccessNonTable() {
+        tryBadTableAccess("SYSTEM", "system", "install_non_market_apps");
+        tryBadTableAccess("BOOKMARKS", "bookmarks", "install_non_market_apps");
+        tryBadTableAccess("SECURE", "secure", "install_non_market_apps");
+        tryBadTableAccess("BLUETOOTH_DEVICES", "bluetooth_devices", "install_non_market_apps");
+        tryBadTableAccess(" secure", "secure", "install_non_market_apps");
+        tryBadTableAccess("secure ", "secure", "install_non_market_apps");
+        tryBadTableAccess(" secure ", "secure", "install_non_market_apps");
     }
 }
