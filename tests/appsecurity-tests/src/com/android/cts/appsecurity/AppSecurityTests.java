@@ -18,6 +18,7 @@ package com.android.cts.appsecurity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import junit.framework.Test;
 
@@ -293,7 +294,7 @@ public class AppSecurityTests extends DeviceTestCase {
             mAllTestsPassed = false;
         }
 
-        public void testRunEnded(long elapsedTime) {
+        public void testRunEnded(long elapsedTime, Map<String, String> resultBundle) {
             // ignore
         }
 
