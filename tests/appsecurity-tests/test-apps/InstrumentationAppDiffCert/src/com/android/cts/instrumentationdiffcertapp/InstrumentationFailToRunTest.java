@@ -16,17 +16,29 @@
 
 package com.android.cts.instrumentationdiffcertapp;
 
-import junit.framework.TestCase;
+import android.app.Instrumentation;
+import android.content.ComponentName;
+import android.content.Context;
+import android.os.Bundle;
+import android.test.InstrumentationTestCase;
 
 /**
- * Test that is expected not to run
+ * Test that a instrumentation targeting another app with a different cert fails.
  */
-public class InstrumentationFailToRunTest extends TestCase {
+public class InstrumentationFailToRunTest extends InstrumentationTestCase {
 
-    /**
-     * Test method that is expected not to run.
-     */
     public void testInstrumentationNotAllowed() {
-        fail("instrumentating app with different cert should fail");
+        Context myContext = getInstrumentation().getContext();
+        // assumes android.app.Instrumentation has been defined in this app's AndroidManifest.xml
+        // as targeting an app with a different cert
+        ComponentName appDiffCertInstrumentation = new ComponentName(myContext,
+                Instrumentation.class);
+        try {
+            getInstrumentation().getContext().startInstrumentation(appDiffCertInstrumentation,
+                null, new Bundle());
+            fail("could launch instrumentation");
+        } catch (SecurityException e) {
+            // expected
+        }
     }
 }

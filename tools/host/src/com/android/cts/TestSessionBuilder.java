@@ -544,7 +544,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
      */
     public void serialize(String planName,
             ArrayList<String> packageNames, HashMap<String, ArrayList<String>> selectedResult)
-            throws ParserConfigurationException, FileNotFoundException,
+            throws ParserConfigurationException, FileNotFoundException, IOException,
             TransformerFactoryConfigurationError, TransformerException {
         File plan = new File(HostConfig.getInstance().getPlanRepository()
                 .getPlanPath(planName));

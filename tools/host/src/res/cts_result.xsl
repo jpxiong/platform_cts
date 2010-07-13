@@ -116,7 +116,9 @@
                                     <TR>
                                         <TD class="rowtitle">Supported Locales</TD>
                                         <TD>
-                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@locales"/>
+                                            <xsl:call-template name="formatDelimitedString">
+                                                <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@locales"/>
+                                            </xsl:call-template>
                                         </TD>
                                     </TR>
                                     <TR>
@@ -177,6 +179,46 @@
                                         <TD class="rowtitle">IMSI</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imsi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Features</TD>
+                                        <TD>
+                                            <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
+                                                <xsl:text>[</xsl:text>
+                                                <xsl:choose>
+                                                    <xsl:when test="@available = 'true'">
+                                                        <xsl:text>X</xsl:text>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xsl:text>_</xsl:text>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                                <xsl:text>] </xsl:text>
+
+                                                <xsl:value-of select="@name" />
+                                                <br />
+                                            </xsl:for-each>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Other Features</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='other']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Root Processes</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/ProcessInfo/Process[@uid='0']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
                                         </TD>
                                     </TR>
                                 </TABLE>
@@ -417,10 +459,31 @@
                     </TABLE>
                 </xsl:for-each> <!-- end test package -->
             </DIV>
+            </body>
+        </html>
+    </xsl:template>
 
-        </body>
-    </html>
-</xsl:template>
+    <!-- Take a delimited string and insert line breaks after a some number of elements. --> 
+    <xsl:template name="formatDelimitedString">
+        <xsl:param name="string" />
+        <xsl:param name="numTokensPerRow" select="10" />
+        <xsl:param name="tokenIndex" select="1" />
+        <xsl:if test="$string">
+            <!-- Requires the last element to also have a delimiter after it. -->
+            <xsl:variable name="token" select="substring-before($string, ';')" />
+            <xsl:value-of select="$token" />
+            <xsl:text>&#160;</xsl:text>
+          
+            <xsl:if test="$tokenIndex mod $numTokensPerRow = 0">
+                <br />
+            </xsl:if>
 
+            <xsl:call-template name="formatDelimitedString">
+                <xsl:with-param name="string" select="substring-after($string, ';')" />
+                <xsl:with-param name="numTokensPerRow" select="$numTokensPerRow" />
+                <xsl:with-param name="tokenIndex" select="$tokenIndex + 1" />
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>

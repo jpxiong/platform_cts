@@ -73,7 +73,9 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         mDatabaseCursor.close();
         mTestAbstractCursor.close();
         mDatabase.close();
-        mDatabaseFile.delete();
+        if (mDatabaseFile.exists()) {
+            mDatabaseFile.delete();
+        }
         super.tearDown();
     }
 
