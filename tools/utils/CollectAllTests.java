@@ -265,33 +265,38 @@ public class CollectAllTests extends DescriptionGenerator {
             public TestResult doRun(Test test) {
                 return super.doRun(test);
             }
-            
-            
-            
+
+
+
         };
-        
+
         runner.setPrinter(new ResultPrinter(System.out) {
             @Override
             protected void printFooter(TestResult result) {
             }
-            
+
             @Override
             protected void printHeader(long runTime) {
             }
         });
         runner.doRun(TESTSUITE);
     }
-    
+
     private String getKnownFailure(final Class<? extends TestCase> testClass,
             final String testName) {
         return getAnnotation(testClass, testName, KNOWN_FAILURE);
     }
-    
+
+    private boolean isKnownFailure(final Class<? extends TestCase> testClass,
+            final String testName) {
+        return getAnnotation(testClass, testName, KNOWN_FAILURE) != null;
+    }
+
     private boolean isBrokenTest(final Class<? extends TestCase> testClass,
             final String testName)  {
         return getAnnotation(testClass, testName, BROKEN_TEST) != null;
     }
-    
+
     private String getAnnotation(final Class<? extends TestCase> testClass,
             final String testName, final String annotationName) {
         try {
@@ -329,12 +334,14 @@ public class CollectAllTests extends DescriptionGenerator {
         String testClassName = test.getClass().getName();
         String testName = test.getName();
         String knownFailure = getKnownFailure(test.getClass(), testName);
-        
-        if (isBrokenTest(test.getClass(), testName)) {
+
+        if (isKnownFailure(test.getClass(), testName)) {
+            System.out.println("ignoring known failure: " + test);
+            return;
+        } else if (isBrokenTest(test.getClass(), testName)) {
             System.out.println("ignoring broken test: " + test);
             return;
         }
-            
 
         if (!testName.startsWith("test")) {
             try {

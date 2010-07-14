@@ -24,7 +24,6 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
-import android.content.pm.IPackageInstallObserver;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -37,8 +36,6 @@ import android.content.pm.PermissionInfo;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
-import android.provider.Contacts.People;
 import android.test.AndroidTestCase;
 
 import java.util.ArrayList;
@@ -632,51 +629,6 @@ public class PackageManagerTest extends AndroidTestCase {
 
         // TODO: Bug ID 1561181.
         // Can't add permission in dynamic way
-    }
-
-    /**
-     * Test that calling {@link PackageManager#addPackageToPreferred(String) throws a
-     * {@link SecurityException}.
-     * <p/>
-     * The method is protected by the {@link android.permission.SET_PREFERRED_APPLICATIONS}
-     * signature permission. Even though this app declares that permission, it still should not be
-     * able to call this method.
-     */
-    public void testAddPackageToPreferred() {
-        // Test addPackageToPreferred, getPreferredPackages
-        List<PackageInfo> pkgInfo = null;
-        pkgInfo = mPackageManager.getPreferredPackages(0);
-        int pkgInfoSize = pkgInfo.size();
-        try {
-            // addPackageToPreferred is protected by the
-            // android.permission.SET_PREFERRED_APPLICATIONS signature permission.
-            // Even though this app declares that permission, it still should not be able to call
-            // this
-            mPackageManager.addPackageToPreferred(CONTENT_PKG_NAME);
-            fail("addPackageToPreferred unexpectedly succeeded");
-        } catch (SecurityException e) {
-            // expected
-        }
-        pkgInfo = mPackageManager.getPreferredPackages(0);
-        // addPackageToPreferred should have no effect
-        assertEquals(pkgInfo.size(), pkgInfoSize);
-    }
-
-    /**
-     * Test that calling {@link PackageManager#removePackageFromPreferred(String)} throws a
-     * {@link SecurityException}.
-     * <p/>
-     * The method is protected by the {@link android.permission.SET_PREFERRED_APPLICATIONS}
-     * signature permission. Even though this app declares that permission, it still should not be
-     * able to call this method.
-     */
-    public void testRemovePackageFromPreferred() {
-        try {
-            mPackageManager.removePackageFromPreferred(CONTENT_PKG_NAME);
-            fail("removePackageFromPreferred unexpectedly succeeded");
-        } catch (SecurityException e) {
-            // expected
-        }
     }
 
     @TestTargets({

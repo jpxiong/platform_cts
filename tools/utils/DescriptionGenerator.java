@@ -80,7 +80,6 @@ public class DescriptionGenerator extends Doclet {
 
     static final String ATTRIBUTE_NAME = "name";
     static final String ATTRIBUTE_HOST_CONTROLLER = "HostController";
-    static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     static final String XML_OUTPUT_PATH = "./description.xml";
 
@@ -404,7 +403,7 @@ public class DescriptionGenerator extends Doclet {
                 elem.getParentNode().removeChild(elem);
             } else {
                 for (TestMethod caze : cases) {
-                    if (caze.mIsBroken) {
+                    if (caze.mIsBroken || caze.mKnownFailure != null) {
                         continue;
                     }
                     Node caseNode = elem.appendChild(mDoc.createElement(TAG_TEST));
@@ -412,10 +411,6 @@ public class DescriptionGenerator extends Doclet {
                     setAttribute(caseNode, ATTRIBUTE_NAME, caze.mName);
                     if ((caze.mController != null) && (caze.mController.length() != 0)) {
                         setAttribute(caseNode, ATTRIBUTE_HOST_CONTROLLER, caze.mController);
-                    }
-
-                    if (caze.mKnownFailure != null) {
-                        setAttribute(caseNode, ATTRIBUTE_KNOWN_FAILURE, caze.mKnownFailure);
                     }
 
                     if (caze.mDescription != null && !caze.mDescription.equals("")) {
