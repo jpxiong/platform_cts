@@ -24,6 +24,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -34,7 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import android.accounts.Account;
+import android.view.animation.cts.DelayedCheck;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -627,7 +628,7 @@ public class ContentResolverTest extends AndroidTestCase {
             "ContentResolver#unregisterContentObserver(ContentObserver) when the input " +
             "params are null")
     public void testRegisterContentObserver() {
-        MockContentObserver mco = new MockContentObserver();
+        final MockContentObserver mco = new MockContentObserver();
 
         mContentResolver.registerContentObserver(TABLE1_URI, true, mco);
         assertFalse(mco.hadOnChanged());
@@ -636,8 +637,12 @@ public class ContentResolverTest extends AndroidTestCase {
         values.put(COLUMN_KEY_NAME, "key10");
         values.put(COLUMN_VALUE_NAME, 10);
         mContentResolver.update(TABLE1_URI, values, null, null);
-
-        assertTrue(mco.hadOnChanged());
+        new DelayedCheck() {
+            @Override
+            protected boolean check() {
+                return mco.hadOnChanged();
+            }
+        }.run();
 
         mco.reset();
         mContentResolver.unregisterContentObserver(mco);
@@ -677,14 +682,19 @@ public class ContentResolverTest extends AndroidTestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
             "ContentResolver#notifyChange(Uri, ContentObserver) when uri is null")
-    public void testNotifyChange1() throws InterruptedException {
-        MockContentObserver mco = new MockContentObserver();
+    public void testNotifyChange1() {
+        final MockContentObserver mco = new MockContentObserver();
 
         mContentResolver.registerContentObserver(TABLE1_URI, true, mco);
         assertFalse(mco.hadOnChanged());
 
         mContentResolver.notifyChange(TABLE1_URI, mco);
-        assertTrue(mco.hadOnChanged());
+        new DelayedCheck() {
+            @Override
+            protected boolean check() {
+                return mco.hadOnChanged();
+            }
+        }.run();
 
         mContentResolver.unregisterContentObserver(mco);
     }
@@ -697,13 +707,18 @@ public class ContentResolverTest extends AndroidTestCase {
     @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
             "ContentResolver#notifyChange(Uri, ContentObserver, boolean) when uri is null ")
     public void testNotifyChange2() {
-        MockContentObserver mco = new MockContentObserver();
+        final MockContentObserver mco = new MockContentObserver();
 
         mContentResolver.registerContentObserver(TABLE1_URI, true, mco);
         assertFalse(mco.hadOnChanged());
 
         mContentResolver.notifyChange(TABLE1_URI, mco, false);
-        assertTrue(mco.hadOnChanged());
+        new DelayedCheck() {
+            @Override
+            protected boolean check() {
+                return mco.hadOnChanged();
+            }
+        }.run();
 
         mContentResolver.unregisterContentObserver(mco);
     }
@@ -789,16 +804,16 @@ public class ContentResolverTest extends AndroidTestCase {
         }
 
         @Override
-        public void onChange(boolean selfChange) {
+        public synchronized void onChange(boolean selfChange) {
             super.onChange(selfChange);
             mHadOnChanged = true;
         }
 
-        public boolean hadOnChanged() {
+        public synchronized boolean hadOnChanged() {
             return mHadOnChanged;
         }
 
-        public void reset() {
+        public synchronized void reset() {
             mHadOnChanged = false;
         }
     }

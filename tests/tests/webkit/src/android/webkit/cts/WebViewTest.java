@@ -672,13 +672,25 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         final Bundle bundle = new Bundle();
         final File f = getActivity().getFileStreamPath("snapshot");
+        if (f.exists()) {
+            f.delete();
+        }
 
         try {
             assertTrue(bundle.isEmpty());
             assertEquals(0, f.length());
             assertTrue(mWebView.savePicture(bundle, f));
-            assertTrue(f.length() > 0);
+
+            // File saving is done in a separate thread.
+            new DelayedCheck() {
+                @Override
+                protected boolean check() {
+                    return f.length() > 0;
+                }
+            }.run();
+
             assertFalse(bundle.isEmpty());
+
             Picture p = Picture.createFromStream(new FileInputStream(f));
             Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
             p.draw(new Canvas(b));

@@ -25,37 +25,25 @@ import junit.framework.TestCase;
 @TestTargetClass(Build.class)
 public class BuildTest extends TestCase {
 
-    private static final String ARMEABI_V7 = "armeabi-v7a";
-
-    private static final String ARMEABI = "armeabi";
-
-    static {
-        System.loadLibrary("buildtest");
-    }
-
     /** Tests that check the values of {@link Build#CPU_ABI} and {@link Build#CPU_ABI2}. */
     public void testCpuAbi() {
-        if (isArmCpu()) {
+        if (CpuFeatures.isArmCpu()) {
             assertArmCpuAbiConstants();
         }
     }
 
-    private native boolean isArmCpu();
-
     private void assertArmCpuAbiConstants() {
-        boolean isArm7Compatible = isArm7Compatible();
-        if (isArm7Compatible) {
+        if (CpuFeatures.isArm7Compatible()) {
             String message = String.format("CPU is ARM v7 compatible, so Build.CPU_ABI must be %s"
-                    + " and Build.CPU_ABI2 must be %s.", ARMEABI_V7, ARMEABI);
-            assertEquals(message, ARMEABI_V7, Build.CPU_ABI);
-            assertEquals(message, ARMEABI, Build.CPU_ABI2);
+                    + " and Build.CPU_ABI2 must be %s.", CpuFeatures.ARMEABI_V7,
+                            CpuFeatures.ARMEABI);
+            assertEquals(message, CpuFeatures.ARMEABI_V7, Build.CPU_ABI);
+            assertEquals(message, CpuFeatures.ARMEABI, Build.CPU_ABI2);
         } else {
             String message = String.format("CPU is not ARM v7 compatible, so Build.CPU_ABI must "
-                    + "be %s and Build.CPU_ABI2 must be 'unknown'.", ARMEABI);
-            assertEquals(message, ARMEABI, Build.CPU_ABI);
+                    + "be %s and Build.CPU_ABI2 must be 'unknown'.", CpuFeatures.ARMEABI);
+            assertEquals(message, CpuFeatures.ARMEABI, Build.CPU_ABI);
             assertEquals(message, "unknown", Build.CPU_ABI2);
         }
     }
-
-    private native boolean isArm7Compatible();
 }
