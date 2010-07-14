@@ -1250,7 +1250,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         }
         
         @Override
-        public void takeSurface(SurfaceHolder.Callback callback) {
+        public void takeSurface(SurfaceHolder.Callback2 callback) {
         }
         
         @Override
