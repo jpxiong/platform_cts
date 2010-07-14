@@ -959,7 +959,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
             }
             
             @Override
-            public void takeSurface(SurfaceHolder.Callback callback) {
+            public void takeSurface(SurfaceHolder.Callback2 callback) {
             }
             
             @Override
