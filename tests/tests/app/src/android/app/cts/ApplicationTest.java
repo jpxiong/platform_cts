@@ -16,17 +16,17 @@
 
 package android.app.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link Application}.
@@ -78,13 +78,10 @@ public class ApplicationTest extends InstrumentationTestCase {
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                // make sure the configuration has been changed.
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+               OrientationTestUtils.toggleOrientation(activity);
             }
         });
-        getInstrumentation().waitForIdleSync();
-
+        instrumentation.waitForIdleSync();
         assertTrue(mockApp.isOnConfigurationChangedCalled);
     }
 
