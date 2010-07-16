@@ -18,6 +18,7 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
+import dalvik.annotation.KnownFailure;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -323,6 +324,8 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         method = "getOpacity",
         args = {}
     )
+    @KnownFailure("Bug 2834281 - Bitmap#hasAlpha seems to return true for "
+        + "images without alpha.")
     public void testGetOpacity() {
         assertEquals(PixelFormat.OPAQUE, mNinePatchDrawable.getOpacity());
 
