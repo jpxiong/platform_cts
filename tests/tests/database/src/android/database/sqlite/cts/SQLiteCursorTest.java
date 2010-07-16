@@ -24,6 +24,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.AbstractCursor;
+import android.database.Cursor;
 import android.database.CursorWindow;
 import android.database.DataSetObserver;
 import android.database.StaleDataException;
@@ -79,8 +80,8 @@ public class SQLiteCursorTest extends AndroidTestCase {
                 TEST_SQL, TABLE_NAME);
         try {
             new SQLiteCursor(mDatabase, cursorDriver, TABLE_NAME, null);
-            fail("constructor didn't throw NullPointerException when SQLiteQuery is null");
-        } catch (NullPointerException e) {
+            fail("constructor didn't throw IllegalArgumentException when SQLiteQuery is null");
+        } catch (IllegalArgumentException e) {
         }
 
         // get SQLiteCursor by querying database
@@ -216,6 +217,44 @@ public class SQLiteCursorTest extends AndroidTestCase {
         // only after requery, getCount can get most up-to-date counting info now.
         assertEquals(TEST_COUNT - 2, cursor.getCount());
         assertTrue(observer.hasChanged());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "requery",
+            args = {}
+        )
+    })
+    public void testRequery2() {
+        mDatabase.disableWriteAheadLogging();
+        mDatabase.execSQL("create table testRequery2 (i int);");
+        mDatabase.execSQL("insert into testRequery2 values(1);");
+        mDatabase.execSQL("insert into testRequery2 values(2);");
+        Cursor c = mDatabase.rawQuery("select * from testRequery2 order by i", null);
+        assertEquals(2, c.getCount());
+        assertTrue(c.moveToFirst());
+        assertEquals(1, c.getInt(0));
+        assertTrue(c.moveToNext());
+        assertEquals(2, c.getInt(0));
+        // add more data to the table and requery
+        mDatabase.execSQL("insert into testRequery2 values(3);");
+        assertTrue(c.requery());
+        assertEquals(3, c.getCount());
+        assertTrue(c.moveToFirst());
+        assertEquals(1, c.getInt(0));
+        assertTrue(c.moveToNext());
+        assertEquals(2, c.getInt(0));
+        assertTrue(c.moveToNext());
+        assertEquals(3, c.getInt(0));
+        // close the database and see if requery throws an exception
+        mDatabase.close();
+        try {
+            c.requery();
+            fail("expected IllegalStateException");
+        } catch (IllegalStateException e) {
+            // expected
+        }
     }
 
     @TestTargets({

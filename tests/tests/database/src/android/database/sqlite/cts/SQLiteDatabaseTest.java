@@ -18,10 +18,7 @@ package android.database.sqlite.cts;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -338,78 +335,6 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             fail("did not throw expected IllegalStateException");
         } catch (IllegalStateException e) {
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getSyncedTables()",
-            method = "getSyncedTables",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test markTableSyncable(String, String)",
-            method = "markTableSyncable",
-            args = {java.lang.String.class, java.lang.String.class}
-        )
-    })
-    public void testGetSyncedTables() {
-        mDatabase.execSQL("CREATE TABLE people (_id INTEGER PRIMARY KEY, name TEXT, "
-                + "_sync_dirty INTEGER);");
-        mDatabase.execSQL("CREATE TABLE _delete_people (name TEXT);");
-        Map<String, String> tableMap = mDatabase.getSyncedTables();
-        assertEquals(0, tableMap.size());
-        mDatabase.markTableSyncable("people", "_delete_people");
-        tableMap = mDatabase.getSyncedTables();
-        assertEquals(1, tableMap.size());
-        Set<String> keys = tableMap.keySet();
-        Iterator<String> iterator = keys.iterator();
-        assertTrue(iterator.hasNext());
-        assertEquals("people", iterator.next());
-        assertEquals("_delete_people", tableMap.get("people"));
-        assertFalse(iterator.hasNext());
-
-        // test sync
-        mDatabase.execSQL("INSERT INTO people VALUES (0, 'foo', 0);");
-        mDatabase.execSQL("UPDATE people SET name = 'updated' WHERE _id = 0;");
-        Cursor c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
-                "_id = 0", null, null, null, null);
-        assertTrue(c.moveToFirst());
-        // _sync_dirty flag has been set
-        assertEquals(1, c.getInt(1));
-        c.close();
-    }
-
-    @SuppressWarnings("deprecation")
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test markTableSyncable(String, String, String)",
-        method = "markTableSyncable",
-        args = {java.lang.String.class, java.lang.String.class, java.lang.String.class}
-    )
-    public void testMarkTableSyncable() {
-        mDatabase.execSQL("CREATE TABLE phone (_id INTEGER PRIMARY KEY, _people_id INTEGER, " +
-                "name TEXT);");
-        mDatabase.execSQL("CREATE TABLE people (_id INTEGER PRIMARY KEY, " +
-                "name TEXT, _sync_dirty INTEGER);");
-        mDatabase.markTableSyncable("phone", "_people_id", "people");
-
-        Map<String, String> tableMap = mDatabase.getSyncedTables();
-        // since no delete table was given, there is no mapping
-        assertEquals(0, tableMap.size());
-
-        // test sync
-        mDatabase.execSQL("INSERT INTO people VALUES (13, 'foo', 0);");
-        mDatabase.execSQL("INSERT INTO phone VALUES (0, 13, 'bar');");
-        mDatabase.execSQL("UPDATE phone SET name = 'updated' WHERE _id = 0;");
-        Cursor c = mDatabase.query("people", new String[] {"_id", "_sync_dirty" },
-                "_id = 13", null, null, null, null);
-        assertTrue(c.moveToFirst());
-        // _sync_dirty flag has been set
-        assertEquals(1, c.getInt(1));
-        c.close();
     }
 
     @TestTargets({
