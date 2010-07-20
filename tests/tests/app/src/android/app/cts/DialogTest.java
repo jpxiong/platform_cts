@@ -326,10 +326,12 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
     public void testOnSaveInstanceState() {
         popDialog(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        mInstrumentation.waitForIdleSync();
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        mInstrumentation.waitForIdleSync();
+
+        assertFalse(d.isOnSaveInstanceStateCalled);
+        assertFalse(TestDialog.isOnRestoreInstanceStateCalled);
+
+        OrientationTestUtils.toggleOrientationSync(mActivity, mInstrumentation);
+
         assertTrue(d.isOnSaveInstanceStateCalled);
         assertTrue(TestDialog.isOnRestoreInstanceStateCalled);
     }
