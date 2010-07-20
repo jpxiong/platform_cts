@@ -38,8 +38,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     private final String OUTPUT_PATH;
     private static final int RECORD_TIME = 3000;
-    private static final int VIDEO_WIDTH = 320;
-    private static final int VIDEO_HEIGHT = 240;
+    private static final int VIDEO_WIDTH = 176;
+    private static final int VIDEO_HEIGHT = 144;
     private static final int FRAME_RATE = 15;
     private static final long MAX_FILE_SIZE = 5000;
     private static final int MAX_DURATION_MSEC = 200;
