@@ -33,11 +33,11 @@ import android.graphics.Picture;
 import android.graphics.Rect;
 import android.graphics.Bitmap.Config;
 import android.net.http.SslCertificate;
+import android.net.http.SslError;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.net.http.SslError;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -1631,28 +1631,27 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testAccessCertificate() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView = new MockWebView(getActivity());
+                mWebView = new WebView(getActivity());
                 getActivity().setContentView(mWebView);
             }
         });
         getInstrumentation().waitForIdleSync();
 
-        final MockWebView mockWebView = (MockWebView) mWebView;
         // need the client to handle error
-        mockWebView.setWebViewClient(new MockWebViewClient());
+        mWebView.setWebViewClient(new MockWebViewClient());
 
-        mockWebView.reset();
+        mWebView.setCertificate(null);
         startWebServer(true);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         // attempt to load the url.
-        mockWebView.loadUrl(url);
+        mWebView.loadUrl(url);
         new DelayedCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mockWebView.hasCalledSetCertificate();
+                return mWebView.getCertificate() != null;
             }
         }.run();
-        SslCertificate cert = mockWebView.getCertificate();
+        SslCertificate cert = mWebView.getCertificate();
         assertNotNull(cert);
         assertEquals("Android", cert.getIssuedTo().getUName());
     }
@@ -1960,28 +1959,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     })
     public void testInternals() {
         // Do not test these APIs. They are implementation details.
-    }
-
-    private static class MockWebView extends WebView {
-        private boolean mHasCalledSetCertificate;
-
-        public MockWebView(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void setCertificate(SslCertificate certificate) {
-            super.setCertificate(certificate);
-            mHasCalledSetCertificate = true;
-        }
-
-        public void reset() {
-            mHasCalledSetCertificate = false;
-        }
-
-        public boolean hasCalledSetCertificate() {
-            return mHasCalledSetCertificate;
-        }
     }
 
     private static class MockWebViewClient extends WebViewClient {
