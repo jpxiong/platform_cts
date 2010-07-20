@@ -145,10 +145,7 @@ public class TabActivityTest extends InstrumentationTestCase {
         sendKeys(KeyEvent.KEYCODE_BACK);
         mInstrumentation.waitForIdleSync();
         assertFalse(MockTabActivity.isOnRestoreInstanceStateCalled);
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        mInstrumentation.waitForIdleSync();
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        mInstrumentation.waitForIdleSync();
+        OrientationTestUtils.toggleOrientationSync(mActivity, mInstrumentation);
         assertTrue(MockTabActivity.isOnRestoreInstanceStateCalled);
     }
 

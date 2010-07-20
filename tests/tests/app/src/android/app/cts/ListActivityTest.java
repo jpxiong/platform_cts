@@ -23,7 +23,6 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.app.ListActivity;
-import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,7 +33,7 @@ import android.widget.TextView;
 @TestTargetClass(ListActivity.class)
 public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActivityTestHelper> {
     private ListActivityTestHelper mStubListActivity;
-    private int mScreenOrientation;
+
     public ListActivityTest() {
         super("com.android.cts.stub", ListActivityTestHelper.class);
     }
@@ -44,7 +43,6 @@ public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActiv
         super.setUp();
         mStubListActivity = getActivity();
         assertNotNull(mStubListActivity);
-        mScreenOrientation = mStubListActivity.getRequestedOrientation();
     }
 
     protected void waitForAction() throws InterruptedException {
@@ -167,20 +165,7 @@ public class ListActivityTest extends ActivityInstrumentationTestCase2<ListActiv
         assertEquals(arrayAdapter, mStubListActivity.getListView().getAdapter());
         assertTrue(mStubListActivity.isOnContentChangedCalled);
         assertFalse(ListActivityTestHelper.isOnRestoreInstanceStateCalled);
-        mStubListActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        getInstrumentation().waitForIdleSync();
-        mStubListActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getInstrumentation().waitForIdleSync();
+        OrientationTestUtils.toggleOrientationSync(mStubListActivity, getInstrumentation());
         assertTrue(ListActivityTestHelper.isOnRestoreInstanceStateCalled);
      }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        if (mStubListActivity != null) {
-            mStubListActivity.setRequestedOrientation(mScreenOrientation);
-            getInstrumentation().waitForIdleSync();
-        }
-    }
-
 }
