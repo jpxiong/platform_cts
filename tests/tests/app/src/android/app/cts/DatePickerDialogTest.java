@@ -16,29 +16,28 @@
 
 package android.app.cts;
 
-import android.app.DatePickerDialog;
-import android.app.Instrumentation;
-import android.app.DatePickerDialog.OnDateSetListener;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
-import android.test.ActivityInstrumentationTestCase2;
-import android.text.TextUtils.TruncateAt;
-import android.view.KeyEvent;
-import android.widget.DatePicker;
-import android.widget.TextView;
 import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.app.DatePickerDialog;
+import android.app.Instrumentation;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.test.ActivityInstrumentationTestCase2;
+import android.text.TextUtils.TruncateAt;
+import android.view.KeyEvent;
+import android.widget.DatePicker;
+import android.widget.TextView;
+
 @TestTargetClass(DatePickerDialog.class)
 public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
 
     private Instrumentation mInstrumentation;
     private DialogStubActivity mActivity;
-    private int mOrientation;
 
     public DatePickerDialogTest() {
         super("com.android.cts.stub", DialogStubActivity.class);
@@ -49,13 +48,11 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         super.setUp();
         mInstrumentation = getInstrumentation();
         mActivity = getActivity();
-        mOrientation = mActivity.getRequestedOrientation();
     }
 
     @Override
     protected void tearDown() throws Exception {
         if (mActivity != null) {
-            mActivity.setRequestedOrientation(mOrientation);
             mActivity.finish();
         }
         super.tearDown();
@@ -174,10 +171,9 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertEquals(mActivity.updatedDay, mActivity.INITIAL_DAY_OF_MONTH);
         assertTrue(DialogStubActivity.onDateChangedCalled);
 
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        mInstrumentation.waitForIdleSync();
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        mInstrumentation.waitForIdleSync();
+        assertFalse(mActivity.onSaveInstanceStateCalled);
+        assertFalse(DialogStubActivity.onRestoreInstanceStateCalled);
+        OrientationTestUtils.toggleOrientationSync(mActivity, mInstrumentation);
         assertTrue(mActivity.onSaveInstanceStateCalled);
         assertTrue(DialogStubActivity.onRestoreInstanceStateCalled);
     }
