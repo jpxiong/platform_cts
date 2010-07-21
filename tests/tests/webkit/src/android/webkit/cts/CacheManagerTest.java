@@ -100,14 +100,19 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         new DelayedCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
-                CacheResult result =
-                    CacheManager.getCacheFile(url, null);
+                CacheResult result = CacheManager.getCacheFile(url, null);
                 return result == null;
             }
         }.run();
+
         loadUrl(url);
-        CacheResult result = CacheManager.getCacheFile(url, null);
-        assertNotNull(result);
+        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+            @Override
+            protected boolean check() {
+                CacheResult result = CacheManager.getCacheFile(url, null);
+                return result != null;
+            }
+        }.run();
 
         // Can not test saveCacheFile(), because the output stream is null and
         // saveCacheFile() will throw a NullPointerException.  There is no
