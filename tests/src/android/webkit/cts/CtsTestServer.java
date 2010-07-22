@@ -449,6 +449,7 @@ public class CtsTestServer {
                 }
                 entity.setContentType(mimeType);
                 response.setEntity(entity);
+                response.setHeader("Content-Length", "" + entity.getContentLength());
             } catch (IOException e) {
                 response = null;
                 // fall through, return 404 at the end
