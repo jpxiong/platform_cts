@@ -240,13 +240,18 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     @ToBeFixed(explanation = "Implementation does not work as expected.")
     public void testAccessBlockNetworkImage() throws Exception {
         String url = TestHtmlConstants.EMBEDDED_IMG_URL;
-        String ext = MimeTypeMap.getFileExtensionFromUrl(url);
+        final String ext = MimeTypeMap.getFileExtensionFromUrl(url);
 
         mWebView.clearCache(true);
         assertFalse(mSettings.getBlockNetworkImage());
         assertTrue(mSettings.getLoadsImagesAutomatically());
         loadAssetUrl(url);
-        assertFalse(mWebServer.getLastRequestUrl().endsWith(ext));
+        new DelayedCheck() {
+            @Override
+            protected boolean check() {
+                return !mWebServer.getLastRequestUrl().endsWith(ext);
+            }
+        }.run();
 
         /* ToBeFixed: Uncomment after fixing the framework
         mWebView.clearCache(true);
