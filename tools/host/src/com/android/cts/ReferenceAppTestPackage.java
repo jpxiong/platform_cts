@@ -16,8 +16,10 @@
 
 package com.android.cts;
 
+import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.RawImage;
+import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 import com.android.ddmlib.log.LogReceiver.LogEntry;
 
@@ -198,6 +200,10 @@ public class ReferenceAppTestPackage extends TestPackage {
                         Log.e("getScreenshot returned a null image", null);
                     }
                 } catch (IOException e) {
+                    Log.e("Error taking snapshot! " + cmdArgs, e);
+                } catch (TimeoutException e) {
+                    Log.e("Error taking snapshot! " + cmdArgs, e);
+                } catch (AdbCommandRejectedException e) {
                     Log.e("Error taking snapshot! " + cmdArgs, e);
                 }
             }
