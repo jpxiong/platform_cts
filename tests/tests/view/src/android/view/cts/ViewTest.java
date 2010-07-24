@@ -47,6 +47,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.Xml;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ActionMode;
 import android.view.Display;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -54,11 +56,6 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
 import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.WindowManagerImpl;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -66,6 +63,10 @@ import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManagerImpl;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.cts.DelayedCheck;
@@ -4612,6 +4613,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         public boolean showContextMenuForChild(View originalView) {
             mHasShowContextMenuForChild = true;
             return false;
+        }
+
+        public ActionMode startActionModeForChild(View originalView,
+                ActionMode.Callback callback) {
+            return null;
         }
 
         public boolean hasShowContextMenuForChild() {
