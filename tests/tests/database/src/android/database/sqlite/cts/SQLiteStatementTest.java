@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDoneException;
@@ -62,39 +63,50 @@ public class SQLiteStatementTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "execute",
+        method = "executeUpdateDelete",
         args = {}
     )
     public void testExecute() {
+        mDatabase.disableWriteAheadLogging();
         populateDefaultTable();
 
-        Cursor c = mDatabase.query("test", null, null, null, null, null, null);
-        assertEquals(0, c.getCount());
+        assertEquals(0, DatabaseUtils.longForQuery(mDatabase, "select count(*) from test", null));
 
-        // test insert
-        SQLiteStatement statement = mDatabase.compileStatement(
-                "INSERT INTO test (data) VALUES ('" + STRING1 + "')");
-        statement.execute();
+        // test update
+        // insert 2 rows and then update them.
+        SQLiteStatement statement1 = mDatabase.compileStatement(
+                "INSERT INTO test (data) VALUES ('" + STRING2 + "')");
+        assertEquals(1, statement1.executeInsert());
+        assertEquals(2, statement1.executeInsert());
+        SQLiteStatement statement2 =
+                mDatabase.compileStatement("UPDATE test set data = 'a' WHERE _id > 0");
+        assertEquals(2, statement2.executeUpdateDelete());
+        statement2.close();
+        // should still have 2 rows in the table
+        assertEquals(2, DatabaseUtils.longForQuery(mDatabase, "select count(*) from test", null));
 
-        c = mDatabase.query("test", null, null, null, null, null, null);
-        assertEquals(1, c.getCount());
+        // test delete
+        // insert 2 more rows and delete 3 of them
+        assertEquals(3, statement1.executeInsert());
+        assertEquals(4, statement1.executeInsert());
+        statement1.close();
+        statement2 = mDatabase.compileStatement("DELETE from test WHERE _id < 4");
+        assertEquals(3, statement2.executeUpdateDelete());
+        statement2.close();
+        // should still have 1 row1 in the table
+        assertEquals(1, DatabaseUtils.longForQuery(mDatabase, "select count(*) from test", null));
 
-        c.moveToFirst();
-        assertEquals(STRING1, c.getString(c.getColumnIndex("data")));
-
-        // if the sql statement is something that causes rows of data to
-        // be returned, execute() simply ignores data and
-        // doesn't throw an exception.
-        statement = mDatabase.compileStatement(
-                "SELECT * FROM test WHERE data=\"" + STRING1 + "\"");
+        // if the SQL statement is something that causes rows of data to
+        // be returned, executeUpdateDelete() (and execute()) throw an exception.
+        statement2 = mDatabase.compileStatement("SELECT count(*) FROM test");
         try {
-            statement.execute();
+            statement2.executeUpdateDelete();
+            fail("exception expected");
         } catch (SQLException e) {
-            fail("exception not expected: " + e.getMessage());
+            // expected
+        } finally {
+            statement2.close();
         }
-
-        c.deactivate();
-        statement.close();
     }
 
     @TestTargets({
@@ -119,26 +131,33 @@ public class SQLiteStatementTest extends AndroidTestCase {
         SQLiteStatement statement = mDatabase.compileStatement(
                 "INSERT INTO test (data) VALUES ('" + STRING2 + "')");
         assertEquals(1, statement.executeInsert());
+        statement.close();
+
+        // try to insert another row with the same id. last inserted rowid should be -1
+        statement = mDatabase.compileStatement("insert or ignore into test values(1, 1);");
+        assertEquals(-1, statement.executeInsert());
+        statement.close();
 
         c = mDatabase.query("test", null, null, null, null, null, null);
         assertEquals(1, c.getCount());
 
         c.moveToFirst();
         assertEquals(STRING2, c.getString(c.getColumnIndex("data")));
+        c.close();
 
         // if the sql statement is something that causes rows of data to
-        // be returned, executeInsert() simply ignores data and
-        // doesn't throw an exception
+        // be returned, executeInsert() throws an exception
         statement = mDatabase.compileStatement(
                 "SELECT * FROM test WHERE data=\"" + STRING2 + "\"");
         try {
             statement.executeInsert();
+            fail("exception expected");
         } catch (SQLException e) {
-            fail("exception not expected: " + e.getMessage());
-        }
+            // expected
+        } finally {
+            statement.close();
 
-        c.deactivate();
-        statement.close();
+        }
     }
 
     @TestTargetNew(
