@@ -22,7 +22,11 @@ import java.util.Map;
 
 import junit.framework.Test;
 
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.InstallException;
 import com.android.ddmlib.Log;
+import com.android.ddmlib.ShellCommandUnresponsiveException;
+import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -79,7 +83,7 @@ public class AppSecurityTests extends DeviceTestCase {
      * Test that an app that declares the same shared uid as an existing app, cannot be installed
      * if it is signed with a different certificate.
      */
-    public void testSharedUidDifferentCerts() throws IOException {
+    public void testSharedUidDifferentCerts() throws InstallException {
         Log.i(LOG_TAG, "installing apks with shared uid, but different certs");
         try {
             // cleanup test apps that might be installed from previous partial test run
@@ -105,7 +109,7 @@ public class AppSecurityTests extends DeviceTestCase {
      * Test that an app update cannot be installed over an existing app if it has a different
      * certificate.
      */
-    public void testAppUpgradeDifferentCerts() throws IOException {
+    public void testAppUpgradeDifferentCerts() throws InstallException {
         Log.i(LOG_TAG, "installing app upgrade with different certs");
         try {
             // cleanup test app that might be installed from previous partial test run
@@ -128,7 +132,8 @@ public class AppSecurityTests extends DeviceTestCase {
     /**
      * Test that an app cannot access another app's private data.
      */
-    public void testAppFailAccessPrivateData() throws IOException {
+    public void testAppFailAccessPrivateData() throws InstallException, TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         Log.i(LOG_TAG, "installing app that attempts to access another app's private data");
         try {
             // cleanup test app that might be installed from previous partial test run
@@ -156,7 +161,8 @@ public class AppSecurityTests extends DeviceTestCase {
     /**
      * Test that an app cannot instrument another app that is signed with different certificate.
      */
-    public void testInstrumentationDiffCert() throws IOException {
+    public void testInstrumentationDiffCert() throws InstallException, TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         Log.i(LOG_TAG, "installing app that attempts to instrument another app");
         try {
             // cleanup test app that might be installed from previous partial test run
@@ -190,7 +196,8 @@ public class AppSecurityTests extends DeviceTestCase {
      * Test that an app cannot use a signature-enforced permission if it is signed with a different
      * certificate than the app that declared the permission.
      */
-    public void testPermissionDiffCert() throws IOException {
+    public void testPermissionDiffCert() throws InstallException, TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         Log.i(LOG_TAG, "installing app that attempts to use permission of another app");
         try {
             // cleanup test app that might be installed from previous partial test run
@@ -229,9 +236,15 @@ public class AppSecurityTests extends DeviceTestCase {
      *
      * @param pkgName Android application package for tests
      * @return <code>true</code> if all tests passed.
-     * @throws IOException if connection to device was lost
+     * @throws TimeoutException in case of a timeout on the connection.
+     * @throws AdbCommandRejectedException if adb rejects the command
+     * @throws ShellCommandUnresponsiveException if the device did not output any test result for
+     * a period longer than the max time to output.
+     * @throws IOException if connection to device was lost.
      */
-    private boolean runDeviceTests(String pkgName) throws IOException {
+    private boolean runDeviceTests(String pkgName)
+            throws TimeoutException, AdbCommandRejectedException,
+            ShellCommandUnresponsiveException, IOException {
         CollectingTestRunListener listener = doRunTests(pkgName);
         return listener.didAllTestsPass();
     }
@@ -240,9 +253,15 @@ public class AppSecurityTests extends DeviceTestCase {
      * Helper method to run tests and return the listener that collected the results.
      * @param pkgName Android application package for tests
      * @return the {@link CollectingTestRunListener}
-     * @throws IOException if connection to device was lost
+     * @throws TimeoutException in case of a timeout on the connection.
+     * @throws AdbCommandRejectedException if adb rejects the command
+     * @throws ShellCommandUnresponsiveException if the device did not output any test result for
+     * a period longer than the max time to output.
+     * @throws IOException if connection to device was lost.
      */
-    private CollectingTestRunListener doRunTests(String pkgName) throws IOException {
+    private CollectingTestRunListener doRunTests(String pkgName)
+            throws TimeoutException, AdbCommandRejectedException,
+            ShellCommandUnresponsiveException, IOException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(pkgName, getDevice());
         CollectingTestRunListener listener = new CollectingTestRunListener();
         testRunner.run(listener);
@@ -256,7 +275,8 @@ public class AppSecurityTests extends DeviceTestCase {
      * @return the test run error message or <code>null</code> if test run completed.
      * @throws IOException if connection to device was lost
      */
-    private String runDeviceTestsWithRunResult(String pkgName) throws IOException {
+    private String runDeviceTestsWithRunResult(String pkgName) throws TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         CollectingTestRunListener listener = doRunTests(pkgName);
         return listener.getTestRunErrorMessage();
     }
