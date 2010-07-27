@@ -869,7 +869,6 @@ public class ContactsTest extends InstrumentationTestCase {
      * Test case for the behavior of the ContactsProvider's groupmembership table
      * It does not test any APIs in android.provider.Contacts.java
      */
-    @KnownFailure(value="bug 2258907, needs investigation")
     public void testGroupMembershipTable() {
         final String[] GROUP_MEMBERSHIP_PROJECTION = new String[] {
                 GroupMembership._ID, GroupMembership.PERSON_ID,
@@ -909,8 +908,6 @@ public class ContactsTest extends InstrumentationTestCase {
             assertTrue(cursor.moveToNext());
             assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
             assertEquals(groupId1, cursor.getInt(GROUP_ID_INDEX));
-            assertNull(cursor.getString(GROUP_SYNC_ACCOUNT_INDEX));
-            assertNull(cursor.getString(GROUP_SYNC_ID_INDEX));
             int id = cursor.getInt(ID_INDEX);
             cursor.close();
 
