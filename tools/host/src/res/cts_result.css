@@ -66,6 +66,7 @@ table {
     border-color: gray;
     border-style: inset;
     font-size:1em;
+    vertical-align: top;
 }
 
 #summaryinfo table {
@@ -79,6 +80,7 @@ table {
 #summaryinfo td {
     padding:1px;
     border-width: 0px 0px 0px 0px;
+    vertical-align: top;
 }
 
 /* The test summary */

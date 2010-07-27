@@ -80,8 +80,11 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
@@ -90,6 +93,8 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
+import android.widget.AbsoluteLayout;
+import android.widget.FrameLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
@@ -247,19 +252,19 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals("", mTextView.getText().toString());
 
         // press '-' key.
-        sendKeys(KeyEvent.KEYCODE_MINUS);
+        mInstrumentation.sendStringSync("-");
         assertEquals("", mTextView.getText().toString());
 
         // press '1' key.
-        sendKeys(KeyEvent.KEYCODE_1);
+        mInstrumentation.sendStringSync("1");
         assertEquals("1", mTextView.getText().toString());
 
         // press '.' key.
-        sendKeys(KeyEvent.KEYCODE_PERIOD);
+        mInstrumentation.sendStringSync(".");
         assertEquals("1", mTextView.getText().toString());
 
         // press 'a' key.
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
         assertEquals("1", mTextView.getText().toString());
 
         final QwertyKeyListener qwertyKeyListener
@@ -275,7 +280,8 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals("1", mTextView.getText().toString());
 
         // press 'a' key.
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
+
         assertEquals("1a", mTextView.getText().toString());
     }
 
@@ -1793,13 +1799,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         assertEquals(errorText, mTextView.getError().toString());
 
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
         // a key event that will not change the TextView's text
         assertEquals("", mTextView.getText().toString());
         // The icon and error message will not be reset to null
         assertNotNull(mTextView.getError());
 
-        sendKeys(KeyEvent.KEYCODE_1);
+        mInstrumentation.sendStringSync("1");
         // a key event cause changes to the TextView's text
         assertEquals("1", mTextView.getText().toString());
         // the error message and icon will be cleared.
@@ -1840,13 +1846,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         assertSame(expected, mTextView.getFilters());
 
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
         // the text is capitalized by InputFilter.AllCaps
         assertEquals("A", mTextView.getText().toString());
-        sendKeys(KeyEvent.KEYCODE_B);
+        mInstrumentation.sendStringSync("b");
         // the text is capitalized by InputFilter.AllCaps
         assertEquals("AB", mTextView.getText().toString());
-        sendKeys(KeyEvent.KEYCODE_C);
+        mInstrumentation.sendStringSync("c");
         // 'C' could not be accepted, because there is a length filter.
         assertEquals("AB", mTextView.getText().toString());
 
@@ -2024,9 +2030,9 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         });
         mInstrumentation.waitForIdleSync();
 
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
         assertEquals("a", mTextView.getText().toString());
-        sendKeys(KeyEvent.KEYCODE_B);
+        mInstrumentation.sendStringSync("b");
         assertEquals("ab", mTextView.getText().toString());
         sendKeys(KeyEvent.KEYCODE_DEL);
         assertEquals("a", mTextView.getText().toString());
@@ -3329,17 +3335,23 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             args = {boolean.class}
         )
     })
+
     public void testMarquee() {
         final MockTextView textView = new MockTextView(mActivity);
         textView.setText(LONG_TEXT);
         textView.setSingleLine();
         textView.setEllipsize(TruncateAt.MARQUEE);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
+
+        final FrameLayout layout = new FrameLayout(mActivity);
+        layout.addView(textView);
+
         // make the fading to be shown
         textView.setHorizontalFadingEdgeEnabled(true);
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mActivity.setContentView(textView);
+                mActivity.setContentView(layout);
             }
         });
         mInstrumentation.waitForIdleSync();

@@ -65,7 +65,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         )
     })
     public void testAnimation() throws Throwable {
-        final View view = mActivity.findViewById(R.id.fit_windows);
+        final View view = mActivity.findViewById(R.id.mock_view);
         // set null animation
         view.setAnimation(null);
         assertNull(view.getAnimation());
@@ -89,7 +89,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
     })
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testStartAnimation() throws Throwable {
-        final View view = mActivity.findViewById(R.id.fit_windows);
+        final View view = mActivity.findViewById(R.id.mock_view);
         // start null animation
         try {
             view.startAnimation(null);
@@ -120,7 +120,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         )
     })
     public void testClearBeforeAnimation() throws Throwable {
-        final View view = mActivity.findViewById(R.id.fit_windows);
+        final View view = mActivity.findViewById(R.id.mock_view);
         assertFalse(mAnimation.hasStarted());
 
         view.setAnimation(mAnimation);
@@ -147,7 +147,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         )
     })
     public void testClearDuringAnimation() throws Throwable {
-        final View view = mActivity.findViewById(R.id.fit_windows);
+        final View view = mActivity.findViewById(R.id.mock_view);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.startAnimation(mAnimation);

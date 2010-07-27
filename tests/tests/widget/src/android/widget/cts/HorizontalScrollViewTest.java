@@ -669,10 +669,12 @@ public class HorizontalScrollViewTest
         mScrollView.setSmoothScrollingEnabled(true);
         assertEquals(0, mScrollView.getScrollX());
 
+        final int velocityX = WidgetTestUtils.convertDipToPixels(getActivity(), 2000);
+
         // fling towards right
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.fling(2000);
+                mScrollView.fling(velocityX);
             }
         });
         delayedCheckFling(0, true);
@@ -681,7 +683,7 @@ public class HorizontalScrollViewTest
         // fling towards left
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mScrollView.fling(-2000);
+                mScrollView.fling(-velocityX);
             }
         });
         delayedCheckFling(currentX, false);
@@ -872,7 +874,7 @@ public class HorizontalScrollViewTest
                 }
                 return mScrollView.getScrollX() < startPosition;
             }
-        };
+        }.run();
 
         new DelayedCheck() {
             private int mPreviousScrollX = mScrollView.getScrollX();

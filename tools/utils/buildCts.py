@@ -121,6 +121,7 @@ class CtsBuilder(object):
     """Generate the test description for the signature check."""
     self.__LogGenerateDescription('android.tests.sigtest')
     package = tools.TestPackage('SignatureTest', 'android.tests.sigtest')
+    package.AddAttribute('appNameSpace', 'android.tests.sigtest')
     package.AddAttribute('signatureCheck', 'true')
     package.AddAttribute('runner', '.InstrumentationRunner')
     package.AddTest('android.tests.sigtest.SignatureTest.signatureTest')
@@ -132,6 +133,7 @@ class CtsBuilder(object):
     """Generate the test description for the reference app tests."""
     self.__LogGenerateDescription('android.apidemos.cts')
     package = tools.TestPackage('ApiDemosReferenceTest', 'android.apidemos.cts')
+    package.AddAttribute('appNameSpace', 'android.apidemos.cts')
     package.AddAttribute('packageToTest', 'com.example.android.apis')
     package.AddAttribute('apkToTestName', 'ApiDemos')
     package.AddAttribute('runner', 'android.test.InstrumentationTestRunner')

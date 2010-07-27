@@ -20,14 +20,28 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.FeatureInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class DeviceInfoInstrument extends Instrumentation {
+
+    private static final String TAG = "DeviceInfoInstrument";
+
+    private static final String PROCESSES = "processes";
+    private static final String FEATURES = "features";
     private static final String PHONE_NUMBER = "phoneNumber";
     public static final String LOCALES = "locales";
     private static final String IMSI = "imsi";
@@ -122,6 +136,14 @@ public class DeviceInfoInstrument extends Instrumentation {
         String phoneNumber = tm.getLine1Number();
         addResult(PHONE_NUMBER, phoneNumber);
 
+        // features
+        String features = getFeatures();
+        addResult(FEATURES, features);
+
+        // processes
+        String processes = getProcesses();
+        addResult(PROCESSES, processes);
+
         finish(Activity.RESULT_OK, mResults);
     }
 
@@ -153,5 +175,85 @@ public class DeviceInfoInstrument extends Instrumentation {
      */
     private void addResult(final String key, final float value){
         mResults.putFloat(key, value);
+    }
+
+    /**
+     * Return a summary of the device's feature as a semi-colon-delimited list of colon separated
+     * name and availability pairs like "feature1:sdk:true;feature2:sdk:false;feature3:other:true;".
+     */
+    private String getFeatures() {
+        StringBuilder features = new StringBuilder();
+
+        try {
+            Set<String> checkedFeatures = new HashSet<String>();
+
+            PackageManager packageManager = getContext().getPackageManager();
+            for (String featureName : getPackageManagerFeatures()) {
+                checkedFeatures.add(featureName);
+                boolean hasFeature = packageManager.hasSystemFeature(featureName);
+                addFeature(features, featureName, "sdk", hasFeature);
+            }
+
+            FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
+            if (featureInfos != null) {
+                for (FeatureInfo featureInfo : featureInfos) {
+                    if (featureInfo.name != null && !checkedFeatures.contains(featureInfo.name)) {
+                        addFeature(features, featureInfo.name, "other", true);
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            Log.e(TAG, "Error getting features: " + exception.getMessage(), exception);
+        }
+
+        return features.toString();
+    }
+
+    private static void addFeature(StringBuilder features, String name, String type,
+            boolean available) {
+        features.append(name).append(':').append(type).append(':').append(available).append(';');
+    }
+
+    /**
+     * Use reflection to get the features defined by the SDK. If there are features that do not fit
+     * the convention of starting with "FEATURE_" then they will still be shown under the
+     * "Other Features" section.
+     *
+     * @return list of feature names from sdk
+     */
+    private List<String> getPackageManagerFeatures() {
+        try {
+            List<String> features = new ArrayList<String>();
+            Field[] fields = PackageManager.class.getFields();
+            for (Field field : fields) {
+                if (field.getName().startsWith("FEATURE_")) {
+                    String feature = (String) field.get(null);
+                    features.add(feature);
+                }
+            }
+            return features;
+        } catch (IllegalAccessException illegalAccess) {
+            throw new RuntimeException(illegalAccess);
+        }
+    }
+
+    /**
+     * Return a semi-colon-delimited list of the root processes that were running on the phone
+     * or an error message.
+     */
+    private static String getProcesses() {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            String[] rootProcesses = RootProcessScanner.getRootProcesses();
+            for (String rootProcess : rootProcesses) {
+                builder.append(rootProcess).append(';');
+            }
+        } catch (Exception exception) {
+            Log.e(TAG, "Error getting processes: " + exception.getMessage(), exception);
+            builder.append(exception.getMessage());
+        }
+
+        return builder.toString();
     }
 }

@@ -118,15 +118,15 @@ public class TimeKeyListenerTest extends
         assertEquals("", mTextView.getText().toString());
 
         // press '1' key.
-        sendKeys(KeyEvent.KEYCODE_1);
+        mInstrumentation.sendStringSync("1");
         assertEquals("1", mTextView.getText().toString());
 
         // press '2' key.
-        sendKeys(KeyEvent.KEYCODE_2);
+        mInstrumentation.sendStringSync("2");
         assertEquals("12", mTextView.getText().toString());
 
         // press 'a' key.
-        sendKeys(KeyEvent.KEYCODE_A);
+        mInstrumentation.sendStringSync("a");
         assertEquals("12a", mTextView.getText().toString());
 
         // press an unaccepted key if it exists.
@@ -137,7 +137,7 @@ public class TimeKeyListenerTest extends
         }
 
         // press 'm' key.
-        sendKeys(KeyEvent.KEYCODE_M);
+        mInstrumentation.sendStringSync("m");
         assertEquals("12am", mTextView.getText().toString());
 
         mActivity.runOnUiThread(new Runnable() {
@@ -149,7 +149,7 @@ public class TimeKeyListenerTest extends
         mInstrumentation.waitForIdleSync();
 
         // press '1' key.
-        sendKeys(KeyEvent.KEYCODE_1);
+        mInstrumentation.sendStringSync("1");
         assertEquals("12am", mTextView.getText().toString());
     }
 
