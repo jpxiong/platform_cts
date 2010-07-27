@@ -22,12 +22,16 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.os.cts.TestThread;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
+
+import java.util.regex.Pattern;
 
 @TestTargetClass(TelephonyManager.class)
 public class TelephonyManagerTest extends AndroidTestCase {
@@ -265,5 +269,138 @@ public class TelephonyManagerTest extends AndroidTestCase {
         mTelephonyManager.isNetworkRoaming();
         mTelephonyManager.getDeviceId();
         mTelephonyManager.getDeviceSoftwareVersion();
+    }
+
+    /**
+     * Tests that the device properly reports either a valid IMEI if GSM,
+     * a valid MEID if CDMA, or a valid MAC address if only a WiFi device.
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getDeviceId",
+        args = {}
+    )
+    public void testGetDeviceId() {
+        String deviceId = mTelephonyManager.getDeviceId();
+        int phoneType = mTelephonyManager.getPhoneType();
+        switch (phoneType) {
+            case TelephonyManager.PHONE_TYPE_GSM:
+                assertImeiDeviceId(deviceId);
+                break;
+
+            case TelephonyManager.PHONE_TYPE_CDMA:
+                assertMeidDeviceId(deviceId);
+                break;
+
+            case TelephonyManager.PHONE_TYPE_NONE:
+                assertMacAddressReported();
+                break;
+
+            default:
+                throw new IllegalArgumentException("Did you add a new phone type? " + phoneType);
+        }
+    }
+
+    private static void assertImeiDeviceId(String deviceId) {
+        assertImeiFormat(deviceId);
+        assertImeiCheckDigit(deviceId);
+        assertReportingBodyIdentifier(deviceId, true); // Must be decimal identifier
+    }
+
+    private static void assertImeiFormat(String deviceId) {
+        // IMEI must include the check digit
+        String imeiPattern = "[0-9]{15}";
+        assertTrue("IMEI device id " + deviceId + " does not match pattern " + imeiPattern,
+                Pattern.matches(imeiPattern, deviceId));
+    }
+
+    private static void assertImeiCheckDigit(String deviceId) {
+        int expectedCheckDigit = getLuhnCheckDigit(deviceId.substring(0, 14));
+        int actualCheckDigit = Character.digit(deviceId.charAt(14), 10);
+        assertEquals("Incorrect check digit for " + deviceId, expectedCheckDigit, actualCheckDigit);
+    }
+
+    /**
+     * Use decimal value (0-9) to index into array to get sum of its digits
+     * needed by Lunh check.
+     *
+     * Example: DOUBLE_DIGIT_SUM[6] = 3 because 6 * 2 = 12 => 1 + 2 = 3
+     */
+    private static final int[] DOUBLE_DIGIT_SUM = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
+
+    /**
+     * Calculate the check digit by starting from the right, doubling every
+     * each digit, summing all the digits including the doubled ones, and
+     * finding a number to make the sum divisible by 10.
+     *
+     * @param deviceId not including the check digit
+     * @return the check digit
+     */
+    private static int getLuhnCheckDigit(String deviceId) {
+        int sum = 0;
+        int dontDoubleModulus = deviceId.length() % 2;
+        for (int i = deviceId.length() - 1; i >= 0; --i) {
+            int digit = Character.digit(deviceId.charAt(i), 10);
+            if (i % 2 == dontDoubleModulus) {
+                sum += digit;
+            } else {
+                sum += DOUBLE_DIGIT_SUM[digit];
+            }
+        }
+        sum %= 10;
+        return sum == 0 ? 0 : 10 - sum;
+    }
+
+    private static void assertReportingBodyIdentifier(String deviceId, boolean decimalIdentifier) {
+        // Check the reporting body identifier
+        int reportingBodyIdentifier = Integer.parseInt(deviceId.substring(0, 2), 16);
+        int decimalBound = 0xA0;
+        String message = String.format("%s RR %x not %s than %x",
+                decimalIdentifier ? "IMEI" : "MEID",
+                reportingBodyIdentifier,
+                decimalIdentifier ? "<" : ">=",
+                decimalBound);
+        assertEquals(message, decimalIdentifier, reportingBodyIdentifier < decimalBound);
+    }
+
+    private static void assertMeidDeviceId(String deviceId) {
+        assertHexadecimalMeidFormat(deviceId);
+        assertReportingBodyIdentifier(deviceId, false); // Must be hexadecimal identifier
+    }
+
+    private static void assertHexadecimalMeidFormat(String deviceId) {
+        // MEID must NOT include the check digit.
+        String meidPattern = "[0-9a-fA-F]{14}";
+        assertTrue("MEID hex device id " + deviceId + " does not match pattern " + meidPattern,
+                Pattern.matches(meidPattern, deviceId));
+    }
+
+    private void assertMacAddressReported() {
+        String macAddress = getMacAddress();
+        String macPattern = "([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}";
+        assertTrue("MAC Address " + macAddress + " does not match pattern " + macPattern,
+                Pattern.matches(macPattern, macAddress));
+    }
+
+    /** @return mac address which requires the WiFi system to be enabled */
+    private String getMacAddress() {
+        WifiManager wifiManager = (WifiManager) getContext()
+                .getSystemService(Context.WIFI_SERVICE);
+
+        boolean enabled = wifiManager.isWifiEnabled();
+
+        try {
+            if (!enabled) {
+                wifiManager.setWifiEnabled(true);
+            }
+
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            return wifiInfo.getMacAddress();
+
+        } finally {
+            if (!enabled) {
+                wifiManager.setWifiEnabled(false);
+            }
+        }
     }
 }

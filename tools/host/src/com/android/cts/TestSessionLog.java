@@ -69,6 +69,9 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_BUILD_NAME = "buildName";
     static final String ATTRIBUTE_ARCH = "arch";
     static final String ATTRIBUTE_VALUE = "value";
+    static final String ATTRIBUTE_AVAILABLE = "available";
+    static final String ATTRIBUTE_TYPE = "type";
+    static final String ATTRIBUTE_UID = "uid";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -84,6 +87,10 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_SUMMARY = "Summary";
     static final String TAG_SCREEN = "Screen";
     static final String TAG_BUILD_INFO = "BuildInfo";
+    static final String TAG_FEATURE_INFO = "FeatureInfo";
+    static final String TAG_FEATURE = "Feature";
+    static final String TAG_PROCESS_INFO = "ProcessInfo";
+    static final String TAG_PROCESS = "Process";
     static final String TAG_PHONE_SUB_INFO = "PhoneSubInfo";
     static final String TAG_TEST_RESULT = "TestResult";
     static final String TAG_TESTPACKAGE = "TestPackage";
@@ -327,6 +334,9 @@ public class TestSessionLog extends XMLResourceHandler {
                         DeviceParameterCollector.BUILD_ABI2, bldInfo.getBuildAbi2());
 
                 deviceSettingNode.appendChild(devInfoNode);
+
+                addFeatureInfo(doc, deviceSettingNode, bldInfo);
+                addProcessInfo(doc, deviceSettingNode, bldInfo);
             }
 
             Node hostInfo = doc.createElement(TAG_HOSTINFO);
@@ -393,6 +403,86 @@ public class TestSessionLog extends XMLResourceHandler {
     }
 
     /**
+     * Creates a {@link #TAG_FEATURE_INFO} tag with {@link #TAG_FEATURE} elements indicating
+     * what features are supported by the device. It parses a string from the deviceInfo argument
+     * that is in the form of "feature1:true;feature2:false;featuer3;true;" with a trailing
+     * semi-colon.
+     *
+     * <pre>
+     *  <FeatureInfo>
+     *     <Feature name="android.name.of.feature" available="true" />
+     *     ...
+     *   </FeatureInfo>
+     * </pre>
+     * @param document used to create elements
+     * @param parentNode to attach the FeatureInfo element to
+     * @param deviceInfo to get the feature data from
+     */
+    private void addFeatureInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        Node featureInfo = document.createElement(TAG_FEATURE_INFO);
+        parentNode.appendChild(featureInfo);
+
+        String features = deviceInfo.getFeatures();
+        if (features == null) {
+            features = "";
+        }
+
+        String[] featurePairs = features.split(";");
+        for (String featurePair : featurePairs) {
+            String[] nameTypeAvailability = featurePair.split(":");
+            if (nameTypeAvailability.length >= 3) {
+                Node feature = document.createElement(TAG_FEATURE);
+                featureInfo.appendChild(feature);
+
+                setAttribute(document, feature, ATTRIBUTE_NAME, nameTypeAvailability[0]);
+                setAttribute(document, feature, ATTRIBUTE_TYPE, nameTypeAvailability[1]);
+                setAttribute(document, feature, ATTRIBUTE_AVAILABLE, nameTypeAvailability[2]);
+            }
+        }
+    }
+
+    /**
+     * Creates a {@link #TAG_PROCESS_INFO} tag with {@link #TAG_PROCESS} elements indicating
+     * what particular processes of interest were running on the device. It parses a string from
+     * the deviceInfo argument that is in the form of "processName1;processName2;..." with a
+     * trailing semi-colon.
+     *
+     * <pre>
+     *   <ProcessInfo>
+     *     <Process name="long_cat_viewer" uid="0" />
+     *     ...
+     *   </ProcessInfo>
+     * </pre>
+     *
+     * @param document
+     * @param parentNode
+     * @param deviceInfo
+     */
+    private void addProcessInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        Node processInfo = document.createElement(TAG_PROCESS_INFO);
+        parentNode.appendChild(processInfo);
+
+        String rootProcesses = deviceInfo.getProcesses();
+        if (rootProcesses == null) {
+            rootProcesses = "";
+        }
+
+        String[] processNames = rootProcesses.split(";");
+        for (String processName : processNames) {
+            processName = processName.trim();
+            if (processName.length() > 0) {
+                Node process = document.createElement(TAG_PROCESS);
+                processInfo.appendChild(process);
+
+                setAttribute(document, process, ATTRIBUTE_NAME, processName);
+                setAttribute(document, process, ATTRIBUTE_UID, "0");
+            }
+        }
+    }
+
+    /**
      * Output TestSuite and result to XML DOM Document.
      *
      * @param doc The document.
@@ -443,7 +533,7 @@ public class TestSessionLog extends XMLResourceHandler {
                     testNode.appendChild(failedMessageNode);
                     setAttribute(doc, failedMessageNode,TAG_FAILED_MESSAGE, failedMessage);
 
-                    String stackTrace = result.getStackTrace();
+                    String stackTrace = sanitizeStackTrace(result.getStackTrace());
                     if (stackTrace != null) {
                         Node stackTraceNode = doc.createElement(TAG_STACK_TRACE);
                         failedMessageNode.appendChild(stackTraceNode);
@@ -459,6 +549,18 @@ public class TestSessionLog extends XMLResourceHandler {
             parentNode.appendChild(testSuiteNode);
         }
         parentNode.appendChild(testSuiteNode);
+    }
+
+    /**
+     * Strip out any invalid XML characters that might cause the report to be unviewable.
+     * http://www.w3.org/TR/REC-xml/#dt-character
+     */
+    private static String sanitizeStackTrace(String trace) {
+        if (trace != null) {
+            return trace.replaceAll("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD]", "");
+        } else {
+            return null;
+        }
     }
 
     /**

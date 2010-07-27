@@ -166,18 +166,15 @@ public class AppSecurityTests extends DeviceTestCase {
                     getTestAppFilePath(TARGET_INSTRUMENT_APK), false);
             assertNull("failed to install target instrumentation app", installResult);
 
-            // the app will install, but will get error at runtime
+            // the app will install, but will get error at runtime when starting instrumentation
             installResult = getDevice().installPackage(getTestAppFilePath(INSTRUMENT_DIFF_CERT_APK),
                     false);
             assertNull("failed to install instrumentation app with diff cert", installResult);
-            // run INSTRUMENT_DIFF_CERT_PKG tests - expect the test run to fail
-            String runResults = runDeviceTestsWithRunResult(INSTRUMENT_DIFF_CERT_PKG);
-            assertNotNull("running instrumentation with diff cert unexpectedly succeeded",
-                    runResults);
-            String msg = String.format("Unexpected error message result from %s. Received %s",
-                    "instrumentation with diff cert. Expected starts with Permission Denial",
-                    runResults);
-            assertTrue(msg, runResults.startsWith("Permission Denial"));
+            // run INSTRUMENT_DIFF_CERT_PKG tests
+            // this test will attempt to call startInstrumentation directly and verify
+            // SecurityException is thrown 
+            assertTrue("running instrumentation with diff cert unexpectedly succeeded",
+                    runDeviceTests(INSTRUMENT_DIFF_CERT_PKG));
         }
         finally {
             getDevice().uninstallPackage(TARGET_INSTRUMENT_PKG);
@@ -246,18 +243,6 @@ public class AppSecurityTests extends DeviceTestCase {
         CollectingTestRunListener listener = new CollectingTestRunListener();
         testRunner.run(listener);
         return listener;
-    }
-
-    /**
-     * Helper method to run the specified packages tests, and return the test run error message.
-     *
-     * @param pkgName Android application package for tests
-     * @return the test run error message or <code>null</code> if test run completed.
-     * @throws IOException if connection to device was lost
-     */
-    private String runDeviceTestsWithRunResult(String pkgName) throws IOException {
-        CollectingTestRunListener listener = doRunTests(pkgName);
-        return listener.getTestRunErrorMessage();
     }
 
     private static class CollectingTestRunListener implements ITestRunListener {

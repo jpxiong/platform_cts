@@ -18,6 +18,7 @@ package com.android.cts;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -125,11 +126,16 @@ public abstract class XMLResourceHandler {
      * @param doc DOM Document
      */
     protected static void writeToFile(File file, Document doc) throws FileNotFoundException,
-            TransformerFactoryConfigurationError, TransformerException {
+            IOException, TransformerFactoryConfigurationError, TransformerException {
         Transformer t = TransformerFactory.newInstance().newTransformer();
         // enable indent in result file
         t.setOutputProperty("indent", "yes");
-        t.transform(new DOMSource(doc),
-                new StreamResult(new FileOutputStream(file)));
+        FileOutputStream fos = new FileOutputStream(file);
+        try {
+            StreamResult sr = new StreamResult(fos);
+            t.transform(new DOMSource(doc), sr);
+        } finally {
+            fos.close();
+        }
     }
 }

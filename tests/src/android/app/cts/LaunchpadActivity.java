@@ -30,6 +30,12 @@ import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.PerformanceTestCase;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class MyBadParcelable implements Parcelable {
     public MyBadParcelable() {
@@ -86,8 +92,6 @@ public class LaunchpadActivity extends Activity {
     public static final String LIFECYCLE_BASIC = "android.app.cts.activity.LIFECYCLE_BASIC";
     public static final String LIFECYCLE_SCREEN = "android.app.cts.activity.LIFECYCLE_SCREEN";
     public static final String LIFECYCLE_DIALOG = "android.app.cts.activity.LIFECYCLE_DIALOG";
-    public static final String LIFECYCLE_FINISH_CREATE = "android.app.cts.activity.LIFECYCLE_FINISH_CREATE";
-    public static final String LIFECYCLE_FINISH_START = "android.app.cts.activity.LIFECYCLE_FINISH_START";
 
     public static final String BROADCAST_REGISTERED = "android.app.cts.activity.BROADCAST_REGISTERED";
     public static final String BROADCAST_LOCAL = "android.app.cts.activity.BROADCAST_LOCAL";
@@ -119,12 +123,14 @@ public class LaunchpadActivity extends Activity {
     public static final String ON_RESUME = "onResume";
     public static final String ON_FREEZE = "onSaveInstanceState";
     public static final String ON_PAUSE = "onPause";
-    public static final String ON_STOP = "onStop";
-    public static final String ON_DESTROY = "onDestroy";
+
+    // ON_STOP and ON_DESTROY are not tested because they may not be called.
 
     public static final String DO_FINISH = "finish";
     public static final String DO_LOCAL_SCREEN = "local-screen";
     public static final String DO_LOCAL_DIALOG = "local-dialog";
+
+    private static final String TAG = "LaunchpadActivity";
 
     private boolean mBadParcelable = false;
 
@@ -134,8 +140,17 @@ public class LaunchpadActivity extends Activity {
     private Intent mData = new Intent().setAction("No result received");
     private RuntimeException mResultStack = null;
 
-    private String[] mExpectedLifecycle = null;
+    /** Index into the {@link #mNextLifecycle} array. */
     private int mNextLifecycle;
+
+    /** Current lifecycle expected to be followed. */
+    private String[] mExpectedLifecycle;
+
+    /** Other possible lifecycles. Never includes the current {@link #mExpectedLifecycle}. */
+    private List<String[]> mOtherPossibleLifecycles = new ArrayList<String[]>(2);
+
+    /** Map from lifecycle arrays to debugging log names. */
+    private Map<String[], String> mLifecycleNames = new HashMap<String[], String>(2);
 
     private String[] mExpectedReceivers = null;
     private int mNextReceiver;
@@ -157,37 +172,82 @@ public class LaunchpadActivity extends Activity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        resetLifecycles();
+
+        // ON_STOP and ON_DESTROY are not tested because they may not be called.
+
         final String action = getIntent().getAction();
         if (LIFECYCLE_BASIC.equals(action)) {
-            setExpectedLifecycle(new String[] {
-                    ON_START, ON_RESUME, DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
+            addPossibleLifecycle(LIFECYCLE_BASIC, new String[] {
+                    ON_START, ON_RESUME, DO_FINISH, ON_PAUSE
             });
         } else if (LIFECYCLE_SCREEN.equals(action)) {
-            setExpectedLifecycle(new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE, ON_STOP, ON_RESTART,
-                    ON_START, ON_RESUME, DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
+            addPossibleLifecycle(LIFECYCLE_SCREEN + "_RESTART", new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE,
+                    ON_RESTART, ON_START, ON_RESUME, DO_FINISH, ON_PAUSE
+            });
+            addPossibleLifecycle(LIFECYCLE_SCREEN + "_RESUME", new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE,
+                    ON_RESUME, DO_FINISH, ON_PAUSE
             });
         } else if (LIFECYCLE_DIALOG.equals(action)) {
-            setExpectedLifecycle(new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE, ON_RESUME,
-                    DO_FINISH, ON_PAUSE, ON_STOP, ON_DESTROY
+            addPossibleLifecycle(LIFECYCLE_DIALOG + "_RESTART", new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE,
+                    ON_RESTART, ON_START, ON_RESUME, DO_FINISH, ON_PAUSE
             });
-        } else if (LIFECYCLE_FINISH_CREATE.equals(action)) {
-            // This one behaves a little differently when running in a group.
-            if (getParent() == null) {
-                setExpectedLifecycle(new String[] {
-                    ON_DESTROY
-                });
-            } else {
-                setExpectedLifecycle(new String[] {
-                        ON_START, ON_STOP, ON_DESTROY
-                });
-            }
-            finish();
-        } else if (LIFECYCLE_FINISH_START.equals(action)) {
-            setExpectedLifecycle(new String[] {
-                    ON_START, DO_FINISH, ON_STOP, ON_DESTROY
+            addPossibleLifecycle(LIFECYCLE_DIALOG + "_RESUME", new String[] {
+                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE,
+                    ON_RESUME, DO_FINISH, ON_PAUSE
             });
+        }
+    }
+
+    private void resetLifecycles() {
+        mNextLifecycle = 0;
+        mExpectedLifecycle = null;
+        mOtherPossibleLifecycles.clear();
+        mLifecycleNames.clear();
+    }
+
+    /**
+     * Add a potential lifecycle that this activity may follow, since there
+     * are usually multiple valid lifecycles. For instance, sometimes onPause
+     * will lead to onResume rather than onStop when another activity is
+     * raised over the current one.
+     *
+     * @param debugName for the lifecycle shown in the logs
+     * @param lifecycle array containing tokens indicating the expected lifecycle
+     */
+    private void addPossibleLifecycle(String debugName, String[] lifecycle) {
+        mLifecycleNames.put(lifecycle, debugName);
+        if (mExpectedLifecycle == null) {
+            mExpectedLifecycle = lifecycle;
+        } else {
+            mOtherPossibleLifecycles.add(lifecycle);
+        }
+    }
+
+    /**
+     * Switch to the next possible lifecycle and return if switching was
+     * successful. Call this method when mExpectedLifecycle doesn't match
+     * the current lifecycle and you need to check another possible lifecycle.
+     *
+     * @return whether on not there was a lifecycle to switch to
+     */
+    private boolean switchToNextPossibleLifecycle() {
+        if (!mOtherPossibleLifecycles.isEmpty()) {
+            String[] newLifecycle = mOtherPossibleLifecycles.remove(0);
+            Log.w(TAG, "Switching expected lifecycles from "
+                    + mLifecycleNames.get(mExpectedLifecycle) + " to "
+                    + mLifecycleNames.get(newLifecycle));
+            mExpectedLifecycle = newLifecycle;
+            return true;
+        } else {
+            Log.w(TAG, "No more lifecycles after "
+                    + mLifecycleNames.get(mExpectedLifecycle));
+            mExpectedLifecycle = null;
+            return false;
         }
     }
 
@@ -352,12 +412,6 @@ public class LaunchpadActivity extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        checkLifecycle(ON_STOP);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case LAUNCHED_RESULT:
@@ -381,50 +435,42 @@ public class LaunchpadActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        checkLifecycle(ON_DESTROY);
-        sCallingTest.activityFinished(mResultCode, mData, mResultStack);
-    }
-
-    private void setExpectedLifecycle(String[] lifecycle) {
-        mExpectedLifecycle = lifecycle;
-        mNextLifecycle = 0;
-    }
-
     private void checkLifecycle(String where) {
+        String action = getIntent().getAction();
+
         if (mExpectedLifecycle == null) {
             return;
         }
 
         if (mNextLifecycle >= mExpectedLifecycle.length) {
-            finishBad("Activity lifecycle incorrect: received " + where
+            finishBad("Activity lifecycle for " + action + " incorrect: received " + where
                     + " but don't expect any more calls");
             mExpectedLifecycle = null;
             return;
         }
-        if (!mExpectedLifecycle[mNextLifecycle].equals(where)) {
-            finishBad("Activity lifecycle incorrect: received " + where + " but expected "
-                    + mExpectedLifecycle[mNextLifecycle] + " at " + mNextLifecycle);
-            mExpectedLifecycle = null;
+
+        do {
+            if (mExpectedLifecycle[mNextLifecycle].equals(where)) {
+                break;
+            }
+        } while (switchToNextPossibleLifecycle());
+
+        if (mExpectedLifecycle == null) {
+            finishBad("Activity lifecycle for " + action + " incorrect: received " + where
+                    + " but expected " + mExpectedLifecycle[mNextLifecycle]
+                    + " at " + mNextLifecycle);
             return;
         }
 
         mNextLifecycle++;
 
         if (mNextLifecycle >= mExpectedLifecycle.length) {
-            setTestResult(RESULT_OK, null);
+            finishGood();
             return;
         }
 
         final String next = mExpectedLifecycle[mNextLifecycle];
-        if (where.equals(ON_DESTROY)) {
-            finishBad("Activity lifecycle incorrect: received " + where
-                    + " but expected more actions (next is " + next + ")");
-            mExpectedLifecycle = null;
-            return;
-        } else if (next.equals(DO_FINISH)) {
+        if (next.equals(DO_FINISH)) {
             mNextLifecycle++;
             if (mNextLifecycle >= mExpectedLifecycle.length) {
                 setTestResult(RESULT_OK, null);
@@ -473,6 +519,9 @@ public class LaunchpadActivity extends Activity {
     private void finishWithResult(int resultCode, Intent data) {
         setTestResult(resultCode, data);
         finish();
+
+        // Member fields set by calling setTestResult above...
+        sCallingTest.activityFinished(mResultCode, mData, mResultStack);
     }
 
     private void setTestResult(int resultCode, Intent data) {
