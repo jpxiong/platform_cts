@@ -27,6 +27,8 @@ public class ActivityTestsBase extends AndroidTestCase implements PerformanceTes
     public static final String PERMISSION_GRANTED = "android.app.cts.permission.TEST_GRANTED";
     public static final String PERMISSION_DENIED = "android.app.cts.permission.TEST_DENIED";
 
+    private static final int TIMEOUT_MS = 60 * 1000;
+
     protected Intent mIntent;
 
     private PerformanceTestCase.Intermediates mIntermediates;
@@ -125,6 +127,11 @@ public class ActivityTestsBase extends AndroidTestCase implements PerformanceTes
     }
 
     public int runLaunchpad(String action) {
+        startLaunchpadActivity(action);
+        return waitForResultOrThrow(TIMEOUT_MS);
+    }
+
+    private void startLaunchpadActivity(String action) {
         LaunchpadActivity.setCallingTest(this);
 
         synchronized (this) {
@@ -133,8 +140,6 @@ public class ActivityTestsBase extends AndroidTestCase implements PerformanceTes
             mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(mIntent);
         }
-
-        return waitForResultOrThrow(60 * 1000);
     }
 
     public int waitForResultOrThrow(int timeoutMs) {
@@ -185,6 +190,7 @@ public class ActivityTestsBase extends AndroidTestCase implements PerformanceTes
         }
         return mResultCode;
     }
+
 
     public int getResultCode() {
         return mResultCode;

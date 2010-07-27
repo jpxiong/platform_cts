@@ -16,7 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -167,7 +166,6 @@ public class ActivityGroupTest extends ActivityTestsBase {
             args = {}
         )
     })
-    @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabScreen() throws Exception {
         mIntent = mTabIntent;
         runLaunchpad(LaunchpadActivity.LIFECYCLE_SCREEN);
@@ -235,143 +233,8 @@ public class ActivityGroupTest extends ActivityTestsBase {
             args = {}
         )
     })
-    @BrokenTest(value="bug 2189784, needs investigation")
     public void testTabDialog() throws Exception {
         mIntent = mTabIntent;
         runLaunchpad(LaunchpadActivity.LIFECYCLE_DIALOG);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "ActivityGroup",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "ActivityGroup",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreate",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onResume",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onSaveInstanceState",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onPause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onStop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getCurrentActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getLocalActivityManager",
-            args = {}
-        )
-    })
-     public void testTabFinishCreate() throws Exception {
-        mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_FINISH_CREATE);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "ActivityGroup",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "ActivityGroup",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreate",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onResume",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onSaveInstanceState",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onPause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onStop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getCurrentActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getLocalActivityManager",
-            args = {}
-        )
-    })
-    public void testTabFinishStart() throws Exception {
-        mIntent = mTabIntent;
-        runLaunchpad(LaunchpadActivity.LIFECYCLE_FINISH_START);
     }
 }

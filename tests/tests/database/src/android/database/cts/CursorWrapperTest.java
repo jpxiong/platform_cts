@@ -16,8 +16,10 @@
 
 package android.database.cts;
 
-import java.io.File;
-import java.util.Arrays;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -33,13 +35,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
+
+import java.io.File;
+import java.util.Arrays;
 
 @TestTargetClass(android.database.CursorWrapper.class)
-public class CursorWrapperTest extends DatabaseCursorTest {
+public class CursorWrapperTest extends AndroidTestCase {
 
     private static final String FIRST_NUMBER = "123";
     private static final String SECOND_NUMBER = "5555";
@@ -61,7 +62,6 @@ public class CursorWrapperTest extends DatabaseCursorTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        setupTestType(TYPE_CURSORWRAPPER);
         setupDatabase();
     }
 
@@ -510,12 +510,12 @@ public class CursorWrapperTest extends DatabaseCursorTest {
         final String STRING_TEXT2 = "Test String2";
         final double NUMBER_DOUBLE = Double.MAX_VALUE;
         final double NUMBER_FLOAT = (float) NUMBER_DOUBLE;
-        final long NUMBER_LONG_INTEGER = (long) 0xaabbccddffL;
+        final long NUMBER_LONG_INTEGER = 0xaabbccddffL;
         final long NUMBER_INTEGER = (int) NUMBER_LONG_INTEGER;
         final long NUMBER_SHORT = (short) NUMBER_INTEGER;
 
-        assertTrue(NUMBER_DOUBLE != (double) NUMBER_FLOAT);
-        assertTrue(NUMBER_LONG_INTEGER != (long) NUMBER_INTEGER);
+        assertTrue(NUMBER_DOUBLE != NUMBER_FLOAT);
+        assertTrue(NUMBER_LONG_INTEGER != NUMBER_INTEGER);
         assertTrue(NUMBER_LONG_INTEGER != (short) NUMBER_SHORT);
         assertTrue(NUMBER_INTEGER != (int) NUMBER_SHORT);
 

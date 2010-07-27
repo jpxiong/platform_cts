@@ -49,6 +49,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import junit.framework.TestCase;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +62,7 @@ import junit.framework.TestCase;
  * This class performs end-to-end testing of the accessibility feature by
  * creating an {@link Activity} and poking around so {@link AccessibilityEvent}s
  * are generated and their correct dispatch verified.
- * </p>
+ * <p>
  * Note: The end-to-end test is composed of two APKs, one with a mock accessibility
  * service, another with the instrumented activity and test cases. The motivation for
  * two APKs design is that CTS tests cannot access the secure settings which is

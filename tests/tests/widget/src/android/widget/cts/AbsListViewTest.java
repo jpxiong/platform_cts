@@ -504,11 +504,16 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
 
         setAdapter();
 
+        View row = mListView.getChildAt(0);
+        int rowHeight = row.getHeight();
+        int middleOfSecondRow = rowHeight + rowHeight/2;
+
         int position1 = mListView.pointToPosition(0, 0);
-        int position2 = mListView.pointToPosition(50, 200);
+        int position2 = mListView.pointToPosition(50, middleOfSecondRow);
 
         assertEquals(mAdapter_countries.getItemId(position1), mListView.pointToRowId(0, 0));
-        assertEquals(mAdapter_countries.getItemId(position2), mListView.pointToRowId(50, 200));
+        assertEquals(mAdapter_countries.getItemId(position2),
+                mListView.pointToRowId(50, middleOfSecondRow));
 
         assertTrue(position2 > position1);
     }
