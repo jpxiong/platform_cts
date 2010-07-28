@@ -49,7 +49,7 @@ checkFile() {
 checkDir ${CTS_ROOT} "Error: Cannot locate CTS in \"${CTS_DIR}\". Please check your configuration in $0"
 checkDir ${SDK_ROOT} "Error: Cannot locate SDK installation in \"${SDK_ROOT}\". Please check your configuration in $0"
 
-DDM_LIB=${SDK_ROOT}/tools/lib/ddmlib.jar
+DDM_LIB=${CTS_ROOT}/tools/ddmlib-prebuilt.jar
 CTS_LIB=${CTS_ROOT}/tools/cts.jar
 JUNIT_LIB=${CTS_ROOT}/tools/junit.jar
 HOSTTEST_LIB=${CTS_ROOT}/tools/hosttestlib.jar
