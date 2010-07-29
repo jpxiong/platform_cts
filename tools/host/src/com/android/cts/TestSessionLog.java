@@ -46,7 +46,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.2";
+    private static final String CTS_RESULT_FILE_VERSION = "1.5";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -72,6 +72,7 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_AVAILABLE = "available";
     static final String ATTRIBUTE_TYPE = "type";
     static final String ATTRIBUTE_UID = "uid";
+    static final String ATTRIBUTE_OPEN_GL_ES_VERSION = "openGlEsVersion";
 
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
@@ -315,6 +316,8 @@ public class TestSessionLog extends XMLResourceHandler {
                 setAttribute(doc, devInfoNode, ATTRIBUTE_NETWORK, bldInfo.getNetwork());
                 setAttribute(doc, devInfoNode, ATTRIBUTE_IMEI, bldInfo.getIMEI());
                 setAttribute(doc, devInfoNode, ATTRIBUTE_IMSI, bldInfo.getIMSI());
+                setAttribute(doc, devInfoNode, ATTRIBUTE_OPEN_GL_ES_VERSION,
+                        bldInfo.getOpenGlEsVersion());
 
                 setAttribute(doc, devInfoNode,
                         DeviceParameterCollector.BUILD_FINGERPRINT, bldInfo.getBuildFingerPrint());
