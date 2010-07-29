@@ -182,6 +182,12 @@
                                         </TD>
                                     </TR>
                                     <TR>
+                                        <TD class="rowtitle">Open GL ES Version</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@openGlEsVersion"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
                                         <TD class="rowtitle">Features</TD>
                                         <TD>
                                             <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
