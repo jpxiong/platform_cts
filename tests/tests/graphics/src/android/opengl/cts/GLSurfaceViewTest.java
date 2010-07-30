@@ -16,12 +16,12 @@
 
 package android.opengl.cts;
 
+import dalvik.annotation.TestTargetClass;
+
 import android.opengl.GLSurfaceView;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.Log;
-
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Tests for the GLSurfaceView class.
