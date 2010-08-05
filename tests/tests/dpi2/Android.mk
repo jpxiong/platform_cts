@@ -27,6 +27,8 @@ LOCAL_PACKAGE_NAME := CtsDpiTestCases2
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
 # We would set LOCAL_SDK_VERSION := 3 here, but the build system
 # doesn't currently support setting LOCAL_SDK_VERSION to anything but
 # current.
