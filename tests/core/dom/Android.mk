@@ -24,9 +24,12 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/dom/src/test/java) \
-	$(call all-java-files-under,../../../../libcore/luni/src/test/java/junit) \
-	../../../../libcore/luni/src/test/java/tests/TestSuiteFactory.java
+	$(call all-java-files-under,../../../../libcore/junit/src/test/java/junit) \
+	$(call all-java-files-under,../../../../libcore/support/src/test/java/)
 
 LOCAL_PACKAGE_NAME := android.core.tests.dom
+
+# for java.* javax.* support classes in libcore/support/src/test/java
+LOCAL_DX_FLAGS := --core-library
 
 include $(BUILD_CTSCORE_PACKAGE)
