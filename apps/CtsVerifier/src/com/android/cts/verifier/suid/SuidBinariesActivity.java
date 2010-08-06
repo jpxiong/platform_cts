@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier;
+package com.android.cts.verifier.suid;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-/** {@link Activity} that displays an introduction to the verifier. */
-public class CtsVerifierActivity extends Activity {
+public class SuidBinariesActivity extends Activity {
 
-    /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-    }
-
-    public void continueButtonClickHandler(View target) {
-        startActivity(new Intent(this, TestListActivity.class));
     }
 }

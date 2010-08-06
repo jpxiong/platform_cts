@@ -58,6 +58,8 @@
     <classpathentry kind="src" path="cts/tools/test-progress-new/src"/>
     <classpathentry kind="src" path="cts/tools/utils"/>
     <classpathentry kind="src" path="cts/tools/vm-tests/src"/>
-    <classpathentry kind="src" path="out/target/common/obj/APPS/CtsTestStubs_intermediates/src/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsAccessibilityServiceTestCases_intermediates/src/src"/>
+    <classpathentry kind="src" path="out/target/common/obj/APPS/CtsTestStubs_intermediates/src/src"/>
+    <classpathentry kind="src" path="out/target/common/obj/APPS/CtsVerifier_intermediates/src"/>
+    <classpathentry kind="src" path="out/target/common/obj/APPS/CtsVerifierTests_intermediates/src"/>
 </classpath>
