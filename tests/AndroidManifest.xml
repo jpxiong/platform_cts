@@ -930,6 +930,8 @@
         <activity android:name="android.opengl.cts.GLSurfaceViewStubActivity"
                   android:label="GLSurfaceViewStub"/>
 
+        <activity android:name="android.opengl.cts.OpenGlEsVersionStubActivity"/>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
