@@ -394,6 +394,15 @@ public class ContentProviderTest extends AndroidTestCase {
             public Bundle call(String method, String request, Bundle args) {
                 return null;
             }
+            
+            public String[] getStreamTypes(Uri url, String mimeTypeFilter) throws RemoteException {
+                return null;
+            }
+
+            public AssetFileDescriptor openTypedAssetFile(Uri url, String mimeType, Bundle opts)
+                    throws RemoteException, FileNotFoundException {
+                return null;
+            }
         };
         assertNull(ContentProvider.coerceToLocalContentProvider(iContentProvider));
     }
