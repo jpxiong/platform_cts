@@ -17,15 +17,23 @@
 package com.android.cts.verifier;
 
 import android.app.Activity;
+import android.app.Instrumentation;
+import android.app.Instrumentation.ActivityMonitor;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.concurrent.TimeUnit;
 
 public class CtsVerifierActivityTest
         extends ActivityInstrumentationTestCase2<CtsVerifierActivity> {
 
     private Activity mActivity;
+    private Instrumentation mInstrumentation;
     private TextView mWelcomeTextView;
+    private Button mContinueButton;
     private String mWelcomeText;
+    private String mContinueText;
 
     public CtsVerifierActivityTest() {
         super(CtsVerifierActivity.class);
@@ -35,16 +43,39 @@ public class CtsVerifierActivityTest
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
+        mInstrumentation = getInstrumentation();
         mWelcomeTextView = (TextView) mActivity.findViewById(R.id.welcome);
         mWelcomeText = mActivity.getString(R.string.welcome_text);
+        mContinueButton = (Button) mActivity.findViewById(R.id.continue_button);
+        mContinueText = mActivity.getString(R.string.continue_button_text);
     }
 
     public void testPreconditions() {
         assertNotNull(mWelcomeTextView);
         assertNotNull(mWelcomeText);
+        assertNotNull(mContinueButton);
     }
 
     public void testWelcome() {
         assertEquals(mWelcomeText, mWelcomeTextView.getText().toString());
+        assertEquals(mContinueText, mContinueButton.getText().toString());
+    }
+
+    /** Check that the continue button leads to the test list successfully. */
+    public void testContinueButton() throws Throwable {
+        ActivityMonitor monitor =
+                new ActivityMonitor(TestListActivity.class.getName(), null, false);
+        mInstrumentation.addMonitor(monitor);
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+               assertTrue(mContinueButton.performClick());
+            }
+        });
+
+        Activity activity = mInstrumentation.waitForMonitorWithTimeout(monitor,
+                TimeUnit.SECONDS.toMillis(10));
+        assertNotNull(activity);
+        activity.finish();
     }
 }
