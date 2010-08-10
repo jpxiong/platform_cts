@@ -21,8 +21,6 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-import org.apache.harmony.luni.internal.util.ZoneInfoDB;
-
 import android.util.TimeUtils;
 
 import java.util.Calendar;
@@ -471,20 +469,6 @@ public class TimeUtilsTest extends TestCase {
             guess = guessTimeZone(c, country);
             assertEquals(name, guess.getID());
         }
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZoneDatabaseVersion",
-            method = "getTimeZoneDatabaseVersion",
-            args = {}
-        )
-    })
-    public void testGetTimeZoneDatabaseVersion(){
-        String version = TimeUtils.getTimeZoneDatabaseVersion();
-        assertTrue(5 == version.length());
-        assertEquals(ZoneInfoDB.getVersion(), version);
     }
 
     private static TimeZone guessTimeZone(Calendar c, String country) {
