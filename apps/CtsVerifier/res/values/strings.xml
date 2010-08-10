@@ -16,4 +16,7 @@
 <resources>
     <string name="app_name">CTS Verifier</string>
     <string name="welcome_text">Welcome to the CTS Verifier!</string>
+    <string name="continue_button_text">Continue</string>
+    <string name="test_list_title">Manual Test List</string>
+    <string name="suid_binaries">SUID Binaries</string>
 </resources>
