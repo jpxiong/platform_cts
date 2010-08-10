@@ -19,6 +19,7 @@ package android.app.cts;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.app.WallpaperManager;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -92,6 +93,14 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 assertFalse("Use a different namespace than 'android' for " + featureName,
                         featureName.startsWith("android"));
             }
+        }
+    }
+
+    public void testBluetoothFeature() {
+        if (BluetoothAdapter.getDefaultAdapter() != null) {
+            assertAvailable(PackageManager.FEATURE_BLUETOOTH);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_BLUETOOTH);
         }
     }
 
