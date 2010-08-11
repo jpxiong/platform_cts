@@ -50,7 +50,6 @@ public class TestListActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-        ListAdapter adapter = getListAdapter();
         Intent intent = getIntent(position);
         startActivity(intent);
     }
