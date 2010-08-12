@@ -29,6 +29,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,14 @@ public class TestListActivity extends ListActivity {
                 Intent intent = getActivityIntent(info.activityInfo);
                 addItem(data, title, intent);
             }
+
+            Collections.sort(data, new Comparator<Map<String, ?>> () {
+                public int compare(Map<String, ?> item, Map<String, ?> otherItem) {
+                    String title = (String) item.get(TITLE);
+                    String otherTitle = (String) otherItem.get(TITLE);
+                    return title.compareTo(otherTitle);
+                }
+            });
 
             return data;
         }
