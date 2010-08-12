@@ -936,6 +936,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testFindNext() throws Throwable {
+        // Reset the scaling so that finding the next "all" text will require scrolling.
+        mWebView.setInitialScale(100);
+
         DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
         int dimension = Math.max(metrics.widthPixels, metrics.heightPixels);
         // create a paragraph high enough to take up the entire screen
