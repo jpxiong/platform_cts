@@ -19,4 +19,15 @@
     <string name="continue_button_text">Continue</string>
     <string name="test_list_title">Manual Test List</string>
     <string name="suid_binaries">SUID Binaries</string>
+
+    <!-- strings for FeatureSummaryActivity -->
+    <string name="feature_summary">Hardware/Software Feature Summary</string>
+    <string name="fs_disallowed">WARNING: device reports a disallowed feature name</string>
+    <string name="fs_missing_wifi_telephony">WARNING: device reports neither WiFi nor telephony</string>
+    <string name="fs_no_data">No data.</string>
+    <string name="empty"></string>
+
+    <!-- strings for AccelerometerTestActivity and MagnetometerTestActivity -->
+    <string name="snsr_accel_test">Accelerometer Test</string>
+    <string name="snsr_mag_test">Magnetometer Test</string>
 </resources>
