@@ -208,7 +208,6 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
                 Sensor.TYPE_ACCELEROMETER).get(0), SensorManager.SENSOR_DELAY_UI);
     }
 
-    @Override
     public void onAccuracyChanged(Sensor arg0, int arg1) {
         // no-op
     }
@@ -255,7 +254,6 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
         mWedge.draw(gl);
     }
 
-    @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             /*
