@@ -26,6 +26,7 @@ import org.apache.http.HttpStatus;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.HttpAuthHandler;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -45,6 +46,9 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+
+        // Set a web chrome client in order to receive progress updates.
+        mWebView.setWebChromeClient(new WebChromeClient());
     }
 
     @Override
