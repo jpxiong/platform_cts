@@ -50,6 +50,7 @@ CTS_TEST_CASE_LIST := \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
 	CtsProviderTestCases \
+	CtsSaxTestCases \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \
 	CtsTextTestCases \
