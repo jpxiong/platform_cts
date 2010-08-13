@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.suid;
+#include <jni.h>
+#include <stdio.h>
 
-import android.app.Activity;
-import android.os.Bundle;
+extern int register_com_android_cts_verifier_os_FileUtils(JNIEnv*);
 
-public class SuidBinariesActivity extends Activity {
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env = NULL;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+        return JNI_ERR;
     }
+
+    if (register_com_android_cts_verifier_os_FileUtils(env)) {
+        return JNI_ERR;
+    }
+
+    return JNI_VERSION_1_4;
 }
