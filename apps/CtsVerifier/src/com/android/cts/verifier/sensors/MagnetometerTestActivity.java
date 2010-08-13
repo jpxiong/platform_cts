@@ -19,7 +19,6 @@ package com.android.cts.verifier.sensors;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -29,37 +28,34 @@ import android.os.Bundle;
  * Displays a wedge using OpenGL that, on a correctly-integrated device, always
  * points down.
  */
-public class AccelerometerTestActivity extends Activity {
+public class MagnetometerTestActivity extends Activity {
     private GLSurfaceView mGLSurfaceView;
+
+    private AccelerometerTestRenderer mListener;
 
     private SensorManager mSensorManager;
 
-    private SensorEventListener mListener;
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
         mGLSurfaceView = new GLSurfaceView(this);
-        AccelerometerTestRenderer renderer = new AccelerometerTestRenderer(this);
+        AccelerometerTestRenderer renderer = new MagnetometerTestRenderer(this);
         mListener = renderer;
         mGLSurfaceView.setRenderer(renderer);
         setContentView(mGLSurfaceView);
     }
 
-    @Override
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(mListener);
         mGLSurfaceView.onPause();
     }
 
-    @Override
     protected void onResume() {
         super.onResume();
-        mGLSurfaceView.onResume();
         mSensorManager.registerListener(mListener, mSensorManager.getSensorList(
-                Sensor.TYPE_ACCELEROMETER).get(0), SensorManager.SENSOR_DELAY_UI);
+                Sensor.TYPE_MAGNETIC_FIELD).get(0), SensorManager.SENSOR_DELAY_UI);
+        mGLSurfaceView.onResume();
     }
 }
