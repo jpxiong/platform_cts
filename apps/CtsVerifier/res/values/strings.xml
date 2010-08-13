@@ -33,7 +33,7 @@
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID Files</string>
     <string name="starting_scan">Starting scan...</string>
-    <string name="file_status">User: %s\nGroup: %s\nPermissions: %s\nPath: %s</string>
+    <string name="file_status">User: %1$s\nGroup: %2$s\nPermissions: %3$s\nPath: %4$s</string>
     <string name="no_file_status">Could not stat file...</string>
     <string name="congratulations">Congratulations!</string>
     <string name="no_suid_files">No unauthorized suid files detected!</string>
