@@ -17,18 +17,16 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
+LOCAL_MODULE := libctsverifier_jni
+
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_PRELINK_MODULE := false
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SRC_FILES := \
+		CtsVerifierJniOnLoad.cpp \
+		com_android_cts_verifier_os_FileUtils.cpp	
 
-LOCAL_PACKAGE_NAME := CtsVerifier
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni
-
-LOCAL_SDK_VERSION := current
-
-include $(BUILD_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(BUILD_SHARED_LIBRARY)
