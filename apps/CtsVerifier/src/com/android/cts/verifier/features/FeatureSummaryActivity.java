@@ -63,7 +63,7 @@ public class FeatureSummaryActivity extends ListActivity {
         /**
          * Constructor does not include 'present' because that's a detected
          * value, and not set during creation.
-         * 
+         *
          * @param name value for this.name
          * @param required value for this.required
          */
