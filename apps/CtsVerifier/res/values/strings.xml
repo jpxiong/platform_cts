@@ -18,16 +18,23 @@
     <string name="welcome_text">Welcome to the CTS Verifier!</string>
     <string name="continue_button_text">Continue</string>
     <string name="test_list_title">Manual Test List</string>
-    <string name="suid_binaries">SUID Binaries</string>
 
-    <!-- strings for FeatureSummaryActivity -->
+    <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
     <string name="fs_disallowed">WARNING: device reports a disallowed feature name</string>
     <string name="fs_missing_wifi_telephony">WARNING: device reports neither WiFi nor telephony</string>
     <string name="fs_no_data">No data.</string>
     <string name="empty"></string>
 
-    <!-- strings for AccelerometerTestActivity and MagnetometerTestActivity -->
+    <!-- Strings for AccelerometerTestActivity and MagnetometerTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
     <string name="snsr_mag_test">Magnetometer Test</string>
+
+    <!-- Strings for SuidFilesActivity -->
+    <string name="suid_files">SUID Files</string>
+    <string name="starting_scan">Starting scan...</string>
+    <string name="file_status">User: %s\nGroup: %s\nPermissions: %s\nPath: %s</string>
+    <string name="no_file_status">Could not stat file...</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="no_suid_files">No unauthorized suid files detected!</string>
 </resources>
