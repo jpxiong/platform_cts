@@ -17,7 +17,13 @@
     <string name="app_name">CTS Verifier</string>
     <string name="welcome_text">Welcome to the CTS Verifier!</string>
     <string name="continue_button_text">Continue</string>
+    
+    <!-- Strings for TestListActivity -->
     <string name="test_list_title">Manual Test List</string>
+    <string name="test_category_sensors">Sensors</string>
+    <string name="test_category_security">Security</string>
+    <string name="test_category_features">Features</string>
+    <string name="test_category_other">Other</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
