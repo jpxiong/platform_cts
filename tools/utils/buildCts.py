@@ -94,9 +94,9 @@ class CtsBuilder(object):
     source_path = [
         'frameworks/base/core/java',            # android test classes
         'frameworks/base/test-runner/src',      # test runner
-        'dalvik/libcore/junit/src/main/java',   # junit classes
+        'libcore/junit/src/main/java',          # junit classes
         'development/tools/hosttestlib/src',    # hosttestlib TestCase extensions
-        'dalvik/libcore/dalvik/src/main/java',  # test annotations
+        'libcore/dalvik/src/main/java',         # test annotations
         'cts/tests/src',                        # cts test stubs
         source_root                             # the source for this package
     ]
