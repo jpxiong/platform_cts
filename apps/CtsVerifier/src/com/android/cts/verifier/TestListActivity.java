@@ -23,10 +23,13 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +43,8 @@ public class TestListActivity extends ListActivity {
 
     /** Activities implementing {@link Intent#ACTION_MAIN} and this will appear in the list. */
     static final String CATEGORY_MANUAL_TEST = "android.cts.intent.category.MANUAL_TEST";
+
+    static final String TEST_CATEGORY_META_DATA = "test_category";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,43 +70,92 @@ public class TestListActivity extends ListActivity {
 
     /**
      * Each {@link ListView} item will have a map associated it with containing the title to
-     * display and the intent used to launch it.
+     * display and the intent used to launch it. If there is no intent, then it is a test category
+     * header.
      */
-    static class TestListAdapter extends SimpleAdapter {
+    static class TestListAdapter extends BaseAdapter {
 
         static final String TITLE = "title";
 
         static final String INTENT = "intent";
 
+        /** View type for a category of tests like "Sensors" or "Features" */
+        static final int TEST_CATEGORY_HEADER_VIEW_TYPE = 0;
+
+        /** View type for an actual test like the Accelerometer test. */
+        static final int TEST_VIEW_TYPE = 1;
+
+        private final List<Map<String, ?>> mData;
+
+        private final LayoutInflater mLayoutInflater;
+
         TestListAdapter(Context context) {
-            super(context, getData(context), android.R.layout.simple_list_item_1,
-                    new String[] {TITLE}, new int[] {android.R.id.text1});
+            this.mData = getData(context);
+            this.mLayoutInflater =
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         static List<Map<String, ?>> getData(Context context) {
-            List<Map<String, ?>> data = new ArrayList<Map<String,?>>();
+            /*
+             * 1. Get all the tests keyed by their category.
+             * 2. Flatten the tests and categories into one giant list for the list view.
+             */
+
+            Map<String, List<Map<String, ?>>> testsByCategory = getTestsByCategory(context);
+
+            List<String> testCategories = new ArrayList<String>(testsByCategory.keySet());
+            Collections.sort(testCategories);
+
+            List<Map<String, ?>> data = new ArrayList<Map<String, ?>>();
+            for (String testCategory : testCategories) {
+                addItem(data, testCategory, null);
+
+                List<Map<String, ?>> tests = testsByCategory.get(testCategory);
+                Collections.sort(tests, new Comparator<Map<String, ?>>() {
+                    public int compare(Map<String, ?> item, Map<String, ?> otherItem) {
+                        String title = (String) item.get(TITLE);
+                        String otherTitle = (String) otherItem.get(TITLE);
+                        return title.compareTo(otherTitle);
+                    }
+                });
+                data.addAll(tests);
+            }
+
+            return data;
+        }
+
+        static Map<String, List<Map<String, ?>>> getTestsByCategory(Context context) {
+            Map<String, List<Map<String, ?>>> testsByCategory =
+                new HashMap<String, List<Map<String, ?>>>();
 
             Intent mainIntent = new Intent(Intent.ACTION_MAIN);
             mainIntent.addCategory(CATEGORY_MANUAL_TEST);
 
             PackageManager packageManager = context.getPackageManager();
-            List<ResolveInfo> list = packageManager.queryIntentActivities(mainIntent, 0);
+            List<ResolveInfo> list = packageManager.queryIntentActivities(mainIntent,
+                    PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
+
             for (int i = 0; i < list.size(); i++) {
                 ResolveInfo info = list.get(i);
+                String testCategory = getTestCategory(context, info.activityInfo.metaData);
                 String title = getTitle(context, info.activityInfo);
                 Intent intent = getActivityIntent(info.activityInfo);
-                addItem(data, title, intent);
+                addItemToCategory(testsByCategory, testCategory, title, intent);
             }
 
-            Collections.sort(data, new Comparator<Map<String, ?>> () {
-                public int compare(Map<String, ?> item, Map<String, ?> otherItem) {
-                    String title = (String) item.get(TITLE);
-                    String otherTitle = (String) otherItem.get(TITLE);
-                    return title.compareTo(otherTitle);
-                }
-            });
+            return testsByCategory;
+        }
 
-            return data;
+        static String getTestCategory(Context context, Bundle metaData) {
+            String testCategory = null;
+            if (metaData != null) {
+                testCategory = metaData.getString(TEST_CATEGORY_META_DATA);
+            }
+            if (testCategory != null) {
+                return testCategory;
+            } else {
+                return context.getString(R.string.test_category_other);
+            }
         }
 
         static String getTitle(Context context, ActivityInfo activityInfo) {
@@ -118,12 +172,95 @@ public class TestListActivity extends ListActivity {
             return intent;
         }
 
+        static void addItemToCategory(Map<String, List<Map<String, ?>>> data, String testCategory,
+                String title, Intent intent) {
+            List<Map<String, ?>> tests;
+            if (data.containsKey(testCategory)) {
+                tests = data.get(testCategory);
+            } else {
+                tests = new ArrayList<Map<String, ?>>();
+            }
+            data.put(testCategory, tests);
+            addItem(tests, title, intent);
+        }
+
+        /**
+         * @param tests to add this new item to
+         * @param title to show in the list view
+         * @param intent for a test to launch or null for a test category header
+         */
         @SuppressWarnings("unchecked")
-        static void addItem(List<Map<String, ?>> data, String title, Intent intent) {
+        static void addItem(List<Map<String, ?>> tests, String title, Intent intent) {
             HashMap item = new HashMap(2);
             item.put(TITLE, title);
             item.put(INTENT, intent);
-            data.add(item);
+            tests.add(item);
+        }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            // Section headers for test categories are not clickable.
+            return false;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return isTestActivity(position);
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return isTestActivity(position) ? TEST_VIEW_TYPE : TEST_CATEGORY_HEADER_VIEW_TYPE;
+        }
+
+        private boolean isTestActivity(int position) {
+            Map<String, ?> item = getItem(position);
+            return item.get(INTENT) != null;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        public int getCount() {
+            return mData.size();
+        }
+
+        public Map<String, ?> getItem(int position) {
+            return mData.get(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView textView;
+            if (convertView == null) {
+                int layout = getLayout(position);
+                textView = (TextView) mLayoutInflater.inflate(layout, parent, false);
+            } else {
+                textView = (TextView) convertView;
+            }
+
+            Map<String, ?> data = getItem(position);
+            String title = (String) data.get(TITLE);
+            textView.setText(title);
+            return textView;
+        }
+
+        private int getLayout(int position) {
+            int viewType = getItemViewType(position);
+            switch (viewType) {
+                case TEST_CATEGORY_HEADER_VIEW_TYPE:
+                    return R.layout.test_category_row;
+                case TEST_VIEW_TYPE:
+                    return android.R.layout.simple_list_item_1;
+                default:
+                    throw new IllegalArgumentException("Illegal view type: " + viewType);
+
+            }
         }
     }
 }
