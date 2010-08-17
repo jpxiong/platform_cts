@@ -40,6 +40,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_security" />
         </activity>
 
         <activity android:name=".features.FeatureSummaryActivity" android:label="@string/feature_summary">
@@ -47,6 +48,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_features" />
         </activity>
 
         <activity android:name=".sensors.AccelerometerTestActivity" android:label="@string/snsr_accel_test"
@@ -55,6 +57,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
         </activity>
 
         <activity android:name=".sensors.MagnetometerTestActivity" android:label="@string/snsr_mag_test"
@@ -63,6 +66,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
         </activity>
     </application>
 </manifest> 
