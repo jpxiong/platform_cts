@@ -24,6 +24,7 @@ import dalvik.annotation.TestTargets;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Looper;
 import android.os.cts.TestThread;
 import android.telephony.CellLocation;
@@ -295,6 +296,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
 
             case TelephonyManager.PHONE_TYPE_NONE:
                 assertNull(deviceId);
+                assertSerialNumber();
                 assertMacAddressReported();
                 break;
 
@@ -389,6 +391,15 @@ public class TelephonyManagerTest extends AndroidTestCase {
         String meidPattern = "[0-9a-fA-F]{14}";
         assertTrue("MEID hex device id " + deviceId + " does not match pattern " + meidPattern,
                 Pattern.matches(meidPattern, deviceId));
+    }
+
+    private void assertSerialNumber() {
+        assertNotNull("Non-telephony devices must have a Build.SERIAL number.",
+                Build.SERIAL);
+        assertTrue("Hardware id must be no longer than 20 characters.",
+                Build.SERIAL.length() <= 20);
+        assertTrue("Hardware id must be alphanumeric.",
+                Pattern.matches("[0-9A-Za-z]+", Build.SERIAL));
     }
 
     private void assertMacAddressReported() {
