@@ -938,11 +938,18 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Parameters parameters = mCamera.getParameters();
         if (!parameters.isZoomSupported()) return;
 
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+
         // Test the zoom parameters.
         assertEquals(0, parameters.getZoom());  // default zoom should be 0.
-        int maxZoom = parameters.getMaxZoom();
-        assertTrue(maxZoom >= 0);
-        if (maxZoom > 0) {
+        for (Size size: parameters.getSupportedPreviewSizes()) {
+            parameters = mCamera.getParameters();
+            parameters.setPreviewSize(size.width, size.height);
+            mCamera.setParameters(parameters);
+            parameters = mCamera.getParameters();
+            int maxZoom = parameters.getMaxZoom();
+            assertTrue(maxZoom >= 0);
+
             // Zoom ratios should be sorted from small to large.
             List<Integer> ratios = parameters.getZoomRatios();
             assertEquals(maxZoom + 1, ratios.size());
@@ -950,31 +957,31 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             for (int i = 0; i < ratios.size() - 1; i++) {
                 assertTrue(ratios.get(i) < ratios.get(i + 1));
             }
-        }
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
-        mCamera.startPreview();
-        waitForPreviewDone();
+            mCamera.startPreview();
+            waitForPreviewDone();
 
-        // Test each zoom step.
-        for (int i = 0; i <= maxZoom; i++) {
-            parameters.setZoom(i);
-            mCamera.setParameters(parameters);
-            assertEquals(i, parameters.getZoom());
-        }
+            // Test each zoom step.
+            for (int i = 0; i <= maxZoom; i++) {
+                parameters.setZoom(i);
+                mCamera.setParameters(parameters);
+                assertEquals(i, parameters.getZoom());
+            }
 
-        // It should throw exception if an invalid value is passed.
-        try {
-            parameters.setZoom(maxZoom + 1);
-            mCamera.setParameters(parameters);
-            fail("setZoom should throw exception.");
-        } catch (RuntimeException e) {
-            // expected
-        }
-        parameters = mCamera.getParameters();
-        assertEquals(maxZoom, parameters.getZoom());
+            // It should throw exception if an invalid value is passed.
+            try {
+                parameters.setZoom(maxZoom + 1);
+                mCamera.setParameters(parameters);
+                fail("setZoom should throw exception.");
+            } catch (RuntimeException e) {
+                // expected
+            }
+            parameters = mCamera.getParameters();
+            assertEquals(maxZoom, parameters.getZoom());
 
-        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        waitForSnapshotDone();
+            mCamera.takePicture(mShutterCallback, mRawPictureCallback,
+                                mJpegPictureCallback);
+            waitForSnapshotDone();
+        }
     }
 
     private void testSmoothZoom() throws Exception {
