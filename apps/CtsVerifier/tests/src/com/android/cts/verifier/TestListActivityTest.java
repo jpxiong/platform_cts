@@ -19,8 +19,10 @@ package com.android.cts.verifier;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.app.Instrumentation.ActivityMonitor;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 
@@ -50,9 +52,29 @@ public class TestListActivityTest
     }
 
     /** Test that clicking on an item launches a test. */
-    public void testListItem() throws Throwable {
+    public void testLaunchAndFinishTestActivity() throws Throwable {
+        clearAllTestResults();
+        Activity testActivity = launchTestActivity();
+        finishTestActivity(testActivity);
+    }
+
+    private void clearAllTestResults() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                ContentResolver resolver = mActivity.getContentResolver();
+                resolver.delete(TestResultsProvider.CONTENT_URI, "1", null);
+
+                Cursor cursor = resolver.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+                        TestResultsProvider.ALL_COLUMNS, null, null, null);
+                assertEquals(0, cursor.getCount());
+                cursor.close();
+            }
+        });
+    }
+
+    private Activity launchTestActivity() {
         IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
-        filter.addCategory(TestListActivity.CATEGORY_MANUAL_TEST);
+        filter.addCategory(TestListAdapter.CATEGORY_MANUAL_TEST);
 
         ActivityMonitor monitor = new ActivityMonitor(filter, null, false);
         mInstrumentation.addMonitor(monitor);
@@ -60,8 +82,20 @@ public class TestListActivityTest
         sendKeys(KeyEvent.KEYCODE_ENTER);
 
         Activity activity = mInstrumentation.waitForMonitorWithTimeout(monitor,
-                TimeUnit.SECONDS.toMillis(10));
+                TimeUnit.SECONDS.toMillis(1));
         assertNotNull(activity);
+        return activity;
+    }
+
+    private void finishTestActivity(Activity activity) throws Throwable {
+        TestResult.setPassedResult(activity);
         activity.finish();
+        mInstrumentation.waitForIdleSync();
+
+        ContentResolver resolver = mActivity.getContentResolver();
+        Cursor cursor = resolver.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+                TestResultsProvider.ALL_COLUMNS, null, null, null);
+        assertEquals(1, cursor.getCount());
+        cursor.close();
     }
 }

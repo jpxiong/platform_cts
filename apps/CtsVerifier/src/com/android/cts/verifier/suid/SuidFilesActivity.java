@@ -17,6 +17,7 @@
 package com.android.cts.verifier.suid;
 
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.TestResult;
 import com.android.cts.verifier.os.FileUtils;
 import com.android.cts.verifier.os.FileUtils.FileStatus;
 
@@ -61,12 +62,13 @@ public class SuidFilesActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setResult(RESULT_CANCELED);
 
         mAdapter = new SuidFilesAdapter();
         setListAdapter(mAdapter);
 
         mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setMessage(getString(R.string.starting_scan));
+        mProgressDialog.setTitle(getString(R.string.scanning_directory));
         mProgressDialog.setOnCancelListener(new OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
                 // If the scanning dialog is cancelled, then stop the task and finish the activity
@@ -109,6 +111,7 @@ public class SuidFilesActivity extends ListActivity {
 
     @Override
     protected void onDestroy() {
+        Log.e("Suid", "onDestroy");
         super.onDestroy();
         if (mFindSuidFilesTask != null) {
             mFindSuidFilesTask.cancel(true);
@@ -223,10 +226,13 @@ public class SuidFilesActivity extends ListActivity {
                             .setOnCancelListener(new OnCancelListener() {
                                 public void onCancel(DialogInterface dialog) {
                                     // No reason to hang around if there were no offending files.
+                                    TestResult.setPassedResult(SuidFilesActivity.this);
                                     finish();
                                 }
                             })
                             .show();
+                } else {
+                    TestResult.setFailedResult(SuidFilesActivity.this);
                 }
             }
         }
