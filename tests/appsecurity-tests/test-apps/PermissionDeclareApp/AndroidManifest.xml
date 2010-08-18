@@ -24,12 +24,42 @@
     <permission android:name="com.android.cts.permissionWithSignature"
         android:protectionLevel="signature" />
 
+    <uses-permission android:name="com.android.cts.permissionWithSignature" />
+
     <application>
+        <receiver android:name="GrantUriPermission" android:exported="true">
+        </receiver>
+
         <!-- Need a way for another app to try to access the permission. So create a content
         provider which is enforced by the permission -->
         <provider android:name="PermissionContentProvider"
                 android:authorities="ctspermissionwithsignature"
                 android:readPermission="com.android.cts.permissionWithSignature"
-                android:writePermission="com.android.cts.permissionWithSignature" />
+                android:writePermission="com.android.cts.permissionWithSignature">
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
+
+        <!-- Need a way for another app to try to access the permission, but will
+             grant uri access. -->
+        <provider android:name="PermissionContentProviderGranting"
+                android:authorities="ctspermissionwithsignaturegranting"
+                android:readPermission="com.android.cts.permissionWithSignature"
+                android:writePermission="com.android.cts.permissionWithSignature">
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
+
+        <!-- Nobody else should get access to this -->
+        <provider android:name="PrivateContentProvider"
+                android:authorities="ctsprivateprovider"
+                android:exported="false">
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
+
+        <!-- Nobody else should get access to this, but we will grant uri access -->
+        <provider android:name="PrivateContentProviderGranting"
+                android:authorities="ctsprivateprovidergranting"
+                android:exported="false">
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
     </application>
 </manifest>
