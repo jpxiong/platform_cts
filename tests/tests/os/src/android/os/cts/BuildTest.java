@@ -22,6 +22,8 @@ import android.os.Build;
 
 import junit.framework.TestCase;
 
+import java.util.regex.Pattern;
+
 @TestTargetClass(Build.class)
 public class BuildTest extends TestCase {
 
@@ -45,5 +47,13 @@ public class BuildTest extends TestCase {
             assertEquals(message, CpuFeatures.ARMEABI, Build.CPU_ABI);
             assertEquals(message, "unknown", Build.CPU_ABI2);
         }
+    }
+
+    private static final Pattern DEVICE_PATTERN =
+        Pattern.compile("^([0-9a-z_]+)$");
+
+    /** Tests that check for valid values of constants in Build. */
+    public void testBuildConstants() {
+        assertTrue(DEVICE_PATTERN.matcher(Build.DEVICE).matches());
     }
 }
