@@ -418,6 +418,7 @@ public class TestDevice implements DeviceObserver {
         public static final String PHONE_NUMBER = "phoneNumber";
         public static final String FEATURES = "features";
         public static final String PROCESSES = "processes";
+        public static final String OPEN_GL_ES_VERSION = "opengles_version";
 
         private HashMap<String, String> mInfoMap;
 
@@ -766,6 +767,15 @@ public class TestDevice implements DeviceObserver {
          */
         public String getProcesses() {
             return mInfoMap.get(PROCESSES);
+        }
+
+        /**
+         * Get Open GL ES version.
+         *
+         * @return version or error message.
+         */
+        public String getOpenGlEsVersion() {
+            return mInfoMap.get(OPEN_GL_ES_VERSION);
         }
     }
 

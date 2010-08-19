@@ -40,6 +40,7 @@ public class DeviceInfoInstrument extends Instrumentation {
 
     private static final String TAG = "DeviceInfoInstrument";
 
+    private static final String OPEN_GL_ES_VERSION = "opengles_version";
     private static final String PROCESSES = "processes";
     private static final String FEATURES = "features";
     private static final String PHONE_NUMBER = "phoneNumber";
@@ -139,6 +140,11 @@ public class DeviceInfoInstrument extends Instrumentation {
         // processes
         String processes = getProcesses();
         addResult(PROCESSES, processes);
+
+        // OpenGL ES version
+        String openGlEsVersion = getOpenGlEsVersion();
+        addResult(OPEN_GL_ES_VERSION, openGlEsVersion);
+
 
         finish(Activity.RESULT_OK, mResults);
     }
@@ -251,5 +257,20 @@ public class DeviceInfoInstrument extends Instrumentation {
         }
 
         return builder.toString();
+    }
+
+    /** @return a string containing the Open GL ES version number or an error message */
+    private String getOpenGlEsVersion() {
+        PackageManager packageManager = getContext().getPackageManager();
+        FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
+        if (featureInfos != null && featureInfos.length > 0) {
+            for (FeatureInfo featureInfo : featureInfos) {
+                // Null feature name means this feature is the open gl es version feature.
+                if (featureInfo.name == null) {
+                    return featureInfo.getGlEsVersion();
+                }
+            }
+        }
+        return "No feature for Open GL ES version.";
     }
 }
