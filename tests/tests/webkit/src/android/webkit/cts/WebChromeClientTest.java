@@ -119,13 +119,14 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
             args = {WebView.class, Bitmap.class}
         )
     })
-    public void testOnReceivedIcon() {
+    public void testOnReceivedIcon() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mWebView.setWebChromeClient(webChromeClient);
 
         WebIconDatabase mIconDb = WebIconDatabase.getInstance();
         String dbPath = getActivity().getFilesDir().toString() + "/icons";
         mIconDb.open(dbPath);
+        Thread.sleep(250);
         mIconDb.removeAllIcons();
 
         assertFalse(webChromeClient.hadOnReceivedIcon());
