@@ -23,14 +23,9 @@
  */
 package com.android.cts.verifier.features;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-
+import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
-import android.app.ListActivity;
 import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -39,7 +34,12 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class FeatureSummaryActivity extends ListActivity {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+
+public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     /**
      * Simple storage class for data about an Android feature.
      */
@@ -107,6 +107,7 @@ public class FeatureSummaryActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fs_main);
+        setResult(RESULT_CANCELED);
 
         // some values used to detect warn-able conditions involving multiple features
         boolean hasWifi = false;
@@ -171,8 +172,8 @@ public class FeatureSummaryActivity extends ListActivity {
         idMap.put(R.drawable.fs_good, 3);
         Collections.sort(listViewData, new Comparator<HashMap<String, Object>>() {
             public int compare(HashMap<String, Object> left, HashMap<String, Object> right) {
-                int leftId = idMap.get((Integer) (left.get("icon")));
-                int rightId = idMap.get((Integer) (right.get("icon")));
+                int leftId = idMap.get(left.get("icon"));
+                int rightId = idMap.get(right.get("icon"));
                 if (leftId == rightId) {
                     return ((String) left.get("feature")).compareTo((String) right.get("feature"));
                 }

@@ -17,7 +17,10 @@
     <string name="app_name">CTS Verifier</string>
     <string name="welcome_text">Welcome to the CTS Verifier!</string>
     <string name="continue_button_text">Continue</string>
-    
+
+    <string name="pass">Pass</string>
+    <string name="fail">Fail</string>
+
     <!-- Strings for TestListActivity -->
     <string name="test_list_title">Manual Test List</string>
     <string name="test_category_sensors">Sensors</string>
