@@ -16,56 +16,47 @@
 
 package com.android.cts.usespermissiondiffcertapp;
 
-import android.app.Activity;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.os.MessageQueue.IdleHandler;
 
-public class ReceiveUriActivity extends Activity {
+public class ReceiveUriService extends Service {
     private static final Object sLock = new Object();
     private static boolean sStarted;
-    private static boolean sNewIntent;
     private static boolean sDestroyed;
-    private static ReceiveUriActivity sCurInstance;
+    private static int sCurStartId;
+    private static ReceiveUriService sCurInstance;
 
     Handler mHandler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public int onStartCommand(Intent intent, int flags, int startId) {
         synchronized (sLock) {
-            if (sCurInstance != null) {
-                finishCurInstance();
-            }
+            sCurStartId = startId;
             sCurInstance = this;
             sStarted = true;
             sDestroyed = false;
             sLock.notifyAll();
         }
+
+        return START_REDELIVER_INTENT;
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        synchronized (sLock) {
-            sNewIntent = true;
-            sLock.notifyAll();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         Looper.myQueue().addIdleHandler(new IdleHandler() {
             @Override
             public boolean queueIdle() {
                 synchronized (sLock) {
                     sDestroyed = true;
+                    sCurInstance = null;
                     sLock.notifyAll();
                 }
                 return false;
@@ -73,17 +64,33 @@ public class ReceiveUriActivity extends Activity {
         });
     }
 
-    public static void finishCurInstance() {
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    public static void stop(Context context) {
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName(
+                "com.android.cts.usespermissiondiffcertapp",
+                "com.android.cts.usespermissiondiffcertapp.ReceiveUriService"));
+        context.stopService(intent);
+    }
+
+    public static int getCurStartId() {
         synchronized (sLock) {
-            if (sCurInstance != null) {
-                sCurInstance.finish();
-                sCurInstance = null;
-            }
+            return sCurStartId;
         }
     }
 
-    public static void finishCurInstanceSync() {
-        finishCurInstance();
+    public static void stopCurWithId(int id) {
+        synchronized (sLock) {
+            sCurInstance.stopSelf(id);
+        }
+    }
+
+    public static void stopSync(Context context) {
+        stop(context);
 
         synchronized (sLock) {
             final long startTime = SystemClock.uptimeMillis();
@@ -105,31 +112,10 @@ public class ReceiveUriActivity extends Activity {
         }
     }
 
-    public static void clearNewIntent() {
-        synchronized (sLock) {
-            sNewIntent = false;
-        }
-    }
-
     public static void waitForStart() {
         synchronized (sLock) {
             final long startTime = SystemClock.uptimeMillis();
             while (!sStarted) {
-                try {
-                    sLock.wait(5000);
-                } catch (InterruptedException e) {
-                }
-                if (SystemClock.uptimeMillis() >= (startTime+5000)) {
-                    throw new RuntimeException("Timeout");
-                }
-            }
-        }
-    }
-
-    public static void waitForNewIntent() {
-        synchronized (sLock) {
-            final long startTime = SystemClock.uptimeMillis();
-            while (!sNewIntent) {
                 try {
                     sLock.wait(5000);
                 } catch (InterruptedException e) {

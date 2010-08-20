@@ -8,7 +8,12 @@ public class GrantUriPermission extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent newIntent = (Intent)intent.getParcelableExtra("intent");
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(newIntent);
+        boolean service = intent.getBooleanExtra("service", false);
+        if (!service) {
+            newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(newIntent);
+        } else {
+            context.startService(newIntent);
+        }
     }
 }

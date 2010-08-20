@@ -25,7 +25,9 @@
 
     <application>
         <uses-library android:name="android.test.runner"/>
-        <activity android:name=".ReceiveUriActivity" android:exported="true" />
+        <activity android:name=".ReceiveUriActivity" android:exported="true"
+                android:launchMode="singleTop" />
+        <service android:name=".ReceiveUriService" android:exported="true" />
     </application>
 
     <instrumentation android:targetPackage="com.android.cts.usespermissiondiffcertapp"

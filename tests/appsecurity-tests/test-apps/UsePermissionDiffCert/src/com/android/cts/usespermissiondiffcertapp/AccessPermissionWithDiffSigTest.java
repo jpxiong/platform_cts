@@ -34,7 +34,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     static final Uri PERM_URI = Uri.parse("content://ctspermissionwithsignature");
     static final Uri PERM_URI_GRANTING = Uri.parse("content://ctspermissionwithsignaturegranting");
     static final Uri PRIV_URI = Uri.parse("content://ctsprivateprovider");
-    static final Uri PRIV_GRANTING_URI = Uri.parse("content://ctsprivateprovidergranting");
+    static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
 
     public void assertReadingContentUriNotAllowed(Uri uri, String msg) {
         try {
@@ -90,20 +90,131 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 "shouldn't write private provider");
     }
 
-    void doTestGrantUriReadPermission(Uri uri) {
-        final Uri subUri = Uri.withAppendedPath(uri, "foo");
-        final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
-
+    public void doTryGrantUriActivityPermissionToSelf(Uri uri, int mode) {
         Intent grantIntent = new Intent();
-        grantIntent.setData(subUri);
-        grantIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        grantIntent.setData(uri);
+        grantIntent.addFlags(mode | Intent.FLAG_ACTIVITY_NEW_TASK);
         grantIntent.setClass(getContext(), ReceiveUriActivity.class);
+        try {
+            ReceiveUriActivity.clearStarted();
+            getContext().startActivity(grantIntent);
+            ReceiveUriActivity.waitForStart();
+            fail("expected SecurityException granting " + uri + " to activity");
+        } catch (SecurityException e) {
+            // This is what we want.
+        }
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantReadUriActivityPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantWriteUriActivityPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantReadUriActivityPrivateToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PRIV_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantWriteUriActivityPrivateToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PRIV_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    public void doTryGrantUriServicePermissionToSelf(Uri uri, int mode) {
+        Intent grantIntent = new Intent();
+        grantIntent.setData(uri);
+        grantIntent.addFlags(mode);
+        grantIntent.setClass(getContext(), ReceiveUriService.class);
+        try {
+            getContext().startService(grantIntent);
+            fail("expected SecurityException granting " + uri + " to service");
+        } catch (SecurityException e) {
+            // This is what we want.
+        }
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantReadUriServicePermissionToSelf() {
+        doTryGrantUriServicePermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantWriteUriServicePermissionToSelf() {
+        doTryGrantUriServicePermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantReadUriServicePrivateToSelf() {
+        doTryGrantUriServicePermissionToSelf(
+                Uri.withAppendedPath(PRIV_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that we can't grant a permission to ourself.
+     */
+    public void testGrantWriteUriServicePrivateToSelf() {
+        doTryGrantUriServicePermissionToSelf(
+                Uri.withAppendedPath(PRIV_URI_GRANTING, "foo"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    void grantUriPermission(Uri uri, int mode, boolean service) {
+        Intent grantIntent = new Intent();
+        grantIntent.setData(uri);
+        grantIntent.addFlags(mode);
+        grantIntent.setClass(getContext(),
+                service ? ReceiveUriService.class : ReceiveUriActivity.class);
         Intent intent = new Intent();
         intent.setComponent(GRANT_URI_PERM_COMP);
         intent.putExtra("intent", grantIntent);
+        intent.putExtra("service", service);
+        getContext().sendBroadcast(intent);
+    }
+
+    void doTestGrantActivityUriReadPermission(Uri uri) {
+        final Uri subUri = Uri.withAppendedPath(uri, "foo");
+        final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
+        final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
+        final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
+
+        // Precondition: no current access.
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read when starting test");
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read when starting test");
 
         ReceiveUriActivity.clearStarted();
-        getContext().sendBroadcast(intent);
+        grantUriPermission(subUri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
         ReceiveUriActivity.waitForStart();
 
         // See if we now have access to the provider.
@@ -123,30 +234,29 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
         // Ensure reading no longer allowed.
         assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
-
     }
 
-    void doTestGrantUriWritePermission(Uri uri) {
+    void doTestGrantActivityUriWritePermission(Uri uri) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
+        final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
+        final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
 
-        Intent grantIntent = new Intent();
-        grantIntent.setData(subUri);
-        grantIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        grantIntent.setClass(getContext(), ReceiveUriActivity.class);
-        Intent intent = new Intent();
-        intent.setComponent(GRANT_URI_PERM_COMP);
-        intent.putExtra("intent", grantIntent);
+        // Precondition: no current access.
+        assertWritingContentUriNotAllowed(subUri, "shouldn't write when starting test");
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write when starting test");
+
+        // --------------------------------
 
         ReceiveUriActivity.clearStarted();
-        getContext().sendBroadcast(intent);
+        grantUriPermission(subUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
         ReceiveUriActivity.waitForStart();
 
         // See if we now have access to the provider.
         getContext().getContentResolver().insert(subUri, new ContentValues());
 
         // But not reading.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read from granted read");
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read from granted write");
 
         // And not to the base path.
         assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
@@ -154,42 +264,286 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // And not a sub-path.
         assertWritingContentUriNotAllowed(subSubUri, "shouldn't write non-granted sub URI");
 
+        // --------------------------------
+
+        ReceiveUriActivity.clearNewIntent();
+        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
+        ReceiveUriActivity.waitForNewIntent();
+
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().insert(sub2Uri, new ContentValues());
+
+        // And still have access to the original URI.
+        getContext().getContentResolver().insert(subUri, new ContentValues());
+
+        // But not reading.
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read from granted write");
+
+        // And not to the base path.
+        assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
+
+        // And not a sub-path.
+        assertWritingContentUriNotAllowed(sub2SubUri, "shouldn't write non-granted sub URI");
+
+        // And make sure we can't generate a permission to a running activity.
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(uri, "hah"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(uri, "hah"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // --------------------------------
+
         // Dispose of activity.
         ReceiveUriActivity.finishCurInstanceSync();
 
-        // Ensure reading no longer allowed.
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // Ensure writing no longer allowed.
         assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write after losing granted URI");
     }
 
     /**
      * Test that the ctspermissionwithsignaturegranting content provider can grant a read
      * permission.
      */
-    public void testGrantReadPermissionFromStartActivity() {
-        doTestGrantUriReadPermission(PERM_URI_GRANTING);
+    public void testGrantActivityReadPermissionFromStartActivity() {
+        doTestGrantActivityUriReadPermission(PERM_URI_GRANTING);
     }
 
     /**
      * Test that the ctspermissionwithsignaturegranting content provider can grant a write
      * permission.
      */
-    public void testGrantWritePermissionFromStartActivity() {
-        doTestGrantUriWritePermission(PERM_URI_GRANTING);
+    public void testGrantActivityWritePermissionFromStartActivity() {
+        doTestGrantActivityUriWritePermission(PERM_URI_GRANTING);
     }
 
     /**
      * Test that the ctsprivateprovidergranting content provider can grant a read
      * permission.
      */
-    public void testGrantReadPrivateFromStartActivity() {
-        doTestGrantUriReadPermission(PRIV_GRANTING_URI);
+    public void testGrantActivityReadPrivateFromStartActivity() {
+        doTestGrantActivityUriReadPermission(PRIV_URI_GRANTING);
     }
 
     /**
      * Test that the ctsprivateprovidergranting content provider can grant a write
      * permission.
      */
-    public void testGrantWritePrivateFromStartActivity() {
-        doTestGrantUriWritePermission(PRIV_GRANTING_URI);
+    public void testGrantActivityWritePrivateFromStartActivity() {
+        doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING);
+    }
+
+    void doTestGrantServiceUriReadPermission(Uri uri) {
+        final Uri subUri = Uri.withAppendedPath(uri, "foo");
+        final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
+        final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
+        final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
+
+        ReceiveUriService.stop(getContext());
+
+        // Precondition: no current access.
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read when starting test");
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read when starting test");
+
+        // --------------------------------
+
+        ReceiveUriService.clearStarted();
+        grantUriPermission(subUri, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
+        ReceiveUriService.waitForStart();
+
+        int firstStartId = ReceiveUriService.getCurStartId();
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().query(subUri, null, null, null, null);
+
+        // But not writing.
+        assertWritingContentUriNotAllowed(subUri, "shouldn't write from granted read");
+
+        // And not to the base path.
+        assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
+
+        // And not to a sub path.
+        assertReadingContentUriNotAllowed(subSubUri, "shouldn't read non-granted sub URI");
+
+        // --------------------------------
+
+        // Send another Intent to it.
+        ReceiveUriService.clearStarted();
+        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
+        ReceiveUriService.waitForStart();
+
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().query(sub2Uri, null, null, null, null);
+
+        // And still to the previous URI.
+        getContext().getContentResolver().query(subUri, null, null, null, null);
+
+        // But not writing.
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write from granted read");
+
+        // And not to the base path.
+        assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
+
+        // And not to a sub path.
+        assertReadingContentUriNotAllowed(sub2SubUri, "shouldn't read non-granted sub URI");
+
+        // --------------------------------
+
+        // Stop the first command.
+        ReceiveUriService.stopCurWithId(firstStartId);
+
+        // Ensure reading no longer allowed.
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
+
+        // And make sure we can't generate a permission to a running service.
+        doTryGrantUriActivityPermissionToSelf(subUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        doTryGrantUriActivityPermissionToSelf(subUri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // --------------------------------
+
+        // Dispose of service.
+        ReceiveUriService.stopSync(getContext());
+
+        // Ensure reading no longer allowed.
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read after losing granted URI");
+    }
+
+    void doTestGrantServiceUriWritePermission(Uri uri) {
+        final Uri subUri = Uri.withAppendedPath(uri, "foo");
+        final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
+        final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
+        final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
+
+        ReceiveUriService.stop(getContext());
+
+        // Precondition: no current access.
+        assertWritingContentUriNotAllowed(subUri, "shouldn't write when starting test");
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write when starting test");
+
+        // --------------------------------
+
+        ReceiveUriService.clearStarted();
+        grantUriPermission(subUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
+        ReceiveUriService.waitForStart();
+
+        int firstStartId = ReceiveUriService.getCurStartId();
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().insert(subUri, new ContentValues());
+
+        // But not reading.
+        assertReadingContentUriNotAllowed(subUri, "shouldn't read from granted write");
+
+        // And not to the base path.
+        assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
+
+        // And not a sub-path.
+        assertWritingContentUriNotAllowed(subSubUri, "shouldn't write non-granted sub URI");
+
+        // --------------------------------
+
+        // Send another Intent to it.
+        ReceiveUriService.clearStarted();
+        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
+        ReceiveUriService.waitForStart();
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().insert(sub2Uri, new ContentValues());
+
+        // And still to the previous URI.
+        getContext().getContentResolver().insert(subUri, new ContentValues());
+
+        // But not reading.
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read from granted write");
+
+        // And not to the base path.
+        assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
+
+        // And not a sub-path.
+        assertWritingContentUriNotAllowed(sub2SubUri, "shouldn't write non-granted sub URI");
+
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // --------------------------------
+
+        // Stop the first command.
+        ReceiveUriService.stopCurWithId(firstStartId);
+
+        // Ensure writing no longer allowed.
+        assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
+
+        // And make sure we can't generate a permission to a running service.
+        doTryGrantUriActivityPermissionToSelf(subUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        doTryGrantUriActivityPermissionToSelf(subUri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // --------------------------------
+
+        // Dispose of service.
+        ReceiveUriService.stopSync(getContext());
+
+        // Ensure writing no longer allowed.
+        assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write after losing granted URI");
+    }
+
+    public void testGrantActivityReadPermissionFromStartService() {
+        doTestGrantServiceUriReadPermission(PERM_URI_GRANTING);
+    }
+
+    public void testGrantActivityWritePermissionFromStartService() {
+        doTestGrantServiceUriWritePermission(PERM_URI_GRANTING);
+    }
+
+    public void testGrantActivityReadPrivateFromStartService() {
+        doTestGrantServiceUriReadPermission(PRIV_URI_GRANTING);
+    }
+
+    public void testGrantActivityWritePrivateFromStartService() {
+        doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING);
     }
 }
