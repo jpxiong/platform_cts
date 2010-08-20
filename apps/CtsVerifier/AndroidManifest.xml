@@ -32,6 +32,9 @@
         </activity>
 
         <activity android:name=".TestListActivity" android:label="@string/test_list_title" />
+        
+        <provider android:name=".TestResultsProvider" 
+                android:authorities="com.android.cts.verifier.testresultsprovider" />
 
         <activity android:name=".suid.SuidFilesActivity" 
                 android:label="@string/suid_files"

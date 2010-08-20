@@ -24,6 +24,8 @@
     <string name="test_category_security">Security</string>
     <string name="test_category_features">Features</string>
     <string name="test_category_other">Other</string>
+    <string name="clear">Clear</string>
+    <string name="test_results_cleared">Test results cleared.</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
@@ -38,7 +40,7 @@
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID Files</string>
-    <string name="starting_scan">Starting scan...</string>
+    <string name="scanning_directory">Scanning directory...</string>
     <string name="file_status">User: %1$s\nGroup: %2$s\nPermissions: %3$s\nPath: %4$s</string>
     <string name="no_file_status">Could not stat file...</string>
     <string name="congratulations">Congratulations!</string>
