@@ -35,4 +35,7 @@
                android:layout_height="match_parent"
                android:background="#000000"
                android:text="@string/fs_no_data"/>
+
+    <include layout="@layout/pass_fail_buttons" />
+
 </LinearLayout>
