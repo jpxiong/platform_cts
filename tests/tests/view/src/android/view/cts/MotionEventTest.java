@@ -22,12 +22,15 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.graphics.Matrix;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.MotionEvent.PointerCoords;
 
 /**
  * Test {@link MotionEvent}.
@@ -496,5 +499,104 @@ public class MotionEventTest extends AndroidTestCase {
         }
         
         mMotionEvent2 = null; // since it was recycled, don't try to recycle again in tear down
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "transform",
+            args = {}
+        )
+    public void testTransformShouldThrowWhenMatrixIsNull() {
+        try {
+            mMotionEvent1.transform(null);
+            fail("transform() should throw an exception when matrix is null.");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "transform",
+            args = {}
+        )
+    public void testTransformShouldApplyMatrixToPointsAndPreserveRawPosition() {
+        // Generate some points on a circle.
+        // Each point 'i' is a point on a circle of radius ROTATION centered at (3,2) at an angle
+        // of ARC * i degrees clockwise relative to the Y axis.
+        // The geometrical representation is irrelevant to the test, it's just easy to generate
+        // and check rotation.  We set the orientation to the same angle.
+        // Coordinate system: down is increasing Y, right is increasing X.
+        final float PI_180 = (float) (Math.PI / 180);
+        final float RADIUS = 10;
+        final float ARC = 36;
+        final float ROTATION = ARC * 2;
+
+        final int pointerCount = 11;
+        final int[] pointerIds = new int[pointerCount];
+        final PointerCoords[] pointerCoords = new PointerCoords[pointerCount];
+        for (int i = 0; i < pointerCount; i++) {
+            final PointerCoords c = new PointerCoords();
+            final float angle = (float) (i * ARC * PI_180);
+            pointerIds[i] = i;
+            pointerCoords[i] = c;
+            c.x = (float) (Math.sin(angle) * RADIUS + 3);
+            c.y = (float) (- Math.cos(angle) * RADIUS + 2);
+            c.orientation = angle;
+        }
+        final MotionEvent event = MotionEvent.obtain(0, 0, MotionEvent.ACTION_MOVE,
+                pointerCount, pointerIds, pointerCoords, 0, 0, 0, 0, 0, 0, 0);
+        final float originalRawX = 0 + 3;
+        final float originalRawY = - RADIUS + 2;
+        dump("Original points.", event);
+
+        // Check original raw X and Y assumption.
+        assertEquals(originalRawX, event.getRawX(), 0.001);
+        assertEquals(originalRawY, event.getRawY(), 0.001);
+
+        // Now translate the motion event so the circle's origin is at (0,0).
+        event.offsetLocation(-3, -2);
+        dump("Translated points.", event);
+
+        // Offsetting the location should preserve the raw X and Y of the first point.
+        assertEquals(originalRawX, event.getRawX(), 0.001);
+        assertEquals(originalRawY, event.getRawY(), 0.001);
+
+        // Apply a rotation about the origin by ROTATION degrees clockwise.
+        Matrix matrix = new Matrix();
+        matrix.setRotate(ROTATION);
+        event.transform(matrix);
+        dump("Rotated points.", event);
+
+        // Check the points.
+        for (int i = 0; i < pointerCount; i++) {
+            final PointerCoords c = pointerCoords[i];
+            event.getPointerCoords(i, c);
+
+            final float angle = (float) ((i * ARC + ROTATION) * PI_180);
+            assertEquals(Math.sin(angle) * RADIUS, c.x, 0.001);
+            assertEquals(- Math.cos(angle) * RADIUS, c.y, 0.001);
+            assertEquals(Math.tan(angle), Math.tan(c.orientation), 0.1);
+        }
+
+        // Applying the transformation should preserve the raw X and Y of the first point.
+        assertEquals(originalRawX, event.getRawX(), 0.001);
+        assertEquals(originalRawY, event.getRawY(), 0.001);
+    }
+
+    private void dump(String label, MotionEvent ev) {
+        if (false) {
+            StringBuilder msg = new StringBuilder();
+            msg.append(label).append("\n");
+
+            msg.append("  Raw: (").append(ev.getRawX()).append(",").append(ev.getRawY()).append(")\n");
+            int pointerCount = ev.getPointerCount();
+            for (int i = 0; i < pointerCount; i++) {
+                msg.append("  Pointer[").append(i).append("]: (")
+                        .append(ev.getX(i)).append(",").append(ev.getY(i)).append("), orientation=")
+                        .append(ev.getOrientation(i) * 180 / Math.PI).append(" deg\n");
+            }
+
+            android.util.Log.i("TEST", msg.toString());
+        }
     }
 }
