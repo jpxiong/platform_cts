@@ -275,8 +275,9 @@ public class TelephonyManagerTest extends AndroidTestCase {
     }
 
     /**
-     * Tests that the device properly reports either a valid IMEI if GSM,
-     * a valid MEID if CDMA, or a valid MAC address if only a WiFi device.
+     * Tests that the device properly reports either a valid IMEI if
+     * GSM, a valid MEID or ESN if CDMA, or a valid MAC address if
+     * only a WiFi device.
      */
     @TestTargetNew(
         level = TestLevel.COMPLETE,
@@ -292,7 +293,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_CDMA:
-                assertMeidDeviceId(deviceId);
+                assertCdmaDeviceId(deviceId);
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
@@ -368,9 +369,23 @@ public class TelephonyManagerTest extends AndroidTestCase {
         assertEquals(message, decimalIdentifier, reportingBodyIdentifier < decimalBound);
     }
 
-    private static void assertMeidDeviceId(String deviceId) {
-        assertHexadecimalMeidFormat(deviceId);
-        assertReportingBodyIdentifier(deviceId, false); // Must be hexadecimal identifier
+    private static void assertCdmaDeviceId(String deviceId) {
+        if (deviceId.length() == 14) {
+            assertHexadecimalMeidFormat(deviceId);
+            assertReportingBodyIdentifier(deviceId, false); // Must be hexadecimal identifier
+        } else if (deviceId.length() == 8) {
+            assertHexadecimalEsnFormat(deviceId);
+        } else {
+            fail("device id on CDMA must be 14-digit hex MEID or 8-digit hex ESN.");
+        }
+    }
+
+    private static void assertHexadecimalEsnFormat(String deviceId) {
+        String esnPattern = "[0-9a-fA-F]{8}";
+        assertTrue("ESN hex device id " + deviceId + " does not match pattern " + esnPattern,
+                   Pattern.matches(esnPattern, deviceId));
+        assertFalse("ESN hex device id " + deviceId + " must not be a pseudo-ESN",
+                    "80".equals(deviceId.substring(0, 2)));
     }
 
     private static void assertHexadecimalMeidFormat(String deviceId) {
