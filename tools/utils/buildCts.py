@@ -97,6 +97,7 @@ class CtsBuilder(object):
         'dalvik/libcore/junit/src/main/java',   # junit classes
         'development/tools/hosttestlib/src',    # hosttestlib TestCase extensions
         'dalvik/libcore/dalvik/src/main/java',  # test annotations
+        'cts/libs/annotation/src',              # cts annotations
         'cts/tests/src',                        # cts test stubs
         source_root                             # the source for this package
     ]

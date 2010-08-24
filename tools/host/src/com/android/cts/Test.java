@@ -16,9 +16,11 @@
 
 package com.android.cts;
 
-import java.util.TimerTask;
-
 import com.android.cts.TestSession.ResultObserver;
+
+import android.annotation.cts.Profile;
+
+import java.util.TimerTask;
 
 /**
  * Correspond to junit's test method, provide functions on storing
@@ -316,8 +318,9 @@ public class Test implements DeviceObserver {
      * Run the test over device given.
      *
      * @param device the device to run the test.
+     * @param profile The profile of the device being tested.
      */
-    public void run(final TestDevice device) throws DeviceDisconnectedException,
+    public void run(final TestDevice device, Profile profile) throws DeviceDisconnectedException,
             ADBServerNeedRestartException {
 
         if ((getName() == null) || (getName().length() == 0)) {
@@ -342,7 +345,7 @@ public class Test implements DeviceObserver {
         String testFullName = getFullName();
         print(testFullName + "...");
 
-        runImpl();
+        runImpl(profile);
 
         synchronized (mTimeOutTimer) {
             if (!mTestStop) {
@@ -369,8 +372,8 @@ public class Test implements DeviceObserver {
     /**
      * Implementation of running test.
      */
-    protected void runImpl() throws DeviceDisconnectedException {
-        mDevice.runTest(this);
+    protected void runImpl(Profile profile) throws DeviceDisconnectedException {
+        mDevice.runTest(this, profile);
     }
 
     /**

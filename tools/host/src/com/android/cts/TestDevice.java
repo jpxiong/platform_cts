@@ -29,6 +29,8 @@ import com.android.ddmlib.SyncService.SyncResult;
 import com.android.ddmlib.log.LogReceiver;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 
+import android.annotation.cts.Profile;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -834,7 +836,7 @@ public class TestDevice implements DeviceObserver {
      *
      * @param test The test to be run.
      */
-    public void runTest(Test test) throws DeviceDisconnectedException {
+    public void runTest(Test test, Profile profile) throws DeviceDisconnectedException {
 
         final String appNameSpace = test.getAppNameSpace();
         String runner = test.getInstrumentationRunner();
@@ -846,8 +848,8 @@ public class TestDevice implements DeviceObserver {
         // passed through two shells \\\$ -> \$ -> $
         final String testName = test.getFullName().replaceAll("\\$", "\\\\\\$");
 
-        final String commandStr = "am instrument -w -r -e class "
-                + testName + " " + appNameSpace + "/" + runner;
+        final String commandStr = "am instrument -w -r -e class " + testName
+                + " -e profile " + profile + " " + appNameSpace + "/" + runner;
         Log.d(commandStr);
         executeShellCommand(commandStr, new IndividualModeResultParser(test));
     }
@@ -859,7 +861,7 @@ public class TestDevice implements DeviceObserver {
      * @param javaPkgName The java package name. If null, run the whole test package;
      *              else, run the specified java package contained in the test package
      */
-    public void runInBatchMode(TestPackage testPackage, final String javaPkgName)
+    public void runInBatchMode(TestPackage testPackage, final String javaPkgName, Profile profile)
                 throws DeviceDisconnectedException {
         String appNameSpace = testPackage.getAppNameSpace();
         String runner = testPackage.getInstrumentationRunner();
@@ -872,7 +874,8 @@ public class TestDevice implements DeviceObserver {
             name = javaPkgName;
         }
 
-        String cmdHeader = "am instrument -w -r -e package " + name + " ";
+        String cmdHeader = "am instrument -w -r -e package " + name
+                + " -e profile " + profile + " ";
         final String commandStr = cmdHeader + appNameSpace + "/" + runner;
         Log.d(commandStr);
 
@@ -886,8 +889,8 @@ public class TestDevice implements DeviceObserver {
      * @param testPackage The testPackage to be run.
      * @param javaClassName The java class name.
      */
-    public void runTestCaseInBatchMode(TestPackage testPackage, final String javaClassName)
-                throws DeviceDisconnectedException {
+    public void runTestCaseInBatchMode(TestPackage testPackage, final String javaClassName,
+            String profile) throws DeviceDisconnectedException {
         if (javaClassName == null) {
             return;
         }
@@ -898,7 +901,8 @@ public class TestDevice implements DeviceObserver {
             runner = DEFAULT_TEST_RUNNER_NAME;
         }
 
-        String cmdHeader = "am instrument -w -r -e class " + javaClassName + " ";
+        String cmdHeader = "am instrument -w -r -e class " + javaClassName
+                + " -e profile " + profile + " ";
         final String commandStr = cmdHeader + appNameSpace + "/" + runner;
         Log.d(commandStr);
 
@@ -1226,7 +1230,7 @@ public class TestDevice implements DeviceObserver {
             mResultLines = new ArrayList<String>();
             mStackTrace = null;
             mFailedMsg = null;
-            mResultCode = CtsTestResult.CODE_PASS;
+            mResultCode = CtsTestResult.CODE_NOT_EXECUTED;
         }
 
         /** {@inheritDoc} */

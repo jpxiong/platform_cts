@@ -21,6 +21,8 @@ import com.android.ddmlib.RawImage;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 import com.android.ddmlib.log.LogReceiver.LogEntry;
 
+import android.annotation.cts.Profile;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -77,8 +79,8 @@ public class ReferenceAppTestPackage extends TestPackage {
      */
     @Override
     public void run(final TestDevice device, final String javaPkgName,
-                    TestSessionLog testSessionLog) throws DeviceDisconnectedException,
-                    InvalidApkPathException, InvalidNameSpaceException {
+            TestSessionLog testSessionLog) throws DeviceDisconnectedException,
+            InvalidApkPathException, InvalidNameSpaceException {
         Test test = getTests().iterator().next();
         if ((test != null) && (test.getResult().isNotExecuted())) {
             String appToTestApkPath =

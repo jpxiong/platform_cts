@@ -15,6 +15,13 @@
  */
 package com.android.cts;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import android.annotation.cts.Profile;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,11 +35,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Builder of test plan and also provides serialization for a test plan.
@@ -101,7 +103,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
      * @param config TestPlan XML configuration file.
      * @return TestSession.
      */
-    public TestSession build(final String config) throws SAXException, IOException,
+    public TestSession build(final String config, Profile profile) throws SAXException, IOException,
             TestPlanNotFoundException, TestNotFoundException, NoSuchAlgorithmException {
         File file = new File(config);
         if (!file.exists()) {
@@ -133,7 +135,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
             planName = planFileName;
         }
 
-        TestSessionLog sessionLog = new TestSessionLog(packages, planName);
+        TestSessionLog sessionLog = new TestSessionLog(packages, planName, profile);
         TestSession ts = new TestSession(sessionLog, numOfRequiredDevices);
         return ts;
     }

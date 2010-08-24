@@ -18,6 +18,8 @@ package com.android.cts;
 
 import com.android.ddmlib.MultiLineReceiver;
 
+import android.annotation.cts.Profile;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,9 +75,8 @@ public class SignatureCheckPackage extends TestPackage {
      */
     @Override
     public void run(final TestDevice device, final String javaPkgName,
-            TestSessionLog testSesssionLog)
-            throws DeviceDisconnectedException, InvalidNameSpaceException,
-            InvalidApkPathException {
+            TestSessionLog testSesssionLog) throws DeviceDisconnectedException,
+            InvalidNameSpaceException, InvalidApkPathException {
         Test test = getTests().iterator().next();
         if ((test != null) && (test.getResult().isNotExecuted())) {
 

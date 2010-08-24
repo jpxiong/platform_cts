@@ -16,6 +16,10 @@
 
 package com.android.cts;
 
+import com.android.cts.TestSession.TestSessionThread;
+
+import android.annotation.cts.Profile;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -25,8 +29,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
-
-import com.android.cts.TestSession.TestSessionThread;
 
 /**
  * Correspond to an APK, provide functions on
@@ -549,7 +551,7 @@ public class TestPackage implements DeviceObserver {
                 mCurrentTest = null;
             }
             // restart the timer even for unexpected tests
-            mTimeOutTimer.restart(new TimeOutTask(this), 
+            mTimeOutTimer.restart(new TimeOutTask(this),
                     HostConfig.Ints.testStatusTimeoutMs.value());
         }
     }
@@ -803,12 +805,12 @@ public class TestPackage implements DeviceObserver {
      */
     private boolean supportsBatchMode() {
         Collection<Test> tests = getTests();
-        
+
         // check whether the package is small enough for batch mode
         if (tests.size() > HostConfig.Ints.maxTestsInBatchMode.value()) {
             return false;
         }
-        
+
         for (Test test : tests) {
             if (!test.getResult().isNotExecuted()) {
                 // if any test has been run, use individual mode
@@ -850,8 +852,9 @@ public class TestPackage implements DeviceObserver {
      *
      * @param javaPkgName The java package name. If null, run the whole package;
      *              else, run the specified java package contained in this package
+     * @param profile The profile of the device being tested.
      */
-    private void runInBatchMode(final String javaPkgName)
+    private void runInBatchMode(final String javaPkgName, Profile profile)
             throws DeviceDisconnectedException {
         mTimeOutTimer = new HostTimer(new TimeOutTask(this),
                 HostConfig.Ints.batchStartTimeoutMs.value());
@@ -859,10 +862,10 @@ public class TestPackage implements DeviceObserver {
         mProgressObserver = new ProgressObserver();
 
         if ((javaPkgName != null) && (javaPkgName.length() > 0)) {
-            runInBatchModeImpl(javaPkgName);
+            runInBatchModeImpl(javaPkgName, profile);
         } else {
             for (String pkgName : getPackageNames()) {
-                runInBatchModeImpl(pkgName);
+                runInBatchModeImpl(pkgName, profile);
             }
         }
     }
@@ -871,9 +874,11 @@ public class TestPackage implements DeviceObserver {
      * Implementation of running in batch mode.
      *
      * @param javaPkgName The java package name.
+     * @param profile The profile of the device being tested.
      */
-    private void runInBatchModeImpl(String javaPkgName) throws DeviceDisconnectedException {
-        mDevice.runInBatchMode(this, javaPkgName);
+    private void runInBatchModeImpl(String javaPkgName, Profile profile)
+            throws DeviceDisconnectedException {
+        mDevice.runInBatchMode(this, javaPkgName, profile);
 
         synchronized (mTimeOutTimer) {
             if (!mTestStop) {
@@ -899,13 +904,14 @@ public class TestPackage implements DeviceObserver {
      * Run this package in individual mode.
      *
      * @param javaPkgName The java package name.
+     * @param profile The profile of the device being tested.
      */
-    protected void runInIndividualMode(final String javaPkgName) throws IOException,
+    protected void runInIndividualMode(final String javaPkgName, Profile profile) throws IOException,
                     DeviceDisconnectedException, ADBServerNeedRestartException {
         Iterator<TestSuite> suites = getTestSuites().iterator();
         while (suites.hasNext() && (!mTestStop)) {
             mCurrentTestSuite = suites.next();
-            mCurrentTestSuite.run(mDevice, javaPkgName);
+            mCurrentTestSuite.run(mDevice, javaPkgName, profile);
         }
     }
 
@@ -994,15 +1000,16 @@ public class TestPackage implements DeviceObserver {
         }
 
         setup(device, javaPkgName);
-        runImpl(javaPkgName);
+        runImpl(javaPkgName, sessionLog.getProfile());
     }
 
     /**
      * Implementation of running the test package.
      *
      * @param javaPkgName The JAVA package name.
+     * @param profile The profile of the device being tested.
      */
-    protected void runImpl(final String javaPkgName) throws IOException,
+    protected void runImpl(final String javaPkgName, Profile profile) throws IOException,
             DeviceDisconnectedException, ADBServerNeedRestartException, InvalidApkPathException,
             InvalidNameSpaceException {
         try {
@@ -1019,15 +1026,15 @@ public class TestPackage implements DeviceObserver {
                 if (supportsBatchMode()) {
                     mIsInBatchMode = true;
                     Log.d("run in batch mode...");
-                    runInBatchMode(javaPkgName);
+                    runInBatchMode(javaPkgName, profile);
                     if (!isAllTestsRun()) {
                         mIsInBatchMode = false;
                         Log.d("run in individual mode");
-                        runInIndividualMode(javaPkgName);
+                        runInIndividualMode(javaPkgName, profile);
                     }
                 } else {
                     Log.d("run in individual mode...");
-                    runInIndividualMode(javaPkgName);
+                    runInIndividualMode(javaPkgName, profile);
                 }
             }
 
@@ -1091,8 +1098,9 @@ public class TestPackage implements DeviceObserver {
      *
      * @param device The device to run the specific test.
      * @param test The specific test to be run.
+     * @param profile The profile of the device being tested.
      */
-    public void runTest(final TestDevice device, final Test test)
+    public void runTest(final TestDevice device, final Test test, Profile profile)
             throws DeviceDisconnectedException, ADBServerNeedRestartException,
             InvalidApkPathException, InvalidNameSpaceException {
 
@@ -1107,15 +1115,16 @@ public class TestPackage implements DeviceObserver {
         println("Test package: " + getAppPackageName());
         setTestDevice(device);
 
-        runTestImpl(test);
+        runTestImpl(test, profile);
     }
 
     /**
      * Implementation of running test.
      *
      * @param test The test to be run.
+     * @param profile The profile of the device being tested.
      */
-    protected void runTestImpl(final Test test) throws DeviceDisconnectedException,
+    protected void runTestImpl(final Test test, Profile profile) throws DeviceDisconnectedException,
             ADBServerNeedRestartException, InvalidApkPathException,
             InvalidNameSpaceException {
         try {
@@ -1126,7 +1135,7 @@ public class TestPackage implements DeviceObserver {
             if (!mTestStop) {
                 Log.d("install " + getAppPackageName() + " succeed!");
                 mCurrentTestSuite = test.getTestSuite();
-                mCurrentTestSuite.run(mDevice, test);
+                mCurrentTestSuite.run(mDevice, test, profile);
             }
 
             if (!mTestStop) {

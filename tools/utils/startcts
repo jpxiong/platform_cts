@@ -53,6 +53,7 @@ DDM_LIB=${SDK_ROOT}/tools/lib/ddmlib.jar
 CTS_LIB=${CTS_ROOT}/tools/cts.jar
 JUNIT_LIB=${CTS_ROOT}/tools/junit.jar
 HOSTTEST_LIB=${CTS_ROOT}/tools/hosttestlib.jar
+CTS_TEST_ANNOTATIONS_HOST_LIB=${CTS_ROOT}/tools/CtsTestAnnotationsHostLib.jar
 ADB_PATH=${SDK_ROOT}/tools
 ADB_EXE=${ADB_PATH}/adb
 
@@ -62,7 +63,7 @@ checkFile ${JUNIT_LIB}
 checkFile ${HOSTTEST_LIB}
 checkFile ${ADB_EXE}
 
-JARS=${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB}:${HOSTTEST_LIB}
+JARS=${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB}:${HOSTTEST_LIB}:${CTS_TEST_ANNOTATIONS_HOST_LIB}
 
 PATH=${ADB_PATH}:${PATH}
 
