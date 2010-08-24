@@ -16,7 +16,9 @@
 
 package com.android.cts.verifier.sensors;
 
-import android.app.Activity;
+import com.android.cts.verifier.PassFailButtons;
+import com.android.cts.verifier.R;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
@@ -29,7 +31,7 @@ import android.os.Bundle;
  * Displays a wedge using OpenGL that, on a correctly-integrated device, always
  * points down.
  */
-public class AccelerometerTestActivity extends Activity {
+public class AccelerometerTestActivity extends PassFailButtons.Activity {
     private GLSurfaceView mGLSurfaceView;
 
     private SensorManager mSensorManager;
@@ -39,13 +41,16 @@ public class AccelerometerTestActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setResult(RESULT_CANCELED);
+
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
-        mGLSurfaceView = new GLSurfaceView(this);
         AccelerometerTestRenderer renderer = new AccelerometerTestRenderer(this);
         mListener = renderer;
+
+        setContentView(R.layout.pass_fail_gl);
+        mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
         mGLSurfaceView.setRenderer(renderer);
-        setContentView(mGLSurfaceView);
     }
 
     @Override
