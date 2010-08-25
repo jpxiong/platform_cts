@@ -1,4 +1,4 @@
-# Copyright (C) 2008 The Android Open Source Project
+# Copyright (C) 2010 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,24 +16,27 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# don't include this package in any target
-LOCAL_MODULE_TAGS := optional
-# and when built explicitly put it in the data partition
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_MODULE := libcts_jni
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+# Don't include this package in any configuration by default.
+LOCAL_MODULE_TAGS := optional
+
+# This isn't part of the system, so don't prelink it.
+LOCAL_PRELINK_MODULE := false
+
+LOCAL_SRC_FILES := \
+		CtsJniOnLoad.cpp
+
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
+
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog
 
 ifneq ($(TARGET_SIMULATOR),true)
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
+LOCAL_C_INCLUDES += cts/tests/cpufeatures
+LOCAL_STATIC_LIBRARIES := cpufeatures
 else
-LOCAL_SRC_FILES := $(filter-out %BuildTest.java,$(call all-java-files-under, src))
+LOCAL_CFLAGS += -DCTS_TARGET_SIMULATOR
 endif
 
-LOCAL_PACKAGE_NAME := CtsOsTestCases
-
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
-# uncomment when dalvik.annotation.Test* are removed or part of SDK
-#LOCAL_SDK_VERSION := current
-
-include $(BUILD_PACKAGE)
+include $(BUILD_SHARED_LIBRARY)
