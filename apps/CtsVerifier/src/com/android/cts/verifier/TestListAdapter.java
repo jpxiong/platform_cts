@@ -273,6 +273,13 @@ class TestListAdapter extends BaseAdapter {
         return position;
     }
 
+    public int getTestResult(int position) {
+        TestListItem item = getItem(position);
+        return mTestResults.containsKey(item.className)
+                ? mTestResults.get(item.className)
+                : TestResult.TEST_RESULT_NOT_EXECUTED;
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView textView;
         if (convertView == null) {
@@ -288,11 +295,7 @@ class TestListAdapter extends BaseAdapter {
         textView.setCompoundDrawablePadding(PADDING);
 
         if (item.isTest()) {
-            int testResult = mTestResults.containsKey(item.className)
-                    ? mTestResults.get(item.className)
-                    : TestResult.TEST_RESULT_NOT_EXECUTED;
-
-
+            int testResult = getTestResult(position);
             int backgroundResource = 0;
             int iconResource = 0;
 
