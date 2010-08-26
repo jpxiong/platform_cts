@@ -443,8 +443,8 @@ public class PopupWindowTest extends
         assertTrue(mPopupWindow.isShowing());
         mPopupWindow.getContentView().getLocationInWindow(viewInWindowXY);
         mPopupWindow.getContentView().getLocationOnScreen(viewOnScreenXY);
-        assertTrue(viewInWindowXY[0] > 0);
-        assertTrue(viewInWindowXY[1] > 0);
+        assertTrue(viewInWindowXY[0] >= 0);
+        assertTrue(viewInWindowXY[1] >= 0);
         assertEquals(viewInWindowXY[0] + xOff, viewOnScreenXY[0]);
         assertEquals(viewInWindowXY[1] + yOff, viewOnScreenXY[1]);
 
