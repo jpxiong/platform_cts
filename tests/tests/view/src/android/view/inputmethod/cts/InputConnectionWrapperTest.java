@@ -97,6 +97,11 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             args = {int.class, int.class}
         ),
         @TestTargetNew(
+                level = TestLevel.COMPLETE,
+                method = "getSelectedText",
+                args = {int.class}
+            ),
+        @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "getCursorCapsMode",
             args = {int.class}
@@ -126,6 +131,11 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             method = "setComposingText",
             args = {CharSequence.class, int.class}
         ),
+        @TestTargetNew(
+                level = TestLevel.COMPLETE,
+                method = "setComposingRegion",
+                args = {int.class, int.class}
+            ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "sendKeyEvent",
@@ -184,6 +194,10 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         assertTrue(inputConnection.isSetComposingTextCalled);
         wrapper.setSelection(0, 10);
         assertTrue(inputConnection.isSetSelectionCalled);
+        wrapper.getSelectedText(0);
+        assertTrue(inputConnection.isGetSelectedTextCalled);
+        wrapper.setComposingRegion(0, 3);
+        assertTrue(inputConnection.isSetComposingRegionCalled);
     }
 
     private class MockInputConnection implements InputConnection {
@@ -198,12 +212,14 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         public boolean isGetExtractedTextCalled;
         public boolean isGetTextAfterCursorCalled;
         public boolean isGetTextBeforeCursorCalled;
+        public boolean isGetSelectedTextCalled;
         public boolean isPerformContextMenuActionCalled;
         public boolean isPerformEditorActionCalled;
         public boolean isPerformPrivateCommandCalled;
         public boolean isReportFullscreenModeCalled;
         public boolean isSendKeyEventCalled;
         public boolean isSetComposingTextCalled;
+        public boolean isSetComposingRegionCalled;
         public boolean isSetSelectionCalled;
 
         public boolean beginBatchEdit() {
@@ -261,6 +277,11 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             return null;
         }
 
+        public CharSequence getSelectedText(int flags) {
+            isGetSelectedTextCalled = true;
+            return null;
+        }
+
         public boolean performContextMenuAction(int id) {
             isPerformContextMenuActionCalled = true;
             return false;
@@ -288,6 +309,11 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
 
         public boolean setComposingText(CharSequence text, int newCursorPosition) {
             isSetComposingTextCalled = true;
+            return false;
+        }
+
+        public boolean setComposingRegion(int start, int end) {
+            isSetComposingRegionCalled = true;
             return false;
         }
 
