@@ -112,6 +112,11 @@ public class TestListActivity extends ListActivity {
             case R.id.clear:
                 handleClearItemSelected();
                 return true;
+
+            case R.id.share:
+                handleShareItemSelected();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -121,6 +126,16 @@ public class TestListActivity extends ListActivity {
         ContentResolver resolver = getContentResolver();
         resolver.delete(TestResultsProvider.CONTENT_URI, "1", null);
         Toast.makeText(this, R.string.test_results_cleared, Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleShareItemSelected() {
+        Intent target = new Intent(Intent.ACTION_SEND);
+        target.setType("text/plain");
+
+        TestResultsReport report = new TestResultsReport(this, getListAdapter());
+        target.putExtra(Intent.EXTRA_SUBJECT, report.getSubject());
+        target.putExtra(Intent.EXTRA_TEXT, report.getBody());
+        startActivity(Intent.createChooser(target, getString(R.string.share_test_results)));
     }
 
     /**
