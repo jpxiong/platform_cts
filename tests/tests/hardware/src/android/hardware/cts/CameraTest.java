@@ -631,7 +631,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void checkExposureCompensation(Parameters parameters) {
-        assertEquals(parameters.getExposureCompensation(), 0);
+        assertEquals(0, parameters.getExposureCompensation());
         int max = parameters.getMaxExposureCompensation();
         int min = parameters.getMinExposureCompensation();
         float step = parameters.getExposureCompensationStep();
@@ -683,7 +683,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
-        assertEquals(mJpegPictureCallbackResult, true);
+        assertTrue(mJpegPictureCallbackResult);
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.hasThumbnail());
         byte[] thumb = exif.getThumbnail();
