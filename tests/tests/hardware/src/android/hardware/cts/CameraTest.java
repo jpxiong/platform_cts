@@ -37,8 +37,8 @@ import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.test.UiThreadTest;
+import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -636,7 +636,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int min = parameters.getMinExposureCompensation();
         float step = parameters.getExposureCompensationStep();
         if (max == 0 && min == 0) {
-            assertEquals(step, 0);
+            assertEquals(0f, step, 0.000001f);
             return;
         }
         assertTrue(step > 0);
