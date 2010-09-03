@@ -20,13 +20,20 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 
+import android.app.Instrumentation;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.IContentProvider;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
+
+import java.util.List;
 
 @TestTargetClass(ContactsContract.Contacts.class)
 public class ContactsContract_ContactsTest extends InstrumentationTestCase {
@@ -70,6 +77,16 @@ public class ContactsContract_ContactsTest extends InstrumentationTestCase {
 
         lastContacted = contact.getLong(Contacts.LAST_TIME_CONTACTED);
         assertTrue(oldLastContacted < lastContacted);
+    }
+
+    public void testContentUri() {
+        Instrumentation instrumentation = getInstrumentation();
+        Context context = instrumentation.getContext();
+        PackageManager packageManager = context.getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_VIEW, ContactsContract.Contacts.CONTENT_URI);
+        List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
+        assertFalse("Device does not support the activity intent: " + intent,
+                resolveInfos.isEmpty());
     }
 }
 
