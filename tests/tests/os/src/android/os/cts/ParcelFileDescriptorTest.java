@@ -31,6 +31,8 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,7 +115,7 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
     }
 
     @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "fromData",
             args = {byte[].class}
     )
@@ -146,6 +148,33 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
             assertEquals(expected.length, count);
             assertEquals(-1, is.read());
             MoreAsserts.assertEquals(expected, observed);
+        } finally {
+            is.close();
+        }
+    }
+
+    @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            notes = "Tests that skip() works on FDs returned by fromData()",
+            method = "fromData",
+            args = {byte[].class}
+    )
+    public void testFromDataSkip() throws IOException {
+        byte[] data = new byte[] { 40, 41, 42, 43, 44, 45, 46 };
+        ParcelFileDescriptor pfd = ParcelFileDescriptor.fromData(data, null);
+        assertNotNull(pfd);
+        FileDescriptor fd = pfd.getFileDescriptor();
+        assertNotNull(fd);
+        assertTrue(fd.valid());
+        FileInputStream is = new FileInputStream(fd);
+        try {
+            assertEquals(1, is.skip(1));
+            assertEquals(41, is.read());
+            assertEquals(42, is.read());
+            assertEquals(2, is.skip(2));
+            assertEquals(45, is.read());
+            assertEquals(46, is.read());
+            assertEquals(-1, is.read());
         } finally {
             is.close();
         }
