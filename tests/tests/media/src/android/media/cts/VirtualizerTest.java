@@ -19,7 +19,7 @@ package android.media.cts;
 import android.media.AudioEffect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.Equalizer;
+import android.media.Virtualizer;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -28,19 +28,16 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Equalizer.class)
-public class EqualizerTest extends AndroidTestCase {
+@TestTargetClass(Virtualizer.class)
+public class VirtualizerTest extends AndroidTestCase {
 
-    private String TAG = "EqualizerTest";
-    private final static int MIN_NUMBER_OF_BANDS = 4;
-    private final static int MAX_LEVEL_RANGE_LOW = -1200;         // -12dB
-    private final static int MIN_LEVEL_RANGE_HIGH = 1200;         // +12dB
-    private final static int TEST_FREQUENCY_MILLIHERTZ = 1000000; // 1kHz
-    private final static int MIN_NUMBER_OF_PRESETS = 0;
-    private final static float TOLERANCE = 100;                   // +/-1dB
+    private String TAG = "VirtualizerTest";
+    private final static short TEST_STRENGTH = 500;
+    private final static short TEST_STRENGTH2 = 1000;
+    private final static float STRENGTH_TOLERANCE = 1.1f;  // 10%
 
-    private Equalizer mEqualizer = null;
-    private Equalizer mEqualizer2 = null;
+    private Virtualizer mVirtualizer = null;
+    private Virtualizer mVirtualizer2 = null;
     private int mSession = -1;
     private boolean mHasControl = false;
     private boolean mIsEnabled = false;
@@ -49,9 +46,8 @@ public class EqualizerTest extends AndroidTestCase {
     private Looper mLooper = null;
     private final Object mLock = new Object();
 
-
     //-----------------------------------------------------------------
-    // EQUALIZER TESTS:
+    // VIRTUALIZER TESTS:
     //----------------------------------
 
     //-----------------------------------------------------------------
@@ -62,7 +58,7 @@ public class EqualizerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "Equalizer",
+            method = "Virtualizer",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
@@ -77,17 +73,17 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test0_0ConstructorAndRelease() throws Exception {
-        Equalizer eq = null;
+        Virtualizer eq = null;
         try {
-            eq = new Equalizer(0, 0);
-            assertNotNull("could not create Equalizer", eq);
+            eq = new Virtualizer(0, 0);
+            assertNotNull(" could not create Virtualizer", eq);
             try {
-                assertTrue("invalid effect ID", (eq.getId() != 0));
+                assertTrue(" invalid effect ID", (eq.getId() != 0));
             } catch (IllegalStateException e) {
-                fail("Equalizer not initialized");
+                fail("Virtualizer not initialized");
             }
         } catch (IllegalArgumentException e) {
-            fail("Equalizer not found");
+            fail("Virtualizer not found");
         } catch (UnsupportedOperationException e) {
             fail("Effect library not loaded");
         } finally {
@@ -102,135 +98,40 @@ public class EqualizerTest extends AndroidTestCase {
     // 1 - get/set parameters
     //----------------------------------
 
-    //Test case 1.0: test setBandLevel() and getBandLevel()
+    //Test case 1.0: test strength
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getNumberOfBands",
+            method = "getStrengthSupported",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getBandLevelRange",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBandLevel",
-            args = {short.class, short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBandLevel",
+            method = "setStrength",
             args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getRoundedStrength",
+            args = {}
         )
     })
-    public void test1_0BandLevel() throws Exception {
-        getEqualizer(0);
+    public void test1_0Strength() throws Exception {
+        getVirtualizer(0);
         try {
-            short numBands = mEqualizer.getNumberOfBands();
-            assertTrue("not enough bands", numBands >= MIN_NUMBER_OF_BANDS);
-
-            short[] levelRange = mEqualizer.getBandLevelRange();
-            assertTrue("min level too high", levelRange[0] <= MAX_LEVEL_RANGE_LOW);
-            assertTrue("max level too low", levelRange[1] >= MIN_LEVEL_RANGE_HIGH);
-
-            mEqualizer.setBandLevel((short)0, levelRange[1]);
-            short level = mEqualizer.getBandLevel((short)0);
-            // allow +/- TOLERANCE margin on actual level compared to requested level
-            assertTrue("setBandLevel failed",
-                    (level >= (levelRange[1] - TOLERANCE)) &&
-                    (level <= (levelRange[1] + TOLERANCE)));
-
-        } catch (IllegalArgumentException e) {
-            fail("Bad parameter value");
-        } catch (UnsupportedOperationException e) {
-            fail("get parameter() rejected");
-        } catch (IllegalStateException e) {
-            fail("get parameter() called in wrong state");
-        } finally {
-            releaseEqualizer();
-        }
-    }
-
-    //Test case 1.1: test band frequency
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBand",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBandFreqRange",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCenterFreq",
-            args = {short.class}
-        )
-    })
-    public void test1_1BandFrequency() throws Exception {
-        getEqualizer(0);
-        try {
-            short band = mEqualizer.getBand(TEST_FREQUENCY_MILLIHERTZ);
-            assertTrue("getBand failed", band >= 0);
-            int[] freqRange = mEqualizer.getBandFreqRange(band);
-            assertTrue("getBandFreqRange failed",
-                    (freqRange[0] <= TEST_FREQUENCY_MILLIHERTZ) &&
-                    (freqRange[1] >= TEST_FREQUENCY_MILLIHERTZ));
-            int freq = mEqualizer.getCenterFreq(band);
-            assertTrue("getCenterFreq failed",
-                    (freqRange[0] <= freq) && (freqRange[1] >= freq));
-
-        } catch (IllegalArgumentException e) {
-            fail("Bad parameter value");
-        } catch (UnsupportedOperationException e) {
-            fail("get parameter() rejected");
-        } catch (IllegalStateException e) {
-            fail("get parameter() called in wrong state");
-        } finally {
-            releaseEqualizer();
-        }
-    }
-
-    //Test case 1.2: test presets
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNumberOfPresets",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "usePreset",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentPreset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPresetName",
-            args = {short.class}
-        )
-    })
-    public void test1_2Presets() throws Exception {
-        getEqualizer(0);
-        try {
-            short numPresets = mEqualizer.getNumberOfPresets();
-            assertTrue("getNumberOfPresets failed", numPresets >= MIN_NUMBER_OF_PRESETS);
-            if (numPresets > 0) {
-                mEqualizer.usePreset((short)(numPresets - 1));
-                short preset = mEqualizer.getCurrentPreset();
-                assertEquals("usePreset failed", preset, (short)(numPresets - 1));
-                String name = mEqualizer.getPresetName(preset);
-                assertNotNull("getPresetName failed", name);
+            if (mVirtualizer.getStrengthSupported()) {
+                short strength = mVirtualizer.getRoundedStrength();
+                strength = (strength == TEST_STRENGTH) ? TEST_STRENGTH2 : TEST_STRENGTH;
+                mVirtualizer.setStrength((short)strength);
+                short strength2 = mVirtualizer.getRoundedStrength();
+                // allow STRENGTH_TOLERANCE difference between set strength and rounded strength
+                assertTrue("got incorrect strength",
+                        ((float)strength2 > (float)strength / STRENGTH_TOLERANCE) &&
+                        ((float)strength2 < (float)strength * STRENGTH_TOLERANCE));
+            } else {
+                short strength = mVirtualizer.getRoundedStrength();
+                assertTrue("got incorrect strength", strength >= 0 && strength <= 1000);
             }
-
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
         } catch (UnsupportedOperationException e) {
@@ -238,11 +139,11 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseVirtualizer();
         }
     }
 
-    //Test case 1.3: test properties
+    //Test case 1.1: test properties
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -252,28 +153,30 @@ public class EqualizerTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "setProperties",
-            args = {Equalizer.Settings.class}
+            args = {Virtualizer.Settings.class}
         )
     })
-    public void test1_3Properties() throws Exception {
-        getEqualizer(0);
+    public void test1_1Properties() throws Exception {
+        getVirtualizer(0);
         try {
-            Equalizer.Settings settings = mEqualizer.getProperties();
-            assertTrue("no enough bands", settings.numBands >= MIN_NUMBER_OF_BANDS);
-            short newLevel = 0;
-            if (settings.bandLevels[0] == 0) {
-                newLevel = -600;
-            }
+            Virtualizer.Settings settings = mVirtualizer.getProperties();
             String str = settings.toString();
-            settings = new Equalizer.Settings(str);
-            settings.curPreset = (short)-1;
-            settings.bandLevels[0] = newLevel;
-            mEqualizer.setProperties(settings);
-            settings = mEqualizer.getProperties();
-            assertTrue("setProperties failed",
-                    (settings.bandLevels[0] >= (newLevel - TOLERANCE)) &&
-                    (settings.bandLevels[0] <= (newLevel + TOLERANCE)));
+            settings = new Virtualizer.Settings(str);
 
+            short strength = settings.strength;
+            if (mVirtualizer.getStrengthSupported()) {
+                strength = (strength == TEST_STRENGTH) ? TEST_STRENGTH2 : TEST_STRENGTH;
+            }
+            settings.strength = strength;
+            mVirtualizer.setProperties(settings);
+            settings = mVirtualizer.getProperties();
+
+            if (mVirtualizer.getStrengthSupported()) {
+                // allow STRENGTH_TOLERANCE difference between set strength and rounded strength
+                assertTrue("got incorrect strength",
+                        ((float)settings.strength > (float)strength / STRENGTH_TOLERANCE) &&
+                        ((float)settings.strength < (float)strength * STRENGTH_TOLERANCE));
+            }
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
         } catch (UnsupportedOperationException e) {
@@ -281,11 +184,11 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseVirtualizer();
         }
     }
 
-    //Test case 1.4: test setBandLevel() throws exception after release
+    //Test case 1.2: test setStrength() throws exception after release
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -294,20 +197,19 @@ public class EqualizerTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setBandLevel",
-            args = {short.class, short.class}
+            method = "setStrength",
+            args = {short.class}
         )
     })
-    public void test1_4SetBandLevelAfterRelease() throws Exception {
-
-        getEqualizer(0);
-        mEqualizer.release();
+    public void test1_2SetStrengthAfterRelease() throws Exception {
+        getVirtualizer(0);
+        mVirtualizer.release();
         try {
-            mEqualizer.setBandLevel((short)0, (short)0);
+            mVirtualizer.setStrength(TEST_STRENGTH);
         } catch (IllegalStateException e) {
             // test passed
         } finally {
-            releaseEqualizer();
+            releaseVirtualizer();
         }
     }
 
@@ -329,17 +231,16 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test2_0SetEnabledGetEnabled() throws Exception {
-        getEqualizer(0);
+        getVirtualizer(0);
         try {
-            mEqualizer.setEnabled(true);
-            assertTrue("invalid state from getEnabled", mEqualizer.getEnabled());
-            mEqualizer.setEnabled(false);
-            assertFalse("invalid state to getEnabled", mEqualizer.getEnabled());
-
+            mVirtualizer.setEnabled(true);
+            assertTrue(" invalid state from getEnabled", mVirtualizer.getEnabled());
+            mVirtualizer.setEnabled(false);
+            assertFalse(" invalid state to getEnabled", mVirtualizer.getEnabled());
         } catch (IllegalStateException e) {
             fail("setEnabled() in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseVirtualizer();
         }
     }
 
@@ -357,15 +258,14 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test2_1SetEnabledAfterRelease() throws Exception {
-
-        getEqualizer(0);
-        mEqualizer.release();
+        getVirtualizer(0);
+        mVirtualizer.release();
         try {
-            mEqualizer.setEnabled(true);
+            mVirtualizer.setEnabled(true);
         } catch (IllegalStateException e) {
             // test passed
         } finally {
-            releaseEqualizer();
+            releaseVirtualizer();
         }
     }
 
@@ -394,12 +294,12 @@ public class EqualizerTest extends AndroidTestCase {
         assertTrue(mInitialized);
         synchronized(mLock) {
             try {
-                getEqualizer(0);
+                getVirtualizer(0);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseVirtualizer();
                 terminateListenerLooper();
             }
         }
@@ -424,17 +324,17 @@ public class EqualizerTest extends AndroidTestCase {
             }
         }
         assertTrue(mInitialized);
-        mEqualizer2.setEnabled(true);
+        mVirtualizer2.setEnabled(true);
         mIsEnabled = true;
-        getEqualizer(0);
+        getVirtualizer(0);
         synchronized(mLock) {
             try {
-                mEqualizer.setEnabled(false);
+                mVirtualizer.setEnabled(false);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseVirtualizer();
                 terminateListenerLooper();
             }
         }
@@ -446,7 +346,7 @@ public class EqualizerTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "setParameterListener",
-            args = {Equalizer.OnParameterChangeListener.class}
+            args = {Virtualizer.OnParameterChangeListener.class}
         )
     })
     public void test3_2ParameterChangedListener() throws Exception {
@@ -459,53 +359,53 @@ public class EqualizerTest extends AndroidTestCase {
             }
         }
         assertTrue(mInitialized);
-        getEqualizer(0);
+        getVirtualizer(0);
         synchronized(mLock) {
             try {
                 mChangedParameter = -1;
-                mEqualizer.setBandLevel((short)0, (short)0);
+                mVirtualizer.setStrength(TEST_STRENGTH);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseVirtualizer();
                 terminateListenerLooper();
             }
         }
         assertEquals("parameter change not received",
-                Equalizer.PARAM_BAND_LEVEL, mChangedParameter);
+                Virtualizer.PARAM_STRENGTH, mChangedParameter);
     }
 
     //-----------------------------------------------------------------
     // private methods
     //----------------------------------
 
-    private void getEqualizer(int session) {
-         if (mEqualizer == null || session != mSession) {
-             if (session != mSession && mEqualizer != null) {
-                 mEqualizer.release();
-                 mEqualizer = null;
+    private void getVirtualizer(int session) {
+         if (mVirtualizer == null || session != mSession) {
+             if (session != mSession && mVirtualizer != null) {
+                 mVirtualizer.release();
+                 mVirtualizer = null;
              }
              try {
-                mEqualizer = new Equalizer(0, session);
+                mVirtualizer = new Virtualizer(0, session);
                 mSession = session;
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "getEqualizer() Equalizer not found exception: "+e);
+                Log.e(TAG, "getVirtualizer() Virtualizer not found exception: "+e);
             } catch (UnsupportedOperationException e) {
-                Log.e(TAG, "getEqualizer() Effect library not loaded exception: "+e);
+                Log.e(TAG, "getVirtualizer() Effect library not loaded exception: "+e);
             }
          }
-         assertNotNull("could not create mEqualizer", mEqualizer);
+         assertNotNull("could not create mVirtualizer", mVirtualizer);
     }
 
-    private void releaseEqualizer() {
-        if (mEqualizer != null) {
-            mEqualizer.release();
-            mEqualizer = null;
+    private void releaseVirtualizer() {
+        if (mVirtualizer != null) {
+            mVirtualizer.release();
+            mVirtualizer = null;
         }
     }
 
-    // Initializes the equalizer listener looper
+    // Initializes the virtualizer listener looper
     class ListenerThread extends Thread {
         boolean mControl;
         boolean mEnable;
@@ -531,16 +431,16 @@ public class EqualizerTest extends AndroidTestCase {
                 // after we are done with it.
                 mLooper = Looper.myLooper();
 
-                mEqualizer2 = new Equalizer(0, 0);
-                assertNotNull("could not create Equalizer2", mEqualizer2);
+                mVirtualizer2 = new Virtualizer(0, 0);
+                assertNotNull("could not create virtualizer2", mVirtualizer2);
 
                 if (mControl) {
-                    mEqualizer2.setControlStatusListener(
+                    mVirtualizer2.setControlStatusListener(
                             new AudioEffect.OnControlStatusChangeListener() {
                         public void onControlStatusChange(
                                 AudioEffect effect, boolean controlGranted) {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
+                                if (effect == mVirtualizer2) {
                                     mHasControl = controlGranted;
                                     mLock.notify();
                                 }
@@ -549,11 +449,11 @@ public class EqualizerTest extends AndroidTestCase {
                     });
                 }
                 if (mEnable) {
-                    mEqualizer2.setEnableStatusListener(
+                    mVirtualizer2.setEnableStatusListener(
                             new AudioEffect.OnEnableStatusChangeListener() {
                         public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
+                                if (effect == mVirtualizer2) {
                                     mIsEnabled = enabled;
                                     mLock.notify();
                                 }
@@ -562,13 +462,13 @@ public class EqualizerTest extends AndroidTestCase {
                     });
                 }
                 if (mParameter) {
-                    mEqualizer2.setParameterListener(new Equalizer.OnParameterChangeListener() {
-                        public void onParameterChange(Equalizer effect,
-                                int status, int param1, int param2, int value)
+                    mVirtualizer2.setParameterListener(new Virtualizer.OnParameterChangeListener() {
+                        public void onParameterChange(Virtualizer effect, int status,
+                                int param, short value)
                         {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
-                                    mChangedParameter = param1;
+                                if (effect == mVirtualizer2) {
+                                    mChangedParameter = param;
                                     mLock.notify();
                                 }
                             }
@@ -587,9 +487,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     // Terminates the listener looper thread.
     private void terminateListenerLooper() {
-        if (mEqualizer2 != null) {
-            mEqualizer2.release();
-            mEqualizer2 = null;
+        if (mVirtualizer2 != null) {
+            mVirtualizer2.release();
+            mVirtualizer2 = null;
         }
         if (mLooper != null) {
             mLooper.quit();
