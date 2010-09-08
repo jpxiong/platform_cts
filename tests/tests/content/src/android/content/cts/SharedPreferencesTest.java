@@ -33,6 +33,9 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Test {@link SharedPreferences}.
@@ -221,5 +224,43 @@ public class SharedPreferencesTest extends AndroidTestCase {
         // there.
         prefs.edit().putString("foo", "bar").commit();
         assertTrue(mPrefsFile.exists());
+    }
+
+    public void testTorture() {
+        Map<String, String> expectedMap = new HashMap<String, String>();
+        Random rand = new Random();
+
+        SharedPreferences prefs = mContext.getSharedPreferences("torture", Context.MODE_PRIVATE);
+        prefs.edit().clear().commit();
+
+        for (int i = 0; i < 100; i++) {
+            prefs = mContext.getSharedPreferences("torture", Context.MODE_PRIVATE);
+            assertEquals(expectedMap, prefs.getAll());
+
+            String key = new Integer(rand.nextInt(25)).toString();
+            String value = new Integer(i).toString();
+            SharedPreferences.Editor editor = prefs.edit();
+
+            if (rand.nextInt(100) < 85) {
+                Log.d(TAG, "Setting " + key + "=" + value);
+                editor.putString(key, value);
+                expectedMap.put(key, value);
+            } else {
+                Log.d(TAG, "Removing " + key);
+                editor.remove(key);
+                expectedMap.remove(key);
+            }
+
+            // Use apply on most, but commit some too.
+            if (rand.nextInt(100) < 85) {
+                Log.d(TAG, "apply.");
+                editor.apply();
+            } else {
+                Log.d(TAG, "commit.");
+                editor.commit();
+            }
+
+            assertEquals(expectedMap, prefs.getAll());
+        }
     }
 }
