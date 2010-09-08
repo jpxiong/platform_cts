@@ -19,7 +19,7 @@ package android.media.cts;
 import android.media.AudioEffect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.Equalizer;
+import android.media.EnvironmentalReverb;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -28,19 +28,16 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Equalizer.class)
-public class EqualizerTest extends AndroidTestCase {
+@TestTargetClass(EnvironmentalReverb.class)
+public class EnvReverbTest extends AndroidTestCase {
 
-    private String TAG = "EqualizerTest";
-    private final static int MIN_NUMBER_OF_BANDS = 4;
-    private final static int MAX_LEVEL_RANGE_LOW = -1200;         // -12dB
-    private final static int MIN_LEVEL_RANGE_HIGH = 1200;         // +12dB
-    private final static int TEST_FREQUENCY_MILLIHERTZ = 1000000; // 1kHz
-    private final static int MIN_NUMBER_OF_PRESETS = 0;
-    private final static float TOLERANCE = 100;                   // +/-1dB
+    private String TAG = "EnvReverbTest";
+    private final static int MILLIBEL_TOLERANCE = 100;            // +/-1dB
+    private final static float DELAY_TOLERANCE = 1.05f;           // 5%
+    private final static float RATIO_TOLERANCE = 1.05f;           // 5%
 
-    private Equalizer mEqualizer = null;
-    private Equalizer mEqualizer2 = null;
+    private EnvironmentalReverb mReverb = null;
+    private EnvironmentalReverb mReverb2 = null;
     private int mSession = -1;
     private boolean mHasControl = false;
     private boolean mIsEnabled = false;
@@ -51,7 +48,7 @@ public class EqualizerTest extends AndroidTestCase {
 
 
     //-----------------------------------------------------------------
-    // EQUALIZER TESTS:
+    // ENVIRONMENTAL REVERB TESTS:
     //----------------------------------
 
     //-----------------------------------------------------------------
@@ -62,7 +59,7 @@ public class EqualizerTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "Equalizer",
+            method = "EnvironmentalReverb",
             args = {int.class, int.class}
         ),
         @TestTargetNew(
@@ -77,22 +74,22 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test0_0ConstructorAndRelease() throws Exception {
-        Equalizer eq = null;
-        try {
-            eq = new Equalizer(0, 0);
-            assertNotNull("could not create Equalizer", eq);
+        EnvironmentalReverb envReverb = null;
+         try {
+            envReverb = new EnvironmentalReverb(0, 0);
+            assertNotNull("could not create EnvironmentalReverb", envReverb);
             try {
-                assertTrue("invalid effect ID", (eq.getId() != 0));
+                assertTrue("invalid effect ID", (envReverb.getId() != 0));
             } catch (IllegalStateException e) {
-                fail("Equalizer not initialized");
+                fail("EnvironmentalReverb not initialized");
             }
         } catch (IllegalArgumentException e) {
-            fail("Equalizer not found");
+            fail("EnvironmentalReverb not found");
         } catch (UnsupportedOperationException e) {
             fail("Effect library not loaded");
         } finally {
-            if (eq != null) {
-                eq.release();
+            if (envReverb != null) {
+                envReverb.release();
             }
         }
     }
@@ -102,45 +99,47 @@ public class EqualizerTest extends AndroidTestCase {
     // 1 - get/set parameters
     //----------------------------------
 
-    //Test case 1.0: test setBandLevel() and getBandLevel()
+    //Test case 1.0: test room level and room HF level
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getNumberOfBands",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBandLevelRange",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBandLevel",
-            args = {short.class, short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBandLevel",
+            method = "setRoomLevel",
             args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getRoomLevel",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setRoomHFLevel",
+            args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getRoomHFLevel",
+            args = {}
         )
     })
-    public void test1_0BandLevel() throws Exception {
-        getEqualizer(0);
+    public void test1_0Room() throws Exception {
+        getReverb(0);
         try {
-            short numBands = mEqualizer.getNumberOfBands();
-            assertTrue("not enough bands", numBands >= MIN_NUMBER_OF_BANDS);
+            short level = mReverb.getRoomLevel();
+            level = (short)((level == 0) ? -1000 : 0);
+            mReverb.setRoomLevel(level);
+            short level2 = mReverb.getRoomLevel();
+            assertTrue("got incorrect room level",
+                    (level2 > (level - MILLIBEL_TOLERANCE)) &&
+                    (level2 < (level + MILLIBEL_TOLERANCE)));
 
-            short[] levelRange = mEqualizer.getBandLevelRange();
-            assertTrue("min level too high", levelRange[0] <= MAX_LEVEL_RANGE_LOW);
-            assertTrue("max level too low", levelRange[1] >= MIN_LEVEL_RANGE_HIGH);
-
-            mEqualizer.setBandLevel((short)0, levelRange[1]);
-            short level = mEqualizer.getBandLevel((short)0);
-            // allow +/- TOLERANCE margin on actual level compared to requested level
-            assertTrue("setBandLevel failed",
-                    (level >= (levelRange[1] - TOLERANCE)) &&
-                    (level <= (levelRange[1] + TOLERANCE)));
+            level = mReverb.getRoomHFLevel();
+            level = (short)((level == 0) ? -1000 : 0);
+            mReverb.setRoomHFLevel(level);
+            level2 = mReverb.getRoomHFLevel();
+            assertTrue("got incorrect room HF level",
+                    (level2 > (level - MILLIBEL_TOLERANCE)) &&
+                    (level2 < (level + MILLIBEL_TOLERANCE)));
 
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
@@ -149,40 +148,50 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
-    //Test case 1.1: test band frequency
+    //Test case 1.1: test decay time and ratio
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getBand",
+            method = "setDecayTime",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getBandFreqRange",
+            method = "getDecayTime",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setDecayHFRatio",
             args = {short.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getCenterFreq",
-            args = {short.class}
+            method = "getDecayHFRatio",
+            args = {}
         )
     })
-    public void test1_1BandFrequency() throws Exception {
-        getEqualizer(0);
+    public void test1_1Decay() throws Exception {
+        getReverb(0);
         try {
-            short band = mEqualizer.getBand(TEST_FREQUENCY_MILLIHERTZ);
-            assertTrue("getBand failed", band >= 0);
-            int[] freqRange = mEqualizer.getBandFreqRange(band);
-            assertTrue("getBandFreqRange failed",
-                    (freqRange[0] <= TEST_FREQUENCY_MILLIHERTZ) &&
-                    (freqRange[1] >= TEST_FREQUENCY_MILLIHERTZ));
-            int freq = mEqualizer.getCenterFreq(band);
-            assertTrue("getCenterFreq failed",
-                    (freqRange[0] <= freq) && (freqRange[1] >= freq));
+            int time = mReverb.getDecayTime();
+            time = (time == 500) ? 1000 : 500;
+            mReverb.setDecayTime(time);
+            int time2 = mReverb.getDecayTime();
+            assertTrue("got incorrect decay time",
+                    ((float)time2 > (float)(time / DELAY_TOLERANCE)) &&
+                    ((float)time2 < (float)(time * DELAY_TOLERANCE)));
+            short ratio = mReverb.getDecayHFRatio();
+            ratio = (short)((ratio == 500) ? 1000 : 500);
+            mReverb.setDecayHFRatio(ratio);
+            short ratio2 = mReverb.getDecayHFRatio();
+            assertTrue("got incorrect decay HF ratio",
+                    ((float)ratio2 > (float)(ratio / RATIO_TOLERANCE)) &&
+                    ((float)ratio2 < (float)(ratio * RATIO_TOLERANCE)));
 
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
@@ -191,45 +200,114 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
-    //Test case 1.2: test presets
+
+    //Test case 1.2: test reverb level and delay
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getNumberOfPresets",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "usePreset",
+            method = "setReverbLevel",
             args = {short.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getCurrentPreset",
+            method = "getReverbLevel",
             args = {}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getPresetName",
-            args = {short.class}
+            method = "setReverbDelay",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getReverbDelay",
+            args = {}
         )
     })
-    public void test1_2Presets() throws Exception {
-        getEqualizer(0);
+    public void test1_2Reverb() throws Exception {
+        getReverb(0);
         try {
-            short numPresets = mEqualizer.getNumberOfPresets();
-            assertTrue("getNumberOfPresets failed", numPresets >= MIN_NUMBER_OF_PRESETS);
-            if (numPresets > 0) {
-                mEqualizer.usePreset((short)(numPresets - 1));
-                short preset = mEqualizer.getCurrentPreset();
-                assertEquals("usePreset failed", preset, (short)(numPresets - 1));
-                String name = mEqualizer.getPresetName(preset);
-                assertNotNull("getPresetName failed", name);
-            }
+            short level = mReverb.getReverbLevel();
+            level = (short)((level == 0) ? -1000 : 0);
+            mReverb.setReverbLevel(level);
+            short level2 = mReverb.getReverbLevel();
+            assertTrue("got incorrect reverb level",
+                    (level2 > (level - MILLIBEL_TOLERANCE)) &&
+                    (level2 < (level + MILLIBEL_TOLERANCE)));
+
+// FIXME:uncomment actual test when early reflections are implemented in the reverb
+//            int time = mReverb.getReverbDelay();
+//             mReverb.setReverbDelay(time);
+//            int time2 = mReverb.getReverbDelay();
+//            assertTrue("got incorrect reverb delay",
+//                    ((float)time2 > (float)(time / DELAY_TOLERANCE)) &&
+//                    ((float)time2 < (float)(time * DELAY_TOLERANCE)));
+            mReverb.setReverbDelay(0);
+            int time2 = mReverb.getReverbDelay();
+            assertEquals("got incorrect reverb delay", mReverb.getReverbDelay(), 0);
+        } catch (IllegalArgumentException e) {
+            fail("Bad parameter value");
+        } catch (UnsupportedOperationException e) {
+            fail("get parameter() rejected");
+        } catch (IllegalStateException e) {
+            fail("get parameter() called in wrong state");
+        } finally {
+            releaseReverb();
+        }
+    }
+
+    //Test case 1.3: test early reflections level and delay
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setReflectionsLevel",
+            args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getReflectionsLevel",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setReflectionsDelay",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getReflectionsDelay",
+            args = {}
+        )
+    })
+    public void test1_3Reflections() throws Exception {
+        getReverb(0);
+        try {
+// FIXME:uncomment actual test when early reflections are implemented in the reverb
+//            short level = mReverb.getReflectionsLevel();
+//            level = (short)((level == 0) ? -1000 : 0);
+//            mReverb.setReflectionsLevel(level);
+//            short level2 = mReverb.getReflectionsLevel();
+//            assertTrue("got incorrect reflections level",
+//                    (level2 > (level - MILLIBEL_TOLERANCE)) &&
+//                    (level2 < (level + MILLIBEL_TOLERANCE)));
+//
+//            int time = mReverb.getReflectionsDelay();
+//            time = (time == 20) ? 0 : 20;
+//            mReverb.setReflectionsDelay(time);
+//            int time2 = mReverb.getReflectionsDelay();
+//            assertTrue("got incorrect reflections delay",
+//                    ((float)time2 > (float)(time / DELAY_TOLERANCE)) &&
+//                    ((float)time2 < (float)(time * DELAY_TOLERANCE)));
+            mReverb.setReflectionsLevel((short) 0);
+            assertEquals("got incorrect reverb delay",
+                    mReverb.getReflectionsLevel(), (short) 0);
+            mReverb.setReflectionsDelay(0);
+            assertEquals("got incorrect reverb delay",
+                    mReverb.getReflectionsDelay(), 0);
 
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
@@ -238,11 +316,64 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
-    //Test case 1.3: test properties
+    //Test case 1.4: test diffusion and density
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setDiffusion",
+            args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getDiffusion",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setDensity",
+            args = {short.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getDensity",
+            args = {}
+        )
+    })
+    public void test1_4DiffusionAndDensity() throws Exception {
+        getReverb(0);
+        try {
+            short ratio = mReverb.getDiffusion();
+            ratio = (short)((ratio == 500) ? 1000 : 500);
+            mReverb.setDiffusion(ratio);
+            short ratio2 = mReverb.getDiffusion();
+            assertTrue("got incorrect diffusion",
+                    ((float)ratio2 > (float)(ratio / RATIO_TOLERANCE)) &&
+                    ((float)ratio2 < (float)(ratio * RATIO_TOLERANCE)));
+
+            ratio = mReverb.getDensity();
+            ratio = (short)((ratio == 500) ? 1000 : 500);
+            mReverb.setDensity(ratio);
+            ratio2 = mReverb.getDensity();
+            assertTrue("got incorrect density",
+                    ((float)ratio2 > (float)(ratio / RATIO_TOLERANCE)) &&
+                    ((float)ratio2 < (float)(ratio * RATIO_TOLERANCE)));
+
+        } catch (IllegalArgumentException e) {
+            fail("Bad parameter value");
+        } catch (UnsupportedOperationException e) {
+            fail("get parameter() rejected");
+        } catch (IllegalStateException e) {
+            fail("get parameter() called in wrong state");
+        } finally {
+            releaseReverb();
+        }
+    }
+
+    //Test case 1.5: test properties
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -252,28 +383,22 @@ public class EqualizerTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "setProperties",
-            args = {Equalizer.Settings.class}
+            args = {EnvironmentalReverb.Settings.class}
         )
     })
-    public void test1_3Properties() throws Exception {
-        getEqualizer(0);
+    public void test1_5Properties() throws Exception {
+        getReverb(0);
         try {
-            Equalizer.Settings settings = mEqualizer.getProperties();
-            assertTrue("no enough bands", settings.numBands >= MIN_NUMBER_OF_BANDS);
-            short newLevel = 0;
-            if (settings.bandLevels[0] == 0) {
-                newLevel = -600;
-            }
+            EnvironmentalReverb.Settings settings = mReverb.getProperties();
             String str = settings.toString();
-            settings = new Equalizer.Settings(str);
-            settings.curPreset = (short)-1;
-            settings.bandLevels[0] = newLevel;
-            mEqualizer.setProperties(settings);
-            settings = mEqualizer.getProperties();
+            settings = new EnvironmentalReverb.Settings(str);
+            short level = (short)((settings.roomLevel == 0) ? -1000 : 0);
+            settings.roomLevel = level;
+            mReverb.setProperties(settings);
+            settings = mReverb.getProperties();
             assertTrue("setProperties failed",
-                    (settings.bandLevels[0] >= (newLevel - TOLERANCE)) &&
-                    (settings.bandLevels[0] <= (newLevel + TOLERANCE)));
-
+                    (settings.roomLevel >= (level - MILLIBEL_TOLERANCE)) &&
+                    (settings.roomLevel <= (level + MILLIBEL_TOLERANCE)));
         } catch (IllegalArgumentException e) {
             fail("Bad parameter value");
         } catch (UnsupportedOperationException e) {
@@ -281,33 +406,7 @@ public class EqualizerTest extends AndroidTestCase {
         } catch (IllegalStateException e) {
             fail("get parameter() called in wrong state");
         } finally {
-            releaseEqualizer();
-        }
-    }
-
-    //Test case 1.4: test setBandLevel() throws exception after release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBandLevel",
-            args = {short.class, short.class}
-        )
-    })
-    public void test1_4SetBandLevelAfterRelease() throws Exception {
-
-        getEqualizer(0);
-        mEqualizer.release();
-        try {
-            mEqualizer.setBandLevel((short)0, (short)0);
-        } catch (IllegalStateException e) {
-            // test passed
-        } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
@@ -329,17 +428,16 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test2_0SetEnabledGetEnabled() throws Exception {
-        getEqualizer(0);
+        getReverb(0);
         try {
-            mEqualizer.setEnabled(true);
-            assertTrue("invalid state from getEnabled", mEqualizer.getEnabled());
-            mEqualizer.setEnabled(false);
-            assertFalse("invalid state to getEnabled", mEqualizer.getEnabled());
-
+            mReverb.setEnabled(true);
+            assertTrue("invalid state from getEnabled", mReverb.getEnabled());
+            mReverb.setEnabled(false);
+            assertFalse("invalid state to getEnabled", mReverb.getEnabled());
         } catch (IllegalStateException e) {
             fail("setEnabled() in wrong state");
         } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
@@ -357,15 +455,15 @@ public class EqualizerTest extends AndroidTestCase {
         )
     })
     public void test2_1SetEnabledAfterRelease() throws Exception {
-
-        getEqualizer(0);
-        mEqualizer.release();
+        getReverb(0);
+        mReverb.release();
         try {
-            mEqualizer.setEnabled(true);
+            mReverb.setEnabled(true);
+            fail("setEnabled() processed after release()");
         } catch (IllegalStateException e) {
             // test passed
         } finally {
-            releaseEqualizer();
+            releaseReverb();
         }
     }
 
@@ -394,12 +492,12 @@ public class EqualizerTest extends AndroidTestCase {
         assertTrue(mInitialized);
         synchronized(mLock) {
             try {
-                getEqualizer(0);
+                getReverb(0);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseReverb();
                 terminateListenerLooper();
             }
         }
@@ -424,17 +522,17 @@ public class EqualizerTest extends AndroidTestCase {
             }
         }
         assertTrue(mInitialized);
-        mEqualizer2.setEnabled(true);
+        mReverb2.setEnabled(true);
         mIsEnabled = true;
-        getEqualizer(0);
+        getReverb(0);
         synchronized(mLock) {
             try {
-                mEqualizer.setEnabled(false);
+                mReverb.setEnabled(false);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseReverb();
                 terminateListenerLooper();
             }
         }
@@ -446,7 +544,7 @@ public class EqualizerTest extends AndroidTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "setParameterListener",
-            args = {Equalizer.OnParameterChangeListener.class}
+            args = {EnvironmentalReverb.OnParameterChangeListener.class}
         )
     })
     public void test3_2ParameterChangedListener() throws Exception {
@@ -459,53 +557,53 @@ public class EqualizerTest extends AndroidTestCase {
             }
         }
         assertTrue(mInitialized);
-        getEqualizer(0);
+        getReverb(0);
         synchronized(mLock) {
             try {
                 mChangedParameter = -1;
-                mEqualizer.setBandLevel((short)0, (short)0);
+                mReverb.setRoomLevel((short)0);
                 mLock.wait(1000);
             } catch(Exception e) {
                 Log.e(TAG, "Create second effect: wait was interrupted.");
             } finally {
-                releaseEqualizer();
+                releaseReverb();
                 terminateListenerLooper();
             }
         }
         assertEquals("parameter change not received",
-                Equalizer.PARAM_BAND_LEVEL, mChangedParameter);
+                EnvironmentalReverb.PARAM_ROOM_LEVEL, mChangedParameter);
     }
 
     //-----------------------------------------------------------------
     // private methods
     //----------------------------------
 
-    private void getEqualizer(int session) {
-         if (mEqualizer == null || session != mSession) {
-             if (session != mSession && mEqualizer != null) {
-                 mEqualizer.release();
-                 mEqualizer = null;
+    private void getReverb(int session) {
+         if (mReverb == null || session != mSession) {
+             if (session != mSession && mReverb != null) {
+                 mReverb.release();
+                 mReverb = null;
              }
              try {
-                mEqualizer = new Equalizer(0, session);
+                mReverb = new EnvironmentalReverb(0, session);
                 mSession = session;
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "getEqualizer() Equalizer not found exception: "+e);
+                Log.e(TAG, "getReverb() EnvironmentalReverb not found exception: "+e);
             } catch (UnsupportedOperationException e) {
-                Log.e(TAG, "getEqualizer() Effect library not loaded exception: "+e);
+                Log.e(TAG, "getReverb() Effect library not loaded exception: "+e);
             }
          }
-         assertNotNull("could not create mEqualizer", mEqualizer);
+         assertNotNull("could not create mReverb", mReverb);
     }
 
-    private void releaseEqualizer() {
-        if (mEqualizer != null) {
-            mEqualizer.release();
-            mEqualizer = null;
+    private void releaseReverb() {
+        if (mReverb != null) {
+            mReverb.release();
+            mReverb = null;
         }
     }
 
-    // Initializes the equalizer listener looper
+    // Initializes the reverb listener looper
     class ListenerThread extends Thread {
         boolean mControl;
         boolean mEnable;
@@ -531,16 +629,16 @@ public class EqualizerTest extends AndroidTestCase {
                 // after we are done with it.
                 mLooper = Looper.myLooper();
 
-                mEqualizer2 = new Equalizer(0, 0);
-                assertNotNull("could not create Equalizer2", mEqualizer2);
+                mReverb2 = new EnvironmentalReverb(0, 0);
+                assertNotNull("could not create reverb2", mReverb2);
 
                 if (mControl) {
-                    mEqualizer2.setControlStatusListener(
+                    mReverb2.setControlStatusListener(
                             new AudioEffect.OnControlStatusChangeListener() {
                         public void onControlStatusChange(
                                 AudioEffect effect, boolean controlGranted) {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
+                                if (effect == mReverb2) {
                                     mHasControl = controlGranted;
                                     mLock.notify();
                                 }
@@ -549,11 +647,11 @@ public class EqualizerTest extends AndroidTestCase {
                     });
                 }
                 if (mEnable) {
-                    mEqualizer2.setEnableStatusListener(
+                    mReverb2.setEnableStatusListener(
                             new AudioEffect.OnEnableStatusChangeListener() {
                         public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
+                                if (effect == mReverb2) {
                                     mIsEnabled = enabled;
                                     mLock.notify();
                                 }
@@ -562,13 +660,13 @@ public class EqualizerTest extends AndroidTestCase {
                     });
                 }
                 if (mParameter) {
-                    mEqualizer2.setParameterListener(new Equalizer.OnParameterChangeListener() {
-                        public void onParameterChange(Equalizer effect,
-                                int status, int param1, int param2, int value)
+                    mReverb2.setParameterListener(new EnvironmentalReverb.OnParameterChangeListener() {
+                        public void onParameterChange(EnvironmentalReverb effect,
+                                int status, int param, int value)
                         {
                             synchronized(mLock) {
-                                if (effect == mEqualizer2) {
-                                    mChangedParameter = param1;
+                                if (effect == mReverb2) {
+                                    mChangedParameter = param;
                                     mLock.notify();
                                 }
                             }
@@ -587,9 +685,9 @@ public class EqualizerTest extends AndroidTestCase {
 
     // Terminates the listener looper thread.
     private void terminateListenerLooper() {
-        if (mEqualizer2 != null) {
-            mEqualizer2.release();
-            mEqualizer2 = null;
+        if (mReverb2 != null) {
+            mReverb2.release();
+            mReverb2 = null;
         }
         if (mLooper != null) {
             mLooper.quit();
