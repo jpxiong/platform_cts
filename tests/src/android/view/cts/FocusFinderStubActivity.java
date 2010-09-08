@@ -16,139 +16,36 @@
 
 package android.view.cts;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.widget.LinearLayout;
-import android.widget.Button;
-import android.widget.TextView;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.content.Context;
+import com.android.cts.stub.R;
 
-/**
- * Holds a few buttons of various sizes and horizontal placements in a vertical
- * layout to excercise some core focus searching.
- */
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.view.ViewGroup;
+import android.widget.Button;
+
 public class FocusFinderStubActivity extends Activity {
 
-    private LinearLayout mLayout;
+    public ViewGroup layout;
 
-    private Button mTopWide;
-    private Button mMidSkinny1Left;
-    private Button mBottomWide;
+    public Button topLeftButton;
 
-    private Button mMidSkinny2Right;
-    public static final String mTopWideLable = "top wide";
-    public static final String mBottomWideLable = "bottom wide";
-    public static final String mMidSkinny1LeftLable = "mid skinny 1(L)";
-    public static final String mMidSkinny2RightLable = "mid skinny 2(R)";
+    public Button topRightButton;
 
-    public LinearLayout getLayout() {
-        return mLayout;
-    }
+    public Button bottomLeftButton;
 
-    public Button getTopWide() {
-        return mTopWide;
-    }
-
-    public Button getMidSkinny1Left() {
-        return mMidSkinny1Left;
-    }
-
-    public Button getMidSkinny2Right() {
-        return mMidSkinny2Right;
-    }
-
-    public Button getBottomWide() {
-        return mBottomWide;
-    }
+    public Button bottomRightButton;
 
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
-        mLayout = new LinearLayout(this);
-        mLayout.setOrientation(LinearLayout.VERTICAL);
-        mLayout.setHorizontalGravity(Gravity.LEFT);
-        mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        mTopWide = makeWide(mTopWideLable);
-        mLayout.addView(mTopWide);
-
-        mMidSkinny1Left = addSkinny(mLayout, mMidSkinny1LeftLable, false);
-
-        mMidSkinny2Right = addSkinny(mLayout,mMidSkinny2RightLable, true);
-
-        mBottomWide = makeWide(mBottomWideLable);
-        mLayout.addView(mBottomWide);
-
-        setContentView(mLayout);
+        setContentView(R.layout.focus_finder_layout);
+        layout = (ViewGroup) findViewById(R.id.layout);
+        topLeftButton = (Button) findViewById(R.id.top_left_button);
+        topRightButton = (Button) findViewById(R.id.top_right_button);
+        bottomLeftButton = (Button) findViewById(R.id.bottom_left_button);
+        bottomRightButton = (Button) findViewById(R.id.bottom_right_button);
     }
-
-    // just to get toString non-sucky
-    private static class MyButton extends Button {
-
-        public MyButton(Context context) {
-            super(context);
-        }
-
-        @Override
-        public String toString() {
-            return getText().toString();
-        }
-    }
-
-    private Button makeWide(String label) {
-        Button button = new MyButton(this);
-        button.setText(label);
-        button.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        return button;
-    }
-
-    /**
-     * Add a skinny button that takes up just less than half of the screen
-     * horizontally.
-     *
-     * @param root
-     *            The layout to add the button to.
-     * @param label
-     *            The label of the button.
-     * @param atRight
-     *            Which side to put the button on.
-     * @return The newly created button.
-     */
-    private Button addSkinny(LinearLayout root, String label, boolean atRight) {
-        Button button = new MyButton(this);
-        button.setText(label);
-        button.setLayoutParams(new LinearLayout.LayoutParams(0, // width
-                ViewGroup.LayoutParams.WRAP_CONTENT, 480));
-
-        TextView filler = new TextView(this);
-        filler.setText("filler");
-        filler.setLayoutParams(new LinearLayout.LayoutParams(0, // width
-                ViewGroup.LayoutParams.WRAP_CONTENT, 520));
-
-        LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        if (atRight) {
-            ll.addView(filler);
-            ll.addView(button);
-            root.addView(ll);
-        } else {
-            ll.addView(button);
-            ll.addView(filler);
-            root.addView(ll);
-        }
-        return button;
-    }
-
 }
 
