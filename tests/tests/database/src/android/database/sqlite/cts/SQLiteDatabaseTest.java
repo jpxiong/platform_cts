@@ -463,7 +463,8 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         mDatabase.execSQL("INSERT INTO test (name, age, address) VALUES ('Jim', 35, 'Chicago');");
 
         // delete one record.
-        mDatabase.delete(TABLE_NAME, "name = 'Mike'", null);
+        int count = mDatabase.delete(TABLE_NAME, "name = 'Mike'", null);
+        assertEquals(1, count);
 
         Cursor cursor = mDatabase.query(TABLE_NAME, TEST_PROJECTION, null,
                 null, null, null, null);
@@ -481,7 +482,8 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         cursor.close();
 
         // delete another record.
-        mDatabase.delete(TABLE_NAME, "name = ?", new String[] { "Jack" });
+        count = mDatabase.delete(TABLE_NAME, "name = ?", new String[] { "Jack" });
+        assertEquals(1, count);
 
         cursor = mDatabase.query(TABLE_NAME, TEST_PROJECTION, null, null, null,
                 null, null);
@@ -498,7 +500,8 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         mDatabase.execSQL("INSERT INTO test (name, age, address) VALUES ('Jack', 30, 'London');");
 
         // delete all records.
-        mDatabase.delete(TABLE_NAME, null, null);
+        count = mDatabase.delete(TABLE_NAME, null, null);
+        assertEquals(3, count);
 
         cursor = mDatabase.query(TABLE_NAME, TEST_PROJECTION, null, null, null, null, null);
         assertNotNull(cursor);
