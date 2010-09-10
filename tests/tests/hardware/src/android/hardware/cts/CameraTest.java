@@ -385,6 +385,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mCamera.setPreviewCallback(mPreviewCallback);
             parameters.setPreviewSize(size.width, size.height);
             mCamera.setParameters(parameters);
+            assertEquals(size, mCamera.getParameters().getPreviewSize());
             mCamera.startPreview();
             waitForPreviewDone();
             assertTrue(mPreviewCallbackResult);
@@ -618,7 +619,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setParameters(parameters);
         Parameters paramActual = mCamera.getParameters();
 
-        // camera may not accept exact parameters, but values must be in valid range
         assertTrue(isValidPixelFormat(paramActual.getPictureFormat()));
         assertEquals(pictureSize.width, paramActual.getPictureSize().width);
         assertEquals(pictureSize.height, paramActual.getPictureSize().height);
@@ -694,6 +694,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Test no thumbnail case.
         p.setJpegThumbnailSize(0, 0);
         mCamera.setParameters(p);
+        Size actual = mCamera.getParameters().getJpegThumbnailSize();
+        assertEquals(0, actual.width);
+        assertEquals(0, actual.height);
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
@@ -857,6 +860,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         for (Size size: parameters.getSupportedPreviewSizes()) {
             parameters.setPreviewSize(size.width, size.height);
             mCamera.setParameters(parameters);
+            assertEquals(size, mCamera.getParameters().getPreviewSize());
             callback.mNumCbWithBuffer1 = 0;
             callback.mNumCbWithBuffer2 = 0;
             callback.mNumCbWithBuffer3 = 0;
@@ -964,7 +968,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             for (int i = 0; i <= maxZoom; i++) {
                 parameters.setZoom(i);
                 mCamera.setParameters(parameters);
-                assertEquals(i, parameters.getZoom());
+                assertEquals(i, mCamera.getParameters().getZoom());
             }
 
             // It should throw exception if an invalid value is passed.
@@ -975,8 +979,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             } catch (RuntimeException e) {
                 // expected
             }
-            parameters = mCamera.getParameters();
-            assertEquals(maxZoom, parameters.getZoom());
+            assertEquals(maxZoom, mCamera.getParameters().getZoom());
 
             mCamera.takePicture(mShutterCallback, mRawPictureCallback,
                                 mJpegPictureCallback);
@@ -999,8 +1002,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int maxZoom = parameters.getMaxZoom();
         parameters.setZoom(maxZoom);
         mCamera.setParameters(parameters);
+        assertEquals(maxZoom, mCamera.getParameters().getZoom());
         parameters.setZoom(0);
         mCamera.setParameters(parameters);
+        assertEquals(0, mCamera.getParameters().getZoom());
         assertFalse(zoomListener.mZoomDone.block(500));
 
         // Nothing will happen if zoom is not moving.
@@ -1049,6 +1054,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         zoomListener.mZoomDone.close();
         parameters.setZoom(0);
         mCamera.setParameters(parameters);
+        assertEquals(0, mCamera.getParameters().getZoom());
         mCamera.startSmoothZoom(maxZoom);
         mCamera.stopSmoothZoom();
         assertTrue(zoomListener.mZoomDone.block(5000));
@@ -1088,6 +1094,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             parameters.setFocusMode(focusMode);
             mCamera.setParameters(parameters);
             parameters = mCamera.getParameters();
+            assertEquals(focusMode, parameters.getFocusMode());
             checkFocusDistances(parameters);
             if (Parameters.FOCUS_MODE_AUTO.equals(focusMode)
                     || Parameters.FOCUS_MODE_MACRO.equals(focusMode)) {
@@ -1265,5 +1272,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 }
             }
         }
+    }
+
+    private void assertEquals(Size expected, Size actual) {
+        assertEquals(expected.width, actual.width);
+        assertEquals(expected.height, actual.height);
     }
 }
