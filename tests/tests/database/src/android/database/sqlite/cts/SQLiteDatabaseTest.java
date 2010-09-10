@@ -149,6 +149,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         }
 
         File dbFile = new File(mDatabaseDir, "database_test12345678.db");
+        dbFile.delete();
         assertFalse(dbFile.exists());
         db = SQLiteDatabase.openOrCreateDatabase(dbFile.getPath(), factory);
         assertNotNull(db);
