@@ -16,26 +16,26 @@
 
 package android.view.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.FocusFinder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 @TestTargetClass(FocusFinder.class)
 public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinderStubActivity> {
 
     private FocusFinder mFocusFinder;
-    private LinearLayout mLayout;
-    private Button mTopWide;
-    private Button mMidSkinny1Left;
-    private Button mMidSkinny2Right;
-    private Button mBottomWide;
+    private ViewGroup mLayout;
+    private Button mTopLeft;
+    private Button mTopRight;
+    private Button mBottomLeft;
+    private Button mBottomRight;
 
     public FocusFinderTest() {
         super("com.android.cts.stub", FocusFinderStubActivity.class);
@@ -45,11 +45,11 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
     protected void setUp() throws Exception {
         super.setUp();
         mFocusFinder = FocusFinder.getInstance();
-        mLayout = getActivity().getLayout();
-        mTopWide = getActivity().getTopWide();
-        mMidSkinny1Left = getActivity().getMidSkinny1Left();
-        mMidSkinny2Right = getActivity().getMidSkinny2Right();
-        mBottomWide = getActivity().getBottomWide();
+        mLayout = getActivity().layout;
+        mTopLeft = getActivity().topLeftButton;
+        mTopRight = getActivity().topRightButton;
+        mBottomLeft = getActivity().bottomLeftButton;
+        mBottomRight = getActivity().bottomRightButton;
     }
 
     @TestTargetNew(
@@ -71,25 +71,29 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         args = {ViewGroup.class, View.class, int.class}
     )
     public void testFindNextFocus() {
-        Button view = (Button)mFocusFinder.findNextFocus(mLayout, mBottomWide, View.FOCUS_UP);
-        assertEquals(mMidSkinny2Right, view);
-        view = (Button)mFocusFinder.findNextFocus(mLayout, mMidSkinny2Right, View.FOCUS_LEFT);
-        assertEquals(mMidSkinny1Left, view);
-        view = (Button)mFocusFinder.findNextFocus(mLayout, mMidSkinny1Left, View.FOCUS_RIGHT);
-        assertEquals(mMidSkinny2Right, view);
-        view = (Button)mFocusFinder.findNextFocus(mLayout, mTopWide, View.FOCUS_DOWN);
-        assertEquals(mMidSkinny1Left, view);
-        view = (Button)mFocusFinder.findNextFocus(mLayout, null, View.FOCUS_DOWN);
-        assertEquals(mTopWide, view);
+        /*
+         * Go clockwise around the buttons from the top left searching for focus.
+         *
+         * +---+---+
+         * | 1 | 2 |
+         * +---+---+
+         * | 3 | 4 |
+         * +---+---+
+         */
+        assertNextFocus(mTopLeft, View.FOCUS_RIGHT, mTopRight);
+        assertNextFocus(mTopRight, View.FOCUS_DOWN, mBottomRight);
+        assertNextFocus(mBottomRight, View.FOCUS_LEFT, mBottomLeft);
+        assertNextFocus(mBottomLeft, View.FOCUS_UP, mTopLeft);
 
-        view = (Button)mFocusFinder.findNextFocus(mLayout, null, View.FOCUS_UP);
-        assertEquals(mBottomWide, view);
+        assertNextFocus(null, View.FOCUS_RIGHT, mTopLeft);
+        assertNextFocus(null, View.FOCUS_DOWN, mTopLeft);
+        assertNextFocus(null, View.FOCUS_LEFT, mBottomRight);
+        assertNextFocus(null, View.FOCUS_UP, mBottomRight);
+    }
 
-        view = (Button)mFocusFinder.findNextFocus(mLayout, null, View.FOCUS_LEFT);
-        assertEquals(mBottomWide, view);
-
-        view = (Button)mFocusFinder.findNextFocus(mLayout, null, View.FOCUS_RIGHT);
-        assertEquals(mTopWide, view);
+    private void assertNextFocus(View currentFocus, int direction, View expectedNextFocus) {
+        View actualNextFocus = mFocusFinder.findNextFocus(mLayout, currentFocus, direction);
+        assertEquals(expectedNextFocus, actualNextFocus);
     }
 
     @TestTargetNew(
@@ -99,20 +103,43 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         args = {ViewGroup.class, Rect.class, int.class}
     )
     public void testFindNextFocusFromRect() {
-        Rect mTempRect = new Rect();
-        mTempRect.set(0, mTopWide.getTop(), 0, mTopWide.getTop());
-        Button view = (Button)mFocusFinder.findNextFocusFromRect(mLayout, mTempRect,
-                View.FOCUS_DOWN);
-        assertEquals(mTopWide, view);
-        mTempRect.set(0, mBottomWide.getTop(), 0, mBottomWide.getTop());
-        view = (Button)mFocusFinder.findNextFocusFromRect(mLayout, mTempRect, View.FOCUS_UP);
-        assertEquals(mMidSkinny1Left, view);
-        mTempRect.set(mMidSkinny1Left.getRight(), 0, mMidSkinny1Left.getRight(), 0);
-        view = (Button)mFocusFinder.findNextFocusFromRect(mLayout, mTempRect, View.FOCUS_RIGHT);
-        assertEquals(mMidSkinny2Right, view);
-        mTempRect.set(mMidSkinny2Right.getLeft(), 0, mMidSkinny2Right.getLeft(), 0);
-        view = (Button)mFocusFinder.findNextFocusFromRect(mLayout, mTempRect, View.FOCUS_LEFT);
-        assertEquals(mMidSkinny1Left, view);
+        /*
+         * Create a small rectangle on the border between the top left and top right buttons.
+         *
+         * +---+---+
+         * |  [ ]  |
+         * +---+---+
+         * |   |   |
+         * +---+---+
+         */
+        Rect rect = new Rect();
+        mTopLeft.getDrawingRect(rect);
+        rect.offset(mTopLeft.getWidth() / 2, 0);
+        rect.inset(mTopLeft.getWidth() / 4, mTopLeft.getHeight() / 4);
+
+        assertNextFocusFromRect(rect, View.FOCUS_LEFT, mTopLeft);
+        assertNextFocusFromRect(rect, View.FOCUS_RIGHT, mTopRight);
+
+        /*
+         * Create a small rectangle on the border between the top left and bottom left buttons.
+         *
+         * +---+---+
+         * |   |   |
+         * +[ ]+---+
+         * |   |   |
+         * +---+---+
+         */
+        mTopLeft.getDrawingRect(rect);
+        rect.offset(0, mTopRight.getHeight() / 2);
+        rect.inset(mTopLeft.getWidth() / 4, mTopLeft.getHeight() / 4);
+
+        assertNextFocusFromRect(rect, View.FOCUS_UP, mTopLeft);
+        assertNextFocusFromRect(rect, View.FOCUS_DOWN, mBottomLeft);
+    }
+
+    private void assertNextFocusFromRect(Rect rect, int direction, View expectedNextFocus) {
+        View actualNextFocus = mFocusFinder.findNextFocusFromRect(mLayout, rect, direction);
+        assertEquals(expectedNextFocus, actualNextFocus);
     }
 
     @TestTargetNew(
@@ -122,38 +149,52 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         args = {ViewGroup.class, int.class, int.class, int.class, int[].class}
     )
     public void testFindNearestTouchable() {
+        /*
+         * Table layout with two rows and coordinates are relative to those parent rows.
+         * Lines outside the box signify touch points used in the tests.
+         *      |
+         *   +---+---+
+         *   | 1 | 2 |--
+         *   +---+---+
+         * --| 3 | 4 |
+         *   +---+---+
+         *         |
+         */
+
+        // 1
+        int x = mTopLeft.getWidth() / 2 - 5;
+        int y = 0;
         int[] deltas = new int[2];
-        int bound = 3;
-        int x = mTopWide.getLeft();
-        int y = mTopWide.getTop() - bound;
-        Button view = (Button)mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_DOWN,
-                deltas);
-        assertEquals(mTopWide, view);
+        View view = mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_DOWN, deltas);
+        assertEquals(mTopLeft, view);
         assertEquals(0, deltas[0]);
-        assertEquals(mTopWide.getTop(), deltas[1]);
-        deltas = new int[2];
-        x = mBottomWide.getLeft();
-        y = mBottomWide.getBottom() + bound;
-        view = (Button)mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_UP, deltas);
-        assertEquals(mBottomWide, view);
-        assertEquals(0, deltas[0]);
-        assertEquals(-(y - mBottomWide.getBottom() + 1), deltas[1]);
-
-        deltas = new int[2];
-        x = mMidSkinny1Left.getLeft() - bound;
-        y = mMidSkinny1Left.getTop();
-        view = (Button)mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_RIGHT, deltas);
-        assertEquals(mTopWide, view);
-        assertEquals(mMidSkinny1Left.getLeft(), deltas[0]);
         assertEquals(0, deltas[1]);
 
+        // 2
         deltas = new int[2];
-        x = mTopWide.getRight() + bound;
-        y = mTopWide.getBottom();
-        view = (Button)mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_LEFT, deltas);
-        assertEquals(mTopWide, view);
-        assertEquals(-(x - mTopWide.getRight() + 1), deltas[0]);
+        x = mTopRight.getRight();
+        y = mTopRight.getBottom() / 2;
+        view = mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_LEFT, deltas);
+        assertEquals(mTopRight, view);
+        assertEquals(-1, deltas[0]);
         assertEquals(0, deltas[1]);
+
+        // 3
+        deltas = new int[2];
+        x = 0;
+        y = mTopLeft.getBottom() + mBottomLeft.getHeight() / 2;
+        view = mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_RIGHT, deltas);
+        assertEquals(mBottomLeft, view);
+        assertEquals(0, deltas[0]);
+        assertEquals(0, deltas[1]);
+
+        // 4
+        deltas = new int[2];
+        x = mBottomRight.getRight();
+        y = mTopRight.getBottom() + mBottomRight.getBottom();
+        view = mFocusFinder.findNearestTouchable(mLayout, x, y, View.FOCUS_UP, deltas);
+        assertEquals(mBottomRight, view);
+        assertEquals(0, deltas[0]);
+        assertEquals(-1, deltas[1]);
     }
-
 }
