@@ -30,6 +30,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.method.Touch;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
@@ -128,24 +129,37 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
             "should add @throws clause into javadoc.")
     public void testOnTouchEvent() throws Throwable {
-        final SpannableString spannable = new SpannableString(LONG_TEXT);
         final TextView tv = new TextView(mActivity);
+
+        // Create a string that is wider than the screen.
+        DisplayMetrics metrics = mActivity.getResources().getDisplayMetrics();
+        int screenWidth = metrics.widthPixels;
+        TextPaint paint = tv.getPaint();
+        String text = LONG_TEXT;
+        int textWidth = Math.round(paint.measureText(text));
+        while (textWidth < screenWidth) {
+            text += LONG_TEXT;
+            textWidth = Math.round(paint.measureText(text));
+        }
+
+        // Drag the difference between the text width and the screen width.
+        int dragAmount = Math.min(screenWidth, textWidth - screenWidth);
+        assertTrue(dragAmount > 0);
+        final String finalText = text;
+        final SpannableString spannable = new SpannableString(finalText);
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mActivity.setContentView(tv);
                 tv.setSingleLine(true);
-                tv.setText(LONG_TEXT);
+                tv.setText(finalText);
             }
         });
         getInstrumentation().waitForIdleSync();
 
-        TextPaint paint = tv.getPaint();
-        final int width = getTextWidth(LONG_TEXT, paint);
         long downTime = SystemClock.uptimeMillis();
         long eventTime = SystemClock.uptimeMillis();
-        int x = width >> 1;
         final MotionEvent event1 = MotionEvent.obtain(downTime, eventTime,
-                MotionEvent.ACTION_DOWN, x, 0, 0);
+                MotionEvent.ACTION_DOWN, dragAmount, 0, 0);
         final MotionEvent event2 = MotionEvent.obtain(downTime, eventTime,
                 MotionEvent.ACTION_MOVE, 0, 0, 0);
         final MotionEvent event3 = MotionEvent.obtain(downTime, eventTime,
@@ -175,7 +189,7 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
         getInstrumentation().waitForIdleSync();
         assertTrue(mReturnFromTouchEvent);
         // TextView has been scrolled.
-        assertEquals(x, tv.getScrollX());
+        assertEquals(dragAmount, tv.getScrollX());
         assertEquals(0, tv.getScrollY());
         assertEquals(0, Touch.getInitialScrollX(tv, spannable));
         assertEquals(0, Touch.getInitialScrollY(tv, spannable));
@@ -189,7 +203,7 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
         getInstrumentation().waitForIdleSync();
         assertTrue(mReturnFromTouchEvent);
         // TextView has not been scrolled.
-        assertEquals(x, tv.getScrollX());
+        assertEquals(dragAmount, tv.getScrollX());
         assertEquals(0, tv.getScrollY());
         assertEquals(-1, Touch.getInitialScrollX(tv, spannable));
         assertEquals(-1, Touch.getInitialScrollY(tv, spannable));
