@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2008 The Android Open Source Project
+# Copyright (C) 2010 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE := libctspermission_jni
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+# Don't include this package in any configuration by default.
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_JNI_SHARED_LIBRARIES := libctspermission_jni
+# This isn't part of the system, so don't prelink it.
+LOCAL_PRELINK_MODULE := false
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SRC_FILES := \
+		CtsPermissionsJniOnLoad.cpp \
+		android_permission_cts_FileUtils.cpp
 
-LOCAL_PACKAGE_NAME := CtsPermissionTestCases
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
 
-# uncomment when dalvik test annotations are removed or part of SDK
-#LOCAL_SDK_VERSION := current
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog
 
-include $(BUILD_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(BUILD_SHARED_LIBRARY)
