@@ -25,21 +25,28 @@ public class MagnetometerTestRenderer extends AccelerometerTestRenderer {
         super(context);
     }
 
-    private static final float[] Y_AXIS = new float[] {
-            0, 1, 0
-    };
-
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             /*
-             * for this test we want *only* magnetometer data, so we can't use
-             * the convenience methods on SensorManager; so compute manually
+             * The base class is written for accelerometer, where the vector
+             * points *away* from the thing being measured (i.e. gravity). But
+             * our vector points *toward* the thing being measured (i.e.
+             * magnetic north pole). Accordingly, the base class has an
+             * inversion to handle that that doesn't apply to us, so the
+             * simplest method is just to flip our vector to point in the exact
+             * opposite direction and then everything works out in the base
+             * class.
              */
+            event.values[0] *= -1;
+            event.values[1] *= -1;
+            event.values[2] *= -1;
+
+            // rest of method is the same as in base class
             normalize(event.values);
-            
-            crossProduct(event.values, Y_AXIS, mCrossProd);
-            mAngle = (float) Math.acos(dotProduct(event.values, Y_AXIS));
+            event.values[1] *= -1;
+            crossProduct(event.values, Z_AXIS, mCrossProd);
+            mAngle = (float) Math.acos(dotProduct(event.values, Z_AXIS));
         }
     }
 }
