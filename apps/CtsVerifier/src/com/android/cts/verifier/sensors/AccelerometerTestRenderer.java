@@ -158,7 +158,7 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
     /**
      * A representation of the Z-axis in vector form.
      */
-    private static final float[] Z_AXIS = new float[] {
+    protected static final float[] Z_AXIS = new float[] {
             0, 0, 1
     };
 
@@ -262,9 +262,9 @@ public class AccelerometerTestRenderer implements GLSurfaceView.Renderer, Sensor
             normalize(event.values);
 
             /*
-             * TODO: DIRTY ROTTEN KLUDGE. I don't know why this works or why
-             * it's necessary, but if you don't do this, 2 of the axes don't
-             * rotate correctly. I suspect I have handedness wrong, somewhere.
+             * Because we need to invert gravity (because the accelerometer vector
+             * actually points up), that constitutes a 180-degree rotation around X,
+             * which means we need to invert Y.
              */
             event.values[1] *= -1;
 
