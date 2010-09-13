@@ -1,0 +1,53 @@
+The code in this directory is intended to be run on an Arduino, which is a
+simple, open-source microcontroller platform:
+    http://arduino.org/
+
+Essentially, an Arduino is a board for an ATMega microcontroller, and a GUI
+IDE project intended for semi-technical developers. The Arduino software
+essentially boils down to an IDE which is a text editor & build automater for a
+C/C++ library that hides most of the low-level details of configuring a
+program to run on the microcontroller. It uses the AVR toolchain and
+programmer to work with the device from a host PC. This project includes a
+Makefile which replicates work the normally performed by the IDE; that is, it
+builds and links the relevant Arduino boilerplate code that sets up the
+microcontroller, and then links together a final .hex file and prepares it for
+upload to the device.
+
+A BlueSMiRF Bluetooth SPP-to-TTL (or similar) board is also required; this
+device is used to validate Bluetooth API support via the CTS Verifier app.
+    http://www.sparkfun.com/commerce/product_info.php?products_id=582
+
+This code running on a simple, inexpensive, known-good microcontroller
+platform makes it much easier to validate the Bluetooth API for an Android
+candidate device than the "Bluetooth Chat" approach currently required by the
+CDD.
+
+A compatible device can be substituted for some or all of the Arduino
+configuration; however it's worth noting that for approximately US$110, a
+complete test rig can be completed and used with any number of devices under
+test. Organizations are, of course, also free to manufacture their own
+Arduino-like devices.
+
+This code (and especially the Makefile) requires version 0018 of the Arduino
+toolchain. Because this software uses a non-Android-standard build, the
+Android source tree includes in the prebuilt/ directory a .hex file compiled
+from this source suitable for directly flashing to an Arduino
+Duemilanove-compatible device.
+
+The file pulsedtr.py is a Python script using the Serial I/O API that strobes
+the DTR line on the serial port. This is a signal to the Arduino to enter
+programming mode; this script is thus used in flashing the Arduino board (via
+a direct USB connection) with the prebuilt .hex file. If you are building
+from source, 'make upload' will handle this for you.
+
+To build the .hex file on Ubuntu Lucid:
+$ sudo add-apt-repository ppa:arduino-ubuntu-team
+$ sudo apt-get update; sudo apt-get install arduino
+$ make
+$ make upload
+
+Alternatively, the file 'cts-verifier.pde' can be loaded into the Arduino IDE
+as a sketch using the normal GUI workflow.
+
+This Makefile should hypothetically work on a Mac with the appropriate Arduino
+toolchain installed, but it has not been tested. Windows is not supported.
