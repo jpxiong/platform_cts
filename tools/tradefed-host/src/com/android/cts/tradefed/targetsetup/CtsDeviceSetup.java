@@ -16,6 +16,8 @@
 package com.android.cts.tradefed.targetsetup;
 
 import com.android.ddmlib.Log;
+import com.android.tradefed.config.IConfiguration;
+import com.android.tradefed.config.IConfigurationReceiver;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.targetsetup.BuildError;
@@ -35,13 +37,22 @@ import java.io.FileNotFoundException;
  * This class is NOT intended for 'official' CTS runs against a production device as the steps
  * performed by this class require a debug build (aka 'adb root' must succeed).
  */
-public class CtsDeviceSetup extends DeviceSetup {
+public class CtsDeviceSetup extends DeviceSetup implements IConfigurationReceiver {
 
     private static final String LOG_TAG = "CtsDeviceSetup";
 
     // TODO: read this from a configuration file rather than hard-coding
     private static final String ACCESSIBILITY_SERVICE_APK_FILE_NAME =
         "CtsDelegatingAccessibilityService.apk";
+
+    private IConfiguration mConfiguration = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setConfiguration(IConfiguration configuration) {
+        mConfiguration  = configuration;
+    }
 
     /**
      * {@inheritDoc}
@@ -65,6 +76,7 @@ public class CtsDeviceSetup extends DeviceSetup {
 
             // TODO: turn on mock locations
             CtsSetup ctsSetup = new CtsSetup();
+            ctsSetup.setConfiguration(mConfiguration);
             enableAccessibilityService(device, buildHelper, ctsSetup);
 
             // end root setup steps
