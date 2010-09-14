@@ -62,9 +62,9 @@ public class TestListActivityTest
         runTestOnUiThread(new Runnable() {
             public void run() {
                 ContentResolver resolver = mActivity.getContentResolver();
-                resolver.delete(TestResultsProvider.CONTENT_URI, "1", null);
+                resolver.delete(TestResultsProvider.RESULTS_CONTENT_URI, "1", null);
 
-                Cursor cursor = resolver.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+                Cursor cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI,
                         TestResultsProvider.ALL_COLUMNS, null, null, null);
                 assertEquals(0, cursor.getCount());
                 cursor.close();
@@ -93,7 +93,7 @@ public class TestListActivityTest
         mInstrumentation.waitForIdleSync();
 
         ContentResolver resolver = mActivity.getContentResolver();
-        Cursor cursor = resolver.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+        Cursor cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI,
                 TestResultsProvider.ALL_COLUMNS, null, null, null);
         assertEquals(1, cursor.getCount());
         cursor.close();

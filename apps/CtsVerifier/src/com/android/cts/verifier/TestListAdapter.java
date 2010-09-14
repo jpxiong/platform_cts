@@ -219,7 +219,7 @@ class TestListAdapter extends BaseAdapter {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = null;
         try {
-            cursor = resolver.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+            cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI,
                     TestResultsProvider.ALL_COLUMNS, null, null, null);
             if (cursor.moveToFirst()) {
                 do {
