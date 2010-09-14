@@ -451,15 +451,6 @@ public class ConsoleUi {
                 return;
             }
 
-            if (cp.containsKey(CTSCommand.OPTION_DEVICE)) {
-                deviceId = cp.getValue(CTSCommand.OPTION_DEVICE);
-                String[] deviceIdList = deviceId.trim().split(",");
-                if (deviceIdList.length > 1) {
-                    Log.e("Just allow choosing one device ID.", null);
-                    return;
-                }
-            }
-
             ActionType actionType = ActionType.START_NEW_SESSION;
             if (cp.containsKey(CTSCommand.OPTION_TEST)) {
                 testName = cp.getValue(CTSCommand.OPTION_TEST);
@@ -490,6 +481,15 @@ public class ConsoleUi {
                             && (actionType != ActionType.RUN_SINGLE_JAVA_PACKAGE)) {
                         actionType = ActionType.RESUME_SESSION;
                     }
+                }
+            }
+
+            if (cp.containsKey(CTSCommand.OPTION_DEVICE)) {
+                deviceId = cp.getValue(CTSCommand.OPTION_DEVICE);
+                String[] deviceIdList = deviceId.trim().split(",");
+                if (deviceIdList.length > 1) {
+                    Log.e("Just allow choosing one device ID.", null);
+                    return;
                 }
             }
 
