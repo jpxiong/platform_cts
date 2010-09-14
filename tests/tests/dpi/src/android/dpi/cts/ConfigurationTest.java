@@ -179,6 +179,7 @@ public class ConfigurationTest extends AndroidTestCase {
      * HVGA      | medium (141-190) | normal
      * WVGA      | high (191-250)   | normal
      * FWVGA     | high (191-250)   | normal
+     * WSVGA     | high (191-250)   | large
 
      * VGA       | medium (141-190) | large
      * WVGA      | medium (141-190) | large
@@ -199,6 +200,8 @@ public class ConfigurationTest extends AndroidTestCase {
         new ScreenConfiguration(640, 480, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_NORMAL, true),
         // FWVGA     | high (191-250)   | normal
         new ScreenConfiguration(864, 480, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_NORMAL),
+        // WSVGA     | high (191-250)   | large
+        new ScreenConfiguration(1024, 600, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_LARGE),
 
         // VGA       | medium (141-190) | large
         new ScreenConfiguration(640, 480, Density.MEDIUM, Configuration.SCREENLAYOUT_SIZE_LARGE),
