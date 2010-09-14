@@ -19,6 +19,7 @@
     <string name="continue_button_text">Continue</string>
 
     <string name="pass_button_text">Pass</string>
+    <string name="info_button_text">Info</string>
     <string name="fail_button_text">Fail</string>
 
     <!-- Strings for TestResultsReport -->
@@ -41,6 +42,7 @@
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
+    <string name="feature_summary_info">This is a test for...</string>
     <string name="fs_disallowed">WARNING: device reports a disallowed feature name</string>
     <string name="fs_missing_wifi_telephony">WARNING: device reports neither WiFi nor telephony</string>
     <string name="fs_no_data">No data.</string>
@@ -48,10 +50,13 @@
 
     <!-- Strings for AccelerometerTestActivity and MagnetometerTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
+    <string name="snsr_accel_test_info">This is a test for...</string>
     <string name="snsr_mag_test">Magnetometer Test</string>
+    <string name="snsr_mag_test_info">This is a test for...</string>
 
     <!-- Strings for SuidFilesActivity -->
-    <string name="suid_files">SUID Files</string>
+    <string name="suid_files">SUID File Scanner</string>
+    <string name="suid_files_info">This test will attempt to find unauthorized SUID binaries, but it is not comprehensive due to permission restrictions.\n\nAuthorized SUID binaries will appear green, while unauthorized SUID binaries will appear red.\n\nPress OK to start the scan...</string>
     <string name="scanning_directory">Scanning directory...</string>
     <string name="file_status">User: %1$s\nGroup: %2$s\nPermissions: %3$s\nPath: %4$s</string>
     <string name="no_file_status">Could not stat file...</string>

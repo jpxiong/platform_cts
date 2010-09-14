@@ -46,7 +46,7 @@ public class TestListActivity extends ListActivity {
 
         TestResultContentObserver observer = new TestResultContentObserver(adapter);
         ContentResolver resolver = getContentResolver();
-        resolver.registerContentObserver(TestResultsProvider.CONTENT_URI, true, observer);
+        resolver.registerContentObserver(TestResultsProvider.RESULTS_CONTENT_URI, true, observer);
     }
 
     /** Launch the activity when its {@link ListView} item is clicked. */
@@ -89,12 +89,12 @@ public class TestListActivity extends ListActivity {
             values.put(TestResultsProvider.COLUMN_TEST_NAME, testResult.getName());
 
             ContentResolver resolver = getContentResolver();
-            int numUpdated = resolver.update(TestResultsProvider.CONTENT_URI, values,
+            int numUpdated = resolver.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
                     TestResultsProvider.COLUMN_TEST_NAME + " = ?",
                     new String[] {testResult.getName()});
 
             if (numUpdated == 0) {
-                resolver.insert(TestResultsProvider.CONTENT_URI, values);
+                resolver.insert(TestResultsProvider.RESULTS_CONTENT_URI, values);
             }
         }
     }
@@ -124,7 +124,7 @@ public class TestListActivity extends ListActivity {
 
     private void handleClearItemSelected() {
         ContentResolver resolver = getContentResolver();
-        resolver.delete(TestResultsProvider.CONTENT_URI, "1", null);
+        resolver.delete(TestResultsProvider.RESULTS_CONTENT_URI, "1", null);
         Toast.makeText(this, R.string.test_results_cleared, Toast.LENGTH_SHORT).show();
     }
 
