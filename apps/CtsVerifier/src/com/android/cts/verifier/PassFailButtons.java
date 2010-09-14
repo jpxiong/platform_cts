@@ -16,7 +16,14 @@
 
 package com.android.cts.verifier;
 
+import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.database.Cursor;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 /**
  * {@link Activity}s to handle clicks to the pass and fail buttons of the pass fail buttons layout.
@@ -27,19 +34,117 @@ import android.view.View;
  *     </li>
  *     <li>Extend one of the activities to get the click handler for the buttons.</li>
  *     <li>Make sure to call setResult(RESULT_CANCEL) in your Activity initially.</li>
+ *     <li>Optionally call setInfoTextResources to add an info button that will show a
+ *         dialog with instructional text.</li>
  * </ol>
  */
 public class PassFailButtons {
 
-    public static class Activity extends android.app.Activity {
+    // Interface mostly for making documentation and refactoring easier...
+    private interface PassFailActivity {
+
+        /**
+         * Adds an initial informational dialog that appears when entering the test activity for
+         * the first time. Also enables the visibility of an "Info" button between the "Pass" and
+         * "Fail" buttons that can be clicked to show the information dialog again.
+         * <p>
+         * Call from {@link Activity#onCreate} after {@link Activity #setContentView(int)}.
+         *
+         * @param titleId for the text shown in the dialog title area
+         * @param messageId for the text shown in the dialog's body area
+         */
+        void setInfoTextResources(int titleId, int messageId);
+
+        /**
+         * Click handler for the pass and fail buttons. No need to call this ever as the XML
+         * view layout will bind to this automatically.
+         */
+        void passFailButtonsClickHandler(View target);
+    }
+
+    public static class Activity extends android.app.Activity implements PassFailActivity {
+
+        public void setInfoTextResources(int titleId, int messageId) {
+            setInfoText(this, titleId, messageId);
+        }
+
         public void passFailButtonsClickHandler(View target) {
             setTestResultAndFinish(this, target);
         }
     }
 
-    public static class ListActivity extends android.app.ListActivity {
+    public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
+
+        public void setInfoTextResources(int titleId, int messageId) {
+            setInfoText(this, titleId, messageId);
+        }
+
         public void passFailButtonsClickHandler(View target) {
             setTestResultAndFinish(this, target);
+        }
+    }
+
+    private static void setInfoText(final android.app.Activity activity, final int titleId,
+            final int messageId) {
+        // Show the middle "info" button and make it show the info dialog when clicked.
+        View infoButton = activity.findViewById(R.id.info_button);
+        infoButton.setVisibility(View.VISIBLE);
+        infoButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                showInfoDialog(activity, titleId, messageId);
+            }
+        });
+
+        // Show the info dialog if the user has never seen it before.
+        if (!hasSeenInfoDialog(activity)) {
+            showInfoDialog(activity, titleId, messageId);
+        }
+    }
+
+    private static boolean hasSeenInfoDialog(android.app.Activity activity) {
+        ContentResolver resolver = activity.getContentResolver();
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(
+                    TestResultsProvider.getTestNameUri(activity.getClass().getName()),
+                    new String[] {TestResultsProvider.COLUMN_TEST_INFO_SEEN}, null, null, null);
+            return cursor.moveToFirst() && cursor.getInt(0) > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    private static void showInfoDialog(final android.app.Activity activity, int titleId,
+            int messageId) {
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        markSeenInfoDialog(activity);
+                    }
+                })
+                .setOnCancelListener(new OnCancelListener() {
+                    public void onCancel(DialogInterface dialog) {
+                        markSeenInfoDialog(activity);
+                    }
+                })
+                .show();
+    }
+
+    private static void markSeenInfoDialog(android.app.Activity activity) {
+        ContentResolver resolver = activity.getContentResolver();
+        ContentValues values = new ContentValues(2);
+        values.put(TestResultsProvider.COLUMN_TEST_NAME, activity.getClass().getName());
+        values.put(TestResultsProvider.COLUMN_TEST_INFO_SEEN, 1);
+        int numUpdated = resolver.update(
+                TestResultsProvider.getTestNameUri(activity.getClass().getName()),
+                values, null, null);
+        if (numUpdated == 0) {
+            resolver.insert(TestResultsProvider.RESULTS_CONTENT_URI, values);
         }
     }
 

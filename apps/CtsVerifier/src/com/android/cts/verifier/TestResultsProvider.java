@@ -33,7 +33,12 @@ public class TestResultsProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.android.cts.verifier.testresultsprovider";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
-    public static final Uri RESULTS_ALL_CONTENT_URI = Uri.withAppendedPath(CONTENT_URI, RESULTS_PATH);
+    public static final Uri RESULTS_CONTENT_URI =
+            Uri.withAppendedPath(CONTENT_URI, RESULTS_PATH);
+
+    public static Uri getTestNameUri(String testName) {
+        return Uri.withAppendedPath(RESULTS_CONTENT_URI, testName);
+    }
 
     public static final String _ID = "_id";
 
@@ -43,10 +48,14 @@ public class TestResultsProvider extends ContentProvider {
     /** Integer test result corresponding to constants in {@link TestResult}. */
     public static final String COLUMN_TEST_RESULT = "testresult";
 
+    /** Boolean indicating whether the test info has been seen. */
+    public static final String COLUMN_TEST_INFO_SEEN = "testinfoseen";
+
     public static final String[] ALL_COLUMNS = {
         _ID,
         COLUMN_TEST_NAME,
-        COLUMN_TEST_RESULT
+        COLUMN_TEST_RESULT,
+        COLUMN_TEST_INFO_SEEN,
     };
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -73,7 +82,7 @@ public class TestResultsProvider extends ContentProvider {
 
         private static final String DATABASE_NAME = "results.db";
 
-        private static final int DATABASE_VERSION = 4;
+        private static final int DATABASE_VERSION = 5;
 
         TestResultsOpenHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -84,7 +93,8 @@ public class TestResultsProvider extends ContentProvider {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                     + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + COLUMN_TEST_NAME + " TEXT, "
-                    + COLUMN_TEST_RESULT + " INTEGER);");
+                    + COLUMN_TEST_RESULT + " INTEGER,"
+                    + COLUMN_TEST_INFO_SEEN + " INTEGER DEFAULT 0);");
         }
 
         @Override
@@ -107,12 +117,14 @@ public class TestResultsProvider extends ContentProvider {
 
             case RESULTS_ID:
                 query.appendWhere(_ID);
-                query.appendWhere(uri.getPathSegments().get(0));
+                query.appendWhere("=");
+                query.appendWhere(uri.getPathSegments().get(1));
                 break;
 
             case RESULTS_TEST_NAME:
                 query.appendWhere(COLUMN_TEST_NAME);
-                query.appendWhere(uri.getPathSegments().get(0));
+                query.appendWhere("=");
+                query.appendWhere("\"" + uri.getPathSegments().get(1) + "\"");
                 break;
 
             default:
@@ -128,13 +140,42 @@ public class TestResultsProvider extends ContentProvider {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         long id = db.insert(TABLE_NAME, null, values);
         getContext().getContentResolver().notifyChange(uri, null);
-        return Uri.withAppendedPath(CONTENT_URI, "" + id);
+        return Uri.withAppendedPath(RESULTS_CONTENT_URI, "" + id);
 
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        int match = URI_MATCHER.match(uri);
+        switch (match) {
+            case RESULTS_ALL:
+                break;
+
+            case RESULTS_ID:
+                String idSelection = _ID + "=" + uri.getPathSegments().get(1);
+                if (selection != null && selection.length() > 0) {
+                    selection = idSelection + " AND " + selection;
+                } else {
+                    selection = idSelection;
+                }
+                break;
+
+            case RESULTS_TEST_NAME:
+                String testNameSelection = COLUMN_TEST_NAME + "=\""
+                        + uri.getPathSegments().get(1) + "\"";
+                if (selection != null && selection.length() > 0) {
+                    selection = testNameSelection + " AND " + selection;
+                } else {
+                    selection = testNameSelection;
+                }
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
         int numUpdated = db.update(TABLE_NAME, values, selection, selectionArgs);
         if (numUpdated > 0) {
             getContext().getContentResolver().notifyChange(uri, null);

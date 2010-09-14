@@ -107,6 +107,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fs_main);
+        setInfoTextResources(R.string.feature_summary, R.string.feature_summary_info);
         setResult(RESULT_CANCELED);
 
         // some values used to detect warn-able conditions involving multiple features

@@ -26,6 +26,14 @@
             android:onClick="passFailButtonsClickHandler"
             android:text="@string/pass_button_text"/>
             
+    <Button android:id="@+id/info_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/fs_indeterminate"
+            android:visibility="gone"
+            android:text="@string/info_button_text"/>
+
     <Button android:id="@+id/fail_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

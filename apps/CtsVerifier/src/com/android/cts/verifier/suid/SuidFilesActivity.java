@@ -27,6 +27,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -67,6 +68,29 @@ public class SuidFilesActivity extends ListActivity {
         mAdapter = new SuidFilesAdapter();
         setListAdapter(mAdapter);
 
+        new AlertDialog.Builder(this)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setTitle(R.string.suid_files)
+            .setMessage(R.string.suid_files_info)
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    startScan();
+                }
+            })
+            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            })
+            .setOnCancelListener(new OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            })
+            .show();
+    }
+
+    private void startScan() {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle(getString(R.string.scanning_directory));
         mProgressDialog.setOnCancelListener(new OnCancelListener() {
@@ -130,6 +154,9 @@ public class SuidFilesActivity extends ListActivity {
             TextView view = (TextView) super.getView(position, convertView, parent);
             File file = getItem(position);
             view.setText(file.getName());
+            view.setBackgroundResource(WHITELIST.contains(file.getName())
+                    ? R.drawable.test_pass_gradient
+                    : R.drawable.test_fail_gradient);
             return view;
         }
     }
@@ -195,8 +222,7 @@ public class SuidFilesActivity extends ListActivity {
             private final FileStatus status = new FileStatus();
 
             public boolean accept(File pathname) {
-                if (!WHITELIST.contains(pathname.getName())
-                        && FileUtils.getFileStatus(pathname.getPath(), status, true)) {
+                if (FileUtils.getFileStatus(pathname.getPath(), status, true)) {
                     return !status.isDirectory()
                             && !status.isSymbolicLink()
                             && status.isSetUid();
@@ -210,24 +236,27 @@ public class SuidFilesActivity extends ListActivity {
         @Override
         protected void onPostExecute(Set<File> results) {
             super.onPostExecute(results);
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
 
-            // Task could be cancled and results could be null but don't bother doing anything.
+            // Task could be cancelled and results could be null but don't bother doing anything.
             if (results != null) {
+                boolean passed = true;
                 for (File result : results) {
+                    if (!WHITELIST.contains(result.getName())) {
+                        passed = false;
+                    }
                     mAdapter.add(result);
                 }
 
                 // Alert the user that nothing was found rather than showing an empty list view.
-                if (results.isEmpty()) {
+                if (passed) {
+                    TestResult.setPassedResult(SuidFilesActivity.this);
                     new AlertDialog.Builder(SuidFilesActivity.this)
                             .setTitle(R.string.congratulations)
                             .setMessage(R.string.no_suid_files)
-                            .setOnCancelListener(new OnCancelListener() {
-                                public void onCancel(DialogInterface dialog) {
-                                    // No reason to hang around if there were no offending files.
-                                    TestResult.setPassedResult(SuidFilesActivity.this);
-                                    finish();
+                            .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
                                 }
                             })
                             .show();
