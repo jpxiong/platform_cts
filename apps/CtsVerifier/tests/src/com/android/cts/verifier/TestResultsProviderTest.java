@@ -24,17 +24,17 @@ public class TestResultsProviderTest extends ProviderTestCase2<TestResultsProvid
     }
 
     public void testInsertUpdateDeleteByTestName() {
-        Cursor cursor = mProvider.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
+        Cursor cursor = mProvider.query(TestResultsProvider.RESULTS_CONTENT_URI,
                 TestResultsProvider.ALL_COLUMNS, null, null, null);
         assertEquals(0, cursor.getCount());
 
         ContentValues values = new ContentValues(2);
         values.put(TestResultsProvider.COLUMN_TEST_NAME, FOO_TEST_NAME);
         values.put(TestResultsProvider.COLUMN_TEST_RESULT, TestResult.TEST_RESULT_FAILED);
-        assertNotNull(mProvider.insert(TestResultsProvider.CONTENT_URI, values));
+        assertNotNull(mProvider.insert(TestResultsProvider.RESULTS_CONTENT_URI, values));
 
-        cursor = mProvider.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
-                TestResultsProvider.ALL_COLUMNS, null, null, null);
+        cursor = mProvider.query(TestResultsProvider.RESULTS_CONTENT_URI, TestResultsProvider.ALL_COLUMNS,
+                null, null, null);
         assertEquals(1, cursor.getCount());
         assertTrue(cursor.moveToFirst());
         assertEquals(FOO_TEST_NAME, cursor.getString(1));
@@ -44,12 +44,12 @@ public class TestResultsProviderTest extends ProviderTestCase2<TestResultsProvid
         values = new ContentValues();
         values.put(TestResultsProvider.COLUMN_TEST_NAME, BAR_TEST_NAME);
         values.put(TestResultsProvider.COLUMN_TEST_RESULT, TestResult.TEST_RESULT_PASSED);
-        int numUpdated = mProvider.update(TestResultsProvider.CONTENT_URI, values,
+        int numUpdated = mProvider.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
                 TestResultsProvider.COLUMN_TEST_NAME + " = ?", new String[] {BAR_TEST_NAME});
         assertEquals(0, numUpdated);
 
-        cursor = mProvider.query(Uri.withAppendedPath(TestResultsProvider.CONTENT_URI, "results"),
-                TestResultsProvider.ALL_COLUMNS, null, null, null);
+        cursor = mProvider.query(TestResultsProvider.RESULTS_CONTENT_URI, TestResultsProvider.ALL_COLUMNS,
+                null, null, null);
         assertEquals(1, cursor.getCount());
         assertTrue(cursor.moveToFirst());
         assertEquals(FOO_TEST_NAME, cursor.getString(1));
@@ -58,23 +58,23 @@ public class TestResultsProviderTest extends ProviderTestCase2<TestResultsProvid
 
         values = new ContentValues(1);
         values.put(TestResultsProvider.COLUMN_TEST_RESULT, TestResult.TEST_RESULT_PASSED);
-        numUpdated = mProvider.update(TestResultsProvider.CONTENT_URI, values,
+        numUpdated = mProvider.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
                 TestResultsProvider.COLUMN_TEST_NAME + " = ?", new String[] {FOO_TEST_NAME});
         assertEquals(1, numUpdated);
 
-        cursor = mProvider.query(Uri.withAppendedPath(TestResultsProvider.CONTENT_URI, "results"),
-                TestResultsProvider.ALL_COLUMNS, null, null, null);
+        cursor = mProvider.query(TestResultsProvider.RESULTS_CONTENT_URI, TestResultsProvider.ALL_COLUMNS,
+                null, null, null);
         assertEquals(1, cursor.getCount());
         assertTrue(cursor.moveToFirst());
         assertEquals(FOO_TEST_NAME, cursor.getString(1));
         assertEquals(TestResult.TEST_RESULT_PASSED, cursor.getInt(2));
         cursor.close();
 
-        int numDeleted = mProvider.delete(TestResultsProvider.CONTENT_URI, "1", null);
+        int numDeleted = mProvider.delete(TestResultsProvider.RESULTS_CONTENT_URI, "1", null);
         assertEquals(1, numDeleted);
 
-        cursor = mProvider.query(TestResultsProvider.RESULTS_ALL_CONTENT_URI,
-                TestResultsProvider.ALL_COLUMNS, null, null, null);
+        cursor = mProvider.query(TestResultsProvider.RESULTS_CONTENT_URI, TestResultsProvider.ALL_COLUMNS,
+                null, null, null);
         assertEquals(0, cursor.getCount());
         cursor.close();
     }
