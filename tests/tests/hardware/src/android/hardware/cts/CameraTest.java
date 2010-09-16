@@ -1251,8 +1251,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 if (!isBadId) throw e;
             }
 
-            int facing = info.mFacing;
-            int orientation = info.mOrientation;
+            int facing = info.facing;
+            int orientation = info.orientation;
             assertTrue(facing == CameraInfo.CAMERA_FACING_BACK ||
                        facing == CameraInfo.CAMERA_FACING_FRONT);
             assertTrue(orientation == 0 || orientation == 90 ||
