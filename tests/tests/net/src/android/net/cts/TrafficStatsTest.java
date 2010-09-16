@@ -170,6 +170,12 @@ public class TrafficStatsTest extends AndroidTestCase {
             server.close();
         }
 
+        // It's too fast to call getUidTxBytes function.
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+
         long mobileTxPacketsAfter = TrafficStats.getTotalTxPackets();
         long mobileRxPacketsAfter = TrafficStats.getTotalRxPackets();
         long mobileTxBytesAfter = TrafficStats.getTotalTxBytes();
