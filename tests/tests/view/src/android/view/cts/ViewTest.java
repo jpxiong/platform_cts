@@ -4655,6 +4655,10 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             mHasChildDrawableStateChanged = false;
             mHasBroughtChildToFront = false;
         }
+
+        public void childOverlayStateChanged(View child) {
+
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {
