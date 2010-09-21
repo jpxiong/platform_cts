@@ -283,7 +283,7 @@ public class AppSecurityTests extends DeviceTestCase {
         private boolean mAllTestsPassed = true;
         private String mTestRunErrorMessage = null;
 
-        public void testEnded(TestIdentifier test) {
+        public void testEnded(TestIdentifier test,  Map<String, String> metrics) {
             // ignore
         }
 
@@ -304,7 +304,7 @@ public class AppSecurityTests extends DeviceTestCase {
             mTestRunErrorMessage = errorMessage;
         }
 
-        public void testRunStarted(int testCount) {
+        public void testRunStarted(String runName, int testCount) {
             // ignore
         }
 
