@@ -67,7 +67,7 @@ public class CtsBuildHelper {
      * @throws FileNotFoundException if file does not exist
      */
     public File getTestApp(String appFileName) throws FileNotFoundException {
-        File apkFile = new File(new File(getRepositoryDir(), "testcases"), appFileName);
+        File apkFile = new File(getTestCasesDir(), appFileName);
         if (!apkFile.exists()) {
             throw new FileNotFoundException(String.format("CTS test app file %s does not exist",
                     apkFile.getAbsolutePath()));
@@ -80,22 +80,35 @@ public class CtsBuildHelper {
     }
 
     /**
-     * @return a {@link File} representing the test plan file with given name
-     * @throws FileNotFoundException if file does not exist
-     */
-    public File getTestPlan(String testPlanFileName) throws FileNotFoundException {
-        File planFile = new File(new File(getRepositoryDir(), "plans"), testPlanFileName);
-        if (!planFile.exists()) {
-            throw new FileNotFoundException(String.format("CTS test plan file %s does not exist",
-                    planFile.getAbsolutePath()));
-        }
-        return planFile;
-    }
-
-    /**
      * @return a {@link File} representing the results directory.
      */
     public File getResultsDir() {
         return new File(getRepositoryDir(), "results");
+    }
+
+    /**
+     * @return a {@link File} representing the test cases directory
+     * @throws FileNotFoundException if dir does not exist
+     */
+    public File getTestCasesDir() throws FileNotFoundException {
+        File dir = new File(getRepositoryDir(), "testcases");
+        if (!dir.exists()) {
+            throw new FileNotFoundException(String.format(
+                    "CTS test cases directory %s does not exist", dir.getAbsolutePath()));
+        }
+        return dir;
+    }
+
+    /**
+     * @return a {@link File} representing the test plan directory
+     * @throws FileNotFoundException if dir does not exist
+     */
+    public File getTestPlansDir() throws FileNotFoundException {
+        File dir = new File(getRepositoryDir(), "plans");
+        if (!dir.exists()) {
+            throw new FileNotFoundException(String.format(
+                    "CTS test plans directory %s does not exist", dir.getAbsolutePath()));
+        }
+        return dir;
     }
 }

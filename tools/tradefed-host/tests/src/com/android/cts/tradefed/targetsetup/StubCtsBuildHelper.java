@@ -43,7 +43,12 @@ public class StubCtsBuildHelper extends CtsBuildHelper {
     }
 
     @Override
-    public File getTestPlan(String testPlanFileName) throws FileNotFoundException {
+    public File getTestPlansDir() throws FileNotFoundException {
+        return new File("tmp");
+    }
+
+    @Override
+    public File getTestCasesDir() {
         return new File("tmp");
     }
 }
