@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/cts-tradefed-host"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/easymock"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ddmlib-prebuilt"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/tradefed-prebuilt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ddmlib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tradefederation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
