@@ -16,8 +16,10 @@
 
 package com.android.cts;
 
+import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
 
 import java.io.IOException;
@@ -229,6 +231,10 @@ public class DeviceManager implements IDeviceChangeListener {
                 // increment the counter semaphore to unblock threads waiting for devices
                 mSemaphore.release();
             } catch (IOException e) {
+                // FIXME: handle failed connection to device.
+            } catch (TimeoutException e) {
+                // FIXME: handle failed connection to device.
+            } catch (AdbCommandRejectedException e) {
                 // FIXME: handle failed connection to device.
             }
         }

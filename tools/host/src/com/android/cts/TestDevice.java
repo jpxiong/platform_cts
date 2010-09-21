@@ -16,6 +16,7 @@
 
 package com.android.cts;
 
+import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.Client;
 import com.android.ddmlib.ClientData;
 import com.android.ddmlib.IDevice;
@@ -23,13 +24,16 @@ import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.MultiLineReceiver;
 import com.android.ddmlib.NullOutputReceiver;
 import com.android.ddmlib.RawImage;
+import com.android.ddmlib.ShellCommandUnresponsiveException;
+import com.android.ddmlib.SyncException;
 import com.android.ddmlib.SyncService;
 import com.android.ddmlib.SyncService.ISyncProgressMonitor;
-import com.android.ddmlib.SyncService.SyncResult;
+import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.log.LogReceiver;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,6 +105,8 @@ public class TestDevice implements DeviceObserver {
             try {
                 mDevice.runLogService("main", logReceiver);
             } catch (IOException e) {
+            } catch (TimeoutException e) {
+            } catch (AdbCommandRejectedException e) {
             }
         }
 
@@ -135,6 +141,10 @@ public class TestDevice implements DeviceObserver {
         try {
             mSyncService = mDevice.getSyncService();
         } catch (IOException e) {
+            // FIXME: handle failed connection.
+        } catch (TimeoutException e) {
+            // FIXME: handle failed connection.
+        } catch (AdbCommandRejectedException e) {
             // FIXME: handle failed connection.
         }
         mBatchModeResultParser = null;
@@ -922,10 +932,16 @@ public class TestDevice implements DeviceObserver {
      * @param remotePath The remote path.
      */
     public void pushFile(String localPath, String remotePath) {
-        SyncResult result = mSyncService.pushFile(localPath, remotePath,
-                new PushMonitor());
-        if (result.getCode() != SyncService.RESULT_OK) {
-            Log.e("Uploading file failed: " + result.getMessage(), null);
+        try {
+            mSyncService.pushFile(localPath, remotePath, new PushMonitor());
+        } catch (TimeoutException e) {
+            Log.e("Uploading file failed: timeout", null);
+        } catch (SyncException e) {
+            Log.e("Uploading file failed: " + e.getMessage(), null);
+        } catch (FileNotFoundException e) {
+            Log.e("Uploading file failed: " + e.getMessage(), null);
+        } catch (IOException e) {
+            Log.e("Uploading file failed: " + e.getMessage(), null);
         }
     }
 
@@ -1670,6 +1686,12 @@ public class TestDevice implements DeviceObserver {
                     mDevice.executeShellCommand(cmd, receiver);
                 } catch (IOException e) {
                     Log.e("", e);
+                } catch (TimeoutException e) {
+                    Log.e("", e);
+                } catch (AdbCommandRejectedException e) {
+                    Log.e("", e);
+                } catch (ShellCommandUnresponsiveException e) {
+                    Log.e("", e);
                 }
             }
         }.start();
@@ -1887,8 +1909,11 @@ public class TestDevice implements DeviceObserver {
      *
      * @return the screenshot
      * @throws IOException
+     * @throws AdbCommandRejectedException
+     * @throws TimeoutException
      */
-    public RawImage getScreenshot() throws IOException {
+    public RawImage getScreenshot() throws IOException, TimeoutException,
+            AdbCommandRejectedException {
         return mDevice.getScreenshot();
     }
 }
