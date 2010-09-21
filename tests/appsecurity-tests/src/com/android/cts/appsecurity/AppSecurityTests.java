@@ -265,6 +265,19 @@ public class AppSecurityTests extends DeviceTestCase {
         return listener;
     }
 
+    /**
+     * Helper method to run the specified packages tests, and return the test run error message.
+     *
+     * @param pkgName Android application package for tests
+     * @return the test run error message or <code>null</code> if test run completed.
+     * @throws IOException if connection to device was lost
+     */
+    private String runDeviceTestsWithRunResult(String pkgName) throws TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        CollectingTestRunListener listener = doRunTests(pkgName);
+        return listener.getTestRunErrorMessage();
+    }
+
     private static class CollectingTestRunListener implements ITestRunListener {
 
         private boolean mAllTestsPassed = true;
