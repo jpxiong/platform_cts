@@ -16,10 +16,10 @@
 
 package android.media.cts;
 
-import android.media.AudioEffect;
+import android.media.audiofx.AudioEffect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.Virtualizer;
+import android.media.audiofx.Virtualizer;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
