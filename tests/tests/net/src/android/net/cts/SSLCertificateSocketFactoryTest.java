@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import android.net.SSLCertificateSocketFactory;
 import android.test.AndroidTestCase;
@@ -141,4 +142,73 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
         // The socket level is invalid.
     }
 
+    // a host and port that are expected to be available but have
+    // a cert with a different CN, in this case CN=mtalk.google.com
+    private static String TEST_CREATE_SOCKET_HOST = "mobile-gtalk.l.google.com";
+    private static int TEST_CREATE_SOCKET_PORT = 5228;
+
+    /**
+     * b/2807618 Make sure that hostname verifcation in cases were it
+     * is documented to be included by various
+     * SSLCertificateSocketFactory.createSocket messages.
+     *
+     * NOTE: Test will fail if external server is not available.
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "createSocket",
+        args = {String.class, int.class}
+    )
+    public void test_createSocket_simple() throws Exception {
+        try {
+            mFactory.createSocket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT);
+            fail();
+        } catch (SSLPeerUnverifiedException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * b/2807618 Make sure that hostname verifcation in cases were it
+     * is documented to be included by various
+     * SSLCertificateSocketFactory.createSocket messages.
+     *
+     * NOTE: Test will fail if external server is not available.
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "createSocket",
+        args = {Socket.class, String.class, int.class, boolean.class}
+    )
+    public void test_createSocket_wrapping() throws Exception {
+        try {
+            Socket underlying = new Socket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT);
+            mFactory.createSocket(
+                    underlying, TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT, true);
+            fail();
+        } catch (SSLPeerUnverifiedException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * b/2807618 Make sure that hostname verifcation in cases were it
+     * is documented to be included by various
+     * SSLCertificateSocketFactory.createSocket messages.
+     *
+     * NOTE: Test will fail if external server is not available.
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "createSocket",
+        args = {String.class, int.class, InetAddress.class, int.class}
+    )
+    public void test_createSocket_bind() throws Exception {
+        try {
+            mFactory.createSocket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT, null, 0);
+            fail();
+        } catch (SSLPeerUnverifiedException expected) {
+            // expected
+        }
+    }
 }
