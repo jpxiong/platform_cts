@@ -19,13 +19,13 @@ package android.media.cts;
 import com.android.cts.stub.R;
 
 import android.content.res.AssetFileDescriptor;
-import android.media.AudioEffect;
+import android.media.audiofx.AudioEffect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.PresetReverb;
-import android.media.EnvironmentalReverb;
-import android.media.Equalizer;
+import android.media.audiofx.PresetReverb;
+import android.media.audiofx.EnvironmentalReverb;
+import android.media.audiofx.Equalizer;
 import android.media.MediaPlayer;
 
 import android.os.Looper;
@@ -92,15 +92,15 @@ public class AudioEffectTest extends AndroidTestCase {
         boolean hasPresetReverb = false;
 
         for (int i = 0; i < desc.length; i++) {
-            if (desc[i].mType.equals(AudioEffect.EFFECT_TYPE_EQUALIZER)) {
+            if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_EQUALIZER)) {
                 hasEQ = true;
-            } else if (desc[i].mType.equals(AudioEffect.EFFECT_TYPE_BASS_BOOST)) {
+            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_BASS_BOOST)) {
                 hasBassBoost = true;
-            } else if (desc[i].mType.equals(AudioEffect.EFFECT_TYPE_VIRTUALIZER)) {
+            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_VIRTUALIZER)) {
                 hasVirtualizer = true;
-            } else if (desc[i].mType.equals(AudioEffect.EFFECT_TYPE_ENV_REVERB)) {
+            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_ENV_REVERB)) {
                 hasEnvReverb = true;
-            } else if (desc[i].mType.equals(AudioEffect.EFFECT_TYPE_PRESET_REVERB)) {
+            } else if (desc[i].type.equals(AudioEffect.EFFECT_TYPE_PRESET_REVERB)) {
                 hasPresetReverb = true;
             }
         }
@@ -138,7 +138,7 @@ public class AudioEffectTest extends AndroidTestCase {
         assertTrue("no effects found", (desc.length != 0));
         for (int i = 0; i < desc.length; i++) {
             try {
-                AudioEffect effect = new AudioEffect(desc[i].mType,
+                AudioEffect effect = new AudioEffect(desc[i].type,
                         AudioEffect.EFFECT_TYPE_NULL,
                         0,
                         0);
@@ -151,7 +151,7 @@ public class AudioEffectTest extends AndroidTestCase {
                     effect.release();
                 }
             } catch (IllegalArgumentException e) {
-                fail("Effect not found: "+desc[i].mName);
+                fail("Effect not found: "+desc[i].name);
             } catch (UnsupportedOperationException e) {
                 fail("Effect library not loaded");
             }
@@ -182,7 +182,7 @@ public class AudioEffectTest extends AndroidTestCase {
         for (int i = 0; i < desc.length; i++) {
             try {
                 AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_NULL,
-                        desc[i].mUuid,
+                        desc[i].uuid,
                         0,
                         0);
                 assertNotNull("could not create AudioEffect", effect);
@@ -194,7 +194,7 @@ public class AudioEffectTest extends AndroidTestCase {
                     effect.release();
                 }
             } catch (IllegalArgumentException e) {
-                fail("Effect not found: "+desc[i].mName);
+                fail("Effect not found: "+desc[i].name);
             } catch (UnsupportedOperationException e) {
                 fail("Effect library not loaded");
             }
