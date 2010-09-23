@@ -16,10 +16,12 @@
 
 package android.permission.cts;
 
+import android.os.Environment;
 import android.test.AndroidTestCase;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Verify certain permissions on the filesystem
@@ -64,5 +66,33 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         } finally {
             assertTrue(myDir.delete());
         }
+    }
+
+    public void testDataDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(Environment.getDataDirectory());
+    }
+
+    public void testAndroidRootDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(Environment.getRootDirectory());
+    }
+
+    public void testDownloadCacheDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(Environment.getDownloadCacheDirectory());
+    }
+
+    public void testRootDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(new File("/"));
+    }
+
+    private static void assertDirectoryNotWritable(File directory) throws Exception {
+        File toCreate = new File(directory, "hello");
+        try {
+            toCreate.createNewFile();
+            fail("Expected \"java.io.IOException: Permission denied\""
+                 + " while examining " + toCreate.getAbsolutePath());
+        } catch (IOException e) {
+            // It's expected we'll get a "Permission denied" exception.
+        }
+        toCreate.delete();
     }
 }
