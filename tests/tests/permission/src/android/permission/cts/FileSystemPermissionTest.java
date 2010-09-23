@@ -16,16 +16,21 @@
 
 package android.permission.cts;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Verify certain permissions on the filesystem
  */
+@MediumTest
 public class FileSystemPermissionTest extends AndroidTestCase {
 
     public void testCreateFileHasSanePermissions() throws Exception {
@@ -68,6 +73,18 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    public void testOtherApplicationDirectoriesAreNotWritable() throws Exception {
+        List<ApplicationInfo> apps = getContext()
+                .getPackageManager()
+                .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
+        String myAppDirectory = getContext().getApplicationInfo().dataDir;
+        for (ApplicationInfo app : apps) {
+            if (!myAppDirectory.equals(app.dataDir)) {
+                assertDirectoryNotWritable(new File(app.dataDir));
+            }
+        }
+    }
+
     public void testApplicationParentDirectoryNotWritable() throws Exception {
         String myDataDir = getContext().getApplicationInfo().dataDir;
         File parentDir = new File(myDataDir).getParentFile();
@@ -95,7 +112,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         try {
             toCreate.createNewFile();
             fail("Expected \"java.io.IOException: Permission denied\""
-                 + " while examining " + toCreate.getAbsolutePath());
+                 + " when trying to create " + toCreate.getAbsolutePath());
         } catch (IOException e) {
             // It's expected we'll get a "Permission denied" exception.
         } finally {
