@@ -68,6 +68,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    public void testApplicationParentDirectoryNotWritable() throws Exception {
+        String myDataDir = getContext().getApplicationInfo().dataDir;
+        File parentDir = new File(myDataDir).getParentFile();
+        assertDirectoryNotWritable(parentDir);
+    }
+
     public void testDataDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(Environment.getDataDirectory());
     }
@@ -92,7 +98,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                  + " while examining " + toCreate.getAbsolutePath());
         } catch (IOException e) {
             // It's expected we'll get a "Permission denied" exception.
+        } finally {
+            toCreate.delete();
         }
-        toCreate.delete();
     }
 }
