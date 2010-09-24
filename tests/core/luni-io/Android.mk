@@ -24,7 +24,7 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/java/io) \
-	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/io) \
+	$(call all-java-files-under,../../../../libcore/luni/src/test/java/libcore/java/io) \
 	$(call all-java-files-under,../../../../libcore/support/src/test/java/) \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg1) \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/pkg2) \
