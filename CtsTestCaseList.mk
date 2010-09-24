@@ -27,16 +27,14 @@ CTS_SECURITY_APPS_LIST := \
 	CtsTargetInstrumentationApp \
 	CtsUsePermissionDiffCert
 
-CTS_TEST_CASE_LIST := \
-	TestDeviceSetup \
-	CtsTestStubs \
+# These test cases will be analyzed by the CTS API coverage tools. 
+CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
 	CtsAppTestCases \
 	CtsBluetoothTestCases \
 	CtsContentTestCases \
 	CtsDatabaseTestCases \
-	CtsDelegatingAccessibilityService \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
 	CtsExampleTestCases \
@@ -53,19 +51,25 @@ CTS_TEST_CASE_LIST := \
 	CtsSaxTestCases \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \
+	CtsTestStubs \
 	CtsTextTestCases \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
 	CtsWidgetTestCases \
 	CtsNetTestCases \
-	SignatureTest \
 	CtsPerformanceTestCases \
 	CtsPerformance2TestCases \
 	CtsPerformance3TestCases \
 	CtsPerformance4TestCases \
-	CtsPerformance5TestCases \
+	CtsPerformance5TestCases
+
+CTS_TEST_CASE_LIST := \
+	TestDeviceSetup \
+	CtsDelegatingAccessibilityService \
+	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
 	$(CTS_APPS_LIST) \
+	$(CTS_COVERAGE_TEST_CASE_LIST) \
 	$(CTS_SECURITY_APPS_LIST)
