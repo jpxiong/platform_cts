@@ -16,14 +16,11 @@
 package com.android.cts.tradefed.targetsetup;
 
 import com.android.ddmlib.Log;
-import com.android.tradefed.config.IConfiguration;
-import com.android.tradefed.config.IConfigurationReceiver;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.targetsetup.BuildError;
 import com.android.tradefed.targetsetup.DeviceSetup;
 import com.android.tradefed.targetsetup.IBuildInfo;
-import com.android.tradefed.targetsetup.IDeviceBuildInfo;
 import com.android.tradefed.targetsetup.IFolderBuildInfo;
 import com.android.tradefed.targetsetup.ITargetPreparer;
 import com.android.tradefed.targetsetup.TargetSetupError;
@@ -31,28 +28,24 @@ import com.android.tradefed.targetsetup.TargetSetupError;
 import java.io.FileNotFoundException;
 
 /**
- * A {@link ITargetPreparer} that accepts a device and a CTS build (represented as a
- * {@link IDeviceBuildInfo} and a {@link IFolderBuildInfo} respectively.
+ * A {@link ITargetPreparer} that attempts to automatically perform the CTS-specific manual steps
+ * for setting up a device for CTS testing.
  * <p/>
  * This class is NOT intended for 'official' CTS runs against a production device as the steps
  * performed by this class require a debug build (aka 'adb root' must succeed).
+ * <p/>
+ * This class currently performs the 'Allow mock locations' and 'accessibililty setup' steps
+ * documented in the CTS user manual. It is intended to be used in conjunction with
+ * a {@link DeviceSetup} which will enable the 'Stay Awake' setting and verify that external
+ * storage is present.
  */
-public class CtsDeviceSetup extends DeviceSetup implements IConfigurationReceiver {
+public class CtsRootDeviceSetup implements ITargetPreparer {
 
-    private static final String LOG_TAG = "CtsDeviceSetup";
+    private static final String LOG_TAG = "CtsRootDeviceSetup";
 
     // TODO: read this from a configuration file rather than hard-coding
     private static final String ACCESSIBILITY_SERVICE_APK_FILE_NAME =
         "CtsDelegatingAccessibilityService.apk";
-
-    private IConfiguration mConfiguration = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setConfiguration(IConfiguration configuration) {
-        mConfiguration  = configuration;
-    }
 
     /**
      * {@inheritDoc}
@@ -60,9 +53,6 @@ public class CtsDeviceSetup extends DeviceSetup implements IConfigurationReceive
     @Override
     public void setUp(ITestDevice device, IBuildInfo buildInfo) throws TargetSetupError,
             DeviceNotAvailableException, BuildError {
-        // call super class to setup device. This will disable screen guard, etc
-        super.setUp(device, buildInfo);
-
         if (!(buildInfo instanceof IFolderBuildInfo)) {
             throw new IllegalArgumentException("Provided buildInfo is not a IFolderBuildInfo");
         }
@@ -72,26 +62,33 @@ public class CtsDeviceSetup extends DeviceSetup implements IConfigurationReceive
         try {
             CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
 
+            if (!device.enableAdbRoot()) {
+                throw new TargetSetupError(String.format(
+                        "Failed to set root on device %s.", device.getSerialNumber()));
+            }
+
             // perform CTS setup steps that only work if adb is root
 
             // TODO: turn on mock locations
-            CtsSetup ctsSetup = new CtsSetup();
-            ctsSetup.setConfiguration(mConfiguration);
-            enableAccessibilityService(device, buildHelper, ctsSetup);
+            enableAccessibilityService(device, buildHelper);
 
             // end root setup steps
-
-            // perform CTS setup common with production builds
-            ctsSetup.setUp(device, buildInfo);
         } catch (FileNotFoundException e) {
             throw new TargetSetupError("Invalid CTS installation", e);
         }
     }
 
-    private void enableAccessibilityService(ITestDevice device, CtsBuildHelper ctsBuild,
-            CtsSetup ctsSetup) throws DeviceNotAvailableException, TargetSetupError,
+    private void enableAccessibilityService(ITestDevice device, CtsBuildHelper ctsBuild)
+            throws DeviceNotAvailableException, TargetSetupError,
             FileNotFoundException {
-        ctsSetup.installApk(device, ctsBuild.getTestApp(ACCESSIBILITY_SERVICE_APK_FILE_NAME));
+        String errorCode = device.installPackage(
+                ctsBuild.getTestApp(ACCESSIBILITY_SERVICE_APK_FILE_NAME), true);
+        if (errorCode != null) {
+            // TODO: retry ?
+            throw new TargetSetupError(String.format(
+                    "Failed to install %s on device %s. Reason: %s",
+                    ACCESSIBILITY_SERVICE_APK_FILE_NAME, device.getSerialNumber(), errorCode));
+        }
         // TODO: enable Settings > Accessibility > Accessibility > Delegating Accessibility
         // Service
     }
