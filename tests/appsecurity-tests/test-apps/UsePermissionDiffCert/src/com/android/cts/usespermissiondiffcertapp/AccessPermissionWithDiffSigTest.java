@@ -26,6 +26,8 @@ import android.util.Log;
 /**
  * Tests that signature-enforced permissions cannot be accessed by apps signed
  * with different certs than app that declares the permission.
+ * 
+ * Accesses app cts/tests/appsecurity-tests/test-apps/PermissionDeclareApp/...
  */
 public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     static final ComponentName GRANT_URI_PERM_COMP
@@ -36,6 +38,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     static final Uri PRIV_URI = Uri.parse("content://ctsprivateprovider");
     static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
 
+    static final String EXPECTED_MIME_TYPE = "got/theMIME";
+    
     public void assertReadingContentUriNotAllowed(Uri uri, String msg) {
         try {
             getContext().getContentResolver().query(uri, null, null, null, null);
@@ -545,5 +549,23 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
     public void testGrantActivityWritePrivateFromStartService() {
         doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING);
+    }
+
+    public void testGetMimeTypePermission() {
+        // Precondition: no current access.
+        assertWritingContentUriNotAllowed(PERM_URI, "shouldn't write when starting test");
+        assertWritingContentUriNotAllowed(PERM_URI, "shouldn't write when starting test");
+        
+        // All apps should be able to get MIME type regardless of permission.
+        assertEquals(getContext().getContentResolver().getType(PERM_URI), EXPECTED_MIME_TYPE);
+    }
+
+    public void testGetMimeTypePrivate() {
+        // Precondition: no current access.
+        assertWritingContentUriNotAllowed(PRIV_URI, "shouldn't write when starting test");
+        assertWritingContentUriNotAllowed(PRIV_URI, "shouldn't write when starting test");
+        
+        // All apps should be able to get MIME type even if provider is private.
+        assertEquals(getContext().getContentResolver().getType(PRIV_URI), EXPECTED_MIME_TYPE);
     }
 }
