@@ -1518,42 +1518,6 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
 
     @TestTargetNew(
             level = TestLevel.COMPLETE,
-            notes = "test setConnectionPoolSize",
-            method = "setConnectionPoolSize",
-            args = {java.lang.Integer.class}
-    )
-    @SmallTest
-    public void testSetConnectionPoolSize() {
-        boolean rslt = mDatabase.enableWriteAheadLogging();
-        assertTrue(rslt);
-        // can't set pool size to zero
-        try {
-            mDatabase.setConnectionPoolSize(0);
-            fail("IllegalArgumentException expected");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
-        try {
-            // set pool size to a valid value
-            mDatabase.setConnectionPoolSize(10);
-        } catch (IllegalStateException e) {
-            fail("IllegalStateException NOT expected to be thrown");
-        } catch (IllegalArgumentException e) {
-            fail("IllegalArgumentException NOT expected to be thrown");
-        } catch (Exception e) {
-            fail("Exception NOT expected to be thrown");
-        }
-        // can't set pool size to < the value above
-        try {
-            mDatabase.setConnectionPoolSize(1);
-            fail("IllegalArgumentException expected");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
-    }
-
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
             notes = "test enableWriteAheadLogging",
             method = "enableWriteAheadLogging",
             args = {}
