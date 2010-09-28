@@ -34,7 +34,7 @@ public class PermissionContentProviderGranting extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        return "got/theMIME";
     }
 
     @Override
