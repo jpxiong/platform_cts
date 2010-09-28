@@ -23,8 +23,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.os.MessageQueue.IdleHandler;
+import android.util.Log;
 
 public class ReceiveUriActivity extends Activity {
+    static final String TAG = "ReceiveUriActivity";
     private static final Object sLock = new Object();
     private static boolean sStarted;
     private static boolean sNewIntent;
@@ -38,6 +40,7 @@ public class ReceiveUriActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         synchronized (sLock) {
+            Log.i(TAG, "onCreate: sCurInstance=" + sCurInstance);
             if (sCurInstance != null) {
                 finishCurInstance();
             }
@@ -53,6 +56,7 @@ public class ReceiveUriActivity extends Activity {
         super.onNewIntent(intent);
 
         synchronized (sLock) {
+            Log.i(TAG, "onNewIntent: sCurInstance=" + sCurInstance);
             sNewIntent = true;
             sLock.notifyAll();
         }
@@ -61,6 +65,7 @@ public class ReceiveUriActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy: sCurInstance=" + sCurInstance);
         Looper.myQueue().addIdleHandler(new IdleHandler() {
             @Override
             public boolean queueIdle() {
