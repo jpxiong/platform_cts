@@ -107,6 +107,14 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertDirectoryNotWritable(new File("/"));
     }
 
+    public void testDevDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(new File("/dev"));
+    }
+
+    public void testProcDirectoryNotWritable() throws Exception {
+        assertDirectoryNotWritable(new File("/proc"));
+    }
+
     private static void assertDirectoryNotWritable(File directory) throws Exception {
         File toCreate = new File(directory, "hello");
         try {
