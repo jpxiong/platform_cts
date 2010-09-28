@@ -25,7 +25,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Looper;
 import android.os.cts.TestThread;
 import android.provider.Settings;
@@ -371,8 +370,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
 
     private static void assertCdmaDeviceId(String deviceId) {
         if (deviceId.length() == 14) {
-            assertHexadecimalMeidFormat(deviceId);
-            assertReportingBodyIdentifier(deviceId, false); // Must be hexadecimal identifier
+            assertMeidFormat(deviceId);
         } else if (deviceId.length() == 8) {
             assertHexadecimalEsnFormat(deviceId);
         } else {
@@ -388,11 +386,19 @@ public class TelephonyManagerTest extends AndroidTestCase {
                     "80".equals(deviceId.substring(0, 2)));
     }
 
-    private static void assertHexadecimalMeidFormat(String deviceId) {
-        // MEID must NOT include the check digit.
-        String meidPattern = "[0-9a-fA-F]{14}";
-        assertTrue("MEID hex device id " + deviceId + " does not match pattern " + meidPattern,
-                Pattern.matches(meidPattern, deviceId));
+    private static void assertMeidFormat(String deviceId) {
+        if (deviceId.substring(0, 2).matches("99|98|97")) {
+            // MEID must NOT include the check digit.
+            String meidPattern = "(99|98|97)[0-9]{12}";
+            assertTrue("MEID device id " + deviceId + " does not match pattern " + meidPattern,
+                    Pattern.matches(meidPattern, deviceId));
+        } else {
+            // MEID must NOT include the check digit.
+            String meidPattern = "[0-9a-fA-F]{14}";
+            assertTrue("MEID device id " + deviceId + " does not match pattern " + meidPattern,
+                    Pattern.matches(meidPattern, deviceId));
+            assertReportingBodyIdentifier(deviceId, false);
+        }
     }
 
     private void assertHardwareId() {
