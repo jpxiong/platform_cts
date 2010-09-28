@@ -17,11 +17,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
        package="com.android.cts.usespermissiondiffcertapp">
 
-    <!--
-    This app declares it uses a permission that requires same signature as app that declares it.
-    -->
-
+    <!-- We say we want to use the other app's permission, but it is signed with
+         a different cert so it should fail. -->
     <uses-permission android:name="com.android.cts.permissionWithSignature"/>
+
+    <!-- This is a permission we can have, which the other app can require for
+         access. -->
+    <permission android:name="com.android.cts.permissionAllowedWithSignature"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.android.cts.permissionAllowedWithSignature"/>
 
     <application>
         <uses-library android:name="android.test.runner"/>

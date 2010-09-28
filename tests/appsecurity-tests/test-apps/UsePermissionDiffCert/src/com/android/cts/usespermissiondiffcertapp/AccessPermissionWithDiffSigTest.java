@@ -16,10 +16,13 @@
 
 package com.android.cts.usespermissiondiffcertapp;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -35,6 +38,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                     "com.android.cts.permissiondeclareapp.GrantUriPermission");
     static final Uri PERM_URI = Uri.parse("content://ctspermissionwithsignature");
     static final Uri PERM_URI_GRANTING = Uri.parse("content://ctspermissionwithsignaturegranting");
+    static final Uri PERM_URI_PATH = Uri.parse("content://ctspermissionwithsignaturepath");
     static final Uri PRIV_URI = Uri.parse("content://ctsprivateprovider");
     static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
 
@@ -194,6 +198,131 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
     }
 
+    static class GrantResultReceiver extends BroadcastReceiver {
+        boolean mHaveResult = false;
+        boolean mGoodResult = false;
+        boolean mSucceeded = false;
+        
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            synchronized (this) {
+                mHaveResult = true;
+                switch (getResultCode()) {
+                    case 100:
+                        mGoodResult = true;
+                        mSucceeded = false;
+                        break;
+                    case 101:
+                        mGoodResult = true;
+                        mSucceeded = true;
+                        break;
+                    default:
+                        mGoodResult = false;
+                        break;
+                }
+                notifyAll();
+            }
+        }
+        
+        void assertSuccess(String failureMessage) {
+            synchronized (this) {
+                final long startTime = SystemClock.uptimeMillis();
+                while (!mHaveResult) {
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                    }
+                    if (SystemClock.uptimeMillis() >= (startTime+5000)) {
+                        throw new RuntimeException("Timeout");
+                    }
+                }
+                if (!mGoodResult) {
+                    fail("Broadcast receiver did not return good result");
+                }
+                if (!mSucceeded) {
+                    fail(failureMessage);
+                }
+            }
+        }
+        
+        void assertFailure(String failureMessage) {
+            synchronized (this) {
+                final long startTime = SystemClock.uptimeMillis();
+                while (!mHaveResult) {
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                    }
+                    if (SystemClock.uptimeMillis() >= (startTime+5000)) {
+                        throw new RuntimeException("Timeout");
+                    }
+                }
+                if (!mGoodResult) {
+                    fail("Broadcast receiver did not return good result");
+                }
+                if (mSucceeded) {
+                    fail(failureMessage);
+                }
+            }
+        }
+    }
+    
+    void grantUriPermissionFail(Uri uri, int mode, boolean service) {
+        Intent grantIntent = new Intent();
+        grantIntent.setData(uri);
+        grantIntent.addFlags(mode);
+        grantIntent.setClass(getContext(),
+                service ? ReceiveUriService.class : ReceiveUriActivity.class);
+        Intent intent = new Intent();
+        intent.setComponent(GRANT_URI_PERM_COMP);
+        intent.putExtra("intent", grantIntent);
+        intent.putExtra("service", service);
+        GrantResultReceiver receiver = new GrantResultReceiver();
+        getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
+        receiver.assertFailure("Able to grant URI permission to " + uri + " when should not");
+    }
+
+    void doTestGrantUriPermissionFail(Uri uri) {
+        grantUriPermissionFail(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
+        grantUriPermissionFail(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
+        grantUriPermissionFail(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
+        grantUriPermissionFail(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
+    }
+    
+    /**
+     * Test that the ctspermissionwithsignature content provider can not grant
+     * URI permissions to others.
+     */
+    public void testGrantPermissionNonGrantingFail() {
+        doTestGrantUriPermissionFail(PERM_URI);
+    }
+
+    /**
+     * Test that the ctspermissionwithsignaturegranting content provider can not grant
+     * URI permissions to paths outside of the grant tree
+     */
+    public void testGrantPermissionOutsideGrantingFail() {
+        doTestGrantUriPermissionFail(PERM_URI_GRANTING);
+        doTestGrantUriPermissionFail(Uri.withAppendedPath(PERM_URI_GRANTING, "invalid"));
+    }
+
+    /**
+     * Test that the ctsprivateprovider content provider can not grant
+     * URI permissions to others.
+     */
+    public void testGrantPrivateNonGrantingFail() {
+        doTestGrantUriPermissionFail(PRIV_URI);
+    }
+
+    /**
+     * Test that the ctsprivateprovidergranting content provider can not grant
+     * URI permissions to paths outside of the grant tree
+     */
+    public void testGrantPrivateOutsideGrantingFail() {
+        doTestGrantUriPermissionFail(PRIV_URI_GRANTING);
+        doTestGrantUriPermissionFail(Uri.withAppendedPath(PRIV_URI_GRANTING, "invalid"));
+    }
+
     void grantUriPermission(Uri uri, int mode, boolean service) {
         Intent grantIntent = new Intent();
         grantIntent.setData(uri);
@@ -217,6 +346,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         assertReadingContentUriNotAllowed(subUri, "shouldn't read when starting test");
         assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read when starting test");
 
+        // --------------------------------
+
         ReceiveUriActivity.clearStarted();
         grantUriPermission(subUri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
         ReceiveUriActivity.waitForStart();
@@ -233,11 +364,63 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // And not to a sub path.
         assertReadingContentUriNotAllowed(subSubUri, "shouldn't read non-granted sub URI");
 
+        // --------------------------------
+
+        ReceiveUriActivity.clearNewIntent();
+        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
+        ReceiveUriActivity.waitForNewIntent();
+
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // See if we now have access to the provider.
+        getContext().getContentResolver().query(sub2Uri, null, null, null, null);
+
+        // And still have access to the original URI.
+        getContext().getContentResolver().query(subUri, null, null, null, null);
+
+        // But not writing.
+        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write from granted read");
+
+        // And not to the base path.
+        assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
+
+        // And not to a sub path.
+        assertReadingContentUriNotAllowed(sub2SubUri, "shouldn't read non-granted sub URI");
+
+        // And make sure we can't generate a permission to a running activity.
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(uri, "hah"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(uri, "hah"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // --------------------------------
+
         // Dispose of activity.
         ReceiveUriActivity.finishCurInstanceSync();
 
+        if (false) {
+            synchronized (this) {
+                Log.i("**", "******************************* WAITING!!!");
+                try {
+                    wait(10000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
         // Ensure reading no longer allowed.
         assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
+        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read after losing granted URI");
     }
 
     void doTestGrantActivityUriWritePermission(Uri uri) {
@@ -331,7 +514,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * Test that the ctspermissionwithsignaturegranting content provider can grant a read
      * permission.
      */
-    public void testGrantActivityReadPermissionFromStartActivity() {
+    public void testGrantReadPermissionFromStartActivity() {
         doTestGrantActivityUriReadPermission(PERM_URI_GRANTING);
     }
 
@@ -339,7 +522,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * Test that the ctspermissionwithsignaturegranting content provider can grant a write
      * permission.
      */
-    public void testGrantActivityWritePermissionFromStartActivity() {
+    public void testGrantWritePermissionFromStartActivity() {
         doTestGrantActivityUriWritePermission(PERM_URI_GRANTING);
     }
 
@@ -347,7 +530,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * Test that the ctsprivateprovidergranting content provider can grant a read
      * permission.
      */
-    public void testGrantActivityReadPrivateFromStartActivity() {
+    public void testGrantReadPrivateFromStartActivity() {
         doTestGrantActivityUriReadPermission(PRIV_URI_GRANTING);
     }
 
@@ -355,7 +538,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * Test that the ctsprivateprovidergranting content provider can grant a write
      * permission.
      */
-    public void testGrantActivityWritePrivateFromStartActivity() {
+    public void testGrantWritePrivateFromStartActivity() {
         doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING);
     }
 
@@ -535,20 +718,90 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write after losing granted URI");
     }
 
-    public void testGrantActivityReadPermissionFromStartService() {
+    public void testGrantReadPermissionFromStartService() {
         doTestGrantServiceUriReadPermission(PERM_URI_GRANTING);
     }
 
-    public void testGrantActivityWritePermissionFromStartService() {
+    public void testGrantWritePermissionFromStartService() {
         doTestGrantServiceUriWritePermission(PERM_URI_GRANTING);
     }
 
-    public void testGrantActivityReadPrivateFromStartService() {
+    public void testGrantReadPrivateFromStartService() {
         doTestGrantServiceUriReadPermission(PRIV_URI_GRANTING);
     }
 
-    public void testGrantActivityWritePrivateFromStartService() {
+    public void testGrantWritePrivateFromStartService() {
         doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING);
+    }
+
+    /**
+     * Test that ctspermissionwithsignaturepath can't grant read permissions
+     * on paths it doesn't have permission to.
+     */
+    public void testGrantReadUriActivityPathPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(PERM_URI_PATH,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that ctspermissionwithsignaturepath can't grant write permissions
+     * on paths it doesn't have permission to.
+     */
+    public void testGrantWriteUriActivityPathPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(PERM_URI_PATH,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    /**
+     * Test that ctspermissionwithsignaturepath can't grant read permissions
+     * on paths it doesn't have permission to.
+     */
+    public void testGrantReadUriActivitySubPathPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_PATH, "foo"),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
+     * Test that ctspermissionwithsignaturepath can't grant write permissions
+     * on paths it doesn't have permission to.
+     */
+    public void testGrantWriteUriActivitySubPathPermissionToSelf() {
+        doTryGrantUriActivityPermissionToSelf(
+                Uri.withAppendedPath(PERM_URI_PATH, "foo"),
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+    }
+
+    /**
+     * Test that the ctspermissionwithsignaturepath content provider can grant a read
+     * permission.
+     */
+    public void testGrantReadPathPermissionFromStartActivity() {
+        doTestGrantActivityUriReadPermission(PERM_URI_PATH);
+    }
+
+    /**
+     * Test that the ctspermissionwithsignaturepath content provider can grant a write
+     * permission.
+     */
+    public void testGrantWritePathPermissionFromStartActivity() {
+        doTestGrantActivityUriWritePermission(PERM_URI_PATH);
+    }
+
+    /**
+     * Test that the ctspermissionwithsignaturepath content provider can grant a read
+     * permission.
+     */
+    public void testGrantReadPathPermissionFromStartService() {
+        doTestGrantServiceUriReadPermission(PERM_URI_PATH);
+    }
+
+    /**
+     * Test that the ctspermissionwithsignaturepath content provider can grant a write
+     * permission.
+     */
+    public void testGrantWritePathPermissionFromStartService() {
+        doTestGrantServiceUriWritePermission(PERM_URI_PATH);
     }
 
     public void testGetMimeTypePermission() {
