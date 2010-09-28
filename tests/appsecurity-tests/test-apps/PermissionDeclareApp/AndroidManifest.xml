@@ -20,11 +20,13 @@
     An app that declares a permission that requires a matching signature to
     access.
     -->
-
     <permission android:name="com.android.cts.permissionWithSignature"
         android:protectionLevel="signature" />
-
     <uses-permission android:name="com.android.cts.permissionWithSignature" />
+
+    <!-- A permission this app will not hold. -->
+    <permission android:name="com.android.cts.permissionNotUsedWithSignature"
+        android:protectionLevel="signature" />
 
     <application>
         <receiver android:name="GrantUriPermission" android:exported="true">
@@ -36,7 +38,6 @@
                 android:authorities="ctspermissionwithsignature"
                 android:readPermission="com.android.cts.permissionWithSignature"
                 android:writePermission="com.android.cts.permissionWithSignature">
-            <grant-uri-permission android:pathPattern=".*" />
         </provider>
 
         <!-- Need a way for another app to try to access the permission, but will
@@ -45,21 +46,40 @@
                 android:authorities="ctspermissionwithsignaturegranting"
                 android:readPermission="com.android.cts.permissionWithSignature"
                 android:writePermission="com.android.cts.permissionWithSignature">
-            <grant-uri-permission android:pathPattern=".*" />
+            <grant-uri-permission android:pathPattern="/foo.*" />
+            <grant-uri-permission android:pathPattern="/yes.*" />
         </provider>
 
         <!-- Nobody else should get access to this -->
         <provider android:name="PrivateContentProvider"
                 android:authorities="ctsprivateprovider"
                 android:exported="false">
-            <grant-uri-permission android:pathPattern=".*" />
         </provider>
 
         <!-- Nobody else should get access to this, but we will grant uri access -->
         <provider android:name="PrivateContentProviderGranting"
                 android:authorities="ctsprivateprovidergranting"
                 android:exported="false">
+            <grant-uri-permission android:pathPattern="/foo.*" />
+            <grant-uri-permission android:pathPattern="/yes.*" />
+        </provider>
+
+        <!-- Target for tests about how path permissions interact with granting
+             URI permissions. -->
+        <provider android:name="PermissionContentProviderPath"
+                android:authorities="ctspermissionwithsignaturepath"
+                android:readPermission="com.android.cts.permissionNotUsedWithSignature"
+                android:writePermission="com.android.cts.permissionNotUsedWithSignature">
+            <path-permission
+                    android:pathPrefix="/foo"
+                    android:readPermission="com.android.cts.permissionWithSignature"
+                    android:writePermission="com.android.cts.permissionWithSignature" />
+            <path-permission
+                    android:pathPrefix="/yes"
+                    android:readPermission="com.android.cts.permissionWithSignature"
+                    android:writePermission="com.android.cts.permissionWithSignature" />
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
+        
     </application>
 </manifest>
