@@ -20,6 +20,7 @@ CTS_LIB=cts.jar
 DDMS_LIB=ddmlib.jar
 JUNIT_LIB=junit.jar
 HOSTTEST_LIB=hosttestlib.jar
+CTS_TEST_ANNOTATIONS_HOST_LIB=CtsTestAnnotationsHostLib.jar
 
 # Checking if "adb" is known by the system
 PATH=.:${PATH}
@@ -65,6 +66,7 @@ CTS_LIBS=\
 ${ANDROID_ROOT}/${JAR_DIR}/${DDMS_LIB}:\
 ${ANDROID_ROOT}/${JAR_DIR}/${JUNIT_LIB}:\
 ${ANDROID_ROOT}/${JAR_DIR}/${HOSTTEST_LIB}:\
+${ANDROID_ROOT}/${JAR_DIR}/${CTS_TEST_ANNOTATIONS_HOST_LIB}:\
 ${ANDROID_ROOT}/${JAR_DIR}/${CTS_LIB}
 # Add path to CTS JAR file in the CTS archive
 CTS_LIBS=${CTS_LIBS}:${CTS_DIR}/${CTS_LIB}
@@ -85,5 +87,6 @@ else
 fi;
 
 JAVA_OPTS="-Xmx512M"
+JAVA_OPTS="${JAVA_OPTS} -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1337"
 
 java ${JAVA_OPTS} -cp ${CTS_LIBS} -DHOST_CONFIG=${CTS_HOST_CFG} com.android.cts.TestHost "$@"

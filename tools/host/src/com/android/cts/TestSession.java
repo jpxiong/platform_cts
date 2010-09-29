@@ -16,6 +16,8 @@
 
 package com.android.cts;
 
+import android.annotation.cts.Profile;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -396,7 +398,7 @@ public class TestSession {
                 if (mTest != null) {
                     TestPackage pkg = mTest.getTestPackage();
                     pkg.setSessionThread(this);
-                    pkg.runTest(mDevice, mTest);
+                    pkg.runTest(mDevice, mTest, mSessionLog.getProfile());
                 } else if (mTestPackage != null) {
                     mTestPackage.setSessionThread(this);
                     mTestPackage.run(mDevice, mJavaPackageName, mSessionLog);
