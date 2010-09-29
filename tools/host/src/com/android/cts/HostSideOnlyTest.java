@@ -16,6 +16,8 @@
 
 package com.android.cts;
 
+import android.annotation.cts.Profile;
+
 import java.io.IOException;
 
 import junit.framework.TestResult;
@@ -77,7 +79,7 @@ public class HostSideOnlyTest extends Test {
 
     /** {@inheritDoc} */
     @Override
-    protected void runImpl() {
+    protected void runImpl(Profile profile) {
         mHostSideTestRunner = new HostSideTestRunner(this);
         mHostSideTestRunner.start();
     }

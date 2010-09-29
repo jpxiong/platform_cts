@@ -263,6 +263,12 @@
                                         </TD>
                                     </TR>
                                     <TR>
+                                        <TD class="rowtitle">Profile</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/@profile"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
                                         <TD class="rowtitle">Start time</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/@starttime"/>

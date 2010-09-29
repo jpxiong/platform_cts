@@ -22,8 +22,12 @@ import com.android.internal.util.Predicates;
 import dalvik.annotation.BrokenTest;
 import dalvik.annotation.SideEffect;
 
+import android.annotation.cts.Profile;
+import android.annotation.cts.RequiredFeatures;
+import android.annotation.cts.SupportedProfiles;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.test.suitebuilder.TestMethod;
@@ -33,7 +37,10 @@ import android.util.Log;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import junit.framework.AssertionFailedError;
@@ -59,11 +66,16 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
      */
     private static final String TAG = "InstrumentationCtsTestRunner";
 
+    private static final String ARGUMENT_PROFILE = "profile";
+
+    /** Profile of the device being tested or null to run all tests regardless of profile. */
+    private Profile mProfile;
+
     /**
      * True if (and only if) we are running in single-test mode (as opposed to
      * batch mode).
      */
-    private boolean singleTest = false;
+    private boolean mSingleTest = false;
 
     @Override
     public void onCreate(Bundle arguments) {
@@ -84,7 +96,16 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
 
         if (arguments != null) {
             String classArg = arguments.getString(ARGUMENT_TEST_CLASS);
-            singleTest = classArg != null && classArg.contains("#");
+            mSingleTest = classArg != null && classArg.contains("#");
+
+            String profileArg = arguments.getString(ARGUMENT_PROFILE);
+            if (profileArg != null) {
+                mProfile = Profile.valueOf(profileArg.toUpperCase());
+            } else {
+                mProfile = Profile.ALL;
+            }
+        } else {
+            mProfile = Profile.ALL;
         }
 
         // attempt to disable keyguard,  if current test has permission to do so
@@ -219,14 +240,74 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     List<Predicate<TestMethod>> getBuilderRequirements() {
         List<Predicate<TestMethod>> builderRequirements =
                 super.getBuilderRequirements();
+
         Predicate<TestMethod> brokenTestPredicate =
                 Predicates.not(new HasAnnotation(BrokenTest.class));
         builderRequirements.add(brokenTestPredicate);
-        if (!singleTest) {
+
+        builderRequirements.add(getProfilePredicate(mProfile));
+        builderRequirements.add(getFeaturePredicate());
+
+        if (!mSingleTest) {
             Predicate<TestMethod> sideEffectPredicate =
                     Predicates.not(new HasAnnotation(SideEffect.class));
             builderRequirements.add(sideEffectPredicate);
         }
         return builderRequirements;
+    }
+
+    private Predicate<TestMethod> getProfilePredicate(final Profile specifiedProfile) {
+        return new Predicate<TestMethod>() {
+            public boolean apply(TestMethod t) {
+                Set<Profile> profiles = new HashSet<Profile>();
+                add(profiles, t.getAnnotation(SupportedProfiles.class));
+                add(profiles, t.getEnclosingClass().getAnnotation(SupportedProfiles.class));
+
+                /*
+                 * Run the test if any of the following conditions are met:
+                 *
+                 * 1. No profile for the device was specified. This means run all tests.
+                 * 2. Specified profile is the ALL profile. This also means run all tests.
+                 * 3. The test does not require a specific type of profile.
+                 * 4. The test specifies that all profiles are supported by the test.
+                 * 5. The test requires a profile which matches the specified profile.
+                 */
+                return specifiedProfile == null
+                        || specifiedProfile == Profile.ALL
+                        || profiles.isEmpty()
+                        || profiles.contains(Profile.ALL)
+                        || profiles.contains(specifiedProfile);
+            }
+
+            private void add(Set<Profile> profiles, SupportedProfiles annotation) {
+                if (annotation != null) {
+                    Collections.addAll(profiles, annotation.value());
+                }
+            }
+        };
+    }
+
+    private Predicate<TestMethod> getFeaturePredicate() {
+        return new Predicate<TestMethod>() {
+            public boolean apply(TestMethod t) {
+                Set<String> features = new HashSet<String>();
+                add(features, t.getAnnotation(RequiredFeatures.class));
+                add(features, t.getEnclosingClass().getAnnotation(RequiredFeatures.class));
+
+                // Run the test only if the device supports all the features.
+                PackageManager packageManager = getContext().getPackageManager();
+                FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
+                for (FeatureInfo featureInfo : featureInfos) {
+                    features.remove(featureInfo.name);
+                }
+                return features.isEmpty();
+            }
+
+            private void add(Set<String> features, RequiredFeatures annotation) {
+                if (annotation != null) {
+                    Collections.addAll(features, annotation.value());
+                }
+            }
+        };
     }
 }
