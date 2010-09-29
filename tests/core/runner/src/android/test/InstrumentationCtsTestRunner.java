@@ -297,8 +297,10 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 // Run the test only if the device supports all the features.
                 PackageManager packageManager = getContext().getPackageManager();
                 FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
-                for (FeatureInfo featureInfo : featureInfos) {
-                    features.remove(featureInfo.name);
+                if (featureInfos != null) {
+                    for (FeatureInfo featureInfo : featureInfos) {
+                        features.remove(featureInfo.name);
+                    }
                 }
                 return features.isEmpty();
             }
