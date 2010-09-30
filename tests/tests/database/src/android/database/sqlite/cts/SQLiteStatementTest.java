@@ -43,7 +43,7 @@ public class SQLiteStatementTest extends AndroidTestCase {
 
     private static final byte[][] BLOBS = new byte [][] {
         parseBlob("86FADCF1A820666AEBD0789F47932151A2EF734269E8AC4E39630AB60519DFD8"),
-        new byte[0],
+        new byte[1],
         null,
         parseBlob("00"),
         parseBlob("FF"),
