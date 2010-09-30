@@ -16,6 +16,14 @@
 
 package com.android.cts;
 
+import com.android.cts.HostConfig.CaseRepository;
+import com.android.cts.HostConfig.PlanRepository;
+import com.android.ddmlib.AndroidDebugBridge;
+
+import org.xml.sax.SAXException;
+
+import android.annotation.cts.Profile;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,12 +38,6 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.xml.sax.SAXException;
-
-import com.android.cts.HostConfig.CaseRepository;
-import com.android.cts.HostConfig.PlanRepository;
-import com.android.ddmlib.AndroidDebugBridge;
 
 /**
  * Act as the host for the device connections, also provides management of
@@ -135,8 +137,9 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * Start zipped package.
      *
      * @param pathName  The path name of the zipped package.
+     * @param profile  The profile of the device being tested.
      */
-    public void startZippedPackage(final String pathName)
+    public void startZippedPackage(final String pathName, Profile profile)
                 throws FileNotFoundException,
                        IOException,
                        ParserConfigurationException,
@@ -168,7 +171,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
         // step 3: start the plan
         TestSession ts = startSession(TEMP_PLAN_NAME, getFirstAvailableDevice().getSerialNumber(),
-                null);
+                null, profile);
 
         // step 4: copy the resulting zip file
         String resultName = pathName.substring(0, pathName.lastIndexOf("."))
@@ -445,8 +448,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * @param type The action type to activate the test session.
      */
     static private void runTest(final TestSession ts, final String deviceId,
-            final String testFullName, final String javaPkgName, ActionType type) throws
-            DeviceNotAvailableException, TestNotFoundException, IllegalTestNameException,
+            final String testFullName, final String javaPkgName, ActionType type)
+            throws DeviceNotAvailableException, TestNotFoundException, IllegalTestNameException,
             DeviceDisconnectedException, InvalidNameSpaceException,
             InvalidApkPathException {
 
@@ -509,12 +512,12 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * @param testPlanName the name of the specified test plan
      * @return a {@link TestSession}
      */
-    static public TestSession createSession(final String testPlanName)
+    static public TestSession createSession(final String testPlanName, Profile profile)
             throws IOException, TestNotFoundException, SAXException,
             ParserConfigurationException, TestPlanNotFoundException, NoSuchAlgorithmException {
 
         String testPlanPath = sConfig.getPlanRepository().getPlanPath(testPlanName);
-        TestSession ts = TestSessionBuilder.getInstance().build(testPlanPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(testPlanPath, profile);
         sSessions.add(ts);
 
         return ts;
@@ -635,17 +638,18 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      *
      * @param testPlanName TestPlan config file name
      * @param deviceId Target device ID
+     * @param profile The profile of the device being tested.
      * @param javaPkgName The specific java package name to be run.
      */
     public TestSession startSession(final String testPlanName,
-            String deviceId, final String javaPkgName)
+            String deviceId, final String javaPkgName, Profile profile)
             throws IOException, DeviceNotAvailableException,
             TestNotFoundException, SAXException, ParserConfigurationException,
             TestPlanNotFoundException, IllegalTestNameException,
             DeviceDisconnectedException, NoSuchAlgorithmException,
             InvalidNameSpaceException, InvalidApkPathException {
 
-        TestSession ts = createSession(testPlanName);
+        TestSession ts = createSession(testPlanName, profile);
         if ((javaPkgName != null) && (javaPkgName.length() != 0)) {
             runTest(ts, deviceId, null, javaPkgName, ActionType.RUN_SINGLE_JAVA_PACKAGE);
         } else {

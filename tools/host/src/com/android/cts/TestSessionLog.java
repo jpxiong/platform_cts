@@ -22,6 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 
+import android.annotation.cts.Profile;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,11 +48,12 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.5";
+    private static final String CTS_RESULT_FILE_VERSION = "1.6";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
     static final String ATTRIBUTE_TESTPLAN = "testPlan";
+    static final String ATTRIBUTE_PROFILE = "profile";
     static final String ATTRIBUTE_RESOLUTION = "resolution";
     static final String ATTRIBUTE_SUBSCRIBER_ID = "subscriberId";
     static final String ATTRIBUTE_DEVICE_ID = "deviceID";
@@ -107,14 +110,17 @@ public class TestSessionLog extends XMLResourceHandler {
     private String mResultPath;
     private String mResultDir;
     private String mTestPlanName;
+    private Profile mProfile;
 
     private ArrayList<DeviceParameterCollector> mDeviceParameterBase;
 
-    public TestSessionLog(final Collection<TestPackage> packages, final String testPlanName) {
+    public TestSessionLog(final Collection<TestPackage> packages, final String testPlanName,
+            final Profile profile) {
         mTestPackages = packages;
 
         mDeviceParameterBase = new ArrayList<TestDevice.DeviceParameterCollector>();
         mTestPlanName = testPlanName;
+        mProfile = profile;
 
         mSessionStartTime = new Date();
         mSessionEndTime = new Date();
@@ -127,6 +133,15 @@ public class TestSessionLog extends XMLResourceHandler {
      */
     public String getTestPlanName() {
         return mTestPlanName;
+    }
+
+    /**
+     * Get the profile.
+     *
+     * @return The profile
+     */
+    public Profile getProfile() {
+        return mProfile;
     }
 
     /**
@@ -284,6 +299,7 @@ public class TestSessionLog extends XMLResourceHandler {
             setAttribute(doc, root, ATTRIBUTE_STARTTIME, HostUtils.dateToString(mSessionStartTime));
             setAttribute(doc, root, ATTRIBUTE_ENDTIME, HostUtils.dateToString(mSessionEndTime));
             setAttribute(doc, root, ATTRIBUTE_TESTPLAN, mTestPlanName);
+            setAttribute(doc, root, ATTRIBUTE_PROFILE, mProfile.name());
 
             // set device information
             for (int i = 0; i < mDeviceParameterBase.size(); i ++) {

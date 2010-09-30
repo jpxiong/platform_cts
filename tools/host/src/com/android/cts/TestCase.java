@@ -16,6 +16,8 @@
 
 package com.android.cts;
 
+import android.annotation.cts.Profile;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -190,15 +192,16 @@ public class TestCase implements DeviceObserver {
      * Run the test case over device given.
      *
      * @param device The device to run the test case over.
+     * @param profile The profile of the device being tested.
      */
-    public void run(final TestDevice device) throws DeviceDisconnectedException,
+    public void run(final TestDevice device, Profile profile) throws DeviceDisconnectedException,
             ADBServerNeedRestartException {
         mTestStop = false;
         Iterator<Test> tests = getTests().iterator();
         while (tests.hasNext() && (!mTestStop)) {
             mCurrentTest = tests.next();
             if (mCurrentTest.getResult().isNotExecuted()) {
-                mCurrentTest.run(device);
+                mCurrentTest.run(device, profile);
             }
         }
     }
@@ -208,12 +211,13 @@ public class TestCase implements DeviceObserver {
      *
      * @param device The device to run the test over.
      * @param test The specific test to be run.
+     * @param profile The profile of the device being tested.
      */
-    public void run(final TestDevice device, final Test test)
+    public void run(final TestDevice device, final Test test, Profile profile)
             throws DeviceDisconnectedException, ADBServerNeedRestartException {
         mTestStop = false;
         mCurrentTest = test;
-        mCurrentTest.run(device);
+        mCurrentTest.run(device, profile);
     }
 
     /** {@inheritDoc} */

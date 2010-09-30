@@ -18,9 +18,6 @@ ifeq ($(BUILD_CTSCORE_PACKAGE),)
     $(error BUILD_CTSCORE_PACKAGE must be defined)
 endif
 
-#
-# Annotation Tests
-##########################################################
 include $(CLEAR_VARS)
 
 # include this package in the tests target for continuous testing

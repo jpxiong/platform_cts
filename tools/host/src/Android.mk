@@ -21,7 +21,7 @@ LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_JAR_MANIFEST := ../etc/manifest.txt
 LOCAL_JAVA_LIBRARIES := \
-    ddmlib-prebuilt junit hosttestlib
+    ddmlib-prebuilt junit hosttestlib CtsTestAnnotationsHostLib
 
 LOCAL_MODULE := cts
 

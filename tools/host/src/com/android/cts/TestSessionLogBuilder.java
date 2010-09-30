@@ -30,6 +30,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import android.annotation.cts.Profile;
+
 /**
  * Builder of test session from the test result XML file.
  */
@@ -90,7 +92,10 @@ public class TestSessionLogBuilder extends XMLResourceHandler {
         String start = getStringAttributeValue(resultNode, TestSessionLog.ATTRIBUTE_STARTTIME);
         String end = getStringAttributeValue(resultNode, TestSessionLog.ATTRIBUTE_ENDTIME);
         String planFilePath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
-        TestSession sessionFromPlan = TestSessionBuilder.getInstance().build(planFilePath);
+        String profileOption = getStringAttributeValue(resultNode,
+                TestSessionLog.ATTRIBUTE_PROFILE);
+        Profile profile = Profile.valueOf(profileOption);
+        TestSession sessionFromPlan = TestSessionBuilder.getInstance().build(planFilePath, profile);
 
         NodeList pkgList = resultNode.getChildNodes();
         for (int i = 0; i < pkgList.getLength(); i++) {
@@ -124,7 +129,7 @@ public class TestSessionLogBuilder extends XMLResourceHandler {
             }
         }
 
-        TestSessionLog log = new TestSessionLog(pkgsFromPlan, planName);
+        TestSessionLog log = new TestSessionLog(pkgsFromPlan, planName, profile);
         try {
             log.setStartTime(HostUtils.dateFromString(start).getTime());
             log.setEndTime(HostUtils.dateFromString(end).getTime());
