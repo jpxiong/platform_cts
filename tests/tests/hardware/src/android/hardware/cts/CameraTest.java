@@ -37,6 +37,7 @@ import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.MoreAsserts;
 import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
@@ -46,6 +47,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -1334,6 +1337,165 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             camera.setPreviewCallback(null);
             mPreviewCallbackResult = true;
             mPreviewDone.open();
+        }
+    }
+
+    public void testPreviewFpsRange() throws Exception {
+        initializeMessageLooper();
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.startPreview();
+
+        // Test if the parameters exists and minimum fps <= maximum fps.
+        int[] defaultFps = new int[2];
+        Parameters parameters = mCamera.getParameters();
+        parameters.getPreviewFpsRange(defaultFps);
+        List<int[]> fpsList = parameters.getSupportedPreviewFpsRange();
+        assertTrue(fpsList.size() > 0);
+        boolean found = false;
+        for(int[] fps: fpsList) {
+            assertTrue(fps[Parameters.PREVIEW_FPS_MIN_INDEX] > 0);
+            assertTrue(fps[Parameters.PREVIEW_FPS_MIN_INDEX] <=
+                       fps[Parameters.PREVIEW_FPS_MAX_INDEX]);
+            if (!found && Arrays.equals(defaultFps, fps)) {
+                found = true;
+            }
+        }
+        assertTrue("Preview fps range must be in the supported list.", found);
+
+        // Test if the list is properly sorted.
+        for (int i = 0; i < fpsList.size() - 1; i++) {
+            int minFps1 = fpsList.get(i)[Parameters.PREVIEW_FPS_MIN_INDEX];
+            int maxFps1 = fpsList.get(i)[Parameters.PREVIEW_FPS_MAX_INDEX];
+            int minFps2 = fpsList.get(i + 1)[Parameters.PREVIEW_FPS_MIN_INDEX];
+            int maxFps2 = fpsList.get(i + 1)[Parameters.PREVIEW_FPS_MAX_INDEX];
+            assertTrue(maxFps1 < maxFps2
+                    || (maxFps1 == maxFps2 && minFps1 < minFps2));
+        }
+
+        // Test if the actual fps is within fps range.
+        Size size = parameters.getPreviewSize();
+        byte[] buffer1 = new byte[size.width * size.height * 3 / 2];
+        byte[] buffer2 = new byte[size.width * size.height * 3 / 2];
+        byte[] buffer3 = new byte[size.width * size.height * 3 / 2];
+        FpsRangePreviewCb callback = new FpsRangePreviewCb();
+        int[] readBackFps = new int[2];
+        for (int[] fps: fpsList) {
+            parameters = mCamera.getParameters();
+            parameters.setPreviewFpsRange(fps[Parameters.PREVIEW_FPS_MIN_INDEX],
+                                          fps[Parameters.PREVIEW_FPS_MAX_INDEX]);
+            callback.reset(fps[Parameters.PREVIEW_FPS_MIN_INDEX] / 1000.0,
+                           fps[Parameters.PREVIEW_FPS_MAX_INDEX] / 1000.0);
+            mCamera.setParameters(parameters);
+            parameters = mCamera.getParameters();
+            parameters.getPreviewFpsRange(readBackFps);
+            MoreAsserts.assertEquals(fps, readBackFps);
+            mCamera.addCallbackBuffer(buffer1);
+            mCamera.addCallbackBuffer(buffer2);
+            mCamera.addCallbackBuffer(buffer3);
+            mCamera.setPreviewCallbackWithBuffer(callback);
+            mCamera.startPreview();
+            try {
+                // Test the frame rate for a while.
+                Thread.sleep(3000);
+            } catch(Exception e) {
+                // ignore
+            }
+            mCamera.stopPreview();
+        }
+
+        // Test the invalid fps cases.
+        parameters = mCamera.getParameters();
+        parameters.setPreviewFpsRange(-1, -1);
+        try {
+            mCamera.setParameters(parameters);
+            fail("Should throw an exception if fps range is negative.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+        parameters.setPreviewFpsRange(10, 5);
+        try {
+            mCamera.setParameters(parameters);
+            fail("Should throw an exception if fps range is invalid.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+
+        terminateMessageLooper();
+    }
+
+    private final class FpsRangePreviewCb
+            implements android.hardware.Camera.PreviewCallback {
+        private double mMinFps, mMaxFps, mMaxFrameInterval, mMinFrameInterval;
+        // An array storing the arrival time of the frames in the last second.
+        private ArrayList<Long> mFrames = new ArrayList<Long>();
+        private long firstFrameArrivalTime;
+
+        public void reset(double minFps, double maxFps) {
+            this.mMinFps = minFps;
+            this.mMaxFps = maxFps;
+            mMaxFrameInterval = 1000.0 / mMinFps;
+            mMinFrameInterval = 1000.0 / mMaxFps;
+            Log.v(TAG, "Min fps=" + mMinFps + ". Max fps=" + mMaxFps
+                    + ". Min frame interval=" + mMinFrameInterval
+                    + ". Max frame interval=" + mMaxFrameInterval);
+            mFrames.clear();
+            firstFrameArrivalTime = 0;
+        }
+
+        // This method tests if the actual fps is between minimum and maximum.
+        // It also tests if the frame interval is too long.
+        public void onPreviewFrame(byte[] data, android.hardware.Camera camera) {
+            long arrivalTime = System.currentTimeMillis();
+            camera.addCallbackBuffer(data);
+            if (firstFrameArrivalTime == 0) firstFrameArrivalTime = arrivalTime;
+
+            // Remove the frames that arrived before the last second.
+            Iterator<Long> it = mFrames.iterator();
+            while(it.hasNext()) {
+                long time = it.next();
+                if (arrivalTime - time > 1000 && mFrames.size() > 1) {
+                    it.remove();
+                } else {
+                    break;
+                }
+            }
+
+            // Start the test after one second.
+            if (arrivalTime - firstFrameArrivalTime > 1000) {
+                assertTrue(mFrames.size() >= 2);
+
+                // Check the frame interval and fps. The interval check
+                // considers the time variance passing frames from the camera
+                // hardware to the callback. It should be a constant time, not a
+                // ratio. The fps check is more strict because individual
+                // variance is averaged out.
+
+                // Check if the frame interval is too large or too small.
+                double intervalMargin = 30;  // ms
+                long lastArrivalTime = mFrames.get(mFrames.size() - 1);
+                double interval = arrivalTime - lastArrivalTime;
+                if (LOGV) Log.v(TAG, "Frame interval=" + interval);
+                assertTrue("Frame interval (" + interval + "ms) is too large." +
+                        " mMaxFrameInterval=" + mMaxFrameInterval + "ms",
+                        interval < mMaxFrameInterval + intervalMargin);
+                assertTrue("Frame interval (" + interval + "ms) is too small." +
+                        " mMinFrameInterval=" + mMinFrameInterval + "ms",
+                        interval > mMinFrameInterval - intervalMargin);
+
+                // Check if the fps is within range.
+                double fpsMargin = 0.03;
+                double avgInterval = (double)(arrivalTime - mFrames.get(0))
+                        / mFrames.size();
+                double fps = 1000.0 / avgInterval;
+                assertTrue("Actual fps (" + fps + ") should be larger than " +
+                           "min fps (" + mMinFps + ")",
+                           fps >= mMinFps * (1 - fpsMargin));
+                assertTrue("Actual fps (" + fps + ") should be smaller than " +
+                           "max fps (" + mMaxFps + ")",
+                           fps <= mMaxFps * (1 + fpsMargin));
+            }
+            // Add the arrival time of this frame to the list.
+            mFrames.add(arrivalTime);
         }
     }
 
