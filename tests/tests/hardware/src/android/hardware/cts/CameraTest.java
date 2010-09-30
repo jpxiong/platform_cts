@@ -505,7 +505,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         )
     })
     @UiThreadTest
-    public void testAccessParameters() throws Exception {
+    public void testParameters() throws Exception {
         initializeMessageLooper();
         // we can get parameters just by getxxx method due to the private constructor
         Parameters pSet = mCamera.getParameters();
@@ -601,6 +601,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         if (parameters.getSupportedFlashModes() != null) {
             assertNotNull(parameters.getFlashMode());
         }
+
+        // Check if the sizes value contain invalid characters.
+        assertNoLetters(parameters.get("preview-size-values"), "preview-size-values");
+        assertNoLetters(parameters.get("picture-size-values"), "picture-size-values");
+        assertNoLetters(parameters.get("jpeg-thumbnail-size-values"),
+                "jpeg-thumbnail-size-values");
 
         // Set the parameters.
         parameters.setPictureFormat(PICTURE_FORMAT);
@@ -1274,8 +1280,74 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
+    @UiThreadTest
+    public void testPreviewPictureSizesCombination() throws Exception {
+        initializeMessageLooper();
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        Parameters parameters = mCamera.getParameters();
+        PreviewCbForPreviewPictureSizesCombination callback =
+            new PreviewCbForPreviewPictureSizesCombination();
+
+        // Test all combination of preview sizes and picture sizes.
+        for (Size previewSize: parameters.getSupportedPreviewSizes()) {
+            for (Size pictureSize: parameters.getSupportedPictureSizes()) {
+                Log.v(TAG, "Test previewSize=(" + previewSize.width + "," +
+                        previewSize.height + "pictureSize=(" + pictureSize.width
+                        + "," + pictureSize.height + ")");
+                mPreviewCallbackResult = false;
+                mCamera.setPreviewCallback(callback);
+                callback.expectedPreviewSize = previewSize;
+                parameters.setPreviewSize(previewSize.width, previewSize.height);
+                parameters.setPictureSize(pictureSize.width, pictureSize.height);
+                mCamera.setParameters(parameters);
+                assertEquals(previewSize, mCamera.getParameters().getPreviewSize());
+                assertEquals(pictureSize, mCamera.getParameters().getPictureSize());
+
+                // Check if the preview size is the same as requested.
+                mCamera.startPreview();
+                waitForPreviewDone();
+                assertTrue(mPreviewCallbackResult);
+
+                // Check if the picture size is the same as requested.
+                mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+                waitForSnapshotDone();
+                assertTrue(mJpegPictureCallbackResult);
+                assertNotNull(mJpegData);
+                Bitmap b = BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length);
+                assertEquals(pictureSize.width, b.getWidth());
+                assertEquals(pictureSize.height, b.getHeight());
+                b.recycle();
+                b = null;
+            }
+        }
+        terminateMessageLooper();
+    }
+
+    private final class PreviewCbForPreviewPictureSizesCombination
+            implements android.hardware.Camera.PreviewCallback {
+        public Size expectedPreviewSize;
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            assertNotNull(data);
+            Size size = camera.getParameters().getPreviewSize();
+            assertEquals(expectedPreviewSize, size);
+            assertEquals(size.width * size.height * 3 / 2, data.length);
+            camera.setPreviewCallback(null);
+            mPreviewCallbackResult = true;
+            mPreviewDone.open();
+        }
+    }
+
     private void assertEquals(Size expected, Size actual) {
         assertEquals(expected.width, actual.width);
         assertEquals(expected.height, actual.height);
+    }
+
+    private void assertNoLetters(String value, String key) {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            assertFalse("Parameter contains invalid characters. key,value=("
+                    + key + "," + value + ")",
+                    Character.isLetter(c) && c != 'x');
+        }
     }
 }
