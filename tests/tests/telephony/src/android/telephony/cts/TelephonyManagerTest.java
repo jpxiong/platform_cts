@@ -24,6 +24,7 @@ import dalvik.annotation.TestTargets;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Looper;
 import android.os.cts.TestThread;
 import android.telephony.CellLocation;
