@@ -17,7 +17,7 @@
 
 CTS_SH=cts
 CTS_LIB=cts.jar
-DDMS_LIB=ddmlib.jar
+DDMS_LIB=ddmlib-prebuilt.jar
 JUNIT_LIB=junit.jar
 HOSTTEST_LIB=hosttestlib.jar
 CTS_TEST_ANNOTATIONS_HOST_LIB=CtsTestAnnotationsHostLib.jar
@@ -38,15 +38,13 @@ if [ -f ${ANDROID_ROOT}/tools/${ADB_TOOLS} ]; then
     BINARY_DIR=tools
     JAR_DIR=tools/lib
 else if [ ! -f ${ANDROID_ROOT}/bin/${ADB_TOOLS} ]; then
-    echo "Please set your Android Framework root path."
-    echo "Define \"ANDROID_ROOT\" variable"
+    echo "Missing ${ANDROID_ROOT}/bin/${ADB_TOOLS}"
     exit -1;
 fi;
 fi;
 
 if [ ! -f ${ANDROID_ROOT}/${JAR_DIR}/${DDMS_LIB} ]; then
-    echo "Please set your Android Framework root path."
-    echo "Define \"ANDROID_ROOT\" variable"
+    echo "Missing ${ANDROID_ROOT}/${JAR_DIR}/${DDMS_LIB}"
     exit -1;
 fi;
 
