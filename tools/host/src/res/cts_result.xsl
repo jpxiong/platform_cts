@@ -302,6 +302,12 @@
                                         </TD>
                                     </TR>
                                     <TR>
+                                        <TD class="rowtitle">Tests Omitted</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/Summary/@omitted"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
                                         <TD class="rowtitle">Tests Not Executed</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/Summary/@notExecuted"/>
@@ -453,6 +459,15 @@
                                                     </div>
                                                 <TD class="failuredetails"></TD>
                                                 </TD>
+                                            </xsl:if>
+
+                                            <xsl:if test="@result='omitted'">
+                                                <TD class="omitted">
+                                                    <div style="text-align: center; margin-left:auto; margin-right:auto;">
+                                                        <xsl:value-of select="@result"/>
+                                                    </div>
+                                                </TD>
+                                                <TD class="failuredetails"></TD>
                                             </xsl:if>
 
                                             <xsl:if test="@result='notExecuted'">
