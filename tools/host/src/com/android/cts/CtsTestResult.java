@@ -37,12 +37,14 @@ public class CtsTestResult {
     public static final int CODE_FAIL = 2;
     public static final int CODE_ERROR = 3;
     public static final int CODE_TIMEOUT = 4;
+    public static final int CODE_OMITTED = 5;
     public static final int CODE_FIRST = CODE_INIT;
-    public static final int CODE_LAST = CODE_TIMEOUT;
+    public static final int CODE_LAST = CODE_OMITTED;
 
     public static final String STR_ERROR = "error";
     public static final String STR_TIMEOUT = "timeout";
     public static final String STR_NOT_EXECUTED = "notExecuted";
+    public static final String STR_OMITTED = "omitted";
     public static final String STR_FAIL = "fail";
     public static final String STR_PASS = "pass";
 
@@ -55,6 +57,7 @@ public class CtsTestResult {
         sCodeToResultMap.put(CODE_FAIL, STR_FAIL);
         sCodeToResultMap.put(CODE_ERROR, STR_ERROR);
         sCodeToResultMap.put(CODE_TIMEOUT, STR_TIMEOUT);
+        sCodeToResultMap.put(CODE_OMITTED, STR_OMITTED);
         sResultToCodeMap = new HashMap<String, Integer>();
         for (int code : sCodeToResultMap.keySet()) {
             sResultToCodeMap.put(sCodeToResultMap.get(code), code);

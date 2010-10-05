@@ -175,13 +175,7 @@ td.pass {
     margin-right:auto;
 }
 
-td.timeout {
-    background-color: #A5C639;
-    vertical-align: top;
-    text-align: center;
-}
-
-td.notExecuted {
+td.timeout, td.omitted, td.notExecuted {
     background-color: #A5C639;
     vertical-align: top;
     text-align: center;
