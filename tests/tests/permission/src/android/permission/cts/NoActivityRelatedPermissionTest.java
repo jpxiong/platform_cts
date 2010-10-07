@@ -91,22 +91,6 @@ public class NoActivityRelatedPermissionTest
     }
 
     /**
-     * Verify that setting Activity's persistent attribute requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#PERSISTENT_ACTIVITY}.
-     */
-    @UiThreadTest
-    @MediumTest
-    public void testSetPersistent() {
-        try {
-            mActivity.setPersistent(true);
-            fail("Activity.setPersistent() did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // Expected
-        }
-    }
-
-    /**
      * Verify that get task requires permissions.
      * <p>Requires Permission:
      *   {@link android.Manifest.permission#GET_TASKS}
