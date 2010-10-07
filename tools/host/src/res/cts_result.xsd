@@ -16,8 +16,8 @@
  -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://compatibility.android.com/cts_result/1.2"
-           xmlns="http://compatibility.android.com/cts_result/1.2"
+           targetNamespace="http://compatibility.android.com/cts_result/1.7"
+           xmlns="http://compatibility.android.com/cts_result/1.7"
            elementFormDefault="qualified">
 
 <xs:element name="TestResult">
@@ -25,6 +25,8 @@
     <xs:sequence>
       <xs:element name="DeviceInfo" type="deviceInfoType"/>
       <xs:element name="HostInfo" type="hostInfoType"/>
+      <xs:element name="FeatureInfo" type="featureInfoType"/>
+      <xs:element name="ProcessInfo" type="processInfoType"/>
       <xs:element name="Summary" type="summaryType"/>
       <xs:element name="TestPackage" type="testPackageType" maxOccurs="unbounded" minOccurs="1"/>
     </xs:sequence>
@@ -32,6 +34,7 @@
     <xs:attribute name="endtime" type="xs:string"/>
     <xs:attribute name="testPlan" type="xs:string"/>
     <xs:attribute name="version" type="xs:string"/>
+    <xs:attribute name="profile" type="xs:string"/>
   </xs:complexType>
 </xs:element>
 
@@ -69,6 +72,9 @@
         <xs:attribute name="navigation" type="xs:string"/>
         <xs:attribute name="network" type="xs:string"/>
         <xs:attribute name="touch" type="xs:string"/>
+        <xs:attribute name="openGlEsVersion" type="xs:string"/>
+        <xs:attribute name="build_abi" type="xs:string"/>
+        <xs:attribute name="build_abi2" type="xs:string"/>
       </xs:complexType>
     </xs:element>
   </xs:sequence>
@@ -106,11 +112,35 @@
   <xs:attribute name="name" type="xs:string"/>
 </xs:complexType>
 
+<xs:complexType name="featureInfoType">
+    <xs:sequence>
+        <xs:element name="Feature" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="type" type="xs:string" />
+                <xs:attribute name="available" type="xs:string" />
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="processInfoType">
+    <xs:sequence>
+        <xs:element name="Process" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="uid" type="xs:integer" />
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="summaryType">
   <xs:attribute name="failed" type="xs:integer"/>
   <xs:attribute name="notExecuted" type="xs:integer"/>
   <xs:attribute name="pass" type="xs:integer"/>
   <xs:attribute name="timeout" type="xs:integer"/>
+  <xs:attribute name="omitted" type="xs:integer"/>
 </xs:complexType>
 
 <xs:complexType name="testPackageType">
@@ -161,6 +191,7 @@
     <xs:enumeration value="fail"/>
     <xs:enumeration value="timeout"/>
     <xs:enumeration value="notExecuted"/>
+    <xs:enumeration value="omitted"/>
   </xs:restriction>
 </xs:simpleType>
 </xs:schema>
