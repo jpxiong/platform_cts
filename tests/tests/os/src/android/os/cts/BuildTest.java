@@ -107,7 +107,7 @@ public class BuildTest extends TestCase {
     }
 
     private static final Pattern DEVICE_PATTERN =
-        Pattern.compile("^([0-9a-z_]+)$");
+        Pattern.compile("^([0-9A-Za-z_-]+)$");
     private static final Pattern SERIAL_NUMBER_PATTERN =
         Pattern.compile("^([0-9A-Za-z]{0,20})$");
 
