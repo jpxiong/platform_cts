@@ -25,6 +25,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.app.QueuedWork;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
@@ -33,6 +34,9 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -263,4 +267,54 @@ public class SharedPreferencesTest extends AndroidTestCase {
             assertEquals(expectedMap, prefs.getAll());
         }
     }
+
+    // Checks that an in-memory commit doesn't mutate a data structure
+    // still being used while writing out to disk.
+    public void testTorture2() {
+        Random rand = new Random();
+
+        for (int fi = 0; fi < 100; fi++) {
+            String prefsName = "torture_" + fi;
+            SharedPreferences prefs = mContext.getSharedPreferences(prefsName, Context.MODE_PRIVATE);
+            prefs.edit().clear().commit();
+            Map<String, String> expectedMap = new HashMap<String, String>();
+
+            for (int applies = 0; applies < 3; applies++) {
+                SharedPreferences.Editor editor = prefs.edit();
+                for (int n = 0; n < 1000; n++) {
+                    String key = new Integer(rand.nextInt(25)).toString();
+                    String value = new Integer(n).toString();
+                    editor.putString(key, value);
+                    expectedMap.put(key, value);
+                }
+                editor.apply();
+            }
+            QueuedWork.waitToFinish();
+
+            String clonePrefsName = prefsName + "_clone";
+            File prefsFile = mContext.getSharedPrefsFile(prefsName);
+            File prefsFileClone = mContext.getSharedPrefsFile(clonePrefsName);
+            prefsFileClone.delete();
+            try {
+                FileOutputStream fos = new FileOutputStream(prefsFileClone);
+                FileInputStream fis = new FileInputStream(prefsFile);
+                byte buf[] = new byte[1024];
+                int n;
+                while ((n = fis.read(buf)) > 0) {
+                    fos.write(buf, 0, n);
+                }
+                fis.close();
+                fos.close();
+            } catch (IOException e) {
+            }
+
+            SharedPreferences clonePrefs = mContext.getSharedPreferences(
+                clonePrefsName, Context.MODE_PRIVATE);
+            assertEquals(expectedMap, clonePrefs.getAll());
+
+            prefsFile.delete();
+            prefsFileClone.delete();
+        }
+    }
+
 }
