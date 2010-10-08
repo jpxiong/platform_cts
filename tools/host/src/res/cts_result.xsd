@@ -25,8 +25,6 @@
     <xs:sequence>
       <xs:element name="DeviceInfo" type="deviceInfoType"/>
       <xs:element name="HostInfo" type="hostInfoType"/>
-      <xs:element name="FeatureInfo" type="featureInfoType"/>
-      <xs:element name="ProcessInfo" type="processInfoType"/>
       <xs:element name="Summary" type="summaryType"/>
       <xs:element name="TestPackage" type="testPackageType" maxOccurs="unbounded" minOccurs="1"/>
     </xs:sequence>
@@ -77,6 +75,8 @@
         <xs:attribute name="build_abi2" type="xs:string"/>
       </xs:complexType>
     </xs:element>
+    <xs:element name="FeatureInfo" type="featureInfoType"/>
+    <xs:element name="ProcessInfo" type="processInfoType"/>
   </xs:sequence>
 </xs:complexType>
 
