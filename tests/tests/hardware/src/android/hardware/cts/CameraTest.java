@@ -607,6 +607,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         float focalLength = parameters.getFocalLength();
         float horizontalViewAngle = parameters.getHorizontalViewAngle();
         float verticalViewAngle = parameters.getVerticalViewAngle();
+        int jpegQuality = parameters.getJpegQuality();
+        int jpegThumnailQuality = parameters.getJpegThumbnailQuality();
         assertTrue(previewSizes != null && previewSizes.size() != 0);
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
         assertTrue(previewFormats != null && previewFormats.size() != 0);
@@ -619,6 +621,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(verticalViewAngle > 0 && verticalViewAngle <= 360);
         Size previewSize = previewSizes.get(0);
         Size pictureSize = pictureSizes.get(0);
+        assertTrue(jpegQuality >= 1 && jpegQuality <= 100);
+        assertTrue(jpegThumnailQuality >= 1 && jpegThumnailQuality <= 100);
 
         // If a parameter is supported, both getXXX and getSupportedXXX have to
         // be non null.
