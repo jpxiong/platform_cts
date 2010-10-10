@@ -79,7 +79,6 @@ public class CtsSetup implements ITargetPreparer, IConfigurationReceiver {
             mConfiguration.injectOptionValue(PlanTest.TEST_PLANS_DIR_OPTION,
                     buildHelper.getTestPlansDir().getAbsolutePath());
             installCtsPrereqs(device, buildHelper);
-            gatherDeviceStats(device, buildHelper);
         } catch (FileNotFoundException e) {
             throw new TargetSetupError("Invalid CTS installation", e);
         } catch (ConfigurationException e) {
@@ -117,11 +116,5 @@ public class CtsSetup implements ITargetPreparer, IConfigurationReceiver {
             throws DeviceNotAvailableException, TargetSetupError, FileNotFoundException {
         installApk(device, ctsBuild.getTestApp(TEST_STUBS_APK));
         installApk(device, ctsBuild.getTestApp(RUNNER_APK_NAME));
-    }
-
-    private void gatherDeviceStats(ITestDevice device, CtsBuildHelper ctsBuild) {
-        // TODO: implement this
-        // install DeviceInfoCollector.apk, run its instrumentation, parse results, store them in
-        // the ctsBuild, then uninstall TestDeviceSetup.apk
     }
 }
