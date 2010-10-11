@@ -345,6 +345,7 @@ public class BaseInputConnectionTest extends
     public void testReportFullscreenMode() {
         InputMethodManager imManager = (InputMethodManager) mInstrumentation.getTargetContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
+        mConnection.reportFullscreenMode(false);
         assertFalse(imManager.isFullscreenMode());
         mConnection.reportFullscreenMode(true);
         assertTrue(imManager.isFullscreenMode());
