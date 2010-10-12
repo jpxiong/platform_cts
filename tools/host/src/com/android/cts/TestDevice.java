@@ -1673,7 +1673,8 @@ public class TestDevice implements DeviceObserver {
                 try {
                     mDevice.executeShellCommand(cmd, receiver);
                 } catch (IOException e) {
-                    Log.e("", e);
+                    Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
+                            mDevice.getSerialNumber()), e);
                 }
             }
         }.start();
