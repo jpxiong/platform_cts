@@ -40,7 +40,7 @@ public class TestSessionLogBuilderTests extends CtsTestBase {
             "<?xml-stylesheet type=\"text/xsl\"  href=\"cts_result.xsl\"?>\n" +
             "\n" +
             "<TestResult endtime=\"Wed Apr 29 10:36:47 CST 2009\" " +
-            "starttime=\"Wed Apr 29 10:36:30 CST 2009\" testPlan=\"location\" version=\"1.0\">\n" +
+            "starttime=\"Wed Apr 29 10:36:30 CST 2009\" testPlan=\"location\" version=\"1.0\" profile=\"ALL\">\n" +
             "  <DeviceInfo>\n" +
             "    <Screen resolution=\"480x320\"/>\n" +
             "    <PhoneSubInfo subscriberId=\"15555218135\"/>\n" +
