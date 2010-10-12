@@ -34,6 +34,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import android.annotation.cts.Profile;
+
 import com.android.cts.TestDevice.DeviceParameterCollector;
 
 /**
@@ -107,7 +109,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
         HostConfig.getInstance().loadTestPackages();
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -288,7 +290,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
         HostConfig.getInstance().loadTestPackages();
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -369,7 +371,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
         HostConfig.getInstance().loadTestPackages();
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -474,7 +476,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
         HostConfig.getInstance().loadTestPackages();
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -558,7 +560,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -640,7 +642,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -706,7 +708,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -787,7 +789,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -848,7 +850,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -923,7 +925,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -996,7 +998,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -1091,7 +1093,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -1172,7 +1174,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         createTestPackage(descriptionConfigStr, mTestPackageBinaryName);
         HostConfig.getInstance().loadTestPackages();
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(2, ts.getNumOfRequiredDevices());
 
         TestSessionLog tsl = ts.getSessionLog();
@@ -1201,7 +1203,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
      * Test serializing the test plan.
      */
     public void testSerialize() throws Exception {
-        final String srcStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        final String srcStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
             + "<TestPlan version=\"1.0\">\n"
             + "<PlanSettings/>\n"
             + "<Entry uri=\"com.google.android.cts.CtsTest\"/>\n"
@@ -1284,7 +1286,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         assertEquals(1, ts.getNumOfRequiredDevices());
 
         ts.getSessionLog().setStartTime(System.currentTimeMillis());
@@ -1423,7 +1425,7 @@ public class TestSessionBuilderTests extends CtsTestBase {
         String planPath = HostConfig.getInstance().getPlanRepository().getPlanPath(planName);
         TestSessionBuilder.getInstance().serialize(planName, packageNames, results);
 
-        TestSession ts = TestSessionBuilder.getInstance().build(planPath);
+        TestSession ts = TestSessionBuilder.getInstance().build(planPath, Profile.ALL);
         ts.getSessionLog().setStartTime(System.currentTimeMillis());
         TestSessionLog tsl = ts.getSessionLog();
         TestPackage testPackage = tsl.getTestPackages().iterator().next();
