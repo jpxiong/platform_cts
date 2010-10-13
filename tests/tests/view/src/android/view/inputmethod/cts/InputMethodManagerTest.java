@@ -164,9 +164,6 @@ public class InputMethodManagerTest
         connection.reportFullscreenMode(true);
         assertTrue(imManager.isFullscreenMode());
 
-        // Currently can't set this status, always false.
-        assertFalse(imManager.isWatchingCursor(view));
-
         IBinder token = view.getWindowToken();
 
         // Show and hide input method.
