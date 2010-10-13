@@ -220,7 +220,7 @@ public class DeviceManager implements IDeviceChangeListener {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                        Log.e("", e);
+                        Log.d("polling for device sync service interrupted");
                     }
                 }
                 CUIOutputStream.println("Device(" + mDevice + ") connected");

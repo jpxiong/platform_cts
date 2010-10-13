@@ -1689,13 +1689,17 @@ public class TestDevice implements DeviceObserver {
                 try {
                     mDevice.executeShellCommand(cmd, receiver);
                 } catch (IOException e) {
-                    Log.e("", e);
+                    Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
+                            mDevice.getSerialNumber()), e);
                 } catch (TimeoutException e) {
-                    Log.e("", e);
+                    Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
+                            mDevice.getSerialNumber()), e);
                 } catch (AdbCommandRejectedException e) {
-                    Log.e("", e);
+                    Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
+                            mDevice.getSerialNumber()), e);
                 } catch (ShellCommandUnresponsiveException e) {
-                    Log.e("", e);
+                    Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
+                            mDevice.getSerialNumber()), e);
                 }
             }
         }.start();
