@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
-    private static final String EXPECTED_RELEASE = "2.2";
+    private static final String EXPECTED_RELEASE = "2.2.1";
     private static final String EXPECTED_SDK = "8";
 
     public void testReleaseVersion() {
