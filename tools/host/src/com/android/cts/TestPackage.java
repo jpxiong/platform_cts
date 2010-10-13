@@ -641,7 +641,7 @@ public class TestPackage implements DeviceObserver {
             CUIOutputStream.println("Test stopped.");
             mTestThread.join();
         } catch (InterruptedException e) {
-            Log.e("", e);
+            Log.d("test thread interrupted");
         }
     }
 
@@ -753,14 +753,14 @@ public class TestPackage implements DeviceObserver {
                 try {
                     wait();
                 } catch (InterruptedException e) {
-                    Log.e("", e);
+                    Log.d("interrupted while waiting for package action complete");
                 }
             }
         }
         try {
             Thread.sleep(HostConfig.Ints.postInstallWaitMs.value());
         } catch (InterruptedException e) {
-            Log.e("", e);
+            Log.d("sleeping after package action complete interrupted");
         }
         Log.d("Leave waitPackageActionComplete()");
     }
