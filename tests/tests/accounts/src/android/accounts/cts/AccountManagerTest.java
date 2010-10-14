@@ -1171,14 +1171,14 @@ public class AccountManagerTest extends AndroidTestCase {
     public void testHasFeature()
             throws IOException, AuthenticatorException, OperationCanceledException {
 
-        testHasFeature(null /* handler */);
-        testHasFeature(new Handler());
+        assertHasFeature(null /* handler */);
+        assertHasFeature(new Handler());
 
-        testHasFeatureWithCallback(null /* handler */);
-        testHasFeatureWithCallback(new Handler());
+        assertHasFeatureWithCallback(null /* handler */);
+        assertHasFeatureWithCallback(new Handler());
     }
 
-    public void testHasFeature(Handler handler)
+    private void assertHasFeature(Handler handler)
             throws IOException, AuthenticatorException, OperationCanceledException {
         Bundle resultBundle = addAccount(am,
                 ACCOUNT_TYPE,
@@ -1269,7 +1269,7 @@ public class AccountManagerTest extends AndroidTestCase {
         }
     }
 
-    public void testHasFeatureWithCallback(Handler handler)
+    private void assertHasFeatureWithCallback(Handler handler)
             throws IOException, AuthenticatorException, OperationCanceledException {
         Bundle resultBundle = addAccount(am,
                 ACCOUNT_TYPE,
