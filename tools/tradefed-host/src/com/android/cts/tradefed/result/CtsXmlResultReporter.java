@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.result;
 
+import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.targetsetup.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
@@ -24,8 +25,8 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.result.TestResult.TestStatus;
+import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.targetsetup.IBuildInfo;
 import com.android.tradefed.targetsetup.IFolderBuildInfo;
 import com.android.tradefed.util.FileUtil;
@@ -38,8 +39,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +61,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
     private static final String TEST_RESULT_FILE_NAME = "testResult.xml";
     private static final String CTS_RESULT_FILE_VERSION = "2.0";
+    private static final String CTS_VERSION = "99";
+
 
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
@@ -74,7 +80,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
     private String mStartTime;
 
-    void setReportDir(File reportDir) {
+    public void setReportDir(File reportDir) {
         mReportDir = reportDir;
     }
 
@@ -138,8 +144,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             serializer.startDocument("UTF-8", false);
             serializer.setFeature(
                     "http://xmlpull.org/v1/doc/features.html#indent-output", true);
-            serializer.processingInstruction("xml-stylesheet type=\"text/xsl\"  href=\"cts_result.xsl\"");
-            printResultsDoc(serializer, startTimestamp, endTime);
+            serializer.processingInstruction("xml-stylesheet type=\"text/xsl\"  " +
+                    "href=\"cts_result.xsl\"");
+            serializeResultsDoc(serializer, startTimestamp, endTime);
             serializer.endDocument();
             // TODO: output not executed timeout omitted counts
             String msg = String.format("XML test result file generated at %s. Total tests %d, " +
@@ -168,7 +175,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param endTime the user-friendly ending time of the test invocation
      * @throws IOException
      */
-    private void printResultsDoc(KXmlSerializer serializer, String startTime, String endTime)
+    private void serializeResultsDoc(KXmlSerializer serializer, String startTime, String endTime)
             throws IOException {
         serializer.startTag(ns, "TestResult");
         // TODO: output test plan and profile values
@@ -178,10 +185,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
 
-        printDeviceInfo(serializer);
-        printHostInfo(serializer);
-        printTestSummary(serializer);
-        printTestResults(serializer);
+        serializeDeviceInfo(serializer);
+        serializeHostInfo(serializer);
+        serializeTestSummary(serializer);
+        serializeTestResults(serializer);
     }
 
     /**
@@ -189,8 +196,131 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      *
      * @param serializer
      */
-    private void printDeviceInfo(KXmlSerializer serializer) {
-        // TODO implement this
+    private void serializeDeviceInfo(KXmlSerializer serializer) throws IOException {
+        serializer.startTag(ns, "DeviceInfo");
+
+        TestRunResult deviceInfoResult = findRunResult(DeviceInfoCollector.APP_PACKAGE_NAME);
+        if (deviceInfoResult == null) {
+            Log.w(LOG_TAG, String.format("Could not find device info run %s",
+                    DeviceInfoCollector.APP_PACKAGE_NAME));
+            return;
+        }
+        // Extract metrics that need extra handling, and then dump the remainder into BuildInfo
+        Map<String, String> metricsCopy = new HashMap<String, String>(
+                deviceInfoResult.getRunMetrics());
+        serializer.startTag(ns, "Screen");
+        String screenWidth = metricsCopy.remove(DeviceInfoCollector.SCREEN_WIDTH);
+        String screenHeight = metricsCopy.remove(DeviceInfoCollector.SCREEN_HEIGHT);
+        serializer.attribute(ns, "resolution", String.format("%sx%s", screenWidth, screenHeight));
+        serializer.endTag(ns, "Screen");
+
+        serializer.startTag(ns, "PhoneSubInfo");
+        serializer.attribute(ns, "subscriberId", metricsCopy.remove(
+                DeviceInfoCollector.PHONE_NUMBER));
+        serializer.endTag(ns, "PhoneSubInfo");
+
+        String featureData = metricsCopy.remove(DeviceInfoCollector.FEATURES);
+        String processData = metricsCopy.remove(DeviceInfoCollector.PROCESSES);
+
+        // dump the remaining metrics without translation
+        serializer.startTag(ns, "BuildInfo");
+        for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
+            serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
+        }
+        serializer.endTag(ns, "BuildInfo");
+
+        serializeFeatureInfo(serializer, featureData);
+        serializeProcessInfo(serializer, processData);
+
+        serializer.endTag(ns, "DeviceInfo");
+    }
+
+    /**
+     * Prints XML indicating what features are supported by the device. It parses a string from the
+     * featureData argument that is in the form of "feature1:true;feature2:false;featuer3;true;"
+     * with a trailing semi-colon.
+     *
+     * <pre>
+     *  <FeatureInfo>
+     *     <Feature name="android.name.of.feature" available="true" />
+     *     ...
+     *   </FeatureInfo>
+     * </pre>
+     *
+     * @param serializer used to create XML
+     * @param featureData raw unparsed feature data
+     */
+    private void serializeFeatureInfo(KXmlSerializer serializer, String featureData) throws IOException {
+        serializer.startTag(ns, "FeatureInfo");
+
+        if (featureData == null) {
+            featureData = "";
+        }
+
+        String[] featurePairs = featureData.split(";");
+        for (String featurePair : featurePairs) {
+            String[] nameTypeAvailability = featurePair.split(":");
+            if (nameTypeAvailability.length >= 3) {
+                serializer.startTag(ns, "Feature");
+                serializer.attribute(ns, "name", nameTypeAvailability[0]);
+                serializer.attribute(ns, "type", nameTypeAvailability[1]);
+                serializer.attribute(ns, "available", nameTypeAvailability[2]);
+                serializer.endTag(ns, "Feature");
+            }
+        }
+        serializer.endTag(ns, "FeatureInfo");
+    }
+
+    /**
+     * Prints XML data indicating what particular processes of interest were running on the device.
+     * It parses a string from the rootProcesses argument that is in the form of
+     * "processName1;processName2;..." with a trailing semi-colon.
+     *
+     * <pre>
+     *   <ProcessInfo>
+     *     <Process name="long_cat_viewer" uid="0" />
+     *     ...
+     *   </ProcessInfo>
+     * </pre>
+     *
+     * @param document
+     * @param parentNode
+     * @param deviceInfo
+     */
+    private void serializeProcessInfo(KXmlSerializer serializer, String rootProcesses)
+            throws IOException {
+        serializer.startTag(ns, "ProcessInfo");
+
+        if (rootProcesses == null) {
+            rootProcesses = "";
+        }
+
+        String[] processNames = rootProcesses.split(";");
+        for (String processName : processNames) {
+            processName = processName.trim();
+            if (processName.length() > 0) {
+                serializer.startTag(ns, "Process");
+                serializer.attribute(ns, "name", processName);
+                serializer.attribute(ns, "uid", "0");
+                serializer.endTag(ns, "Process");
+            }
+        }
+        serializer.endTag(ns, "ProcessInfo");
+    }
+
+    /**
+     * Finds the {@link TestRunResult} with the given name.
+     *
+     * @param runName
+     * @return the {@link TestRunResult}
+     */
+    private TestRunResult findRunResult(String runName) {
+        for (TestRunResult runResult : getRunResults()) {
+            if (runResult.getName().equals(runName)) {
+                return runResult;
+            }
+        }
+        return null;
     }
 
     /**
@@ -198,8 +328,32 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      *
      * @param serializer
      */
-    private void printHostInfo(KXmlSerializer serializer) {
-        // TODO implement this
+    private void serializeHostInfo(KXmlSerializer serializer) throws IOException {
+        serializer.startTag(ns, "HostInfo");
+
+        String hostName = "";
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException ignored) {}
+        serializer.attribute(ns, "name", hostName);
+
+        serializer.startTag(ns, "Os");
+        serializer.attribute(ns, "name", System.getProperty("os.name"));
+        serializer.attribute(ns, "version", System.getProperty("os.version"));
+        serializer.attribute(ns, "arch", System.getProperty("os.arch"));
+        serializer.endTag(ns, "Os");
+
+        serializer.startTag(ns, "Java");
+        serializer.attribute(ns, "name", System.getProperty("java.vendor"));
+        serializer.attribute(ns, "version", System.getProperty("java.version"));
+        serializer.endTag(ns, "Java");
+
+        serializer.startTag(ns, "Cts");
+        serializer.attribute(ns, "version", CTS_VERSION);
+        // TODO: consider outputting tradefed options here
+        serializer.endTag(ns, "Cts");
+
+        serializer.endTag(ns, "HostInfo");
     }
 
     /**
@@ -208,7 +362,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param serializer
      * @throws IOException
      */
-    private void printTestSummary(KXmlSerializer serializer) throws IOException {
+    private void serializeTestSummary(KXmlSerializer serializer) throws IOException {
         serializer.startTag(ns, "Summary");
         serializer.attribute(ns, "failed", Integer.toString(getNumErrorTests() +
                 getNumFailedTests()));
@@ -227,9 +381,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param serializer
      * @throws IOException
      */
-    private void printTestResults(KXmlSerializer serializer) throws IOException {
+    private void serializeTestResults(KXmlSerializer serializer) throws IOException {
         for (TestRunResult runResult : getRunResults()) {
-            printTestRunResult(serializer, runResult);
+            serializeTestRunResult(serializer, runResult);
         }
     }
 
@@ -240,8 +394,12 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param runResult the {@link TestRunResult}
      * @throws IOException
      */
-    private void printTestRunResult(KXmlSerializer serializer, TestRunResult runResult)
+    private void serializeTestRunResult(KXmlSerializer serializer, TestRunResult runResult)
             throws IOException {
+        if (runResult.getName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+            // ignore run results for the info collecting packages
+            return;
+        }
         serializer.startTag(ns, "TestPackage");
         serializer.attribute(ns, "name", runResult.getName());
         serializer.attribute(ns, "runTime", formatElapsedTime(runResult.getElapsedTime()));
@@ -261,10 +419,11 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         Map<String, Map<TestIdentifier, TestResult>> classResultsMap = buildClassNameMap(
                 runResult.getTestResults());
 
-        for (Map.Entry<String, Map<TestIdentifier, TestResult>> resultsEntry : classResultsMap.entrySet()) {
+        for (Map.Entry<String, Map<TestIdentifier, TestResult>> resultsEntry :
+                classResultsMap.entrySet()) {
             serializer.startTag(ns, "TestCase");
             serializer.attribute(ns, "name", resultsEntry.getKey());
-            printTests(serializer, resultsEntry.getValue());
+            serializeTests(serializer, resultsEntry.getValue());
             serializer.endTag(ns, "TestCase");
         }
         serializer.endTag(ns, "TestPackage");
@@ -297,10 +456,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param results
      * @throws IOException
      */
-    private void printTests(KXmlSerializer serializer, Map<TestIdentifier, TestResult> results)
+    private void serializeTests(KXmlSerializer serializer, Map<TestIdentifier, TestResult> results)
             throws IOException {
         for (Map.Entry<TestIdentifier, TestResult> resultEntry : results.entrySet()) {
-            printTest(serializer, resultEntry.getKey(), resultEntry.getValue());
+            serializeTest(serializer, resultEntry.getKey(), resultEntry.getValue());
         }
     }
 
@@ -312,7 +471,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param result
      * @throws IOException
      */
-    private void printTest(KXmlSerializer serializer, TestIdentifier testId, TestResult result)
+    private void serializeTest(KXmlSerializer serializer, TestIdentifier testId, TestResult result)
             throws IOException {
         serializer.startTag(ns, "Test");
         serializer.attribute(ns, "name", testId.getTestName());
@@ -375,7 +534,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * Example: Fri Aug 20 15:13:03 PDT 2010
      */
     String getTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM DD HH:mm:ss x yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
         return dateFormat.format(new Date());
     }
 
@@ -385,7 +544,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * Example: 2010.08.16_11.42.12
      */
     private String getResultTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.DD_HH.mm.ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
         return dateFormat.format(new Date());
     }
 
