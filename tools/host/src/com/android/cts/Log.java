@@ -73,7 +73,7 @@ public class Log {
         if (!HostConfig.DEBUG) {
             CUIOutputStream.println(ERROR_PREFIX + msg);
             if (e != null) {
-                CUIOutputStream.println(e.getMessage());
+                CUIOutputStream.println(e.toString());
             }
             return;
         }
