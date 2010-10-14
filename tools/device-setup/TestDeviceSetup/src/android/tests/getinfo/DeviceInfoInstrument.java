@@ -40,7 +40,9 @@ public class DeviceInfoInstrument extends Instrumentation {
 
     private static final String TAG = "DeviceInfoInstrument";
 
-    private static final String OPEN_GL_ES_VERSION = "opengles_version";
+    // constants for device info attributes to be sent as instrumentation keys
+    // these values should correspond to attributes defined in cts_result.xsd
+    private static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
     private static final String PROCESSES = "processes";
     private static final String FEATURES = "features";
     private static final String PHONE_NUMBER = "phoneNumber";
@@ -50,26 +52,23 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static final String NETWORK = "network";
     public static final String KEYPAD = "keypad";
     public static final String NAVIGATION = "navigation";
-    public static final String TOUCH_SCREEN = "touch_screen";
-    private static final String SCREEN_Y_DENSITY = "screen_Y_density";
-    private static final String SCREEN_X_DENSITY = "screen_X_density";
-    private static final String SCREEN_DENSITY = "screen_density";
+    public static final String TOUCH_SCREEN = "touch";
+    private static final String SCREEN_Y_DENSITY = "Ydpi";
+    private static final String SCREEN_X_DENSITY = "Xdpi";
     private static final String SCREEN_HEIGHT = "screen_height";
     private static final String SCREEN_WIDTH = "screen_width";
-    private static final String VERSION_SDK = "version_sdk";
-    private static final String VERSION_RELEASE = "version_release";
-    private static final String VERSION_INCREMENTAL = "version_incremental";
+    private static final String VERSION_SDK = "androidPlatformVersion";
+    private static final String VERSION_RELEASE = "buildVersion";
     private static final String BUILD_ABI = "build_abi";
     private static final String BUILD_ABI2 = "build_abi2";
     private static final String BUILD_FINGERPRINT = "build_fingerprint";
-    private static final String BUILD_TAGS = "build_tags";
     private static final String BUILD_TYPE = "build_type";
     private static final String BUILD_MODEL = "build_model";
     private static final String BUILD_BRAND = "build_brand";
     private static final String BUILD_BOARD = "build_board";
     private static final String BUILD_DEVICE = "build_device";
-    private static final String PRODUCT_NAME = "product_name";
-    private static final String BUILD_ID = "build_id";
+    private static final String PRODUCT_NAME = "buildName";
+    private static final String BUILD_ID = "buildID";
     private static Bundle mResults = new Bundle();
 
     public DeviceInfoInstrument() {
@@ -91,12 +90,10 @@ public class DeviceInfoInstrument extends Instrumentation {
         addResult(BUILD_BRAND, Build.BRAND);
         addResult(BUILD_MODEL, Build.MODEL);
         addResult(BUILD_TYPE, Build.TYPE);
-        addResult(BUILD_TAGS, Build.TAGS);
         addResult(BUILD_FINGERPRINT, Build.FINGERPRINT);
         addResult(BUILD_ABI, Build.CPU_ABI);
         addResult(BUILD_ABI2, Build.CPU_ABI2);
 
-        addResult(VERSION_INCREMENTAL, Build.VERSION.INCREMENTAL);
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
         addResult(VERSION_SDK, Build.VERSION.SDK);
 
@@ -107,7 +104,6 @@ public class DeviceInfoInstrument extends Instrumentation {
         d.getMetrics(metrics);
         addResult(SCREEN_WIDTH, metrics.widthPixels);
         addResult(SCREEN_HEIGHT, metrics.heightPixels);
-        addResult(SCREEN_DENSITY, metrics.density);
         addResult(SCREEN_X_DENSITY, metrics.xdpi);
         addResult(SCREEN_Y_DENSITY, metrics.ydpi);
 
