@@ -403,9 +403,11 @@ public class TestDevice implements DeviceObserver {
      * Store the build information of a device
      */
     public static final class DeviceParameterCollector{
-        public static final String PRODUCT_NAME = "product_name";
-        public static final String BUILD_VERSION = "version_release";
-        public static final String BUILD_ID = "build_id";
+        // the device info keys expected to be sent from device info instrumentation
+        // these constants should match exactly with those defined in DeviceInfoInstrument.jaa
+        public static final String PRODUCT_NAME = "buildName";
+        public static final String BUILD_VERSION = "buildVersion";
+        public static final String BUILD_ID = "buildID";
         public static final String BUILD_FINGERPRINT = "build_fingerprint";
         public static final String BUILD_TAGS = "build_tags";
         public static final String BUILD_TYPE = "build_type";
@@ -417,13 +419,12 @@ public class TestDevice implements DeviceObserver {
         public static final String BUILD_ABI2 = "build_abi2";
         public static final String SCREEN_HEIGHT = "screen_height";
         public static final String SCREEN_WIDTH = "screen_width";
-        public static final String SCREEN_DENSITY = "screen_density";
         public static final String SERIAL_NUMBER = "serialNumber";
-        public static final String VERSION_SDK = "version_sdk";
+        public static final String VERSION_SDK = "androidPlatformVersion";
         public static final String LOCALES = "locales";
-        public static final String SCREEN_Y_DENSITY = "screen_Y_density";
-        public static final String SCREEN_X_DENSITY = "screen_X_density";
-        public static final String TOUCH_SCREEN = "touch_screen";
+        public static final String SCREEN_Y_DENSITY = "Ydpi";
+        public static final String SCREEN_X_DENSITY = "Xdpi";
+        public static final String TOUCH_SCREEN = "touch";
         public static final String NAVIGATION = "navigation";
         public static final String KEYPAD = "keypad";
         public static final String NETWORK = "network";
@@ -432,7 +433,7 @@ public class TestDevice implements DeviceObserver {
         public static final String PHONE_NUMBER = "phoneNumber";
         public static final String FEATURES = "features";
         public static final String PROCESSES = "processes";
-        public static final String OPEN_GL_ES_VERSION = "opengles_version";
+        public static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
 
         private HashMap<String, String> mInfoMap;
 
