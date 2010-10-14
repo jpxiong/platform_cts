@@ -48,21 +48,4 @@ public class DevicePowerPermissionTest extends AndroidTestCase {
             // expected
         }
     }
-
-    /**
-     * Verify that generating user activity requires Permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#DEVICE_POWER}.
-     *
-     * TODO: add back SmallTest annotation when test has been fixed
-     */
-    @KnownFailure("will be fixed in future release")
-    public void testUserActivity() {
-        try {
-            mPowerManager.userActivity(0, false);
-            fail("Was able to call PowerManager.userActivity without DEVICE_POWER Permission.");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
 }
