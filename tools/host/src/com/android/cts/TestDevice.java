@@ -1687,7 +1687,7 @@ public class TestDevice implements DeviceObserver {
             @Override
             public void run() {
                 try {
-                    mDevice.executeShellCommand(cmd, receiver);
+                    mDevice.executeShellCommand(cmd, receiver, 0);
                 } catch (IOException e) {
                     Log.e(String.format("Failed to execute shell command %s on device %s", cmd,
                             mDevice.getSerialNumber()), e);
