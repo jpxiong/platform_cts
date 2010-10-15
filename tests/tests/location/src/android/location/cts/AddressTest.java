@@ -548,7 +548,10 @@ public class AddressTest extends TestCase {
         assertEquals(address.getAdminArea(), parcel.readString());
         assertEquals(address.getSubAdminArea(), parcel.readString());
         assertEquals(address.getLocality(), parcel.readString());
+        assertEquals(address.getSubLocality(), parcel.readString());
         assertEquals(address.getThoroughfare(), parcel.readString());
+        assertEquals(address.getSubThoroughfare(), parcel.readString());
+        assertEquals(address.getPremises(), parcel.readString());
         assertEquals(address.getPostalCode(), parcel.readString());
         assertEquals(address.getCountryCode(), parcel.readString());
         assertEquals(address.getCountryName(), parcel.readString());
