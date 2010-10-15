@@ -40,7 +40,7 @@ public class BuildVersionTest extends TestCase {
      * Verifies {@link Build.FINGERPRINT} follows expected format:
      * <p/>
      * <code>
-     * (BRAND)/(PRODUCT)/(DEVICE)/(BOARD):(VERSION.RELEASE)/(BUILD_ID)/
+     * (BRAND)/(PRODUCT)/(DEVICE):(VERSION.RELEASE)/(BUILD_ID)/
      * (BUILD_NUMBER):(BUILD_VARIANT)/(TAGS)
      * </code>
      */
@@ -51,18 +51,19 @@ public class BuildVersionTest extends TestCase {
         assertEquals("Build fingerprint must not include whitespace", -1,
                 fingerprint.indexOf(' '));
         final String[] fingerprintSegs = fingerprint.split("/");
-        assertEquals("Build fingerprint does not match expected format", 7, fingerprintSegs.length);
+        assertEquals("Build fingerprint does not match expected format", 6, fingerprintSegs.length);
         assertEquals(Build.BRAND, fingerprintSegs[0]);
         assertEquals(Build.PRODUCT, fingerprintSegs[1]);
-        assertEquals(Build.DEVICE, fingerprintSegs[2]);
-        // parse BOARD:VERSION_RELEASE
-        String[] bootloaderPlat = fingerprintSegs[3].split(":");
-        assertEquals(Build.BOARD, bootloaderPlat[0]);
-        assertEquals(Build.VERSION.RELEASE, bootloaderPlat[1]);
-        assertEquals(Build.ID, fingerprintSegs[4]);
+
+        String[] devicePlatform = fingerprintSegs[2].split(":");
+        assertEquals(2, devicePlatform.length);
+        assertEquals(Build.DEVICE, devicePlatform[0]);
+        assertEquals(Build.VERSION.RELEASE, devicePlatform[1]);
+
+        assertEquals(Build.ID, fingerprintSegs[3]);
         // no requirements for BUILD_NUMBER and BUILD_VARIANT
-        assertTrue(fingerprintSegs[5].contains(":"));
+        assertTrue(fingerprintSegs[4].contains(":"));
         // no strict requirement for TAGS
-        //assertEquals(Build.TAGS, fingerprintSegs[6]);
+        //assertEquals(Build.TAGS, fingerprintSegs[5]);
     }
 }
