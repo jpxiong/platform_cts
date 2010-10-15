@@ -1732,22 +1732,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         });
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "performLongClick",
-        args = {}
-    )
-    public void testPerformLongClick() throws InterruptedException {
-        String form = "<p><form><input type=\"text\" name=\"Test\"><br>"
-                + "<input type=\"submit\" value=\"Submit\"></form></p>";
-        mWebView.loadDataWithBaseURL("fake://home", "<html><body>" + form
-                + "</body></html>", "text/html", "UTF-8", null);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
-
-        mWebView.performLongClick();
-        // no simple way to check the effect of a long click
-    }
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
