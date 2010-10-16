@@ -177,8 +177,12 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
 
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_ACCELEROMETER,
                 Sensor.TYPE_ACCELEROMETER);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_BAROMETER,
+                Sensor.TYPE_PRESSURE);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_COMPASS,
                 Sensor.TYPE_MAGNETIC_FIELD);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_GYROSCOPE,
+                Sensor.TYPE_GYROSCOPE);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_LIGHT,
                 Sensor.TYPE_LIGHT);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_PROXIMITY,
