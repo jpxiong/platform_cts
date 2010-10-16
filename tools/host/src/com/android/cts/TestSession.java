@@ -490,7 +490,7 @@ public class TestSession {
             int omittedNum = mSessionLog.getTestList(CtsTestResult.CODE_OMITTED).size();
             int notExecutedNum = mSessionLog.getTestList(CtsTestResult.CODE_NOT_EXECUTED).size();
             int timeOutNum = mSessionLog.getTestList(CtsTestResult.CODE_TIMEOUT).size();
-            int total = passNum + failNum + notExecutedNum + timeOutNum;
+            int total = passNum + failNum + omittedNum + notExecutedNum + timeOutNum;
 
             println("Test summary:   pass=" + passNum
                     + "   fail=" + failNum
