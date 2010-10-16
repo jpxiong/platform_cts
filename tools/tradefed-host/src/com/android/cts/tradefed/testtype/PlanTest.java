@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.ddmlib.Log;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
@@ -128,6 +129,7 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
             Collection<String> testUris = parser.getTestUris();
             ITestCaseRepo testRepo = createTestCaseRepo();
             Collection<IRemoteTest> tests = testRepo.getTests(testUris);
+            collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
             for (IRemoteTest test : tests) {
                 if (test instanceof IDeviceTest) {
                     ((IDeviceTest)test).setDevice(getDevice());
@@ -139,6 +141,18 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
         } catch (ParseException e) {
             throw new IllegalArgumentException("failed to parse CTS plan file", e);
         }
+    }
+
+    /**
+     * Runs the device info collector instrumentation on device, and forwards it to test listeners
+     * as run metrics.
+     *
+     * @param listeners
+     * @throws DeviceNotAvailableException
+     */
+    private void collectDeviceInfo(ITestDevice device, File testApkDir,
+            List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+        DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listeners);
     }
 
     /**
