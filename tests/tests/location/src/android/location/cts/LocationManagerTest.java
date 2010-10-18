@@ -475,13 +475,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
         }
 
         try {
-            mManager.requestLocationUpdates(TEST_MOCK_PROVIDER_NAME, 0, 0, listener, null);
-            fail("Should throw IllegalArgumentException if param looper is null!");
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
-
-        try {
             mManager.removeUpdates( (LocationListener) null );
             fail("Should throw IllegalArgumentException if listener is null!");
         } catch (IllegalArgumentException e) {
