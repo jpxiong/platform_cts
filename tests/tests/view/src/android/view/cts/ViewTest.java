@@ -558,25 +558,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertEquals(-1, view.getBaseline());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeScroll",
-        args = {}
-    )
-    public void testComputeScroll() throws Throwable {
-        final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
-        assertTrue(view.hasCalledComputeScroll());
-
-        view.reset();
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                view.requestLayout();
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        assertTrue(view.hasCalledComputeScroll());
-    }
-
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
