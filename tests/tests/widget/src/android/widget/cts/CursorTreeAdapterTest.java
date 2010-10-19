@@ -79,12 +79,20 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         mDatabase.execSQL("CREATE TABLE child1 (_id INTEGER PRIMARY KEY, value TEXT);");
         mDatabase.execSQL("INSERT INTO child1 (value) VALUES ('" + CHILD_VALUE_ONE + "');");
         mDatabase.execSQL("INSERT INTO child1 (value) VALUES ('" + CHILD_VALUE_TWO + "');");
+        return getChild1Cursor();
+    }
+
+    private Cursor getChild1Cursor() {
         return mDatabase.query("child1", VALUE_PROJECTION, null, null, null, null, null);
     }
 
     private Cursor createChild2Cursor() {
         mDatabase.execSQL("CREATE TABLE child2 (_id INTEGER PRIMARY KEY, value TEXT);");
         mDatabase.execSQL("INSERT INTO child2 (value) VALUES ('" + CHILD_VALUE_THREE + "');");
+        return getChild2Cursor();
+    }
+
+    private Cursor getChild2Cursor() {
         return mDatabase.query("child2", VALUE_PROJECTION, null, null, null, null, null);
     }
 
@@ -679,7 +687,7 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         level = TestLevel.COMPLETE,
         notes = "Test {@link CursorAdapter#getChildView(int, int, boolean, View, ViewGroup)}",
         method = "getChildView",
-        args = {int.class, int.class, boolean.class, android.view.View.class, 
+        args = {int.class, int.class, boolean.class, android.view.View.class,
                 android.view.ViewGroup.class}
     )
     public void testGetChildView() {
@@ -792,9 +800,15 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
 
             if (0 == groupCursor.getPosition()) {
                 mHasAddedChild1IntoCache = true;
+                if (mChildCursor1.isClosed()) {
+                    mChildCursor1 = getChild1Cursor();
+                }
                 return mChildCursor1;
             } else if (1 == groupCursor.getPosition()) {
                 mHasAddedChild2IntoCache = true;
+                if (mChildCursor2.isClosed()) {
+                    mChildCursor2 = getChild2Cursor();
+                }
                 return mChildCursor2;
             }
             return null;
