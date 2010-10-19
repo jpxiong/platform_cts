@@ -215,11 +215,11 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
         mInstrumentation.waitForIdleSync();
 
         assertEquals(0, mGridView.getSelectedItemPosition());
-        KeyEvent event = new KeyEvent(KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_DPAD_RIGHT);
+        KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT);
         mInstrumentation.sendKeySync(event);
         assertEquals(1, mGridView.getSelectedItemPosition());
 
-        event = new KeyEvent(KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_DPAD_LEFT);
+        event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT);
         mInstrumentation.sendKeySync(event);
         assertEquals(0, mGridView.getSelectedItemPosition());
 
@@ -577,7 +577,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "attachLayoutAnimationParameters",
-        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class, 
+        args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class, int.class,
                 int.class}
     )
     public void testAttachLayoutAnimationParameters() {

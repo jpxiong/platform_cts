@@ -2712,25 +2712,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "onKeyMultiple",
-        args = {int.class, int.class, android.view.KeyEvent.class}
-    )
-    public void testOnKeyMultiple() throws Throwable {
-        final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                view.setFocusable(true);
-            }
-        });
-
-        assertFalse(view.hasCalledOnKeyMultiple());
-        KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_ENTER);
-        getInstrumentation().sendKeySync(keyEvent);
-        assertTrue(view.hasCalledOnKeyMultiple());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "dispatchKeyShortcutEvent",
         args = {android.view.KeyEvent.class}
     )
