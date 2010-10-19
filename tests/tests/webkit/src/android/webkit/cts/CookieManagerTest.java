@@ -26,6 +26,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import java.util.Date;
@@ -49,6 +50,9 @@ public class CookieManagerTest extends
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+
+        // Set a web chrome client in order to receive progress updates.
+        mWebView.setWebChromeClient(new WebChromeClient());
 
         mCookieManager = CookieManager.getInstance();
         assertNotNull(mCookieManager);
