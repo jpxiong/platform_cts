@@ -136,18 +136,20 @@ public class ImageSwitcherTest extends AndroidTestCase {
         imageSwitcher.setImageURI(uri);
         assertSame(iv1, imageSwitcher.getCurrentView());
 
-        Bitmap testImageBitmap = WidgetTestUtils.getUnscaledBitmap(getContext().getResources(),
-                R.raw.testimage);
         BitmapDrawable currViewBitmap =
             (BitmapDrawable) ((ImageView) imageSwitcher.getCurrentView()).getDrawable();
+        Bitmap testImageBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(
+                getContext().getResources(), R.raw.testimage,
+                currViewBitmap.getBitmap().getConfig());
         WidgetTestUtils.assertEquals(testImageBitmap, currViewBitmap.getBitmap());
 
         createSampleImage(imagefile, R.raw.scenery);
         uri = Uri.parse(imagefile.getPath());
         imageSwitcher.setImageURI(uri);
         assertSame(iv, imageSwitcher.getCurrentView());
-        Bitmap sceneryImageBitmap = WidgetTestUtils.getUnscaledBitmap(getContext().getResources(),
-                R.raw.scenery);
+        Bitmap sceneryImageBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(
+                getContext().getResources(), R.raw.scenery,
+                currViewBitmap.getBitmap().getConfig());
         currViewBitmap =
             (BitmapDrawable) ((ImageView) imageSwitcher.getCurrentView()).getDrawable();
         WidgetTestUtils.assertEquals(sceneryImageBitmap, currViewBitmap.getBitmap());
