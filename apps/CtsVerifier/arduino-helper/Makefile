@@ -41,7 +41,7 @@ ARDUINO_PATH=/usr/share/arduino
 ARDUINO_VERSION=18
 ARDUINO_CORES_PATH = $(ARDUINO_PATH)/hardware/arduino/cores/arduino
 AVR_TOOLS_PATH = /usr/bin
-AVRDUDE_PATH = $(ARDUINO_PATH)/hardware/tools
+AVRDUDE_PATH = /usr/bin
 
 # Programming port information
 PORT = /dev/ttyUSB0
@@ -117,8 +117,9 @@ LDFLAGS = -O$(OPT) -lm -Wl,--gc-sections
 
 # Programming support using avrdude. Settings and variables.
 AVRDUDE_WRITE_FLASH = -U flash:w:$(OUT_DIR)/$(TARGET).hex
-AVRDUDE_FLAGS = -V -F -C $(ARDUINO_PATH)/hardware/tools/avrdude.conf \
--p $(MCU) -P $(PORT) -c $(AVRDUDE_PROGRAMMER) -b $(UPLOAD_RATE)
+#AVRDUDE_FLAGS = -V -F -C $(ARDUINO_PATH)/hardware/tools/avrdude.conf \
+
+AVRDUDE_FLAGS = -V -F -p $(MCU) -P $(PORT) -c $(AVRDUDE_PROGRAMMER) -b $(UPLOAD_RATE)
 
 # AVR cross-compiler toolchain binaries
 CC = $(AVR_TOOLS_PATH)/avr-gcc
@@ -149,11 +150,12 @@ build: elf hex
 
 # Concatenates the 'sketch' .pde file with the usual Arduino boilerplate
 $(OUT_DIR)/$(TARGET).cpp: $(TARGET).pde
-	test -d $(OUT_DIR) || mkdir $(OUT_DIR)
-	echo '#include "WProgram.h"' > $(OUT_DIR)/$(TARGET).cpp
-	echo 'void setup();' >> $(OUT_DIR)/$(TARGET).cpp
-	echo 'void loop();' >> $(OUT_DIR)/$(TARGET).cpp
-	cat $(TARGET).pde >> $(OUT_DIR)/$(TARGET).cpp
+	@echo "Generate $(TARGET).cpp from $(TARGET).pde"
+	@test -d $(OUT_DIR) || mkdir $(OUT_DIR)
+	@echo '#include "WProgram.h"' > $(OUT_DIR)/$(TARGET).cpp
+	@echo 'void setup();' >> $(OUT_DIR)/$(TARGET).cpp
+	@echo 'void loop();' >> $(OUT_DIR)/$(TARGET).cpp
+	@cat $(TARGET).pde >> $(OUT_DIR)/$(TARGET).cpp
 
 elf: $(OUT_DIR)/$(TARGET).elf
 hex: $(OUT_DIR)/$(TARGET).hex
@@ -172,10 +174,10 @@ upload: $(OUT_DIR)/$(TARGET).hex
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(OUT_DIR)/$(TARGET).hex
 ELFSIZE = $(SIZE)  $(OUT_DIR)/$(TARGET).elf
 sizebefore:
-	@if [ -f $(OUT_DIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(HEXSIZE); echo; fi
+	@if [ -f $(OUT_DIR)/$(TARGET).elf ]; then echo $(MSG_SIZE_BEFORE); $(HEXSIZE); fi
 
 sizeafter:
-	@if [ -f $(OUT_DIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(HEXSIZE); echo; fi
+	@if [ -f $(OUT_DIR)/$(TARGET).elf ]; then echo $(MSG_SIZE_AFTER); $(HEXSIZE); fi
 
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
@@ -254,9 +256,14 @@ $(ARDUINO_CPP_MODULES_OBJ):
 
 # Target: clean project.
 clean:
-	$(REMOVE) $(OUT_DIR)/$(TARGET).hex $(OUT_DIR)/$(TARGET).eep $(OUT_DIR)/$(TARGET).cof $(OUT_DIR)/$(TARGET).elf \
-	$(OUT_DIR)/$(TARGET).map $(OUT_DIR)/$(TARGET).sym $(OUT_DIR)/$(TARGET).lss $(OUT_DIR)/core.a \
-	$(ARDUINO_C_MODULES_SRC:.c=.s) $(ARDUINO_C_MODULES_SRC:.c=.d) $(ARDUINO_CPP_MODULES_SRC:.cpp=.s) $(ARDUINO_CPP_MODULES_SRC:.cpp=.d) $(ARDUINO_C_MODULES_OBJ) $(ARDUINO_CPP_MODULES_OBJ) $(OUT_DIR)/$(TARGET).cpp
+	$(REMOVE) $(OUT_DIR)/$(TARGET).hex $(OUT_DIR)/$(TARGET).eep \
+        $(OUT_DIR)/$(TARGET).cof $(OUT_DIR)/$(TARGET).elf \
+        $(OUT_DIR)/$(TARGET).map $(OUT_DIR)/$(TARGET).sym \
+        $(OUT_DIR)/$(TARGET).lss $(OUT_DIR)/core.a \
+	$(ARDUINO_C_MODULES_SRC:.c=.s) $(ARDUINO_C_MODULES_SRC:.c=.d) \
+        $(ARDUINO_CPP_MODULES_SRC:.cpp=.s) $(ARDUINO_CPP_MODULES_SRC:.cpp=.d) \
+        $(ARDUINO_C_MODULES_OBJ) $(ARDUINO_CPP_MODULES_OBJ) \
+        $(OUT_DIR)/$(TARGET).cpp $(OUT_DIR)/$(TARGET).o
 distclean: clean
 	$(RMDIR) $(OUT_DIR)
 
