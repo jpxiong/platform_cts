@@ -518,6 +518,23 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         assertTrue(d.onKeyDownReturn);
     }
 
+     @TestTargetNew(
+         level = TestLevel.COMPLETE,
+         method = "onKeyMultiple",
+         args = {int.class, int.class, android.view.KeyEvent.class}
+     )
+     public void testOnKeyMultiple() {
+         popDialog(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
+         final TestDialog d = (TestDialog) mActivity.getDialog();
+
+         assertNull(d.keyMultipleEvent);
+         d.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_UNKNOWN));
+         assertTrue(d.isOnKeyMultipleCalled);
+         assertFalse(d.onKeyMultipleReturn);
+         assertEquals(KeyEvent.KEYCODE_UNKNOWN, d.keyMultipleEvent.getKeyCode());
+         assertEquals(KeyEvent.ACTION_MULTIPLE, d.keyMultipleEvent.getAction());
+     }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
