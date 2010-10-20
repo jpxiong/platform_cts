@@ -256,10 +256,10 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
             mSimpleCursorAdapter.setViewImage(view,
                     createTestImage(mContext, SAMPLE_IMAGE_NAME, testimgRawId));
             assertNotNull(view.getDrawable());
-            Bitmap testBitmap = WidgetTestUtils.getUnscaledBitmap(mContext.getResources(),
-                    testimgRawId);
-            WidgetTestUtils.assertEquals(testBitmap,
-                    ((BitmapDrawable) view.getDrawable()).getBitmap());
+            Bitmap actualBitmap = ((BitmapDrawable) view.getDrawable()).getBitmap();
+            Bitmap testBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(mContext.getResources(),
+                    testimgRawId, actualBitmap.getConfig());
+            WidgetTestUtils.assertEquals(testBitmap, actualBitmap);
         } finally {
             destroyTestImage(mContext, SAMPLE_IMAGE_NAME);
         }

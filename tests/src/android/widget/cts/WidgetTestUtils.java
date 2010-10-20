@@ -48,7 +48,8 @@ public class WidgetTestUtils {
         }
 
         // b1 and b2 are all not null.
-        if (b1.getWidth() != b2.getWidth() || b1.getHeight() != b2.getHeight()) {
+        if (b1.getWidth() != b2.getWidth() || b1.getHeight() != b2.getHeight()
+            || b1.getConfig() != b2.getConfig()) {
             Assert.fail("the bitmaps are not equal");
         }
 
@@ -117,6 +118,21 @@ public class WidgetTestUtils {
     public static Bitmap getUnscaledBitmap(Resources resources, int resId) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
+        return BitmapFactory.decodeResource(resources, resId, options);
+    }
+
+    /**
+     * Retrieve a dithered bitmap that can be used for comparison on any density
+     * @param resources
+     * @param config the preferred config for the returning bitmap
+     * @return the {@link Bitmap} or <code>null</code>
+     */
+    public static Bitmap getUnscaledAndDitheredBitmap(Resources resources,
+            int resId, Bitmap.Config config) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inDither = true;
+        options.inScaled = false;
+        options.inPreferredConfig = config;
         return BitmapFactory.decodeResource(resources, resId, options);
     }
 }
