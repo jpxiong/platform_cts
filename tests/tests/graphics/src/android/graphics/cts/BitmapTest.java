@@ -15,11 +15,12 @@
  */
 package android.graphics.cts;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -33,16 +34,14 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.widget.cts.WidgetTestUtils;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 @TestTargetClass(Bitmap.class)
 public class BitmapTest extends AndroidTestCase {
-    private static final int BUFFER_SIZE = 1016;
     private Resources mRes;
     private Bitmap mBitmap;
     private BitmapFactory.Options mOptions;
@@ -133,49 +132,51 @@ public class BitmapTest extends AndroidTestCase {
         )
     })
     public void testCopyPixelsToBuffer(){
+        final int pixSize = mBitmap.getRowBytes() * mBitmap.getHeight();
+        final int tooSmall = pixSize / 2;
+
         // abnormal case: unsupported Buffer subclass
         try{
-            mBitmap.copyPixelsToBuffer(CharBuffer.allocate(BUFFER_SIZE));
+            mBitmap.copyPixelsToBuffer(CharBuffer.allocate(pixSize));
             fail("shouldn't come to here");
         }catch(RuntimeException e1){
         }
 
         // abnormal case: Buffer not large enough for pixels
         try{
-            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(BUFFER_SIZE));
+            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(tooSmall));
             fail("shouldn't come to here");
         }catch(RuntimeException e2){
         }
 
         // normal case
-        long pixSize = mBitmap.getRowBytes() * mBitmap.getHeight();
-        ByteBuffer byteBuf = ByteBuffer.allocate(101608);
+        ByteBuffer byteBuf = ByteBuffer.allocate(pixSize);
         assertEquals(0, byteBuf.position());
         mBitmap.copyPixelsToBuffer(byteBuf);
         assertEquals(pixSize, byteBuf.position());
 
         // abnormal case: Buffer not large enough for pixels
         try{
-            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(16));
+            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(tooSmall));
             fail("shouldn't come to here");
         }catch(RuntimeException e3){
         }
 
         // normal case
-        ShortBuffer shortBuf = ShortBuffer.allocate(BUFFER_SIZE);
+        ShortBuffer shortBuf = ShortBuffer.allocate(pixSize);
         assertEquals(0, shortBuf.position());
         mBitmap.copyPixelsToBuffer(shortBuf);
         assertEquals(pixSize >> 1, shortBuf.position());
 
         // abnormal case: Buffer not large enough for pixels
         try{
-            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(16));
+            mBitmap.copyPixelsToBuffer(ByteBuffer.allocate(tooSmall));
             fail("shouldn't come to here");
         }catch(RuntimeException e4){
         }
 
         // normal case
-        IntBuffer intBuf1 = IntBuffer.allocate(BUFFER_SIZE);
+        IntBuffer intBuf1 = IntBuffer.allocate(pixSize);
         assertEquals(0, intBuf1.position());
         mBitmap.copyPixelsToBuffer(intBuf1);
         assertEquals(pixSize >> 2, intBuf1.position());
@@ -183,7 +184,7 @@ public class BitmapTest extends AndroidTestCase {
         Bitmap bitmap = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(),
                 mBitmap.getConfig());
         bitmap.copyPixelsFromBuffer(intBuf1);
-        IntBuffer intBuf2 = IntBuffer.allocate(BUFFER_SIZE);
+        IntBuffer intBuf2 = IntBuffer.allocate(pixSize);
         bitmap.copyPixelsToBuffer(intBuf2);
 
         assertEquals(intBuf1.position(), intBuf2.position());
