@@ -143,23 +143,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(-1);
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_DOWN);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        assertSelection(END_OF_1ST_LINE);
-
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                Selection.removeSelection(mEditable);
-                mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_RIGHT);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        assertSelection(END_OF_1ST_LINE);
-
-        runTestOnUiThread(new Runnable() {
-            public void run() {
                 Selection.removeSelection(mEditable);
                 mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_UP);
             }
@@ -185,22 +168,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         getInstrumentation().waitForIdleSync();
         assertNotNull(mTextView.getLayout());
         assertEquals(1, mTextView.getLayout().getLineCount());
-
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                Selection.removeSelection(mEditable);
-                mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_DOWN);
-            }
-        });
-        assertSelection(END_OF_ALL_TEXT);
-
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                Selection.removeSelection(mEditable);
-                mArrowKeyMovementMethod.onTakeFocus(mTextView, mEditable, View.FOCUS_RIGHT);
-            }
-        });
-        assertSelection(END_OF_ALL_TEXT);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
