@@ -97,67 +97,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         assertFalse(ConnectivityManager.isNetworkTypeValid(-1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNetworkPreference",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setNetworkPreference",
-            args = {int.class}
-        )
-    })
-    public void testAccessNetworkPreference() {
-        int initialSetting = mCm.getNetworkPreference();
-
-        // Changing the network preference requires android.permission.WRITE_SECURE_SETTINGS,
-        // which is only available to signed or system applications.
-
-        // Setting the same preference that is already set is a no-op and does not throw
-        // a SecurityException.
-        mCm.setNetworkPreference(initialSetting);
-        assertEquals(initialSetting, mCm.getNetworkPreference());
-
-        // find a valid setting that is different from the initial setting
-        int validSetting = -1;
-        NetworkInfo[] ni = mCm.getAllNetworkInfo();
-        for (NetworkInfo n : ni) {
-            int type = n.getType();
-            if (type != initialSetting) {
-                validSetting = type;
-                break;
-            }
-        }
-        if (validSetting >= 0) {
-            try {
-                mCm.setNetworkPreference(validSetting);
-                fail("Trying to change the network preference should throw SecurityException");
-            } catch (SecurityException expected) {
-                // expected
-            }
-        }
-
-        // find an invalid setting
-        int invalidSetting = -1;
-        for (int i = 0; i < 10; i++) {
-            if (!ConnectivityManager.isNetworkTypeValid(i)) {
-                invalidSetting = i;
-                break;
-            }
-        }
-        if (invalidSetting >= 0) {
-            // illegal setting should be ignored
-            mCm.setNetworkPreference(invalidSetting);
-            assertEquals(initialSetting, mCm.getNetworkPreference());
-        }
-
-        // illegal setting should be ignored
-        mCm.setNetworkPreference(-1);
-        assertEquals(initialSetting, mCm.getNetworkPreference());
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test getAllNetworkInfo().",
