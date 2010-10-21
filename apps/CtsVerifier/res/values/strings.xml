@@ -46,13 +46,18 @@
     <string name="fs_disallowed">WARNING: device reports a disallowed feature name</string>
     <string name="fs_missing_wifi_telephony">WARNING: device reports neither WiFi nor telephony</string>
     <string name="fs_no_data">No data.</string>
+    <string name="fs_legend_good">standard feature reported by device</string>
+    <string name="fs_legend_indeterminate">optional feature not reported by device</string>
+    <string name="fs_legend_warning">non-standard feature reported by device</string>
+    <string name="fs_legend_error">required feature not reported, or forbidden feature reported</string>
+
     <string name="empty"></string>
 
     <!-- Strings for AccelerometerTestActivity and MagnetometerTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
-    <string name="snsr_accel_test_info">This is a test for...</string>
+    <string name="snsr_accel_test_info">This test verifies that the accelerometer is working properly. As you move the device around through space, the triangle should always point down (i.e. in the direction of gravity.) If it does not, the accelerometer is improperly configured.</string>
     <string name="snsr_mag_test">Magnetometer Test</string>
-    <string name="snsr_mag_test_info">This is a test for...</string>
+    <string name="snsr_mag_test_info">This test verifies that the magnetometer (compass) is working properly. As you move the device around through space, the triangle should always point toward the north pole (which may point through the ground.) If it does not, the magnetometer is improperly configured. Be sure not to run this test with the device near any strong magnetic field generators.</string>
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>

@@ -19,6 +19,7 @@ package com.android.cts.verifier.features;
 import com.android.cts.verifier.features.FeatureSummaryActivity.Feature;
 
 import android.content.pm.PackageManager;
+import android.os.Build;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -29,11 +30,18 @@ import junit.framework.TestCase;
 public class FeatureSummaryActivityTest extends TestCase {
 
     public void testAllFeatures() throws Exception {
+        int version = Build.VERSION.SDK_INT;
+
         Set<String> expectedFeatures = getFeatureConstants();
 
         Set<String> actualFeatures = new HashSet<String>();
-        for (Feature feature : FeatureSummaryActivity.ALL_FEATURES) {
+        for (Feature feature : FeatureSummaryActivity.ALL_ECLAIR_FEATURES) {
             actualFeatures.add(feature.name);
+        }
+        if (version >= Build.VERSION_CODES.FROYO) {
+            for (Feature feature : FeatureSummaryActivity.ALL_FROYO_FEATURES) {
+                actualFeatures.add(feature.name);
+            }
         }
 
         assertEquals("Feature list needs to be updated.",

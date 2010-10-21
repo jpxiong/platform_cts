@@ -19,9 +19,11 @@ package com.android.cts.verifier;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -53,7 +55,7 @@ public class PassFailButtons {
          * @param titleId for the text shown in the dialog title area
          * @param messageId for the text shown in the dialog's body area
          */
-        void setInfoTextResources(int titleId, int messageId);
+        void setInfoResources(int titleId, int messageId, int viewId);
 
         /**
          * Click handler for the pass and fail buttons. No need to call this ever as the XML
@@ -64,8 +66,8 @@ public class PassFailButtons {
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
 
-        public void setInfoTextResources(int titleId, int messageId) {
-            setInfoText(this, titleId, messageId);
+        public void setInfoResources(int titleId, int messageId, int viewId) {
+            setInfo(this, titleId, messageId, viewId);
         }
 
         public void passFailButtonsClickHandler(View target) {
@@ -75,8 +77,8 @@ public class PassFailButtons {
 
     public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
 
-        public void setInfoTextResources(int titleId, int messageId) {
-            setInfoText(this, titleId, messageId);
+        public void setInfoResources(int titleId, int messageId, int viewId) {
+            setInfo(this, titleId, messageId, viewId);
         }
 
         public void passFailButtonsClickHandler(View target) {
@@ -84,20 +86,20 @@ public class PassFailButtons {
         }
     }
 
-    private static void setInfoText(final android.app.Activity activity, final int titleId,
-            final int messageId) {
+    private static void setInfo(final android.app.Activity activity, final int titleId,
+            final int messageId, final int viewId) {
         // Show the middle "info" button and make it show the info dialog when clicked.
         View infoButton = activity.findViewById(R.id.info_button);
         infoButton.setVisibility(View.VISIBLE);
         infoButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                showInfoDialog(activity, titleId, messageId);
+                showInfoDialog(activity, titleId, messageId, viewId);
             }
         });
 
         // Show the info dialog if the user has never seen it before.
         if (!hasSeenInfoDialog(activity)) {
-            showInfoDialog(activity, titleId, messageId);
+            showInfoDialog(activity, titleId, messageId, viewId);
         }
     }
 
@@ -117,22 +119,26 @@ public class PassFailButtons {
     }
 
     private static void showInfoDialog(final android.app.Activity activity, int titleId,
-            int messageId) {
-        new AlertDialog.Builder(activity)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        markSeenInfoDialog(activity);
-                    }
-                })
-                .setOnCancelListener(new OnCancelListener() {
-                    public void onCancel(DialogInterface dialog) {
-                        markSeenInfoDialog(activity);
-                    }
-                })
-                .show();
+            int messageId, int viewId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity).setIcon(
+                android.R.drawable.ic_dialog_info).setTitle(titleId);
+        if (viewId > 0) {
+            LayoutInflater inflater = (LayoutInflater) activity
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            builder.setView(inflater.inflate(viewId, null));
+        } else {
+            builder.setMessage(messageId);
+        }
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                markSeenInfoDialog(activity);
+            }
+        }).setOnCancelListener(new OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                markSeenInfoDialog(activity);
+            }
+        })
+    	.show();
     }
 
     private static void markSeenInfoDialog(android.app.Activity activity) {
