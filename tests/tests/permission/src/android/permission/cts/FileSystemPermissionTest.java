@@ -80,7 +80,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         String myAppDirectory = getContext().getApplicationInfo().dataDir;
         for (ApplicationInfo app : apps) {
             if (!myAppDirectory.equals(app.dataDir)) {
-                assertDirectoryNotWritable(new File(app.dataDir));
+                assertDirectoryAndSubdirectoriesNotWritable(new File(app.dataDir));
             }
         }
     }
@@ -125,6 +125,49 @@ public class FileSystemPermissionTest extends AndroidTestCase {
             // It's expected we'll get a "Permission denied" exception.
         } finally {
             toCreate.delete();
+        }
+    }
+
+    /**
+     * Verify that any publicly readable directories reachable from
+     * the root directory are not writable.
+     *
+     * Note: Because not all directories are readable, this is a best-effort
+     * test only.  Writable directories within unreadable subdirectories
+     * will NOT be detected by this code.
+     */
+    public void testAllOtherDirectoriesNotWritable() throws Exception {
+        File start = new File("/");
+        assertDirectoryAndSubdirectoriesNotWritable(start);
+    }
+
+    private void assertDirectoryAndSubdirectoriesNotWritable(File dir) throws Exception {
+        if (!dir.isDirectory()) {
+            return;
+        }
+
+        if (!dir.getAbsolutePath().equals(dir.getCanonicalPath())) {
+            // don't follow symbolic links.
+            return;
+        }
+
+        String myHome = getContext().getApplicationInfo().dataDir;
+        String thisDir = dir.getCanonicalPath();
+        if (thisDir.startsWith(myHome)) {
+            // Don't examine directories within our home directory.
+            // We expect these directories to be writable.
+            return;
+        }
+
+        assertDirectoryNotWritable(dir);
+
+        File[] subFiles = dir.listFiles();
+        if (subFiles == null) {
+            return;
+        }
+
+        for (File f : subFiles) {
+            assertDirectoryAndSubdirectoriesNotWritable(f);
         }
     }
 }
