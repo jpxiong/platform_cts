@@ -25,8 +25,8 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestResult.TestStatus;
 import com.android.tradefed.result.TestRunResult;
+import com.android.tradefed.result.TestResult.TestStatus;
 import com.android.tradefed.targetsetup.IBuildInfo;
 import com.android.tradefed.targetsetup.IFolderBuildInfo;
 import com.android.tradefed.util.FileUtil;
@@ -110,13 +110,34 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         mStartTime = getTimestamp();
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void testLog(String dataName, LogDataType dataType, InputStream dataStream) {
         // TODO: implement this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+        super.testFailed(status, test, trace);
+        Log.i(LOG_TAG, String.format("Test %s#%s: %s\n%s", test.getClassName(), test.getTestName(),
+                status.toString(), trace));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
+        super.testRunEnded(elapsedTime, runMetrics);
+        Log.i(LOG_TAG, String.format("Test run %s complete. Tests passed %d, failed %d, error %d",
+                getCurrentRunResults().getName(), getCurrentRunResults().getNumPassedTests(),
+                getCurrentRunResults().getNumFailedTests(),
+                getCurrentRunResults().getNumErrorTests()));
     }
 
     /**
