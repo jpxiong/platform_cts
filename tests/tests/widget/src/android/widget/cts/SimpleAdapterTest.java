@@ -410,10 +410,10 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
             mSimpleAdapter.setViewImage(view, SimpleCursorAdapterTest.createTestImage(mContext,
                     "testimage", com.android.cts.stub.R.raw.testimage));
             assertNotNull(view.getDrawable());
-            Bitmap testBitmap = WidgetTestUtils.getUnscaledBitmap(mContext.getResources(),
-                    com.android.cts.stub.R.raw.testimage);
-            WidgetTestUtils.assertEquals(testBitmap,
-                    ((BitmapDrawable) view.getDrawable()).getBitmap());
+            Bitmap actualBitmap = ((BitmapDrawable) view.getDrawable()).getBitmap();
+            Bitmap testBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(mContext.getResources(),
+                    com.android.cts.stub.R.raw.testimage, actualBitmap.getConfig());
+            WidgetTestUtils.assertEquals(testBitmap, actualBitmap);
         } finally {
             SimpleCursorAdapterTest.destroyTestImage(mContext,"testimage");
         }
