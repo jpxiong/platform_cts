@@ -25,6 +25,7 @@ import dalvik.annotation.SideEffect;
 import android.annotation.cts.Profile;
 import android.annotation.cts.RequiredFeatures;
 import android.annotation.cts.SupportedProfiles;
+import android.app.Instrumentation;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.FeatureInfo;
@@ -67,6 +68,10 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     private static final String TAG = "InstrumentationCtsTestRunner";
 
     private static final String ARGUMENT_PROFILE = "profile";
+
+    private static final String REPORT_VALUE_ID = "InstrumentationCtsTestRunner";
+
+    private static final int REPORT_VALUE_RESULT_OMITTED = -3;
 
     /** Profile of the device being tested or null to run all tests regardless of profile. */
     private Profile mProfile;
@@ -256,9 +261,42 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         return builderRequirements;
     }
 
+    /**
+     * Send back an indication that a test was omitted. InstrumentationTestRunner won't run omitted
+     * tests, but CTS needs to know that the test was omitted. Otherwise, it will attempt to rerun
+     * the test thinking that ADB must have crashed or something.
+     */
+    private void sendOmittedStatus(TestMethod t) {
+        Bundle bundle = new Bundle();
+        bundle.putString(Instrumentation.REPORT_KEY_IDENTIFIER, REPORT_VALUE_ID);
+        bundle.putInt(InstrumentationTestRunner.REPORT_KEY_NUM_TOTAL, 1);
+        bundle.putInt(InstrumentationTestRunner.REPORT_KEY_NUM_CURRENT, 1);
+        bundle.putString(InstrumentationTestRunner.REPORT_KEY_NAME_CLASS,
+                t.getEnclosingClassname());
+        bundle.putString(InstrumentationTestRunner.REPORT_KEY_NAME_TEST,
+                t.getName());
+
+        // First status message causes CTS to print out the test name like "Class#test..."
+        sendStatus(InstrumentationTestRunner.REPORT_VALUE_RESULT_START, bundle);
+
+        // Second status message causes CTS to complete the line like "Class#test...(omitted)"
+        sendStatus(REPORT_VALUE_RESULT_OMITTED, bundle);
+    }
+
     private Predicate<TestMethod> getProfilePredicate(final Profile specifiedProfile) {
         return new Predicate<TestMethod>() {
             public boolean apply(TestMethod t) {
+                if (isValidTest(t)) {
+                    // InstrumentationTestRunner will run the test and send back results.
+                    return true;
+                } else {
+                    // InstrumentationTestRunner WON'T run the test, so send back omitted status.
+                    sendOmittedStatus(t);
+                    return false;
+                }
+            }
+
+            private boolean isValidTest(TestMethod t) {
                 Set<Profile> profiles = new HashSet<Profile>();
                 add(profiles, t.getAnnotation(SupportedProfiles.class));
                 add(profiles, t.getEnclosingClass().getAnnotation(SupportedProfiles.class));
@@ -290,6 +328,17 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     private Predicate<TestMethod> getFeaturePredicate() {
         return new Predicate<TestMethod>() {
             public boolean apply(TestMethod t) {
+                if (isValidTest(t)) {
+                    // InstrumentationTestRunner will run the test and send back results.
+                    return true;
+                } else {
+                    // InstrumentationTestRunner WON'T run the test, so send back omitted status.
+                    sendOmittedStatus(t);
+                    return false;
+                }
+            }
+
+            private boolean isValidTest(TestMethod t) {
                 Set<String> features = new HashSet<String>();
                 add(features, t.getAnnotation(RequiredFeatures.class));
                 add(features, t.getEnclosingClass().getAnnotation(RequiredFeatures.class));
