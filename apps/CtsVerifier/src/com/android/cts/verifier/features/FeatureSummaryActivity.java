@@ -21,6 +21,7 @@
  * http://www.fatcow.com/free-icons/
  * http://creativecommons.org/licenses/by/3.0/us/
  */
+
 package com.android.cts.verifier.features;
 
 import com.android.cts.verifier.PassFailButtons;
@@ -28,6 +29,7 @@ import com.android.cts.verifier.R;
 
 import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -63,7 +65,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         /**
          * Constructor does not include 'present' because that's a detected
          * value, and not set during creation.
-         *
+         * 
          * @param name value for this.name
          * @param required value for this.required
          */
@@ -75,47 +77,57 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     }
 
     /**
-     * A list of all known features. If a constant is added to PackageManager,
-     * this list needs to be updated. We could detect these fields via
-     * Reflection, but we can't determine whether the features are required or
-     * not that way, so we need this block anyway.
+     * A list of all features added in Eclair (API=7).
      */
-    public static final Feature[] ALL_FEATURES = {
-            new Feature(PackageManager.FEATURE_BLUETOOTH, true),
+    public static final Feature[] ALL_ECLAIR_FEATURES = {
             new Feature(PackageManager.FEATURE_CAMERA, true),
             new Feature(PackageManager.FEATURE_CAMERA_AUTOFOCUS, false),
             new Feature(PackageManager.FEATURE_CAMERA_FLASH, false),
             new Feature(PackageManager.FEATURE_LIVE_WALLPAPER, false),
-            new Feature(PackageManager.FEATURE_LOCATION, true),
-            new Feature(PackageManager.FEATURE_LOCATION_GPS, true),
-            new Feature(PackageManager.FEATURE_LOCATION_NETWORK, true),
-            new Feature(PackageManager.FEATURE_MICROPHONE, true),
-            new Feature(PackageManager.FEATURE_SENSOR_ACCELEROMETER, true),
-            new Feature(PackageManager.FEATURE_SENSOR_COMPASS, true),
             new Feature(PackageManager.FEATURE_SENSOR_LIGHT, false),
             new Feature(PackageManager.FEATURE_SENSOR_PROXIMITY, false),
             new Feature(PackageManager.FEATURE_TELEPHONY, false),
             new Feature(PackageManager.FEATURE_TELEPHONY_CDMA, false),
             new Feature(PackageManager.FEATURE_TELEPHONY_GSM, false),
-            new Feature(PackageManager.FEATURE_TOUCHSCREEN, true),
-            new Feature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH, false),
-            new Feature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH_DISTINCT, false),
-            new Feature(PackageManager.FEATURE_WIFI, false),
+    };
+
+    /**
+     * A list of all features added in FroYo (API=8). Because we want to run on
+     * Eclair devices, we can't use static references to constants added later
+     * than Eclair. We could use Reflection, but we'd still need a list of
+     * string literals (for constant names) anyway, and there's little point in
+     * using Reflection to to look up a constant String value for a constant
+     * String name.
+     */
+    public static final Feature[] ALL_FROYO_FEATURES = {
+            new Feature("android.hardware.bluetooth", true),
+            new Feature("android.hardware.location", true),
+            new Feature("android.hardware.location.gps", true),
+            new Feature("android.hardware.location.network", true),
+            new Feature("android.hardware.microphone", true),
+            new Feature("android.hardware.sensor.accelerometer", true),
+            new Feature("android.hardware.sensor.compass", true),
+            new Feature("android.hardware.touchscreen", true),
+            new Feature("android.hardware.touchscreen.multitouch", false),
+            new Feature("android.hardware.touchscreen.multitouch.distinct", false),
+            new Feature("android.hardware.wifi", false),
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fs_main);
-        setInfoTextResources(R.string.feature_summary, R.string.feature_summary_info);
+        setInfoResources(R.string.feature_summary, R.string.feature_summary_info, R.layout.fs_info);
         setResult(RESULT_CANCELED);
 
-        // some values used to detect warn-able conditions involving multiple features
+        // some values used to detect warn-able conditions involving multiple
+        // features
         boolean hasWifi = false;
         boolean hasTelephony = false;
         boolean hasIllegalFeature = false;
 
-        // get list of all features device thinks it has, & store in a HashMap for fast lookups
+        // get list of all features device thinks it has, & store in a HashMap
+        // for fast lookups
         HashMap<String, String> actualFeatures = new HashMap<String, String>();
         for (FeatureInfo fi : getPackageManager().getSystemAvailableFeatures()) {
             actualFeatures.put(fi.name, fi.name);
@@ -127,7 +139,15 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         // roll over all known features & check whether device reports them
         boolean present = false;
         int statusIcon;
-        for (Feature f : ALL_FEATURES) {
+        ArrayList<Feature> features = new ArrayList<Feature>();
+        int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.ECLAIR_MR1) {
+            Collections.addAll(features, ALL_ECLAIR_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.FROYO) {
+            Collections.addAll(features, ALL_FROYO_FEATURES);
+        }
+        for (Feature f : features) {
             HashMap<String, Object> row = new HashMap<String, Object>();
             listViewData.add(row);
             present = actualFeatures.containsKey(f.name);
@@ -138,10 +158,12 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
                 statusIcon = R.drawable.fs_good;
                 actualFeatures.remove(f.name);
             } else if (!present && f.required) {
-                // it's required, but device doesn't report it. Boo, set the bogus icon
+                // it's required, but device doesn't report it. Boo, set the
+                // bogus icon
                 statusIcon = R.drawable.fs_error;
             } else {
-                // device doesn't report it, but it's not req'd, so can't tell if there's a problem
+                // device doesn't report it, but it's not req'd, so can't tell
+                // if there's a problem
                 statusIcon = R.drawable.fs_indeterminate;
             }
             row.put("feature", f.name);
@@ -156,7 +178,8 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             listViewData.add(row);
             row.put("feature", feature);
             if (feature.startsWith("android")) { // intentionally not "android."
-                // sorry, you're not allowed to squat in the official namespace; set bogus icon
+                // sorry, you're not allowed to squat in the official namespace;
+                // set bogus icon
                 row.put("icon", R.drawable.fs_error);
                 hasIllegalFeature = true;
             } else {
@@ -165,7 +188,8 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             }
         }
 
-        // sort the ListView's data to group by icon type, for easier reading by humans
+        // sort the ListView's data to group by icon type, for easier reading by
+        // humans
         final HashMap<Integer, Integer> idMap = new HashMap<Integer, Integer>();
         idMap.put(R.drawable.fs_error, 0);
         idMap.put(R.drawable.fs_warning, 1);
@@ -186,8 +210,11 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // Set up the SimpleAdapter used to populate the ListView
         SimpleAdapter adapter = new SimpleAdapter(this, listViewData, R.layout.fs_row,
-            new String[] { "feature", "icon" },
-            new int[] { R.id.fs_feature, R.id.fs_icon });
+                new String[] {
+                        "feature", "icon"
+                }, new int[] {
+                        R.id.fs_feature, R.id.fs_icon
+                });
         adapter.setViewBinder(new SimpleAdapter.ViewBinder() {
             public boolean setViewValue(View view, Object data, String repr) {
                 try {
@@ -206,7 +233,8 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         });
         setListAdapter(adapter);
 
-        // finally, check for our second-order error cases and set warning text if necessary
+        // finally, check for our second-order error cases and set warning text
+        // if necessary
         StringBuffer sb = new StringBuffer();
         if (hasIllegalFeature) {
             sb.append(getResources().getString(R.string.fs_disallowed)).append("\n");
@@ -214,6 +242,11 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         if (!hasWifi && !hasTelephony) {
             sb.append(getResources().getString(R.string.fs_missing_wifi_telephony)).append("\n");
         }
-        ((TextView) (findViewById(R.id.fs_warnings))).setText(sb.toString());
+        String warnings = sb.toString().trim();
+        if (warnings == null || "".equals(warnings)) {
+            ((TextView) (findViewById(R.id.fs_warnings))).setVisibility(View.GONE);
+        } else {
+            ((TextView) (findViewById(R.id.fs_warnings))).setText(warnings);
+        }
     }
 }

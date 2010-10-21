@@ -49,7 +49,7 @@ public class AccelerometerTestActivity extends PassFailButtons.Activity {
         mListener = renderer;
 
         setContentView(R.layout.pass_fail_gl);
-        setInfoTextResources(R.string.snsr_accel_test, R.string.snsr_accel_test_info);
+        setInfoResources(R.string.snsr_accel_test, R.string.snsr_accel_test_info, -1);
         mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
         mGLSurfaceView.setRenderer(renderer);
     }
