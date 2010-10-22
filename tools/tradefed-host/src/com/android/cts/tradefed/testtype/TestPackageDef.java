@@ -16,10 +16,13 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.Log;
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.InstrumentationTest;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Container for CTS test info.
@@ -38,6 +41,8 @@ public class TestPackageDef {
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
     private boolean mIsReferenceAppTest = false;
+
+    private Collection<TestIdentifier> mTests = new ArrayList<TestIdentifier>();
 
     void setUri(String uri) {
         mUri = uri;
@@ -117,10 +122,13 @@ public class TestPackageDef {
      */
     public IRemoteTest createTest(File testCaseDir) {
         if (mIsHostSideTest) {
-            // TODO: implement this
-            Log.w(LOG_TAG, String.format("Skipping currently unsupported host side test %s",
-                    mName));
-            return null;
+            Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
+            JarHostTest hostTest = new JarHostTest();
+            hostTest.setRunName(mName);
+            hostTest.setJarFile(new File(testCaseDir, mJarPath));
+            hostTest.setTestAppPath(testCaseDir.getAbsolutePath());
+            hostTest.setTests(mTests);
+            return hostTest;
         } else if (mIsSignatureTest) {
             // TODO: implement this
             Log.w(LOG_TAG, String.format("Skipping currently unsupported signature test %s",
@@ -146,5 +154,23 @@ public class TestPackageDef {
             instrTest.setInstallFile(apkFile);
             return instrTest;
         }
+    }
+
+    /**
+     * Add a {@link TestDef} to the list of tests in this package.
+     *
+     * @param testdef
+     */
+    void addTest(TestIdentifier testDef) {
+        mTests.add(testDef);
+    }
+
+    /**
+     * Get the collection of tests in this test package.
+     * <p/>
+     * Exposed for unit testing.
+     */
+    Collection<TestIdentifier> getTests() {
+        return mTests;
     }
 }

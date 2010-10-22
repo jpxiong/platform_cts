@@ -22,7 +22,7 @@ LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_MODULE := cts-tradefed
 LOCAL_MODULE_TAGS := optional
-LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt
+LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt hosttestlib
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 

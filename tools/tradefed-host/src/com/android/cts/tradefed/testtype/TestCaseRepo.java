@@ -68,7 +68,7 @@ class TestCaseRepo implements ITestCaseRepo {
      * @throws ParseException
      */
     private void parseTestFromXml(File xmlFile)  {
-        TestCaseXmlParser parser = new TestCaseXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser();
         try {
             parser.parse(createStreamFromFile(xmlFile));
             TestPackageDef def = parser.getTestPackageDef();
