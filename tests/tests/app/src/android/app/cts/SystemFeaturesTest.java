@@ -38,7 +38,6 @@ import android.test.InstrumentationTestCase;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -240,55 +239,23 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         int phoneType = mTelephonyManager.getPhoneType();
         switch (phoneType) {
             case TelephonyManager.PHONE_TYPE_GSM:
-                assertTelephonyFeatures(PackageManager.FEATURE_TELEPHONY,
-                        PackageManager.FEATURE_TELEPHONY_GSM);
+                assertAvailable(PackageManager.FEATURE_TELEPHONY);
+                assertAvailable(PackageManager.FEATURE_TELEPHONY_GSM);
                 break;
 
             case TelephonyManager.PHONE_TYPE_CDMA:
-                assertTelephonyFeatures(PackageManager.FEATURE_TELEPHONY,
-                        PackageManager.FEATURE_TELEPHONY_CDMA);
+                assertAvailable(PackageManager.FEATURE_TELEPHONY);
+                assertAvailable(PackageManager.FEATURE_TELEPHONY_CDMA);
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
-                assertTelephonyFeatures();
+                assertNotAvailable(PackageManager.FEATURE_TELEPHONY);
+                assertNotAvailable(PackageManager.FEATURE_TELEPHONY_CDMA);
+                assertNotAvailable(PackageManager.FEATURE_TELEPHONY_GSM);
                 break;
 
             default:
                 throw new IllegalArgumentException("Did you add a new phone type? " + phoneType);
-        }
-    }
-
-    /**
-     * Checks that the given features are enabled and also that all the other telephony features
-     * are disabled.
-     *
-     * @param expectedFeaturesEnabled that {@link PackageManager} should report
-     */
-    private void assertTelephonyFeatures(String... expectedFeaturesEnabled) {
-        // Create sets of enabled and disabled features.
-        Set<String> enabledFeatures = new HashSet<String>();
-        Collections.addAll(enabledFeatures, expectedFeaturesEnabled);
-
-        Set<String> disabledFeatures = new HashSet<String>();
-        Collections.addAll(disabledFeatures,
-                PackageManager.FEATURE_TELEPHONY,
-                PackageManager.FEATURE_TELEPHONY_GSM,
-                PackageManager.FEATURE_TELEPHONY_CDMA);
-        disabledFeatures.removeAll(enabledFeatures);
-
-        // Get all available features to test not only hasFeature but getSystemAvailableFeatures.
-        PackageManager packageManager = mContext.getPackageManager();
-        Set<String> availableFeatures = new HashSet<String>();
-        for (FeatureInfo featureInfo : packageManager.getSystemAvailableFeatures()) {
-            availableFeatures.add(featureInfo.name);
-        }
-
-        for (String feature : enabledFeatures) {
-            assertAvailable(feature);
-        }
-
-        for (String feature : disabledFeatures) {
-            assertNotAvailable(feature);
         }
     }
 
