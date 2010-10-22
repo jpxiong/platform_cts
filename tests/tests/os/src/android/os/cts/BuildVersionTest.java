@@ -27,13 +27,14 @@ import junit.framework.TestCase;
 public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
-    private static final String EXPECTED_RELEASE = "2.2.1";
-    private static final String EXPECTED_SDK = "8";
+    private static final String EXPECTED_RELEASE = "2.3";
+    private static final int EXPECTED_SDK = 9;
 
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
         assertEquals(EXPECTED_RELEASE, Build.VERSION.RELEASE);
-        assertEquals(EXPECTED_SDK, Build.VERSION.SDK);
+        assertEquals("" + EXPECTED_SDK, Build.VERSION.SDK);
+        assertEquals(EXPECTED_SDK, Build.VERSION.SDK_INT);
     }
 
     /**
