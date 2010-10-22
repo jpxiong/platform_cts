@@ -440,4 +440,18 @@ public class TelephonyManagerTest extends AndroidTestCase {
             }
         }
     }
+
+    private static final String ISO_COUNTRY_CODE_PATTERN = "[a-z]{2}";
+
+    public void testGetNetworkCountryIso() {
+        String countryCode = mTelephonyManager.getNetworkCountryIso();
+        assertTrue("Country code '" + countryCode + "' did not match " + ISO_COUNTRY_CODE_PATTERN,
+                Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+    }
+
+    public void testGetSimCountryIso() {
+        String countryCode = mTelephonyManager.getSimCountryIso();
+        assertTrue("Country code '" + countryCode + "' did not match " + ISO_COUNTRY_CODE_PATTERN,
+                Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+    }
 }
