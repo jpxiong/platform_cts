@@ -63,9 +63,7 @@ public class RingtoneManagerTest
         mOriginalVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
         mDefaultUri = RingtoneManager.getActualDefaultRingtoneUri(mContext,
                 RingtoneManager.TYPE_RINGTONE);
-        // set ringer to a reasonable volume
-        int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
-        mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume / 2,
+        mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE,
                 AudioManager.FLAG_ALLOW_RINGER_MODES);
     }
 
