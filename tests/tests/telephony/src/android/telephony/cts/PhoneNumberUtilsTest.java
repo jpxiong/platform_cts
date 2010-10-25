@@ -282,12 +282,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:+18005555555"));
         assertEquals("+18005555555", PhoneNumberUtils.getNumberFromIntent(intent, getContext()));
 
-        intent = new Intent(Intent.ACTION_DIAL, Uri.parse("voicemail:"));
-        TelephonyManager tm =
-                (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        assertEquals(tm.getVoiceMailNumber(),
-                PhoneNumberUtils.getNumberFromIntent(intent, getContext()));
-
         ContentResolver cr = getContext().getContentResolver();
         Uri personRecord = null;
         Uri phoneRecord = null;
