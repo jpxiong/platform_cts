@@ -157,11 +157,17 @@ public class CtsTestResult {
         int resCode = CODE_PASS;
         String failedMessage = null;
         String stackTrace = null;
-        if ((testResult != null) && (testResult.failureCount() > 0)) {
+        if ((testResult != null) && (testResult.failureCount() > 0 || testResult.errorCount() > 0)) {
             resCode = CODE_FAIL;
             Enumeration<TestFailure> failures = testResult.failures();
             while (failures.hasMoreElements()) {
                 TestFailure failure = failures.nextElement();
+                failedMessage += failure.exceptionMessage();
+                stackTrace += failure.trace();
+            }
+            Enumeration<TestFailure> errors = testResult.errors();
+            while (errors.hasMoreElements()) {
+                TestFailure failure = errors.nextElement();
                 failedMessage += failure.exceptionMessage();
                 stackTrace += failure.trace();
             }
