@@ -76,6 +76,7 @@ public class BuildDalvikSuite {
     private static String restrictTo = null; // e.g. restrict to
     // "opcodes.add_double"
 
+    private static final String TARGET_JAR_ROOT_PATH = "/data/local/tmp";
     
     private int testClassCnt = 0;
     private int testMethodsCnt = 0;
@@ -275,13 +276,14 @@ public class BuildDalvikSuite {
 
     private void addCTSHostMethod(String pName, String method, MethodData md,
             Set<String> dependentTestClassNames) {
+    	final String targetCoreJarPath = String.format("%s/dexcore.jar", TARGET_JAR_ROOT_PATH);
     	curJunitFileData+="public void "+method+ "() throws Exception {\n";
         curJunitFileData+= "    "+getADBPushJavaLine("dot/junit/dexcore.jar",
-                "/data/dexcore.jar");
+        		targetCoreJarPath);
 
         // push class with Main jar.
         String mjar = "Main_"+method+".jar";
-        String mainJar = "/data/"+mjar;
+        String mainJar = String.format("%s/%s", TARGET_JAR_ROOT_PATH, mjar);
         String pPath = pName.replaceAll("\\.","/");
         //System.out.println("adb push "+pPath+"/"+mjar +" "+mainJar);
         curJunitFileData+= "    "+getADBPushJavaLine(pPath+"/"+mjar, mainJar);
@@ -289,10 +291,10 @@ public class BuildDalvikSuite {
         // for each dependency:
         // adb push dot/junit/opcodes/add_double_2addr/Main_testN2.jar
         // /data/Main_testN2.jar
-        String cp = "/data/dexcore.jar:"+mainJar;
+        String cp = String.format("%s:%s", targetCoreJarPath, mainJar);
         for (String depFqcn : dependentTestClassNames) {
             int lastDotPos = depFqcn.lastIndexOf('.');
-            String targetName= "/data/"+depFqcn.substring(lastDotPos +1)+".jar";
+            String targetName= TARGET_JAR_ROOT_PATH+depFqcn.substring(lastDotPos +1)+".jar";
             String sourceName = depFqcn.replaceAll("\\.", "/")+".jar";
             //System.out.println("adb push "+sourceName+" "+targetName);
             curJunitFileData+= "    "+getADBPushJavaLine(sourceName, targetName);
@@ -306,10 +308,6 @@ public class BuildDalvikSuite {
         curJunitFileData+= "    "+getADBExecJavaLine(cp, mainclass);
         curJunitFileData+= "}\n\n"; 
     }    
-    
-    
- 
-    
     
     private void handleTests() throws IOException {
         System.out.println("collected "+testMethodsCnt+" test methods in " + 
