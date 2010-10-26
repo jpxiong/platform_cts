@@ -1,10 +1,14 @@
 
 package dot.junit;
 
+
+import com.android.ddmlib.IDevice;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 public class DeviceUtil {
@@ -86,22 +90,19 @@ public class DeviceUtil {
         }
         return f.getAbsolutePath();
     }
-    
-    public static void adbPush(String source, String target) 
+
+    public static void adbPush(IDevice device, String source, String target)
             throws IOException {
-        DeviceUtil.digestCommand(new String[] {"adb", "push",
+        DeviceUtil.digestCommand(new String[] {"adb", "-s", device.getSerialNumber(), "push",
             DeviceUtil.createFilePath(source), target}, null);
     }
 
-    public static void adbExec(String classpath, String mainclass) {
-        DeviceUtil.digestCommand(new String[] {"adb", "shell", "mkdir", 
-               "/data/local/tmp/dalvik-cache"}, null);
-        DeviceUtil.digestCommand(new String[] {"adb", "shell", "ANDROID_DATA=/data/local/tmp", 
-               "dalvikvm", "-Xint:portable", "-Xmx512M",
-               "-Xss32K", "-Djava.io.tmpdir=/data/local/tmp",
-               "-classpath", classpath, mainclass,
-               "&&", "echo", "mk_dalvikvmok" }, "mk_dalvikvmok");
+    public static void adbExec(IDevice device, String classpath, String mainclass) {
+        DeviceUtil.digestCommand(new String[] {"adb", "-s", device.getSerialNumber(), "shell",
+               "mkdir", "/data/local/tmp/dalvik-cache"}, null);
+        DeviceUtil.digestCommand(new String[] {"adb", "-s", device.getSerialNumber(), "shell",
+               "ANDROID_DATA=/data/local/tmp", "dalvikvm", "-Xint:portable", "-Xmx512M", "-Xss32K",
+               "-Djava.io.tmpdir=/data/local/tmp", "-classpath", classpath, mainclass, "&&",
+               "echo", "mk_dalvikvmok" }, "mk_dalvikvmok");
     }
-    
- 
-}
+ }
