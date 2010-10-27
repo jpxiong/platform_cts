@@ -94,7 +94,9 @@ public class DeviceUtil {
     }
 
     public static void adbExec(String classpath, String mainclass) {
-        DeviceUtil.digestCommand(new String[] {"adb", "shell",
+        DeviceUtil.digestCommand(new String[] {"adb", "shell", "mkdir", 
+               "/data/local/tmp/dalvik-cache"}, null);
+        DeviceUtil.digestCommand(new String[] {"adb", "shell", "ANDROID_DATA=/data/local/tmp", 
                "dalvikvm", "-Xint:portable", "-Xmx512M",
                "-Xss32K", "-Djava.io.tmpdir=/data/local/tmp",
                "-classpath", classpath, mainclass,
