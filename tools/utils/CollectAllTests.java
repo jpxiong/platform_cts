@@ -297,6 +297,11 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, BROKEN_TEST) != null;
     }
 
+    private boolean isSuppressed(final Class<? extends TestCase> testClass,
+            final String testName)  {
+        return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
+    }
+
     private String getAnnotation(final Class<? extends TestCase> testClass,
             final String testName, final String annotationName) {
         try {
@@ -341,6 +346,9 @@ public class CollectAllTests extends DescriptionGenerator {
         } else if (isBrokenTest(test.getClass(), testName)) {
             System.out.println("ignoring broken test: " + test);
             return;
+        } else if (isSuppressed(test.getClass(), testName)) {
+            System.out.println("ignoring suppressed test: " + test);
+            return;
         }
 
         if (!testName.startsWith("test")) {
@@ -359,7 +367,7 @@ public class CollectAllTests extends DescriptionGenerator {
             testCases.put(testClassName, testClass);
         }
 
-        testClass.mCases.add(new TestMethod(testName, "", "", knownFailure, false));
+        testClass.mCases.add(new TestMethod(testName, "", "", knownFailure, false, false));
 
         try {
             test.getClass().getConstructor(new Class<?>[0]);
