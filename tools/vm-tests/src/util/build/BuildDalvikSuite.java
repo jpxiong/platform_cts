@@ -64,7 +64,7 @@ public class BuildDalvikSuite {
 
     // the folder for the generated junit-files for the cts host (which in turn
     // execute the real vm tests using adb push/shell etc)
-    private static String HOSTJUNIT_SRC_OUTPUT_FOLDER = ""; 
+    private static String HOSTJUNIT_SRC_OUTPUT_FOLDER = "";
     private static String OUTPUT_FOLDER = "";
     private static String COMPILED_CLASSES_FOLDER = "";
 
@@ -77,11 +77,11 @@ public class BuildDalvikSuite {
     // "opcodes.add_double"
 
     private static final String TARGET_JAR_ROOT_PATH = "/data/local/tmp";
-    
+
     private int testClassCnt = 0;
     private int testMethodsCnt = 0;
-    
-    
+
+
     /*
      * using a linked hashmap to keep the insertion order for iterators.
      * the junit suite/tests adding order is used to generate the order of the
@@ -113,9 +113,9 @@ public class BuildDalvikSuite {
             CLASSES_OUTPUT_FOLDER = MAIN_SRC_OUTPUT_FOLDER + "/classes";
 
             COMPILED_CLASSES_FOLDER = args[4];
-            
+
             HOSTJUNIT_SRC_OUTPUT_FOLDER = args[5];
-            HOSTJUNIT_CLASSES_OUTPUT_FOLDER = HOSTJUNIT_SRC_OUTPUT_FOLDER 
+            HOSTJUNIT_CLASSES_OUTPUT_FOLDER = HOSTJUNIT_SRC_OUTPUT_FOLDER
                     + "/classes";
 
             if (args.length > 6) {
@@ -193,12 +193,14 @@ public class BuildDalvikSuite {
         }
         li.add(method);
     }
-    
+
     private static final String ctsAllTestsB =
         "package dot.junit;\n" +
         "import junit.framework.Test;\n" +
         "import junit.framework.TestSuite;\n" +
-        "public class AllJunitHostTests {\n" +
+        "import com.android.hosttest.DeviceTestSuite;\n" +
+        "\n" +
+        "public class AllJunitHostTests extends DeviceTestSuite {\n" +
         "    public static final Test suite() {\n" +
         "        TestSuite suite = new TestSuite(\"CTS Host tests for all " +
         " dalvik vm opcodes\");\n";
@@ -213,7 +215,7 @@ public class BuildDalvikSuite {
     private String curAllTestsData = ctsAllTestsB;
     private String curJunitFileName = null;
     private String curJunitFileData = "";
-    
+
     private JavacBuildStep javacHostJunitBuildStep;
 
     private void flushHostJunitFile() {
@@ -229,7 +231,7 @@ public class BuildDalvikSuite {
             curJunitFileData = "";
         }
     }
-    
+
     private void ctsFinish() {
     	flushHostJunitFile();
     	curAllTestsData+="return suite;\n}\n}\n";
@@ -242,35 +244,36 @@ public class BuildDalvikSuite {
     	javacHostJunitBuildStep.addSourceFile(new File(
     	        HOSTJUNIT_SRC_OUTPUT_FOLDER + "/dot/junit/DeviceUtil.java").
     	        getAbsolutePath());
-    	
     }
-    
+
     private void openCTSHostFileFor(String pName, String classOnlyName) {
         String sourceName = "JUnit_"+classOnlyName;
         // Add to AllTests.java
-        String suiteline = "suite.addTestSuite("+pName+"." + sourceName + 
+        String suiteline = "suite.addTestSuite("+pName+"." + sourceName +
                 ".class);\n";
         curAllTestsData += suiteline;
         // flush previous JunitFile
         flushHostJunitFile();
 
         // prepare current testcase-file
-        curJunitFileName = HOSTJUNIT_SRC_OUTPUT_FOLDER+"/" 
+        curJunitFileName = HOSTJUNIT_SRC_OUTPUT_FOLDER+"/"
                 + pName.replaceAll("\\.","/")+"/"+sourceName+".java";
         curJunitFileData =
             "package "+pName+";\n"+
             "import java.io.IOException;\n"+
             "import junit.framework.TestCase;\n"+
-            "import dot.junit.DeviceUtil;\n"+
-            "public class "+sourceName+" extends TestCase {\n";
+            "import com.android.hosttest.DeviceTestCase;\n"+
+            "import dot.junit.DeviceUtil;\n" +
+            "\n" +
+            "public class "+sourceName+" extends DeviceTestCase {\n";
     }
 
     private String getADBPushJavaLine(String source, String target) {
-        return "DeviceUtil.adbPush(\"" + source + "\", \"" + target + "\");";
+        return "DeviceUtil.adbPush(getDevice(), \"" + source + "\", \"" + target + "\");";
     }
 
     private String getADBExecJavaLine(String classpath, String mainclass) {
-        return "DeviceUtil.adbExec(\"" + classpath + "\", \"" + 
+        return "DeviceUtil.adbExec(getDevice(), \"" + classpath + "\", \"" +
                 mainclass + "\");";
     }
 
@@ -300,18 +303,18 @@ public class BuildDalvikSuite {
             //System.out.println("adb push "+sourceName+" "+targetName);
             curJunitFileData+= "    "+getADBPushJavaLine(sourceName, targetName);
             cp+= ":"+targetName;
-            // dot.junit.opcodes.invoke_interface_range.ITest 
+            // dot.junit.opcodes.invoke_interface_range.ITest
             // -> dot/junit/opcodes/invoke_interface_range/ITest.jar
         }
 
         //"dot.junit.opcodes.add_double_2addr.Main_testN2";
         String mainclass = pName + ".Main_" + method;
         curJunitFileData+= "    "+getADBExecJavaLine(cp, mainclass);
-        curJunitFileData+= "}\n\n"; 
-    }    
-    
+        curJunitFileData+= "}\n\n";
+    }
+
     private void handleTests() throws IOException {
-        System.out.println("collected "+testMethodsCnt+" test methods in " + 
+        System.out.println("collected "+testMethodsCnt+" test methods in " +
                 testClassCnt+" junit test classes");
         String datafileContent = "";
         Set<BuildStep> targets = new TreeSet<BuildStep>();
@@ -360,9 +363,9 @@ public class BuildDalvikSuite {
 
                 Set<String> dependentTestClassNames = parseTestClassName(pName,
                         classOnlyName, methodContent);
-                
+
                 addCTSHostMethod(pName, method, md, dependentTestClassNames);
-                
+
 
                 if (dependentTestClassNames.isEmpty()) {
                     continue;
@@ -409,7 +412,7 @@ public class BuildDalvikSuite {
 
                 char ca = method.charAt("test".length()); // either N,B,E,
                 // or V (VFE)
-                String comment;                
+                String comment;
                 switch (ca) {
                 case 'N':
                     comment = "Normal #" + method.substring(5);
@@ -432,8 +435,8 @@ public class BuildDalvikSuite {
                 for (String className : dependentTestClassNames) {
                     line += className + " ";
                 }
-                
-                
+
+
                 // test description
                 String[] pparts = pName.split("\\.");
                 // detail e.g. add_double
@@ -460,25 +463,25 @@ public class BuildDalvikSuite {
 
                     // Unescape reserved words
                     detail = detail.replace("opc-", "");
-                    
+
                     description = detail;
                 } else if ("verify".equals(type)) {
                     description = "verifier";
                 } else {
                     description = type + " " + detail;
-                }                
+                }
 
                 String details = (md.title != null ? md.title : "");
                 if (md.constraint != null) {
                     details = " Constraint " + md.constraint + ", " + details;
                 }
                 if (details.length() != 0) {
-                    details = details.substring(0, 1).toUpperCase() 
+                    details = details.substring(0, 1).toUpperCase()
                             + details.substring(1);
                 }
-                
+
                 line += ";" + description + ";" + comment + ";" + details;
-                
+
                 datafileContent += line + "\n";
                 generateBuildStepFor(pName, method, dependentTestClassNames,
                         targets);
@@ -486,10 +489,10 @@ public class BuildDalvikSuite {
 
 
         }
-        
+
         // write latest HOSTJUNIT generated file and AllTests.java
         ctsFinish();
-        
+
         File scriptDataDir = new File(OUTPUT_FOLDER + "/data/");
         scriptDataDir.mkdirs();
         writeToFile(new File(scriptDataDir, "scriptdata"), datafileContent);
@@ -497,13 +500,13 @@ public class BuildDalvikSuite {
         if (!javacHostJunitBuildStep.build()) {
             System.out.println("main javac cts-host-hostjunit-classes build " +
                     "step failed");
-            System.exit(1);        	
+            System.exit(1);
         }
-        
+
         if (javacBuildStep.build()) {
             for (BuildStep buildStep : targets) {
                 if (!buildStep.build()) {
-                    System.out.println("building failed. buildStep: " + 
+                    System.out.println("building failed. buildStep: " +
                             buildStep.getClass().getName()+", "+buildStep);
                     System.exit(1);
                 }
@@ -791,12 +794,12 @@ public class BuildDalvikSuite {
     private void writeToFileMkdir(File file, String content) {
 	    File parent = file.getParentFile();
 	    if (!parent.exists() && !parent.mkdirs()) {
-	        throw new RuntimeException("failed to create directory: " + 
+	        throw new RuntimeException("failed to create directory: " +
 	                parent.getAbsolutePath());
 	    }
 	    writeToFile(file, content);
-    }    
-    
+    }
+
     private void writeToFile(File file, String content) {
         try {
             if (file.length() == content.length()) {
