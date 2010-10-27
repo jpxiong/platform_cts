@@ -48,7 +48,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.7";
+    private static final String CTS_RESULT_FILE_VERSION = "1.8";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -342,6 +342,9 @@ public class TestSessionLog extends XMLResourceHandler {
                         DeviceParameterCollector.BUILD_TYPE, bldInfo.getBuildType());
                 setAttribute(doc, devInfoNode,
                         DeviceParameterCollector.BUILD_MODEL, bldInfo.getBuildModel());
+                setAttribute(doc, devInfoNode,
+                        DeviceParameterCollector.BUILD_MANUFACTURER,
+                                bldInfo.getBuildManufacturer());
                 setAttribute(doc, devInfoNode,
                         DeviceParameterCollector.BUILD_BRAND, bldInfo.getBuildBrand());
                 setAttribute(doc, devInfoNode,

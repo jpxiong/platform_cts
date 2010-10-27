@@ -399,6 +399,7 @@ public class TestDevice implements DeviceObserver {
         public static final String BUILD_FINGERPRINT = "build_fingerprint";
         public static final String BUILD_TAGS = "build_tags";
         public static final String BUILD_TYPE = "build_type";
+        public static final String BUILD_MANUFACTURER = "build_manufacturer";
         public static final String BUILD_MODEL = "build_model";
         public static final String BUILD_BRAND = "build_brand";
         public static final String BUILD_BOARD = "build_board";
@@ -600,6 +601,15 @@ public class TestDevice implements DeviceObserver {
          */
         public String getBuildModel() {
             return mInfoMap.get(BUILD_MODEL);
+        }
+
+        /**
+         * Get the build manufacturer.
+         *
+         * @return The build manufacturer.
+         */
+        public String getBuildManufacturer() {
+            return mInfoMap.get(BUILD_MANUFACTURER);
         }
 
         /**
