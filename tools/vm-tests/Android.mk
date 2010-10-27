@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := $(call all-src-files)
 LOCAL_MODULE := cts-dalvik-buildutil
 LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 
-LOCAL_JAVA_LIBRARIES := dx dasm cfassembler 
+LOCAL_JAVA_LIBRARIES := dx dasm cfassembler hosttestlib ddmlib
 LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
 
 include $(BUILD_HOST_JAVA_LIBRARY)
@@ -66,12 +66,13 @@ $(GENERATED_FILES): PRIVATE_LIB_FOLDER := $(LOCAL_PATH)/lib
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES := $(intermediates)/tests
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_MAIN_FILES := $(intermediates)/main_files
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES := $(intermediates)/hostjunit_files
-$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar
+$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar  $(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar $(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar
+
 	$(hide) mkdir -p $@
 # copy Util class to compile later together with the generated host side junit tests	
 	$(hide) mkdir -p $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit && cp $(PRIVATE_SRC_FOLDER)/util/build/DeviceUtil.java.template $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit/DeviceUtil.java
 # generated and compile the host side junit tests
-	$(hide) java -cp $(subst $(space),$(colon),$^):$(HOST_JDK_TOOLS_JAR) util.build.BuildDalvikSuite $(PRIVATE_SRC_FOLDER) $(PRIVATE_INTERMEDIATES) $<:$(PRIVATE_LIB_FOLDER)/junit.jar $(PRIVATE_INTERMEDIATES_MAIN_FILES) $(BUILD_UTIL_INTERMEDIATES_CLASSES) $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES) $$RUN_VM_TESTS_RTO
+	$(hide) java -cp $(subst $(space),$(colon),$^):$(HOST_JDK_TOOLS_JAR) util.build.BuildDalvikSuite $(PRIVATE_SRC_FOLDER) $(PRIVATE_INTERMEDIATES) $<:$(PRIVATE_LIB_FOLDER)/junit.jar:$(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar:$(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar $(PRIVATE_INTERMEDIATES_MAIN_FILES) $(BUILD_UTIL_INTERMEDIATES_CLASSES) $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES) $$RUN_VM_TESTS_RTO
 	@echo "wrote generated Main_*.java files to $(PRIVATE_INTERMEDIATES_MAIN_FILES)"
 INSTALLED_TESTS := $(dir $(LOCAL_INSTALLED_MODULE))../cts_dalviktests/timestamp
 
