@@ -1229,6 +1229,7 @@ public class TestDevice implements DeviceObserver {
         public final static int STATUS_PASS = 0;
         public final static int STATUS_FAIL = -1;
         public final static int STATUS_ERROR = -2;
+        public final static int STATUS_OMITTED = -3;
 
         private ArrayList<String> mResultLines;
 
@@ -1247,7 +1248,7 @@ public class TestDevice implements DeviceObserver {
             mResultLines = new ArrayList<String>();
             mStackTrace = null;
             mFailedMsg = null;
-            mResultCode = CtsTestResult.CODE_OMITTED;
+            mResultCode = CtsTestResult.CODE_FAIL;
         }
 
         /** {@inheritDoc} */
@@ -1443,6 +1444,10 @@ public class TestDevice implements DeviceObserver {
             case STATUS_ERROR:
                 mResultCode = CtsTestResult.CODE_FAIL;
                 break;
+
+            case STATUS_OMITTED:
+                mResultCode = CtsTestResult.CODE_OMITTED;
+                break;
             }
         }
 
@@ -1508,6 +1513,10 @@ public class TestDevice implements DeviceObserver {
                 case STATUS_PASS:
                     mResultCode = CtsTestResult.CODE_PASS;
                     break;
+
+                case STATUS_OMITTED:
+                    mResultCode = CtsTestResult.CODE_OMITTED;
+                    break;
                 }
                 resultLines.removeAll(resultLines);
             }
@@ -1558,6 +1567,10 @@ public class TestDevice implements DeviceObserver {
                 case STATUS_FAIL:
                     mTest.setResult(new CtsTestResult(
                             CtsTestResult.CODE_FAIL, mFailedMsg, mStackTrace));
+                    break;
+
+                case STATUS_OMITTED:
+                    mTest.setResult(new CtsTestResult(CtsTestResult.CODE_OMITTED));
                     break;
                 }
             }

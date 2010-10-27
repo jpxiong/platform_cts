@@ -65,6 +65,7 @@ public class DescriptionGenerator extends Doclet {
     static final String HOST_CONTROLLER = "dalvik.annotation.HostController";
     static final String KNOWN_FAILURE = "dalvik.annotation.KnownFailure";
     static final String BROKEN_TEST = "dalvik.annotation.BrokenTest";
+    static final String SUPPRESSED_TEST = "android.test.suitebuilder.annotation.Suppress";
 
     static final String JUNIT_TEST_CASE_CLASS_NAME = "junit.framework.testcase";
     static final String TAG_PACKAGE = "TestPackage";
@@ -403,7 +404,7 @@ public class DescriptionGenerator extends Doclet {
                 elem.getParentNode().removeChild(elem);
             } else {
                 for (TestMethod caze : cases) {
-                    if (caze.mIsBroken || caze.mKnownFailure != null) {
+                    if (caze.mIsBroken || caze.mIsSuppressed || caze.mKnownFailure != null) {
                         continue;
                     }
                     Node caseNode = elem.appendChild(mDoc.createElement(TAG_TEST));
@@ -524,6 +525,7 @@ public class DescriptionGenerator extends Doclet {
                 String controller = "";
                 String knownFailure = null;
                 boolean isBroken = false;
+                boolean isSuppressed = false;
                 for (AnnotationDesc cAnnot : annotations) {
 
                     AnnotationTypeDoc atype = cAnnot.annotationType();
@@ -533,12 +535,14 @@ public class DescriptionGenerator extends Doclet {
                         knownFailure = getAnnotationDescription(cAnnot);
                     } else if (atype.toString().equals(BROKEN_TEST)) {
                         isBroken = true;
+                    } else if (atype.toString().equals(SUPPRESSED_TEST)) {
+                        isSuppressed = true;
                     }
                 }
 
                 if (name.startsWith("test")) {
                     cases.add(new TestMethod(name, method.commentText(), controller, knownFailure,
-                            isBroken));
+                            isBroken, isSuppressed));
                 }
             }
 
@@ -596,6 +600,7 @@ public class DescriptionGenerator extends Doclet {
         String mController;
         String mKnownFailure;
         boolean mIsBroken;
+        boolean mIsSuppressed;
 
         /**
          * Construct an test case object.
@@ -605,12 +610,13 @@ public class DescriptionGenerator extends Doclet {
          * @param knownFailure The reason of known failure.
          */
         TestMethod(String name, String description, String controller, String knownFailure,
-                boolean isBroken) {
+                boolean isBroken, boolean isSuppressed) {
             mName = name;
             mDescription = description;
             mController = controller;
             mKnownFailure = knownFailure;
             mIsBroken = isBroken;
+            mIsSuppressed = isSuppressed;
         }
     }
 }
