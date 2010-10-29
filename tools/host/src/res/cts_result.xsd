@@ -16,8 +16,8 @@
  -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://compatibility.android.com/cts_result/1.7"
-           xmlns="http://compatibility.android.com/cts_result/1.7"
+           targetNamespace="http://compatibility.android.com/cts_result/1.8"
+           xmlns="http://compatibility.android.com/cts_result/1.8"
            elementFormDefault="qualified">
 
 <xs:element name="TestResult">
@@ -57,6 +57,7 @@
         <xs:attribute name="buildName" type="xs:string"/>
         <xs:attribute name="buildVersion" type="xs:string"/>
         <xs:attribute name="build_board" type="xs:string"/>
+        <xs:attribute name="build_manufacturer" type="xs:string"/>
         <xs:attribute name="build_brand" type="xs:string"/>
         <xs:attribute name="build_device" type="xs:string"/>
         <xs:attribute name="build_fingerprint" type="xs:string"/>
