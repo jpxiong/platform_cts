@@ -198,6 +198,11 @@ public class DateUtilsTest extends AndroidTestCase {
     })
     @SuppressWarnings("deprecation")
     public void testFormatMethods() {
+        if (!LocaleUtils.isSupportedLocale(Locale.US)) {
+            // Locale is set to US in setUp method.
+            return;
+        }
+
         long elapsedTime = 2 * 60 * 60;
         String expected = "2:00:00";
         assertEquals(expected, DateUtils.formatElapsedTime(elapsedTime));
