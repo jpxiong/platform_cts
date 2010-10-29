@@ -245,9 +245,13 @@ public class YuvImageTest extends AndroidTestCase {
         Bitmap expected = null;
         Bitmap actual = null;
         boolean sameRect = rect1.equals(rect2) ? true : false;
-        expected = Bitmap.createBitmap(testBitmap, rect1.left, rect1.top,
-                rect1.width(), rect1.height());
-        actual = compressDecompress(image, rect2);
+
+		Rect actualRect = new Rect(rect2);
+        actual = compressDecompress(image, actualRect);
+
+        Rect expectedRect = sameRect ? actualRect : rect1;
+        expected = Bitmap.createBitmap(testBitmap, expectedRect.left, expectedRect.top, expectedRect.width(), expectedRect.height());
+        
         compareBitmaps(expected, actual, mMseMargin, sameRect);
     }
 
