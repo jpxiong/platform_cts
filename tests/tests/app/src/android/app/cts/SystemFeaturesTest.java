@@ -30,6 +30,7 @@ import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.location.LocationManager;
 import android.net.sip.SipManager;
@@ -106,10 +107,39 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
     }
 
     public void testCameraFeatures() {
+        int numCameras = Camera.getNumberOfCameras();
+        if (numCameras == 0) {
+            assertNotAvailable(PackageManager.FEATURE_CAMERA);
+            assertNotAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
+            assertNotAvailable(PackageManager.FEATURE_CAMERA_FLASH);
+            assertNotAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+        } else {
+            checkFrontCamera();
+            checkRearCamera();
+        }
+    }
+
+    private void checkFrontCamera() {
+        CameraInfo info = new CameraInfo();
+        int numCameras = Camera.getNumberOfCameras();
+        int frontCameraId = -1;
+        for (int i = 0; i < numCameras; i++) {
+            Camera.getCameraInfo(i, info);
+            if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+                frontCameraId = i;
+            }
+        }
+
+        if (frontCameraId > -1) {
+            assertAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+        }
+    }
+
+    private void checkRearCamera() {
         Camera camera = null;
         try {
-            // Try getting a camera. This is unlikely to fail but implentations without a camera
-            // could return null or throw an exception.
             camera = Camera.open();
             if (camera != null) {
                 assertAvailable(PackageManager.FEATURE_CAMERA);
@@ -131,10 +161,6 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 assertNotAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
                 assertNotAvailable(PackageManager.FEATURE_CAMERA_FLASH);
             }
-        } catch (RuntimeException e) {
-            assertNotAvailable(PackageManager.FEATURE_CAMERA);
-            assertNotAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
-            assertNotAvailable(PackageManager.FEATURE_CAMERA_FLASH);
         } finally {
             if (camera != null) {
                 camera.release();
