@@ -70,6 +70,18 @@
                                             </TD>
                                         </TR>
                                         <TR>
+                                            <TD class="rowtitle">Build Brand</TD>
+                                            <TD>
+                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_brand"/>
+                                            </TD>
+                                        </TR>
+                                        <TR>
+                                            <TD class="rowtitle">Build Manufacturer</TD>
+                                            <TD>
+                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_manufacturer"/>
+                                            </TD>
+                                        </TR>
+                                        <TR>
                                             <TD class="rowtitle">Device ID</TD>
                                             <TD>
                                                 <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/>

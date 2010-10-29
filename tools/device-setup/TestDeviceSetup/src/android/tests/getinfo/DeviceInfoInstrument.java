@@ -65,6 +65,7 @@ public class DeviceInfoInstrument extends Instrumentation {
     private static final String BUILD_TYPE = "build_type";
     private static final String BUILD_MODEL = "build_model";
     private static final String BUILD_BRAND = "build_brand";
+    private static final String BUILD_MANUFACTURER = "build_manufacturer";
     private static final String BUILD_BOARD = "build_board";
     private static final String BUILD_DEVICE = "build_device";
     private static final String PRODUCT_NAME = "buildName";
@@ -87,6 +88,7 @@ public class DeviceInfoInstrument extends Instrumentation {
         addResult(PRODUCT_NAME, Build.PRODUCT);
         addResult(BUILD_DEVICE, Build.DEVICE);
         addResult(BUILD_BOARD, Build.BOARD);
+        addResult(BUILD_MANUFACTURER, Build.MANUFACTURER);
         addResult(BUILD_BRAND, Build.BRAND);
         addResult(BUILD_MODEL, Build.MODEL);
         addResult(BUILD_TYPE, Build.TYPE);
