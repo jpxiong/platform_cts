@@ -19,8 +19,9 @@ package dot.junit.opcodes.filled_new_array_range;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_1;
+import dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_10;
+import dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11;
 import dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_2;
-import dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_9;
 
 public class Test_filled_new_array_range extends DxTestCase {
     /**
@@ -140,31 +141,32 @@ public class Test_filled_new_array_range extends DxTestCase {
     }
     
     /**
-     * @constraint n/a 
+     * @constraint n/a
      * @title attempt to instantiate array of non-existent class
      */
     public void testVFE8() {
+        T_filled_new_array_range_10 t = new T_filled_new_array_range_10();
         try {
-        	Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_10");
-        	fail("expected a verification exception");
-        } catch(Throwable t) {
-        	DxUtil.checkVerifyException(t);	
+            t.run();
+            fail("expected NoClassDefFoundError exception");
+        } catch (NoClassDefFoundError e) {
+            // expected
         }
     }
-    
+
     /**
-     * @constraint n/a 
+     * @constraint n/a
      * @title attempt to instantiate array of inaccessible class
      */
     public void testVFE9() {
-    	//@uses dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11
+        //@uses dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11
         //@uses dot.junit.opcodes.filled_new_array_range.TestStubs
+        T_filled_new_array_range_11 t = new T_filled_new_array_range_11();
         try {
-        	Class.forName("dot.junit.opcodes.filled_new_array_range.d.T_filled_new_array_range_11");
-        	fail("expected a verification exception");
-        } catch(Throwable t) {
-        	DxUtil.checkVerifyException(t);	
+            t.run();
+            fail("expected IllegalAccessError exception");
+        } catch (IllegalAccessError e) {
+            // expected
         }
     }
-    
 }
