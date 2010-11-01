@@ -2699,37 +2699,52 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         )
     })
     public void testSingleLine() {
-        // singleLine
-        mTextView = findTextView(R.id.textview_singleLine);
-        setSpannableText(mTextView, "This is a really long sentence"
-                        + " which can not be placed in one line on the screen.");
+        final TextView textView = new TextView(mActivity);
+        setSpannableText(textView, "This is a really long sentence"
+                + " which can not be placed in one line on the screen.");
 
-        assertEquals(SingleLineTransformationMethod.getInstance(),
-                mTextView.getTransformationMethod());
-        int singleLineWidth = mTextView.getLayout().getWidth();
-        int singleLineHeight = mTextView.getLayout().getHeight();
+        // Narrow layout assures that the text will get wrapped.
+        FrameLayout innerLayout = new FrameLayout(mActivity);
+        innerLayout.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
+        innerLayout.addView(textView);
+
+        final FrameLayout layout = new FrameLayout(mActivity);
+        layout.addView(innerLayout);
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setSingleLine(false);
+                mActivity.setContentView(layout);
+                textView.setSingleLine(true);
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals(null, mTextView.getTransformationMethod());
-        assertTrue(mTextView.getLayout().getHeight() > singleLineHeight);
-        assertTrue(mTextView.getLayout().getWidth() < singleLineWidth);
+
+        assertEquals(SingleLineTransformationMethod.getInstance(),
+                textView.getTransformationMethod());
+        int singleLineWidth = textView.getLayout().getWidth();
+        int singleLineHeight = textView.getLayout().getHeight();
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                textView.setSingleLine(false);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertEquals(null, textView.getTransformationMethod());
+        assertTrue(textView.getLayout().getHeight() > singleLineHeight);
+        assertTrue(textView.getLayout().getWidth() < singleLineWidth);
 
         // same behaviours as setSingLine(true)
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setSingleLine();
+                textView.setSingleLine();
             }
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(SingleLineTransformationMethod.getInstance(),
-                mTextView.getTransformationMethod());
-        assertEquals(singleLineHeight, mTextView.getLayout().getHeight());
-        assertEquals(singleLineWidth, mTextView.getLayout().getWidth());
+                textView.getTransformationMethod());
+        assertEquals(singleLineHeight, textView.getLayout().getHeight());
+        assertEquals(singleLineWidth, textView.getLayout().getWidth());
     }
 
     @TestTargetNew(
