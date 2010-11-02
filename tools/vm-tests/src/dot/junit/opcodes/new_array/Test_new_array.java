@@ -19,16 +19,13 @@ package dot.junit.opcodes.new_array;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.new_array.d.T_new_array_1;
+import dot.junit.opcodes.new_array.d.T_new_array_10;
+import dot.junit.opcodes.new_array.d.T_new_array_11;
 import dot.junit.opcodes.new_array.d.T_new_array_2;
 import dot.junit.opcodes.new_array.d.T_new_array_3;
 
 public class Test_new_array extends DxTestCase {
-    
-     @SuppressWarnings("unused")
-     private class TestStub{
-            // used by testVFE8
-     }
-    
+
     /**
      * @title Array of ints
      */
@@ -59,7 +56,7 @@ public class Test_new_array extends DxTestCase {
             assertFalse(r[i]);
         }
     }
-    
+
     /**
      * @title Array of Objects
      */
@@ -74,7 +71,7 @@ public class Test_new_array extends DxTestCase {
             assertNull(r[i]);
         }
     }
-    
+
     /**
      * @title Array size = 0
      */
@@ -83,7 +80,7 @@ public class Test_new_array extends DxTestCase {
         int[] r = t.run(0);
         assertNotNull(r);
         assertEquals(0, r.length);
-    }    
+    }
 
     /**
      * @title expected NegativeArraySizeException
@@ -97,10 +94,10 @@ public class Test_new_array extends DxTestCase {
             // expected
         }
     }
-    
+
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title  number of registers
      */
     public void testVFE1() {
@@ -113,8 +110,8 @@ public class Test_new_array extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title  size argument - long
      */
     public void testVFE2() {
@@ -125,9 +122,9 @@ public class Test_new_array extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
+     *
      * @constraint B1
      * @title  size argument - reference
      */
@@ -141,8 +138,8 @@ public class Test_new_array extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A19 
+     *
+     * @constraint A19
      * @title  constant pool index
      */
     public void testVFE4() {
@@ -155,8 +152,8 @@ public class Test_new_array extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A22 
+     *
+     * @constraint A22
      * @title  attempt to create object
      */
     public void testVFE5() {
@@ -167,10 +164,10 @@ public class Test_new_array extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint A20 
+     *
+     * @constraint A20
      * @title  array of more than 255 dimensions
      */
     public void testVFE6() {
@@ -181,33 +178,30 @@ public class Test_new_array extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to instantiate array of non-existent class. Java 
-     * throws NoClassDefFoundError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to instantiate array of non-existent class.
      */
     public void testVFE7() {
         try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_new_array_11().run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to instantiate array of inaccessible class. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to instantiate array of inaccessible class.
      */
     public void testVFE8() {
+        //@uses dot.junit.opcodes.new_array.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.new_array.d.T_new_array_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_new_array_10().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
-    
+
 }
