@@ -26,7 +26,7 @@
 
 .method public run()V
 .limit regs 6
-       check-cast v5, dot/junit/opcodes/check_cast/Test_check_cast$TestStub
+       check-cast v5, dot/junit/opcodes/check_cast/TestStubs
        return-void
 .end method
 
