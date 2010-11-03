@@ -20,7 +20,14 @@ import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.iget.d.T_iget_1;
 import dot.junit.opcodes.iget.d.T_iget_11;
+import dot.junit.opcodes.iget.d.T_iget_12;
+import dot.junit.opcodes.iget.d.T_iget_13;
 import dot.junit.opcodes.iget.d.T_iget_2;
+import dot.junit.opcodes.iget.d.T_iget_21;
+import dot.junit.opcodes.iget.d.T_iget_5;
+import dot.junit.opcodes.iget.d.T_iget_6;
+import dot.junit.opcodes.iget.d.T_iget_7;
+import dot.junit.opcodes.iget.d.T_iget_8;
 import dot.junit.opcodes.iget.d.T_iget_9;
 
 public class Test_iget extends DxTestCase {
@@ -98,70 +105,66 @@ public class Test_iget extends DxTestCase {
      */
     public void testVFE3() {
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_13().run();
+            fail("expected a NoSuchFieldError exception");
+        } catch (NoSuchFieldError e) {
+            // expected
         }
     }
     
     /**
      * @constraint n/a
-     * @title Attempt to read inaccessible private field. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read inaccessible private field.
      */
     public void testVFE4() {
         //@uses dot.junit.opcodes.iget.d.T_iget_6
         //@uses dot.junit.opcodes.iget.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_6().run();
+            fail("expected an IllegalAccessError exception");
+        } catch (IllegalAccessError e) {
+            // expected
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to read field of undefined class. Java throws NoClassDefFoundError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read field of undefined class.
      */
     public void testVFE5() {
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_7().run();
+            fail("expected a NoClassDefFoundError exception");
+        } catch (NoClassDefFoundError e) {
+            // expected
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to read undefined field. Java throws NoSuchFieldError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read undefined field.
      */
     public void testVFE6() {
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_8().run();
+            fail("expected a NoSuchFieldError exception");
+        } catch (NoSuchFieldError e) {
+            // expected
         }
     }
     
     /**
      * @constraint n/a
-     * @title Attempt to read superclass' private field from subclass. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read superclass' private field from subclass.
      */
     public void testVFE7() {
         //@uses dot.junit.opcodes.iget.d.T_iget_12
         //@uses dot.junit.opcodes.iget.d.T_iget_1
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_12().run();
+            fail("expected an IllegalAccessError exception");
+        } catch (IllegalAccessError e) {
+            // expected
         }
     }
    
@@ -264,37 +267,33 @@ public class Test_iget extends DxTestCase {
     
     /**
      * @constraint B12
-     * @title Attempt to read protected field of unrelated class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read protected field of unrelated class.
      */
     public void testVFE15() {
         //@uses dot.junit.opcodes.iget.d.T_iget_21
         //@uses dot.junit.opcodes.iget.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_21");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_21().run();
+            fail("expected an IllegalAccessError exception");
+        } catch (IllegalAccessError e) {
+            // expected
         }
     }
-    
     
     /**
      * @constraint A11
-     * @title Attempt to read static field. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read static field.
      */
     public void testVFE16() {
         //@uses dot.junit.opcodes.iget.d.T_iget_5
-        //@uses dot.junit.opcodes.iget.TestStubs        
+        //@uses dot.junit.opcodes.iget.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.iget.d.T_iget_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_iget_5().run();
+            fail("expected an IncompatibleClassChangeError exception");
+        } catch (IncompatibleClassChangeError e) {
+            // expected
         }
     }
-    
 
     /**
      * @constraint B6 
