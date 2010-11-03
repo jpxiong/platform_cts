@@ -532,7 +532,7 @@ public class BuildDalvikSuite {
 
         File sourceFolder = new File(JAVASRC_FOLDER);
         String fileName = dependentTestClassName.replace('.', '/').trim();
-
+        
         if (new File(sourceFolder, fileName + ".dfh").exists()) {
 
             BuildStep.BuildFile inputFile = new BuildStep.BuildFile(
