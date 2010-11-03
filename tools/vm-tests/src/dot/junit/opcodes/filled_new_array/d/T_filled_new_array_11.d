@@ -27,7 +27,7 @@
 .method public run()[Ljava/lang/Object;
 .limit regs 10
     const v9, 0
-    filled-new-array {v9}, [Ldot/junit/opcodes/filled_new_array/TestStubs$TestStub;
+    filled-new-array {v9}, [Ldot/junit/opcodes/filled_new_array/TestStubs;
     move-result-object v0
     return-object v0
 .end method

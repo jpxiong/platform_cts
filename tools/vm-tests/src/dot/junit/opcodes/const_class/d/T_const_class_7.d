@@ -27,7 +27,7 @@
 .method public run()Ljava/lang/Class;
 .limit regs 255
 
-       const-class v254, dot/junit/opcodes/const_class/TestStubs$TestStub
+       const-class v254, dot/junit/opcodes/const_class/TestStubs
        return-object v254
 .end method
 
