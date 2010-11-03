@@ -61,15 +61,13 @@ public class Test_const_class extends DxTestCase {
      * @title Class is not accessible
      */
     public void testE2() {
-        //@uses dot.junit.opcodes.const_class.TestStubs$TestStub
+        //@uses dot.junit.opcodes.const_class.TestStubs
         //@uses dot.junit.opcodes.const_class.d.T_const_class_7
         try {
             T_const_class_7 t = new T_const_class_7();
             t.run();
-            fail("expected a verification exception");
+            fail("expected an IllegalAccessError exception");
         } catch (IllegalAccessError e) {
-            // expected
-        } catch(VerifyError e) {
             // expected
         }
     }

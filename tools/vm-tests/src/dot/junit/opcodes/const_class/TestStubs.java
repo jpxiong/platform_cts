@@ -16,9 +16,6 @@
 
 package dot.junit.opcodes.const_class;
 
-public class TestStubs {
-     @SuppressWarnings("unused")
-        private class TestStub {
-            // used by testE2
-        }    
+//used by testE2
+class TestStubs {
 }

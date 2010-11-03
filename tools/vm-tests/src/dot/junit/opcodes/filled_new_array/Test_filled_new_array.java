@@ -19,8 +19,9 @@ package dot.junit.opcodes.filled_new_array;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.filled_new_array.d.T_filled_new_array_1;
+import dot.junit.opcodes.filled_new_array.d.T_filled_new_array_10;
+import dot.junit.opcodes.filled_new_array.d.T_filled_new_array_11;
 import dot.junit.opcodes.filled_new_array.d.T_filled_new_array_2;
-import dot.junit.opcodes.filled_new_array.d.T_filled_new_array_9;
 
 public class Test_filled_new_array extends DxTestCase {
     /**
@@ -145,11 +146,13 @@ public class Test_filled_new_array extends DxTestCase {
      * @title attempt to instantiate array of non-existent class
      */
     public void testVFE8() {
+        //@uses dot.junit.opcodes.filled_new_array.d.T_filled_new_array_10
         try {
-            Class.forName("dot.junit.opcodes.filled_new_array.d.T_filled_new_array_10");
-            fail("expected a verification exception");
-        } catch(Throwable t) {
-            DxUtil.checkVerifyException(t);    
+            T_filled_new_array_10 T = new T_filled_new_array_10();
+            T.run();
+            fail("expected a NoClassDefFoundError exception");
+        } catch(NoClassDefFoundError t) {
+            // expected
         }
     }
     
@@ -161,10 +164,11 @@ public class Test_filled_new_array extends DxTestCase {
         //@uses dot.junit.opcodes.filled_new_array.d.T_filled_new_array_11
         //@uses dot.junit.opcodes.filled_new_array.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.filled_new_array.d.T_filled_new_array_11");
-            fail("expected a verification exception");
-        } catch(Throwable t) {
-            DxUtil.checkVerifyException(t);    
+            T_filled_new_array_11 T = new T_filled_new_array_11();
+            T.run();
+            fail("expected a IllegalAccessError exception");
+        } catch(IllegalAccessError t) {
+            // expected
         }
     }
     
