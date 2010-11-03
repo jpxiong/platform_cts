@@ -20,6 +20,8 @@ import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.check_cast.d.T_check_cast_1;
 import dot.junit.opcodes.check_cast.d.T_check_cast_2;
+import dot.junit.opcodes.check_cast.d.T_check_cast_3;
+import dot.junit.opcodes.check_cast.d.T_check_cast_7;
 
 
 public class Test_check_cast extends DxTestCase {
@@ -118,34 +120,34 @@ public class Test_check_cast extends DxTestCase {
         }
     }
 
-   
     /**
      * @constraint n/a
-     * @title Attempt to access inaccessible class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
-     */    
+     * @title Attempt to access inaccessible class, expect throws IllegalAccessError
+     */
     public void testVFE5() {
         //@uses dot.junit.opcodes.check_cast.TestStubs
         //@uses dot.junit.opcodes.check_cast.d.T_check_cast_3
+        T_check_cast_3 t = new T_check_cast_3();
         try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_3");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            t.run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError iae) {
+            // expected
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to access undefined class. Java throws NoClassDefFoundError on 
-     * first access but Dalvik throws VerifyError on class loading.
-     */    
+     * @title Attempt to access undefined class, expect throws NoClassDefFoundError on
+     * first access
+     */
     public void testVFE6() {
+        T_check_cast_7 t = new T_check_cast_7();
         try {
-            Class.forName("dot.junit.opcodes.check_cast.d.T_check_cast_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            t.run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError iae) {
+            // expected
         }
     }
     

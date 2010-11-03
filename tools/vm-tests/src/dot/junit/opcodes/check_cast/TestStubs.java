@@ -16,12 +16,5 @@
 
 package dot.junit.opcodes.check_cast;
 
-public class TestStubs {
-    @SuppressWarnings("unused")
-    private class TestStub {
-        // used by testVFE5
-        public void foo() {
-            
-        }
-    } 
+class TestStubs {
 }
