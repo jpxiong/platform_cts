@@ -26,7 +26,7 @@
 
 .method public run()V
 .limit regs 6
-       instance-of v0, v5, dot/junit/opcodes/instance_of/TestStubs$TestStub
+       instance-of v0, v5, dot/junit/opcodes/instance_of/TestStubs
        return-void
 .end method
 
