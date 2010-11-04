@@ -20,11 +20,16 @@ import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.sget_char.d.T_sget_char_1;
 import dot.junit.opcodes.sget_char.d.T_sget_char_11;
+import dot.junit.opcodes.sget_char.d.T_sget_char_12;
+import dot.junit.opcodes.sget_char.d.T_sget_char_13;
 import dot.junit.opcodes.sget_char.d.T_sget_char_5;
+import dot.junit.opcodes.sget_char.d.T_sget_char_6;
+import dot.junit.opcodes.sget_char.d.T_sget_char_7;
+import dot.junit.opcodes.sget_char.d.T_sget_char_8;
 import dot.junit.opcodes.sget_char.d.T_sget_char_9;
 
 public class Test_sget_char extends DxTestCase {
-    
+
     /**
      * @title get char from static field
      */
@@ -49,7 +54,7 @@ public class Test_sget_char extends DxTestCase {
      * @title attempt to access non-static field
      */
     public void testE1() {
-        
+
         T_sget_char_5 t = new T_sget_char_5();
         try {
             t.run();
@@ -58,7 +63,7 @@ public class Test_sget_char extends DxTestCase {
             // expected
         }
     }
-    
+
     /**
      * @title initialization of referenced class throws exception
      */
@@ -72,10 +77,10 @@ public class Test_sget_char extends DxTestCase {
         }
     }
 
-   
+
 
     /**
-     * @constraint A12 
+     * @constraint A12
      * @title constant pool index
      */
     public void testVFE1() {
@@ -88,8 +93,8 @@ public class Test_sget_char extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A23 
+     *
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE2() {
@@ -100,84 +105,75 @@ public class Test_sget_char extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B13 
-     * @title read char from long field - only field with same name but 
+     *
+     * @constraint B13
+     * @title read char from long field - only field with same name but
      * different type exists
      */
     public void testVFE3() {
         try {
-            Class.forName("dot.junit.opcodes.sget_char.d.T_sget_char_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sget_char_13().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to read inaccessible field. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read inaccessible field.
      */
     public void testVFE4() {
         //@uses dot.junit.opcodes.sget_char.d.T_sget_char_6
         //@uses dot.junit.opcodes.sget_char.TestStubs
         try {
-            Class.forName("dot.junit.opcodes.sget_char.d.T_sget_char_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sget_char_6().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to read field of undefined class. Java throws NoClassDefFoundError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read field of undefined class.
      */
     public void testVFE5() {
         try {
-            Class.forName("dot.junit.opcodes.sget_char.d.T_sget_char_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sget_char_7().run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to read undefined field. Java throws NoSuchFieldError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read undefined field.
      */
     public void testVFE6() {
         try {
-            Class.forName("dot.junit.opcodes.sget_char.d.T_sget_char_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sget_char_8().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to read superclass' private field from subclass. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to read superclass' private field from subclass.
      */
     public void testVFE7() {
         //@uses dot.junit.opcodes.sget_char.d.T_sget_char_12
         //@uses dot.junit.opcodes.sget_char.d.T_sget_char_1
         try {
-            Class.forName("dot.junit.opcodes.sget_char.d.T_sget_char_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sget_char_12().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
-   
+
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title sget_char shall not work for reference fields
      */
     public void testVFE8() {
@@ -188,10 +184,10 @@ public class Test_sget_char extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for short fields
      */
     public void testVFE9() {
@@ -202,10 +198,10 @@ public class Test_sget_char extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for int fields
      */
     public void testVFE10() {
@@ -216,10 +212,10 @@ public class Test_sget_char extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for byte fields
      */
     public void testVFE11() {
@@ -230,10 +226,10 @@ public class Test_sget_char extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for boolean fields
      */
     public void testVFE12() {
@@ -243,11 +239,11 @@ public class Test_sget_char extends DxTestCase {
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
-    }    
-    
+    }
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for double fields
      */
     public void testVFE13() {
@@ -257,11 +253,11 @@ public class Test_sget_char extends DxTestCase {
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
-    } 
-    
+    }
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sget_char shall not work for long fields
      */
     public void testVFE14() {
@@ -271,5 +267,5 @@ public class Test_sget_char extends DxTestCase {
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
-    } 
+    }
 }
