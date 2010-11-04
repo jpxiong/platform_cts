@@ -16,6 +16,8 @@
 
 package android.accessibilityservice.cts;
 
+import com.android.cts.accessibilityservice.R;
+
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.IAccessibilityServiceDelegate;
 import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
@@ -47,8 +49,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.android.cts.accessibilityservice.R;
-
 import junit.framework.TestCase;
 
 import java.util.Iterator;
@@ -56,23 +56,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import junit.framework.TestCase;
+
 /**
  * This class performs end-to-end testing of the accessibility feature by
  * creating an {@link Activity} and poking around so {@link AccessibilityEvent}s
  * are generated and their correct dispatch verified.
- * </p>
- * Note: The end-to-end test is composed of two APKs, one with a delegating accessibility
+ * <p>
+ * Note: The end-to-end test is composed of two APKs, one with a mock accessibility
  * service, another with the instrumented activity and test cases. The motivation for
  * two APKs design is that CTS tests cannot access the secure settings which is
  * required for enabling accessibility and accessibility services. Therefore, manual
- * installation of the <strong>CtsDelegatingAccessibilityService.apk</strong>
- * whose source is located at <strong>cts/tests/accessibilityservice</strong> is required.
+ * installation of the <strong>CtsAccessibilityServiceTestMockService.apk</strong>
+ * whose source is located at <strong>cts/tests/accessibility</strong> is required.
  * Once the former package has been installed accessibility must be enabled (Settings ->
- * Accessibility), the delegating service must be enabled (Settings -> Accessibility
- * -> Delegating Accessibility Service), and then the CTS tests in this package can be
- * successfully run. Further, the delegate and tests run in separate processes since
+ * Accessibility), the mock service must be enabled (Settings -> Accessibility
+ * -> Mock Accessibility Service), and then the CTS tests in this package can be
+ * successfully run. Further, the mock and tests run in separate processes since
  * the instrumentation restarts the process in which it is running and this
- * breaks the binding between the delegating accessibility service and the system.
+ * breaks the binding between the mock accessibility service and the system.
  */
 public class AccessibilityEndToEndTest extends
         ActivityInstrumentationTestCase2<AccessibilityEndToEndTestActivity> {
@@ -114,15 +116,17 @@ public class AccessibilityEndToEndTest extends
      * @throws Exception If any error occurs.
      */
     public AccessibilityEndToEndTest() throws Exception {
-        super("com.android.cts.accessibilityservice", AccessibilityEndToEndTestActivity.class);
+        super(AccessibilityEndToEndTestActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        // wait for the activity to settle down so we do not receive
-        // the event for its start, thus breaking the tests
-        getInstrumentation().waitForIdleSync();
+        // TODO (svetoslavganov): This is a temporary workaround for
+        // nondeterministically failing tests with partially populated events.
+        // It seems that not all times the View hierarchy is fully
+        // instantiated on time. This seems related to bug 2630683.
+        Thread.sleep(500);
     }
 
     @LargeTest
@@ -247,7 +251,7 @@ public class AccessibilityEndToEndTest extends
 
     @LargeTest
     public void testTypeViewTextChangedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
+        final Activity activity = getActivity();
 
         // focus the edit text
         final EditText editText = (EditText) activity.findViewById(R.id.edittext);
@@ -677,13 +681,36 @@ public class AccessibilityEndToEndTest extends
                     receivedEvent.isFullScreen());
             TestCase.assertEquals("itemCount has incorrect value", expectedEvent.getItemCount(),
                     receivedEvent.getItemCount());
-            // This will fail due to a bug fixed in Gingerbread. Bug 2593810 (removed the method).
-            // assertEqualsNotificationAsParcelableData(expectedEvent, receivedEvent);
+            assertEqualsNotificationAsParcelableData(expectedEvent, receivedEvent);
             TestCase.assertEquals("password has incorrect value", expectedEvent.isPassword(),
                     receivedEvent.isPassword());
             TestCase.assertEquals("removedCount has incorrect value", expectedEvent
                     .getRemovedCount(), receivedEvent.getRemovedCount());
             assertEqualsText(expectedEvent, receivedEvent);
+        }
+
+        /**
+         * Compares the {@link android.os.Parcelable} data of the
+         * <code>expectedEvent</code> and <code>receivedEvent</code> to verify
+         * that the received event is the one that is expected.
+         */
+        private void assertEqualsNotificationAsParcelableData(AccessibilityEvent expectedEvent,
+                AccessibilityEvent receivedEvent) {
+            String message = "parcelableData has incorrect value";
+            Notification expectedNotification = (Notification) expectedEvent.getParcelableData();
+            Notification receivedNotification = (Notification) receivedEvent.getParcelableData();
+
+            if (expectedNotification == null) {
+                if (receivedNotification == null) {
+                    return;
+                }
+            }
+
+            TestCase.assertNotNull(message, receivedNotification);
+
+            // we do a very simple sanity check
+            TestCase.assertEquals(message, expectedNotification.tickerText.toString(),
+                    receivedNotification.tickerText.toString());
         }
 
         /**

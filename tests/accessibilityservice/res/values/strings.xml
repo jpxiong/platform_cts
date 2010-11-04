@@ -20,31 +20,4 @@
     <!-- String title of the mock accessibility service -->
     <string name="title_delegating_accessibility_service">Delegating Accessibility Service</string>
 
-    <!-- String title of the accessibility end-to-end test activity -->
-    <string name="accessibility_end_to_end_test_activity">End-to-end test</string>
-
-    <!-- String value of used as text input -->
-    <string name="text_input_blah">Blah</string>
-
-    <!-- String value of used as text input -->
-    <string name="text_input_blah_blah">Blah blah</string>
-
-    <!-- String title of the button -->
-    <string name="button_title">Click me</string>
-
-    <!-- String value of the first list item -->
-    <string name="first_list_item">First list item</string>
-
-    <!-- String value of the second list item -->
-    <string name="second_list_item">Second list item</string>
-
-    <!-- String alert title -->
-    <string name="alert_title">Alert title</string>
-
-    <!-- String alert message -->
-    <string name="alert_message">Alert message</string>
-
-    <!-- String notification message -->
-    <string name="notification_message">Notification message</string>
-
 </resources>

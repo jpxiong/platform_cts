@@ -519,10 +519,10 @@ public class ExpandableListViewTest extends AndroidTestCase {
         args = {int.class, int.class}
     )
     public void testGetPackedPositionForChild() {
-        assertEquals((long) 0x8000000000000000L,
+        assertEquals(0x8000000000000000L,
                 ExpandableListView.getPackedPositionForChild(0, 0));
 
-        assertEquals((long) 0xffffffffffffffffL,
+        assertEquals(0xffffffffffffffffL,
                 ExpandableListView.getPackedPositionForChild(Integer.MAX_VALUE, 0xffffffff));
     }
 

@@ -16,6 +16,12 @@
 
 package android.text.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import android.test.AndroidTestCase;
 import android.text.InputFilter;
 import android.text.SpannableString;
@@ -24,11 +30,6 @@ import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 import android.text.style.TabStopSpan;
 import android.text.style.UnderlineSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link SpannableStringBuilder}.
@@ -249,6 +250,28 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
         builder = new SpannableStringBuilder("hello, world");
         builder.replace(0, 5, text, 0, text.length());
         assertEquals("ahiabc, world", builder.toString());
+
+        // Replacing by an empty string (identical target indexes)
+        builder = new SpannableStringBuilder("hello, world");
+        builder.replace(4, 6, "", 0, 0);
+        assertEquals("hell world", builder.toString());
+
+        builder = new SpannableStringBuilder("hello, world");
+        builder.replace(4, 6, "any string", 5, 5);
+        assertEquals("hell world", builder.toString());
+
+        // Inserting in place (no deletion)
+        builder = new SpannableStringBuilder("hello, world");
+        builder.replace(3, 3, "any string", 0, 0);
+        assertEquals("hello, world", builder.toString());
+
+        builder = new SpannableStringBuilder("hello, world");
+        builder.replace(7, 7, "nice ", 0, 5);
+        assertEquals("hello, nice world", builder.toString());
+
+        builder = new SpannableStringBuilder("hello, world");
+        builder.replace(0, 0, "say ", 1, 4);
+        assertEquals("ay hello, world", builder.toString());
 
         try {
             builder.replace(0, 5, text, 10, 3);
