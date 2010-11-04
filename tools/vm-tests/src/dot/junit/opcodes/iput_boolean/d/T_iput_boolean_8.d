@@ -27,8 +27,8 @@
 .method public run()V
 .limit regs 3
 
-       new-instance v0, Ldot/junit/opcodes/iput/TestStubs;
-       invoke-direct {v0}, dot/junit/opcodes/iput/TestStubs/<init>()V
+       new-instance v0, Ldot/junit/opcodes/iput_boolean/TestStubs;
+       invoke-direct {v0}, dot/junit/opcodes/iput_boolean/TestStubs/<init>()V
        const v1, 0
        iput-boolean v1, v0, dot.junit.opcodes.iput_boolean.TestStubs.TestStubField Z
        return-void
