@@ -27,8 +27,8 @@
 .method public run()Ljava/lang/Object;
 .limit regs 5
 
-       new-instance v1, dot/junit/opcodes/new_instance/TestStubs$TestStub
-;       invoke-direct {v1}, dot/junit/opcodes/new_instance/TestStubs$TestStub/<init>()V
+       new-instance v1, dot/junit/opcodes/new_instance/TestStubs
+;       invoke-direct {v1}, dot/junit/opcodes/new_instance/TestStubs/<init>()V
 ; intentionally return v4 ("this")    
        return-object v4
 .end method

@@ -20,6 +20,8 @@ import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.new_instance.d.T_new_instance_1;
 import dot.junit.opcodes.new_instance.d.T_new_instance_3;
+import dot.junit.opcodes.new_instance.d.T_new_instance_4;
+import dot.junit.opcodes.new_instance.d.T_new_instance_5;
 import dot.junit.opcodes.new_instance.d.T_new_instance_8;
 import dot.junit.opcodes.new_instance.d.T_new_instance_9;
 
@@ -37,7 +39,7 @@ public class Test_new_instance extends DxTestCase {
     }
 
     /**
-     * @title class initialization throws exception 
+     * @title class initialization throws exception
      */
     public void testE1() {
         try {
@@ -49,7 +51,7 @@ public class Test_new_instance extends DxTestCase {
     }
 
     /**
-     * @constraint A21 
+     * @constraint A21
      * @title  attempt to instantiate interface
      */
     public void testE4() {
@@ -65,7 +67,7 @@ public class Test_new_instance extends DxTestCase {
     }
 
     /**
-     * @constraint A21 
+     * @constraint A21
      * @title  attempt to instantiate abstract
      * class
      */
@@ -82,7 +84,7 @@ public class Test_new_instance extends DxTestCase {
     }
 
     /**
-     * @constraint A18 
+     * @constraint A18
      * @title  constant pool index
      */
     public void testVFE1() {
@@ -95,8 +97,8 @@ public class Test_new_instance extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A21 
+     *
+     * @constraint A21
      * @title  attempt to create array using new
      */
     public void testVFE2() {
@@ -121,9 +123,9 @@ public class Test_new_instance extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE4() {
@@ -134,41 +136,37 @@ public class Test_new_instance extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to instantiate array of inaccessible class. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to instantiate array of inaccessible class.
      */
     public void testVFE5() {
         //@uses dot.junit.opcodes.new_instance.TestStubs
         //@uses dot.junit.opcodes.new_instance.d.T_new_instance_4
         try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_new_instance_4().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to instantiate array of non-existent class. Java 
-     * throws NoClassDefFoundError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to instantiate array of non-existent class.
      */
     public void testVFE6() {
         try {
-            Class.forName("dot.junit.opcodes.new_instance.d.T_new_instance_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_new_instance_5().run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError t) {
         }
     }
 
     /**
      * @constraint B7
-     * @title A register which holds the result of a new-instance instruction must not be used 
-     * if the same new-instance  instruction is again executed before the instance is initialized 
+     * @title A register which holds the result of a new-instance instruction must not be used
+     * if the same new-instance  instruction is again executed before the instance is initialized
      */
     public void testVFE7() {
         try {
@@ -178,11 +176,11 @@ public class Test_new_instance extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint B7
-     * @title A register which holds the result of a new-instance instruction must not be used 
-     * if the same new-instance  instruction is again executed before the instance is initialized 
+     * @title A register which holds the result of a new-instance instruction must not be used
+     * if the same new-instance  instruction is again executed before the instance is initialized
      */
     public void testVFE8() {
         try {
