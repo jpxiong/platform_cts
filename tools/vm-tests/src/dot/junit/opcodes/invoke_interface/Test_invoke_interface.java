@@ -23,8 +23,14 @@ import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_11;
 import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_12;
 import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_13;
 import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_14;
-import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_17;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_16;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_18;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_20;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_21;
 import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_3;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_4;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_5;
+import dot.junit.opcodes.invoke_interface.d.T_invoke_interface_7;
 
 public class Test_invoke_interface extends DxTestCase {
 
@@ -37,7 +43,7 @@ public class Test_invoke_interface extends DxTestCase {
         assertEquals(-1, t.run("aa", "bb"));
         assertEquals(1, t.run("bb", "aa"));
     }
-    
+
     /**
      * @title Check that new frame is created by invoke_interface and
      * arguments are passed to method
@@ -52,7 +58,7 @@ public class Test_invoke_interface extends DxTestCase {
     }
 
 
-    
+
     /**
      * @title objref is null
      */
@@ -117,27 +123,6 @@ public class Test_invoke_interface extends DxTestCase {
         }
     }
 
-
-    /**
-     * @title Attempt to invoke non-public interface method
-     */
-    public void testE8() {
-        //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_17
-        //@uses dot.junit.opcodes.invoke_interface.ITest
-        //@uses dot.junit.opcodes.invoke_interface.ITestImpl        
-        //@uses dot.junit.opcodes.invoke_interface.ITestImplAbstract        
-        try {
-            T_invoke_interface_17 t = new T_invoke_interface_17();
-            t.run();
-            fail("expected a verification exception");
-        } catch (IllegalAccessError e) {
-            // expected
-        } catch (VerifyError e) {
-            // expected
-        }
-    }
-
-
     /**
      * @constraint A16
      * @title invalid constant pool index
@@ -150,17 +135,16 @@ public class Test_invoke_interface extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint A16
-     * @title The referenced method_id must belong to an interface (not a class). 
+     * @title The referenced method_id must belong to an interface (not a class).
      */
     public void testVFE2() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_4");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_4().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
 
@@ -169,11 +153,12 @@ public class Test_invoke_interface extends DxTestCase {
      * @title number of arguments
      */
     public void testVFE5() {
+        //@uses dot.junit.opcodes.invoke_interface.ITest
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_5");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_5(new ITestImpl());
+            fail("expected VerifyError");
+        } catch (VerifyError t) {
         }
     }
 
@@ -191,7 +176,7 @@ public class Test_invoke_interface extends DxTestCase {
     }
 
     /**
-     * @constraint B9 
+     * @constraint B9
      * @title number of arguments passed to method
      */
     public void testVFE9() {
@@ -204,28 +189,31 @@ public class Test_invoke_interface extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title invoke-interface may not be used to call <init>.
      */
     public void testVFE10() {
+        //@uses dot.junit.opcodes.invoke_interface.ITest
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
+        //@uses dot.junit.opcodes.invoke_interface.ITestImplAbstract
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_18");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_18().run(new ITestImpl());
+            fail("expected InstantiationError");
+        } catch (InstantiationError t) {
         }
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title invoke-interface may not be used to call <clinit>.
      */
     public void testVFE11() {
+        //@uses dot.junit.opcodes.invoke_interface.ITest
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_20");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_20().run(new ITestImpl());
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
 
@@ -234,16 +222,17 @@ public class Test_invoke_interface extends DxTestCase {
      * @title types of arguments passed to method
      */
     public void testVFE12() {
+        //@uses dot.junit.opcodes.invoke_interface.ITest
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_21");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_21().run(new ITestImpl());
+            fail("expected VerifyError");
+        } catch (VerifyError t) {
         }
     }
-    
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE13() {
@@ -254,50 +243,46 @@ public class Test_invoke_interface extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to call undefined method. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call undefined method.
      */
     public void testVFE14() {
         //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_7
         //@uses dot.junit.opcodes.invoke_interface.ITest
-        //@uses dot.junit.opcodes.invoke_interface.ITestImpl        
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_7().run(new ITestImpl());
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Method has different signature. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Method has different signature.
      */
     public void testVFE15() {
         //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_16
         //@uses dot.junit.opcodes.invoke_interface.ITest
-        //@uses dot.junit.opcodes.invoke_interface.ITestImpl     
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
-            Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_interface_16().run(new ITestImpl());
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
-    
+
+
     /**
-     * @constraint B6 
-     * @title instance methods may only be invoked on already initialized instances. 
+     * @constraint B6
+     * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE21() {
         //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_22
         //@uses dot.junit.opcodes.invoke_interface.ITest
-        //@uses dot.junit.opcodes.invoke_interface.ITestImpl             
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
             Class.forName("dot.junit.opcodes.invoke_interface.d.T_invoke_interface_22");
             fail("expected a verification exception");

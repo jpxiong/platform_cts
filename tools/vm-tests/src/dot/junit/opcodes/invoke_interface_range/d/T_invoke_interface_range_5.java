@@ -14,26 +14,11 @@
  * limitations under the License.
  */
 
-package dot.junit.opcodes.invoke_interface;
+package dot.junit.opcodes.invoke_interface_range.d;
 
-public class ITestImpl implements ITest {
-    public void doit() {
-        // impl
+import dot.junit.opcodes.invoke_interface_range.ITest;
+
+public class T_invoke_interface_range_5 {
+    public T_invoke_interface_range_5(ITest test) {
     }
-
-    public void doit(int i) {
-        //
-    }
-
-    public native void doitNative();
-
-    public int test(int a) {
-        if (a == 999) return 195;
-        return 0;
-    }
-
-    public int testArgsOrder(int a, int b) {
-        return a / b;
-    }
-
 }
