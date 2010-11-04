@@ -19,11 +19,17 @@ package dot.junit.opcodes.sput_wide;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_1;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_10;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_11;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_12;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_13;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_14;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_15;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_17;
 import dot.junit.opcodes.sput_wide.d.T_sput_wide_5;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_7;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_8;
+import dot.junit.opcodes.sput_wide.d.T_sput_wide_9;
 
 public class Test_sput_wide extends DxTestCase {
     /**
@@ -35,7 +41,7 @@ public class Test_sput_wide extends DxTestCase {
         t.run();
         assertEquals(778899112233l, T_sput_wide_1.st_i1);
     }
-    
+
     /**
      * @title put double into static field
      */
@@ -46,7 +52,7 @@ public class Test_sput_wide extends DxTestCase {
         assertEquals(0.5d, T_sput_wide_5.st_i1);
     }
 
- 
+
     /**
      * @title modification of final field
      */
@@ -68,7 +74,7 @@ public class Test_sput_wide extends DxTestCase {
         t.run();
         assertEquals(77, T_sput_wide_14.getProtectedField());
     }
-  
+
     /**
      * @title initialization of referenced class throws exception
      */
@@ -83,7 +89,7 @@ public class Test_sput_wide extends DxTestCase {
     }
 
     /**
-     * @constraint A12 
+     * @constraint A12
      * @title constant pool index
      */
     public void testVFE1() {
@@ -96,8 +102,8 @@ public class Test_sput_wide extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A23 
+     *
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE2() {
@@ -111,26 +117,25 @@ public class Test_sput_wide extends DxTestCase {
 
 
     /**
-     * 
-     * @constraint B13 
-     * @title put int into long field - only field with same name but 
+     *
+     * @constraint B13
+     * @title put int into long field - only field with same name but
      * different type exists
      */
     public void testVFE5() {
         try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_wide_17().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
-    
- 
+
+
 
     /**
-     * 
-     * @constraint B13 
-     * @title type of field doesn't match opcode - attempt to modify float 
+     *
+     * @constraint B13
+     * @title type of field doesn't match opcode - attempt to modify float
      * field with double-width register
      */
     public void testVFE7() {
@@ -141,87 +146,85 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint A12 
-     * @title Attempt to set non-static field. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     *
+     * @constraint A12
+     * @title Attempt to set non-static field.Dalvik throws IncompatibleClassChangeError when
+     * executing the code.
      */
     public void testVFE8() {
          try {
-             Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_7");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_sput_wide_7().run();
+             fail("expected IncompatibleClassChangeError");
+         } catch (IncompatibleClassChangeError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to modify inaccessible field. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify inaccessible field. Dalvik throws IllegalAccessError when executing
+     * the code.
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.sput_wide.TestStubs
         //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_8
         try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_wide_8().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to modify field of undefined class. Java throws NoClassDefFoundError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify field of undefined class. Dalvik throws NoClassDefFoundError when
+     * executing the code.
      */
     public void testVFE10() {
+        //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_9
         try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_wide_9().run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to modify undefined field. Java throws NoSuchFieldError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify undefined field. Dalvik throws NoSuchFieldError when executing the
+     * code.
      */
     public void testVFE11() {
+        //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_10
         try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_wide_10().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
-    
-    
-    
+
+
+
     /**
      * @constraint n/a
-     * @title Attempt to modify superclass' private field from subclass. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify superclass' private field from subclass. Dalvik throws
+     * IllegalAccessError when executing the code.
      */
     public void testVFE12() {
         //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_1
         //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_15
         try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_15");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
+            new T_sput_wide_15().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
             DxUtil.checkVerifyException(t);
         }
     }
-    
-    
+
+
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title sput-wide shall not work for single-width numbers
      */
     public void testVFE13() {
@@ -232,10 +235,10 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for reference fields
      */
     public void testVFE14() {
@@ -246,10 +249,10 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for char fields
      */
     public void testVFE15() {
@@ -260,10 +263,10 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for int fields
      */
     public void testVFE16() {
@@ -274,10 +277,10 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for byte fields
      */
     public void testVFE17() {
@@ -288,10 +291,10 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for boolean fields
      */
     public void testVFE18() {
@@ -304,8 +307,8 @@ public class Test_sput_wide extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput-wide shall not work for short fields
      */
     public void testVFE6() {
@@ -316,7 +319,7 @@ public class Test_sput_wide extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-  
+
     /**
      * @constraint n/a
      * @title Modification of final field in other class
@@ -325,12 +328,11 @@ public class Test_sput_wide extends DxTestCase {
         //@uses dot.junit.opcodes.sput_wide.TestStubs
         //@uses dot.junit.opcodes.sput_wide.d.T_sput_wide_11
     	try {
-            Class.forName("dot.junit.opcodes.sput_wide.d.T_sput_wide_11");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_wide_11().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
-    
+
 }
