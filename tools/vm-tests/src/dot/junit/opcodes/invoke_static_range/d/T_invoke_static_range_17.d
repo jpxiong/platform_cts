@@ -27,7 +27,7 @@
 .method public run()V
 .limit regs 1
 
-       invoke-static/range {}, dot/junit/opcodes/invokestatic/TestClass/testProtected()V
+       invoke-static/range {}, dot/junit/opcodes/invoke_static_range/TestClass/testProtected()V
        return-void
 .end method
 

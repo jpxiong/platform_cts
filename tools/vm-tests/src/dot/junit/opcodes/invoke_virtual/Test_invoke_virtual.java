@@ -19,9 +19,15 @@ package dot.junit.opcodes.invoke_virtual;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_1;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_10;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_14;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_15;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_17;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_18;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_19;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_20;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_4;
+import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_5;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_6;
 import dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_7;
 
@@ -66,7 +72,7 @@ public class Test_invoke_virtual extends DxTestCase {
      */
     public void testN6() {
         //@uses dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_17
-        //@uses dot.junit.opcodes.invoke_virtual.d.TSuper        
+        //@uses dot.junit.opcodes.invoke_virtual.d.TSuper
         T_invoke_virtual_17 t = new T_invoke_virtual_17();
         assertEquals(5, t.run());
     }
@@ -114,7 +120,7 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint A13 
+     * @constraint A13
      * @title invalid constant pool index
      */
     public void testVFE1() {
@@ -127,20 +133,19 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;clinit&gt; may not be called using invoke-virtual
      */
     public void testVFE3() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_virtual_10().run();
+            fail("expected IncompatibleClassChangeError");
+        } catch (IncompatibleClassChangeError t) {
         }
     }
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title number of arguments passed to method
      */
     public void testVFE4() {
@@ -153,7 +158,7 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint B9 
+     * @constraint B9
      * @title types of arguments passed to method
      */
     public void testVFE5() {
@@ -166,7 +171,7 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;init&gt; may not be called using invoke_virtual
      */
     public void testVFE6() {
@@ -179,7 +184,7 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint B10 
+     * @constraint B10
      * @title assignment incompatible references when accessing
      *                  protected method
      */
@@ -196,14 +201,14 @@ public class Test_invoke_virtual extends DxTestCase {
     }
 
     /**
-     * @constraint B10 
+     * @constraint B10
      * @title assignment incompatible references when accessing
      *                  public method
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_23
         //@uses dot.junit.opcodes.invoke_virtual.d.TSuper
-        //@uses dot.junit.opcodes.invoke_virtual.d.TSuper2        
+        //@uses dot.junit.opcodes.invoke_virtual.d.TSuper2
         try {
             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_23");
             fail("expected a verification exception");
@@ -211,85 +216,75 @@ public class Test_invoke_virtual extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
-    
+
+
     /**
      * @constraint n/a
-     * @title Attempt to call static method. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call static method.
      */
     public void testVFE10() {
          try {
-             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_5");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_virtual_5().run();
+             fail("expected IncompatibleClassChangeError");
+         } catch (IncompatibleClassChangeError t) {
          }
     }
-    
-    
+
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke non-existing method. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke non-existing method.
      */
     public void testVFE12() {
          try {
-             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_15");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_virtual_15().run();
+             fail("expected NoSuchMethodError");
+         } catch (NoSuchMethodError t) {
          }
     }
-  
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke private method of other class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke private method of other class.
      */
     public void testVFE13() {
         //@uses dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_18
         //@uses dot.junit.opcodes.invoke_virtual.TestStubs
          try {
-             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_18");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_virtual_18().run(new TestStubs());
+             fail("expected IllegalAccessError");
+         } catch (IllegalAccessError t) {
          }
     }
 
     /**
      * @constraint B12
-     * @title Attempt to invoke protected method of unrelated class. Java throws 
-     * IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke protected method of unrelated class.
      */
     public void testVFE14() {
         //@uses dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_20
         //@uses dot.junit.opcodes.invoke_virtual.TestStubs
          try {
-             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_20");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_virtual_20().run(new TestStubs());
+             fail("expected IllegalAccessError");
+         } catch (IllegalAccessError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Method has different signature. Java throws 
-     * NoSuchMethodError on first access but Dalvik throws VerifyError on class loading.
+     * @title Method has different signature.
      */
     public void testVFE15() {
         //@uses dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_19
         //@uses dot.junit.opcodes.invoke_virtual.d.TSuper
          try {
-             Class.forName("dot.junit.opcodes.invoke_virtual.d.T_invoke_virtual_19");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_virtual_19().run();
+             fail("expected NoSuchMethodError");
+         } catch (NoSuchMethodError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
      * @title invoke-virtual shall be used to invoke private methods
@@ -302,9 +297,9 @@ public class Test_invoke_virtual extends DxTestCase {
              DxUtil.checkVerifyException(t);
          }
     }
-    
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE17() {
@@ -315,9 +310,9 @@ public class Test_invoke_virtual extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint A13 
+     * @constraint A13
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
@@ -328,10 +323,10 @@ public class Test_invoke_virtual extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint B6 
-     * @title instance methods may only be invoked on already initialized instances. 
+     * @constraint B6
+     * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE19() {
         try {
@@ -341,5 +336,5 @@ public class Test_invoke_virtual extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-  
+
 }

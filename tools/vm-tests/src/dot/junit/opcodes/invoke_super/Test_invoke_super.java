@@ -19,10 +19,16 @@ package dot.junit.opcodes.invoke_super;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_1;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_10;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_14;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_15;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_17;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_18;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_19;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_2;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_20;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_4;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_5;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_6;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_7;
 
@@ -37,7 +43,7 @@ public class Test_invoke_super extends DxTestCase {
         T_invoke_super_1 t = new T_invoke_super_1();
         assertEquals(5, t.run());
     }
-   
+
 
     /**
      * @title Invoke protected method of superclass
@@ -65,7 +71,7 @@ public class Test_invoke_super extends DxTestCase {
      */
     public void testN6() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_17
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper        
+        //@uses dot.junit.opcodes.invoke_super.d.TSuper
         //@uses dot.junit.opcodes.invoke_super.d.TSuper2
         T_invoke_super_17 t = new T_invoke_super_17();
         assertEquals(5, t.run());
@@ -91,7 +97,7 @@ public class Test_invoke_super extends DxTestCase {
      */
     public void testE2() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_4
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper        
+        //@uses dot.junit.opcodes.invoke_super.d.TSuper
         T_invoke_super_4 t = new T_invoke_super_4();
         try {
             t.run();
@@ -117,7 +123,7 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint A13 
+     * @constraint A13
      * @title invalid constant pool index
      */
     public void testVFE1() {
@@ -130,20 +136,19 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;clinit&gt; may not be called using invoke-super
      */
     public void testVFE3() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_super_10().run();
+            fail("expected IncompatibleClassChangeError");
+        } catch (IncompatibleClassChangeError t) {
         }
     }
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title number of arguments passed to method
      */
     public void testVFE4() {
@@ -156,12 +161,12 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint B9 
+     * @constraint B9
      * @title types of arguments passed to method.
      */
     public void testVFE5() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_12
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper                
+        //@uses dot.junit.opcodes.invoke_super.d.TSuper
         try {
             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_12");
             fail("expected a verification exception");
@@ -171,7 +176,7 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;init&gt; may not be called using invoke_super
      */
     public void testVFE6() {
@@ -184,7 +189,7 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint B10 
+     * @constraint B10
      * @title assignment incompatible references when accessing
      *                  protected method
      */
@@ -201,14 +206,14 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint B10 
+     * @constraint B10
      * @title assignment incompatible references when accessing
      *                  public method
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_23
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper2        
+        //@uses dot.junit.opcodes.invoke_super.d.TSuper2
         try {
             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_23");
             fail("expected a verification exception");
@@ -216,93 +221,83 @@ public class Test_invoke_super extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to call static method. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call static method.
      */
     public void testVFE10() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_5
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
          try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_5");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_super_5().run();
+             fail("expected IncompatibleClassChangeError");
+         } catch (IncompatibleClassChangeError t) {
          }
     }
-    
-    
+
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke non-existing method. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke non-existing method.
      */
     public void testVFE12() {
          try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_15");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_super_15().run();
+             fail("expected NoSuchMethodError");
+         } catch (NoSuchMethodError t) {
          }
     }
-  
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke private method of other class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke private method of other class.
      */
     public void testVFE13() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_18
         //@uses dot.junit.opcodes.invoke_super.TestStubs
          try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_18");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_super_18().run(new TestStubs());
+             fail("expected IllegalAccessError");
+         } catch (IllegalAccessError t) {
          }
     }
 
     /**
      * @constraint B12
-     * @title Attempt to invoke protected method of unrelated class. Java throws 
-     * IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke protected method of unrelated class.
      */
     public void testVFE14() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_20
         //@uses dot.junit.opcodes.invoke_super.TestStubs
          try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_20");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_super_20().run(new TestStubs());
+             fail("expected IllegalAccessError");
+         } catch (IllegalAccessError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Method has different signature. Java throws 
-     * NoSuchMethodError on first access but Dalvik throws VerifyError on class loading.
+     * @title Method has different signature.
      */
     public void testVFE15() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_19
         //@uses dot.junit.opcodes.invoke_super.d.TSuper
          try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_19");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_super_19().run();
+             fail("expected NoSuchMethodError");
+         } catch (NoSuchMethodError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
      * @title invoke-super shall be used to invoke private methods
      */
     public void testVFE16() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_13
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper        
+        //@uses dot.junit.opcodes.invoke_super.d.TSuper
          try {
              Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_13");
              fail("expected a verification exception");
@@ -310,9 +305,9 @@ public class Test_invoke_super extends DxTestCase {
              DxUtil.checkVerifyException(t);
          }
     }
-    
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE17() {
@@ -325,7 +320,7 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint A13 
+     * @constraint A13
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
@@ -336,10 +331,10 @@ public class Test_invoke_super extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint B6 
-     * @title instance methods may only be invoked on already initialized instances. 
+     * @constraint B6
+     * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE19() {
         //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_25
