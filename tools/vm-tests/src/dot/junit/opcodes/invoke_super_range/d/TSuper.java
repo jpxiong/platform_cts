@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,36 @@
  * limitations under the License.
  */
 
-package dot.junit.opcodes.invoke_interface_range.d;
+package dot.junit.opcodes.invoke_super_range.d;
 
+public class TSuper {
 
-public class T_invoke_interface_range_17 {
+    public int toInt() {
+        return 0;
+    }
 
-    public void run() {
+    public int toInt(float f) {
+        return 0;
+    }
+
+    public native int toIntNative();
+
+    public static int toIntStatic() {
+        return 0;
+    }
+
+    protected int toIntP() {
+        return 0;
+    }
+
+    private int toIntPvt() {
+        return 0;
+    }
+
+    public int testArgsOrder(int arg1, int arg2) {
+        return 0;
+    }
+
+    public void testString(String s) {
     }
 }

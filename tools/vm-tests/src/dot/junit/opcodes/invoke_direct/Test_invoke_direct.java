@@ -18,9 +18,13 @@ package dot.junit.opcodes.invoke_direct;
 
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
-
+import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_12;
+import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_13;
+import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_16;
 import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_2;
 import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_21;
+import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_6;
+import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_7;
 import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_8;
 import dot.junit.opcodes.invoke_direct.d.T_invoke_direct_9;
 
@@ -69,11 +73,11 @@ public class Test_invoke_direct extends DxTestCase {
         } catch (UnsatisfiedLinkError e) {
             // expected
         }
-    }   
+    }
 
     /**
-     * @constraint A13 
-     * @title invalid constant pool index 
+     * @constraint A13
+     * @title invalid constant pool index
      */
     public void testVFE1() {
         try {
@@ -85,7 +89,7 @@ public class Test_invoke_direct extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title invoke-direct may not be used to invoke &lt;clinit&gt;
      */
     public void testVFE3() {
@@ -98,22 +102,21 @@ public class Test_invoke_direct extends DxTestCase {
     }
 
     /**
-     * @constraint B4 
+     * @constraint B4
      * @title invoke-direct target must be in self or superclass
      */
     public void testVFE4() {
         //@uses dot.junit.opcodes.invoke_direct.d.T_invoke_direct_6
-        //@uses dot.junit.opcodes.invoke_direct.TSuper       
+        //@uses dot.junit.opcodes.invoke_direct.TSuper
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_direct_6();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title number of arguments
      */
     public void testVFE5() {
@@ -126,7 +129,7 @@ public class Test_invoke_direct extends DxTestCase {
     }
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title int is passed instead of obj ref
      */
     public void testVFE6() {
@@ -171,7 +174,7 @@ public class Test_invoke_direct extends DxTestCase {
      */
     public void testVFE10() {
         //@uses dot.junit.opcodes.invoke_direct.d.T_invoke_direct_25
-        //@uses dot.junit.opcodes.invoke_direct.TPlain                
+        //@uses dot.junit.opcodes.invoke_direct.TPlain
         //@uses dot.junit.opcodes.invoke_direct.TSuper
         try {
             Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_25");
@@ -195,9 +198,9 @@ public class Test_invoke_direct extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
- 
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE12() {
@@ -209,38 +212,34 @@ public class Test_invoke_direct extends DxTestCase {
         }
     }
 
-        
+
     /**
      * @constraint n/a
-     * @title Attempt to call undefined method. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call undefined method.
      */
     public void testVFE13() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_direct_7().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Method has different signature. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Method has different signature.
      */
     public void testVFE14() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_16");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_direct_16().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke static method. Java throws IncompatibleClassChangeError 
+     * @title Attempt to invoke static method. Java throws IncompatibleClassChangeError
      * on first access but Dalvik throws VerifyError on class loading.
      */
     public void testVFE15() {
@@ -252,23 +251,21 @@ public class Test_invoke_direct extends DxTestCase {
         }
     }
 
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to invoke private method of superclass. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to invoke private method of superclass.
      */
     public void testVFE16() {
         //@uses dot.junit.opcodes.invoke_direct.d.T_invoke_direct_12
         //@uses dot.junit.opcodes.invoke_direct.TSuper
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_12");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_direct_12().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
-    
+
 
     /**
      * @constraint n/a
@@ -276,18 +273,17 @@ public class Test_invoke_direct extends DxTestCase {
      */
     public void testVFE17() {
         //@uses dot.junit.opcodes.invoke_direct.d.T_invoke_direct_13
-        //@uses dot.junit.opcodes.invoke_direct.TAbstract       
+        //@uses dot.junit.opcodes.invoke_direct.TAbstract
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_direct_13().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
+
     /**
-     * @constraint B5 
-     * @title An instance initializer must only be invoked on an uninitialized instance. 
+     * @constraint B5
+     * @title An instance initializer must only be invoked on an uninitialized instance.
      */
     public void testVFE18() {
         try {
@@ -297,14 +293,14 @@ public class Test_invoke_direct extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint B8 
+     * @constraint B8
      * @title attempt to access inherited instance field before <init> is called
      */
     public void testVFE19() {
         //@uses dot.junit.opcodes.invoke_direct.d.T_invoke_direct_18
-        //@uses dot.junit.opcodes.invoke_direct.TSuper   
+        //@uses dot.junit.opcodes.invoke_direct.TSuper
         try {
             Class.forName("dot.junit.opcodes.invoke_direct.d.T_invoke_direct_18");
             fail("expected a verification exception");
@@ -312,9 +308,9 @@ public class Test_invoke_direct extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint A13 
+     * @constraint A13
      * @title attempt to invoke interface method
      */
     public void testVFE20() {
@@ -325,10 +321,10 @@ public class Test_invoke_direct extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint B6 
-     * @title instance methods may only be invoked on already initialized instances. 
+     * @constraint B6
+     * @title instance methods may only be invoked on already initialized instances.
      */
     public void testVFE21() {
         try {
