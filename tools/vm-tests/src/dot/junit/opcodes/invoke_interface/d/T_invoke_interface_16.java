@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package dot.junit.opcodes.invoke_interface;
+package dot.junit.opcodes.invoke_interface.d;
 
-public class ITestImpl implements ITest {
-    public void doit() {
-        // impl
+import dot.junit.opcodes.invoke_interface.ITest;
+
+public class T_invoke_interface_16 {
+
+    public void run(ITest test) {
     }
-
-    public void doit(int i) {
-        //
-    }
-
-    public native void doitNative();
-
-    public int test(int a) {
-        if (a == 999) return 195;
-        return 0;
-    }
-
-    public int testArgsOrder(int a, int b) {
-        return a / b;
-    }
-
 }
