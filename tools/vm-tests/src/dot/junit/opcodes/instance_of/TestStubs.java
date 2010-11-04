@@ -16,12 +16,5 @@
 
 package dot.junit.opcodes.instance_of;
 
-public class TestStubs {
-    @SuppressWarnings("unused")
-    private class TestStub {
-        // used by testVFE5
-        public void foo() {
-            
-        }
-    }   
+class TestStubs {
 }
