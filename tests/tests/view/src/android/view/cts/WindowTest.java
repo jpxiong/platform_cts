@@ -37,7 +37,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
-import android.view.accessibility.AccessibilityEvent;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.InputQueue;
 import android.view.KeyEvent;
@@ -50,6 +50,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
 
 @TestTargetClass(Window.class)
@@ -1148,6 +1149,9 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         public void togglePanel(int featureId, KeyEvent event) {
         }
 
+        public void invalidatePanelMenu(int featureId) {
+        }
+        
         public boolean performPanelShortcut(int featureId, int keyCode, KeyEvent event, int flags) {
             return true;
         }
@@ -1325,6 +1329,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
         public boolean onSearchRequested() {
             return false;
+        }
+
+        public ActionMode onStartActionMode(ActionMode.Callback callback) {
+            return null;
         }
     }
 }

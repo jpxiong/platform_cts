@@ -96,7 +96,6 @@ public class CanvasTest extends InstrumentationTestCase {
     )
     public void testCanvas1() {
         final Canvas c = new Canvas();
-        assertNull(c.getGL());
     }
 
     @TestTargetNew(
@@ -128,36 +127,6 @@ public class CanvasTest extends InstrumentationTestCase {
         new Canvas(mMutableBitmap);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Canvas",
-            args = {javax.microedition.khronos.opengles.GL.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getGL",
-            args = {}
-        )
-    })
-    public void testCanvas3() {
-        Canvas c = new Canvas();
-        assertNull(c.getGL());
-        final MyGL myGL = new MyGL();
-        c = new Canvas(myGL);
-        assertTrue(myGL.equals(c.getGL()));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "freeGlCaches",
-        args = {}
-    )
-    public void testFreeGlCaches() {
-        // can't get the changed state
-        Canvas.freeGlCaches();
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "setBitmap",
@@ -170,16 +139,6 @@ public class CanvasTest extends InstrumentationTestCase {
             fail("should throw out IllegalStateException when setting an "
                     + "ImmutableBitmap to a Canvas");
         } catch (IllegalStateException e) {
-            // expected
-        }
-
-        // abnormal case: GL not null
-        final Canvas c = new Canvas(new MyGL());
-        try {
-            c.setBitmap(mMutableBitmap);
-            fail("should throw out RuntimeException when setting MutableBitmap to Canvas "
-                    + "when the Canvas is created with GL");
-        } catch (RuntimeException e) {
             // expected
         }
 
@@ -197,39 +156,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.setBitmap(mMutableBitmap);
         assertEquals(BITMAP_WIDTH, mCanvas.getWidth());
         assertEquals(31, mCanvas.getHeight());
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setViewport",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeight",
-            args = {}
-        )
-    })
-    public void testSetViewport() {
-        assertEquals(BITMAP_WIDTH, mCanvas.getWidth());
-        assertEquals(BITMAP_HEIGHT, mCanvas.getHeight());
-
-        // set viewport has no effect for bitmap based canvas
-        mCanvas.setViewport(BITMAP_HEIGHT, BITMAP_WIDTH);
-        assertEquals(BITMAP_WIDTH, mCanvas.getWidth());
-        assertEquals(BITMAP_HEIGHT, mCanvas.getHeight());
-
-        // only GL based canvas that can set viewport
-        mCanvas = new Canvas(new MyGL());
-        mCanvas.setViewport(BITMAP_HEIGHT, BITMAP_WIDTH);
-        assertEquals(BITMAP_HEIGHT, mCanvas.getWidth());
-        assertEquals(BITMAP_WIDTH, mCanvas.getHeight());
     }
 
     @TestTargetNew(
@@ -2265,9 +2191,5 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(0.0f, values[6]);
         assertEquals(0.0f, values[7]);
         assertEquals(1.0f, values[8]);
-    }
-
-    private class MyGL implements GL {
-        //do nothing
     }
 }

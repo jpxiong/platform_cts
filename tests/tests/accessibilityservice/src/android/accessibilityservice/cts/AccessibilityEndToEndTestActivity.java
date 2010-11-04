@@ -16,6 +16,8 @@
 
 package android.accessibilityservice.cts;
 
+import com.android.cts.accessibilityservice.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -25,8 +27,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.android.cts.accessibilityservice.R;
 
 /**
  * This class is an {@link Activity} used to perform end-to-end

@@ -33,6 +33,15 @@ public class CamcorderProfileTest extends AndroidTestCase {
 
     private static final String TAG = "CamcorderProfileTest";
 
+    // Uses get without id if cameraId == -1 and get with id otherwise.
+    private CamcorderProfile getWithOptionalId(int quality, int cameraId) {
+        if (cameraId == -1) {
+            return CamcorderProfile.get(quality);
+        } else {
+            return CamcorderProfile.get(cameraId, quality);
+        }
+    }
+
     private void checkProfile(CamcorderProfile profile) {
         Log.v(TAG, String.format("profile: duration=%d, quality=%d, " +
             "fileFormat=%d, videoCodec=%d, videoBitRate=%d, videoFrameRate=%d, " +
@@ -52,7 +61,19 @@ public class CamcorderProfileTest extends AndroidTestCase {
             profile.audioChannels));
         assertTrue(profile.duration > 0);
         assertTrue(profile.quality == CamcorderProfile.QUALITY_LOW ||
-                   profile.quality == CamcorderProfile.QUALITY_HIGH);
+                   profile.quality == CamcorderProfile.QUALITY_HIGH ||
+                   profile.quality == CamcorderProfile.QUALITY_QCIF ||
+                   profile.quality == CamcorderProfile.QUALITY_CIF ||
+                   profile.quality == CamcorderProfile.QUALITY_480P ||
+                   profile.quality == CamcorderProfile.QUALITY_720P ||
+                   profile.quality == CamcorderProfile.QUALITY_1080P ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_LOW ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_HIGH ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_QCIF ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_CIF ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_480P ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_720P ||
+                   profile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_1080P);
         assertTrue(profile.videoBitRate > 0);
         assertTrue(profile.videoFrameRate > 0);
         assertTrue(profile.videoFrameWidth > 0);
@@ -60,6 +81,128 @@ public class CamcorderProfileTest extends AndroidTestCase {
         assertTrue(profile.audioBitRate > 0);
         assertTrue(profile.audioSampleRate > 0);
         assertTrue(profile.audioChannels > 0);
+    }
+
+    private void assertProfileEquals(CamcorderProfile expectedProfile,
+            CamcorderProfile actualProfile) {
+        assertEquals(expectedProfile.duration, actualProfile.duration);
+        assertEquals(expectedProfile.fileFormat, actualProfile.fileFormat);
+        assertEquals(expectedProfile.videoCodec, actualProfile.videoCodec);
+        assertEquals(expectedProfile.videoBitRate, actualProfile.videoBitRate);
+        assertEquals(expectedProfile.videoFrameRate, actualProfile.videoFrameRate);
+        assertEquals(expectedProfile.videoFrameWidth, actualProfile.videoFrameWidth);
+        assertEquals(expectedProfile.videoFrameHeight, actualProfile.videoFrameHeight);
+        assertEquals(expectedProfile.audioCodec, actualProfile.audioCodec);
+        assertEquals(expectedProfile.audioBitRate, actualProfile.audioBitRate);
+        assertEquals(expectedProfile.audioSampleRate, actualProfile.audioSampleRate);
+        assertEquals(expectedProfile.audioChannels, actualProfile.audioChannels);
+    }
+
+    private void checkSpecificProfileDimensions(CamcorderProfile profile, int quality) {
+        Log.v(TAG, String.format("specific profile: quality=%d, width = %d, height = %d",
+                    profile.quality, profile.videoFrameWidth, profile.videoFrameHeight));
+
+        switch (quality) {
+            case CamcorderProfile.QUALITY_QCIF:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_QCIF:
+                assertEquals(176, profile.videoFrameWidth);
+                assertEquals(144, profile.videoFrameHeight);
+                break;
+
+            case CamcorderProfile.QUALITY_CIF:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_CIF:
+                assertEquals(352, profile.videoFrameWidth);
+                assertEquals(288, profile.videoFrameHeight);
+                break;
+
+            case CamcorderProfile.QUALITY_480P:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_480P:
+                assertEquals(720, profile.videoFrameWidth);
+                assertEquals(480, profile.videoFrameHeight);
+                break;
+
+            case CamcorderProfile.QUALITY_720P:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_720P:
+                assertEquals(1280, profile.videoFrameWidth);
+                assertEquals(720, profile.videoFrameHeight);
+                break;
+
+            case CamcorderProfile.QUALITY_1080P:
+            case CamcorderProfile.QUALITY_TIME_LAPSE_1080P:
+                assertEquals(1920, profile.videoFrameWidth);
+                assertEquals(1088, profile.videoFrameHeight);
+                break;
+        }
+    }
+
+    // Checks if the existing specific profiles have the correct dimensions.
+    // Also checks that the mimimum quality specific profile matches the low profile and
+    // similarly that the maximum quality specific profile matches the high profile.
+    private void checkSpecificProfiles(int cameraId,
+            CamcorderProfile low, CamcorderProfile high, int[] specificQualities) {
+        CamcorderProfile minProfile = null;
+        CamcorderProfile maxProfile = null;
+
+        for (int i = 0; i < specificQualities.length; i++) {
+            int quality = specificQualities[i];
+            if (CamcorderProfile.hasProfile(quality)) {
+                CamcorderProfile profile = getWithOptionalId(quality, cameraId);
+                checkSpecificProfileDimensions(profile, quality);
+
+                if (minProfile == null) {
+                    minProfile = profile;
+                }
+                maxProfile = profile;
+            }
+        }
+
+        assertNotNull(minProfile);
+        assertNotNull(maxProfile);
+
+        Log.v(TAG, String.format("min profile: quality=%d, width = %d, height = %d",
+                    minProfile.quality, minProfile.videoFrameWidth, minProfile.videoFrameHeight));
+        Log.v(TAG, String.format("max profile: quality=%d, width = %d, height = %d",
+                    maxProfile.quality, maxProfile.videoFrameWidth, maxProfile.videoFrameHeight));
+
+        assertProfileEquals(low, minProfile);
+        assertProfileEquals(high, maxProfile);
+    }
+
+    private void checkGet(int cameraId) {
+        Log.v(TAG, (cameraId == -1)
+                   ? "Checking get without id"
+                   : "Checking get with id = " + cameraId);
+
+        CamcorderProfile lowProfile =
+            getWithOptionalId(CamcorderProfile.QUALITY_LOW, cameraId);
+        CamcorderProfile highProfile =
+            getWithOptionalId(CamcorderProfile.QUALITY_HIGH, cameraId);
+        checkProfile(lowProfile);
+        checkProfile(highProfile);
+
+        CamcorderProfile lowTimeLapseProfile =
+            getWithOptionalId(CamcorderProfile.QUALITY_TIME_LAPSE_LOW, cameraId);
+        CamcorderProfile highTimeLapseProfile =
+            getWithOptionalId(CamcorderProfile.QUALITY_TIME_LAPSE_HIGH, cameraId);
+        checkProfile(lowTimeLapseProfile);
+        checkProfile(highTimeLapseProfile);
+
+        int[] specificProfileQualities = {CamcorderProfile.QUALITY_QCIF,
+                                          CamcorderProfile.QUALITY_CIF,
+                                          CamcorderProfile.QUALITY_480P,
+                                          CamcorderProfile.QUALITY_720P,
+                                          CamcorderProfile.QUALITY_1080P};
+
+        int[] specificTimeLapseProfileQualities = {CamcorderProfile.QUALITY_TIME_LAPSE_QCIF,
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_CIF,
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_480P,
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_720P,
+                                                   CamcorderProfile.QUALITY_TIME_LAPSE_1080P};
+
+        checkSpecificProfiles(cameraId, lowProfile, highProfile,
+                specificProfileQualities);
+        checkSpecificProfiles(cameraId, lowTimeLapseProfile, highTimeLapseProfile,
+                specificTimeLapseProfileQualities);
     }
 
     @TestTargets({
@@ -70,10 +213,7 @@ public class CamcorderProfileTest extends AndroidTestCase {
         )
     })
     public void testGet() {
-        CamcorderProfile lowProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
-        CamcorderProfile highProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        checkProfile(lowProfile);
-        checkProfile(highProfile);
+        checkGet(-1);
     }
 
     @TestTargets({
@@ -85,13 +225,8 @@ public class CamcorderProfileTest extends AndroidTestCase {
     })
     public void testGetWithId() {
         int nCamera = Camera.getNumberOfCameras();
-        for (int id = 0; id < nCamera; id++) {
-            CamcorderProfile lowProfile = CamcorderProfile.get(id,
-                    CamcorderProfile.QUALITY_LOW);
-            CamcorderProfile highProfile = CamcorderProfile.get(id,
-                    CamcorderProfile.QUALITY_HIGH);
-            checkProfile(lowProfile);
-            checkProfile(highProfile);
+        for (int cameraId = 0; cameraId < nCamera; cameraId++) {
+            checkGet(cameraId);
         }
     }
 }

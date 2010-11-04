@@ -72,8 +72,7 @@ public class AccessibilityServiceInfoTest extends TestCase {
                 receivedInfo.eventTypes);
         assertEquals("feedbackType not marshalled properly", sentInfo.feedbackType,
                 receivedInfo.feedbackType);
-        // This will fail here and is fixed in Froyo. Bug 2448479.
-        // assertEquals("flags not marshalled properly", sentInfo.flags, receivedInfo.flags);
+        assertEquals("flags not marshalled properly", sentInfo.flags, receivedInfo.flags);
         assertEquals("notificationTimeout not marshalled properly", sentInfo.notificationTimeout,
                 receivedInfo.notificationTimeout);
         assertEquals("packageNames not marshalled properly", sentInfo.packageNames.length,

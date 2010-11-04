@@ -202,8 +202,7 @@ public class AccessibilityEventTest extends TestCase {
         TestCase.assertEquals("fromIndex not properly recycled", 0, event.getFromIndex());
         TestCase.assertEquals("itemCount not properly recycled", 0, event.getItemCount());
         TestCase.assertNull("packageName not properly recycled", event.getPackageName());
-        // This will fail and is fixed in Gingerbread Bug: 2593810
-        // TestCase.assertNull("parcelableData not properly recycled", event.getParcelableData());
+        TestCase.assertNull("parcelableData not properly recycled", event.getParcelableData());
         TestCase.assertEquals("removedCount not properly recycled", 0, event.getRemovedCount());
         TestCase.assertTrue("text not properly recycled", event.getText().isEmpty());
     }
