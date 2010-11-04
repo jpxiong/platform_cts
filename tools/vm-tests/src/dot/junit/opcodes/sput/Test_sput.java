@@ -19,12 +19,18 @@ package dot.junit.opcodes.sput;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.sput.d.T_sput_1;
+import dot.junit.opcodes.sput.d.T_sput_10;
 import dot.junit.opcodes.sput.d.T_sput_11;
 import dot.junit.opcodes.sput.d.T_sput_12;
 import dot.junit.opcodes.sput.d.T_sput_13;
 import dot.junit.opcodes.sput.d.T_sput_14;
+import dot.junit.opcodes.sput.d.T_sput_15;
+import dot.junit.opcodes.sput.d.T_sput_17;
 import dot.junit.opcodes.sput.d.T_sput_19;
 import dot.junit.opcodes.sput.d.T_sput_5;
+import dot.junit.opcodes.sput.d.T_sput_7;
+import dot.junit.opcodes.sput.d.T_sput_8;
+import dot.junit.opcodes.sput.d.T_sput_9;
 
 
 public class Test_sput extends DxTestCase {
@@ -49,7 +55,7 @@ public class Test_sput extends DxTestCase {
         assertEquals(3.14f, T_sput_19.st_f1);
     }
 
- 
+
     /**
      * @title modification of final field
      */
@@ -73,8 +79,8 @@ public class Test_sput extends DxTestCase {
     }
 
     /**
-     * @title Trying to put float into integer field. Dalvik doens't distinguish 32-bits types 
-     * internally, so this operation makes no sense but shall not crash the VM.  
+     * @title Trying to put float into integer field. Dalvik doens't distinguish 32-bits types
+     * internally, so this operation makes no sense but shall not crash the VM.
      */
     public void testN6() {
         T_sput_5 t = new  T_sput_5();
@@ -84,7 +90,7 @@ public class Test_sput extends DxTestCase {
         }
     }
 
-   
+
 
     /**
      * @title initialization of referenced class throws exception
@@ -100,7 +106,7 @@ public class Test_sput extends DxTestCase {
     }
 
     /**
-     * @constraint A12 
+     * @constraint A12
      * @title  constant pool index
      */
     public void testVFE1() {
@@ -113,8 +119,8 @@ public class Test_sput extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint A23 
+     *
+     * @constraint A23
      * @title  number of registers
      */
     public void testVFE2() {
@@ -128,24 +134,23 @@ public class Test_sput extends DxTestCase {
 
 
     /**
-     * 
-     * @constraint B13 
-     * @title  put integer into long field - only field with same name but 
+     *
+     * @constraint B13
+     * @title  put integer into long field - only field with same name but
      * different type exists
      */
     public void testVFE5() {
         try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_17().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
 
     /**
-     * 
-     * @constraint B13 
-     * @title type of field doesn't match opcode - attempt to modify double field 
+     *
+     * @constraint B13
+     * @title type of field doesn't match opcode - attempt to modify double field
      * with single-width register
      */
     public void testVFE7() {
@@ -156,87 +161,77 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint A12 
-     * @title Attempt to set non-static field. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     *
+     * @constraint A12
+     * @title Attempt to set non-static field.
      */
     public void testVFE8() {
          try {
-             Class.forName("dot.junit.opcodes.sput.d.T_sput_7");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_sput_7().run();
+             fail("expected IncompatibleClassChangeError");
+         } catch (IncompatibleClassChangeError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to modify inaccessible field. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify inaccessible field.
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.sput.TestStubs
         //@uses dot.junit.opcodes.sput.d.T_sput_8
         try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_8().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to modify field of undefined class. Java throws NoClassDefFoundError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify field of undefined class.
      */
     public void testVFE10() {
         try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_9");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_9().run();
+            fail("expected NoClassDefFoundError");
+        } catch (NoClassDefFoundError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Attempt to modify undefined field. Java throws NoSuchFieldError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify undefined field.
      */
     public void testVFE11() {
         try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_sput_10().run();
+            fail("expected NoSuchFieldError");
+        } catch (NoSuchFieldError t) {
         }
     }
-    
-    
-    
+
+
+
     /**
      * @constraint n/a
-     * @title Attempt to modify superclass' private field from subclass. Java 
-     * throws IllegalAccessError on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to modify superclass' private field from subclass.
      */
     public void testVFE12() {
         //@uses dot.junit.opcodes.sput.d.T_sput_1
         //@uses dot.junit.opcodes.sput.d.T_sput_15
         try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_15");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+             new T_sput_15().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
-    
-    
+
+
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title sput shall not work for wide numbers
      */
     public void testVFE13() {
@@ -247,10 +242,10 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput shall not work for reference fields
      */
     public void testVFE14() {
@@ -261,10 +256,10 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput shall not work for short fields
      */
     public void testVFE15() {
@@ -275,10 +270,10 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput shall not work for boolean fields
      */
     public void testVFE16() {
@@ -289,10 +284,10 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput shall not work for char fields
      */
     public void testVFE17() {
@@ -303,10 +298,10 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title sput shall not work for byte fields
      */
     public void testVFE18() {
@@ -317,7 +312,7 @@ public class Test_sput extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
      * @constraint n/a
      * @title Modification of final field in other class
@@ -326,11 +321,10 @@ public class Test_sput extends DxTestCase {
         //@uses dot.junit.opcodes.sput.TestStubs
         //@uses dot.junit.opcodes.sput.d.T_sput_11
     	try {
-            Class.forName("dot.junit.opcodes.sput.d.T_sput_11");
+            new T_sput_11().run();
             fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+        } catch (IllegalAccessError t) {
         }
     }
-    
+
 }
