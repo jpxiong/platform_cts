@@ -28,7 +28,7 @@
 .limit regs 5
 
        const v0, 3
-       new-array v0, v0, [Ldot/junit/opcodes/new_array/Test_new_array$TestStub;
+       new-array v0, v0, [Ldot/junit/opcodes/new_array/TestStubs;
        
        return-object v0
 .end method
