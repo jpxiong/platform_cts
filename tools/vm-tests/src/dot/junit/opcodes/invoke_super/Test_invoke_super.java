@@ -292,21 +292,6 @@ public class Test_invoke_super extends DxTestCase {
     }
 
     /**
-     * @constraint n/a
-     * @title invoke-super shall be used to invoke private methods
-     */
-    public void testVFE16() {
-        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_13
-        //@uses dot.junit.opcodes.invoke_super.d.TSuper
-         try {
-             Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_13");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
-         }
-    }
-
-    /**
      * @constraint A23
      * @title number of registers
      */
