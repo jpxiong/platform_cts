@@ -24,8 +24,8 @@ import dot.junit.opcodes.instance_of.d.T_instance_of_3;
 import dot.junit.opcodes.instance_of.d.T_instance_of_7;
 
 public class Test_instance_of extends DxTestCase {
- 
-    
+
+
     /**
      * @title (Object)String instanceof String
      */
@@ -60,25 +60,22 @@ public class Test_instance_of extends DxTestCase {
     }
 
     /**
-     * @title Attempt to access inaccessible class. 
-     */    
+     * @title Attempt to access inaccessible class.
+     */
     public void testE2() {
-        //@uses dot.junit.opcodes.instance_of.TestStubs$TestStub
+        //@uses dot.junit.opcodes.instance_of.TestStubs
         //@uses dot.junit.opcodes.instance_of.d.T_instance_of_3
         try {
             T_instance_of_3 tt = new T_instance_of_3();
             tt.run();
-            fail("expected a verification exception");
+            fail("expected IllegalAccessError");
         } catch (IllegalAccessError e) {
-            // expected
-        } catch(VerifyError e) {
-            // expected
         }
     }
-    
+
     /**
-     * @title Attempt to access undefined class. 
-     */    
+     * @title Attempt to access undefined class.
+     */
     public void testE3() {
         try {
             T_instance_of_7 tt = new T_instance_of_7();
@@ -92,7 +89,7 @@ public class Test_instance_of extends DxTestCase {
     }
 
     /**
-     * @constraint A19 
+     * @constraint A19
      * @title constant pool index
      */
     public void testVFE1() {
@@ -105,8 +102,8 @@ public class Test_instance_of extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title type of argument - int
      */
     public void testVFE2() {
@@ -119,8 +116,8 @@ public class Test_instance_of extends DxTestCase {
     }
 
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title type of argument - long
      */
     public void testVFE3() {
@@ -131,10 +128,10 @@ public class Test_instance_of extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * 
-     * @constraint B1 
+     *
+     * @constraint B1
      * @title number of registers
      */
     public void testVFE4() {
@@ -146,5 +143,5 @@ public class Test_instance_of extends DxTestCase {
         }
     }
 
-    
+
 }
