@@ -19,12 +19,18 @@ package dot.junit.opcodes.invoke_static_range;
 import dot.junit.DxTestCase;
 import dot.junit.DxUtil;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_1;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_13;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_14;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_15;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_18;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_19;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_2;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_4;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_5;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_6;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_7;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_8;
 
 
 
@@ -77,7 +83,7 @@ public class Test_invoke_static_range extends DxTestCase {
 
     /**
      * @title Native method can't be linked
-     * 
+     *
      */
     public void testE2() {
         T_invoke_static_range_6 t = new T_invoke_static_range_6();
@@ -104,7 +110,7 @@ public class Test_invoke_static_range extends DxTestCase {
     }
 
     /**
-     * @constraint A14 
+     * @constraint A14
      * @title invalid constant pool index
      */
     public void testVFE1() {
@@ -117,7 +123,7 @@ public class Test_invoke_static_range extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;clinit&gt; may not be called using invoke_static_range
      */
     public void testVFE3() {
@@ -130,7 +136,7 @@ public class Test_invoke_static_range extends DxTestCase {
     }
 
     /**
-     * @constraint B1 
+     * @constraint B1
      * @title number of arguments passed to method
      */
     public void testVFE4() {
@@ -143,20 +149,19 @@ public class Test_invoke_static_range extends DxTestCase {
     }
 
     /**
-     * @constraint A15 
+     * @constraint A15
      * @title &lt;init&gt; may not be called using invoke_static_range
      */
     public void testVFE5() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_19");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_static_range_19().run();
+            fail("expected IncompatibleClassChangeError");
+        } catch (IncompatibleClassChangeError t) {
         }
     }
 
     /**
-     * @constraint B9 
+     * @constraint B9
      * @title types of arguments passed to method
      */
     public void testVFE6() {
@@ -167,87 +172,77 @@ public class Test_invoke_static_range extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
-   
+
+
     /**
      * @constraint n/a
-     * @title Attempt to call non-static method. Java throws IncompatibleClassChangeError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call non-static method.
      */
     public void testVFE7() {
          try {
-             Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_5");
-             fail("expected a verification exception");
-         } catch (Throwable t) {
-             DxUtil.checkVerifyException(t);
+             new T_invoke_static_range_5().run();
+             fail("expected IncompatibleClassChangeError");
+         } catch (IncompatibleClassChangeError t) {
          }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to call undefined method. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call undefined method.
      */
     public void testVFE8() {
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_7");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_static_range_7().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
-    
+
     /**
      * @constraint n/a
-     * @title Attempt to call private method of other class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call private method of other class.
      */
     public void testVFE9() {
         //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_8
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_8");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_static_range_8().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
 
     /**
      * @constraint n/a
-     * @title Method has different signature. Java throws NoSuchMethodError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Method has different signature.
      */
     public void testVFE10() {
         //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_13
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_13");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_static_range_13().run();
+            fail("expected NoSuchMethodError");
+        } catch (NoSuchMethodError t) {
         }
     }
 
-        
+
     /**
      * @constraint B12
-     * @title Attempt to call protected method of unrelated class. Java throws IllegalAccessError 
-     * on first access but Dalvik throws VerifyError on class loading.
+     * @title Attempt to call protected method of unrelated class.
      */
     public void testVFE12() {
         //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17
         //@uses dot.junit.opcodes.invoke_static_range.TestClass
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
+            new T_invoke_static_range_17().run();
+            fail("expected IllegalAccessError");
+        } catch (IllegalAccessError t) {
         }
     }
-    
+
     /**
-     * @constraint A23 
+     * @constraint A23
      * @title number of registers
      */
     public void testVFE13() {
@@ -258,9 +253,9 @@ public class Test_invoke_static_range extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
     /**
-     * @constraint A14 
+     * @constraint A14
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
