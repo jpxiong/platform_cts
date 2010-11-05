@@ -292,6 +292,21 @@ public class Test_invoke_super_range extends DxTestCase {
     }
 
     /**
+     * @constraint n/a
+     * @title invoke-super/range shall be used to invoke private methods
+     */
+    public void testVFE16() {
+        //@uses dot.junit.opcodes.invoke_super_range.d.T_invoke_super_range_13
+        //@uses dot.junit.opcodes.invoke_super_range.d.TSuper
+         try {
+             Class.forName("dot.junit.opcodes.invoke_super_range.d.T_invoke_super_range_13");
+             fail("expected a verification exception");
+         } catch (Throwable t) {
+             DxUtil.checkVerifyException(t);
+         }
+    }
+
+    /**
      * @constraint A23
      * @title number of registers
      */
