@@ -21,8 +21,6 @@ import com.android.cts.TestHost.MODE;
 
 import org.xml.sax.SAXException;
 
-import android.annotation.cts.Profile;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -256,27 +254,25 @@ public class ConsoleUi {
         final String testStr = CTSCommand.OPTION_T + "/" + CTSCommand.OPTION_TEST;
         final String deviceStr = CTSCommand.OPTION_D + "/" + CTSCommand.OPTION_DEVICE;
         final String pkgStr = CTSCommand.OPTION_P + "/" + CTSCommand.OPTION_PACKAGE;
-        final String profileOptionStr = "[" + CTSCommand.OPTION_PROFILE + " profile_name]";
 
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
-                + cmdStr + " test_plan_name " + profileOptionStr
-                + ": run a test plan");
+                + cmdStr + " test_plan_name: run a test plan");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
-                + cmdStr + " test_plan_name " + deviceStr + " device_ID " + profileOptionStr
+                + cmdStr + " test_plan_name " + deviceStr + " device_ID"
                 +  ": run a test plan using the specified device");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
-                + cmdStr + " test_plan_name " + testStr + " test_name " + profileOptionStr
+                + cmdStr + " test_plan_name " + testStr + " test_name"
                 + ": run a specific test");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
-                + cmdStr + " test_plan_name " + pkgStr + " java_package_name " + profileOptionStr
+                + cmdStr + " test_plan_name " + pkgStr + " java_package_name"
                 + ": run a specific java package");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
                 + cmdStr + " test_plan_name " + testStr + " test_name "
-                + deviceStr + " device_ID " + profileOptionStr
+                + deviceStr + " device_ID"
                 + ": run a specific test using the specified device");
         CUIOutputStream.println(CMD_OPT_LEADING_SPACE
                 + cmdStr + " test_plan_name " + pkgStr + " java_package_name "
-                + deviceStr + " device_ID " + profileOptionStr
+                + deviceStr + " device_ID"
                 + ": run a specific java package using the specified device");
     }
 
@@ -364,7 +360,7 @@ public class ConsoleUi {
     private void processStartPackageCommand(CommandParser cp) {
         try {
             String pathName = cp.getValue(CTSCommand.OPTION_PACKAGE);
-            mHost.startZippedPackage(pathName, getProfile(cp));
+            mHost.startZippedPackage(pathName);
         } catch (DeviceDisconnectedException e) {
           Log.e("Device " + e.getMessage() + " disconnected", e);
         } catch (Exception e) {
@@ -393,9 +389,6 @@ public class ConsoleUi {
             return true;
         } else if (isValidCommandOption(cp, CTSCommand.START,
                 CTSCommand.OPTION_P)) {
-            return true;
-        } else if (isValidCommandOption(cp, CTSCommand.START,
-                CTSCommand.OPTION_PROFILE)) {
             return true;
         } else {
             return false;
@@ -442,8 +435,6 @@ public class ConsoleUi {
             return;
         }
 
-        Profile profile = getProfile(cp);
-
         String testPlanPath = null;
         String deviceId = null;
         String testName = null;
@@ -485,7 +476,7 @@ public class ConsoleUi {
                 if ((testName == null) || (testName.length() == 0)) {
                     String mode = chooseMode(sessionList);
                     if (CREATE_SESSION.equals(mode)) {
-                        ts = TestHost.createSession(testPlanName, profile);
+                        ts = TestHost.createSession(testPlanName);
                     }
                 }
                 if (ts == null) {
@@ -523,7 +514,7 @@ public class ConsoleUi {
             }
 
             if (ts == null) {
-                ts = TestHost.createSession(testPlanName, profile);
+                ts = TestHost.createSession(testPlanName);
             }
 
             mHost.startSession(ts, deviceId, testName, javaPkgName, actionType);
@@ -547,15 +538,6 @@ public class ConsoleUi {
             Log.e(e.getMessage(), null);
         } catch (InvalidNameSpaceException e) {
             Log.e(e.getMessage(), null);
-        }
-    }
-
-    private Profile getProfile(CommandParser cp) {
-        String profileOption = cp.getValue(CTSCommand.OPTION_PROFILE);
-        if (profileOption != null) {
-            return Profile.valueOf(profileOption.toUpperCase());
-        } else {
-            return Profile.ALL;
         }
     }
 
@@ -1201,8 +1183,8 @@ public class ConsoleUi {
             CUIOutputStream.println("There aren't any test results!");
         } else {
             CUIOutputStream.println("List of all results: ");
-            CUIOutputStream.println("Session\t\tTest result\t\t\t\tStart time\t\tEnd time\t"
-                    + "\tProfile\tTest plan name\t");
+            CUIOutputStream.println("Session\t\tTest result\t\t\t\t\tStart time\t\tEnd time\t"
+                    + "\tTest plan name\t");
             CUIOutputStream.println("\t\tPass\tFail\tTimeout\tOmitted\tNotExecuted");
 
             for (TestSession session : sessions) {
@@ -1230,7 +1212,6 @@ public class ConsoleUi {
                 CUIOutputStream.println(Long.toString(session.getId()) + "\t\t"
                         + resStr + "\t\t" + startTimeStr
                         + "\t" + endTimeStr
-                        + "\t" + log.getProfile().name()
                         + "\t" + log.getTestPlanName());
 
             }

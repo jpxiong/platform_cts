@@ -20,8 +20,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import android.annotation.cts.Profile;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -103,7 +101,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
      * @param config TestPlan XML configuration file.
      * @return TestSession.
      */
-    public TestSession build(final String config, Profile profile) throws SAXException, IOException,
+    public TestSession build(final String config) throws SAXException, IOException,
             TestPlanNotFoundException, TestNotFoundException, NoSuchAlgorithmException {
         File file = new File(config);
         if (!file.exists()) {
@@ -135,7 +133,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
             planName = planFileName;
         }
 
-        TestSessionLog sessionLog = new TestSessionLog(packages, planName, profile);
+        TestSessionLog sessionLog = new TestSessionLog(packages, planName);
         TestSession ts = new TestSession(sessionLog, numOfRequiredDevices);
         return ts;
     }
