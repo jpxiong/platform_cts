@@ -113,7 +113,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 assertAvailable(PackageManager.FEATURE_CAMERA);
 
                 Camera.Parameters params = camera.getParameters();
-                if (!Parameters.FOCUS_MODE_FIXED.equals(params.getFocusMode())) {
+                if (params.getSupportedFocusModes().contains(Parameters.FOCUS_MODE_AUTO)) {
                     assertAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
                 } else {
                     assertNotAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
