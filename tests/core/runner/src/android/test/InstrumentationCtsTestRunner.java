@@ -22,9 +22,7 @@ import com.android.internal.util.Predicates;
 import dalvik.annotation.BrokenTest;
 import dalvik.annotation.SideEffect;
 
-import android.annotation.cts.Profile;
 import android.annotation.cts.RequiredFeatures;
-import android.annotation.cts.SupportedProfiles;
 import android.app.Instrumentation;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -67,14 +65,9 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
      */
     private static final String TAG = "InstrumentationCtsTestRunner";
 
-    private static final String ARGUMENT_PROFILE = "profile";
-
     private static final String REPORT_VALUE_ID = "InstrumentationCtsTestRunner";
 
     private static final int REPORT_VALUE_RESULT_OMITTED = -3;
-
-    /** Profile of the device being tested or null to run all tests regardless of profile. */
-    private Profile mProfile;
 
     /**
      * True if (and only if) we are running in single-test mode (as opposed to
@@ -102,15 +95,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         if (arguments != null) {
             String classArg = arguments.getString(ARGUMENT_TEST_CLASS);
             mSingleTest = classArg != null && classArg.contains("#");
-
-            String profileArg = arguments.getString(ARGUMENT_PROFILE);
-            if (profileArg != null) {
-                mProfile = Profile.valueOf(profileArg.toUpperCase());
-            } else {
-                mProfile = Profile.ALL;
-            }
-        } else {
-            mProfile = Profile.ALL;
         }
 
         // attempt to disable keyguard,  if current test has permission to do so
@@ -250,7 +234,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 Predicates.not(new HasAnnotation(BrokenTest.class));
         builderRequirements.add(brokenTestPredicate);
 
-        builderRequirements.add(getProfilePredicate(mProfile));
         builderRequirements.add(getFeaturePredicate());
 
         if (!mSingleTest) {
@@ -283,47 +266,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         sendStatus(REPORT_VALUE_RESULT_OMITTED, bundle);
     }
 
-    private Predicate<TestMethod> getProfilePredicate(final Profile specifiedProfile) {
-        return new Predicate<TestMethod>() {
-            public boolean apply(TestMethod t) {
-                if (isValidTest(t)) {
-                    // InstrumentationTestRunner will run the test and send back results.
-                    return true;
-                } else {
-                    // InstrumentationTestRunner WON'T run the test, so send back omitted status.
-                    sendOmittedStatus(t);
-                    return false;
-                }
-            }
-
-            private boolean isValidTest(TestMethod t) {
-                Set<Profile> profiles = new HashSet<Profile>();
-                add(profiles, t.getAnnotation(SupportedProfiles.class));
-                add(profiles, t.getEnclosingClass().getAnnotation(SupportedProfiles.class));
-
-                /*
-                 * Run the test if any of the following conditions are met:
-                 *
-                 * 1. No profile for the device was specified. This means run all tests.
-                 * 2. Specified profile is the ALL profile. This also means run all tests.
-                 * 3. The test does not require a specific type of profile.
-                 * 4. The test specifies that all profiles are supported by the test.
-                 * 5. The test requires a profile which matches the specified profile.
-                 */
-                return specifiedProfile == null
-                        || specifiedProfile == Profile.ALL
-                        || profiles.isEmpty()
-                        || profiles.contains(Profile.ALL)
-                        || profiles.contains(specifiedProfile);
-            }
-
-            private void add(Set<Profile> profiles, SupportedProfiles annotation) {
-                if (annotation != null) {
-                    Collections.addAll(profiles, annotation.value());
-                }
-            }
-        };
-    }
 
     private Predicate<TestMethod> getFeaturePredicate() {
         return new Predicate<TestMethod>() {

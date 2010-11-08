@@ -16,8 +16,6 @@
 
 package com.android.cts;
 
-import android.annotation.cts.Profile;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -269,9 +267,8 @@ public class TestSuite implements DeviceObserver {
      *
      * @param device The device to run the test over.
      * @param javaPkgName The java package name.
-     * @param profile The profile of the device being tested.
      */
-    public void run(final TestDevice device, final String javaPkgName, Profile profile)
+    public void run(final TestDevice device, final String javaPkgName)
             throws IOException, DeviceDisconnectedException, ADBServerNeedRestartException {
         Iterator<TestSuite> subSuites = getSubSuites().iterator();
         Iterator<TestCase> testCases = getTestCases().iterator();
@@ -282,7 +279,7 @@ public class TestSuite implements DeviceObserver {
 
         while (subSuites.hasNext() && (!mTestStop)) {
             mCurrentSubSuite = subSuites.next();
-            mCurrentSubSuite.run(device, javaPkgName, profile);
+            mCurrentSubSuite.run(device, javaPkgName);
         }
 
         while (testCases.hasNext() && (!mTestStop)) {
@@ -290,7 +287,7 @@ public class TestSuite implements DeviceObserver {
             String fullName = mFullName + "." + mCurrentTestCase.getName();
             if ((javaPkgName == null) || (javaPkgName.length() == 0)
                     || fullName.startsWith(javaPkgName)) {
-                mCurrentTestCase.run(device, profile);
+                mCurrentTestCase.run(device);
             }
         }
     }
@@ -300,16 +297,15 @@ public class TestSuite implements DeviceObserver {
      *
      * @param device The device to run the test over.
      * @param test The specific test to be run.
-     * @param profile The profile of the device being tested.
      */
-    public void run(final TestDevice device, final Test test, Profile profile)
+    public void run(final TestDevice device, final Test test)
             throws DeviceDisconnectedException, ADBServerNeedRestartException {
         mTestStop = false;
         mCurrentTestCase = null;
         mCurrentSubSuite = null;
 
         mCurrentTestCase = test.getTestCase();
-        mCurrentTestCase.run(device, test, profile);
+        mCurrentTestCase.run(device, test);
     }
 
     /** {@inheritDoc} */
