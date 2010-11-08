@@ -22,8 +22,6 @@ import com.android.ddmlib.AndroidDebugBridge;
 
 import org.xml.sax.SAXException;
 
-import android.annotation.cts.Profile;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -137,9 +135,8 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * Start zipped package.
      *
      * @param pathName  The path name of the zipped package.
-     * @param profile  The profile of the device being tested.
      */
-    public void startZippedPackage(final String pathName, Profile profile)
+    public void startZippedPackage(final String pathName)
                 throws FileNotFoundException,
                        IOException,
                        ParserConfigurationException,
@@ -171,7 +168,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
         // step 3: start the plan
         TestSession ts = startSession(TEMP_PLAN_NAME, getFirstAvailableDevice().getSerialNumber(),
-                null, profile);
+                null);
 
         // step 4: copy the resulting zip file
         String resultName = pathName.substring(0, pathName.lastIndexOf("."))
@@ -512,12 +509,12 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * @param testPlanName the name of the specified test plan
      * @return a {@link TestSession}
      */
-    static public TestSession createSession(final String testPlanName, Profile profile)
+    static public TestSession createSession(final String testPlanName)
             throws IOException, TestNotFoundException, SAXException,
             ParserConfigurationException, TestPlanNotFoundException, NoSuchAlgorithmException {
 
         String testPlanPath = sConfig.getPlanRepository().getPlanPath(testPlanName);
-        TestSession ts = TestSessionBuilder.getInstance().build(testPlanPath, profile);
+        TestSession ts = TestSessionBuilder.getInstance().build(testPlanPath);
         sSessions.add(ts);
 
         return ts;
@@ -642,14 +639,14 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
      * @param javaPkgName The specific java package name to be run.
      */
     public TestSession startSession(final String testPlanName,
-            String deviceId, final String javaPkgName, Profile profile)
+            String deviceId, final String javaPkgName)
             throws IOException, DeviceNotAvailableException,
             TestNotFoundException, SAXException, ParserConfigurationException,
             TestPlanNotFoundException, IllegalTestNameException,
             DeviceDisconnectedException, NoSuchAlgorithmException,
             InvalidNameSpaceException, InvalidApkPathException {
 
-        TestSession ts = createSession(testPlanName, profile);
+        TestSession ts = createSession(testPlanName);
         if ((javaPkgName != null) && (javaPkgName.length() != 0)) {
             runTest(ts, deviceId, null, javaPkgName, ActionType.RUN_SINGLE_JAVA_PACKAGE);
         } else {

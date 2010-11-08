@@ -18,8 +18,6 @@ package com.android.cts;
 
 import com.android.ddmlib.MultiLineReceiver;
 
-import android.annotation.cts.Profile;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
