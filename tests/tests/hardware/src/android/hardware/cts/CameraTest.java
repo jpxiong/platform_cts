@@ -1345,19 +1345,34 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     })
     @UiThreadTest
     public void testMultipleCameras() throws Exception {
-        mCamera = Camera.open();  // Make sure original open still works.
-        mCamera.release();
-
         int nCameras = Camera.getNumberOfCameras();
         Log.v(TAG, "total " + nCameras + " cameras");
-        assertTrue(nCameras > 0);
+        assertTrue(nCameras >= 0);
+
+        boolean backCameraExist = false;
+        CameraInfo info = new CameraInfo();
+        for (int i = 0; i < nCameras; i++) {
+            Camera.getCameraInfo(i, info);
+            if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
+                backCameraExist = true;
+                break;
+            }
+        }
+        // Make sure original open still works. It must return a back-facing
+        // camera.
+        mCamera = Camera.open();
+        if (mCamera != null) {
+            mCamera.release();
+            assertTrue(backCameraExist);
+        } else {
+            assertFalse(backCameraExist);
+        }
 
         for (int id = -1; id <= nCameras; id++) {
             Log.v(TAG, "testing camera #" + id);
 
             boolean isBadId = (id < 0 || id >= nCameras);
 
-            CameraInfo info = new CameraInfo();
             try {
                 Camera.getCameraInfo(id, info);
                 if (isBadId) {
