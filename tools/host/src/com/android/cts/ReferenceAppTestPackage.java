@@ -21,8 +21,6 @@ import com.android.ddmlib.RawImage;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 import com.android.ddmlib.log.LogReceiver.LogEntry;
 
-import android.annotation.cts.Profile;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
