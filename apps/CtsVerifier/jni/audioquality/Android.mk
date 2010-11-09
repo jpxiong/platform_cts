@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2010 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+LOCAL_PATH := $(call my-dir)
 
-LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+
+LOCAL_CPP_EXTENSION := .cpp
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_PRELINK_MODULE := false
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_MODULE    := libaudioquality
+LOCAL_SRC_FILES := Fft.cpp Window.cpp GlitchTest.cpp MeasureRms.cpp \
+   OverflowCheck.cpp LinearityTest.cpp CompareSpectra.cpp \
+   GenerateSinusoid.cpp Wrapper.cpp
 
-LOCAL_PACKAGE_NAME := CtsVerifier
-
-LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni libaudioquality
-
-LOCAL_SDK_VERSION := current
-
-include $(BUILD_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(BUILD_SHARED_LIBRARY)
