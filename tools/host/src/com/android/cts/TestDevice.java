@@ -404,9 +404,11 @@ public class TestDevice implements DeviceObserver {
         public static final String BUILD_DEVICE = "build_device";
         public static final String BUILD_ABI = "build_abi";
         public static final String BUILD_ABI2 = "build_abi2";
+        public static final String SCREEN_SIZE = "screen_size";
         public static final String SCREEN_HEIGHT = "screen_height";
         public static final String SCREEN_WIDTH = "screen_width";
         public static final String SCREEN_DENSITY = "screen_density";
+        public static final String SCREEN_DENSITY_BUCKET = "screen_density_bucket";
         public static final String SERIAL_NUMBER = "serialNumber";
         public static final String VERSION_SDK = "version_sdk";
         public static final String LOCALES = "locales";
@@ -691,6 +693,10 @@ public class TestDevice implements DeviceObserver {
             return mInfoMap.get(SERIAL_NUMBER);
         }
 
+        public String getScreenSize() {
+            return mInfoMap.get(SCREEN_SIZE);
+        }
+
         /**
          * Return screen resolution(width x height)
          *
@@ -698,6 +704,24 @@ public class TestDevice implements DeviceObserver {
          */
         public String getScreenResolution() {
             return mInfoMap.get(SCREEN_WIDTH) + "x" + mInfoMap.get(SCREEN_HEIGHT);
+        }
+
+        /**
+         * Return logical screen density
+         *
+         * @return The logical screen density.
+         */
+        public String getScreenDensity() {
+            return mInfoMap.get(SCREEN_DENSITY);
+        }
+
+        /**
+         * Return the probable screen density bucket
+         *
+         * @return The probable screen density bucket.
+         */
+        public String getScreenDensityBucket() {
+            return mInfoMap.get(SCREEN_DENSITY_BUCKET);
         }
 
         /**
