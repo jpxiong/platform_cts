@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -51,6 +52,8 @@ public class DeviceInfoInstrument extends Instrumentation {
     public static final String KEYPAD = "keypad";
     public static final String NAVIGATION = "navigation";
     public static final String TOUCH_SCREEN = "touch_screen";
+    private static final String SCREEN_SIZE = "screen_size";
+    private static final String SCREEN_DENSITY_BUCKET = "screen_density_bucket";
     private static final String SCREEN_Y_DENSITY = "screen_Y_density";
     private static final String SCREEN_X_DENSITY = "screen_X_density";
     private static final String SCREEN_DENSITY = "screen_density";
@@ -112,6 +115,12 @@ public class DeviceInfoInstrument extends Instrumentation {
         addResult(SCREEN_DENSITY, metrics.density);
         addResult(SCREEN_X_DENSITY, metrics.xdpi);
         addResult(SCREEN_Y_DENSITY, metrics.ydpi);
+
+        String screenDensityBucket = getScreenDensityBucket(metrics);
+        addResult(SCREEN_DENSITY_BUCKET, screenDensityBucket);
+
+        String screenSize = getScreenSize();
+        addResult(SCREEN_SIZE, screenSize);
 
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -183,6 +192,49 @@ public class DeviceInfoInstrument extends Instrumentation {
      */
     private void addResult(final String key, final float value){
         mResults.putFloat(key, value);
+    }
+
+    private String getScreenSize() {
+        Configuration config = getContext().getResources().getConfiguration();
+        int screenLayout = config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        String screenSize = String.format("0x%x", screenLayout);
+        switch (screenLayout) {
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                screenSize = "small";
+                break;
+
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                screenSize = "normal";
+                break;
+
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                screenSize = "large";
+                break;
+
+            case Configuration.SCREENLAYOUT_SIZE_UNDEFINED:
+                screenSize = "undefined";
+                break;
+        }
+        return screenSize;
+    }
+
+    private String getScreenDensityBucket(DisplayMetrics metrics) {
+        switch (metrics.densityDpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                return "ldpi";
+
+            case DisplayMetrics.DENSITY_MEDIUM:
+                return "mdpi";
+
+            case DisplayMetrics.DENSITY_HIGH:
+                return "hdpi";
+
+            case 320:
+                return "xdpi";
+
+            default:
+                return "" + metrics.densityDpi;
+        }
     }
 
     /**

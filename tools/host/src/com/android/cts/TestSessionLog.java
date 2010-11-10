@@ -46,7 +46,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.9";
+    private static final String CTS_RESULT_FILE_VERSION = "1.10";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -294,6 +294,14 @@ public class TestSessionLog extends XMLResourceHandler {
 
                 Node screenNode = doc.createElement(TAG_SCREEN);
                 setAttribute(doc, screenNode, ATTRIBUTE_RESOLUTION, bldInfo.getScreenResolution());
+
+                setAttribute(doc, screenNode, DeviceParameterCollector.SCREEN_SIZE,
+                        bldInfo.getScreenSize());
+                setAttribute(doc, screenNode, DeviceParameterCollector.SCREEN_DENSITY,
+                        bldInfo.getScreenDensity());
+                setAttribute(doc, screenNode, DeviceParameterCollector.SCREEN_DENSITY_BUCKET,
+                        bldInfo.getScreenDensityBucket());
+
                 deviceSettingNode.appendChild(screenNode);
                 Node simCardNode = doc.createElement(TAG_PHONE_SUB_INFO);
                 setAttribute(doc, simCardNode, ATTRIBUTE_SUBSCRIBER_ID, bldInfo.getPhoneNumber());
