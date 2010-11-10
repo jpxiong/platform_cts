@@ -286,4 +286,14 @@ public class CookieManagerTest extends
             }
         }.run();
     }
+
+    public void testb3167208() throws Exception {
+        String uri = "http://host.android.com/path/";
+        // note the space after the domain=
+        String problemCookie = "foo=bar; domain= .android.com; path=/";
+        mCookieManager.setCookie(uri, problemCookie);
+        String cookie = mCookieManager.getCookie(uri);
+        assertNotNull(cookie);
+        assertTrue(cookie.contains("foo=bar"));
+    }
 }
