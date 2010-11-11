@@ -134,9 +134,22 @@
                                             </TD>
                                         </TR>
                                         <TR>
-                                            <TD class="rowtitle">Screen size</TD>
+                                            <TD class="rowtitle">Screen Size</TD>
+                                            <TD>
+                                                <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_size"/>
+                                            </TD>
+                                        </TR>
+                                        <TR>
+                                            <TD class="rowtitle">Resolution</TD>
                                             <TD>
                                                 <xsl:value-of select="TestResult/DeviceInfo/Screen/@resolution"/>
+                                            </TD>
+                                        </TR>
+                                        <TR>
+                                            <TD class="rowtitle">Density</TD>
+                                            <TD>
+                                                <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density"/>
+                                                (<xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density_bucket"/>)
                                             </TD>
                                         </TR>
                                         <TR>
@@ -146,13 +159,13 @@
                                             </TD>
                                         </TR>
                                         <TR>
-                                            <TD class="rowtitle">x dpi</TD>
+                                            <TD class="rowtitle">X dpi</TD>
                                             <TD>
                                                 <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Xdpi"/>
                                             </TD>
                                         </TR>
                                         <TR>
-                                            <TD class="rowtitle">y dpi</TD>
+                                            <TD class="rowtitle">Y dpi</TD>
                                             <TD>
                                                 <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Ydpi"/>
                                             </TD>
