@@ -472,11 +472,17 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
 
     @LargeTest
     public void testManyRowsLong() throws Exception {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-
+        mDatabase.beginTransaction();
         final int count = 9000;
-        for (int i = 0; i < count; i++) {
-            mDatabase.execSQL("INSERT INTO test (data) VALUES (" + i + ");");
+        try {
+            mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
+
+            for (int i = 0; i < count; i++) {
+                mDatabase.execSQL("INSERT INTO test (data) VALUES (" + i + ");");
+            }
+            mDatabase.setTransactionSuccessful();
+        } finally {
+            mDatabase.endTransaction();
         }
 
         Cursor testCursor = getTestCursor(mDatabase.query("test", new String[] { "data" },
