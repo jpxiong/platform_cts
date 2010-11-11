@@ -283,9 +283,6 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         assertFalse(layerDrawable.setDrawableByLayerId(30, d1));
 
-        layerDrawable.setDrawableByLayerId(20, null);
-        assertEquals(null, layerDrawable.getDrawable(1));
-
         try {
             layerDrawable.getDrawable(layerDrawable.getNumberOfLayers());
             fail("Should throw IndexOutOfBoundsException");
