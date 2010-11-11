@@ -32,6 +32,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.Camera.Parameters;
 import android.location.LocationManager;
+import android.net.sip.SipManager;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.test.InstrumentationTestCase;
@@ -203,6 +204,30 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
             }
         }
         return features;
+    }
+
+    public void testSipFeatures() {
+        if (SipManager.newInstance(mContext) != null) {
+            assertAvailable(PackageManager.FEATURE_SIP);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_SIP);
+            assertNotAvailable(PackageManager.FEATURE_SIP_VOIP);
+        }
+
+        if (SipManager.isApiSupported(mContext)) {
+            assertAvailable(PackageManager.FEATURE_SIP);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_SIP);
+            assertNotAvailable(PackageManager.FEATURE_SIP_VOIP);
+        }
+
+        if (SipManager.isVoipSupported(mContext)) {
+            assertAvailable(PackageManager.FEATURE_SIP);
+            assertAvailable(PackageManager.FEATURE_SIP_VOIP);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_SIP);
+            assertNotAvailable(PackageManager.FEATURE_SIP_VOIP);
+        }
     }
 
     /**
