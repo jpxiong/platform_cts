@@ -62,11 +62,7 @@ public class RoundRectShapeTest extends TestCase {
         } catch (ArrayIndexOutOfBoundsException e) {
         }
 
-        try {
-            new RoundRectShape(null, new RectF(), new float[8]);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
+        new RoundRectShape(null, new RectF(), new float[8]);
 
         try {
             new RoundRectShape(new float[8], new RectF(), new float[7]);
