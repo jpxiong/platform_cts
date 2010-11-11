@@ -20,10 +20,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Verify that pre-installed packages don't have the debuggable
@@ -32,21 +29,14 @@ import java.util.Set;
  */
 public class DebuggableTest extends AndroidTestCase {
 
-    // Remove whitelist in future release.
-    private static final Set<String> WHITELISTED_APPS = new HashSet<String>(Arrays.asList(
-            "com.google.android.apps.uploader"
-            ));
-
     public void testNoDebuggable() {
         List<ApplicationInfo> apps = getContext()
                 .getPackageManager()
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
         for (ApplicationInfo app : apps) {
             String appName = app.packageName;
-            if (!WHITELISTED_APPS.contains(appName)) {
-                assertTrue("Package " + appName + " is marked as debuggable.",
-                        (app.flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0);
-            }
+            assertTrue("Package " + appName + " is marked as debuggable.",
+                    (app.flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0);
         }
     }
 }
