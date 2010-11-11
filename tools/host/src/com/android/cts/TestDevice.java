@@ -1280,7 +1280,7 @@ public class TestDevice implements DeviceObserver {
             mResultLines = new ArrayList<String>();
             mStackTrace = null;
             mFailedMsg = null;
-            mResultCode = CtsTestResult.CODE_PASS;
+            mResultCode = CtsTestResult.CODE_FAIL;
         }
 
         /** {@inheritDoc} */
