@@ -29,6 +29,8 @@ import java.util.List;
 
 /**
  * Verify certain permissions on the filesystem
+ *
+ * TODO: Combine this file with {@link android.os.cts.FileAccessPermissionTest}
  */
 @MediumTest
 public class FileSystemPermissionTest extends AndroidTestCase {
@@ -113,6 +115,27 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     public void testProcDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(new File("/proc"));
+    }
+
+    public void testDevMemSane() throws Exception {
+        File f = new File("/dev/mem");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    public void testDevkmemSane() throws Exception {
+        File f = new File("/dev/kmem");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    public void testDevPortSane() throws Exception {
+        File f = new File("/dev/port");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
     }
 
     private static void assertDirectoryNotWritable(File directory) throws Exception {
