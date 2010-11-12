@@ -77,33 +77,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "abortBroadcast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearAbortBroadcast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAbortBroadcast",
-            args = {}
-        )
-    })
-    public void testAccessAbortBroadcast() {
-        MockReceiverInternal mockReceiver = new MockReceiverInternal();
-
-        mockReceiver.abortBroadcast();
-        assertTrue(mockReceiver.getAbortBroadcast());
-
-        mockReceiver.clearAbortBroadcast();
-        assertFalse(mockReceiver.getAbortBroadcast());
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "getDebugUnregister",
             args = {}
         ),
@@ -377,7 +350,7 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
 
     static class MyServiceConnection implements ServiceConnection {
         private boolean serviceConnected;
-        
+
         public synchronized void onServiceConnected(ComponentName name, IBinder service) {
             serviceConnected = true;
             notifyAll();
@@ -385,7 +358,7 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
 
         public synchronized void onServiceDisconnected(ComponentName name) {
         }
-        
+
         public synchronized boolean waitForService(long timeout) {
             if (!serviceConnected) {
                 try {
