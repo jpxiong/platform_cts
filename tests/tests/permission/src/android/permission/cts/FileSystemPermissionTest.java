@@ -23,6 +23,7 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -162,6 +163,43 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     public void testAllOtherDirectoriesNotWritable() throws Exception {
         File start = new File("/");
         assertDirectoryAndSubdirectoriesNotWritable(start);
+    }
+
+    public void testAllBlockDevicesAreNotReadableWritable() throws Exception {
+        assertBlockDevicesInDirAndSubDirAreNotWritable(new File("/dev"));
+    }
+
+    private static void
+    assertBlockDevicesInDirAndSubDirAreNotWritable(File dir) throws Exception {
+        assertTrue(dir.isDirectory());
+        File[] subDirectories = dir.listFiles(new FileFilter() {
+            @Override public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+
+
+        /* recurse into subdirectories */
+        if (subDirectories != null) {
+            for (File f : subDirectories) {
+                assertBlockDevicesInDirAndSubDirAreNotWritable(f);
+            }
+        }
+
+        File[] filesInThisDirectory = dir.listFiles();
+        if (filesInThisDirectory == null) {
+            return;
+        }
+
+        for (File f: filesInThisDirectory) {
+            FileUtils.FileStatus status = new FileUtils.FileStatus();
+            FileUtils.getFileStatus(f.getAbsolutePath(), status, false);
+            if (status.hasModeFlag(FileUtils.S_IFBLK)) {
+                assertFalse(f.getCanonicalPath(), f.canRead());
+                assertFalse(f.getCanonicalPath(), f.canWrite());
+                assertFalse(f.getCanonicalPath(), f.canExecute());
+            }
+        }
     }
 
     private void assertDirectoryAndSubdirectoriesNotWritable(File dir) throws Exception {
