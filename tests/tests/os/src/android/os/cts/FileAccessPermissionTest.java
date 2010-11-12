@@ -40,6 +40,8 @@ import java.io.IOException;
  *
  * mksdcard <size> <file>
  * emulator -sdcard <filepath>
+ *
+ * TODO: Combine this file with {@link android.permission.cts.FileSystemPermissionTest}
  */
 public class FileAccessPermissionTest extends AndroidTestCase {
 
