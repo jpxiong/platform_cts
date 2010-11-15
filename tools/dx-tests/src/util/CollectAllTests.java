@@ -417,6 +417,9 @@ public class CollectAllTests {
                 }
                 }
             }
+	    if (reader != null) {
+		reader.close();
+	    }
         } catch (Exception e) {
             throw new RuntimeException("failed to parse", e);
         }
@@ -474,6 +477,12 @@ public class CollectAllTests {
         md.methodBody = builder.toString();
         md.constraint = constraint;
         md.title = title;
+	if (scanner != null) {
+	    scanner.close();
+	}
+	if (scanner2 != null) {
+	    scanner2.close();
+	}
         return md;
     }
 
