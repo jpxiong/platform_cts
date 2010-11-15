@@ -22,6 +22,7 @@ import static android.media.AudioManager.ADJUST_SAME;
 import static android.media.AudioManager.FLAG_ALLOW_RINGER_MODES;
 import static android.media.AudioManager.FLAG_SHOW_UI;
 import static android.media.AudioManager.MODE_IN_CALL;
+import static android.media.AudioManager.MODE_IN_COMMUNICATION;
 import static android.media.AudioManager.MODE_NORMAL;
 import static android.media.AudioManager.MODE_RINGTONE;
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
@@ -230,6 +231,8 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
         assertEquals(MODE_RINGTONE, mAudioManager.getMode());
         mAudioManager.setMode(MODE_IN_CALL);
         assertEquals(MODE_IN_CALL, mAudioManager.getMode());
+        mAudioManager.setMode(MODE_IN_COMMUNICATION);
+        assertEquals(MODE_IN_COMMUNICATION, mAudioManager.getMode());
         mAudioManager.setMode(MODE_NORMAL);
         assertEquals(MODE_NORMAL, mAudioManager.getMode());
     }
@@ -291,25 +294,30 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
 
         mAudioManager.setBluetoothScoOn(true);
         assertTrue(mAudioManager.isBluetoothScoOn());
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
 
         mAudioManager.setBluetoothScoOn(false);
         assertFalse(mAudioManager.isBluetoothScoOn());
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
 
         mAudioManager.setSpeakerphoneOn(true);
         assertTrue(mAudioManager.isSpeakerphoneOn());
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
         mAudioManager.setSpeakerphoneOn(false);
         assertFalse(mAudioManager.isSpeakerphoneOn());
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
+        assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
     }
 
     @TestTargets({
