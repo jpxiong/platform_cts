@@ -14,19 +14,4 @@
 # limitations under the License.
 #
 
-LOCAL_PATH:= $(call my-dir)
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := libctsverifier_jni
-
-LOCAL_MODULE_TAGS := optional
-
-LOCAL_PRELINK_MODULE := false
-
-LOCAL_SRC_FILES := \
-		CtsVerifierJniOnLoad.cpp \
-		com_android_cts_verifier_os_FileUtils.cpp	
-
-LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
-
-include $(BUILD_SHARED_LIBRARY)
+include $(call all-subdir-makefiles)
