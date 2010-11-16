@@ -34,6 +34,7 @@ import android.hardware.Camera.Parameters;
 import android.location.LocationManager;
 import android.net.sip.SipManager;
 import android.net.wifi.WifiManager;
+import android.nfc.NfcAdapter;
 import android.telephony.TelephonyManager;
 import android.test.InstrumentationTestCase;
 
@@ -165,6 +166,14 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
             assertAvailable(PackageManager.FEATURE_LOCATION_NETWORK);
         } else {
             assertNotAvailable(PackageManager.FEATURE_LOCATION_NETWORK);
+        }
+    }
+
+    public void testNfcFeatures() {
+        if (NfcAdapter.getDefaultAdapter() != null) {
+            assertAvailable(PackageManager.FEATURE_NFC);
+        } else {
+            assertNotAvailable(PackageManager.FEATURE_NFC);
         }
     }
 
