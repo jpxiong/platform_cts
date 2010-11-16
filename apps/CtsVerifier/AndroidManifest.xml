@@ -21,6 +21,9 @@
       android:versionName="1.0">
       
     <uses-sdk android:minSdkVersion="5"></uses-sdk>
+    
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application android:label="@string/app_name">
 
@@ -71,5 +74,26 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
         </activity>
-    </application>
+
+      <activity android:name=".audioquality.AudioQualityVerifierActivity"
+                android:label="@string/aq_verifier"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait">
+          <intent-filter>
+              <action android:name="android.intent.action.MAIN" />
+              <category android:name="android.cts.intent.category.MANUAL_TEST" />
+          </intent-filter>
+          <meta-data android:name="test_category" android:value="@string/test_category_audio" />
+      </activity>
+      
+      <activity android:name=".audioquality.CalibrateVolumeActivity"
+                android:label="@string/aq_calibrate_volume_name" />
+      
+      <activity android:name=".audioquality.ViewResultsActivity"
+                android:label="@string/aq_view_results_name" />
+
+      <service android:name=".audioquality.ExperimentService" />
+      
+   </application>
+
 </manifest> 
