@@ -1331,8 +1331,14 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
             return false;
         }
 
-        public ActionMode onStartActionMode(ActionMode.Callback callback) {
+        public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
             return null;
+        }
+
+        public void onActionModeStarted(ActionMode mode) {
+        }
+
+        public void onActionModeFinished(ActionMode mode) {
         }
     }
 }
