@@ -26,7 +26,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Verify certain permissions on the filesystem
@@ -163,6 +166,38 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     public void testAllOtherDirectoriesNotWritable() throws Exception {
         File start = new File("/");
         assertDirectoryAndSubdirectoriesNotWritable(start);
+    }
+
+    private static final Set<String> OTHER_RANDOM_DIRECTORIES = new HashSet<String>(
+            Arrays.asList(
+                    "/data/backup",
+                    "/data/secure",
+                    "/data/system",
+                    "/data/dalvik-cache",
+                    "/data/property",
+                    "/data/app",
+                    "/data/app-private",
+                    "/data/local",
+                    "/data/misc",
+                    "/data/dontpanic",
+                    "/data/lost+found",
+                    "/data/drm",
+                    "/data/drm/rights",
+                    "/data/data/.drm",
+                    "/data/data/.drm/.wmdrm"
+            )
+    );
+
+    /**
+     * Because /data and /data/data are not readable, we blindly try to
+     * poke around in there looking for bad directories.  There has to be
+     * a better way...
+     */
+    public void testOtherRandomDirectoriesNotWritable() throws Exception {
+        for (String dir : OTHER_RANDOM_DIRECTORIES) {
+            File start = new File(dir);
+            assertDirectoryAndSubdirectoriesNotWritable(start);
+        }
     }
 
     public void testAllBlockDevicesAreNotReadableWritable() throws Exception {
