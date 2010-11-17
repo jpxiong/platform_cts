@@ -110,6 +110,7 @@ public class DeviceInfoInstrument extends Instrumentation {
         d.getMetrics(metrics);
         addResult(SCREEN_WIDTH, metrics.widthPixels);
         addResult(SCREEN_HEIGHT, metrics.heightPixels);
+        addResult(SCREEN_DENSITY, metrics.density);
         addResult(SCREEN_X_DENSITY, metrics.xdpi);
         addResult(SCREEN_Y_DENSITY, metrics.ydpi);
 
