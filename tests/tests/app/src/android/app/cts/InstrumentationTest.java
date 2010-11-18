@@ -16,7 +16,12 @@
 
 package android.app.cts;
 
-import java.util.List;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.app.Application;
@@ -46,12 +51,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+import java.util.List;
 
 @TestTargetClass(Instrumentation.class)
 public class InstrumentationTest extends InstrumentationTestCase {
@@ -508,10 +508,14 @@ public class InstrumentationTest extends InstrumentationTestCase {
         method = "callActivityOnSaveInstanceState",
         args = {Activity.class, Bundle.class}
     )
-    public void testCallActivityOnSaveInstanceState() {
+    public void testCallActivityOnSaveInstanceState() throws Throwable {
         final Bundle bundle = new Bundle();
         mActivity.setOnSaveInstanceState(false);
-        mInstrumentation.callActivityOnSaveInstanceState(mActivity, bundle);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mInstrumentation.callActivityOnSaveInstanceState(mActivity, bundle);
+            }
+        });
         mInstrumentation.waitForIdleSync();
 
         assertTrue(mActivity.isOnSaveInstanceState());
@@ -958,15 +962,15 @@ public class InstrumentationTest extends InstrumentationTestCase {
             @Override
             public void togglePanel(int featureId, KeyEvent event) {
             }
-            
+
             @Override
             public void invalidatePanelMenu(int featureId) {
             }
-            
+
             @Override
             public void takeSurface(SurfaceHolder.Callback2 callback) {
             }
-            
+
             @Override
             public void takeInputQueue(InputQueue.Callback queue) {
             }
