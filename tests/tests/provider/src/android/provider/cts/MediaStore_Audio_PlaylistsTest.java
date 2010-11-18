@@ -30,6 +30,8 @@ import android.os.Environment;
 import android.provider.MediaStore.Audio.Playlists;
 import android.test.InstrumentationTestCase;
 
+import java.util.regex.Pattern;
+
 @TestTargetClass(Playlists.class)
 public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
@@ -117,7 +119,6 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
     }
 
     public void testStoreAudioPlaylistsInternal() {
-        // the internal database does not have play lists
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");
         values.put(Playlists.DATA, "/data/data/com.android.cts.stub/files/my_favorites.pl");
@@ -126,6 +127,8 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
         long dateModified = System.currentTimeMillis();
         values.put(Playlists.DATE_MODIFIED, dateModified);
         Uri uri = mContentResolver.insert(Playlists.INTERNAL_CONTENT_URI, values);
-        assertNull(uri);
+        assertNotNull(uri);
+        assertTrue(Pattern.matches("content://media/internal/audio/playlists/\\d+",
+                uri.toString()));
     }
 }

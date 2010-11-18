@@ -20,7 +20,6 @@ import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -33,6 +32,8 @@ import android.provider.MediaStore.Audio.Playlists.Members;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
 import android.test.InstrumentationTestCase;
+
+import java.util.regex.Pattern;
 
 @TestTargetClass(Members.class)
 public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestCase {
@@ -279,7 +280,6 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
     }
 
     public void testStoreAudioPlaylistsMembersInternal() {
-        // the internal database does not have play lists
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");
         values.put(Playlists.DATA, "/data/data/com.android.cts.stub/files/my_favorites.pl");
@@ -288,6 +288,8 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         long dateModified = System.currentTimeMillis();
         values.put(Playlists.DATE_MODIFIED, dateModified);
         Uri uri = mContentResolver.insert(Playlists.INTERNAL_CONTENT_URI, values);
-        assertNull(uri);
+        assertNotNull(uri);
+        assertTrue(Pattern.matches("content://media/internal/audio/playlists/\\d+",
+                uri.toString()));
     }
 }
