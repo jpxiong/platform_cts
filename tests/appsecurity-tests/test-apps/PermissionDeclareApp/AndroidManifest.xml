@@ -31,6 +31,8 @@
     <application>
         <receiver android:name="GrantUriPermission" android:exported="true">
         </receiver>
+        <receiver android:name="SetInstallerPackage" android:exported="true">
+        </receiver>
 
         <!-- Need a way for another app to try to access the permission. So create a content
         provider which is enforced by the permission -->
