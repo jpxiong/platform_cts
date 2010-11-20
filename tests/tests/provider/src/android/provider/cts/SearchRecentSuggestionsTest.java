@@ -28,6 +28,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.SearchRecentSuggestions;
 import android.test.ProviderTestCase2;
+import android.view.animation.cts.DelayedCheck;
 
 @TestTargetClass(android.provider.SearchRecentSuggestions.class)
 public class SearchRecentSuggestionsTest extends
@@ -99,11 +100,11 @@ public class SearchRecentSuggestionsTest extends
             String query1 = "query1";
             String line1 = "line1";
             srs.saveRecentQuery(query1, line1);
+
+            waitForCursorCount(mTestUri, SearchRecentSuggestions.QUERIES_PROJECTION_2LINE, 1);
+
             c = mTestSRSProvider.query(mTestUri, SearchRecentSuggestions.QUERIES_PROJECTION_2LINE,
                     null, null, null);
-            assertNotNull(c);
-            assertEquals(1, c.getCount());
-
             c.moveToFirst();
             assertEquals(query1, c
                     .getString(SearchRecentSuggestions.QUERIES_PROJECTION_QUERY_INDEX));
@@ -114,26 +115,21 @@ public class SearchRecentSuggestionsTest extends
             String query2 = "query2";
             String line2 = "line2";
             srs.saveRecentQuery(query2, line2);
-            c = mTestSRSProvider.query(mTestUri, null, null, null, null);
-            assertNotNull(c);
-            assertEquals(2, c.getCount());
-            c.close();
+            waitForCursorCount(mTestUri, null, 2);
 
             String query3 = "query3";
             String line3 = "line3";
             srs.saveRecentQuery(query3, line3);
-            c = mTestSRSProvider.query(mTestUri, null, null, null, null);
-            assertNotNull(c);
-            assertEquals(3, c.getCount());
-            c.close();
+            waitForCursorCount(mTestUri, null, 3);
 
             // truncateHistory will delete the oldest one record
             ContentResolver cr = mContext.getContentResolver();
             srs.truncateHistory(cr, 2);
+
+            waitForCursorCount(mTestUri, SearchRecentSuggestions.QUERIES_PROJECTION_2LINE, 2);
+
             c = mTestSRSProvider.query(mTestUri, SearchRecentSuggestions.QUERIES_PROJECTION_2LINE,
                     null, null, null);
-            assertNotNull(c);
-            assertEquals(2, c.getCount());
 
             // and the left two should be: test2 and test3, test1 should be delete
             c.moveToFirst();
@@ -150,9 +146,7 @@ public class SearchRecentSuggestionsTest extends
 
             // clear all history
             srs.clearHistory();
-            c = mTestSRSProvider.query(mTestUri, null, null, null, null);
-            assertNotNull(c);
-            assertEquals(0, c.getCount());
+            waitForCursorCount(mTestUri, null, 0);
         } finally {
             c.close();
         }
@@ -229,5 +223,22 @@ public class SearchRecentSuggestionsTest extends
         protected void truncateHistory(ContentResolver cr, int maxEntries) {
             super.truncateHistory(cr, maxEntries);
         }
+    }
+
+    private void waitForCursorCount(final Uri uri, final String[] projection,
+            final int expectedCount) {
+        new DelayedCheck() {
+            protected boolean check() {
+                Cursor cursor = null;
+                try {
+                    cursor = mTestSRSProvider.query(uri, projection, null, null, null);
+                    return cursor != null && cursor.getCount() == expectedCount;
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                }
+            }
+        }.run();
     }
 }
