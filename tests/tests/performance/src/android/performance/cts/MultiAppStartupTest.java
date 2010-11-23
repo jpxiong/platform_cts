@@ -17,18 +17,9 @@
 package android.performance.cts;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.test.InstrumentationTestCase;
-
-
-import java.lang.Runnable;
-import java.lang.String;
-import java.lang.System;
-import java.util.List;
 
 public class MultiAppStartupTest extends InstrumentationTestCase {
     private static final String PACKAGE_UNDER_TEST = "com.android.calculator2";
@@ -80,13 +71,9 @@ public class MultiAppStartupTest extends InstrumentationTestCase {
         Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
         launchActivity("com.android.mms", "ui.ConversationList", true);
         Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
-        launchActivity("com.android.alarmclock", "AlarmClock", true);
-        Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
         launchActivity("com.android.contacts", "TwelveKeyDialer", false);
         Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
         launchActivity("com.android.contacts", "RecentCallsListActivity", false);
-        Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
-        launchActivity("com.android.calendar", "LaunchActivity", true);
         Thread.sleep(ACTIVITY_STARTUP_WAIT_TIME);
 
         long finalStartDuration = launchActivityUnderTest();
