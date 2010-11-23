@@ -147,11 +147,9 @@ public class ContentQueryMapTest extends AndroidTestCase {
         mContentQueryMap = new ContentQueryMap(mCursor, DummyProvider.NAME, false, new Handler());
         rows = mContentQueryMap.getRows();
         assertFalse(rows.containsKey(NAME0));
-        try {
-            mContentQueryMap.requery();
-            fail("Should throw an IllegalStateException about requerying a closed cursor.");
-        } catch (IllegalStateException requeryAlreadyClosedCursor) {
-        }
+        mContentQueryMap.requery();
+        rows = mContentQueryMap.getRows();
+        assertFalse(rows.containsKey(NAME0));
     }
 
     @TestTargets({
