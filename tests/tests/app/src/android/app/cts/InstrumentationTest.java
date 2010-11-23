@@ -493,7 +493,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         assertEquals(text.length(), keyDownList.size());
         assertEquals(text.length(), keyUpList.size());
 
-        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
         KeyEvent[] keyEvents = kcm.getEvents(text.toCharArray());
 
         int i = 0;
