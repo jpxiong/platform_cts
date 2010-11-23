@@ -267,9 +267,9 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         values.put(Media.MIME_TYPE, "image/jpeg");
         values.put(Media.SIZE, 86853);
         values.put(Media.TITLE, "testimage");
-        long dateAdded = System.currentTimeMillis();
+        long dateAdded = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_ADDED, dateAdded);
-        long dateModified = System.currentTimeMillis();
+        long dateModified = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_MODIFIED, dateModified);
 
         // insert
@@ -298,7 +298,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             assertEquals("testimage", c.getString(c.getColumnIndex(Media.TITLE)));
             assertEquals(86853, c.getInt(c.getColumnIndex(Media.SIZE)));
             long realDateAdded = c.getLong(c.getColumnIndex(Media.DATE_ADDED));
-            assertTrue(realDateAdded > 0);
+            assertTrue(realDateAdded >= dateAdded);
             assertEquals(dateModified, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
             c.close();
 
@@ -318,7 +318,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             values.put(Media.MIME_TYPE, "image/jpeg");
             values.put(Media.SIZE, 86854);
             values.put(Media.TITLE, "testimage1");
-            dateModified = System.currentTimeMillis();
+            dateModified = System.currentTimeMillis() / 1000;
             values.put(Media.DATE_MODIFIED, dateModified);
             assertEquals(1, mContentResolver.update(uri, values, null, null));
 

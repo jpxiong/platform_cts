@@ -74,9 +74,8 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");
         values.put(Playlists.DATA, externalPlaylistPath);
-        long dateAdded = System.currentTimeMillis();
-        values.put(Playlists.DATE_ADDED, dateAdded);
-        long dateModified = System.currentTimeMillis();
+        long dateAdded = System.currentTimeMillis() / 1000;
+        long dateModified = System.currentTimeMillis() / 1000;
         values.put(Playlists.DATE_MODIFIED, dateModified);
         // insert
         Uri uri = mContentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, values);
@@ -91,7 +90,8 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
             assertEquals(externalPlaylistPath,
                     c.getString(c.getColumnIndex(Playlists.DATA)));
 
-            assertEquals(dateAdded, c.getLong(c.getColumnIndex(Playlists.DATE_ADDED)));
+            long realDateAdded = c.getLong(c.getColumnIndex(Playlists.DATE_ADDED));
+            assertTrue(realDateAdded >= dateAdded);
             assertEquals(dateModified, c.getLong(c.getColumnIndex(Playlists.DATE_MODIFIED)));
             assertTrue(c.getLong(c.getColumnIndex(Playlists._ID)) > 0);
             c.close();
@@ -108,7 +108,7 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
             assertEquals(externalPlaylistPath,
                     c.getString(c.getColumnIndex(Playlists.DATA)));
 
-            assertEquals(dateAdded, c.getLong(c.getColumnIndex(Playlists.DATE_ADDED)));
+            assertEquals(realDateAdded, c.getLong(c.getColumnIndex(Playlists.DATE_ADDED)));
             assertEquals(dateModified, c.getLong(c.getColumnIndex(Playlists.DATE_MODIFIED)));
             c.close();
         } finally {

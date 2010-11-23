@@ -112,7 +112,7 @@ public class MediaStoreAudioTestHelper {
         public static final String EXTERNAL_DATA = Environment.getExternalStorageDirectory() +
                 "/" + FILE_NAME;
 
-        public static final long DATE_MODIFIED = System.currentTimeMillis();
+        public static final long DATE_MODIFIED = System.currentTimeMillis() / 1000;
 
         public static final String GENRE = "POP";
         @Override
