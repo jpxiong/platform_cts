@@ -90,7 +90,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
         assertLoadUrlSuccessfully(url);
         assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_FORBIDDEN), mWebView.getTitle());
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mWebView.getTitle());
         assertTrue(client.useHttpAuthUsernamePassword);
 
         // missing credentials
@@ -148,6 +148,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         private boolean mProceed;
         private String mUser;
         private String mPassword;
+        private int mAuthCount;
 
         MyWebViewClient(boolean proceed, String user, String password) {
             mProceed = proceed;
@@ -157,6 +158,11 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
         public void onReceivedHttpAuthRequest(WebView view,
                 HttpAuthHandler handler, String host, String realm) {
+            ++mAuthCount;
+            if (mAuthCount > 1) {
+                handler.cancel();
+                return;
+            }
             this.realm = realm;
             this.useHttpAuthUsernamePassword = handler.useHttpAuthUsernamePassword();
             if (mProceed) {
