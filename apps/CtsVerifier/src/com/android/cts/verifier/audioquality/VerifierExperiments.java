@@ -17,7 +17,7 @@
 package com.android.cts.verifier.audioquality;
 
 import com.android.cts.verifier.audioquality.experiments.BiasExperiment;
-import com.android.cts.verifier.audioquality.experiments.ClippingExperiment;
+import com.android.cts.verifier.audioquality.experiments.OverflowExperiment;
 import com.android.cts.verifier.audioquality.experiments.GainLinearityExperiment;
 import com.android.cts.verifier.audioquality.experiments.GlitchExperiment;
 import com.android.cts.verifier.audioquality.experiments.SoundLevelExperiment;
@@ -42,7 +42,7 @@ public class VerifierExperiments {
             mExperiments = new ArrayList<Experiment>();
             mExperiments.add(new SoundLevelExperiment());
             mExperiments.add(new BiasExperiment());
-            mExperiments.add(new ClippingExperiment());
+            mExperiments.add(new OverflowExperiment());
             mExperiments.add(new GainLinearityExperiment());
             mExperiments.add(new SpectrumShapeExperiment());
             mExperiments.add(new GlitchExperiment(0));

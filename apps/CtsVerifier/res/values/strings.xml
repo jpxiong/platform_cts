@@ -107,7 +107,7 @@
     <string name="aq_spectrum_shape_exp">Spectrum shape test</string>
     <string name="aq_glitch_exp">Glitch test</string>
     <string name="aq_linearity_exp">Gain linearity test</string>
-    <string name="aq_clipping_exp">Clipping check</string>
+    <string name="aq_overflow_exp">Overflow check</string>
     <string name="aq_bias_exp">Bias measurement</string>
     
     <!-- Experiment outcomes -->
@@ -118,10 +118,10 @@
     <!-- Experiment reports -->
     <string name="aq_loopback_report">Experiment ran successfully.</string>
     <string name="aq_bias_report">Mean = %1$.3g, tolerance = +/- %2$.0f\nRMS = %3$.0f, duration = %4$.1fs</string>
-    <string name="aq_clipping_report_error">Overflow check unsuccessful</string>
-    <string name="aq_clipping_report_short">Insufficient tone detected.\nExpected %1$.1fs tone; observed %2$.1fs</string>
-    <string name="aq_clipping_report_fail">"Clipping check failed due to discontinuities.\nObserved %1$d bad frames\nTone duration %2$.1fs\nMin peak = %3$.0f, max = %4$.0f</string>
-    <string name="aq_clipping_report_pass">"Observed %1$d bad frames\nTone duration %2$.1fs\nMin peak = %3$.0f, max = %4$.0f</string>
+    <string name="aq_overflow_report_error">Overflow check unsuccessful</string>
+    <string name="aq_overflow_report_short">Insufficient tone detected.\nExpected %1$.1fs tone; observed %2$.1fs</string>
+    <string name="aq_overflow_report_fail">"Overflow check failed due to discontinuities.\nObserved %1$d bad frames\nTone duration %2$.1fs\nMin peak = %3$.0f, max = %4$.0f</string>
+    <string name="aq_overflow_report_pass">"Observed %1$d bad frames\nTone duration %2$.1fs\nMin peak = %3$.0f, max = %4$.0f</string>
     <string name="aq_linearity_report_error">Experiment failed, error code %1$g</string>
     <string name="aq_linearity_report_normal">Deviation from linearity = %1$.3g dB\nMax allowed = %2$.1f dB</string>
     <string name="aq_glitch_report_error">Error performing Glitch test.</string>

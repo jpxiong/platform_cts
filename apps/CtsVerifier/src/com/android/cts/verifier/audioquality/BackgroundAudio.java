@@ -17,7 +17,6 @@
 package com.android.cts.verifier.audioquality;
 
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
 
@@ -57,7 +56,7 @@ public class BackgroundAudio extends Thread {
 
         // Start playback:
         Log.i(TAG, "Looping " + data.length + " bytes of audio, buffer size " + mBufferSize);
-        mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+        mAudioTrack = new AudioTrack(AudioQualityVerifierActivity.PLAYBACK_STREAM,
                 AudioQualityVerifierActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
                 AudioQualityVerifierActivity.AUDIO_FORMAT, mBufferSize, AudioTrack.MODE_STREAM);
         if (mAudioTrack.getState() == AudioTrack.STATE_INITIALIZED) {
