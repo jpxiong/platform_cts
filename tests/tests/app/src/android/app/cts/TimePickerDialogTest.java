@@ -26,7 +26,6 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.KeyEvent;
 import android.widget.TimePicker;
 
 /**
@@ -59,7 +58,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         super.setUp();
 
         mContext = getInstrumentation().getContext();
-        mActivity = getActivity();
         mOnTimeSetListener = new OnTimeSetListener(){
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 mCallbackHour = hourOfDay;
@@ -131,7 +129,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     )
     public void testOnTimeChanged() throws Throwable {
         final int minute = 34;
-        popDialog(DialogStubActivity.TEST_TIMEPICKERDIALOG);
+        startDialogActivity(DialogStubActivity.TEST_TIMEPICKERDIALOG);
         final TimePickerDialog d = (TimePickerDialog) mActivity.getDialog();
 
         runTestOnUiThread(new Runnable() {
@@ -181,14 +179,7 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertFalse(b2.getBoolean(IS_24_HOUR));
     }
 
-    private void popDialog(int index) {
-        assertTrue(index > 0);
-
-        while (index != 0) {
-            sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
-            index--;
-        }
-
-        sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+    private void startDialogActivity(int dialogNumber) {
+        mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
     }
 }

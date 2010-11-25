@@ -16,6 +16,8 @@
 
 package android.app.cts;
 
+import com.android.cts.stub.R;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -25,20 +27,18 @@ import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
-
-import com.android.cts.stub.R;
 
 /*
  * Stub class for  Dialog, AlertDialog, DatePickerDialog, TimePickerDialog etc.
@@ -289,49 +289,27 @@ public class DialogStubActivity extends Activity {
         return (String) mDialog.getWindow().getAttributes().getTitle();
     }
 
+    private static final String TEST_DIALOG_NUMBER_EXTRA = "testDialogNumber";
+
+    public static <T extends Activity> T startDialogActivity(
+            ActivityInstrumentationTestCase2<T> testCase, int dialogNumber) {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.putExtra(TEST_DIALOG_NUMBER_EXTRA, dialogNumber);
+        testCase.setActivityIntent(intent);
+        return testCase.getActivity();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.dialog_stub_layout);
 
-        findViewById(R.id.dialog_test_button_1).setOnClickListener(
-                new MockClickListener(TEST_DIALOG_WITHOUT_THEME));
-        findViewById(R.id.dialog_test_button_2).setOnClickListener(
-                new MockClickListener(TEST_DIALOG_WITH_THEME));
-        findViewById(R.id.dialog_test_button_3).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG));
-        findViewById(R.id.dialog_test_button_4).setOnClickListener(
-                new MockClickListener(TEST_CUSTOM_ALERTDIALOG));
-        final Button dialogTestButton5 = (Button) findViewById(R.id.dialog_test_button_5);
-        dialogTestButton5.setOnClickListener(new MockClickListener(TEST_DATEPICKERDIALOG));
-        findViewById(R.id.dialog_test_button_6).setOnClickListener(
-                new MockClickListener(TEST_DATEPICKERDIALOG_WITH_THEME));
-        findViewById(R.id.dialog_test_button_7).setOnClickListener(
-                new MockClickListener(TEST_TIMEPICKERDIALOG));
-        findViewById(R.id.dialog_test_button_8).setOnClickListener(
-                new MockClickListener(TEST_TIMEPICKERDIALOG_WITH_THEME));
-        findViewById(R.id.dialog_test_button_9).setOnClickListener(
-                new MockClickListener(TEST_ONSTART_AND_ONSTOP));
-        findViewById(R.id.dialog_test_button_10).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_DEPRECATED));
-        findViewById(R.id.dialog_test_button_11).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_CALLBACK));
-        findViewById(R.id.dialog_test_button_12).setOnClickListener(
-                new MockClickListener(TEST_CUSTOM_ALERTDIALOG_VIEW));
-        findViewById(R.id.dialog_test_button_13).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE));
-
-        findViewById(R.id.dialog_test_button_14).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_THEME));
-        findViewById(R.id.dialog_test_button_15).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_CANCELABLE));
-        findViewById(R.id.dialog_test_button_16).setOnClickListener(
-                new MockClickListener(TEST_ALERTDIALOG_NOT_CANCELABLE));
-        findViewById(R.id.dialog_test_button_17).setOnClickListener(
-                new MockClickListener(TEST_PROTECTED_CANCELABLE));
-        findViewById(R.id.dialog_test_button_18).setOnClickListener(
-                new MockClickListener(TEST_PROTECTED_NOT_CANCELABLE));
+        Intent intent = getIntent();
+        int dialogNum = intent.getIntExtra(TEST_DIALOG_NUMBER_EXTRA, -1);
+        if (dialogNum != -1) {
+            showDialog(dialogNum);
+        }
     }
 
     public void setUpTitle(final String title) {
@@ -381,18 +359,6 @@ public class DialogStubActivity extends Activity {
             super.onCreate(savedInstanceState);
         }
 
-    }
-
-    private class MockClickListener implements OnClickListener {
-        private final int mId;
-
-        public MockClickListener(final int id) {
-            mId = id;
-        }
-
-        public void onClick(View v) {
-            showDialog(mId);
-        }
     }
 
     class MockOnClickListener implements DialogInterface.OnClickListener {

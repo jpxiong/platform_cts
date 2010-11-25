@@ -16,6 +16,11 @@
 
 package android.app.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.AlertDialog;
 import android.app.Instrumentation;
 import android.content.Context;
@@ -29,10 +34,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /*
  * Test AlertDialog
@@ -55,15 +56,10 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
     protected void setUp() throws Exception {
         super.setUp();
         mInstrumentation = getInstrumentation();
-        mActivity = getActivity();
     }
 
-    protected void popDialog(int index) {
-        while (index != 0) {
-            sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
-            index--;
-        }
-        sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+    protected void startDialogActivity(int dialogNumber) {
+        mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
     }
 
     @TestTargets({
@@ -121,7 +117,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
     }
 
     private void doTestAlertDialog(int index) throws Throwable {
-        popDialog(index);
+        startDialogActivity(index);
         assertTrue(mActivity.getDialog().isShowing());
 
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
@@ -294,7 +290,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         )
     })
     public void testAlertDialogDeprecatedAPIWithMessage() throws Throwable {
-        popDialog(DialogStubActivity.TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_DEPRECATED_WITH_MESSAGE);
         assertTrue(mActivity.getDialog().isShowing());
 
         mPositiveButton = ((AlertDialog) (mActivity.getDialog())).getButton(
@@ -368,7 +364,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         )
     })
     public void testCustomAlertDialog() {
-        popDialog(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG);
+        startDialogActivity(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
@@ -405,7 +401,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         )
     })
     public void testCustomAlertDialogView() {
-        popDialog(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG_VIEW);
+        startDialogActivity(DialogStubActivity.TEST_CUSTOM_ALERTDIALOG_VIEW);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
@@ -437,7 +433,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         )
     })
     public void testCallback() {
-        popDialog(DialogStubActivity.TEST_ALERTDIALOG_CALLBACK);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_CALLBACK);
         assertTrue(mActivity.onCreateCalled);
 
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_0);
@@ -453,7 +449,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         args = {Context.class, int.class}
     )
     public void testAlertDialogTheme() throws Exception {
-        popDialog(DialogStubActivity.TEST_ALERTDIALOG_THEME);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_THEME);
         assertTrue(mActivity.getDialog().isShowing());
     }
 
@@ -464,7 +460,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         args = {Context.class, boolean.class, OnCancelListener.class}
     )
     public void testAlertDialogCancelable() throws Exception {
-        popDialog(DialogStubActivity.TEST_ALERTDIALOG_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_CANCELABLE);
         assertTrue(mActivity.getDialog().isShowing());
         assertFalse(mActivity.onCancelCalled);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
@@ -479,7 +475,7 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
         args = {Context.class, boolean.class, OnCancelListener.class}
     )
     public void testAlertDialogNotCancelable() throws Exception {
-        popDialog(DialogStubActivity.TEST_ALERTDIALOG_NOT_CANCELABLE);
+        startDialogActivity(DialogStubActivity.TEST_ALERTDIALOG_NOT_CANCELABLE);
         assertTrue(mActivity.getDialog().isShowing());
         assertFalse(mActivity.onCancelCalled);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);

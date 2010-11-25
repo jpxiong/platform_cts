@@ -47,15 +47,6 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     protected void setUp() throws Exception {
         super.setUp();
         mInstrumentation = getInstrumentation();
-        mActivity = getActivity();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        if (mActivity != null) {
-            mActivity.finish();
-        }
-        super.tearDown();
     }
 
     @TestTargets({
@@ -144,7 +135,7 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
     }
 
     private void doTestDatePickerDialog(int index) throws Exception {
-        popDialog(index);
+        startDialogActivity(index);
         final DatePickerDialog datePickerDialog = (DatePickerDialog) mActivity.getDialog();
         assertTrue(datePickerDialog.isShowing());
         final TextView title = (TextView) datePickerDialog.findViewById(
@@ -178,15 +169,7 @@ public class DatePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertTrue(DialogStubActivity.onRestoreInstanceStateCalled);
     }
 
-    private void popDialog(int index) {
-        assertTrue(index > 0);
-
-        while (index != 0) {
-            sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
-            index--;
-        }
-
-        sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+    private void startDialogActivity(int index) {
+        mActivity = DialogStubActivity.startDialogActivity(this, index);
     }
-
 }
