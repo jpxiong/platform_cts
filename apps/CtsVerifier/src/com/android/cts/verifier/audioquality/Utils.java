@@ -18,7 +18,6 @@ package com.android.cts.verifier.audioquality;
 
 import android.content.Context;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Environment;
 import android.util.Log;
@@ -307,7 +306,7 @@ public class Utils {
 
     public static void playRaw(byte[] data) {
         Log.i(TAG, "Playing " + data.length + " bytes of pre-recorded audio");
-        AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, AudioQualityVerifierActivity.SAMPLE_RATE,
+        AudioTrack at = new AudioTrack(AudioQualityVerifierActivity.PLAYBACK_STREAM, AudioQualityVerifierActivity.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO, AudioQualityVerifierActivity.AUDIO_FORMAT,
                 data.length, AudioTrack.MODE_STREAM);
         writeAudio(at, data);

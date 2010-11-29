@@ -26,7 +26,9 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +52,7 @@ public class AudioQualityVerifierActivity extends Activity implements View.OnCli
     public static final int SAMPLE_RATE = 16000;
     public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     public static final int BYTES_PER_SAMPLE = 2;
+    public static final int PLAYBACK_STREAM = AudioManager.STREAM_MUSIC;
 
     // Intent Extra definitions, which must match those in
     // com.google.android.voicesearch.speechservice.RecognitionController
@@ -127,12 +130,26 @@ public class AudioQualityVerifierActivity extends Activity implements View.OnCli
         fillAdapter();
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(this);
+        checkNotSilent();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mAdapter.notifyDataSetChanged(); // Update List UI
+        checkNotSilent();
+    }
+
+    private void checkNotSilent() {
+        AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mgr.setStreamMute(PLAYBACK_STREAM, false);
+        int volume = mgr.getStreamVolume(PLAYBACK_STREAM);
+        int max = mgr.getStreamMaxVolume(PLAYBACK_STREAM);
+        Log.i(TAG, "Volume " + volume + ", max " + max);
+        if (volume <= max / 10) {
+            // Volume level is silent or very quiet; increase to two-thirds
+            mgr.setStreamVolume(PLAYBACK_STREAM, (max * 2) / 3, AudioManager.FLAG_SHOW_UI);
+        }
     }
 
     // Called when an experiment has completed
