@@ -16,7 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargetClass;
 
 import android.content.ContentResolver;
@@ -169,50 +168,25 @@ public class SettingsTest extends AndroidTestCase {
         }
     }
 
-    @BrokenTest("Cannot access secure settings table")
-    public void testSecureTable() throws RemoteException {
+    public void testSecureTable() throws Exception {
         final String[] SECURE_PROJECTION = new String[] {
                 Settings.Secure._ID, Settings.Secure.NAME, Settings.Secure.VALUE
         };
 
-        String insertName = "name_insert";
-        String insertValue = "value_insert";
-
-        // get provider
         ContentResolver cr = mContext.getContentResolver();
         IContentProvider provider = cr.acquireProvider(Settings.Secure.CONTENT_URI);
+        assertNotNull(provider);
 
-        // Test: insert
-        ContentValues value = new ContentValues();
-        value.put(Settings.Secure.NAME, insertName);
-        value.put(Settings.Secure.VALUE, insertValue);
-
-        provider.insert(Settings.Secure.CONTENT_URI, value);
-
+        // Test that the secure table can be read from.
         Cursor cursor = null;
         try {
             cursor = provider.query(Settings.Secure.CONTENT_URI, SECURE_PROJECTION,
-                    Settings.Secure.NAME + "=\"" + insertName + "\"", null, null);
+                    Settings.Secure.NAME + "=\"" + Settings.Secure.ADB_ENABLED + "\"", null, null);
             assertNotNull(cursor);
-            assertEquals(1, cursor.getCount());
         } finally {
-            // TODO should clean up more better
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.close();
-        }
-
-        try {
-            provider.delete(Settings.Secure.CONTENT_URI,
-                    Settings.Secure.NAME + "=\"" + insertName + "\"", null);
-
-            cursor = provider.query(Settings.Secure.CONTENT_URI, SECURE_PROJECTION,
-                    Settings.Secure.NAME + "=\"" + insertName + "\"", null, null);
-            assertNotNull(cursor);
-            assertEquals(0, cursor.getCount());
-        } finally {
-            // TODO should clean up more better
-            if (cursor != null)
-                cursor.close();
+            }
         }
     }
 
