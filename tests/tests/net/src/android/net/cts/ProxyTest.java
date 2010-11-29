@@ -46,7 +46,7 @@ public class ProxyTest extends AndroidTestCase {
             level = TestLevel.COMPLETE,
             method = "getDefaultHost",
             args = {}
-        ),
+        )
     })
     public void testAccessProperties() {
         final int minValidPort = 0;
