@@ -16,28 +16,16 @@
 
 package android.net.cts;
 
-import android.content.Context;
-import android.net.Proxy;
-import android.provider.Settings.Secure;
-import android.test.AndroidTestCase;
-
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.net.Proxy;
+import android.test.AndroidTestCase;
+
 @TestTargetClass(Proxy.class)
 public class ProxyTest extends AndroidTestCase {
-
-    private Context mContext;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mContext = getContext();
-    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
@@ -59,18 +47,7 @@ public class ProxyTest extends AndroidTestCase {
             method = "getDefaultHost",
             args = {}
         ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPort",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHost",
-            args = {Context.class}
-        )
     })
-    @BrokenTest("Cannot write secure settings table")
     public void testAccessProperties() {
         final int minValidPort = 0;
         final int maxValidPort = 65535;
@@ -80,12 +57,5 @@ public class ProxyTest extends AndroidTestCase {
         } else {
             assertTrue(defaultPort >= minValidPort && defaultPort <= maxValidPort);
         }
-
-        final String host = "proxy.example.com";
-        final int port = 2008;
-
-        Secure.putString(mContext.getContentResolver(), Secure.HTTP_PROXY, host + ":" + port);
-        assertEquals(host, Proxy.getHost(mContext));
-        assertEquals(port, Proxy.getPort(mContext));
     }
 }
