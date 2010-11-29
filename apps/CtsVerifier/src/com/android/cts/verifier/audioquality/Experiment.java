@@ -16,6 +16,8 @@
 
 package com.android.cts.verifier.audioquality;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.android.cts.verifier.R;
 
 import android.content.Context;
@@ -32,7 +34,7 @@ public class Experiment implements Runnable {
     private String mName;
     private String mScore;
     private String mReport;
-    private String mAudioFileName;
+    private List<String> mAudioFileNames;
 
     enum Status { NotStarted, Running, Stopped, Completed }
     private Status mStatus;
@@ -68,7 +70,7 @@ public class Experiment implements Runnable {
         mStatus = Status.NotStarted;
         mScore = "";
         mReport = "";
-        mAudioFileName = null;
+        mAudioFileNames = new ArrayList<String>();
     }
 
     public void start() {
@@ -94,15 +96,21 @@ public class Experiment implements Runnable {
     }
 
     public void setRecording(byte[] data) {
-        // Save captured data to file
-        mAudioFileName = Utils.getExternalDir(mContext, this) + "/"
-            + Utils.cleanString(getName()) + ".raw";
-        Log.i(TAG, "Saving recorded data to " + mAudioFileName);
-        Utils.saveFile(mAudioFileName, data);
+        setRecording(data, -1);
     }
 
-    public String getAudioFileName() {
-        return mAudioFileName;
+    public void setRecording(byte[] data, int num) {
+        // Save captured data to file
+        String filename = Utils.getExternalDir(mContext, this) + "/"
+            + Utils.cleanString(getName())
+            + (num == -1 ? "" : "_" + String.valueOf(num)) + ".raw";
+        Log.i(TAG, "Saving recorded data to " + filename);
+        Utils.saveFile(filename, data);
+        mAudioFileNames.add(filename);
+    }
+
+    public List<String> getAudioFileNames() {
+        return mAudioFileNames;
     }
 
     // Timeout in seconds

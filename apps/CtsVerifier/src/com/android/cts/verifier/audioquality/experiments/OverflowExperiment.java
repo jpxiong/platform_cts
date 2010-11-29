@@ -32,7 +32,7 @@ import android.content.Context;
  * by checking if the signal has any discontinuities (which might indicate
  * wraparound, for example).
  */
-public class ClippingExperiment extends LoopbackExperiment {
+public class OverflowExperiment extends LoopbackExperiment {
     private static final float FREQ = 250.0f;
     private static final float AMPL = 32768.0f * 1.1f * CalibrateVolumeActivity.OUTPUT_AMPL
             / CalibrateVolumeActivity.TARGET_AMPL;
@@ -40,13 +40,13 @@ public class ClippingExperiment extends LoopbackExperiment {
     private static final float MIN_DURATION = DURATION * 0.9f;
     private static final float RAMP = 0.01f;
 
-    public ClippingExperiment() {
+    public OverflowExperiment() {
         super(true);
     }
 
     @Override
     protected String lookupName(Context context) {
-        return context.getString(R.string.aq_clipping_exp);
+        return context.getString(R.string.aq_overflow_exp);
     }
 
     @Override
@@ -68,18 +68,18 @@ public class ClippingExperiment extends LoopbackExperiment {
 
         if (error < 0.0f) {
             setScore(getString(R.string.aq_fail));
-            setReport(getString(R.string.aq_clipping_report_error));
+            setReport(getString(R.string.aq_overflow_report_error));
         } else if (duration < MIN_DURATION) {
             setScore(getString(R.string.aq_fail));
-            setReport(String.format(getString(R.string.aq_clipping_report_short),
+            setReport(String.format(getString(R.string.aq_overflow_report_short),
                     DURATION, duration));
         } else if (numDeltas > 0) {
             setScore(getString(R.string.aq_fail));
-            setReport(String.format(getString(R.string.aq_clipping_report_fail),
+            setReport(String.format(getString(R.string.aq_overflow_report_fail),
                     numDeltas, duration, minPeak, maxPeak));
         } else {
             setScore(getString(R.string.aq_pass));
-            setReport(String.format(getString(R.string.aq_clipping_report_pass),
+            setReport(String.format(getString(R.string.aq_overflow_report_pass),
                     numDeltas, duration, minPeak, maxPeak));
         }
    }

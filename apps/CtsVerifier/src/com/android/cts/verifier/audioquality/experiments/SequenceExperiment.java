@@ -54,6 +54,7 @@ public class SequenceExperiment extends LoopbackExperiment {
         for (int trial = 0; trial < n; trial++) {
             playbackData[trial] = getStim(mContext, trial);
             recordedData[trial] = loopback(playbackData[trial]);
+            setRecording(recordedData[trial], trial);
         }
         compare(playbackData, recordedData);
         mTerminator.terminate(false);

@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This Activity allows the user to examine the results of the
@@ -79,8 +80,8 @@ public class ViewResultsActivity extends Activity implements View.OnClickListene
 
         ArrayList<Parcelable> attachments = new ArrayList<Parcelable>();
         for (Experiment exp : mExperiments) {
-            String filename = exp.getAudioFileName();
-            if (filename != null) {
+            List<String> filenames = exp.getAudioFileNames();
+            for (String filename : filenames) {
                 attachments.add(Uri.fromFile(new File(filename)));
             }
         }
