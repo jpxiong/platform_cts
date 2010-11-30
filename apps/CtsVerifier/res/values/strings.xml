@@ -73,6 +73,22 @@
     
      <!-- Title for Audio Quality Verifier activity -->
     <string name="aq_verifier">Audio Quality Verifier</string>
+    <string name="aq_verifier_info">
+        1. Click \"Calibrate\". Position the phone in front of the center of
+           the speaker cone with the microphone facing the speaker,
+           and adjust the volume of the speaker until the status message
+           indicates it is correct.
+        \n\n2. Click on any test in the list to run it, or \"Run All\" to run
+           each test in sequence.
+        \n\nIf the sound level check fails, go back to the calibration step before
+            running any other test.
+        \n\n3. Click \"Results\" to view the outcomes. A correctly functioning
+           device should pass all tests.
+        \n\n4. Click \"Send by email\" from the results page to send the
+           results to an e-mail address of your choice. The recordings
+           made are also attached as raw 16 bit, 16 kHz audio files to
+           help you diagnose any failed tests.
+    </string>
     
     <!-- Button labels for VerifierActivity -->
     <string name="aq_calibrate">Calibrate</string>
