@@ -23,13 +23,14 @@ import android.content.ISyncContext;
 import android.os.Bundle;
 import android.os.RemoteException;
 
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class MockSyncAdapter extends ISyncAdapter.Stub {
 
     private static MockSyncAdapter sSyncAdapter = null;
 
-    private Account mAccount;
+    private ArrayList<Account> mAccounts = new ArrayList<Account>();
     private String mAuthority;
     private Bundle mExtras;
     private boolean mInitialized;
@@ -37,8 +38,8 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
     private boolean mCancelSync;
     private CountDownLatch mLatch;
 
-    public Account getAccount() {
-        return mAccount;
+    public ArrayList<Account> getAccounts() {
+        return mAccounts;
     }
 
     public String getAuthority() {
@@ -62,7 +63,7 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
     }
 
     public void clearData() {
-        mAccount = null;
+        mAccounts.clear();
         mAuthority = null;
         mExtras = null;
         mInitialized = false;
@@ -78,7 +79,7 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
     public void startSync(ISyncContext syncContext, String authority, Account account,
             Bundle extras) throws RemoteException {
 
-        mAccount = account;
+        mAccounts.add(account);
         mAuthority = authority;
         mExtras = extras;
 
@@ -98,7 +99,7 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
     }
 
     public void cancelSync(ISyncContext syncContext) throws RemoteException {
-        mAccount = null;
+        mAccounts.clear();
         mAuthority = null;
         mExtras = null;
 
@@ -114,7 +115,7 @@ public class MockSyncAdapter extends ISyncAdapter.Stub {
     public void initialize(android.accounts.Account account, java.lang.String authority)
             throws android.os.RemoteException {
 
-        mAccount = account;
+        mAccounts.add(account);
         mAuthority = authority;
 
         mInitialized = true;
