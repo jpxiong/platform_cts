@@ -16,9 +16,9 @@
 
 package com.android.cts.verifier.audioquality;
 
+import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 /**
  * Main UI for the Android Audio Quality Verifier.
  */
-public class AudioQualityVerifierActivity extends Activity implements View.OnClickListener,
+public class AudioQualityVerifierActivity extends PassFailButtons.Activity implements View.OnClickListener,
         OnItemClickListener {
     public static final String TAG = "AudioQualityVerifier";
 
@@ -94,6 +94,8 @@ public class AudioQualityVerifierActivity extends Activity implements View.OnCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aq_verifier_activity);
+        setInfoResources(R.string.aq_verifier, R.string.aq_verifier_info, -1);
+        setResult(RESULT_CANCELED);
 
         mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
         mRunAllButton = (Button) findViewById(R.id.runAllButton);
