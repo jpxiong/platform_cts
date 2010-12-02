@@ -53,6 +53,7 @@ public class CtsApiCoverage {
         System.out.println("Options:");
         System.out.println("  -o FILE         output file or standard out if not given");
         System.out.println("  -f [txt|xml]    format of output either text or xml");
+        System.out.println("  -d PATH         path to dexdeps or expected to be in $PATH");
         System.out.println();
         System.exit(1);
     }
@@ -61,28 +62,23 @@ public class CtsApiCoverage {
         List<File> testApks = new ArrayList<File>();
         File outputFile = null;
         int format = FORMAT_TXT;
+        String dexDeps = "dexDeps";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
                 if ("-o".equals(args[i])) {
-                    if (i + 1 < args.length) {
-                        outputFile = new File(args[++i]);;
-                    } else {
-                        printUsage();
-                    }
+                    outputFile = new File(getExpectedArg(args, ++i));
                 } else if ("-f".equals(args[i])) {
-                    if (i + 1 < args.length) {
-                        String formatArg = args[++i];
-                        if ("xml".equalsIgnoreCase(formatArg)) {
-                            format = FORMAT_XML;
-                        } else if ("txt".equalsIgnoreCase(formatArg)) {
-                            format = FORMAT_TXT;
-                        } else {
-                            printUsage();
-                        }
+                    String formatSpec = getExpectedArg(args, ++i);
+                    if ("xml".equalsIgnoreCase(formatSpec)) {
+                        format = FORMAT_XML;
+                    } else if ("txt".equalsIgnoreCase(formatSpec)) {
+                        format = FORMAT_TXT;
                     } else {
                         printUsage();
                     }
+                } else if ("-d".equals(args[i])) {
+                    dexDeps = getExpectedArg(args, ++i);
                 } else {
                     printUsage();
                 }
@@ -104,9 +100,19 @@ public class CtsApiCoverage {
 
         ApiCoverage apiCoverage = getEmptyApiCoverage();
         for (File testApk : testApks) {
-            addApiCoverage(apiCoverage, testApk);
+            addApiCoverage(apiCoverage, testApk, dexDeps);
         }
         outputCoverageReport(apiCoverage, testApks, outputFile, format);
+    }
+
+    /** Get the argument or print out the usage and exit. */
+    private static String getExpectedArg(String[] args, int index) {
+        if (index < args.length) {
+            return args[index];
+        } else {
+            printUsage();
+            return null;    // Never will happen because printUsage will call exit(1)
+        }
     }
 
     /**
@@ -143,15 +149,13 @@ public class CtsApiCoverage {
      * @param apiCoverage object to which the coverage statistics will be added to
      * @param testApk containing the tests that will be scanned by dexdeps
      */
-    private static void addApiCoverage(ApiCoverage apiCoverage, File testApk)
+    private static void addApiCoverage(ApiCoverage apiCoverage, File testApk, String dexdeps)
             throws SAXException, IOException {
         XMLReader xmlReader = XMLReaderFactory.createXMLReader();
         DexDepsXmlHandler dexDepsXmlHandler = new DexDepsXmlHandler(apiCoverage);
         xmlReader.setContentHandler(dexDepsXmlHandler);
 
-        // TODO: Take an argument to specify the location of dexdeps.
-        Process process = new ProcessBuilder("out/host/linux-x86/bin/dexdeps",
-                "--format=xml", testApk.getPath()).start();
+        Process process = new ProcessBuilder(dexdeps, "--format=xml", testApk.getPath()).start();
         xmlReader.parse(new InputSource(process.getInputStream()));
     }
 
