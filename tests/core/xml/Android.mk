@@ -26,7 +26,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/xml/src/test/java) \
 	$(call all-java-files-under,../../../../libcore/dom/src/test) \
 	$(call all-java-files-under,../../../../libcore/junit/src/test/java/junit) \
-	$(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/xml) \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/javax/xml/parsers) \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/org/xml/sax) \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/org/xml/sax/support) \
