@@ -149,7 +149,9 @@ public class CtsApiCoverage {
         DexDepsXmlHandler dexDepsXmlHandler = new DexDepsXmlHandler(apiCoverage);
         xmlReader.setContentHandler(dexDepsXmlHandler);
 
-        Process process = new ProcessBuilder("dexdeps", "--format=xml", testApk.getPath()).start();
+        // TODO: Take an argument to specify the location of dexdeps.
+        Process process = new ProcessBuilder("out/host/linux-x86/bin/dexdeps",
+                "--format=xml", testApk.getPath()).start();
         xmlReader.parse(new InputSource(process.getInputStream()));
     }
 
