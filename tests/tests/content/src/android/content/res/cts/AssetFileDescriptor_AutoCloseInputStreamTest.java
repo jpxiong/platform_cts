@@ -16,79 +16,251 @@
 
 package android.content.res.cts;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import android.content.res.AssetFileDescriptor;
-import android.os.ParcelFileDescriptor;
-import android.test.AndroidTestCase;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.content.res.AssetFileDescriptor;
+import android.os.ParcelFileDescriptor;
+import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 @TestTargetClass(AssetFileDescriptor.AutoCloseInputStream.class)
 public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCase {
     private static final int FILE_END = -1;
-    private static final int FILE_LENGTH = 10;
     private static final String FILE_NAME = "testAssertFileDescriptorAutoCloseInputStream";
     private static final byte[] FILE_DATA = new byte[] {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
             };
-    private static final int OFFSET = 0;
-    private static final int READ_LENGTH = 1;
+    private static final int FILE_LENGTH = FILE_DATA.length;
 
     private File mFile;
-    private AssetFileDescriptor mAssetFileDes;
+    private AssetFileDescriptor mFd;
+    private AssetFileDescriptor.AutoCloseInputStream mInput;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mFile = new File(getContext().getFilesDir(), FILE_NAME);
-        mFile.createNewFile();
+        FileOutputStream outputStream = new FileOutputStream(mFile);
+        outputStream.write(FILE_DATA);
+        outputStream.close();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        // As {@link AssetFileDescripter#createOutputStream()}
-        // and {@link AssetFileDescripter#createInputStream()} doc,
-        // the input and output stream will be auto closed when the AssetFileDescriptor closed.
-        // Here is no need to close AutoCloseInputStream, as AssetFileDescriptor will do it for us.
-        if (mAssetFileDes != null) {
-            mAssetFileDes.close();
+        if (mFd != null) {
+            mFd.close();
+            mFd = null;
         }
-        getContext().deleteFile(FILE_NAME);
+        mFile.delete();
     }
 
-    /*
-     * Test AutoInputStream life circle.
-     * Test point:
-     * 1. Test AutoInputStream read what we write into file.
-     */
     @TestTargets({
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "AssetFileDescriptor.AutoCloseInputStream",
             args = {AssetFileDescriptor.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
+            method = "skip",
+            args = {long.class}
+        )
+    })
+    public void testSkip() throws IOException {
+        openInput(0, FILE_LENGTH);
+        assertEquals(FILE_DATA[0], mInput.read());
+        assertEquals(0, mInput.skip(0));
+        assertEquals(FILE_DATA[1], mInput.read());
+        assertEquals(3, mInput.skip(3));
+        assertEquals(FILE_DATA[5], mInput.read());
+        assertEquals(3, mInput.skip(10));
+        assertEquals(FILE_END, mInput.read());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "read",
             args = {}
+        )
+    })
+    public void testRead() throws IOException {
+        openInput(0, FILE_LENGTH);
+        for (int i = 0; i < FILE_LENGTH; i++) {
+            assertEquals(FILE_DATA[i], mInput.read());
+        }
+        assertEquals(FILE_END, mInput.read());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
+            level = TestLevel.PARTIAL_COMPLETE,
             method = "read",
-            args = {byte[].class, int.class, int.class}
+            args = {}
+        )
+    })
+    public void testReadPartial() throws IOException {
+        long len = 6;
+        openInput(0, len);
+        for (int i = 0; i < len; i++) {
+            assertEquals(FILE_DATA[i], mInput.read());
+        }
+        assertEquals(FILE_END, mInput.read());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
         ),
         @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "read",
-            args = {byte[].class}
+                level = TestLevel.COMPLETE,
+                method = "read",
+                args = {byte[].class, int.class, int.class}
+        )
+    })
+    public void testReadBufferLen() throws IOException {
+        openInput(0, FILE_LENGTH);
+        byte[] buf = new byte[FILE_LENGTH];
+        assertEquals(3, mInput.read(buf, 0, 3));
+        assertEquals(3, mInput.read(buf, 3, 3));
+        assertEquals(3, mInput.read(buf, 6, 4));
+        MoreAsserts.assertEquals(FILE_DATA, buf);
+        assertEquals(FILE_END, mInput.read(buf, 0, 4));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
         ),
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "read",
+                args = {byte[].class}
+        )
+    })
+    public void testReadBuffer() throws IOException {
+        openInput(0, FILE_LENGTH);
+        byte[] buf = new byte[6];
+        assertEquals(6, mInput.read(buf));
+        assertEquals(FILE_DATA[0], buf[0]);
+        assertEquals(3, mInput.read(buf));
+        assertEquals(FILE_DATA[6], buf[0]);
+        assertEquals(FILE_END, mInput.read(buf));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
+        ),
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "read",
+                args = {byte[].class}
+        )
+    })
+    public void testReadBufferPartial() throws IOException {
+        long len = 8;
+        openInput(0, len);
+        byte[] buf = new byte[6];
+        assertEquals(6, mInput.read(buf));
+        assertEquals(FILE_DATA[0], buf[0]);
+        assertEquals(2, mInput.read(buf));
+        assertEquals(FILE_DATA[6], buf[0]);
+        assertEquals(FILE_END, mInput.read(buf));
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
+        ),
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "available",
+                args = {}
+        )
+    })
+    public void testAvailableRead() throws IOException {
+        openInput(0, FILE_LENGTH);
+        assertEquals(FILE_LENGTH, mInput.available());
+        assertEquals(FILE_DATA[0], mInput.read());
+        assertEquals(FILE_LENGTH -1 , mInput.available());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
+        ),
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "available",
+                args = {}
+        )
+    })
+    public void testAvailableReadBuffer() throws IOException {
+        openInput(0, FILE_LENGTH);
+        byte[] buf = new byte[3];
+        assertEquals(FILE_LENGTH, mInput.available());
+        assertEquals(buf.length, mInput.read(buf));
+        assertEquals(FILE_LENGTH - buf.length, mInput.available());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.PARTIAL_COMPLETE,
+            method = "AssetFileDescriptor.AutoCloseInputStream",
+            args = {AssetFileDescriptor.class}
+        ),
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "available",
+                args = {}
+        )
+    })
+    public void testAvailableReadBufferLen() throws IOException {
+        openInput(0, FILE_LENGTH);
+        byte[] buf = new byte[3];
+        assertEquals(FILE_LENGTH, mInput.available());
+        assertEquals(2, mInput.read(buf, 0, 2));
+        assertEquals(FILE_LENGTH - 2, mInput.available());
+    }
+
+    /*
+     * Tests that AutoInputStream doesn't support mark().
+     */
+    @TestTargets({
+        @TestTargetNew(
+                level = TestLevel.PARTIAL_COMPLETE,
+                method = "AssetFileDescriptor.AutoCloseInputStream",
+                args = {AssetFileDescriptor.class}
+         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "mark",
@@ -103,57 +275,27 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
             level = TestLevel.COMPLETE,
             method = "markSupported",
             args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "skip",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "available",
-            args = {}
         )
     })
-    public void testInputStream() throws IOException {
-        initAssetFileDescriptor();
-        FileOutputStream outputStream = null;
-        outputStream = mAssetFileDes.createOutputStream();
-        outputStream.write(FILE_DATA);
-        mAssetFileDes.close();
-
-        initAssetFileDescriptor();
-        AssetFileDescriptor.AutoCloseInputStream inputStream = null;
-        inputStream = new AssetFileDescriptor.AutoCloseInputStream(mAssetFileDes);
-        assertEquals(FILE_LENGTH, inputStream.available());
-        assertEquals(FILE_DATA[0], inputStream.read());
-        byte[] readFromFile = new byte[2];
-        int readBytes = inputStream.read(readFromFile);
-        assertTrue(FILE_END != readBytes);
-        while (readBytes < readFromFile.length) {
-            readFromFile[readBytes] = (byte) inputStream.read();
-            readBytes++;
-        }
-        assertEquals(FILE_DATA[1], readFromFile[0]);
-        assertEquals(FILE_DATA[2], readFromFile[1]);
-        inputStream.mark(FILE_LENGTH);
-        assertEquals(5, inputStream.skip(5));
-        readBytes = inputStream.read(readFromFile, OFFSET, READ_LENGTH);
-        while (readBytes < READ_LENGTH) {
-            readFromFile[readBytes] = (byte) inputStream.read();
-            readBytes++;
-        }
-        assertEquals(FILE_DATA[8], readFromFile[0]);
-        assertEquals(FILE_END, inputStream.read());
-        inputStream.reset();
-        assertEquals(FILE_END, inputStream.read(readFromFile));
-        assertEquals(FILE_END, inputStream.read(readFromFile, 0, 1));
-        assertFalse(inputStream.markSupported());
+    public void testMark() throws IOException {
+        openInput(0, FILE_LENGTH);
+        assertFalse(mInput.markSupported());
+        assertEquals(FILE_DATA[0], mInput.read());
+        mInput.mark(FILE_LENGTH);  // should do nothing
+        assertEquals(FILE_DATA[1], mInput.read());
+        mInput.reset();  // should do nothing
+        assertEquals(FILE_DATA[2], mInput.read());
     }
 
-    private void initAssetFileDescriptor() throws FileNotFoundException {
+    private void openInput(long startOffset, long length)
+            throws IOException {
+        if (mFd != null) {
+            mFd.close();
+            mFd = null;
+        }
         ParcelFileDescriptor fd =
-            ParcelFileDescriptor.open(mFile, ParcelFileDescriptor.MODE_READ_WRITE);
-        mAssetFileDes = new AssetFileDescriptor(fd, 0, FILE_LENGTH);
+                ParcelFileDescriptor.open(mFile, ParcelFileDescriptor.MODE_READ_WRITE);
+        mFd = new AssetFileDescriptor(fd, startOffset, length);
+        mInput = new AssetFileDescriptor.AutoCloseInputStream(mFd);
     }
 }
