@@ -22,6 +22,8 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
+import android.hardware.Camera.Size;
 import android.media.CamcorderProfile;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -42,7 +44,7 @@ public class CamcorderProfileTest extends AndroidTestCase {
         }
     }
 
-    private void checkProfile(CamcorderProfile profile) {
+    private void checkProfile(CamcorderProfile profile, List<Size> videoSizes) {
         Log.v(TAG, String.format("profile: duration=%d, quality=%d, " +
             "fileFormat=%d, videoCodec=%d, videoBitRate=%d, videoFrameRate=%d, " +
             "videoFrameWidth=%d, videoFrameHeight=%d, audioCodec=%d, " +
@@ -81,6 +83,9 @@ public class CamcorderProfileTest extends AndroidTestCase {
         assertTrue(profile.audioBitRate > 0);
         assertTrue(profile.audioSampleRate > 0);
         assertTrue(profile.audioChannels > 0);
+        assertTrue(isSizeSupported(profile.videoFrameWidth,
+                                   profile.videoFrameHeight,
+                                   videoSizes));
     }
 
     private void assertProfileEquals(CamcorderProfile expectedProfile,
@@ -138,8 +143,13 @@ public class CamcorderProfileTest extends AndroidTestCase {
     // Checks if the existing specific profiles have the correct dimensions.
     // Also checks that the mimimum quality specific profile matches the low profile and
     // similarly that the maximum quality specific profile matches the high profile.
-    private void checkSpecificProfiles(int cameraId,
-            CamcorderProfile low, CamcorderProfile high, int[] specificQualities) {
+    private void checkSpecificProfiles(
+            int cameraId,
+            CamcorderProfile low,
+            CamcorderProfile high,
+            int[] specificQualities,
+            List<Size> videoSizes) {
+
         CamcorderProfile minProfile = null;
         CamcorderProfile maxProfile = null;
 
@@ -148,6 +158,10 @@ public class CamcorderProfileTest extends AndroidTestCase {
             if (CamcorderProfile.hasProfile(quality)) {
                 CamcorderProfile profile = getWithOptionalId(quality, cameraId);
                 checkSpecificProfileDimensions(profile, quality);
+
+                assertTrue(isSizeSupported(profile.videoFrameWidth,
+                                           profile.videoFrameHeight,
+                                           videoSizes));
 
                 if (minProfile == null) {
                     minProfile = profile;
@@ -166,6 +180,7 @@ public class CamcorderProfileTest extends AndroidTestCase {
 
         assertProfileEquals(low, minProfile);
         assertProfileEquals(high, maxProfile);
+
     }
 
     private void checkGet(int cameraId) {
@@ -173,19 +188,21 @@ public class CamcorderProfileTest extends AndroidTestCase {
                    ? "Checking get without id"
                    : "Checking get with id = " + cameraId);
 
+        final List<Size> videoSizes = getSupportedVideoSizes(cameraId);
+
         CamcorderProfile lowProfile =
             getWithOptionalId(CamcorderProfile.QUALITY_LOW, cameraId);
         CamcorderProfile highProfile =
             getWithOptionalId(CamcorderProfile.QUALITY_HIGH, cameraId);
-        checkProfile(lowProfile);
-        checkProfile(highProfile);
+        checkProfile(lowProfile, videoSizes);
+        checkProfile(highProfile, videoSizes);
 
         CamcorderProfile lowTimeLapseProfile =
             getWithOptionalId(CamcorderProfile.QUALITY_TIME_LAPSE_LOW, cameraId);
         CamcorderProfile highTimeLapseProfile =
             getWithOptionalId(CamcorderProfile.QUALITY_TIME_LAPSE_HIGH, cameraId);
-        checkProfile(lowTimeLapseProfile);
-        checkProfile(highTimeLapseProfile);
+        checkProfile(lowTimeLapseProfile, null);
+        checkProfile(highTimeLapseProfile, null);
 
         int[] specificProfileQualities = {CamcorderProfile.QUALITY_QCIF,
                                           CamcorderProfile.QUALITY_CIF,
@@ -200,9 +217,9 @@ public class CamcorderProfileTest extends AndroidTestCase {
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_1080P};
 
         checkSpecificProfiles(cameraId, lowProfile, highProfile,
-                specificProfileQualities);
+                specificProfileQualities, videoSizes);
         checkSpecificProfiles(cameraId, lowTimeLapseProfile, highTimeLapseProfile,
-                specificTimeLapseProfileQualities);
+                specificTimeLapseProfileQualities, null);
     }
 
     @TestTargets({
@@ -228,5 +245,28 @@ public class CamcorderProfileTest extends AndroidTestCase {
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
             checkGet(cameraId);
         }
+    }
+
+    private List<Size> getSupportedVideoSizes(int cameraId) {
+        Camera camera = (cameraId == -1)? Camera.open(): Camera.open(cameraId);
+        Parameters parameters = camera.getParameters();
+        List<Size> videoSizes = parameters.getSupportedVideoSizes();
+        if (videoSizes == null) {
+            videoSizes = parameters.getSupportedPreviewSizes();
+            assertNotNull(videoSizes);
+        }
+        camera.release();
+        return videoSizes;
+    }
+
+    private boolean isSizeSupported(int width, int height, List<Size> sizes) {
+        if (sizes == null) return true;
+
+        for (Size size: sizes) {
+            if (size.width == width && size.height == height) {
+                return true;
+            }
+        }
+        return false;
     }
 }
