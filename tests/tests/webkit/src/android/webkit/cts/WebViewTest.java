@@ -577,6 +577,42 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "addJavascriptInterface",
+        args = {Object.class, String.class}
+    )
+    public void testAddJavascriptInterfaceNull() throws Exception {
+        WebSettings settings = mWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        String setTitleToPropertyTypeHtml = "<html><head></head>" +
+                "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
+
+        // Test that the property is initially undefined.
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("undefined", mWebView.getTitle());
+
+        // Test that adding a null object has no effect.
+        mWebView.addJavascriptInterface(null, "injectedObject");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("undefined", mWebView.getTitle());
+
+        // Test that adding an object gives an object type.
+        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        mWebView.addJavascriptInterface(obj, "injectedObject");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("object", mWebView.getTitle());
+
+        // Test that trying to replace with a null object has no effect.
+        mWebView.addJavascriptInterface(null, "injectedObject");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("object", mWebView.getTitle());
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
