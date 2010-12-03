@@ -32,7 +32,45 @@
                     }
                 </script>
                 <style type="text/css">
-                    @import "api-coverage.css";
+                    body {
+                        background-color: #CCCCCC;
+                        font-family: sans-serif;
+                        margin: 10px;
+                    }
+
+                    .info {
+                        margin-bottom: 10px;
+                    }
+
+                    .apks, .package, .class {
+                        cursor: pointer;
+                        text-decoration: underline;
+                    }
+
+                    .packageDetails {
+                        padding-left: 20px;
+                    }
+
+                    .classDetails {
+                        padding-left: 40px;
+                    }
+
+                    .method {
+                        font-family: courier;
+                        white-space: nowrap;
+                    }
+
+                    .red {
+                        background-color: #FF0000;
+                    }
+
+                    .yellow {
+                        background-color: #FFFF00;
+                    }
+
+                    .green {
+                        background-color: #00FF00;
+                    }
                 </style>
             </head>
             <body>
