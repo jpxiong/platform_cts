@@ -689,6 +689,45 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(paramActual.getPreviewFrameRate() > 0);
 
         checkExposureCompensation(parameters);
+        checkPreferredPreviewSizeForVideo(parameters);
+    }
+
+    private void checkPreferredPreviewSizeForVideo(Parameters parameters) {
+        List<Size> videoSizes = parameters.getSupportedVideoSizes();
+        Size preferredPreviewSize = parameters.getPreferredPreviewSizeForVideo();
+
+        // If getSupportedVideoSizes() returns null,
+        // getPreferredPreviewSizeForVideo() will return null;
+        // otherwise, if getSupportedVideoSizes() does not return null,
+        // getPreferredPreviewSizeForVideo() will not return null.
+        if (videoSizes == null) {
+            assertNull(preferredPreviewSize);
+        } else {
+            assertNotNull(preferredPreviewSize);
+        }
+
+        // If getPreferredPreviewSizeForVideo() returns null,
+        // getSupportedVideoSizes() will return null;
+        // otherwise, if getPreferredPreviewSizeForVideo() does not return null,
+        // getSupportedVideoSizes() will not return null.
+        if (preferredPreviewSize == null) {
+            assertNull(videoSizes);
+        } else {
+            assertNotNull(videoSizes);
+        }
+
+        if (videoSizes != null) {  // implies: preferredPreviewSize != null
+            // If getSupportedVideoSizes() does not return null,
+            // the returned list will contain at least one size.
+            assertTrue(videoSizes.size() > 0);
+
+            // In addition, getPreferredPreviewSizeForVideo() returns a size
+            // that is among the supported preview sizes.
+            List<Size> previewSizes = parameters.getSupportedPreviewSizes();
+            assertNotNull(previewSizes);
+            assertTrue(previewSizes.size() > 0);
+            assertTrue(previewSizes.contains(preferredPreviewSize));
+        }
     }
 
     private void checkExposureCompensation(Parameters parameters) {
