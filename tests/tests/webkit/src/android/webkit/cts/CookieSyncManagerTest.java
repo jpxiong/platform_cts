@@ -67,9 +67,10 @@ public class CookieSyncManagerTest
         cookieManager.setAcceptCookie(true);
         assertTrue(cookieManager.acceptCookie());
 
-        String cookieValue = "a = b";
-        cookieManager.setCookie(TestHtmlConstants.HELLO_WORLD_URL, cookieValue);
-        assertEquals(cookieValue, cookieManager.getCookie(TestHtmlConstants.HELLO_WORLD_URL));
+        String url = TestHtmlConstants.getFileUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        String cookieValue = "a=b";
+        cookieManager.setCookie(url, cookieValue);
+        assertEquals(cookieValue, cookieManager.getCookie(url));
 
         // Cookie is stored in RAM but not in the database.
         assertFalse(cookieManager.hasCookies());
