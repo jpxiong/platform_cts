@@ -62,7 +62,15 @@ public class CookieSyncManagerTest
         assertSame(csm1, csm2);
 
         final CookieManager cookieManager = CookieManager.getInstance();
-        assertFalse(cookieManager.hasCookies());
+
+        // Remove all cookies from the database.
+        cookieManager.removeAllCookie();
+        new DelayedCheck(30000) {
+            @Override
+            protected boolean check() {
+                return !cookieManager.hasCookies();
+            }
+        }.run();
 
         cookieManager.setAcceptCookie(true);
         assertTrue(cookieManager.acceptCookie());
@@ -77,7 +85,7 @@ public class CookieSyncManagerTest
 
         // Store the cookie to the database.
         csm1.sync();
-        new DelayedCheck(10000) {
+        new DelayedCheck(30000) {
             @Override
             protected boolean check() {
                 return cookieManager.hasCookies();
@@ -86,7 +94,7 @@ public class CookieSyncManagerTest
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
-        new DelayedCheck(10000) {
+        new DelayedCheck(30000) {
             @Override
             protected boolean check() {
                 return !cookieManager.hasCookies();
