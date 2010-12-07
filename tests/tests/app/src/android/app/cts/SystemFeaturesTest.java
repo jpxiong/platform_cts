@@ -260,7 +260,6 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
             assertAvailable(PackageManager.FEATURE_SIP);
             assertAvailable(PackageManager.FEATURE_SIP_VOIP);
         } else {
-            assertNotAvailable(PackageManager.FEATURE_SIP);
             assertNotAvailable(PackageManager.FEATURE_SIP_VOIP);
         }
     }
