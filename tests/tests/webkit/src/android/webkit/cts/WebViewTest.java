@@ -572,6 +572,31 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("object", mWebView.getTitle());
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "removeJavascriptInterface",
+        args = {String.class}
+    )
+    public void testRemoveJavascriptInterface() throws Exception {
+        WebSettings settings = mWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        String setTitleToPropertyTypeHtml = "<html><head></head>" +
+                "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
+
+        // Test that adding an object gives an object type.
+        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        mWebView.addJavascriptInterface(obj, "injectedObject");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("object", mWebView.getTitle());
+
+        // Test that removing the object leaves the property undefined.
+        mWebView.removeJavascriptInterface("injectedObject");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("undefined", mWebView.getTitle());
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
