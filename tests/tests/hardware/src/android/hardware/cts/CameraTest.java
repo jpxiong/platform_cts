@@ -1689,4 +1689,103 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     Character.isLetter(c) && c != 'x');
         }
     }
+
+    @UiThreadTest
+    public void testSceneMode() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testSceneModeByCamera(id);
+        }
+    }
+
+    private class SceneModeSettings {
+        public String mScene, mFlash, mFocus, mWhiteBalance;
+        public List<String> mSupportedFlash, mSupportedFocus, mSupportedWhiteBalance;
+
+        public SceneModeSettings(Parameters parameters) {
+            mScene = parameters.getSceneMode();
+            mFlash = parameters.getFlashMode();
+            mFocus = parameters.getFocusMode();
+            mWhiteBalance = parameters.getWhiteBalance();
+            mSupportedFlash = parameters.getSupportedFlashModes();
+            mSupportedFocus = parameters.getSupportedFocusModes();
+            mSupportedWhiteBalance = parameters.getSupportedWhiteBalance();
+        }
+    }
+
+    private void testSceneModeByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        Parameters parameters = mCamera.getParameters();
+        List<String> supportedSceneModes = parameters.getSupportedSceneModes();
+        if (supportedSceneModes != null) {
+            assertEquals(Parameters.SCENE_MODE_AUTO, parameters.getSceneMode());
+            SceneModeSettings autoSceneMode = new SceneModeSettings(parameters);
+
+            // Store all scene mode affected settings.
+            SceneModeSettings[] settings = new SceneModeSettings[supportedSceneModes.size()];
+            for (int i = 0; i < supportedSceneModes.size(); i++) {
+                parameters.setSceneMode(supportedSceneModes.get(i));
+                mCamera.setParameters(parameters);
+                parameters = mCamera.getParameters();
+                settings[i] = new SceneModeSettings(parameters);
+            }
+
+            // Make sure scene mode settings are consistent before preview and
+            // after preview.
+            mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+            mCamera.startPreview();
+            waitForPreviewDone();
+            for (int i = 0; i < supportedSceneModes.size(); i++) {
+                String sceneMode = supportedSceneModes.get(i);
+                parameters.setSceneMode(sceneMode);
+                mCamera.setParameters(parameters);
+                parameters = mCamera.getParameters();
+                assertEquals("Flash is inconsistent in scene mode " + sceneMode,
+                        settings[i].mFlash, parameters.getFlashMode());
+                assertEquals("Focus is inconsistent in scene mode " + sceneMode,
+                        settings[i].mFocus, parameters.getFocusMode());
+                assertEquals("White balance is inconsistent in scene mode " + sceneMode,
+                        settings[i].mWhiteBalance, parameters.getWhiteBalance());
+                assertEquals("Suppported flash modes are inconsistent in scene mode " + sceneMode,
+                        settings[i].mSupportedFlash, parameters.getSupportedFlashModes());
+                assertEquals("Suppported focus modes are inconsistent in scene mode " + sceneMode,
+                        settings[i].mSupportedFocus, parameters.getSupportedFocusModes());
+                assertEquals("Suppported white balance are inconsistent in scene mode " + sceneMode,
+                        settings[i].mSupportedWhiteBalance, parameters.getSupportedWhiteBalance());
+            }
+
+            for (int i = 0; i < settings.length; i++) {
+                if (Parameters.SCENE_MODE_AUTO.equals(settings[i].mScene)) continue;
+
+                // If the scene mode overrides the flash mode, it should also override
+                // the supported flash modes.
+                if (autoSceneMode.mSupportedFlash != null) {
+                    if (!autoSceneMode.mFlash.equals(settings[i].mFlash)) {
+                        assertEquals(1, settings[i].mSupportedFlash.size());
+                        assertTrue(settings[i].mSupportedFlash.contains(settings[i].mFlash));
+                    }
+                }
+
+                // If the scene mode overrides the focus mode, it should also override
+                // the supported focus modes.
+                if (autoSceneMode.mSupportedFocus != null) {
+                    if (!autoSceneMode.mFocus.equals(settings[i].mFocus)) {
+                        assertEquals(1, settings[i].mSupportedFocus.size());
+                        assertTrue(settings[i].mSupportedFocus.contains(settings[i].mFocus));
+                    }
+                }
+
+                // If the scene mode overrides the white balance, it should also override
+                // the supported white balance.
+                if (autoSceneMode.mSupportedWhiteBalance != null) {
+                    if (!autoSceneMode.mWhiteBalance.equals(settings[i].mWhiteBalance)) {
+                        assertEquals(1, settings[i].mSupportedWhiteBalance.size());
+                        assertTrue(settings[i].mSupportedWhiteBalance.contains(settings[i].mWhiteBalance));
+                    }
+                }
+            }
+        }
+        terminateMessageLooper();
+    }
 }
