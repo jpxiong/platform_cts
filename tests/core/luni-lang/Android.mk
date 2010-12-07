@@ -23,7 +23,7 @@ endif
 ##########################################################
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under,../../../../libcore/luni/src/test/java/org/apache/harmony/luni/tests/java/lang) \
+LOCAL_SRC_FILES := \
 	$(call all-java-files-under,../../../../libcore/luni/src/test/java/tests/api/java/lang) \
 	$(call all-java-files-under,../../../../libcore/support/src/test/java/) \
 	../../../../libcore/luni/src/test/java/tests/luni/AllTestsLang.java
