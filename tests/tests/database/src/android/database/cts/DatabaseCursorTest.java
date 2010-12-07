@@ -16,13 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.BrokenTest;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Random;
-
-import junit.framework.TestCase;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -40,8 +33,11 @@ import android.test.AndroidTestCase;
 import android.test.PerformanceTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.MediumTest;
-import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Random;
 
 public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTestCase {
     private static final String sString1 = "this is a test";
@@ -368,59 +364,6 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
         @Override
         public void onInvalidated() {
         }
-    }
-
-    //@Large
-    @Suppress
-    public void testLoadingThreadDelayRegisterData() throws Exception {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-
-        final int count = 505;
-        String sql = "INSERT INTO test (data) VALUES (?);";
-        SQLiteStatement s = mDatabase.compileStatement(sql);
-        for (int i = 0; i < count; i++) {
-            s.bindLong(1, i);
-            s.execute();
-        }
-
-        int maxRead = 500;
-        int initialRead = 5;
-        SQLiteCursor testCursor = (SQLiteCursor) mDatabase.rawQuery("select * from test;", null,
-                initialRead, maxRead);
-
-        TestObserver observer = new TestObserver(count, testCursor);
-        testCursor.getCount();
-        testCursor.registerDataSetObserver(observer);
-        if (!observer.quit) {
-            Looper.loop();
-        }
-        testCursor.close();
-    }
-
-    @LargeTest
-    @BrokenTest("Consistently times out, even with count reduced to 30000")
-    public void testLoadingThread() throws Exception {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-
-        final int count = 50000;
-        String sql = "INSERT INTO test (data) VALUES (?);";
-        SQLiteStatement s = mDatabase.compileStatement(sql);
-        for (int i = 0; i < count; i++) {
-            s.bindLong(1, i);
-            s.execute();
-        }
-
-        int maxRead = 1000;
-        int initialRead = 5;
-        SQLiteCursor testCursor = (SQLiteCursor) mDatabase.rawQuery("select * from test;", null,
-                initialRead, maxRead);
-
-        TestObserver observer = new TestObserver(count, testCursor);
-        testCursor.registerDataSetObserver(observer);
-        testCursor.getCount();
-
-        Looper.loop();
-        testCursor.close();
     }
 
     @LargeTest
