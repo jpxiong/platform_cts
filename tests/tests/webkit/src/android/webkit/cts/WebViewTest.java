@@ -336,56 +336,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testScrollBarOverlay() throws Throwable {
-        DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
-
-        String p = "<p style=\"height:" + dimension + "px;" +
-                "width:" + dimension + "px;margin:0px auto;\">Test scroll bar overlay.</p>";
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        mWebView.setHorizontalScrollbarOverlay(true);
+        mWebView.setVerticalScrollbarOverlay(false);
         assertTrue(mWebView.overlayHorizontalScrollbar());
         assertFalse(mWebView.overlayVerticalScrollbar());
-        int startX = mWebView.getScrollX();
-        int startY = mWebView.getScrollY();
-
-        final int bigVelocity = 10000;
-        // fling to the max and wait for ending scroll
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.flingScroll(bigVelocity, bigVelocity);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-
-        int overlayOffsetX = mWebView.getScrollX() - startX;
-        int insetOffsetY = mWebView.getScrollY() - startY;
-
-        // scroll back
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.flingScroll(-bigVelocity, -bigVelocity);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
 
         mWebView.setHorizontalScrollbarOverlay(false);
         mWebView.setVerticalScrollbarOverlay(true);
         assertFalse(mWebView.overlayHorizontalScrollbar());
         assertTrue(mWebView.overlayVerticalScrollbar());
-
-        // fling to the max and wait for ending scroll
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.flingScroll(bigVelocity, bigVelocity);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-
-        int insetOffsetX = mWebView.getScrollX() - startX;
-        int overlayOffsetY = mWebView.getScrollY() - startY;
-
-        assertTrue(overlayOffsetY > insetOffsetY);
-        assertTrue(overlayOffsetX > insetOffsetX);
     }
 
     @TestTargets({
