@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.test.AndroidTestCase;
 
 import java.io.IOException;
@@ -1326,4 +1327,28 @@ public class AccountManagerTest extends AndroidTestCase {
                 handler);
         waitForLatch(latch);
     }
+
+    /**
+     * Tests that AccountManagerService is properly caching data.
+     */
+    public void testGetsAreCached() throws IOException, AuthenticatorException,
+            OperationCanceledException {
+
+        // Add an account,
+        assertEquals(false, isAccountPresent(am.getAccounts(), ACCOUNT));
+        addAccountExplicitly(ACCOUNT, ACCOUNT_PASSWORD, null /* userData */);
+
+        // Then verify that we don't hit disk retrieving it,
+        StrictMode.ThreadPolicy oldPolicy = StrictMode.getThreadPolicy();
+        try {
+            StrictMode.setThreadPolicy(
+                new StrictMode.ThreadPolicy.Builder().detectDiskReads().penaltyDeath().build());
+            Account[] accounts = am.getAccounts();
+            assertNotNull(accounts);
+            assertTrue(accounts.length > 0);
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
+        }
+    }
+
 }
