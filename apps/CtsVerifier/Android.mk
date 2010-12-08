@@ -31,4 +31,10 @@ LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
 
+# Builds and launches CTS Verifier on a device.
+.PHONY: cts-verifier
+cts-verifier: CtsVerifier adb
+	adb install -r $(ANDROID_PRODUCT_OUT)/data/app/CtsVerifier.apk \
+		&& adb shell "am start -n com.android.cts.verifier/.CtsVerifierActivity"
+
 include $(call all-makefiles-under,$(LOCAL_PATH))
