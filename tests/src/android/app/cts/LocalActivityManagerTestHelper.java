@@ -28,7 +28,7 @@ import android.app.cts.CTSResult;
 public class LocalActivityManagerTestHelper extends ActivityGroup {
 
     public static final String ACTION_DISPATCH_RESUME = "dispatchResume";
-    public static final String ACTION_START_ACTIIVTY = "startActivity";
+    public static final String ACTION_START_ACTIVITY = "startActivity";
     public static final String ACTION_DISPATCH_CREATE = "dispatchCreate";
     public static final String ACTION_DISPATCH_STOP = "dispatchStop";
     public static final String ACTION_DISPATCH_PAUSE_TRUE = "dispatchPauseTrue";
@@ -66,7 +66,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
         super.onResume();
         if (mCurrentAction.equals(ACTION_DISPATCH_RESUME)) {
             testDispatchResume();
-        } else if (mCurrentAction.equals(ACTION_START_ACTIIVTY)) {
+        } else if (mCurrentAction.equals(ACTION_START_ACTIVITY)) {
             testStartActivity();
         } else if (mCurrentAction.equals(ACTION_DISPATCH_CREATE)) {
             testDispatchCreate();
@@ -109,9 +109,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testDispatchDestroy() {
@@ -146,9 +144,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testSaveInstanceState() {
@@ -175,9 +171,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testDispatchPauseFalse() {
@@ -191,9 +185,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testDispatchPauseTrue() {
@@ -207,9 +199,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testDispatchStop() {
@@ -229,9 +219,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testDispatchCreate() {
@@ -269,8 +257,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             fail();
             return;
         }
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
+        pass();
     }
 
     private void testStartActivity() {
@@ -324,13 +311,7 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
             return;
         } catch (NullPointerException e) {
         }
-        sResult.setResult(CTSResult.RESULT_OK);
-        finish();
-    }
-
-    private void fail() {
-        sResult.setResult(CTSResult.RESULT_FAIL);
-        finish();
+        pass();
     }
 
     private void testDispatchResume() {
@@ -341,11 +322,19 @@ public class LocalActivityManagerTestHelper extends ActivityGroup {
         LocalActivityManagerStubActivity.sIsOnResumeCalled = false;
         mLocalActivityManager.dispatchResume();
         if (LocalActivityManagerStubActivity.sIsOnResumeCalled) {
-            sResult.setResult(CTSResult.RESULT_OK);
+            pass();
         } else {
-            sResult.setResult(CTSResult.RESULT_FAIL);
+            fail();
         }
+    }
+
+    private void fail() {
+        sResult.setResult(CTSResult.RESULT_FAIL);
         finish();
     }
 
+    private void pass() {
+        sResult.setResult(CTSResult.RESULT_OK);
+        finish();
+    }
 }

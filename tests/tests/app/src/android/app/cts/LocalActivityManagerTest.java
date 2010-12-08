@@ -112,7 +112,7 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
     })
     public void testStartActivity() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
-        setupActivity(LocalActivityManagerTestHelper.ACTION_START_ACTIIVTY);
+        setupActivity(LocalActivityManagerTestHelper.ACTION_START_ACTIVITY);
         waitForResult();
     }
 
