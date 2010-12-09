@@ -26,7 +26,6 @@ import dalvik.annotation.ToBeFixed;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
-import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.Spannable;
@@ -34,9 +33,10 @@ import android.text.SpannableStringBuilder;
 import android.text.method.MultiTapKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+
+import java.util.concurrent.TimeUnit;
 
 @TestTargetClass(MultiTapKeyListener.class)
 public class MultiTapKeyListenerTest extends
@@ -118,327 +118,131 @@ public class MultiTapKeyListenerTest extends
         }
     }
 
-    @Override
-    public void sendRepeatedKeys(int... keys) {
-        super.sendRepeatedKeys(keys);
-        waitForListenerTimeout();
+    public void testOnKeyDown_capitalizeNone() {
+        MultiTapKeyListener keyListener = MultiTapKeyListener.getInstance(false, Capitalize.NONE);
+
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 2);
+        assertEquals("h", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_3, 2);
+        assertEquals("he", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_5, 3);
+        assertEquals("hel", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_5, 3);
+        assertEquals("hell", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_6, 3);
+        assertEquals("hello", mTextView.getText().toString());
     }
 
-    /**
-     * Wait for TIME_OUT, or listener will accept key event as multi tap rather than a new key.
-     */
-    private void waitForListenerTimeout() {
+    public void testOnKeyDown_capitalizeCharacters() {
+        MultiTapKeyListener keyListener = MultiTapKeyListener.getInstance(false,
+                Capitalize.CHARACTERS);
+
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 2);
+        assertEquals("H", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_3, 2);
+        assertEquals("HE", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_5, 3);
+        assertEquals("HEL", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_5, 3);
+        assertEquals("HELL", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_6, 3);
+        assertEquals("HELLO", mTextView.getText().toString());
+    }
+
+    public void testOnKeyDown_capitalizeSentences() {
+        MultiTapKeyListener keyListener = MultiTapKeyListener.getInstance(false,
+                Capitalize.SENTENCES);
+
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 2);
+        assertEquals("H", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 3);
+        assertEquals("Hi", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_1, 1);
+        assertEquals("Hi.", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_POUND, 1);
+        assertEquals("Hi. ", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_2, 2);
+        assertEquals("Hi. B", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_9, 3);
+        assertEquals("Hi. By", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_3, 2);
+        assertEquals("Hi. Bye", mTextView.getText().toString());
+    }
+
+    public void testOnKeyDown_capitalizeWords() {
+        MultiTapKeyListener keyListener = MultiTapKeyListener.getInstance(false,
+                Capitalize.WORDS);
+
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 2);
+        assertEquals("H", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 3);
+        assertEquals("Hi", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_POUND, 1);
+        assertEquals("Hi ", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_2, 2);
+        assertEquals("Hi B", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_9, 3);
+        assertEquals("Hi By", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_3, 2);
+        assertEquals("Hi Bye", mTextView.getText().toString());
+    }
+
+    private void prepareEmptyTextView() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText("", BufferType.EDITABLE);
+                Selection.setSelection(mTextView.getEditableText(), 0, 0);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertEquals("", mTextView.getText().toString());
+    }
+
+    private void callOnKeyDown(final MultiTapKeyListener keyListener, final int keyCode,
+            final int numTimes) {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < numTimes; i++) {
+                    keyListener.onKeyDown(mTextView, mTextView.getEditableText(), keyCode,
+                            new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+                }
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        // Wait a bit in order to distinguish this character and the next one.
         try {
             Thread.sleep(TIME_OUT);
         } catch (InterruptedException e) {
             fail("thrown unexpected InterruptedException when sleep.");
         }
-    }
-
-    /**
-     * Check point when Capitalize.NONE and autotext is false:
-     * 1. press KEYCODE_4 twice, text is "h".
-     * 2. press KEYCODE_3 twice, text is "he".
-     * 3. press KEYCODE_5 three times, text is "hel".
-     * 4. press KEYCODE_5 three times, text is "hell".
-     * 5. press KEYCODE_8 twice, text is "hellu".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey1() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(false, Capitalize.NONE);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("h", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("he", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("hel", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("hell", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-        assertEquals("hellu", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.NONE and autotext is true:
-     * 1. press KEYCODE_4 twice, text is "h".
-     * 2. press KEYCODE_3 twice, text is "he".
-     * 3. press KEYCODE_5 three times, text is "hel".
-     * 4. press KEYCODE_5 three times, text is "hell".
-     * 5. press KEYCODE_8 twice, text should not be "hellu".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1738241", explanation = "can not correct spelling automatically")
-    public void testPressKey2() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(true, Capitalize.NONE);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("h", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("he", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("hel", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("hell", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-//        assertFalse("hellu".equals(mEditText.getText().toString())); issue 1738241
-    }
-
-    /**
-     * Check point when Capitalize.SENTENCES and autotext is false:
-     * 1. press KEYCODE_4 twice, text is "H".
-     * 2. press KEYCODE_3 twice, text is "He".
-     * 3. press KEYCODE_5 three times, text is "Hel".
-     * 4. press KEYCODE_5 three times, text is "Hell".
-     * 5. press KEYCODE_8 twice, text is "Hellu".
-     * 6. press KEYCODE_1 once, text is "Hellu.".
-     * 7. press KEYCODE_POUND once, text is "Hellu. ".
-     * 8. press KEYCODE_6 once, text is "Hellu. M".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey3() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(false, Capitalize.SENTENCES);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("He", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hel", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hell", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-        assertEquals("Hellu", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_1);
-        assertEquals("Hellu.", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_POUND);
-        assertEquals("Hellu. ", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_6);
-        assertEquals("Hellu. M", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.SENTENCES and autotext is true:
-     * 1. press KEYCODE_4 twice, text is "H".
-     * 2. press KEYCODE_3 twice, text is "He".
-     * 3. press KEYCODE_5 three times, text is "Hel".
-     * 4. press KEYCODE_5 three times, text is "Hell".
-     * 5. press KEYCODE_8 twice, text is "Hellu".
-     * 6. press KEYCODE_1 once, text is "Hellu.".
-     * 7. press KEYCODE_POUND once, text is "Hellu. ".
-     * 8. press KEYCODE_6 once, text should not be "Hellu. M".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1738241", explanation = "can not correct spelling automatically")
-    public void testPressKey4() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(true, Capitalize.SENTENCES);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("He", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hel", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hell", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-        assertEquals("Hellu", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_1);
-//        assertFalse("Hellu.".equals(mEditText.getText().toString())); issue 1738241
-//
-//        sendRepeatedKeys(1, KeyEvent.KEYCODE_POUND);
-//        assertEquals("Hellu. ", mEditText.getText().toString());
-//
-//        sendRepeatedKeys(1, KeyEvent.KEYCODE_6);
-//        assertEquals("Hellu. M", mEditText.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.WORDS and autotext is false:
-     * 1. press KEYCODE_4 twice, text is "H".
-     * 2. press KEYCODE_3 twice, text is "He".
-     * 3. press KEYCODE_5 three times, text is "Hel".
-     * 4. press KEYCODE_5 three times, text is "Hell".
-     * 5. press KEYCODE_8 twice, text is "Hellu".
-     * 6. press KEYCODE_POUND once, text is "Hellu ".
-     * 7. press KEYCODE_6 once, text is "Hellu M".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey5() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(false, Capitalize.WORDS);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("He", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hel", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("Hell", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-        assertEquals("Hellu", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_POUND);
-        assertEquals("Hellu ", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_6);
-        assertEquals("Hellu M", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.CHARACTERS and autotext is false:
-     * 1. press KEYCODE_4 twice, text is "H".
-     * 2. press KEYCODE_3 twice, text is "HE".
-     * 3. press KEYCODE_5 three times, text is "HEL".
-     * 4. press KEYCODE_5 three times, text is "HELL".
-     * 5. press KEYCODE_8 twice, text is "HELLU".
-     * 6. press KEYCODE_POUND once, text is "HELLU ".
-     * 7. press KEYCODE_6 once, text is "HELLU M".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey6() {
-        final MultiTapKeyListener multiTapKeyListener
-                = MultiTapKeyListener.getInstance(false, Capitalize.CHARACTERS);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(multiTapKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_4);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_3);
-        assertEquals("HE", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("HEL", mTextView.getText().toString());
-
-        sendRepeatedKeys(3, KeyEvent.KEYCODE_5);
-        assertEquals("HELL", mTextView.getText().toString());
-
-        sendRepeatedKeys(2, KeyEvent.KEYCODE_8);
-        assertEquals("HELLU", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_POUND);
-        assertEquals("HELLU ", mTextView.getText().toString());
-
-        sendRepeatedKeys(1, KeyEvent.KEYCODE_6);
-        assertEquals("HELLU M", mTextView.getText().toString());
     }
 
     @TestTargetNew(
