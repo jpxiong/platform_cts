@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -117,16 +118,6 @@ public class AccessibilityEndToEndTest extends
      */
     public AccessibilityEndToEndTest() throws Exception {
         super(AccessibilityEndToEndTestActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // TODO (svetoslavganov): This is a temporary workaround for
-        // nondeterministically failing tests with partially populated events.
-        // It seems that not all times the View hierarchy is fully
-        // instantiated on time. This seems related to bug 2630683.
-        Thread.sleep(500);
     }
 
     @LargeTest
@@ -228,8 +219,13 @@ public class AccessibilityEndToEndTest extends
         focusedEvent.setClassName(Button.class.getName());
         focusedEvent.setPackageName(getActivity().getPackageName());
         focusedEvent.getText().add(activity.getString(R.string.button_title));
-        focusedEvent.setItemCount(3);
-        focusedEvent.setCurrentItemIndex(2);
+        if (hasActivityActionBar()) {
+            focusedEvent.setItemCount(4);
+            focusedEvent.setCurrentItemIndex(3);
+        } else {
+            focusedEvent.setItemCount(3);
+            focusedEvent.setCurrentItemIndex(2);
+        }
         focusedEvent.setEnabled(true);
 
         // set expectations
@@ -415,6 +411,14 @@ public class AccessibilityEndToEndTest extends
         // failure - reset so it is not accept more events
         service.reset();
         throw lastVerifyThrowable;
+    }
+
+    /**
+     * @return Whether the activity has action bar.
+     */
+    private boolean hasActivityActionBar() {
+        return (getActivity().getApplicationInfo().targetSdkVersion
+                >= Build.VERSION_CODES.HONEYCOMB);
     }
 
     static class MockAccessibilityService extends AccessibilityService implements
@@ -610,7 +614,6 @@ public class AccessibilityEndToEndTest extends
                 }
                 AccessibilityEvent expectedEvent = mExpectedEvents.poll();
                 assertEqualsAccessiblityEvent(expectedEvent, receivedEvent);
-
             }
         }
 
