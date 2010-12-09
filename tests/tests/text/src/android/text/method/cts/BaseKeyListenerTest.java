@@ -62,117 +62,89 @@ public class BaseKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    /**
-     * Check point:
-     * 1. Set the cursor and press DEL key, the character before cursor is deleted.
-     * 2. Set a selection and press DEL key, the selection is deleted.
-     * 3. Press ALT+DEL key, the whole content of TextView is deleted.
-     * 4. when there is no any selections and press DEL key, an IndexOutOfBoundsException occurs
-     * 5. ALT+DEL does not delete everything where there is a selection
-     * 6. DEL key does not take effect when text view does not have BaseKeyListener.
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "backspace",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "1. when there is no any selections, " +
-            "an IndexOutOfBoundsException occurs. " +
-            "2. ALT+DEL does not delete everything where there is a selection, " +
-            "javadoc does not explain this situation")
     public void testBackspace() {
-        Editable content;
+        final Editable content = Editable.Factory.getInstance().newEditable(TEST_STRING);
+        setTextViewText(content);
+
+        // Nothing to delete when the cursor is at the beginning.
         final MockBaseKeyListener baseKeyListener = new MockBaseKeyListener();
         KeyEvent delKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
-
-        content = Editable.Factory.getInstance().newEditable(TEST_STRING);
         Selection.setSelection(content, 0, 0);
         baseKeyListener.backspace(mTextView, content, KeyEvent.KEYCODE_DEL, delKeyEvent);
         assertEquals("123456", content.toString());
 
-        content = Editable.Factory.getInstance().newEditable(TEST_STRING);
+        // Delete the first three letters using a selection.
+        setTextViewText(content);
         Selection.setSelection(content, 0, 3);
         baseKeyListener.backspace(mTextView, content, KeyEvent.KEYCODE_DEL, delKeyEvent);
         assertEquals("456", content.toString());
 
-        content = Editable.Factory.getInstance().newEditable(TEST_STRING);
-        try {
-            baseKeyListener.backspace(mTextView, content, KeyEvent.KEYCODE_DEL,delKeyEvent);
-            fail("did not throw IndexOutOfBoundsException when there is no selections");
-        } catch (IndexOutOfBoundsException e) {
-            // expected.
-        }
+        // Delete the entire line wit ALT + DEL
+        setTextViewText(content);
+        KeyEvent altDelKeyEvent = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL,
+                0, KeyEvent.META_ALT_ON);
+        Selection.setSelection(content, 0, 0);
+        baseKeyListener.backspace(mTextView, content, KeyEvent.KEYCODE_DEL, altDelKeyEvent);
+        assertEquals("", content.toString());
+    }
 
-        final String str = "123456";
+    private void setTextViewText(final CharSequence content) {
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setText(str, BufferType.EDITABLE);
-                mTextView.setKeyListener(baseKeyListener);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 1, 1);
+                mTextView.setText(content, BufferType.EDITABLE);
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals(str, mTextView.getText().toString());
-        // delete the first character '1'
+    }
+
+    public void testBackspace_withSendKeys() {
+        final MockBaseKeyListener baseKeyListener = new MockBaseKeyListener();
+        final String str = "123456";
+
+        // Delete the first character '1'
+        prepareTextView(str, baseKeyListener, 1, 1);
         sendKeys(KeyEvent.KEYCODE_DEL);
         assertEquals("23456", mTextView.getText().toString());
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText(str, BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 1, 3);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals(str, mTextView.getText().toString());
-        // delete character '2' and '3'
+        // Delete character '2' and '3'
+        prepareTextView(str, baseKeyListener, 1, 3);
         sendKeys(KeyEvent.KEYCODE_DEL);
         assertEquals("1456", mTextView.getText().toString());
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText(str, BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals(str, mTextView.getText().toString());
-        // delete everything on the line the cursor is on.
-        sendKeys(KeyEvent.KEYCODE_ALT_LEFT);
-        sendKeys(KeyEvent.KEYCODE_DEL);
+        // Delete everything on the line the cursor is on.
+        prepareTextView(str, baseKeyListener, 0, 0);
+        sendAltDelete();
         assertEquals("", mTextView.getText().toString());
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText(str, BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 2, 4);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals(str, mTextView.getText().toString());
         // ALT+DEL deletes the selection only.
-        sendKeys(KeyEvent.KEYCODE_ALT_LEFT);
-        sendKeys(KeyEvent.KEYCODE_DEL);
+        prepareTextView(str, baseKeyListener, 2, 4);
+        sendAltDelete();
         assertEquals("1256", mTextView.getText().toString());
 
-        // text view does not have BaseKeyListener
+        // DEL key does not take effect when TextView does not have BaseKeyListener.
+        prepareTextView(str, null, 1, 1);
+        sendKeys(KeyEvent.KEYCODE_DEL);
+        assertEquals(str, mTextView.getText().toString());
+    }
+
+    private void prepareTextView(final CharSequence content, final BaseKeyListener keyListener,
+            final int selectionStart, final int selectionEnd) {
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setText(str, BufferType.EDITABLE);
-                mTextView.setKeyListener(null);
+                mTextView.setText(content, BufferType.EDITABLE);
+                mTextView.setKeyListener(keyListener);
                 mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 1, 1);
+                Selection.setSelection((Editable) mTextView.getText(), selectionStart,
+                        selectionEnd);
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals(str, mTextView.getText().toString());
-        // DEL key does not take effect
+    }
+
+    private void sendAltDelete() {
+        mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ALT_LEFT));
         sendKeys(KeyEvent.KEYCODE_DEL);
-        assertEquals(str, mTextView.getText().toString());
+        mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ALT_LEFT));
     }
 
     /**
