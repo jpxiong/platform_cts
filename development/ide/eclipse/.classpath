@@ -37,6 +37,7 @@
     <classpathentry kind="src" path="cts/tests/tests/performance5/src"/>
     <classpathentry kind="src" path="cts/tests/tests/permission/src"/>
     <classpathentry kind="src" path="cts/tests/tests/permission2/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/preference/src"/>
     <classpathentry kind="src" path="cts/tests/tests/provider/src"/>
     <classpathentry kind="src" path="cts/tests/tests/speech/src"/>
     <classpathentry kind="src" path="cts/tests/tests/telephony/src"/>
