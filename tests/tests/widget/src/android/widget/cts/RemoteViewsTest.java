@@ -41,6 +41,7 @@ import android.text.style.cts.MockURLSpanTestActivity;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -365,13 +366,6 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
                 .getResources().getDrawable(R.drawable.testimage);
         WidgetTestUtils.assertEquals(d.getBitmap(),
                 ((BitmapDrawable) image.getDrawable()).getBitmap());
-
-        try {
-            mRemoteViews.reapply(mActivity, text);
-            fail("Should throw ActionException");
-        } catch (ActionException e) {
-            // expected
-        }
     }
 
     @TestTargetNew(
@@ -390,10 +384,11 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
         assertTrue(mRemoteViews.onLoadClass(ImageView.class));
         assertTrue(mRemoteViews.onLoadClass(ProgressBar.class));
         assertTrue(mRemoteViews.onLoadClass(Chronometer.class));
+        assertTrue(mRemoteViews.onLoadClass(ListView.class));
+        assertTrue(mRemoteViews.onLoadClass(GridView.class));
 
         // those classes without annotation @RemoteView
-        assertFalse(mRemoteViews.onLoadClass(ListView.class));
-        assertFalse(mRemoteViews.onLoadClass(GridView.class));
+        assertFalse(mRemoteViews.onLoadClass(EditText.class));
     }
 
     @TestTargetNew(
