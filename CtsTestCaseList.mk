@@ -47,6 +47,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsOsTestCases \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
+	CtsPreferenceTestCases \
 	CtsProviderTestCases \
 	CtsSaxTestCases \
 	CtsSpeechTestCases \
