@@ -26,7 +26,6 @@ import dalvik.annotation.ToBeFixed;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
-import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.Spannable;
@@ -35,7 +34,6 @@ import android.text.method.QwertyKeyListener;
 import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
@@ -71,253 +69,121 @@ public class QwertyKeyListenerTest extends
         new QwertyKeyListener(null, true);
     }
 
-    /**
-     * Check point when Capitalize.NONE and autotext is true:
-     * 1. press KEYCODE_H, text is "h".
-     * 2. press KEYCODE_E, text is "he".
-     * 3. press KEYCODE_L, text is "hel".
-     * 4. press KEYCODE_L, text is "hell".
-     * 5. press KEYCODE_U, text should not be "hellu".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1738241", explanation = "can not correct spelling automatically")
-    public void testPressKey1() {
-        final QwertyKeyListener qwertyKeyListener
-                = QwertyKeyListener.getInstance(true, Capitalize.NONE);
+    public void testOnKeyDown_capitalizeNone() {
+        QwertyKeyListener keyListener = QwertyKeyListener.getInstance(false, Capitalize.NONE);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(qwertyKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
+        prepareEmptyTextView();
 
-        sendKeys(KeyEvent.KEYCODE_H);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_H);
         assertEquals("h", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_E);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_E);
         assertEquals("he", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_L);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_L);
         assertEquals("hel", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_L);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_L);
         assertEquals("hell", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_U);
-//        assertFalse("hellu".equals(mTextView.getText().toString())); issue 1738241
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_O);
+        assertEquals("hello", mTextView.getText().toString());
     }
 
-    /**
-     * Check point when Capitalize.NONE and autotext is false:
-     * 1. press KEYCODE_H, text is "h".
-     * 2. press KEYCODE_E, text is "he".
-     * 3. press KEYCODE_L, text is "hel".
-     * 4. press KEYCODE_L, text is "hell".
-     * 5. press KEYCODE_U, text is "hellu".
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey2() {
-        final QwertyKeyListener qwertyKeyListener
-                = QwertyKeyListener.getInstance(false, Capitalize.NONE);
+    public void testOnKeyDown_capitalizeCharacters() {
+        QwertyKeyListener keyListener = QwertyKeyListener.getInstance(false,
+                Capitalize.CHARACTERS);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(qwertyKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
+        prepareEmptyTextView();
 
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("h", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_E);
-        assertEquals("he", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("hel", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("hell", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_U);
-        assertEquals("hellu", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.SENTENCES and autotext is false:
-     * 1. press KEYCODE_H, text is "H".
-     * 2. press KEYCODE_E, text is "He".
-     * 3. press KEYCODE_L, text is "Hel".
-     * 4. press KEYCODE_L, text is "Hell".
-     * 5. press KEYCODE_U, text is "Hellu".
-     * 6. press KEYCODE_PERIOD, text is "Hellu."
-     * 7. press KEYCODE_SPACE, text is "Hellu. "
-     * 8. press KEYCODE_H, text is "Hellu. H"
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey3() {
-        final QwertyKeyListener qwertyKeyListener
-                = QwertyKeyListener.getInstance(false, Capitalize.SENTENCES);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(qwertyKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_H);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_H);
         assertEquals("H", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_E);
-        assertEquals("He", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("Hel", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("Hell", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_U);
-        assertEquals("Hellu", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_PERIOD);
-        assertEquals("Hellu.", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_SPACE);
-        assertEquals("Hellu. ", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("Hellu. H", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.WORDS and autotext is false:
-     * 1. press KEYCODE_H, text is "H".
-     * 2. press KEYCODE_E, text is "He".
-     * 3. press KEYCODE_L, text is "Hel".
-     * 4. press KEYCODE_L, text is "Hell".
-     * 5. press KEYCODE_U, text is "Hellu".
-     * 7. press KEYCODE_SPACE, text is "Hellu "
-     * 8. press KEYCODE_H, text is "Hellu H"
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey4() {
-        final QwertyKeyListener qwertyKeyListener
-                = QwertyKeyListener.getInstance(false, Capitalize.WORDS);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(qwertyKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_E);
-        assertEquals("He", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("Hel", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_L);
-        assertEquals("Hell", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_U);
-        assertEquals("Hellu", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_SPACE);
-        assertEquals("Hellu ", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("Hellu H", mTextView.getText().toString());
-    }
-
-    /**
-     * Check point when Capitalize.CHARACTERS and autotext is false:
-     * 1. press KEYCODE_H, text is "H".
-     * 2. press KEYCODE_E, text is "HE".
-     * 3. press KEYCODE_L, text is "HEL".
-     * 4. press KEYCODE_L, text is "HELL".
-     * 5. press KEYCODE_U, text is "HELLU".
-     * 7. press KEYCODE_SPACE, text is "HELLU "
-     * 8. press KEYCODE_H, text is "HELLU H"
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyDown",
-        args = {View.class, Editable.class, int.class, KeyEvent.class}
-    )
-    public void testPressKey5() {
-        final QwertyKeyListener qwertyKeyListener
-                = QwertyKeyListener.getInstance(false, Capitalize.CHARACTERS);
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
-                Selection.setSelection((Editable) mTextView.getText(), 0, 0);
-                mTextView.setKeyListener(qwertyKeyListener);
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("H", mTextView.getText().toString());
-
-        sendKeys(KeyEvent.KEYCODE_E);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_E);
         assertEquals("HE", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_L);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_L);
         assertEquals("HEL", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_L);
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_L);
         assertEquals("HELL", mTextView.getText().toString());
 
-        sendKeys(KeyEvent.KEYCODE_U);
-        assertEquals("HELLU", mTextView.getText().toString());
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_O);
+        assertEquals("HELLO", mTextView.getText().toString());
+    }
 
-        sendKeys(KeyEvent.KEYCODE_SPACE);
-        assertEquals("HELLU ", mTextView.getText().toString());
+    public void testOnKeyDown_capitalizeSentences() {
+        QwertyKeyListener keyListener = QwertyKeyListener.getInstance(false,
+                Capitalize.SENTENCES);
 
-        sendKeys(KeyEvent.KEYCODE_H);
-        assertEquals("HELLU H", mTextView.getText().toString());
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_H);
+        assertEquals("H", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_I);
+        assertEquals("Hi", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_PERIOD);
+        assertEquals("Hi.", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_SPACE);
+        assertEquals("Hi. ", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_B);
+        assertEquals("Hi. B", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_Y);
+        assertEquals("Hi. By", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_E);
+        assertEquals("Hi. Bye", mTextView.getText().toString());
+    }
+
+    public void testOnKeyDown_capitalizeWords() {
+        QwertyKeyListener keyListener = QwertyKeyListener.getInstance(false,
+                Capitalize.WORDS);
+
+        prepareEmptyTextView();
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_H);
+        assertEquals("H", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_I);
+        assertEquals("Hi", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_SPACE);
+        assertEquals("Hi ", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_B);
+        assertEquals("Hi B", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_Y);
+        assertEquals("Hi By", mTextView.getText().toString());
+
+        callOnKeyDown(keyListener, KeyEvent.KEYCODE_E);
+        assertEquals("Hi Bye", mTextView.getText().toString());
+    }
+
+    private void prepareEmptyTextView() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setText("", BufferType.EDITABLE);
+                Selection.setSelection(mTextView.getEditableText(), 0, 0);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertEquals("", mTextView.getText().toString());
+    }
+
+    private void callOnKeyDown(final QwertyKeyListener keyListener, final int keyCode) {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                keyListener.onKeyDown(mTextView, mTextView.getEditableText(), keyCode,
+                        new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     @TestTargetNew(
