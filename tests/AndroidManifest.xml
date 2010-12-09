@@ -932,6 +932,11 @@
 
         <activity android:name="android.opengl.cts.OpenGlEsVersionStubActivity"/>
 
+        <activity android:name="android.preference.cts.PreferenceStubActivity">
+            <meta-data android:name="android.preference" 
+                    android:resource="@xml/preferences_from_intent" />
+        </activity>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
