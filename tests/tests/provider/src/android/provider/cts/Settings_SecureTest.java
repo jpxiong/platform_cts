@@ -116,11 +116,10 @@ public class Settings_SecureTest extends AndroidTestCase {
         } catch (SecurityException expected) {
         }
 
-        // TODO: Should be fixed to throw SettingNotFoundException.
         try {
             Secure.getFloat(cr, NO_SUCH_SETTING);
-            fail("NullPointerException should have been thrown!");
-        } catch (NullPointerException expected) {
+            fail("SettingNotFoundException should have been thrown!");
+        } catch (SettingNotFoundException expected) {
         }
 
         try {
