@@ -183,23 +183,16 @@ public class KeyEventTest extends AndroidTestCase {
         args = {android.view.KeyCharacterMap.KeyData.class}
     )
     public void testGetKeyData() {
+        KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z);
         KeyData keyData = new KeyData();
-        char origDisplayLabel = keyData.displayLabel;
-        char origNumber = keyData.number;
-        char[] origMeta = new char[KeyData.META_LENGTH];
-        origMeta[0] = keyData.meta[0];
-        origMeta[1] = keyData.meta[1];
-        origMeta[2] = keyData.meta[2];
-        origMeta[3] = keyData.meta[3];
+        assertTrue(keyEvent.getKeyData(keyData));
 
-        assertTrue(mKeyEvent.getKeyData(keyData));
-        // check whether KeyData has been updated.
-        assertTrue(keyData.displayLabel != origDisplayLabel);
-        assertTrue(keyData.number != origNumber);
-        assertTrue(keyData.meta[0] != origMeta[0]);
-        assertTrue(keyData.meta[1] != origMeta[1]);
-        assertTrue(keyData.meta[2] != origMeta[2]);
-        assertTrue(keyData.meta[3] != origMeta[3]);
+        assertEquals('Z', keyData.displayLabel);
+        assertEquals(0, keyData.number);
+        assertEquals('z', keyData.meta[0]);
+        assertEquals('Z', keyData.meta[1]);
+        assertEquals(0, keyData.meta[2]);
+        assertEquals(0, keyData.meta[3]);
     }
 
     @TestTargetNew(
@@ -509,8 +502,6 @@ public class KeyEventTest extends AndroidTestCase {
         method = "getMatch",
         args = {char[].class}
     )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add NPE description in javadoc.")
     public void testGetMatch1() {
         char[] codes1 = new char[] { '0', '1', '2' };
         assertEquals('0', mKeyEvent.getMatch(codes1));
@@ -521,13 +512,6 @@ public class KeyEventTest extends AndroidTestCase {
         char[] codes3 = { '2', 'S' };
         mKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_S);
         assertEquals('S', mKeyEvent.getMatch(codes3));
-
-        try {
-            mKeyEvent.getMatch(null);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-            // empty
-        }
     }
 
     @TestTargetNew(
@@ -742,7 +726,7 @@ public class KeyEventTest extends AndroidTestCase {
         public boolean onKeyLongPress(int keyCode, KeyEvent event) {
             return false;
         }
-        
+
         public boolean onKeyMultiple(int keyCode, int count, KeyEvent event) {
             mIsMultiple = true;
             mKeyCode = keyCode;
