@@ -196,7 +196,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
     }
 
     public void testNfcFeatures() {
-        if (NfcAdapter.getDefaultAdapter() != null) {
+        if (NfcAdapter.getDefaultAdapter(mContext) != null) {
             assertAvailable(PackageManager.FEATURE_NFC);
         } else {
             assertNotAvailable(PackageManager.FEATURE_NFC);
