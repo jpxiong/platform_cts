@@ -148,26 +148,30 @@ public class CacheManager_CacheResultTest
         final long time = System.currentTimeMillis();
         loadUrl(url);
         CacheResult result = CacheManager.getCacheFile(url, null);
-        assertNotNull(result);
-        assertNotNull(result.getInputStream());
-        assertTrue(result.getContentLength() > 0);
-        assertNull(result.getETag());
-        assertEquals(time - age,
-                DateUtils.parseDate(result.getLastModified()).getTime(), tolerance);
-        File file = new File(CacheManager.getCacheFileBaseDir().getPath(), result.getLocalPath());
-        assertTrue(file.exists());
-        assertNull(result.getLocation());
-        assertEquals("text/html", result.getMimeType());
-        assertNull(result.getOutputStream());
-        assertEquals(time + validity, result.getExpires(), tolerance);
-        assertEquals(HttpStatus.SC_OK, result.getHttpStatusCode());
-        assertNotNull(result.getEncoding());
+        if (CacheManager.cacheDisabled()) {
+            assertNull(result);
+        } else {
+            assertNotNull(result);
+            assertNotNull(result.getInputStream());
+            assertTrue(result.getContentLength() > 0);
+            assertNull(result.getETag());
+            assertEquals(time - age,
+                    DateUtils.parseDate(result.getLastModified()).getTime(), tolerance);
+            File file = new File(CacheManager.getCacheFileBaseDir().getPath(), result.getLocalPath());
+            assertTrue(file.exists());
+            assertNull(result.getLocation());
+            assertEquals("text/html", result.getMimeType());
+            assertNull(result.getOutputStream());
+            assertEquals(time + validity, result.getExpires(), tolerance);
+            assertEquals(HttpStatus.SC_OK, result.getHttpStatusCode());
+            assertNotNull(result.getEncoding());
 
-        result.setEncoding("iso-8859-1");
-        assertEquals("iso-8859-1", result.getEncoding());
+            result.setEncoding("iso-8859-1");
+            assertEquals("iso-8859-1", result.getEncoding());
 
-        result.setInputStream(null);
-        assertNull(result.getInputStream());
+            result.setInputStream(null);
+            assertNull(result.getInputStream());
+        }
     }
 
     private void loadUrl(String url){
