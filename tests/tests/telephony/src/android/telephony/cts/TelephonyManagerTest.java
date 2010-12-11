@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Looper;
@@ -444,14 +445,26 @@ public class TelephonyManagerTest extends AndroidTestCase {
     private static final String ISO_COUNTRY_CODE_PATTERN = "[a-z]{2}";
 
     public void testGetNetworkCountryIso() {
+        PackageManager packageManager = getContext().getPackageManager();
         String countryCode = mTelephonyManager.getNetworkCountryIso();
-        assertTrue("Country code '" + countryCode + "' did not match " + ISO_COUNTRY_CODE_PATTERN,
-                Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            assertTrue("Country code '" + countryCode + "' did not match "
+                    + ISO_COUNTRY_CODE_PATTERN,
+                    Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+        } else {
+            assertEquals("", countryCode);
+        }
     }
 
     public void testGetSimCountryIso() {
+        PackageManager packageManager = getContext().getPackageManager();
         String countryCode = mTelephonyManager.getSimCountryIso();
-        assertTrue("Country code '" + countryCode + "' did not match " + ISO_COUNTRY_CODE_PATTERN,
-                Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            assertTrue("Country code '" + countryCode + "' did not match "
+                    + ISO_COUNTRY_CODE_PATTERN,
+                    Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
+        } else {
+            assertEquals("", countryCode);
+        }
     }
 }
