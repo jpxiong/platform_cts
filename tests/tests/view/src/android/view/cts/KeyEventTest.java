@@ -31,6 +31,8 @@ import android.view.KeyEvent;
 import android.view.KeyCharacterMap.KeyData;
 import android.view.KeyEvent.Callback;
 
+import junit.framework.Assert;
+
 /**
  * Test {@link KeyEvent}.
  */
@@ -288,6 +290,7 @@ public class KeyEventTest extends AndroidTestCase {
     public void testGetUnicodeChar1() {
         // 48 is Unicode character of '0'
         assertEquals(48, mKeyEvent.getUnicodeChar());
+
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_9, 5, 0);
         // 57 is Unicode character of '9'
@@ -310,6 +313,7 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(48, mKeyEvent.getUnicodeChar(MetaKeyKeyListener.META_CAP_LOCKED));
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_9, 5, 0);
+
         // 57 is Unicode character of '9'
         assertEquals(57, mKeyEvent.getUnicodeChar(0));
 
@@ -390,19 +394,203 @@ public class KeyEventTest extends AndroidTestCase {
         assertFalse(mKeyEvent.isAltPressed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isModifierKey(int)}",
-        method = "isModifierKey",
-        args = {int.class}
-    )
+    public void testGetModifierMetaStateMask() {
+        int mask = KeyEvent.getModifierMetaStateMask();
+        assertTrue((mask & KeyEvent.META_SHIFT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_SHIFT_LEFT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_SHIFT_RIGHT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_ALT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_ALT_LEFT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_ALT_RIGHT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_CTRL_ON) != 0);
+        assertTrue((mask & KeyEvent.META_CTRL_LEFT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_CTRL_RIGHT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_META_ON) != 0);
+        assertTrue((mask & KeyEvent.META_META_LEFT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_META_RIGHT_ON) != 0);
+        assertTrue((mask & KeyEvent.META_SYM_ON) != 0);
+        assertTrue((mask & KeyEvent.META_FUNCTION_ON) != 0);
+
+        assertFalse((mask & KeyEvent.META_CAPS_LOCK_ON) != 0);
+        assertFalse((mask & KeyEvent.META_NUM_LOCK_ON) != 0);
+        assertFalse((mask & KeyEvent.META_SCROLL_LOCK_ON) != 0);
+    }
+
     public void testIsModifierKey() {
         assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_SHIFT_LEFT));
         assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_SHIFT_RIGHT));
         assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_ALT_LEFT));
         assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_ALT_RIGHT));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_CTRL_LEFT));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_CTRL_RIGHT));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_META_LEFT));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_META_RIGHT));
         assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_SYM));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_NUM));
+        assertTrue(KeyEvent.isModifierKey(KeyEvent.KEYCODE_FUNCTION));
+
         assertFalse(KeyEvent.isModifierKey(KeyEvent.KEYCODE_0));
+    }
+
+    private static final int UNDEFINED_META_STATE = 0x80000000;
+
+    public void testNormalizeMetaState() {
+        // Already normalized values.
+        assertEquals(0, KeyEvent.normalizeMetaState(0));
+        assertEquals(KeyEvent.getModifierMetaStateMask(),
+                KeyEvent.normalizeMetaState(KeyEvent.getModifierMetaStateMask()));
+
+        // Values that require normalization.
+        assertEquals(KeyEvent.META_SHIFT_LEFT_ON | KeyEvent.META_SHIFT_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_SHIFT_LEFT_ON));
+        assertEquals(KeyEvent.META_SHIFT_RIGHT_ON | KeyEvent.META_SHIFT_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_SHIFT_RIGHT_ON));
+        assertEquals(KeyEvent.META_ALT_LEFT_ON | KeyEvent.META_ALT_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_ALT_LEFT_ON));
+        assertEquals(KeyEvent.META_ALT_RIGHT_ON | KeyEvent.META_ALT_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_ALT_RIGHT_ON));
+        assertEquals(KeyEvent.META_CTRL_LEFT_ON | KeyEvent.META_CTRL_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_CTRL_LEFT_ON));
+        assertEquals(KeyEvent.META_CTRL_RIGHT_ON | KeyEvent.META_CTRL_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_CTRL_RIGHT_ON));
+        assertEquals(KeyEvent.META_META_LEFT_ON | KeyEvent.META_META_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_META_LEFT_ON));
+        assertEquals(KeyEvent.META_META_RIGHT_ON | KeyEvent.META_META_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_META_RIGHT_ON));
+        assertEquals(KeyEvent.META_CAPS_LOCK_ON,
+                KeyEvent.normalizeMetaState(MetaKeyKeyListener.META_CAP_LOCKED));
+        assertEquals(KeyEvent.META_ALT_ON,
+                KeyEvent.normalizeMetaState(MetaKeyKeyListener.META_ALT_LOCKED));
+        assertEquals(KeyEvent.META_SYM_ON,
+                KeyEvent.normalizeMetaState(MetaKeyKeyListener.META_SYM_LOCKED));
+        assertEquals(KeyEvent.META_SHIFT_ON,
+                KeyEvent.normalizeMetaState(KeyEvent.META_SHIFT_ON | UNDEFINED_META_STATE));
+    }
+
+    public void testMetaStateHasNoModifiers() {
+        assertTrue(KeyEvent.metaStateHasNoModifiers(0));
+        assertTrue(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_CAPS_LOCK_ON));
+        assertTrue(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_NUM_LOCK_ON));
+        assertTrue(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_SCROLL_LOCK_ON));
+
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_SHIFT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_SHIFT_LEFT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_SHIFT_RIGHT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_ALT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_ALT_LEFT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_ALT_RIGHT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_CTRL_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_CTRL_LEFT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_CTRL_RIGHT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_META_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_META_LEFT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_META_RIGHT_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_SYM_ON));
+        assertFalse(KeyEvent.metaStateHasNoModifiers(KeyEvent.META_FUNCTION_ON));
+    }
+
+    public void testMetaStateHasModifiers() {
+        assertTrue(KeyEvent.metaStateHasModifiers(0, 0));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_NUM_LOCK_ON | KeyEvent.META_CAPS_LOCK_ON
+                        | KeyEvent.META_SCROLL_LOCK_ON, 0));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_LEFT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_SHIFT_LEFT_ON | KeyEvent.META_SHIFT_RIGHT_ON,
+                KeyEvent.META_SHIFT_LEFT_ON | KeyEvent.META_SHIFT_RIGHT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_LEFT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_NUM_LOCK_ON | KeyEvent.META_CAPS_LOCK_ON
+                        | KeyEvent.META_SCROLL_LOCK_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_LEFT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_ON | KeyEvent.META_ALT_RIGHT_ON,
+                KeyEvent.META_ALT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_LEFT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_CTRL_RIGHT_ON | KeyEvent.META_META_LEFT_ON,
+                KeyEvent.META_CTRL_RIGHT_ON | KeyEvent.META_META_ON));
+        assertTrue(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_SYM_ON | KeyEvent.META_FUNCTION_ON | KeyEvent.META_CAPS_LOCK_ON,
+                KeyEvent.META_SYM_ON | KeyEvent.META_FUNCTION_ON));
+
+        assertFalse(KeyEvent.metaStateHasModifiers(0, KeyEvent.META_SHIFT_ON));
+        assertFalse(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_ON));
+        assertFalse(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_LEFT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_ON));
+        assertFalse(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_LEFT_ON,
+                KeyEvent.META_ALT_RIGHT_ON));
+        assertFalse(KeyEvent.metaStateHasModifiers(
+                KeyEvent.META_ALT_LEFT_ON,
+                KeyEvent.META_CTRL_LEFT_ON));
+
+        final int[] invalidModifiers = new int[] {
+                KeyEvent.META_CAPS_LOCK_ON,
+                KeyEvent.META_NUM_LOCK_ON,
+                KeyEvent.META_SCROLL_LOCK_ON,
+                MetaKeyKeyListener.META_CAP_LOCKED,
+                MetaKeyKeyListener.META_ALT_LOCKED,
+                MetaKeyKeyListener.META_SYM_LOCKED,
+                KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_LEFT_ON,
+                KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_RIGHT_ON,
+                KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_LEFT_ON| KeyEvent.META_SHIFT_RIGHT_ON,
+                KeyEvent.META_ALT_ON | KeyEvent.META_ALT_LEFT_ON,
+                KeyEvent.META_ALT_ON | KeyEvent.META_ALT_RIGHT_ON,
+                KeyEvent.META_ALT_ON | KeyEvent.META_ALT_LEFT_ON| KeyEvent.META_ALT_RIGHT_ON,
+                KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_LEFT_ON,
+                KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_RIGHT_ON,
+                KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_LEFT_ON| KeyEvent.META_CTRL_RIGHT_ON,
+                KeyEvent.META_META_ON | KeyEvent.META_META_LEFT_ON,
+                KeyEvent.META_META_ON | KeyEvent.META_META_RIGHT_ON,
+                KeyEvent.META_META_ON | KeyEvent.META_META_LEFT_ON| KeyEvent.META_META_RIGHT_ON,
+        };
+        for (int modifiers : invalidModifiers) {
+            try {
+                KeyEvent.metaStateHasModifiers(0, modifiers);
+                Assert.fail("Expected IllegalArgumentException");
+            } catch (IllegalArgumentException ex) {
+            }
+        }
+
+        assertFalse(KeyEvent.metaStateHasModifiers(0, UNDEFINED_META_STATE));
+    }
+
+    public void testHasNoModifiers() {
+        KeyEvent ev = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_A, 0, KeyEvent.META_CAPS_LOCK_ON);
+        assertTrue(ev.hasNoModifiers());
+
+        ev = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_A, 0, KeyEvent.META_CAPS_LOCK_ON | KeyEvent.META_SHIFT_ON);
+        assertFalse(ev.hasNoModifiers());
+    }
+
+    public void testHasModifiers() {
+        KeyEvent ev = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_A, 0, KeyEvent.META_CAPS_LOCK_ON);
+        assertTrue(ev.hasModifiers(0));
+
+        ev = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_A, 0, KeyEvent.META_CAPS_LOCK_ON | KeyEvent.META_SHIFT_ON);
+        assertTrue(ev.hasModifiers(KeyEvent.META_SHIFT_ON));
+
+        ev = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_A, 0,
+                KeyEvent.META_CAPS_LOCK_ON | KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_RIGHT_ON);
+        assertFalse(ev.hasModifiers(KeyEvent.META_SHIFT_LEFT_ON));
     }
 
     @TestTargetNew(
