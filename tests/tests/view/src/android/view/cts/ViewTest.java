@@ -4011,8 +4011,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             args = {}
         )
     })
-    @ToBeFixed(bug = "", explanation = "when scrollbar is with INSET style, the bottom padding" +
-            "should be increased.")
     @UiThreadTest
     public void testScrollbarStyle() {
         MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
@@ -4037,8 +4035,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
         assertEquals(View.SCROLLBARS_INSIDE_INSET, view.getScrollBarStyle());
         assertEquals(verticalScrollBarWidth, view.getPaddingRight());
-        // issue, mockView.getPaddingBottom() is expected to equal horizontalScrollBarHeight.
-        assertEquals(0, view.getPaddingBottom());
+        assertEquals(horizontalScrollBarHeight, view.getPaddingBottom());
 
         view.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         assertEquals(View.SCROLLBARS_OUTSIDE_OVERLAY, view.getScrollBarStyle());
@@ -4048,8 +4045,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
         assertEquals(View.SCROLLBARS_OUTSIDE_INSET, view.getScrollBarStyle());
         assertEquals(verticalScrollBarWidth, view.getPaddingRight());
-        // issue, mockView.getPaddingBottom() is expected to equal horizontalScrollBarHeight.
-        assertEquals(0, view.getPaddingBottom());
+        assertEquals(horizontalScrollBarHeight, view.getPaddingBottom());
 
         // TODO: how to get the position of the Scrollbar to assert it is inside or outside.
     }
