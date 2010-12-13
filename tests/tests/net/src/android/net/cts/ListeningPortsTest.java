@@ -67,7 +67,7 @@ public class ListeningPortsTest extends TestCase {
         assertNoListeningUdpPorts("/proc/net/udp6");
     }
 
-    private static final int RETRIES_MAX = 4;
+    private static final int RETRIES_MAX = 6;
 
     /**
      * UDP tests can be flaky due to DNS lookups.  Compensate.
