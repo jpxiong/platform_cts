@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 public class ListeningPortsTest extends TestCase {
@@ -50,12 +51,40 @@ public class ListeningPortsTest extends TestCase {
         EXCEPTION_PATTERNS.add("[0]{16}[F]{4}[0]{4}[0-9A-F]{6}7F:[0-9A-F]{4}"); // IPv4-6 Conversion
     }
 
-    public static void testNoListeningPorts() {
-        final boolean isTcp = true;
-        assertNoListeningPorts("/proc/net/tcp", isTcp);
-        assertNoListeningPorts("/proc/net/tcp6", isTcp);
-        assertNoListeningPorts("/proc/net/udp", !isTcp);
-        assertNoListeningPorts("/proc/net/udp6", !isTcp);
+    public void testNoListeningTcpPorts() {
+        assertNoListeningPorts("/proc/net/tcp", true);
+    }
+
+    public void testNoListeningTcp6Ports() {
+        assertNoListeningPorts("/proc/net/tcp6", true);
+    }
+
+    public void testNoListeningUdpPorts() throws Exception {
+        assertNoListeningUdpPorts("/proc/net/udp");
+    }
+
+    public void testNoListeningUdp6Ports() throws Exception {
+        assertNoListeningUdpPorts("/proc/net/udp6");
+    }
+
+    private static final int RETRIES_MAX = 4;
+
+    /**
+     * UDP tests can be flaky due to DNS lookups.  Compensate.
+     */
+    private static void assertNoListeningUdpPorts(String procFilePath) throws Exception {
+        for (int i = 0; i < RETRIES_MAX; i++) {
+            try {
+                assertNoListeningPorts(procFilePath, false);
+                return;
+            } catch (ListeningPortsAssertionError e) {
+                if (i == RETRIES_MAX - 1) {
+                    throw e;
+                }
+                Thread.sleep(2 * 1000 * i);
+            }
+        }
+        throw new IllegalStateException("unreachable");
     }
 
     private static void assertNoListeningPorts(String procFilePath, boolean isTcp) {
@@ -94,7 +123,8 @@ public class ListeningPortsTest extends TestCase {
                         isAddress(localAddress));
 
                 if (!isException(localAddress) && isPortListening(state, isTcp)) {
-                    fail("Found port listening on " + localAddress + " in " + procFilePath);
+                    throw new ListeningPortsAssertionError(
+                            "Found port listening on " + localAddress + " in " + procFilePath);
                 }
             }
         } catch (FileNotFoundException notFound) {
@@ -127,5 +157,11 @@ public class ListeningPortsTest extends TestCase {
         // 0A = TCP_LISTEN from include/net/tcp_states.h
         String listeningState = isTcp ? "0A" : "07";
         return listeningState.equals(state);
+    }
+
+    private static class ListeningPortsAssertionError extends AssertionFailedError {
+        private ListeningPortsAssertionError(String msg) {
+            super(msg);
+        }
     }
 }
