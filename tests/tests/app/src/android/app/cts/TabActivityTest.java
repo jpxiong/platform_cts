@@ -30,7 +30,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.test.InstrumentationTestCase;
-import android.view.KeyEvent;
 import android.widget.TabHost;
 
 @TestTargetClass(TabActivity.class)
@@ -132,21 +131,6 @@ public class TabActivityTest extends InstrumentationTestCase {
         final TabHost tabHost = mActivity.getTabHost();
         assertNotNull(tabHost);
         assertNotNull(tabHost.getTabWidget());
-
-        // Test onSaveInstanceState
-        assertFalse(mActivity.isOnSaveInstanceStateCalled);
-        final Intent embedded = new Intent(mInstrumentation.getTargetContext(),
-                ChildTabActivity.class);
-        mActivity.startActivity(embedded);
-        mInstrumentation.waitForIdleSync();
-        assertTrue(mActivity.isOnSaveInstanceStateCalled);
-
-        // Test onRestoreInstanceState
-        sendKeys(KeyEvent.KEYCODE_BACK);
-        mInstrumentation.waitForIdleSync();
-        assertFalse(MockTabActivity.isOnRestoreInstanceStateCalled);
-        OrientationTestUtils.toggleOrientationSync(mActivity, mInstrumentation);
-        assertTrue(MockTabActivity.isOnRestoreInstanceStateCalled);
     }
 
     @TestTargetNew(
