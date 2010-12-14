@@ -541,7 +541,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "addJavascriptInterface",
         args = {Object.class, String.class}
     )
-    public void testAddJavascriptInterfaceNull() throws Exception {
+    public void testAddJavascriptInterfaceNullObject() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         String setTitleToPropertyTypeHtml = "<html><head></head>" +
@@ -570,6 +570,47 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
         assertEquals("object", mWebView.getTitle());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "addJavascriptInterface",
+            args = {Object.class, String.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "removeJavascriptInterface",
+            args = {String.class}
+        )
+    })
+    public void testAddJavascriptInterfaceOddName() throws Exception {
+        WebSettings settings = mWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+
+        // We should be able to use any character other than a single quote.
+        // TODO: We currently fail when the name contains '#', '\', '\n' or '\r'.
+        // See b/3279426
+        //String oddNames[] = {" x y ", "`!\"$%^&*()-=_+[]{};#:@~\\|,./<>?\n\r ", " ", "\n", ""};
+        String oddNames[] = {" x y ", "`!\"$%^&*()-=_+[]{};:@~|,./<>? ", " ", ""};
+        for (String name : oddNames) {
+            String setTitleToPropertyTypeHtml = "<html><head>" +
+                    "<script>function updateTitle() { document.title = typeof window['" +
+                    name +
+                    "']; }</script>" +
+                    "</head><body onload=\"updateTitle();\"></body></html>";
+
+            mWebView.addJavascriptInterface(obj, name);
+            mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+            waitForLoadComplete(mWebView, TEST_TIMEOUT);
+            assertEquals("object", mWebView.getTitle());
+
+            mWebView.removeJavascriptInterface(name);
+            mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+            waitForLoadComplete(mWebView, TEST_TIMEOUT);
+            assertEquals("undefined", mWebView.getTitle());
+        }
     }
 
     @TestTargetNew(
