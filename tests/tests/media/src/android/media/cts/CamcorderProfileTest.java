@@ -124,7 +124,7 @@ public class CamcorderProfileTest extends AndroidTestCase {
             case CamcorderProfile.QUALITY_TIME_LAPSE_480P:
                 assertTrue(720 == profile.videoFrameWidth ||  // SMPTE 293M/ITU-R Rec. 601
                            640 == profile.videoFrameWidth ||  // ATSC/NTSC (square sampling)
-                           704 == profile.videoFrameWdith);   // ATSC/NTSC (non-square sampling)
+                           704 == profile.videoFrameWidth);   // ATSC/NTSC (non-square sampling)
                 assertEquals(480, profile.videoFrameHeight);
                 break;
 
