@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
@@ -71,9 +72,15 @@ public class NoReceiveSmsPermissionTest extends AndroidTestCase {
                 Log.w(LOG_TAG, "wait for sms interrupted");
             }
         }
-        assertTrue("Sms not sent successfully, test environment problem?",
-                receiver.isMessageSent());
-        assertFalse("Sms received without proper permissions", receiver.isSmsReceived());
+
+        PackageManager packageManager = getContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            assertTrue("Sms not sent successfully, test environment problem?",
+                    receiver.isMessageSent());
+            assertFalse("Sms received without proper permissions", receiver.isSmsReceived());
+        } else {
+            assertFalse(receiver.isMessageSent());
+        }
     }
 
     private void sendSMSToSelf() {

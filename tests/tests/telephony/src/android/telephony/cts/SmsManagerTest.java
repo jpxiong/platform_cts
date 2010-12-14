@@ -16,23 +16,25 @@
 
 package android.telephony.cts;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
-import android.telephony.TelephonyManager;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests for {@link android.telephony.SmsManager}.
@@ -126,6 +128,8 @@ public class SmsManagerTest extends AndroidTestCase {
         )
     })
     public void testSendMessages() throws InterruptedException {
+        PackageManager packageManager = getContext().getPackageManager();
+        boolean hasTelephony = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
 
         mSendIntent = new Intent(SMS_SEND_ACTION);
         mDeliveryIntent = new Intent(SMS_DELIVERY_ACTION);
@@ -144,7 +148,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendTextMessage(mDestAddr, mDestAddr, mSentIntent, mDeliveredIntent);
         assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(1, TIME_OUT));
         }
 
         if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
@@ -160,7 +164,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
         assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(1, TIME_OUT));
         }
 
         // send multi parts text sms
@@ -176,7 +180,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendMultiPartTextMessage(mDestAddr, parts, sentIntents, deliveryIntents);
         assertTrue(mSendReceiver.waitForCalls(numParts, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertTrue(mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
+            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
         }
     }
 
