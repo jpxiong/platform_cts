@@ -452,7 +452,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
                     + ISO_COUNTRY_CODE_PATTERN,
                     Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
         } else {
-            assertEquals("", countryCode);
+            // Non-telephony may still have the property defined if it has a SIM.
         }
     }
 
@@ -464,7 +464,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
                     + ISO_COUNTRY_CODE_PATTERN,
                     Pattern.matches(ISO_COUNTRY_CODE_PATTERN, countryCode));
         } else {
-            assertEquals("", countryCode);
+            // Non-telephony may still have the property defined if it has a SIM.
         }
     }
 }
