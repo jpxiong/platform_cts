@@ -184,20 +184,20 @@ public class LaunchpadActivity extends Activity {
             });
         } else if (LIFECYCLE_SCREEN.equals(action)) {
             addPossibleLifecycle(LIFECYCLE_SCREEN + "_RESTART", new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE,
+                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_PAUSE,
                     ON_RESTART, ON_START, ON_RESUME, DO_FINISH, ON_PAUSE
             });
             addPossibleLifecycle(LIFECYCLE_SCREEN + "_RESUME", new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_FREEZE, ON_PAUSE,
+                    ON_START, ON_RESUME, DO_LOCAL_SCREEN, ON_PAUSE,
                     ON_RESUME, DO_FINISH, ON_PAUSE
             });
         } else if (LIFECYCLE_DIALOG.equals(action)) {
             addPossibleLifecycle(LIFECYCLE_DIALOG + "_RESTART", new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE,
+                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_PAUSE,
                     ON_RESTART, ON_START, ON_RESUME, DO_FINISH, ON_PAUSE
             });
             addPossibleLifecycle(LIFECYCLE_DIALOG + "_RESUME", new String[] {
-                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_FREEZE, ON_PAUSE,
+                    ON_START, ON_RESUME, DO_LOCAL_DIALOG, ON_PAUSE,
                     ON_RESUME, DO_FINISH, ON_PAUSE
             });
         }
@@ -399,7 +399,6 @@ public class LaunchpadActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle icicle) {
         super.onSaveInstanceState(icicle);
-        checkLifecycle(ON_FREEZE);
         if (mBadParcelable) {
             icicle.putParcelable("baddy", new MyBadParcelable());
         }
@@ -451,13 +450,15 @@ public class LaunchpadActivity extends Activity {
 
         do {
             if (mExpectedLifecycle[mNextLifecycle].equals(where)) {
+                Log.w(TAG, "Matched: " + where);
                 break;
+            } else {
+                Log.w(TAG, "Expected " + mExpectedLifecycle[mNextLifecycle] + " but got " + where);
             }
         } while (switchToNextPossibleLifecycle());
 
         if (mExpectedLifecycle == null) {
             finishBad("Activity lifecycle for " + action + " incorrect: received " + where
-                    + " but expected " + mExpectedLifecycle[mNextLifecycle]
                     + " at " + mNextLifecycle);
             return;
         }
