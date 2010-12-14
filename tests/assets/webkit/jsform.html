@@ -24,7 +24,7 @@
             }
         }
     </script>
-    <body onload="fireSubmit()">
+    <body onload="window.setTimeout(function() { fireSubmit(); }, 0);">
         javascript form test
         <form id="formId" action="test.html#result" method="post">
             <input type="hidden" name="foo" value="bar" />
