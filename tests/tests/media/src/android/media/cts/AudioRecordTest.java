@@ -18,6 +18,7 @@ package android.media.cts;
 
 import java.nio.ByteBuffer;
 
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -40,6 +41,7 @@ public class AudioRecordTest extends AndroidTestCase {
     private boolean mIsOnPeriodicNotificationCalled;
     private boolean mIsHandleMessageCalled;
     private Looper mLooper;
+    private int MAX_RECORD_START_TIME_MS = 100;
 
     @Override
     protected void setUp() throws Exception {
@@ -228,6 +230,9 @@ public class AudioRecordTest extends AndroidTestCase {
         final int RECORD_TIME = 10000;
         assertEquals(AudioRecord.STATE_INITIALIZED, mAudioRecord.getState());
 
+        PackageManager pm = getContext().getPackageManager();
+        boolean isLowLatency = pm.hasSystemFeature(PackageManager.FEATURE_AUDIO_LOW_LATENCY);
+
         int markerInFrames = mAudioRecord.getSampleRate() / 2;
         assertEquals(AudioRecord.SUCCESS,
                 mAudioRecord.setNotificationMarkerPosition(markerInFrames));
@@ -253,6 +258,10 @@ public class AudioRecordTest extends AndroidTestCase {
         byte[] byteData = new byte[BUFFER_SIZE];
         long time = System.currentTimeMillis();
         mAudioRecord.startRecording();
+        if (isLowLatency) {
+            assertTrue("Record start time too long",
+                    (System.currentTimeMillis() - time) < MAX_RECORD_START_TIME_MS);
+        }
         assertEquals(AudioRecord.RECORDSTATE_RECORDING, mAudioRecord.getRecordingState());
         while (System.currentTimeMillis() - time < RECORD_TIME) {
             Thread.sleep(SLEEP_TIME);
