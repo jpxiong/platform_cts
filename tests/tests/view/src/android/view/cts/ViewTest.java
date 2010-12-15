@@ -46,9 +46,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.Xml;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.Display;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -56,6 +55,11 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManagerImpl;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -63,10 +67,6 @@ import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.WindowManagerImpl;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.cts.DelayedCheck;
@@ -2681,8 +2681,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.setFocusable(true);
+                view.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
+        assertTrue(view.isFocused());
 
         KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU);
         getInstrumentation().sendKeySync(event);
@@ -3082,8 +3085,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.setFocusable(true);
+                view.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
+        assertTrue(view.isFocused());
 
         KeyEvent event = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
         getInstrumentation().sendKeySync(event);
