@@ -29,6 +29,7 @@ import android.app.QueuedWork;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -317,4 +318,30 @@ public class SharedPreferencesTest extends AndroidTestCase {
         }
     }
 
+    public void testModeMultiProcess() {
+        // Pre-load it.
+        mContext.getSharedPreferences("multiprocessTest", 0);
+
+        final StrictMode.ThreadPolicy oldPolicy = StrictMode.getThreadPolicy();
+        try {
+            StrictMode.ThreadPolicy diskReadDeath =
+                    new StrictMode.ThreadPolicy.Builder().detectDiskReads().penaltyDeath().build();
+            StrictMode.setThreadPolicy(diskReadDeath);
+
+            // This shouldn't hit disk.  (it was already pre-loaded above)
+            mContext.getSharedPreferences("multiprocessTest", 0);
+
+            boolean didRead = false;
+            // This SHOULD hit disk.  (multi-process flag is set)
+            try {
+                mContext.getSharedPreferences("multiprocessTest", Context.MODE_MULTI_PROCESS);
+                fail();  // we shouldn't get here.
+            } catch (StrictMode.StrictModeViolation e) {
+                didRead = true;
+            }
+            assertTrue(didRead);
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
+        }
+    }
 }
