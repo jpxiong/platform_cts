@@ -2029,10 +2029,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setMeasuredDimensionWrapper(20, 30);
         assertEquals(20, view.getMeasuredWidth());
         assertEquals(30, view.getMeasuredHeight());
-
-        view.setMeasuredDimensionWrapper(-20, -30);
-        assertEquals(-20, view.getMeasuredWidth());
-        assertEquals(-30, view.getMeasuredHeight());
     }
 
     @TestTargets({
