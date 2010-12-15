@@ -113,9 +113,12 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mDialerFilter.setMode(DialerFilter.DIGITS_ONLY);
+                mDialerFilter.requestFocus();
             }
         });
         mInstrumentation.waitForIdleSync();
+
+        assertTrue(mDialerFilter.hasFocus());
 
         mInstrumentation.sendStringSync("123");
         assertEquals("", mDialerFilter.getLetters().toString());
