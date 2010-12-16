@@ -482,13 +482,14 @@ public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingV
         mSymbolTextView.setText(ARGENTINA_SYMBOL);
         mWarningTextView.setVisibility(View.VISIBLE);
 
+        assertTrue(mEditText.requestFocus());
         assertTrue(mEditText.hasFocus());
         assertFalse(mButtonOk.hasFocus());
         assertFalse(mButtonCancel.hasFocus());
         assertFalse(mSymbolTextView.hasFocus());
         assertFalse(mWarningTextView.hasFocus());
 
-        assertFalse(editListener.hasFocus());
+        assertTrue(editListener.hasFocus());
         assertFalse(okListener.hasFocus());
         assertFalse(cancelListener.hasFocus());
         assertFalse(symbolListener.hasFocus());
