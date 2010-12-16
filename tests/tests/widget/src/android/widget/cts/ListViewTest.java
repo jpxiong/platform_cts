@@ -16,9 +16,14 @@
 
 package android.widget.cts;
 
-import java.util.List;
+import com.android.cts.stub.R;
+import com.google.android.collect.Lists;
 
-import junit.framework.Assert;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -44,14 +49,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.android.cts.stub.R;
-import com.google.android.collect.Lists;
+import java.util.List;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import junit.framework.Assert;
 
 @TestTargetClass(ListView.class)
 public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
@@ -721,9 +721,11 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setAdapter(mAdapter_countries);
+                mListView.requestFocus();
             }
         });
         mInstrumentation.waitForIdleSync();
+        assertTrue(mListView.hasFocus());
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
