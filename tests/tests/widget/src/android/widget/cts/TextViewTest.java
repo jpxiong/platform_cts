@@ -111,7 +111,10 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private static final String LONG_TEXT = "This is a really long string which exceeds "
-            + "the width of the view.";
+            + "the width of the view. New devices have a much larger screen which "
+            + "actually enables long strings to be displayed with no fading. "
+            + "I have made this string longer to fix this case. If you are correcting "
+            + "this text, I would love to see the kind of devices you guys now use!";
     private static final long TIMEOUT = 5000;
     private CharSequence mTransformedText;
 
