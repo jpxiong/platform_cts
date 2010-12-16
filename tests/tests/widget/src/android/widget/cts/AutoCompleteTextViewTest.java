@@ -16,7 +16,13 @@
 
 package android.widget.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -39,13 +45,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.AutoCompleteTextView.Validator;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(AutoCompleteTextView.class)
 public class AutoCompleteTextViewTest extends
@@ -499,8 +499,6 @@ public class AutoCompleteTextViewTest extends
         // Set Threshold to 4 characters
         mAutoCompleteTextView.setThreshold(4);
 
-        inflatePopup();
-        assertTrue(mAutoCompleteTextView.isPopupShowing());
         String testString = "tes";
         // Test the filter if the input string is not long enough to threshold
         runTestOnUiThread(new Runnable() {
@@ -515,8 +513,6 @@ public class AutoCompleteTextViewTest extends
         // onFilterComplete will close the popup.
         assertFalse(mAutoCompleteTextView.isPopupShowing());
 
-        inflatePopup();
-        assertTrue(mAutoCompleteTextView.isPopupShowing());
         testString = "that";
         mInstrumentation.sendStringSync(testString);
         assertFalse(mAutoCompleteTextView.isPopupShowing());
@@ -555,11 +551,16 @@ public class AutoCompleteTextViewTest extends
             public void run() {
                 mAutoCompleteTextView.setAdapter(mAdapter);
                 mAutoCompleteTextView.setValidator(mValidator);
-                mAutoCompleteTextView.setAdapter(mAdapter);
+
+                mAutoCompleteTextView.setText("test");
+                mAutoCompleteTextView.setFocusable(true);
+                mAutoCompleteTextView.requestFocus();
+                mAutoCompleteTextView.showDropDown();
             }
         });
-        inflatePopup();
+        mInstrumentation.waitForIdleSync();
         assertTrue(mAutoCompleteTextView.isPopupShowing());
+
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
         // KeyBack will close the popup.
         assertFalse(mAutoCompleteTextView.isPopupShowing());
@@ -972,18 +973,6 @@ public class AutoCompleteTextViewTest extends
         protected int getAfter() {
             return mAfter;
         }
-    }
-
-    private void inflatePopup() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mAutoCompleteTextView.setText("");
-                mAutoCompleteTextView.setFocusable(true);
-                mAutoCompleteTextView.requestFocus();
-                mAutoCompleteTextView.showDropDown();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
     }
 
     private static class MockFilter extends Filter {
