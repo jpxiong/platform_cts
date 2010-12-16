@@ -16,6 +16,14 @@
 
 package android.widget.cts;
 
+import com.android.cts.stub.R;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
@@ -44,14 +52,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
-
 /**
  * Test {@link GridView}.
  */
@@ -72,7 +72,6 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
         mGridView = null;
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
@@ -310,6 +309,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     )
     public void testSetHorizontalSpacing() {
         mGridView = findGridViewById(R.id.gridview);
+        mGridView.setStretchMode(GridView.NO_STRETCH);
         // Number of columns should be big enough, otherwise the
         // horizontal spacing cannot be correctly verified.
         mGridView.setNumColumns(20);
@@ -531,7 +531,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             assertEquals(0, child.getLeft() - mGridView.getListPaddingLeft());
         }
     }
-    
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         notes = "Test {@link GridView#getNumColumns()}",
@@ -539,11 +539,11 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
     )
     public void testGetNumColumns() {
         mGridView = new GridView(mActivity);
-        
+
         assertEquals(mGridView.getNumColumns(), GridView.AUTO_FIT);
-        
+
         mGridView = findGridViewById(R.id.gridview);
-        
+
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mGridView.setAdapter(new MockGridViewAdapter(10));
@@ -551,7 +551,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             }
         });
         mInstrumentation.waitForIdleSync();
-        
+
         assertEquals(mGridView.getNumColumns(), 10);
 
         mActivity.runOnUiThread(new Runnable() {
@@ -560,7 +560,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             }
         });
         mInstrumentation.waitForIdleSync();
-        
+
         assertEquals(mGridView.getNumColumns(), 1);
 
         mActivity.runOnUiThread(new Runnable() {
@@ -569,7 +569,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
             }
         });
         mInstrumentation.waitForIdleSync();
-        
+
         //although setNumColumns(0) was called, the number of columns should be 1
         assertEquals(mGridView.getNumColumns(), 1);
     }
