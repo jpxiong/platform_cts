@@ -22,6 +22,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.net.http.Headers;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
@@ -91,7 +92,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
             args = {String.class, Map.class}
         ),
         @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
+            level = TestLevel.SUFFICIENT,
             method = "saveCacheFile",
             args = {String.class, CacheResult.class}
         )
@@ -109,7 +110,18 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
             }
         }.run();
 
-        loadUrl(url);
+        CacheResult expected = CacheManager.createCacheFile(
+            url, 200, new Headers(), "text/plain", true);
+        if (CacheManager.cacheDisabled()) {
+            assertNull(expected);
+        } else {
+            assertNotNull(expected);
+            // Minor hack: the cache entry will be discarded unless it has a non-zero length.
+            // When using the Apache HTTP stack this field is updated by WebViewWorker, but
+            // we want this CTS test to apply to both the Apache and Chrome HTTP stacks.
+            expected.setContentLength(100);
+            CacheManager.saveCacheFile(url, expected);
+        }
         new DelayedCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
@@ -123,10 +135,6 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
                 }
             }
         }.run();
-
-        // Can not test saveCacheFile(), because the output stream is null and
-        // saveCacheFile() will throw a NullPointerException.  There is no
-        // public API to set the output stream.
     }
 
     private void loadUrl(String url){
