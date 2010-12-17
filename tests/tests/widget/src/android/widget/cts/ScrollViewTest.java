@@ -658,6 +658,7 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
     @UiThreadTest
     public void testRequestChildRectangleOnScreen() {
         mScrollView.setSmoothScrollingEnabled(false);
+        mScrollView.setVerticalFadingEdgeEnabled(true);
         int edge = mScrollView.getVerticalFadingEdgeLength();
 
         View child = mScrollView.findViewById(R.id.first_child);
