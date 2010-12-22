@@ -157,7 +157,8 @@ public class CamcorderProfileTest extends AndroidTestCase {
 
         for (int i = 0; i < specificQualities.length; i++) {
             int quality = specificQualities[i];
-            if (CamcorderProfile.hasProfile(quality)) {
+            if ((cameraId != -1 && CamcorderProfile.hasProfile(cameraId, quality)) ||
+                (cameraId == -1 && CamcorderProfile.hasProfile(quality))) {
                 CamcorderProfile profile = getWithOptionalId(quality, cameraId);
                 checkSpecificProfileDimensions(profile, quality);
 
