@@ -62,11 +62,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         args = {}
     )
     public void testGetCacheFileBaseDir() {
-        if (CacheManager.cacheDisabled()) {
-            assertNull(CacheManager.getCacheFileBaseDir());
-        } else {
-            assertTrue(CacheManager.getCacheFileBaseDir().exists());
-        }
+        assertTrue(CacheManager.getCacheFileBaseDir().exists());
     }
 
     @TestTargets({
