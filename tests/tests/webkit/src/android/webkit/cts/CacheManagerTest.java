@@ -122,15 +122,21 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
-                if (CacheManager.cacheDisabled()) {
-                    // Cache is disabled, so the URL should not have been added.
-                    return result == null;
-                } else {
-                    // Cache enabled, so the last URL loaded should be there.
-                    return result != null;
-                }
+                return result != null;
             }
         }.run();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.PARTIAL,
+        method = "cacheDisabled",
+        args = {}
+    )
+    public void testCacheDisabled() {
+        assertFalse(CacheManager.cacheDisabled());
+
+        // Because setCacheDisabled is package private, we can not call it.
+        // cacheDisabled() always return false. How to let it return true?
     }
 
     private void loadUrl(String url){
