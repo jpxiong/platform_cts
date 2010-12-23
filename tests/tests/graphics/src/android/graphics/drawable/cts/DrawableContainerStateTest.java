@@ -241,8 +241,8 @@ public class DrawableContainerStateTest extends TestCase{
     })
     public void testConstantHeightsAndWidths() {
         assertEquals(0, mDrawableContainerState.getChildCount());
-        assertEquals(0, mDrawableContainerState.getConstantHeight());
-        assertEquals(0, mDrawableContainerState.getConstantWidth());
+        assertEquals(-1, mDrawableContainerState.getConstantHeight());
+        assertEquals(-1, mDrawableContainerState.getConstantWidth());
         assertEquals(0, mDrawableContainerState.getConstantMinimumHeight());
         assertEquals(0, mDrawableContainerState.getConstantMinimumWidth());
 
