@@ -16,20 +16,22 @@
 
 package android.telephony.cts;
 
-import java.util.ArrayList;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.telephony.TelephonyManager;
+import android.content.pm.PackageManager;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+
+import java.util.ArrayList;
 
 /**
  * Tests for {@link android.telephony.SmsManager}.
@@ -104,6 +106,10 @@ public class SmsManagerTest extends AndroidTestCase {
         )
     })
     public void testSendMessages() throws InterruptedException {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
 
         mSendIntent = new Intent(SMS_SEND_ACTION);
         mDeliveryIntent = new Intent(SMS_DELIVERY_ACTION);
