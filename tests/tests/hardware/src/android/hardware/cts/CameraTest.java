@@ -595,6 +595,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // If camera supports flash, the default flash mode must be off.
         String flashMode = parameters.getFlashMode();
         assertTrue(flashMode == null || flashMode.equals(parameters.FLASH_MODE_OFF));
+        String wb = parameters.getWhiteBalance();
+        assertTrue(wb == null || wb.equals(parameters.WHITE_BALANCE_AUTO));
+        String effect = parameters.getColorEffect();
+        assertTrue(effect == null || effect.equals(parameters.EFFECT_NONE));
 
         // Some parameters must be supported.
         List<Size> previewSizes = parameters.getSupportedPreviewSizes();
