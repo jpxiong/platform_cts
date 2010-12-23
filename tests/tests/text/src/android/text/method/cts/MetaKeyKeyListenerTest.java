@@ -29,6 +29,7 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.method.DateKeyListener;
 import android.text.method.MetaKeyKeyListener;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -426,9 +427,10 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
         args = {long.class, int.class, KeyEvent.class}
     )
     public void testHandleKeyDown() {
+        KeyEvent fullEvent = new KeyEvent(0, 0, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT,
+                0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0);
         long state = MetaKeyKeyListener.handleKeyDown(MetaKeyKeyListener.META_CAP_LOCKED,
-                KeyEvent.KEYCODE_SHIFT_LEFT,
-                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT));
+                KeyEvent.KEYCODE_SHIFT_LEFT, fullEvent);
         assertEquals(0, state);
     }
 
@@ -438,10 +440,11 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
         args = {long.class, int.class, KeyEvent.class}
     )
     public void testHandleKeyUp() {
+        KeyEvent fullEvent = new KeyEvent(0, 0, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT,
+                0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0);
         long state = MetaKeyKeyListener.handleKeyUp(MetaKeyKeyListener.META_CAP_LOCKED,
-                KeyEvent.KEYCODE_SHIFT_LEFT,
-                new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT));
-        assertEquals(MetaKeyKeyListener.META_CAP_LOCKED, state);
+                KeyEvent.KEYCODE_SHIFT_LEFT, fullEvent);
+        assertEquals(0, state);
     }
 
     private class MockMetaKeyKeyListener extends MetaKeyKeyListener {
