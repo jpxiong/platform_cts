@@ -21,19 +21,28 @@ import dalvik.annotation.TestTargetClass;
 import android.os.Build;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 @TestTargetClass(Build.VERSION.class)
 public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
-    private static final String EXPECTED_RELEASE = "2.2.1";
-    private static final String EXPECTED_SDK = "8";
+    private static final Set<String> EXPECTED_RELEASES =
+        new HashSet<String>(Arrays.asList("2.2", "2.2.1"));
+    private static final int EXPECTED_SDK = 8;
 
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
-        assertEquals(EXPECTED_RELEASE, Build.VERSION.RELEASE);
-        assertEquals(EXPECTED_SDK, Build.VERSION.SDK);
+        assertTrue("Your Build.VERSION.RELEASE of " + Build.VERSION.RELEASE
+                + " was not one of the following: " + EXPECTED_RELEASES,
+                        EXPECTED_RELEASES.contains(Build.VERSION.RELEASE));
+
+        assertEquals("" + EXPECTED_SDK, Build.VERSION.SDK);
+        assertEquals(EXPECTED_SDK, Build.VERSION.SDK_INT);
     }
 
     /**
