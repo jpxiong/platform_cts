@@ -31,6 +31,7 @@ import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
+import android.media.CamcorderProfile;
 import android.media.ExifInterface;
 import android.media.MediaRecorder;
 import android.os.ConditionVariable;
@@ -915,13 +916,31 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Camera.Parameters parameters = mCamera.getParameters();
         SurfaceHolder surfaceHolder;
         surfaceHolder = getActivity().getSurfaceView().getHolder();
-        Size size = parameters.getPreviewSize();
+        CamcorderProfile profile = CamcorderProfile.get(cameraId,
+                CamcorderProfile.QUALITY_LOW);
+
+        // Set the preview size.
+        if (parameters.getSupportedVideoSizes() == null) {
+            parameters.setPreviewSize(profile.videoFrameWidth,
+                    profile.videoFrameHeight);
+        } else {  // Driver supports separates outputs for preview and video.
+            List<Size> sizes = parameters.getSupportedPreviewSizes();
+            Size preferred = parameters.getPreferredPreviewSizeForVideo();
+            int product = preferred.width * preferred.height;
+            for (Size size: sizes) {
+                if (size.width * size.height <= product) {
+                    parameters.setPreviewSize(size.width, size.height);
+                    break;
+                }
+            }
+        }
+
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(surfaceHolder);
         mCamera.startPreview();
         mCamera.lock();  // Locking again from the same process has no effect.
         try {
-            recordVideo(size, surfaceHolder);
+            recordVideo(profile, surfaceHolder);
             fail("Recording should not succeed because camera is locked.");
         } catch (Exception e) {
             // expected
@@ -935,26 +954,25 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             // expected
         }
 
-        try {
-            recordVideo(size, surfaceHolder);
-        } catch (Exception e) {
-            fail("Should not throw exception");
-        }
+        recordVideo(profile, surfaceHolder);  // should not throw exception
+        // Media recorder already releases the camera so the test application
+        // can lock and use the camera now.
         mCamera.lock();  // should not fail
         mCamera.setParameters(parameters);  // should not fail
         terminateMessageLooper();
     }
 
-    private void recordVideo(Size size, SurfaceHolder surfaceHolder) throws Exception {
+    private void recordVideo(CamcorderProfile profile,
+            SurfaceHolder holder) throws Exception {
         MediaRecorder recorder = new MediaRecorder();
         try {
+            // Pass the camera from the test application to media recorder.
             recorder.setCamera(mCamera);
+            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            recorder.setProfile(profile);
             recorder.setOutputFile("/dev/null");
-            recorder.setVideoSize(size.width, size.height);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            recorder.setPreviewDisplay(surfaceHolder.getSurface());
+            recorder.setPreviewDisplay(holder.getSurface());
             recorder.prepare();
             recorder.start();
             Thread.sleep(5000);
