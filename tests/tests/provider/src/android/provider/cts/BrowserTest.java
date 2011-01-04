@@ -28,8 +28,10 @@ import android.os.RemoteException;
 import android.provider.Browser;
 import android.provider.Browser.BookmarkColumns;
 import android.provider.Browser.SearchColumns;
+import android.provider.BrowserContract;
+import android.provider.BrowserContract.Bookmarks;
+import android.provider.BrowserContract.History;
 import android.test.ActivityInstrumentationTestCase2;
-import android.webkit.WebIconDatabase;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -70,20 +72,29 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         mBookmarksBackup = new ArrayList<ContentValues>();
         mSearchesBackup = new ArrayList<ContentValues>();
 
-        // backup the current contents in database
-        Cursor cursor = mProvider.query(Browser.BOOKMARKS_URI, null, null, null, null);
+        // backup the current contents in database (_id=1 is a fixed id root)
+        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, "_id != 1", null, null);
         if (cursor.moveToFirst()) {
+            String[] colNames = cursor.getColumnNames();
             while (!cursor.isAfterLast()) {
                 ContentValues value = new ContentValues();
 
-                value.put(BookmarkColumns._ID, cursor.getInt(0));
-                value.put(BookmarkColumns.TITLE, cursor.getString(1));
-                value.put(BookmarkColumns.URL, cursor.getString(2));
-                value.put(BookmarkColumns.VISITS, cursor.getInt(3));
-                value.put(BookmarkColumns.DATE, cursor.getLong(4));
-                value.put(BookmarkColumns.CREATED, cursor.getLong(5));
-                value.put(BookmarkColumns.BOOKMARK, cursor.getInt(7));
-                value.put(BookmarkColumns.FAVICON, cursor.getBlob(8));
+                for (int i = 0; i < colNames.length; i++) {
+                    switch (cursor.getType(i)) {
+                    case Cursor.FIELD_TYPE_BLOB:
+                        value.put(colNames[i], cursor.getBlob(i));
+                        break;
+                    case Cursor.FIELD_TYPE_FLOAT:
+                        value.put(colNames[i], cursor.getFloat(i));
+                        break;
+                    case Cursor.FIELD_TYPE_INTEGER:
+                        value.put(colNames[i], cursor.getLong(i));
+                        break;
+                    case Cursor.FIELD_TYPE_STRING:
+                        value.put(colNames[i], cursor.getString(i));
+                        break;
+                    }
+                }
                 mBookmarksBackup.add(value);
 
                 cursor.moveToNext();
@@ -106,28 +117,37 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
         cursor.close();
 
-        mProvider.delete(Browser.BOOKMARKS_URI, null, null);
+        Uri uri = Bookmarks.CONTENT_URI.buildUpon()
+                .appendQueryParameter(BrowserContract.CALLER_IS_SYNCADAPTER, "true")
+                .build();
+        mProvider.delete(uri, null, null);
         mProvider.delete(Browser.SEARCHES_URI, null, null);
+        mProvider.delete(History.CONTENT_URI, null, null);
 
         mActivity = getActivity();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        // clear all new contents added in test cases.
-        mProvider.delete(Browser.BOOKMARKS_URI, null, null);
-        mProvider.delete(Browser.SEARCHES_URI, null, null);
+        try {
+            // clear all new contents added in test cases.
+            Uri uri = Bookmarks.CONTENT_URI.buildUpon()
+                .appendQueryParameter(BrowserContract.CALLER_IS_SYNCADAPTER, "true")
+                .build();
+            mProvider.delete(uri, null, null);
+            mProvider.delete(Browser.SEARCHES_URI, null, null);
 
-        // recover the old backup contents
-        for (ContentValues value : mBookmarksBackup) {
-            mProvider.insert(Browser.BOOKMARKS_URI, value);
+            // recover the old backup contents
+            for (ContentValues value : mBookmarksBackup) {
+                mProvider.insert(Bookmarks.CONTENT_URI, value);
+            }
+
+            for (ContentValues value : mSearchesBackup) {
+                mProvider.insert(Browser.SEARCHES_URI, value);
+            }
+        } finally {
+            super.tearDown();
         }
-
-        for (ContentValues value : mSearchesBackup) {
-            mProvider.insert(Browser.SEARCHES_URI, value);
-        }
-
-        super.tearDown();
     }
 
     @TestTargets({
@@ -305,7 +325,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(visitedHistoryUrl, cursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX));
-            assertEquals(visitedHistoryUrl, 
+            assertEquals(visitedHistoryUrl,
                     cursor.getString(Browser.HISTORY_PROJECTION_TITLE_INDEX));
             assertEquals(0, cursor.getInt(Browser.HISTORY_PROJECTION_BOOKMARK_INDEX));
             assertEquals(1, cursor.getInt(Browser.HISTORY_PROJECTION_VISITS_INDEX));
@@ -320,7 +340,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(visitedHistoryUrl, cursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX));
-            assertEquals(visitedHistoryUrl, 
+            assertEquals(visitedHistoryUrl,
                     cursor.getString(Browser.HISTORY_PROJECTION_TITLE_INDEX));
             assertEquals(0, cursor.getInt(Browser.HISTORY_PROJECTION_BOOKMARK_INDEX));
             assertEquals(2, cursor.getInt(Browser.HISTORY_PROJECTION_VISITS_INDEX));
@@ -450,7 +470,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             int historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - 1, historyCountAfterDelete);
             cursor.moveToLast();
-            assertEquals(MAX_HISTORY_COUNT - 1, 
+            assertEquals(MAX_HISTORY_COUNT - 1,
                     cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
             cursor.close();
 
@@ -541,7 +561,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         level = TestLevel.COMPLETE,
         notes = "test requestAllIcons(ContentResolver, String, WebIconDatabase.IconListener).",
         method = "requestAllIcons",
-        args = {android.content.ContentResolver.class, java.lang.String.class, 
+        args = {android.content.ContentResolver.class, java.lang.String.class,
                 android.webkit.WebIconDatabase.IconListener.class}
     )
     public void testRequestAllIcons() {
