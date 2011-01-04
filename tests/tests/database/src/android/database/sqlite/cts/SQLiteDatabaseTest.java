@@ -138,16 +138,6 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertNotNull(db);
         db.close();
 
-        try {
-            // do not allow to create file in the directory
-            SQLiteDatabase.openDatabase("/system/database.db", factory,
-                    SQLiteDatabase.CREATE_IF_NECESSARY);
-            fail("didn't throw SQLiteException when do not allow to create database file");
-        } catch (SQLiteException e) {
-        } finally {
-            db.close();
-        }
-
         File dbFile = new File(mDatabaseDir, "database_test12345678.db");
         dbFile.delete();
         assertFalse(dbFile.exists());
