@@ -1810,4 +1810,58 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
         terminateMessageLooper();
     }
+
+    @UiThreadTest
+    public void testInvalidParameters() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testInvalidParametersByCamera(id);
+        }
+    }
+
+    private void testInvalidParametersByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        // Test flash mode.
+        Parameters parameters = mCamera.getParameters();
+        List<String> list = parameters.getSupportedFlashModes();
+        if (list != null && list.size() > 0) {
+            String original = parameters.getFlashMode();
+            parameters.setFlashMode("invalid");
+            try {
+                mCamera.setParameters(parameters);
+                fail("Should throw exception for invalid parameters");
+            } catch (RuntimeException e) {
+                // expected
+            }
+            parameters = mCamera.getParameters();
+            assertEquals(original, parameters.getFlashMode());
+        }
+
+        // Test focus mode.
+        String originalFocus = parameters.getFocusMode();
+        parameters.setFocusMode("invalid");
+        try {
+            mCamera.setParameters(parameters);
+            fail("Should throw exception for invalid parameters");
+        } catch (RuntimeException e) {
+            // expected
+        }
+        parameters = mCamera.getParameters();
+        assertEquals(originalFocus, parameters.getFocusMode());
+
+        // Test preview size.
+        Size originalSize = parameters.getPreviewSize();
+        parameters.setPreviewSize(-1, -1);
+        try {
+            mCamera.setParameters(parameters);
+            fail("Should throw exception for invalid parameters");
+        } catch (RuntimeException e) {
+            // expected
+        }
+        parameters = mCamera.getParameters();
+        assertEquals(originalSize, parameters.getPreviewSize());
+
+        terminateMessageLooper();
+    }
 }
