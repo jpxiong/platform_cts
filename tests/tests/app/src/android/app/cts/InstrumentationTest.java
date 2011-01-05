@@ -946,6 +946,11 @@ public class InstrumentationTest extends InstrumentationTestCase {
             }
 
             @Override
+            public boolean superDispatchKeyShortcutEvent(KeyEvent event) {
+                return false;
+            }
+
+            @Override
             public boolean superDispatchTouchEvent(MotionEvent event) {
                 return false;
             }
