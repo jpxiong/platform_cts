@@ -996,6 +996,37 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getBuiltInZoomControls());
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAppCacheEnabled",
+            args = {}
+        )
+    })
+    public void testSetAppCacheEnabled() throws Exception {
+        // Tests that when AppCache is enabled and used, but the database path
+        // is not set or is set to an inaccessible path, the WebView does not crash.
+        startWebServer();
+        String url = mWebServer.getAppCacheUrl();
+        mSettings.setAppCacheEnabled(true);
+        mSettings.setJavaScriptEnabled(true);
+
+        mWebView.loadUrl(url);
+        new DelayedCheck(10000) {
+            protected boolean check() {
+                return mWebView.getTitle().equals("Done");
+            }
+        }.run();
+
+        mSettings.setAppCachePath("/data/foo");
+        mWebView.loadUrl(url);
+        new DelayedCheck(10000) {
+            protected boolean check() {
+                return mWebView.getTitle().equals("Done");
+            }
+        }.run();
+    }
+
     /**
      * Starts the internal web server. The server will be shut down automatically
      * during tearDown().

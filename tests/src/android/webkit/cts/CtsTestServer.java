@@ -81,6 +81,8 @@ public class CtsTestServer {
     public static final String USERAGENT_PATH = "/useragent.html";
     public static final String ASSET_PREFIX = "/assets/";
     public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
+    public static final String APPCACHE_PATH = "/appcache.html";
+    public static final String APPCACHE_MANIFEST_PATH = "/appcache.manifest";
     public static final String REDIRECT_PREFIX = "/redirect";
     public static final String DELAY_PREFIX = "/delayed";
     public static final String BINARY_PREFIX = "/binary";
@@ -342,6 +344,12 @@ public class CtsTestServer {
         return sb.toString();
     }
 
+    public String getAppCacheUrl() {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(APPCACHE_PATH);
+        return sb.toString();
+    }
+
     public String getLastRequestUrl() {
         return mLastQuery;
     }
@@ -495,6 +503,38 @@ public class CtsTestServer {
             // We cannot close the socket here, because we need to respond.
             // Status must be set to OK, or else the test will fail due to
             // a RunTimeException.
+        } else if (path.equals(APPCACHE_PATH)) {
+            response = createResponse(HttpStatus.SC_OK);
+            response.setEntity(createEntity("<!DOCTYPE HTML>" +
+                    "<html manifest=\"appcache.manifest\">" +
+                    "  <head>" +
+                    "    <title>Waiting</title>" +
+                    "    <script>" +
+                    "      function updateTitle() { document.title = \"Done\"; }" +
+                    "      window.applicationCache.onnoupdate = updateTitle;" +
+                    "      window.applicationCache.oncached = updateTitle;" +
+                    "      window.applicationCache.onupdateready = updateTitle;" +
+                    "      window.applicationCache.onobsolete = updateTitle;" +
+                    "      window.applicationCache.onerror = updateTitle;" +
+                    "    </script>" +
+                    "  </head>" +
+                    "  <body>AppCache test</body>" +
+                    "</html>"));
+        } else if (path.equals(APPCACHE_MANIFEST_PATH)) {
+            response = createResponse(HttpStatus.SC_OK);
+            try {
+                StringEntity entity = new StringEntity("CACHE MANIFEST");
+                // This entity property is not used when constructing the response, (See
+                // AbstractMessageWriter.write(), which is called by
+                // AbstractHttpServerConnection.sendResponseHeader()) so we have to set this header
+                // manually.
+                // TODO: Should we do this for all responses from this server?
+                entity.setContentType("text/cache-manifest");
+                response.setEntity(entity);
+                response.setHeader("Content-Type", "text/cache-manifest");
+            } catch (UnsupportedEncodingException e) {
+                Log.w(TAG, "Unexpected UnsupportedEncodingException");
+            }
         }
         if (response == null) {
             response = createResponse(HttpStatus.SC_NOT_FOUND);
