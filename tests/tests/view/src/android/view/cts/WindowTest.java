@@ -1196,6 +1196,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
             return true;
         }
 
+        public boolean superDispatchKeyShortcutEvent(KeyEvent event) {
+            return false;
+        }
+
         public boolean superDispatchTouchEvent(MotionEvent event) {
             return true;
         }
@@ -1265,6 +1269,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
         public boolean dispatchKeyEvent(KeyEvent event) {
             return true;
+        }
+
+        public boolean dispatchKeyShortcutEvent(KeyEvent event) {
+            return false;
         }
 
         public boolean dispatchTouchEvent(MotionEvent event) {
