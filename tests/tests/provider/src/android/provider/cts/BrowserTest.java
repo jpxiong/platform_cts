@@ -80,6 +80,11 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                 ContentValues value = new ContentValues();
 
                 for (int i = 0; i < colNames.length; i++) {
+                    if (Bookmarks.PARENT_SOURCE_ID.equals(colNames[i])
+                            || Bookmarks.INSERT_AFTER_SOURCE_ID.equals(colNames[i])) {
+                        // These aren't actual columns, so skip them in the backup
+                        continue;
+                    }
                     switch (cursor.getType(i)) {
                     case Cursor.FIELD_TYPE_BLOB:
                         value.put(colNames[i], cursor.getBlob(i));
