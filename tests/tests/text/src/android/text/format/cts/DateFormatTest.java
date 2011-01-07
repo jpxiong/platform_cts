@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 @TestTargetClass(DateFormat.class)
 public class DateFormatTest extends AndroidTestCase {
@@ -173,5 +174,30 @@ public class DateFormatTest extends AndroidTestCase {
         assertEquals(expectedString, actual.toString());
         actual = DateFormat.format(format, formatDate.getTime());
         assertEquals(expectedString, actual.toString());
+    }
+
+    @TestTargetNew(level = TestLevel.ADDITIONAL)
+    public void test2038() {
+        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+        calendar.setTimeInMillis(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L);
+        assertEquals("Sun Nov 24 17:31:44 GMT+00:00 1833",
+                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+
+        calendar.setTimeInMillis(Integer.MIN_VALUE * 1000L);
+        assertEquals("Fri Dec 13 20:45:52 GMT+00:00 1901",
+                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+
+        calendar.setTimeInMillis(0L);
+        assertEquals("Thu Jan 01 00:00:00 GMT+00:00 1970",
+                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+
+        calendar.setTimeInMillis(Integer.MAX_VALUE * 1000L);
+        assertEquals("Tue Jan 19 03:14:07 GMT+00:00 2038",
+                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+
+        calendar.setTimeInMillis((2L + Integer.MAX_VALUE + Integer.MAX_VALUE) * 1000L);
+        assertEquals("Sun Feb 07 06:28:16 GMT+00:00 2106",
+                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
     }
 }
