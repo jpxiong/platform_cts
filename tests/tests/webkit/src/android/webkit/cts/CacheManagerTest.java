@@ -133,10 +133,8 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         args = {}
     )
     public void testCacheDisabled() {
+        // The cache should always be enabled.
         assertFalse(CacheManager.cacheDisabled());
-
-        // Because setCacheDisabled is package private, we can not call it.
-        // cacheDisabled() always return false. How to let it return true?
     }
 
     private void loadUrl(String url){
