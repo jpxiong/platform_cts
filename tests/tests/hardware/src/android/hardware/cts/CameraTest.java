@@ -1172,10 +1172,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // It should not generate callbacks if zoom value is not changed.
         mCamera.startSmoothZoom(0);
         assertFalse(zoomListener.mZoomDone.block(500));
+        assertEquals(0, mCamera.getParameters().getZoom());
 
         // Test startSmoothZoom.
         mCamera.startSmoothZoom(maxZoom);
         assertEquals(true, zoomListener.mZoomDone.block(5000));
+        assertEquals(maxZoom, mCamera.getParameters().getZoom());
         assertEquals(maxZoom, zoomListener.mValues.size());
         for(int i = 0; i < maxZoom; i++) {
             // Make sure we get all the callbacks in order.
@@ -1190,6 +1192,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             zoomListener.mZoomDone.close();
             mCamera.startSmoothZoom(maxZoom / 2);
             assertTrue(zoomListener.mZoomDone.block(5000));
+            assertEquals(maxZoom / 2, mCamera.getParameters().getZoom());
             assertEquals(maxZoom - (maxZoom / 2), zoomListener.mValues.size());
             int i = maxZoom - 1;
             for(Integer value: zoomListener.mValues) {
@@ -1216,6 +1219,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.startSmoothZoom(maxZoom);
         mCamera.stopSmoothZoom();
         assertTrue(zoomListener.mZoomDone.block(5000));
+        assertEquals(zoomListener.mValues.size(), mCamera.getParameters().getZoom());
         for(int i = 0; i < zoomListener.mValues.size() - 1; i++) {
             // Make sure we get all the callbacks in order (except the last).
             assertEquals(i + 1, zoomListener.mValues.get(i).intValue());
@@ -1230,7 +1234,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         public void onZoomChange(int value, boolean stopped, Camera camera) {
             mValues.add(value);
-            assertEquals(value, camera.getParameters().getZoom());
             assertFalse(mStopped);
             mStopped = stopped;
             if (stopped) {
