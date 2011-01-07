@@ -635,50 +635,6 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
         assertEquals(child0.getLeft(), child1.getLeft());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link GridView#computeVerticalScrollExtent()}",
-            method = "computeVerticalScrollExtent",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link GridView#computeVerticalScrollExtent()}",
-            method = "computeVerticalScrollOffset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link GridView#computeVerticalScrollExtent()}",
-            method = "computeVerticalScrollRange",
-            args = {}
-        )
-    })
-    public void testScroll() throws Throwable {
-        final MockGridView mockGridView= new MockGridView(mActivity);
-        final ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        // this test case can not be ran in UI thread.
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.getWindow().setContentView(mockGridView, params);
-                mockGridView.setAdapter(new ImageAdapter(mActivity));
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        TouchUtils.scrollToTop(this, mActivity, mockGridView);
-
-        int oldRange = mockGridView.computeVerticalScrollRange();
-        int oldExtent = mockGridView.computeVerticalScrollExtent();
-        int oldOffset = mockGridView.computeVerticalScrollOffset();
-
-        TouchUtils.scrollToBottom(this, mActivity, mockGridView);
-        assertEquals(oldRange, mockGridView.computeVerticalScrollRange());
-        assertEquals(oldExtent, mockGridView.computeVerticalScrollExtent());
-        assertTrue(oldOffset < mockGridView.computeVerticalScrollOffset());
-    }
-
     private static class MockGridView extends GridView {
         private boolean mCalledOnMeasure = false;
         private boolean mCalledOnFocusChanged = false;
