@@ -339,7 +339,8 @@ public class CompoundButtonTest extends AndroidTestCase {
         int drawableHeight;
         Rect bounds;
         Drawable drawable;
-        Canvas canvas = new Canvas();
+        Canvas canvas = new Canvas(android.graphics.Bitmap.createBitmap(100, 100,
+                android.graphics.Bitmap.Config.ARGB_8888));
         MockCompoundButton compoundButton;
 
         // onDraw when there is no drawable
