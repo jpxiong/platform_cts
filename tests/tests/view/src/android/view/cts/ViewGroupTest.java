@@ -1948,6 +1948,7 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         public int mBottom;
 
         public MockCanvas() {
+            super(Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888));
         }
 
         public MockCanvas(Bitmap bitmap) {
