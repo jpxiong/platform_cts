@@ -16,15 +16,17 @@
 
 package android.text.format.cts;
 
+import android.content.Context;
+
 import java.util.Locale;
 
 public class LocaleUtils {
 
     /** Return whether or not the specified locale is available on the system. */
-    public static boolean isSupportedLocale(Locale locale) {
-        Locale[] locales = Locale.getAvailableLocales();
-        for (Locale availableLocale : locales) {
-            if (locale.equals(availableLocale)) {
+    public static boolean isSupportedLocale(Context context, Locale locale) {
+        String[] locales = context.getAssets().getLocales();
+        for (String availableLocale : locales) {
+            if (locale.toString().equals(availableLocale)) {
                 return true;
             }
         }
