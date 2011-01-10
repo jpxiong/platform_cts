@@ -305,4 +305,21 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         ConfigurationInfo conInf = mActivityManager.getDeviceConfigurationInfo();
         assertNotNull(conInf);
     }
+
+    /**
+     * Simple test for {@link ActivityManager.isUserAMonkey()} - verifies its false.
+     *
+     * TODO: test positive case
+     */
+    public void testIsUserAMonkey() {
+        assertFalse(ActivityManager.isUserAMonkey());
+    }
+
+    /**
+     * Verify that {@link ActivityManager.isRunningInTestHarness()} is false.
+     */
+    public void testIsRunningInTestHarness() {
+        assertFalse("isRunningInTestHarness must be false in production builds",
+                ActivityManager.isRunningInTestHarness());
+    }
 }
