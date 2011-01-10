@@ -137,23 +137,25 @@ public class AudioEffectTest extends AndroidTestCase {
         AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
         assertTrue("no effects found", (desc.length != 0));
         for (int i = 0; i < desc.length; i++) {
-            try {
-                AudioEffect effect = new AudioEffect(desc[i].type,
-                        AudioEffect.EFFECT_TYPE_NULL,
-                        0,
-                        0);
-                assertNotNull("could not create AudioEffect", effect);
+            if (!desc[i].type.equals(AudioEffect.EFFECT_TYPE_NULL)) {
                 try {
-                    assertTrue("invalid effect ID", (effect.getId() != 0));
-                } catch (IllegalStateException e) {
-                    fail("AudioEffect not initialized");
-                } finally {
-                    effect.release();
+                    AudioEffect effect = new AudioEffect(desc[i].type,
+                            AudioEffect.EFFECT_TYPE_NULL,
+                            0,
+                            0);
+                    assertNotNull("could not create AudioEffect", effect);
+                    try {
+                        assertTrue("invalid effect ID", (effect.getId() != 0));
+                    } catch (IllegalStateException e) {
+                        fail("AudioEffect not initialized");
+                    } finally {
+                        effect.release();
+                    }
+                } catch (IllegalArgumentException e) {
+                    fail("Effect not found: "+desc[i].name);
+                } catch (UnsupportedOperationException e) {
+                    fail("Effect library not loaded");
                 }
-            } catch (IllegalArgumentException e) {
-                fail("Effect not found: "+desc[i].name);
-            } catch (UnsupportedOperationException e) {
-                fail("Effect library not loaded");
             }
         }
     }

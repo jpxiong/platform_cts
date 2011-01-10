@@ -1,4 +1,5 @@
-# Copyright (C) 2008 The Android Open Source Project
+#
+# Copyright (C) 2010 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,19 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-LOCAL_PATH := $(call my-dir)
-
-# descGen java library
-# ============================================================
+LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_MODULE := vogarexpectlib
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE := descGen
-
-LOCAL_SRC_FILES := CollectAllTests.java DescriptionGenerator.java
-
-LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR) $(LOCAL_PATH)/lib/junit.jar
-
-LOCAL_STATIC_JAVA_LIBRARIES := vogarexpectlib
-
+LOCAL_STATIC_JAVA_LIBRARIES := guavalib jsonlib
 include $(BUILD_HOST_JAVA_LIBRARY)
+
