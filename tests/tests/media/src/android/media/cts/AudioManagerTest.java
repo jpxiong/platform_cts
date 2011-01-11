@@ -27,9 +27,6 @@ import static android.media.AudioManager.MODE_RINGTONE;
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.RINGER_MODE_VIBRATE;
-import static android.media.AudioManager.ROUTE_BLUETOOTH_SCO;
-import static android.media.AudioManager.ROUTE_EARPIECE;
-import static android.media.AudioManager.ROUTE_SPEAKER;
 import static android.media.AudioManager.STREAM_MUSIC;
 import static android.media.AudioManager.USE_DEFAULT_STREAM_TYPE;
 import static android.media.AudioManager.VIBRATE_SETTING_OFF;
@@ -583,6 +580,13 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                 // adjusting the volume to zero should result in either silent or vibrate mode
                 assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
                         mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
+                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
+                // There are two possible ways the device may work. It may have a silent/vibrate
+                // mode or it may have distinct silent and vibrate modes.
+                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_NORMAL ||
+                        mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE);
+                // Increase the volume one more time to get out of the vibrate mode which may
+                // be separate from silent mode.
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
                 assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
             }
