@@ -21,6 +21,7 @@ import android.test.AndroidTestCase;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,11 +64,29 @@ public class FileAccessPermissionTest extends AndroidTestCase {
         file = new File("/system/app");
         assertTrue(file.canRead());
         assertFalse(file.canWrite());
-        File[] apkFiles = file.listFiles();
-        for (File f : apkFiles) {
-            assertTrue(f.canRead());
+
+        // Test not writable / deletable for all files
+        File[] allFiles = file.listFiles();
+        for (File f : allFiles) {
             assertFalse(f.canWrite());
             assertFalse(f.delete());
+        }
+    }
+
+    /**
+     * Test apks in /system/app.
+     */
+    public void testApksAlwaysReadable() {
+        File file = new File("/system/app");
+
+        // Test readable for only apk files
+        File[] apkFiles = file.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                return filename.endsWith(".apk");
+            }
+        });
+        for (File f : apkFiles) {
+            assertTrue(f.canRead());
         }
     }
 
