@@ -128,13 +128,14 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
             parser.parse(createXmlStream(ctsPlanFile));
             Collection<String> testUris = parser.getTestUris();
             ITestCaseRepo testRepo = createTestCaseRepo();
-            Collection<IRemoteTest> tests = testRepo.getTests(testUris);
             collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
-            for (IRemoteTest test : tests) {
-                if (test instanceof IDeviceTest) {
-                    ((IDeviceTest)test).setDevice(getDevice());
+            for (String testUri : testUris) {
+                ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
+                if (testPackage != null) {
+                    runTest(listeners, testPackage);
+                } else {
+                    Log.w(LOG_TAG, String.format("Could not find test uri %s", testUri));
                 }
-                test.run(listeners);
             }
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("failed to find CTS plan file", e);
@@ -144,13 +145,34 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
     }
 
     /**
+     * Runs the test.
+     *
+     * @param listeners
+     * @param testPackage
+     * @throws DeviceNotAvailableException
+     */
+    private void runTest(List<ITestInvocationListener> listeners, ITestPackageDef testPackage)
+            throws DeviceNotAvailableException {
+        IRemoteTest test = testPackage.createTest(mTestCaseDir);
+        if (test != null) {
+            if (test instanceof IDeviceTest) {
+                ((IDeviceTest)test).setDevice(getDevice());
+            }
+            ResultFilter filter = new ResultFilter(listeners, testPackage);
+            test.run(filter);
+        }
+    }
+
+    /**
      * Runs the device info collector instrumentation on device, and forwards it to test listeners
      * as run metrics.
+     * <p/>
+     * Exposed so unit tests can mock.
      *
      * @param listeners
      * @throws DeviceNotAvailableException
      */
-    private void collectDeviceInfo(ITestDevice device, File testApkDir,
+    void collectDeviceInfo(ITestDevice device, File testApkDir,
             List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
         DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listeners);
     }

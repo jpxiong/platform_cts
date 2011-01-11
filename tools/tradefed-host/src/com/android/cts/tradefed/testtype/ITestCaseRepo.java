@@ -16,9 +16,6 @@
 
 package com.android.cts.tradefed.testtype;
 
-import com.android.tradefed.testtype.IRemoteTest;
-
-import java.util.Collection;
 
 /**
  * Interface for accessing tests from the CTS repository.
@@ -26,11 +23,11 @@ import java.util.Collection;
 interface ITestCaseRepo {
 
     /**
-     * Gets a list of tests identified by given list of uris
+     * Get a {@link TestPackageDef} given a uri
      *
-     * @param testUris the string uris
-     * @return a {@link Collection} of {@link IRemoteTest}
+     * @param testUri the string uris
+     * @return a {@link TestPackageDef} or <code>null</code> if the uri cannot be found in repo
      */
-    public Collection<IRemoteTest> getTests(Collection<String> testUris);
+    public ITestPackageDef getTestPackage(String testUri);
 
 }

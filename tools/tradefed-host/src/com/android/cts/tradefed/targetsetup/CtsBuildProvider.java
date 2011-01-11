@@ -50,4 +50,11 @@ public class CtsBuildProvider implements IBuildProvider {
     public void buildNotTested(IBuildInfo info) {
         // ignore
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void cleanUp(IBuildInfo info) {
+        // ignore
+    }
 }

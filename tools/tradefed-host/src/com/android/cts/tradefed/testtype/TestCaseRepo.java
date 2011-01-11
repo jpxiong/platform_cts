@@ -16,7 +16,6 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.Log;
-import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.BufferedInputStream;
@@ -25,8 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -115,21 +112,8 @@ class TestCaseRepo implements ITestCaseRepo {
     /**
      * {@inheritDoc}
      */
-    public Collection<IRemoteTest> getTests(Collection<String> testUris) {
-        Collection<IRemoteTest> tests = new ArrayList<IRemoteTest>(testUris.size());
-        for (String uri : testUris) {
-            TestPackageDef def = mTestMap.get(uri);
-            if (def != null) {
-                IRemoteTest test = def.createTest(mTestCaseDir);
-                if (test != null) {
-                    tests.add(test);
-                } else {
-                    Log.w(LOG_TAG, String.format("Failed to create test from package uri %s", uri));
-                }
-            } else {
-                Log.w(LOG_TAG, String.format("Could not find test with uri %s", uri));
-            }
-        }
-        return tests;
+    @Override
+    public ITestPackageDef getTestPackage(String testUri) {
+        return mTestMap.get(testUri);
     }
 }
