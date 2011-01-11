@@ -29,7 +29,7 @@ import java.util.Collection;
  * <p/>
  * Knows how to translate this info into a runnable {@link IRemoteTest}.
  */
-public class TestPackageDef {
+class TestPackageDef implements ITestPackageDef {
 
     private static final String LOG_TAG = "TestPackageDef";
 
@@ -44,13 +44,15 @@ public class TestPackageDef {
 
     private Collection<TestIdentifier> mTests = new ArrayList<TestIdentifier>();
 
+    /** the cached {@link IRemoteTest} */
+    private IRemoteTest mRemoteTest;
+
     void setUri(String uri) {
         mUri = uri;
     }
 
     /**
-     * Get the unique URI of the test package.
-     * @return the {@link String} uri
+     * {@inheritDoc}
      */
     public String getUri() {
         return mUri;
@@ -114,13 +116,20 @@ public class TestPackageDef {
     }
 
     /**
-     * Creates a runnable {@link IRemoteTest} from info stored in this definition.
-     *
-     * @param testCaseDir {@link File} representing directory of test case data
-     * @return a {@link IRemoteTest} with all necessary data populated to run the test or
-     *         <code>null</code> if test could not be created
+     * {@inheritDoc}
      */
     public IRemoteTest createTest(File testCaseDir) {
+        if (mRemoteTest == null) {
+            mRemoteTest = doCreateTest(testCaseDir);
+        }
+        return mRemoteTest;
+    }
+
+    /**
+     * @param testCaseDir
+     * @return
+     */
+    private IRemoteTest doCreateTest(File testCaseDir) {
         if (mIsHostSideTest) {
             Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
             JarHostTest hostTest = new JarHostTest();
@@ -154,6 +163,13 @@ public class TestPackageDef {
             instrTest.setInstallFile(apkFile);
             return instrTest;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isKnownTest(TestIdentifier testDef) {
+        return mTests.contains(testDef);
     }
 
     /**
