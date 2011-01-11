@@ -99,7 +99,8 @@ public class PlanTestTest extends TestCase {
         IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
         Collection<IRemoteTest> tests = new ArrayList<IRemoteTest>(1);
         tests.add(mockTest);
-        EasyMock.expect(mMockRepo.getTests(uris)).andReturn(tests);
+        //
+       // EasyMock.expect(mMockRepo.getTests(uris)).andReturn(tests);
 
         // expect
         mockTest.run((List<ITestInvocationListener>)EasyMock.anyObject());
