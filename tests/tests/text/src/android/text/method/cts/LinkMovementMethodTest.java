@@ -129,7 +129,7 @@ public class LinkMovementMethodTest extends
         Selection.setSelection(spannable, 0, spannable.length());
 
         assertSelection(spannable, 0, spannable.length());
-        assertEquals(2, spannable.getSpans(0, spannable.length(), Object.class).length);
+        assertTrue("Expected at least 2 spans", 2 <= spannable.getSpans(0, spannable.length(), Object.class).length);
         method.onTakeFocus(null, spannable, View.FOCUS_UP);
         assertSelection(spannable, -1);
         assertEquals(1, spannable.getSpans(0, spannable.length(), Object.class).length);
@@ -141,7 +141,7 @@ public class LinkMovementMethodTest extends
         // focus forwards
         Selection.setSelection(spannable, 0, spannable.length());
         assertSelection(spannable, 0, spannable.length());
-        assertEquals(3, spannable.getSpans(0, spannable.length(), Object.class).length);
+        assertTrue("Expected at least 3 spans", 3 <= spannable.getSpans(0, spannable.length(), Object.class).length);
         method.onTakeFocus(null, spannable, View.FOCUS_RIGHT);
         assertSelection(spannable, -1);
         assertEquals(0, spannable.getSpans(0, spannable.length(), Object.class).length);
@@ -151,7 +151,7 @@ public class LinkMovementMethodTest extends
         // param direction is unknown(0)
         Selection.setSelection(spannable, 0, spannable.length());
         assertSelection(spannable, 0, spannable.length());
-        assertEquals(3, spannable.getSpans(0, spannable.length(), Object.class).length);
+        assertTrue("Expected at least 3 spans", 3 <= spannable.getSpans(0, spannable.length(), Object.class).length);
         method.onTakeFocus(null, spannable, 0);
         assertSelection(spannable, -1);
         assertEquals(0, spannable.getSpans(0, spannable.length(), Object.class).length);
@@ -576,7 +576,7 @@ public class LinkMovementMethodTest extends
         Selection.setSelection(spannable, 0, spannable.length());
 
         assertSelection(spannable, 0, spannable.length());
-        assertEquals(3, spannable.getSpans(0, spannable.length(), Object.class).length);
+        assertTrue("Expected at least 3 spans", 3 <= spannable.getSpans(0, spannable.length(), Object.class).length);
         method.initialize(null, spannable);
         assertSelection(spannable, -1);
         assertEquals(0, spannable.getSpans(0, spannable.length(), Object.class).length);
