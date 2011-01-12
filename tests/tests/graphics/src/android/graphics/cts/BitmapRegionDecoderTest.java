@@ -22,6 +22,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
@@ -44,7 +45,7 @@ import java.util.ArrayList;
 
 @TestTargetClass(BitmapRegionDecoder.class)
 public class BitmapRegionDecoderTest extends InstrumentationTestCase {
-    private static final String TAG = "BitmapRegionDecoder";
+    private static final String TAG = "BitmapRegionDecoderTest";
     private ArrayList<File> mFilesCreated = new ArrayList<File>(
             NAMES_TEMP_FILES.length);
 
@@ -300,13 +301,21 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
                 int top = rect1.top / opts.inSampleSize;
                 Rect rect2 = new Rect(left, top, left + actual.getWidth(),
                         top + actual.getHeight());
-                expected = Bitmap.createBitmap(wholeImage, rect2.left,
-                        rect2.top, rect2.width(), rect2.height(), null, false);
+                expected = cropBitmap(wholeImage, rect2);
                 compareBitmaps(expected, actual, mMseMargin, true);
                 actual.recycle();
                 expected.recycle();
             }
         }
+    }
+
+    private Bitmap cropBitmap(Bitmap wholeImage, Rect rect) {
+        Bitmap cropped = Bitmap.createBitmap(rect.width(), rect.height(),
+                wholeImage.getConfig());
+        Canvas canvas = new Canvas(cropped);
+        Rect dst = new Rect(0, 0, rect.width(), rect.height());
+        canvas.drawBitmap(wholeImage, rect, dst, null);
+        return cropped;
     }
 
     private InputStream obtainInputStream(int resId) {
