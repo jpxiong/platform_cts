@@ -198,7 +198,7 @@ public class DateUtilsTest extends AndroidTestCase {
     })
     @SuppressWarnings("deprecation")
     public void testFormatMethods() {
-        if (!LocaleUtils.isSupportedLocale(Locale.US)) {
+        if (!LocaleUtils.isSupportedLocale(mContext, Locale.US)) {
             // Locale is set to US in setUp method.
             return;
         }
