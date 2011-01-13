@@ -18,7 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -305,15 +304,14 @@ public class InsetDrawableTest extends AndroidTestCase {
         method = "getOpacity",
         args = {}
     )
-    @BrokenTest(value="bug 2397630 - needs investigation")
     public void testGetOpacity() {
-        Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
+        Drawable d = mContext.getResources().getDrawable(R.drawable.testimage);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
+        insetDrawable.setAlpha(255);
         assertEquals(PixelFormat.OPAQUE, insetDrawable.getOpacity());
 
-        d = mContext.getResources().getDrawable(R.drawable.testimage);
-        insetDrawable = new InsetDrawable(d, 0);
-        assertEquals(PixelFormat.OPAQUE, insetDrawable.getOpacity());
+        insetDrawable.setAlpha(100);
+        assertEquals(PixelFormat.TRANSLUCENT, insetDrawable.getOpacity());
     }
 
     @TestTargetNew(
@@ -441,22 +439,6 @@ public class InsetDrawableTest extends AndroidTestCase {
 
         ConstantState constantState = insetDrawable.getConstantState();
         assertNotNull(constantState);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "mutate",
-        args = {}
-    )
-    public void testMutate() {
-        Resources resources = mContext.getResources();
-        InsetDrawable d1 = (InsetDrawable) resources.getDrawable(R.drawable.insetdrawable);
-
-        d1.setAlpha(100);
-        d1.mutate();
-        d1.setAlpha(200);
-
-        // Cannot test whether alpha was set properly.
     }
 
     private class MockInsetDrawable extends InsetDrawable {
