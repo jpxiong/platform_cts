@@ -344,6 +344,7 @@ public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingV
          * setDuplicateParentStateEnabled
          */
         TextView v = new TextView(mActivity);
+        v.setSingleLine(); // otherwise the multiline state interferes with theses tests
         v.setText("Test setDuplicateParentStateEnabled");
 
         v.setDuplicateParentStateEnabled(false);
