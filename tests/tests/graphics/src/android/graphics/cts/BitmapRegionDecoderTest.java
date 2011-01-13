@@ -51,24 +51,28 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
 
     private Resources mRes;
 
-    // The test images, including a baseline JPEG, progressive JPEG, a PNG,
+    // The test images, including baseline JPEGs and progressive JPEGs, a PNG,
     // a GIF and a BMP.
     private static int[] RES_IDS = new int[] {
             R.drawable.baseline_jpeg, R.drawable.progressive_jpeg,
+            R.drawable.baseline_restart_jpeg,
+            R.drawable.progressive_restart_jpeg,
             R.drawable.png_test, R.drawable.gif_test, R.drawable.bmp_test
     };
     private static String[] NAMES_TEMP_FILES = new String[] {
-        "baseline_temp.jpg", "progressive_temp.jpg", "png_temp.png",
-        "gif_temp.gif", "bmp_temp.bmp"
+        "baseline_temp.jpg", "progressive_temp.jpg", "baseline_restart_temp.jpg"
+        , "progressive_restart_temp.jpg", "png_temp.png", "gif_temp.gif",
+        "bmp_temp.bmp"
     };
 
     // The width and height of the above image.
     // -1 denotes that the image format is not supported by BitmapRegionDecoder
-    private static int WIDTHS[] = new int[] {1280, 1280, 640, -1, -1};
-    private static int HEIGHTS[] = new int[] {960, 960, 480, -1, -1};
+    private static int WIDTHS[] = new int[] {
+            1280, 1280, 1280, 1280, 640, -1, -1};
+    private static int HEIGHTS[] = new int[] {960, 960, 960, 960, 480, -1, -1};
 
     // The number of test images, format of which is supported by BitmapRegionDecoder
-    private static int NUM_TEST_IMAGES = 3;
+    private static int NUM_TEST_IMAGES = 5;
 
     private static int TILE_SIZE = 256;
 
