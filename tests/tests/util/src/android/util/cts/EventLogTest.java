@@ -163,8 +163,8 @@ public class EventLogTest extends TestCase {
 
     private long getTime() throws InterruptedException {
         // The precision of currentTimeMillis is poor compared to event timestamps
-        Thread.sleep(20);
-        return System.currentTimeMillis() - 10;
+        Thread.sleep(40);
+        return System.currentTimeMillis() - 20;
     }
 
     private ArrayList<EventLog.Event> getEventsSince(long since, int[] tags) throws IOException {
