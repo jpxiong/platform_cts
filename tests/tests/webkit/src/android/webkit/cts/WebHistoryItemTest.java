@@ -27,6 +27,7 @@ import android.graphics.Bitmap;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -75,6 +76,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     })
     public void testWebHistoryItem() {
         final WebView view = getActivity().getWebView();
+        view.setWebChromeClient(new WebChromeClient());
         WebBackForwardList list = view.copyBackForwardList();
         assertEquals(0, list.getSize());
 
@@ -111,6 +113,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     @BrokenTest(value = "Bug 2121787: Test times out on the host side. Not 100% reproducible.")
     public void testRedirect() throws InterruptedException {
         final WebView view = getActivity().getWebView();
+        view.setWebChromeClient(new WebChromeClient());
         // set the web view client so that redirects are loaded in the WebView itself
         view.setWebViewClient(new WebViewClient());
         WebBackForwardList list = view.copyBackForwardList();
@@ -135,15 +138,6 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, item.getTitle());
         // To be fixed: item.getOriginalUrl() returns null
         // assertEquals(redirect, item.getOriginalUrl());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "clone() is protected and WebHistoryItem cannot be subclassed",
-        method = "clone",
-        args = {}
-    )
-    public void testClone() {
     }
 
     private void assertLoadUrlSuccessfully(final WebView view, String url) {
