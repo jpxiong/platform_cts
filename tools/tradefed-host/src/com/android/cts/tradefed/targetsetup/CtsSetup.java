@@ -15,7 +15,7 @@
  */
 package com.android.cts.tradefed.targetsetup;
 
-import com.android.cts.tradefed.testtype.PlanTest;
+import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.config.IConfiguration;
 import com.android.tradefed.config.IConfigurationReceiver;
@@ -74,9 +74,9 @@ public class CtsSetup implements ITargetPreparer, IConfigurationReceiver {
         try {
             CtsBuildHelper buildHelper = createBuildHelper(ctsBuildInfo.getRootDir());
             // pass necessary build information to the other config objects
-            mConfiguration.injectOptionValue(PlanTest.TEST_CASES_DIR_OPTION,
+            mConfiguration.injectOptionValue(CtsTest.TEST_CASES_DIR_OPTION,
                     buildHelper.getTestCasesDir().getAbsolutePath());
-            mConfiguration.injectOptionValue(PlanTest.TEST_PLANS_DIR_OPTION,
+            mConfiguration.injectOptionValue(CtsTest.TEST_PLANS_DIR_OPTION,
                     buildHelper.getTestPlansDir().getAbsolutePath());
             installCtsPrereqs(device, buildHelper);
         } catch (FileNotFoundException e) {
