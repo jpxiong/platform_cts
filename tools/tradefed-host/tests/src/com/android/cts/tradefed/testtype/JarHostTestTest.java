@@ -17,11 +17,15 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 
 import org.easymock.EasyMock;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import junit.framework.TestCase;
@@ -51,6 +55,10 @@ public class JarHostTestTest extends TestCase {
             super(name);
         }
 
+        public MockTest() {
+            super();
+        }
+
         public void testFoo() {
         }
     }
@@ -64,15 +72,20 @@ public class JarHostTestTest extends TestCase {
         ITestInvocationListener listener = EasyMock.createMock(ITestInvocationListener.class);
         TestIdentifier expectedTest = new TestIdentifier(MockTest.class.getName(), "testFoo");
 
+        Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>(1);
+        tests.add(expectedTest);
         listener.testRunStarted(RUN_NAME, 1);
         listener.testStarted(expectedTest);
         listener.testEnded(expectedTest, Collections.EMPTY_MAP);
         listener.testRunEnded(EasyMock.anyLong(), EasyMock.eq(Collections.EMPTY_MAP));
+        mJarTest.setTests(tests);
+        mJarTest.setDevice(EasyMock.createMock(ITestDevice.class));
+        mJarTest.setJarFile(new File("fakefile"));
+        mJarTest.setRunName(RUN_NAME);
 
         EasyMock.replay(listener);
-
-        mJarTest.setRunName(RUN_NAME);
         mJarTest.run(listener);
+        EasyMock.verify(listener);
     }
 
 }

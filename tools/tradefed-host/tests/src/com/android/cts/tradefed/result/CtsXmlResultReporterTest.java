@@ -75,14 +75,23 @@ public class CtsXmlResultReporterTest extends TestCase {
      * A simple test to ensure expected output is generated for test run with no tests.
      */
     public void testEmptyGeneration() {
-        final String expectedOutput = "<?xml version='1.0' encoding='UTF-8' standalone='no' ?>" +
-            "<?xml-stylesheet type=\"text/xsl\" href=\"cts_result.xsl\"?>" +
-            "<TestResult testPlan=\"unknown\" profile=\"unknown\" starttime=\"ignore\" endtime=\"ignore\" version=\"2.0\"> " +
-            "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"0\" total=\"0\" />" +
-            "</TestResult>";
+        final String expectedHeaderOutput = "<?xml version='1.0' encoding='UTF-8' standalone='no' ?>" +
+            "<?xml-stylesheet type=\"text/xsl\" href=\"cts_result.xsl\"?>";
+        final String expectedTestOutput =
+            "<TestResult testPlan=\"unknown\" profile=\"unknown\" starttime=\"ignore\" endtime=\"ignore\" version=\"2.0\"> ";
+        final String expectedSummaryOutput =
+            "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"0\" total=\"0\" />";
+        final String expectedEndTag = "</TestResult>";
         mResultReporter.invocationStarted(new BuildInfo(1, "test", "test"));
         mResultReporter.invocationEnded(1);
-        assertEquals(expectedOutput, getOutput());
+        String actualOutput = getOutput();
+        assertTrue(actualOutput.startsWith(expectedHeaderOutput));
+        assertTrue(String.format("test output did not contain expected test result. Got %s",
+                actualOutput), actualOutput.contains(expectedTestOutput));
+        assertTrue(String.format("test output did not contain expected test summary. Got %s",
+                actualOutput), actualOutput.contains(expectedSummaryOutput));
+        assertTrue(String.format("test output did not contain expected TestResult end tag. Got %s",
+                actualOutput), actualOutput.endsWith(expectedEndTag));
     }
 
     /**

@@ -74,6 +74,12 @@ public class PlanTestTest extends TestCase {
                 // return empty stream, not used
                 return new ByteArrayInputStream(new byte[0]);
             }
+
+            @Override
+            void collectDeviceInfo(ITestDevice device, File testApkDir,
+                    List<ITestInvocationListener> listeners) {
+                // ignore
+            }
         };
         mPlanTest.setDevice(mMockDevice);
         // not used, but needs to be non-null
@@ -96,17 +102,14 @@ public class PlanTestTest extends TestCase {
         uris.add("test-uri");
         EasyMock.expect(mMockPlanParser.getTestUris()).andReturn(uris);
 
+        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
         IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
-        Collection<IRemoteTest> tests = new ArrayList<IRemoteTest>(1);
-        tests.add(mockTest);
-        //
-       // EasyMock.expect(mMockRepo.getTests(uris)).andReturn(tests);
-
-        // expect
-        mockTest.run((List<ITestInvocationListener>)EasyMock.anyObject());
+        EasyMock.expect(mMockRepo.getTestPackage("test-uri")).andReturn(mockPackageDef);
+        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject())).andReturn(mockTest);
+        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks();
-        EasyMock.replay(mockTest);
+        EasyMock.replay(mockTest, mockPackageDef);
         mPlanTest.run(mMockListener);
         verifyMocks();
     }
