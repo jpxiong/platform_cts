@@ -1766,12 +1766,19 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 parameters.setSceneMode(sceneMode);
                 mCamera.setParameters(parameters);
                 parameters = mCamera.getParameters();
-                assertEquals("Flash is inconsistent in scene mode " + sceneMode,
-                        settings[i].mFlash, parameters.getFlashMode());
-                assertEquals("Focus is inconsistent in scene mode " + sceneMode,
-                        settings[i].mFocus, parameters.getFocusMode());
-                assertEquals("White balance is inconsistent in scene mode " + sceneMode,
-                        settings[i].mWhiteBalance, parameters.getWhiteBalance());
+
+                // In auto scene mode, camera HAL will not remember the previous
+                // flash, focus, and white-balance. It will just take values set
+                // by parameters. But the supported flash, focus, and
+                // white-balance should still be restored in auto scene mode.
+                if (!Parameters.SCENE_MODE_AUTO.equals(sceneMode)) {
+                    assertEquals("Flash is inconsistent in scene mode " + sceneMode,
+                            settings[i].mFlash, parameters.getFlashMode());
+                    assertEquals("Focus is inconsistent in scene mode " + sceneMode,
+                            settings[i].mFocus, parameters.getFocusMode());
+                    assertEquals("White balance is inconsistent in scene mode " + sceneMode,
+                            settings[i].mWhiteBalance, parameters.getWhiteBalance());
+                }
                 assertEquals("Suppported flash modes are inconsistent in scene mode " + sceneMode,
                         settings[i].mSupportedFlash, parameters.getSupportedFlashModes());
                 assertEquals("Suppported focus modes are inconsistent in scene mode " + sceneMode,
