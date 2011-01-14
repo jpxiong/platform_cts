@@ -16,9 +16,10 @@
 
 package android.view.cts;
 
+import com.android.cts.stub.R;
+
 import android.app.Activity;
 import android.os.Bundle;
-import com.android.cts.stub.R;
 
 /**
  * A simple activity to test "Focus Handling"
@@ -27,6 +28,7 @@ public class FocusHandlingStubActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Holo_NoActionBar);
         setContentView(R.layout.focus_handling_layout);
     }
 }
