@@ -16,6 +16,7 @@
 package com.android.cts.tradefed.targetsetup;
 
 import com.android.ddmlib.Log;
+import com.android.tradefed.config.IConfiguration;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.targetsetup.BuildError;
@@ -76,6 +77,20 @@ public class CtsSetupTest extends TestCase {
     }
 
     /**
+     * Test {@link CtsSetup#setUp(ITestDevice, IBuildInfo)} when a {@link IConfiguration} has not
+     * been provided.
+     */
+    public void testSetUp_missingConfig() throws TargetSetupError, BuildError,
+            DeviceNotAvailableException {
+        try {
+            mSetup.setUp(mMockDevice,  EasyMock.createMock(IFolderBuildInfo.class));
+            fail("IllegalStateException not thrown");
+        } catch (IllegalStateException e) {
+            // expected
+        }
+    }
+
+    /**
      * Test normal case for {@link CtsSetup#setUp(ITestDevice, IBuildInfo)}
      */
     public void testSetUp() throws TargetSetupError, BuildError, DeviceNotAvailableException {
@@ -87,6 +102,7 @@ public class CtsSetupTest extends TestCase {
                 mMockDevice.installPackage((File)EasyMock.anyObject(), EasyMock.anyBoolean()))
                 .andReturn(null)
                 .anyTimes();
+        mSetup.setConfiguration(EasyMock.createMock(IConfiguration.class));
         EasyMock.replay(ctsBuild, mMockDevice);
         mSetup.setUp(mMockDevice, ctsBuild);
     }
