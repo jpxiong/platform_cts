@@ -32,25 +32,38 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Test;
 
 /**
- * A {@link Test} that runs all the tests in the CTS test plan with given name
+ * A {@link Test} for running CTS tests.
+ * <p/>
+ * Supports running all the tests contained in a CTS plan, or individual test packages.
  */
-public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemoteTest {
+public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteTest {
 
     private static final String LOG_TAG = "PlanTest";
 
     public static final String TEST_CASES_DIR_OPTION = "test-cases-path";
     public static final String TEST_PLANS_DIR_OPTION = "test-plans-path";
+    private static final String PLAN_OPTION = "plan";
+    private static final String PACKAGE_OPTION = "package";
 
     private ITestDevice mDevice;
 
-    @Option(name = "plan", description = "the test plan to run")
+    @Option(name = PLAN_OPTION, description = "the test plan to run")
     private String mPlanName = null;
+
+    @Option(name = PACKAGE_OPTION, description = "the test packages(s) to run")
+    private Collection<String> mPackageNames = new ArrayList<String>();
+
+    @Option(name = "exclude-package", description = "the test packages(s) to exclude from the run")
+    private Collection<String> mExcludedPackageNames = new ArrayList<String>();
 
     @Option(name = TEST_CASES_DIR_OPTION, description =
         "file path to directory containing CTS test cases")
@@ -59,6 +72,10 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
     @Option(name = TEST_PLANS_DIR_OPTION, description =
         "file path to directory containing CTS test plans")
     private File mTestPlanDir = null;
+
+    @Option(name = "collect-device-info", description =
+        "flag to control whether to collect info from device. Default true")
+    private boolean mCollectDeviceInfo = true;
 
     /**
      * {@inheritDoc}
@@ -102,11 +119,91 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
     }
 
     /**
+     * Set the collect device info flag.
+     * <p/>
+     * Exposed for unit testing
+     */
+    void setCollectDeviceInfo(boolean collectDeviceInfo) {
+        mCollectDeviceInfo = collectDeviceInfo;
+    }
+
+    /**
+     * Adds a package name to the list of test packages to run.
+     * <p/>
+     * Exposed for unit testing
+     */
+    void addPackageName(String packageName) {
+        mPackageNames.add(packageName);
+    }
+
+    /**
+     * Adds a package name to the list of test packages to exclude.
+     * <p/>
+     * Exposed for unit testing
+     */
+    void addExcludedPackageName(String packageName) {
+        mExcludedPackageNames.add(packageName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void run(List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+        checkFields();
+
+        Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
+
+        try {
+            Collection<String> testUris = getTestsToRun();
+            ITestCaseRepo testRepo = createTestCaseRepo();
+            collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
+            for (String testUri : testUris) {
+                ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
+                if (testPackage != null) {
+                    runTest(listeners, testPackage);
+                } else {
+                    Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("failed to find CTS plan file", e);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("failed to parse CTS plan file", e);
+        }
+    }
+
+    /**
+     * Return the list of test uris to run
+     *
+     * @return the list of test uris to run
+     * @throws ParseException
+     * @throws FileNotFoundException
+     */
+    private Collection<String> getTestsToRun() throws ParseException, FileNotFoundException {
+        Set<String> testUris = new HashSet<String>();
         if (mPlanName == null) {
-            throw new IllegalArgumentException("missing --plan option");
+            testUris.addAll(mPackageNames);
+        } else {
+            String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
+            File ctsPlanFile = new File(mTestPlanDir, ctsPlanRelativePath);
+            IPlanXmlParser parser = createXmlParser();
+            parser.parse(createXmlStream(ctsPlanFile));
+            testUris.addAll(parser.getTestUris());
+        }
+        testUris.removeAll(mExcludedPackageNames);
+        return testUris;
+    }
+
+    private void checkFields() {
+        if (mPlanName == null && mPackageNames.size() <= 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Missing the --%s or --%s(s) to run", PLAN_OPTION, PACKAGE_OPTION));
+        }
+        // for simplicity of command line usage, don't allow both --plan and --package
+        if (mPlanName != null && mPackageNames.size() > 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Only one of a --%s or --%s(s) to run can be specified", PLAN_OPTION,
+                    PACKAGE_OPTION));
         }
         if (getDevice() == null) {
             throw new IllegalArgumentException("missing device");
@@ -117,30 +214,6 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
         }
         if (mTestPlanDir == null) {
             throw new IllegalArgumentException(String.format("missing %s", TEST_PLANS_DIR_OPTION));
-        }
-
-        Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
-
-        try {
-            String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
-            File ctsPlanFile = new File(mTestPlanDir, ctsPlanRelativePath);
-            IPlanXmlParser parser = createXmlParser();
-            parser.parse(createXmlStream(ctsPlanFile));
-            Collection<String> testUris = parser.getTestUris();
-            ITestCaseRepo testRepo = createTestCaseRepo();
-            collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
-            for (String testUri : testUris) {
-                ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
-                if (testPackage != null) {
-                    runTest(listeners, testPackage);
-                } else {
-                    Log.w(LOG_TAG, String.format("Could not find test uri %s", testUri));
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("failed to find CTS plan file", e);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("failed to parse CTS plan file", e);
         }
     }
 
@@ -174,7 +247,9 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
      */
     void collectDeviceInfo(ITestDevice device, File testApkDir,
             List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
-        DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listeners);
+        if (mCollectDeviceInfo) {
+            DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listeners);
+        }
     }
 
     /**
@@ -203,4 +278,5 @@ public class PlanTest extends AbstractRemoteTest implements IDeviceTest, IRemote
     InputStream createXmlStream(File xmlFile) throws FileNotFoundException {
         return new BufferedInputStream(new FileInputStream(xmlFile));
     }
+
 }
