@@ -91,8 +91,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         final String actualUserAgentString = mSettings.getUserAgentString();
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
         final String patternString = "Mozilla/5\\.0 \\(Linux; U; Android (.+); (\\w+)-(\\w+);" +
-            " (.+) Build/(.+)\\) AppleWebKit/533\\.1 \\(KHTML, like Gecko\\) Version/4\\.0" +
-            " Mobile Safari/533\\.1";
+            "(.+)\\s?Build/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) Version/4\\.0" +
+            "( Mobile)? Safari/(\\d+)\\.(\\d+)";
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
         Matcher patternMatcher = userAgentExpr.matcher(actualUserAgentString);
@@ -103,7 +103,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         Locale currentLocale = Locale.getDefault();
         assertEquals(currentLocale.getLanguage().toLowerCase(), patternMatcher.group(2));
         assertEquals(currentLocale.getCountry().toLowerCase(), patternMatcher.group(3));
-        assertEquals(Build.MODEL, patternMatcher.group(4));
+        // Model is only added in release builds
+        if ("REL".equals(Build.VERSION.CODENAME))
+            assertEquals(Build.MODEL, patternMatcher.group(4));
         assertEquals(Build.ID, patternMatcher.group(5));
     }
 
