@@ -1208,6 +1208,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
             return true;
         }
 
+        public boolean superDispatchGenericMotionEvent(MotionEvent event) {
+            return true;
+        }
+
         public View getDecorView() {
             return null;
         }
@@ -1282,7 +1286,11 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         public boolean dispatchTrackballEvent(MotionEvent event) {
             return true;
         }
-        
+
+        public boolean dispatchGenericMotionEvent(MotionEvent event) {
+            return true;
+        }
+
         public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
             return true;
         }
