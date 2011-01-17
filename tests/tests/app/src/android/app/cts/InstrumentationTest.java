@@ -961,6 +961,11 @@ public class InstrumentationTest extends InstrumentationTestCase {
             }
 
             @Override
+            public boolean superDispatchGenericMotionEvent(MotionEvent event) {
+                return false;
+            }
+
+            @Override
             public void takeKeyEvents(boolean get) {
             }
 
