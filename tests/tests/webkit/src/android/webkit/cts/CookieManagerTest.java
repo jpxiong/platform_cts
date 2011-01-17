@@ -107,6 +107,7 @@ public class CookieManagerTest extends
         )
     })
     public void testAcceptCookie() throws Exception {
+        mCookieManager.removeAllCookie();
         mCookieManager.setAcceptCookie(false);
         assertFalse(mCookieManager.acceptCookie());
         assertFalse(mCookieManager.hasCookies());

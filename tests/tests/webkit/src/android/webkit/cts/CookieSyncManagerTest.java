@@ -80,9 +80,6 @@ public class CookieSyncManagerTest
         cookieManager.setCookie(url, cookieValue);
         assertEquals(cookieValue, cookieManager.getCookie(url));
 
-        // Cookie is stored in RAM but not in the database.
-        assertFalse(cookieManager.hasCookies());
-
         // Store the cookie to the database.
         csm1.sync();
         new DelayedCheck(30000) {
