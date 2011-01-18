@@ -16,6 +16,11 @@
 
 package android.text.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -29,13 +34,6 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.Layout.Alignment;
 import android.text.style.StrikethroughSpan;
-
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Layout.class)
 public class LayoutTest extends AndroidTestCase {
@@ -338,34 +336,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(9.0f, layout.getLineRight(0));
         assertEquals(7.0f, layout.getLineRight(1));
         assertEquals(10.0f, layout.getLineRight(2));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineMax",
-        args = {int.class}
-    )
-    @BrokenTest("unsure if asserted widths are correct")
-    public void testGetLineMax() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        assertEquals(6.0f, layout.getLineMax(0));
-        assertEquals(3.0f, layout.getLineMax(1));
-        assertEquals(9.0f, layout.getLineMax(2));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineWidth",
-        args = {int.class}
-    )
-    @BrokenTest("unsure if asserted widths are correct")
-    public void testGetLineWidth() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        assertEquals(6.0f, layout.getLineWidth(0));
-        assertEquals(3.0f, layout.getLineWidth(1));
-        assertEquals(9.0f, layout.getLineWidth(2));
     }
 
     @TestTargetNew(
