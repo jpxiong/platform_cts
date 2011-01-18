@@ -41,7 +41,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     private WebIconDatabase mIconDb;
 
     public WebChromeClientTest() {
-        super("com.android.cts.stub", WebViewStubActivity.class);
+        super(WebViewStubActivity.class);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
             args = {WebView.class, int.class}
         )
     })
-    public void testOnProgressChanged() throws InterruptedException {
+    public void testOnProgressChanged() {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mWebView.setWebChromeClient(webChromeClient);
 
@@ -119,15 +119,21 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
             args = {WebView.class, Bitmap.class}
         )
     })
-    public void testOnReceivedIcon() throws Exception {
+    public void testOnReceivedIcon() throws Throwable {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mWebView.setWebChromeClient(webChromeClient);
 
-        WebIconDatabase mIconDb = WebIconDatabase.getInstance();
-        String dbPath = getActivity().getFilesDir().toString() + "/icons";
-        mIconDb.open(dbPath);
-        Thread.sleep(250);
-        mIconDb.removeAllIcons();
+        runTestOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // getInstance must run on the UI thread
+                WebIconDatabase mIconDb = WebIconDatabase.getInstance();
+                String dbPath = getActivity().getFilesDir().toString() + "/icons";
+                mIconDb.open(dbPath);
+                mIconDb.removeAllIcons();
+            }
+        });
 
         assertFalse(webChromeClient.hadOnReceivedIcon());
 
