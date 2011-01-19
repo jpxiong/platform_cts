@@ -321,6 +321,11 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
     }
 
+    private boolean hasSideEffects(final Class<? extends TestCase> testClass,
+            final String testName) {
+        return getAnnotation(testClass, testName, SIDE_EFFECT) != null;
+    }
+
     private boolean isVogarKnownFailure(final Class<? extends TestCase> testClass,
             final String testName) {
         if (vogarExpectationStore == null) {
@@ -376,6 +381,9 @@ public class CollectAllTests extends DescriptionGenerator {
             return;
         } else if (isSuppressed(test.getClass(), testName)) {
             System.out.println("ignoring suppressed test: " + test);
+            return;
+        } else if (hasSideEffects(test.getClass(), testName)) {
+            System.out.println("ignoring test with side effects: " + test);
             return;
         } else if (isVogarKnownFailure(test.getClass(), testName)) {
             System.out.println("ignoring vogar known failure: " + test);
