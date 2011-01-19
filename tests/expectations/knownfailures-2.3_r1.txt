@@ -1,0 +1,34 @@
+[
+/* These tests consistently fail on GRH78. */
+{ name: "android.location.cts.GeocoderTest#testGetFromLocation" },
+{ name: "android.location.cts.GeocoderTest#testGetFromLocationName" },
+{ name: "android.net.cts.ListeningPortsTest#testNoListeningUdp6Ports" },
+{ name: "android.webkit.cts.WebSettingsTest#testSetAppCacheEnabled" },
+{ name: "android.net.cts.SSLCertificateSocketFactoryTest" },
+
+/* These tests pass when executed individually but fail when running CTS as a whole on GRH78. */
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection",
+  bug: 3184701
+},
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyAuthConnection",
+  bug: 3184701
+},
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testConsequentProxyConnection",
+  bug: 3184701
+},
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyAuthConnection_doOutput",
+  bug: 3184701
+},
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyAuthConnectionFailed",
+  bug: 3184701
+},
+{
+  name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection_Not_Found_Response",
+  bug: 3184701
+}
+]

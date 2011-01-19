@@ -37,6 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import vogar.ExpectationStore;
+
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.AnnotationValue;
@@ -67,6 +69,7 @@ public class DescriptionGenerator extends Doclet {
     static final String BROKEN_TEST = "dalvik.annotation.BrokenTest";
     static final String SIDE_EFFECT = "dalvik.annotation.SideEffect";
     static final String SUPPRESSED_TEST = "android.test.suitebuilder.annotation.Suppress";
+    static final String CTS_EXPECTATION_DIR = "cts/tests/expectations";
 
     static final String JUNIT_TEST_CASE_CLASS_NAME = "junit.framework.testcase";
     static final String TAG_PACKAGE = "TestPackage";
@@ -117,9 +120,17 @@ public class DescriptionGenerator extends Doclet {
             return true;
         }
 
+        ExpectationStore ctsExpectationStore = null;
+        try {
+            ctsExpectationStore = VogarUtils.provideExpectationStore("./" + CTS_EXPECTATION_DIR);
+        } catch (IOException e) {
+            Log.e("Couldn't load expectation store.", e);
+            return false;
+        }
+
         for (ClassDoc clazz : classes) {
             if ((!clazz.isAbstract()) && (isValidJUnitTestCase(clazz))) {
-                xmlGenerator.addTestClass(new TestClass(clazz));
+                xmlGenerator.addTestClass(new TestClass(clazz, ctsExpectationStore));
             }
         }
 
@@ -500,9 +511,9 @@ public class DescriptionGenerator extends Doclet {
          *
          * @param clazz The specified ClassDoc.
          */
-        TestClass(ClassDoc clazz) {
+        TestClass(ClassDoc clazz, ExpectationStore expectationStore) {
             mName = clazz.toString();
-            mCases = getTestMethods(clazz);
+            mCases = getTestMethods(expectationStore, clazz);
         }
 
         /**
@@ -511,7 +522,7 @@ public class DescriptionGenerator extends Doclet {
          * @param clazz The specified ClassDoc.
          * @return A collection of TestMethod.
          */
-        Collection<TestMethod> getTestMethods(ClassDoc clazz) {
+        Collection<TestMethod> getTestMethods(ExpectationStore expectationStore, ClassDoc clazz) {
             Collection<MethodDoc> methods = getAllMethods(clazz);
 
             ArrayList<TestMethod> cases = new ArrayList<TestMethod>();
@@ -539,6 +550,10 @@ public class DescriptionGenerator extends Doclet {
                     } else if (atype.toString().equals(SUPPRESSED_TEST)) {
                         isSuppressed = true;
                     }
+                }
+
+                if (VogarUtils.isVogarKnownFailure(expectationStore, clazz.toString(), name)) {
+                    isBroken = true;
                 }
 
                 if (name.startsWith("test")) {

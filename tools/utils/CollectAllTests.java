@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import vogar.Expectation;
+import vogar.ExpectationStore;
+import vogar.ModeId;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,15 +48,6 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.textui.ResultPrinter;
 import junit.textui.TestRunner;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import vogar.ExpectationStore;
-import vogar.Expectation;
-import vogar.ModeId;
 
 public class CollectAllTests extends DescriptionGenerator {
 
@@ -103,12 +103,13 @@ public class CollectAllTests extends DescriptionGenerator {
     private static String MANIFESTFILE = "";
     private static String TESTSUITECLASS = "";
     private static String ANDROID_MAKE_FILE = "";
-    private static String EXPECTATION_DIR = null;
+    private static String LIBCORE_EXPECTATION_DIR = null;
 
     private static Test TESTSUITE;
 
     static XMLGenerator xmlGenerator;
-    private static ExpectationStore vogarExpectationStore;
+    private static ExpectationStore libcoreVogarExpectationStore;
+    private static ExpectationStore ctsVogarExpectationStore;
 
     public static void main(String[] args) {
         if (args.length > 2) {
@@ -116,7 +117,7 @@ public class CollectAllTests extends DescriptionGenerator {
             MANIFESTFILE = args [1];
             TESTSUITECLASS = args[2];
             if (args.length > 3) {
-                EXPECTATION_DIR = args[3];
+                LIBCORE_EXPECTATION_DIR = args[3];
             }
             if (args.length > 4) {
                 ANDROID_MAKE_FILE = args[4];
@@ -195,7 +196,8 @@ public class CollectAllTests extends DescriptionGenerator {
         }
 
         try {
-            vogarExpectationStore = provideExpectationStore(EXPECTATION_DIR);
+            libcoreVogarExpectationStore = VogarUtils.provideExpectationStore(LIBCORE_EXPECTATION_DIR);
+            ctsVogarExpectationStore = VogarUtils.provideExpectationStore(CTS_EXPECTATION_DIR);
         } catch (IOException e) {
             System.err.println("Can't initialize vogar expectation store");
             e.printStackTrace(System.err);
@@ -326,15 +328,6 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, SIDE_EFFECT) != null;
     }
 
-    private boolean isVogarKnownFailure(final Class<? extends TestCase> testClass,
-            final String testName) {
-        if (vogarExpectationStore == null) {
-            return false;
-        }
-        String fullTestName = String.format("%s#%s", testClass.getName(), testName);
-        return vogarExpectationStore.get(fullTestName) != Expectation.SUCCESS;
-    }
-
     private String getAnnotation(final Class<? extends TestCase> testClass,
             final String testName, final String annotationName) {
         try {
@@ -385,8 +378,11 @@ public class CollectAllTests extends DescriptionGenerator {
         } else if (hasSideEffects(test.getClass(), testName)) {
             System.out.println("ignoring test with side effects: " + test);
             return;
-        } else if (isVogarKnownFailure(test.getClass(), testName)) {
-            System.out.println("ignoring vogar known failure: " + test);
+        } else if (VogarUtils.isVogarKnownFailure(libcoreVogarExpectationStore, test.getClass().getName(), testName)) {
+            System.out.println("ignoring libcore expectation known failure: " + test);
+            return;
+        } else if (VogarUtils.isVogarKnownFailure(ctsVogarExpectationStore, test.getClass().getName(), testName)) {
+            System.out.println("ignoring cts expectation known failure: " + test);
             return;
         }
 
@@ -415,27 +411,5 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (NoSuchMethodException e) {
             failed.add(test.getClass().getName());
         }
-    }
-
-    public static ExpectationStore provideExpectationStore(String dir) throws IOException {
-        if (dir == null) {
-            return null;
-        }
-        ExpectationStore result = ExpectationStore.parse(getExpectationFiles(dir), ModeId.DEVICE);
-        return result;
-    }
-
-    private static Set<File> getExpectationFiles(String dir) {
-        Set<File> expectSet = new HashSet<File>();
-        File[] files = new File(dir).listFiles(new FilenameFilter() {
-            // ignore obviously temporary files
-            public boolean accept(File dir, String name) {
-                return !name.endsWith("~") && !name.startsWith(".");
-            }
-        });
-        if (files != null) {
-            expectSet.addAll(Arrays.asList(files));
-        }
-        return expectSet;
     }
 }
