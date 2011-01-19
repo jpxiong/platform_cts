@@ -853,6 +853,10 @@ public class InstrumentationTest extends InstrumentationTestCase {
             }
 
             @Override
+            public void alwaysReadCloseOnTouchAttr() {
+            }
+
+            @Override
             public View peekDecorView() {
                 return null;
             }
