@@ -199,55 +199,6 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         });
         mInstrumentation.waitForIdleSync();
     }
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnScrollListener",
-        args = {android.widget.AbsListView.OnScrollListener.class}
-    )
-    public void testSetOnScrollListener() throws Throwable {
-        MockOnScrollListener onScrollListener = new MockOnScrollListener();
-
-        assertNull(onScrollListener.getView());
-        assertEquals(0, onScrollListener.getFirstVisibleItem());
-        assertEquals(0, onScrollListener.getVisibleItemCount());
-        assertEquals(0, onScrollListener.getTotalItemCount());
-        assertEquals(-1, onScrollListener.getScrollState());
-
-        assertFalse(onScrollListener.isOnScrollCalled());
-        assertFalse(onScrollListener.isOnScrollStateChangedCalled());
-
-        mListView.setOnScrollListener(onScrollListener);
-        assertSame(mListView, onScrollListener.getView());
-        assertEquals(0, onScrollListener.getFirstVisibleItem());
-        assertEquals(0, onScrollListener.getVisibleItemCount());
-        assertEquals(0, onScrollListener.getTotalItemCount());
-        assertEquals(-1, onScrollListener.getScrollState());
-
-        assertTrue(onScrollListener.isOnScrollCalled());
-        assertFalse(onScrollListener.isOnScrollStateChangedCalled());
-        onScrollListener.reset();
-
-        setAdapter();
-
-        assertSame(mListView, onScrollListener.getView());
-        assertEquals(0, onScrollListener.getFirstVisibleItem());
-        assertEquals(mListView.getChildCount(), onScrollListener.getVisibleItemCount());
-        assertEquals(mCountryList.length, onScrollListener.getTotalItemCount());
-        assertEquals(-1, onScrollListener.getScrollState());
-
-        assertTrue(onScrollListener.isOnScrollCalled());
-        assertFalse(onScrollListener.isOnScrollStateChangedCalled());
-        onScrollListener.reset();
-
-        TouchUtils.scrollToBottom(this, mActivity, mListView);
-        assertSame(mListView, onScrollListener.getView());
-        assertEquals(mListView.getChildCount(), onScrollListener.getVisibleItemCount());
-        assertEquals(mCountryList.length, onScrollListener.getTotalItemCount());
-        assertEquals(OnScrollListener.SCROLL_STATE_IDLE, onScrollListener.getScrollState());
-
-        assertTrue(onScrollListener.isOnScrollCalled());
-        assertTrue(onScrollListener.isOnScrollStateChangedCalled());
-    }
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
