@@ -1216,6 +1216,9 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
             return null;
         }
 
+        public void alwaysReadCloseOnTouchAttr() {
+        }
+
         public View peekDecorView() {
             return null;
         }
