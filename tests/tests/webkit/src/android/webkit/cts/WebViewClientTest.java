@@ -193,7 +193,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         mWebServer = new CtsTestServer(getActivity());
 
         assertFalse(webViewClient.hasOnReceivedHttpAuthRequestCalled());
-        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.EMBEDDED_IMG_URL);
         assertLoadUrlSuccessfully(mWebView, url);
         assertTrue(webViewClient.hasOnReceivedHttpAuthRequestCalled());
     }
