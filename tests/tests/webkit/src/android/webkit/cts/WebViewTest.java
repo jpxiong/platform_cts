@@ -47,6 +47,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
+import android.webkit.CacheManager.CacheResult;
 import android.webkit.DownloadListener;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebBackForwardList;
@@ -1210,8 +1211,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(0, cacheFileBaseDir.list().length);
 
         startWebServer(false);
-        mWebView.loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mWebView.loadUrl(url);
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        new DelayedCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                CacheResult result = CacheManager.getCacheFile(url, null);
+                return result != null;
+            }
+        }.run();
         int cacheFileCount = cacheFileBaseDir.list().length;
         assertTrue(cacheFileCount > 0);
 
