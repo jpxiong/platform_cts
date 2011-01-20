@@ -147,9 +147,12 @@ public class AvailableIntentsTest extends AndroidTestCase {
         args = {java.lang.String.class, android.net.Uri.class}
     )
     public void testDialPhoneNumber() {
-        Uri uri = Uri.parse("tel:(212)5551212");
-        Intent intent = new Intent(Intent.ACTION_DIAL, uri);
-        assertCanBeHandled(intent);
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Uri uri = Uri.parse("tel:(212)5551212");
+            Intent intent = new Intent(Intent.ACTION_DIAL, uri);
+            assertCanBeHandled(intent);
+        }
     }
 
     /**
@@ -161,8 +164,11 @@ public class AvailableIntentsTest extends AndroidTestCase {
         args = {java.lang.String.class, android.net.Uri.class}
     )
     public void testDialVoicemail() {
-        Uri uri = Uri.parse("voicemail:");
-        Intent intent = new Intent(Intent.ACTION_DIAL, uri);
-        assertCanBeHandled(intent);
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Uri uri = Uri.parse("voicemail:");
+            Intent intent = new Intent(Intent.ACTION_DIAL, uri);
+            assertCanBeHandled(intent);
+        }
     }
 }
