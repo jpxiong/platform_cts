@@ -87,13 +87,14 @@ public class CtsTestTest extends TestCase {
      * Test normal case {@link CtsTest#run(java.util.List)} when running a plan.
      */
     @SuppressWarnings("unchecked")
-    public void testRun__plan() throws DeviceNotAvailableException, ParseException {
+    public void testRun_plan() throws DeviceNotAvailableException, ParseException {
         setParsePlanExceptations();
 
         ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
         IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
         EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject())).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
+                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
         mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks(mockTest, mockPackageDef);
@@ -107,12 +108,37 @@ public class CtsTestTest extends TestCase {
      * Test normal case {@link CtsTest#run(java.util.List)} when running a package.
      */
     @SuppressWarnings("unchecked")
-    public void testRun__package() throws DeviceNotAvailableException {
+    public void testRun_package() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
         ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
         IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
         EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject())).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
+                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
+        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+
+        replayMocks(mockTest, mockPackageDef);
+        mCtsTest.run(mMockListener);
+        verifyMocks(mockTest, mockPackageDef);
+    }
+
+    /**
+     * Test normal case {@link CtsTest#run(java.util.List)} when running a class.
+     */
+    @SuppressWarnings("unchecked")
+    public void testRun_class() throws DeviceNotAvailableException {
+        final String className = "className";
+        final String methodName = "methodName";
+        mCtsTest.setClassName(className);
+        mCtsTest.setMethodName(methodName);
+
+
+        EasyMock.expect(mMockRepo.findPackageForTest(className)).andReturn(PACKAGE_NAME);
+        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
+        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
+        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
+        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
+                EasyMock.eq(className), EasyMock.eq(methodName))).andReturn(mockTest);
         mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks(mockTest, mockPackageDef);
@@ -165,6 +191,52 @@ public class CtsTestTest extends TestCase {
     public void testRun_packagePlan() throws DeviceNotAvailableException {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.addPackageName(PACKAGE_NAME);
+        try {
+            mCtsTest.run(mMockListener);
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test {@link CtsTest#run(java.util.List)} when --plan and --class options have been
+     * specified
+     */
+    public void testRun_planClass() throws DeviceNotAvailableException {
+        mCtsTest.setPlanName(PLAN_NAME);
+        mCtsTest.setClassName("class");
+        try {
+            mCtsTest.run(mMockListener);
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test {@link CtsTest#run(java.util.List)} when --package and --class options have been
+     * specified
+     */
+    public void testRun_packageClass() throws DeviceNotAvailableException {
+        mCtsTest.addPackageName(PACKAGE_NAME);
+        mCtsTest.setClassName("class");
+        try {
+            mCtsTest.run(mMockListener);
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test {@link CtsTest#run(java.util.List)} when --plan, --package and --class options have been
+     * specified
+     */
+    public void testRun_planPackageClass() throws DeviceNotAvailableException {
+        mCtsTest.setPlanName(PLAN_NAME);
+        mCtsTest.addPackageName(PACKAGE_NAME);
+        mCtsTest.setClassName("class");
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");

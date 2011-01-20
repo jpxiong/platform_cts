@@ -30,4 +30,12 @@ interface ITestCaseRepo {
      */
     public ITestPackageDef getTestPackage(String testUri);
 
+    /**
+     * Attempt to find the package uri for a given test class name
+     *
+     * @param testClassName the test class name
+     * @return the package uri or <code>null</code> if the package cannot be found
+     */
+    public String findPackageForTest(String testClassName);
+
 }
