@@ -20,7 +20,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -168,8 +167,6 @@ public class WifiInfoTest extends AndroidTestCase {
             args = {}
         )
     })
-    @ToBeFixed(bug="1871573", explanation="android.net.wifi.WifiInfo#getNetworkId() return -1 when"
-        + " there is wifi connection")
     public void testWifiInfoProperties() throws Exception {
         // this test case should in Wifi environment
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
@@ -187,8 +184,7 @@ public class WifiInfoTest extends AndroidTestCase {
         wifiInfo.getMacAddress();
         setWifiEnabled(false);
         Thread.sleep(DURATION);
-        wifiInfo = mWifiManager.getConnectionInfo();
-        assertEquals(-1, wifiInfo.getNetworkId());
+        assertEquals(WifiManager.WIFI_STATE_DISABLED, mWifiManager.getWifiState());
     }
 
 }
