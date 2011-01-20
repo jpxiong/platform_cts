@@ -17,6 +17,7 @@
 package android.permission.cts;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -33,14 +34,17 @@ public class NoCallPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testActionCall() {
-        Uri uri = Uri.parse("tel:123456");
-        Intent intent = new Intent(Intent.ACTION_CALL, uri);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            mContext.startActivity(intent);
-            fail("startActivity(Intent.ACTION_CALL) did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
+        PackageManager packageManager = getContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Uri uri = Uri.parse("tel:123456");
+            Intent intent = new Intent(Intent.ACTION_CALL, uri);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                mContext.startActivity(intent);
+                fail("startActivity(Intent.ACTION_CALL) did not throw SecurityException as expected");
+            } catch (SecurityException e) {
+                // expected
+            }
         }
     }
 
@@ -51,17 +55,20 @@ public class NoCallPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testCallVoicemail() {
-        try {
-            //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED,
-            Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED",
-                    Uri.fromParts("voicemail", "", null));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(intent);
-            fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
+        PackageManager packageManager = getContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            try {
+                //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED,
+                Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED",
+                        Uri.fromParts("voicemail", "", null));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+                fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw SecurityException as expected");
+            } catch (SecurityException e) {
+                // expected
+            }
         }
-    }
+     }
 
     /**
      * Verify that Intent.ACTION_CALL_PRIVILEGED requires permissions.
@@ -70,14 +77,19 @@ public class NoCallPermissionTest extends AndroidTestCase {
      */
     @SmallTest
     public void testCall911() {
-        //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED, Uri.parse("tel:911"));
-        Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED", Uri.parse("tel:911"));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            mContext.startActivity(intent);
-            fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
+        PackageManager packageManager = getContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            //Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED, Uri.parse("tel:911"));
+            Intent intent = new Intent("android.intent.action.CALL_PRIVILEGED",
+                    Uri.parse("tel:911"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                mContext.startActivity(intent);
+                fail("startActivity(Intent.ACTION_CALL_PRIVILEGED) did not throw " +
+                        "SecurityException as expected");
+            } catch (SecurityException e) {
+               // expected
+           }
         }
     }
 
