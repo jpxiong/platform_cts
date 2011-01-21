@@ -29,7 +29,7 @@ import dalvik.annotation.TestTargets;
 @TestTargetClass(AudioTrack.class)
 public class AudioTrackTest extends AndroidTestCase {
     private String TAG = "AudioTrackTest";
-    private final long WAIT_MSEC = 100;
+    private final long WAIT_MSEC = 200;
     private final int OFFSET_DEFAULT = 0;
     private final int OFFSET_NEGATIVE = -10;
 
