@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.MediumTest;
 
 /**
@@ -42,22 +41,6 @@ public class NoActivityRelatedPermissionTest
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
-    }
-
-    /**
-     * Verify that setting Activity's persistent attribute requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#PERSISTENT_ACTIVITY}.
-     */
-    @UiThreadTest
-    @MediumTest
-    public void testSetPersistent() {
-        try {
-            mActivity.setPersistent(true);
-            fail("Activity.setPersistent() did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // Expected
-        }
     }
 
     /**
