@@ -403,7 +403,10 @@ public class CtsTestServer {
         if (path.startsWith(AUTH_PREFIX)) {
             // authentication required
             Header[] auth = request.getHeaders("Authorization");
-            if (auth.length > 0 && auth[0].getValue().equals(AUTH_CREDENTIALS)) {
+            if ((auth.length > 0 && auth[0].getValue().equals(AUTH_CREDENTIALS))
+                // This is a hack to make sure that loads to this url's will always
+                // ask for authentication. This is what the test expects.
+                 && !path.endsWith("embedded_image.html")) {
                 // fall through and serve content
                 path = path.substring(AUTH_PREFIX.length());
             } else {
