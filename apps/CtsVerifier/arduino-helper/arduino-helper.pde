@@ -23,7 +23,7 @@
  * sender in case data is lost and the fixed-byte messages
  * get out of sync.
  */
-#define MESSAGE_SIZE 128
+#define MESSAGE_SIZE 128 // serial buffer size on TTL is 128 bytes
 #define MESSAGE_DELIMITER 0xBEEF
 #define MESSAGE_ESCAPE 0x2a
 struct message {
@@ -62,23 +62,23 @@ struct setmode_pong {
   uint16_t id;
   uint16_t playfield_width;
   uint16_t playfield_height;
-  uint16_t paddle_width;
-  uint16_t paddle_offset;
-  uint16_t max_paddle_motion;
-  uint8_t unused[MESSAGE_SIZE - 14];
+  uint16_t ball_x;
+  uint16_t ball_y;
+  uint16_t ball_radius;
+  uint16_t ball_velocity_x;
+  uint16_t ball_velocity_y;
+  uint8_t unused[MESSAGE_SIZE - 18];
 };
 
 #define OPCODE_PONG_BALL_STATE (OPCODE_RESET + 4)
 struct pong_ball_state {
   uint16_t opcode;
   uint16_t id;
-  uint16_t ball_x;
-  uint16_t ball_y;
-  uint8_t unused[MESSAGE_SIZE - 8];
+  uint8_t unused[MESSAGE_SIZE - 4];
 };
 
 struct wall_time_struct {
-  uint32_t raw; // long == 4-byte on AVR
+  uint32_t raw;
   uint8_t initialized;
   uint8_t hours;
   uint8_t minutes;
@@ -86,20 +86,47 @@ struct wall_time_struct {
 };
 struct wall_time_struct WALL_TIME;
 
+/*
+ * Main ball-playing state record.
+ */
 struct pong_state_struct {
   uint16_t playfield_width;
   uint16_t playfield_height;
-  uint16_t paddle_width;
-  uint16_t paddle_offset;
-  uint16_t max_paddle_motion;
-  uint16_t paddle_x;
-  uint16_t last_ball_x;
-  uint16_t last_ball_y;
+  int16_t ball_x;
+  int16_t ball_y;
+  int16_t ball_radius;
+  int16_t velocity_x;
+  int16_t velocity_y;
 };
 struct pong_state_struct PONG_STATE;
 
 
-void print_current_time() {
+/* This is a temporary buffer used by the message handler */
+struct message_buffer {
+  uint16_t count; // number of bytes read into the buffer
+  uint8_t buffer[MESSAGE_SIZE]; // contents of a 'struct message'
+};
+struct message_buffer MESSAGE_BUFFER;
+
+
+/*
+ * Clears all stateful values, including the wall clock time, current message
+ * data, and user/app state. Also clears the message handler's buffer. By
+ * "clear" we mean "memset to 0".
+ */
+void reset() {
+  memset(&WALL_TIME, 0, sizeof(WALL_TIME));
+  memset(&CURRENT_MESSAGE, 0, sizeof(CURRENT_MESSAGE));
+  memset(&MESSAGE_BUFFER, 0, sizeof(MESSAGE_BUFFER));
+  memset(&PONG_STATE, 0, sizeof(PONG_STATE));
+}
+
+
+/*
+ * Closes out a serial response, which involves sending a blank line in
+ * between messages. Also prints the current time, for funsies.
+ */
+void close_response() {
   if (WALL_TIME.initialized) {
     Serial.print("current_time=");
     Serial.print(WALL_TIME.hours, DEC);
@@ -114,98 +141,124 @@ void print_current_time() {
   } else {
     Serial.println("current_time=00:00:00");
   }
+  Serial.print("\r\n");
 }
 
 
+/*
+ * Opcode processor/handler.
+ */
 void handle_current_message() {
-  static uint16_t last_id;
+  static uint16_t last_id = 999999;
   static struct setmode_pong* setmode_pong_msg;
-  static struct pong_ball_state* pong_ball_state_msg;
-  static uint16_t paddle_half_width;
-  static uint16_t paddle_max;
-  static uint16_t danger;
-  static uint8_t invert;
-  static uint16_t delta;
 
-  if (CURRENT_MESSAGE.id == 0 || CURRENT_MESSAGE.id == last_id) {
+  if (CURRENT_MESSAGE.id == last_id) {
     return;
   }
   last_id = CURRENT_MESSAGE.id;
 
   switch (CURRENT_MESSAGE.opcode) {
 
-    case OPCODE_SETMODE_PONG:
+    case OPCODE_SETMODE_PONG: // initialize ball animation state
       memset(&PONG_STATE, 0, sizeof(PONG_STATE));
       setmode_pong_msg = (struct setmode_pong*)(&CURRENT_MESSAGE);
       PONG_STATE.playfield_width = setmode_pong_msg->playfield_width;
       PONG_STATE.playfield_height = setmode_pong_msg->playfield_height;
-      PONG_STATE.paddle_width = setmode_pong_msg->paddle_width;
-      PONG_STATE.paddle_offset = setmode_pong_msg->paddle_offset;
-      PONG_STATE.max_paddle_motion = setmode_pong_msg->max_paddle_motion;
-
-      paddle_half_width = PONG_STATE.paddle_width / 2;
-      paddle_max = PONG_STATE.playfield_width - paddle_half_width;
+      PONG_STATE.ball_x = setmode_pong_msg->ball_x;
+      PONG_STATE.ball_y = setmode_pong_msg->ball_y;
+      PONG_STATE.ball_radius = setmode_pong_msg->ball_radius;
+      PONG_STATE.velocity_x = setmode_pong_msg->ball_velocity_x;
+      PONG_STATE.velocity_y = setmode_pong_msg->ball_velocity_y;
 
       Serial.println("message_type=setmode_pong_ack");
       Serial.print("id=");
       Serial.println(CURRENT_MESSAGE.id);
-      print_current_time();
-      Serial.println("");
+      Serial.print("ball_x=");
+      Serial.println(PONG_STATE.ball_x, DEC);
+      Serial.print("ball_y=");
+      Serial.println(PONG_STATE.ball_y, DEC);
+      Serial.print("ball_velocity_x=");
+      Serial.println(PONG_STATE.velocity_x, DEC);
+      Serial.print("ball_velocity_y=");
+      Serial.println(PONG_STATE.velocity_y, DEC);
+      Serial.print("playfield_width=");
+      Serial.println(PONG_STATE.playfield_width, DEC);
+      Serial.print("playfield_height=");
+      Serial.println(PONG_STATE.playfield_height, DEC);
+      Serial.print("ball_radius=");
+      Serial.println(PONG_STATE.ball_radius, DEC);
+      close_response();
       break;
 
-    case OPCODE_PONG_BALL_STATE:
-      pong_ball_state_msg = (struct pong_ball_state*)(&CURRENT_MESSAGE);
-      danger = pong_ball_state_msg->ball_x - PONG_STATE.paddle_x;
-      invert = (danger < 0);
-      danger *= invert ? -1 : 1;
-      if (danger < paddle_half_width) {
-        delta = 0;
-      } else if (danger < PONG_STATE.playfield_width / 3) {
-        delta = PONG_STATE.max_paddle_motion / 3;
-      } else if (danger < PONG_STATE.playfield_width * 2 / 3) {
-        delta = PONG_STATE.max_paddle_motion * 2 / 3;
-      } else {
-        delta = PONG_STATE.max_paddle_motion;
+    case OPCODE_PONG_BALL_STATE: // update a frame
+      /* This gets called once per update/refresh request from host. From the
+       * perspective of the AVR, we are running this animation in arbitrary
+       * time units. If host calls this at 10 FPS, we return data at 10 FPS.
+       * If it calls us at 100FPS, we return data at 100FPS. */
+      PONG_STATE.ball_x += PONG_STATE.velocity_x;
+      PONG_STATE.ball_y += PONG_STATE.velocity_y;
+
+      // all we do is bounce around the inside of the box we were given
+      if ((PONG_STATE.ball_x - PONG_STATE.ball_radius) < 0) {
+        PONG_STATE.velocity_x *= -1;
+        PONG_STATE.ball_x = PONG_STATE.ball_radius;
+      } else if ((PONG_STATE.ball_x + PONG_STATE.ball_radius) > PONG_STATE.playfield_width) {
+        PONG_STATE.velocity_x *= -1;
+        PONG_STATE.ball_x = PONG_STATE.playfield_width - PONG_STATE.ball_radius;
       }
-      delta *= invert ? 1 : -1;
-      PONG_STATE.paddle_x += delta;
-      if (PONG_STATE.paddle_x < paddle_half_width) {
-        PONG_STATE.paddle_x = paddle_half_width;
-      } else if (PONG_STATE.paddle_x > paddle_max) {
-        PONG_STATE.paddle_x = paddle_max;
+
+      if ((PONG_STATE.ball_y - PONG_STATE.ball_radius) < 0) {
+        PONG_STATE.velocity_y *= -1;
+        PONG_STATE.ball_y = PONG_STATE.ball_radius;
+      } else if ((PONG_STATE.ball_y + PONG_STATE.ball_radius) > PONG_STATE.playfield_height) {
+        PONG_STATE.velocity_y *= -1;
+        PONG_STATE.ball_y = PONG_STATE.playfield_height - PONG_STATE.ball_radius;
       }
 
       Serial.println("message_type=pong_paddle_state");
       Serial.print("id=");
+      Serial.println(CURRENT_MESSAGE.id, DEC);
+      Serial.print("ball_x=");
+      Serial.println(PONG_STATE.ball_x, DEC);
+      Serial.print("ball_y=");
+      Serial.println(PONG_STATE.ball_y, DEC);
+      close_response();
+      break;
+
+    case OPCODE_RESET:
+      reset();
+      Serial.println("message_type=reset_ack");
+      Serial.print("id=");
       Serial.println(CURRENT_MESSAGE.id);
-      print_current_time();
-      Serial.print("paddle_x=");
-      Serial.println(PONG_STATE.paddle_x);
-      Serial.println("");
+      close_response();
+      break;
+
+    case OPCODE_INIT_TIME:
+      // cast CURRENT_MESSAGE to our time struct to conveniently fetch
+      // out the current time
+      WALL_TIME.raw = ((struct init_time*)(&CURRENT_MESSAGE))->cur_raw_time;
+      WALL_TIME.initialized = 1;
+
+      Serial.println("message_type=init_time_ack");
+      Serial.print("id=");
+      Serial.println(CURRENT_MESSAGE.id);
+      close_response();
+      break;
+
+    case OPCODE_CURRENT_TIME:
+      Serial.println("message_type=current_time_ack");
+      Serial.print("id=");
+      Serial.println(CURRENT_MESSAGE.id);
+      close_response();
       break;
 
     default:
+      Serial.println("message_type=unknown_command_ack");
+      Serial.print("id=");
+      Serial.println(CURRENT_MESSAGE.id);
+      close_response();
       break;
   }
-}
-
-/* This is a temporary buffer used by the message handler */
-struct message_buffer {
-  uint16_t count; // number of bytes read into the buffer
-  uint8_t buffer[MESSAGE_SIZE]; // contents of a 'struct message'
-};
-struct message_buffer MESSAGE_BUFFER;
-
-/*
- * Clears all stateful values, including the wall clock time, current message
- * data, and user/app state. Also clears the message handler's buffer. By
- * "clear" we mean "memset to 0".
- */
-void reset() {
-  memset(&WALL_TIME, 0, sizeof(WALL_TIME));
-  memset(&CURRENT_MESSAGE, 0, sizeof(CURRENT_MESSAGE));
-  memset(&MESSAGE_BUFFER, 0, sizeof(MESSAGE_BUFFER));
-  memset(&PONG_STATE, 0, sizeof(PONG_STATE));
 }
 
 
@@ -226,16 +279,10 @@ void pump_message_processor() {
   static uint8_t cur_byte;
   static uint16_t* cur_word;
   static int8_t delimiter_index;
-  static char buf[4];
+  static char buf[6];
   while (Serial.available() > 0) { // keep going as long as we might have messages
     cur_byte = (uint8_t)(Serial.read() & 0x000000ff);
     MESSAGE_BUFFER.buffer[(MESSAGE_BUFFER.count)++] = cur_byte;
-    Serial.print("booga ");
-    Serial.print(itoa(MESSAGE_BUFFER.count, buf, 10));
-    Serial.print(" ");
-    Serial.print(itoa(Serial.available(), buf, 10));
-    Serial.print(" ");
-    Serial.println(itoa(cur_byte, buf, 10));
     if (MESSAGE_BUFFER.count >= MESSAGE_SIZE) {
       if ((*(uint16_t*)(MESSAGE_BUFFER.buffer + MESSAGE_SIZE - 2)) != MESSAGE_DELIMITER) {
         // whoops, we got out of sync with the transmitter. Scan current
@@ -251,10 +298,6 @@ void pump_message_processor() {
             }
           }
         }
-        Serial.print("klaxon ");
-        Serial.println(itoa(delimiter_index, buf, 10));
-        Serial.print("klaxon ");
-        Serial.println(itoa(*((uint16_t*)(MESSAGE_BUFFER.buffer + MESSAGE_SIZE - 2)), buf, 10));
         MESSAGE_BUFFER.count = 0;
         if (delimiter_index >= 0) {
           for (int i = delimiter_index + 2; i < MESSAGE_SIZE; ++i, ++(MESSAGE_BUFFER.count)) {
@@ -262,46 +305,15 @@ void pump_message_processor() {
           }
         }
         memset(MESSAGE_BUFFER.buffer + MESSAGE_BUFFER.count, 0, MESSAGE_SIZE - MESSAGE_BUFFER.count);
+        close_response();
       } else {
         memcpy(&CURRENT_MESSAGE, MESSAGE_BUFFER.buffer, MESSAGE_SIZE);
         memset(&MESSAGE_BUFFER, 0, sizeof(MESSAGE_BUFFER));
-        switch (CURRENT_MESSAGE.opcode) {
-          case OPCODE_RESET:
-            reset();
-            return;
-
-          case OPCODE_INIT_TIME:
-            // cast CURRENT_MESSAGE to our time struct to conveniently fetch
-            // out the current time
-            WALL_TIME.raw = ((struct init_time*)(&CURRENT_MESSAGE))->cur_raw_time;
-            WALL_TIME.initialized = 1;
-
-            Serial.println("message_type=init_time_ack");
-            Serial.print("id=");
-            Serial.println(CURRENT_MESSAGE.id);
-            print_current_time();
-            Serial.println("");
-
-            CURRENT_MESSAGE.id = 0;
-            break;
-
-          case OPCODE_CURRENT_TIME:
-            Serial.println("message_type=current_time_ack");
-            Serial.print("id=");
-            Serial.println(CURRENT_MESSAGE.id);
-            print_current_time();
-            Serial.println("");
-
-            CURRENT_MESSAGE.id = 0;
-
-          default:
-            // no-op -- actually means main loop will handle it
-            break;
-        }
       }
     }
   }
 }
+
 
 /*
  * Pumps the system wall clock. This checks the device's monotonic clock to
@@ -320,7 +332,6 @@ void pump_clock() {
 
   if (millis() / 1000 != tmp_prev_millis) {
     tmp_prev_millis = millis() / 1000;
-    print_current_time();
   }
 
   if (WALL_TIME.initialized) {
@@ -348,15 +359,7 @@ void setup() {
  * Standard Arduino loop-pump hook.
  */
 void loop() {
-  static uint16_t last_id = 0;
-
-  // pump the clock and message processor
   pump_clock();
   pump_message_processor();
-  
-  // ignore any "system" messages (those with ID == 0) but dispatch app messages
-  if ((last_id != CURRENT_MESSAGE.id) && (CURRENT_MESSAGE.id != 0)) {
-    handle_current_message();
-  }
-  last_id = CURRENT_MESSAGE.id;
+  handle_current_message();
 }
