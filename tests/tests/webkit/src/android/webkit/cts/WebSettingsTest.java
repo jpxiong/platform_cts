@@ -90,8 +90,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     public void testUserAgentString_default() {
         final String actualUserAgentString = mSettings.getUserAgentString();
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
-        final String patternString = "Mozilla/5\\.0 \\(Linux; U; Android (.+); (\\w+)-(\\w+);" +
-            "(.+)\\s?Build/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) Version/4\\.0" +
+        final String patternString = "Mozilla/5\\.0 \\(Linux; U; Android (.+); (\\w+)-(\\w+);\\s?" +
+            "(.*)\\sBuild/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) Version/4\\.0" +
             "( Mobile)? Safari/(\\d+)\\.(\\d+)";
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
