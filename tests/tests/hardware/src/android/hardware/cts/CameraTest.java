@@ -849,25 +849,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(focalLength, exifFocalLength, 0.001);
 
         // Test gps exif tags.
-        mCamera.startPreview();
-        parameters.setGpsLatitude(37.736071);
-        parameters.setGpsLongitude(-122.441983);
-        parameters.setGpsAltitude(21);
-        parameters.setGpsTimestamp(1199145600);
-        String thirtyTwoCharacters = "GPS NETWORK HYBRID ARE ALL FINE.";
-        parameters.setGpsProcessingMethod(thirtyTwoCharacters);
-        mCamera.setParameters(parameters);
-        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
-        waitForSnapshotDone();
-        exif = new ExifInterface(JPEG_PATH);
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP));
-        assertEquals(thirtyTwoCharacters,
-                exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
+        testGpsExifValues(parameters, 37.736071, -122.441983, 21, 1199145600,
+            "GPS NETWORK HYBRID ARE ALL FINE.");
+        testGpsExifValues(parameters, 0.736071, 0.441983, 1, 1199145601, "GPS");
+        testGpsExifValues(parameters, -89.736071, -179.441983, 100000, 1199145602, "NETWORK");
 
         // Test gps tags do not exist after calling removeGpsData.
         mCamera.startPreview();
@@ -878,6 +863,33 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
         terminateMessageLooper();
+    }
+
+    private void testGpsExifValues(Parameters parameters, double latitude,
+            double longitude, double altitude, long timestamp, String method)
+            throws IOException {
+        mCamera.startPreview();
+        parameters.setGpsLatitude(latitude);
+        parameters.setGpsLongitude(longitude);
+        parameters.setGpsAltitude(altitude);
+        parameters.setGpsTimestamp(timestamp);
+        parameters.setGpsProcessingMethod(method);
+        mCamera.setParameters(parameters);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
+        ExifInterface exif = new ExifInterface(JPEG_PATH);
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP));
+        assertNotNull(exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP));
+        assertEquals(method, exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
+        float[] latLong = new float[2];
+        assertTrue(exif.getLatLong(latLong));
+        assertEquals((float)latitude, latLong[0], 0.0001f);
+        assertEquals((float)longitude, latLong[1], 0.0001f);
+        assertEquals(altitude, exif.getAltitude(-1), 1);
     }
 
     private void checkGpsDataNull(ExifInterface exif) {
