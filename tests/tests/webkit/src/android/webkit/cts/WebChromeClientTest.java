@@ -126,7 +126,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         WebIconDatabase mIconDb = WebIconDatabase.getInstance();
         String dbPath = getActivity().getFilesDir().toString() + "/icons";
         mIconDb.open(dbPath);
-        Thread.sleep(250);
+        Thread.sleep(3000);
         mIconDb.removeAllIcons();
 
         assertFalse(webChromeClient.hadOnReceivedIcon());
