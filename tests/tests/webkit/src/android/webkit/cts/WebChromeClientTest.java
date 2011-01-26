@@ -115,42 +115,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "onReceivedIcon",
-            args = {WebView.class, Bitmap.class}
-        )
-    })
-    public void testOnReceivedIcon() throws Throwable {
-        final MockWebChromeClient webChromeClient = new MockWebChromeClient();
-        mWebView.setWebChromeClient(webChromeClient);
-
-        runTestOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                // getInstance must run on the UI thread
-                WebIconDatabase mIconDb = WebIconDatabase.getInstance();
-                String dbPath = getActivity().getFilesDir().toString() + "/icons";
-                mIconDb.open(dbPath);
-                mIconDb.removeAllIcons();
-            }
-        });
-
-        assertFalse(webChromeClient.hadOnReceivedIcon());
-
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mWebView.loadUrl(url);
-
-        new DelayedCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return webChromeClient.hadOnReceivedIcon();
-            }
-        }.run();
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "onCreateWindow",
             args = {WebView.class, boolean.class, boolean.class, Message.class}
         ),
