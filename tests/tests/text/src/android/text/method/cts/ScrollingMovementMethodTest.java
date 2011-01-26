@@ -486,8 +486,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         int previousScrollX = mTextView.getScrollX();
         runActionOnUiThread(new Runnable() {
             public void run() {
-                method.onKeyDown(mTextView, null, KeyEvent.KEYCODE_DPAD_RIGHT,
-                        new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
+                method.onKeyDown(mTextView, (Spannable) mTextView.getText(),
+                        KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                                KeyEvent.KEYCODE_DPAD_RIGHT));
             }
         });
         assertTrue(mTextView.getScrollX() > previousScrollX);
@@ -495,8 +496,9 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         previousScrollX = mTextView.getScrollX();
         runActionOnUiThread(new Runnable() {
             public void run() {
-                method.onKeyDown(mTextView, null, KeyEvent.KEYCODE_DPAD_LEFT,
-                        new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT));
+                method.onKeyDown(mTextView, (Spannable) mTextView.getText(),
+                        KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
+                                KeyEvent.KEYCODE_DPAD_LEFT));
             }
         });
         assertTrue(mTextView.getScrollX() < previousScrollX);
@@ -505,7 +507,8 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertVisibleLineInTextView(0);
         runActionOnUiThread(new Runnable() {
             public void run() {
-                assertFalse(method.onKeyDown(mTextView, mSpannable, 0, null));
+                assertFalse(method.onKeyDown(mTextView, mSpannable, 0,
+                        new KeyEvent(KeyEvent.ACTION_DOWN, 0)));
             }
         });
         assertEquals(previousScrollX, mTextView.getScrollX());
