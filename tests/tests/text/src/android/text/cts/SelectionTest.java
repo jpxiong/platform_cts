@@ -16,15 +16,16 @@
 
 package android.text.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
+
 import android.test.AndroidTestCase;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Selection.class)
 public class SelectionTest extends AndroidTestCase {
@@ -106,12 +107,6 @@ public class SelectionTest extends AndroidTestCase {
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
         }
-
-        try {
-            Selection.setSelection(null, 3, 6);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -145,12 +140,6 @@ public class SelectionTest extends AndroidTestCase {
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
         }
-
-        try {
-            Selection.setSelection(null, 3);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -158,7 +147,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "removeSelection",
         args = {android.text.Spannable.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testRemoveSelection() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -176,12 +164,6 @@ public class SelectionTest extends AndroidTestCase {
         Selection.removeSelection(builder);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.removeSelection(null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -189,7 +171,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "selectAll",
         args = {android.text.Spannable.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testSelectAll() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -214,12 +195,6 @@ public class SelectionTest extends AndroidTestCase {
         Selection.selectAll(empty);
         assertEquals(0, Selection.getSelectionStart(empty));
         assertEquals(0, Selection.getSelectionEnd(empty));
-
-        try {
-            Selection.selectAll(null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -227,20 +202,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveLeft",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testMoveLeft() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 50, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveLeft(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder, 6, 8);
         assertTrue(Selection.moveLeft(builder, layout));
@@ -260,24 +227,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.moveLeft(builder, layout));
         assertEquals(0, Selection.getSelectionStart(builder));
         assertEquals(0, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveLeft(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.moveLeft(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.moveLeft(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -285,20 +234,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveRight",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testMoveRight() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 200, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveRight(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder,1, 5);
         assertTrue(Selection.moveRight(builder, layout));
@@ -322,24 +263,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.moveRight(builder, layout));
         assertEquals(text.length(), Selection.getSelectionStart(builder));
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveRight(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.moveRight(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.moveRight(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargetNew(
@@ -347,7 +270,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveUp",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testMoveUp() {
         CharSequence text = "Google\nhello,world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -380,14 +302,6 @@ public class SelectionTest extends AndroidTestCase {
         assertFalse(Selection.moveUp(builder, layout));
         assertEquals(5, Selection.getSelectionStart(builder));
         assertEquals(5, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveUp(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        Selection.moveUp(null, layout);
     }
 
     @TestTargetNew(
@@ -395,20 +309,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveDown",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testMoveDown() {
         CharSequence text = "hello,world\nGoogle";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 200, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveDown(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder, 1, 3);
         assertTrue(Selection.moveDown(builder, layout));
@@ -433,18 +339,6 @@ public class SelectionTest extends AndroidTestCase {
         Selection.moveDown(builder, layout);
         assertEquals(18, Selection.getSelectionStart(builder));
         assertEquals(18, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveDown(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.moveDown(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargetNew(
@@ -452,8 +346,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendSelection",
         args = {android.text.Spannable.class, int.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testExtendSelection() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -505,20 +397,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendLeft",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testExtendLeft() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 200, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendLeft(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder, 7, 8);
         assertTrue(Selection.extendLeft(builder, layout));
@@ -537,24 +421,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.extendLeft(builder, layout));
         assertEquals(0, Selection.getSelectionStart(builder));
         assertEquals(0, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendLeft(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendLeft(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.extendLeft(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargetNew(
@@ -562,20 +428,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendRight",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testExtendRight() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 200, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendRight(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder, 1, 6);
         assertTrue(Selection.extendRight(builder, layout));
@@ -590,24 +448,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.extendRight(builder, layout));
         assertEquals(12, Selection.getSelectionStart(builder));
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendRight(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.extendRight(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendRight(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargetNew(
@@ -615,7 +455,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendUp",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testExtendUp() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -640,18 +479,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(8, Selection.getSelectionStart(builder));
         assertEquals(0, Selection.getSelectionEnd(builder));
 
-        try {
-            Selection.extendUp(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendUp(null, layout);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
         builder = new SpannableStringBuilder();
         assertTrue(Selection.extendUp(builder, layout));
         assertEquals(-1, Selection.getSelectionStart(builder));
@@ -663,20 +490,12 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendDown",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testExtendDown() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         StaticLayout layout = new StaticLayout(text, new TextPaint(), 200, null, 0, 0, false);
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendDown(builder, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
 
         Selection.setSelection(builder, 1, 3);
         assertTrue(Selection.extendDown(builder, layout));
@@ -690,24 +509,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.extendDown(builder, layout));
         assertEquals(1, Selection.getSelectionStart(builder));
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendDown(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.extendDown(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendDown(null, layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 
     @TestTargetNew(
@@ -715,7 +516,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendToLeftEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testExtendToLeftEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -742,18 +542,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(2, Selection.getSelectionStart(builder));
         assertEquals(0, Selection.getSelectionEnd(builder));
 
-        try {
-            Selection.extendToLeftEdge(new SpannableStringBuilder(), null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendToLeftEdge(null, layout);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
         builder = new SpannableStringBuilder();
         assertEquals(-1, Selection.getSelectionStart(builder));
         assertEquals(-1, Selection.getSelectionEnd(builder));
@@ -768,8 +556,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "extendToRightEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testExtendToRightEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -794,24 +580,6 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.extendToRightEdge(builder, layout));
         assertEquals(1, Selection.getSelectionStart(builder));
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.extendToRightEdge(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            Selection.extendToRightEdge(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.extendToRightEdge(null, layout);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -819,7 +587,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveToLeftEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1371108",explanation = "throw unexpected NullPointerException")
     public void testMoveToLeftEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -845,18 +612,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionStart(builder));
         assertEquals(0, Selection.getSelectionEnd(builder));
 
-        try {
-            Selection.moveToLeftEdge(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.moveToLeftEdge(null, layout);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
         builder = new SpannableStringBuilder();
         assertTrue(Selection.moveToLeftEdge(builder, layout));
         assertEquals(0, Selection.getSelectionStart(builder));
@@ -868,8 +623,6 @@ public class SelectionTest extends AndroidTestCase {
         method = "moveToRightEdge",
         args = {android.text.Spannable.class, android.text.Layout.class}
     )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testMoveToRightEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -894,23 +647,5 @@ public class SelectionTest extends AndroidTestCase {
         assertTrue(Selection.moveToRightEdge(builder, layout));
         assertEquals(text.length(), Selection.getSelectionStart(builder));
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
-
-        try {
-            Selection.moveToRightEdge(builder, null);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.moveToRightEdge(null, layout);
-            fail("should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Selection.moveToRightEdge(new SpannableStringBuilder(), layout);
-            fail("should throw IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
     }
 }
