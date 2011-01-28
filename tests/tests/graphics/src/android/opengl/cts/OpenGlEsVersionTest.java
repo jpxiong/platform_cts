@@ -83,33 +83,42 @@ public class OpenGlEsVersionTest
         EGLDisplay display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
         int[] numConfigs = new int[1];
 
-        if (egl.eglGetConfigs(display, null, 0, numConfigs)) {
-            EGLConfig[] configs = new EGLConfig[numConfigs[0]];
-            if (egl.eglGetConfigs(display, configs, numConfigs[0], numConfigs)) {
-                int[] value = new int[1];
-                for (int i = 0; i < numConfigs[0]; i++) {
-                    if (egl.eglGetConfigAttrib(display, configs[i],
-                            EGL10.EGL_RENDERABLE_TYPE, value)) {
-                        if ((value[0] & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT) {
-                            return 2;
+        if (egl.eglInitialize(display, null)) {
+            try {
+                if (egl.eglGetConfigs(display, null, 0, numConfigs)) {
+                    EGLConfig[] configs = new EGLConfig[numConfigs[0]];
+                    if (egl.eglGetConfigs(display, configs, numConfigs[0], numConfigs)) {
+                        int[] value = new int[1];
+                        for (int i = 0; i < numConfigs[0]; i++) {
+                            if (egl.eglGetConfigAttrib(display, configs[i],
+                                    EGL10.EGL_RENDERABLE_TYPE, value)) {
+                                if ((value[0] & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT) {
+                                    return 2;
+                                }
+                            } else {
+                                Log.w(TAG, "Getting config attribute with "
+                                        + "EGL10#eglGetConfigAttrib failed "
+                                        + "(" + i + "/" + numConfigs[0] + "): "
+                                        + egl.eglGetError());
+                            }
                         }
+                        return 1;
                     } else {
-                        Log.w(TAG, "Getting config attribute with "
-                                + "EGL10#eglGetConfigAttrib failed "
-                                + "(" + i + "/" + numConfigs[0] + "): "
+                        Log.e(TAG, "Getting configs with EGL10#eglGetConfigs failed: "
                                 + egl.eglGetError());
+                        return -1;
                     }
+                } else {
+                    Log.e(TAG, "Getting number of configs with EGL10#eglGetConfigs failed: "
+                            + egl.eglGetError());
+                    return -2;
                 }
-                return 1;
-            } else {
-                Log.e(TAG, "Getting configs with EGL10#eglGetConfigs failed: "
-                        + egl.eglGetError());
-                return -1;
-            }
+              } finally {
+                  egl.eglTerminate(display);
+              }
         } else {
-            Log.e(TAG, "Getting number of configs with EGL10#eglGetConfigs failed: "
-                    + egl.eglGetError());
-            return -2;
+            Log.e(TAG, "Couldn't initialize EGL.");
+            return -3;
         }
     }
 
