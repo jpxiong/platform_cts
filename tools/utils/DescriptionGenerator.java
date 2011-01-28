@@ -65,6 +65,7 @@ public class DescriptionGenerator extends Doclet {
     static final String HOST_CONTROLLER = "dalvik.annotation.HostController";
     static final String KNOWN_FAILURE = "dalvik.annotation.KnownFailure";
     static final String BROKEN_TEST = "dalvik.annotation.BrokenTest";
+    static final String SIDE_EFFECT = "dalvik.annotation.SideEffect";
     static final String SUPPRESSED_TEST = "android.test.suitebuilder.annotation.Suppress";
 
     static final String JUNIT_TEST_CASE_CLASS_NAME = "junit.framework.testcase";
