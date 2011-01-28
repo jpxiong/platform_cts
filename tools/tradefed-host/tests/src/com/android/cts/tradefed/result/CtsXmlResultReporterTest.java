@@ -78,7 +78,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         final String expectedHeaderOutput = "<?xml version='1.0' encoding='UTF-8' standalone='no' ?>" +
             "<?xml-stylesheet type=\"text/xsl\" href=\"cts_result.xsl\"?>";
         final String expectedTestOutput =
-            "<TestResult testPlan=\"unknown\" profile=\"unknown\" starttime=\"ignore\" endtime=\"ignore\" version=\"2.0\"> ";
+            "<TestResult testPlan=\"unknown\" starttime=\"ignore\" endtime=\"ignore\" version=\"1.10\"> ";
         final String expectedSummaryOutput =
             "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"0\" total=\"0\" />";
         final String expectedEndTag = "</TestResult>";
@@ -110,8 +110,8 @@ public class CtsXmlResultReporterTest extends TestCase {
         // TODO: consider doing xml based compare
         assertTrue(output.contains(
                 "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"1\" total=\"1\" />"));
-        assertTrue(output.contains("<TestPackage name=\"run\" runTime=\"3s\" digest=\"\" " +
-                "failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"1\" total=\"1\">"));
+        assertTrue(output.contains("<TestPackage name=\"run\" digest=\"\" " +
+                "failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"1\" >"));
         assertTrue(output.contains(String.format("<TestCase name=\"%s\">", testId.getClassName())));
 
         final String testCaseTag = String.format(
