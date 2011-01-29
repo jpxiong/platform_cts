@@ -54,6 +54,7 @@ project_home=$1
 javac=$2
 tmpdir=$3 # ANDROID_BUILD_TOP/$3
 dxjarpath=$4
+outdir=$5
 project_src=$project_home/src
 project_lib=$project_home/lib
 project_data=$project_home/data
@@ -103,7 +104,7 @@ echo "compile the Main_*.java files"
 javac -d $javac_out -classpath $project_lib/junit.jar:$javac_out -sourcepath $mainfilesdir \@$mainfileslist
 
 # now copy relevant data from intermediates dir to its final destination
-fdest=$ANDROID_BUILD_TOP/out/target/common/cts/dxconverter
+fdest=$outdir/cts/dxconverter
 mkdir -p $fdest/data
 acp -r $javac_out $fdest/
 acp $mainfilesdir/data/scriptdata $fdest/data/scriptdata
