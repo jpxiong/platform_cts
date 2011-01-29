@@ -43,6 +43,11 @@ public class FeatureSummaryActivityTest extends TestCase {
                 actualFeatures.add(feature.name);
             }
         }
+        if (version >= Build.VERSION_CODES.GINGERBREAD) {
+            for (Feature feature : FeatureSummaryActivity.ALL_GINGERBREAD_FEATURES) {
+                actualFeatures.add(feature.name);
+            }
+        }
 
         assertEquals("Feature list needs to be updated.",
                 expectedFeatures.size(), actualFeatures.size());
