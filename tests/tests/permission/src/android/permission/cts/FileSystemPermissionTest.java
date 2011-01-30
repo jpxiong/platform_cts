@@ -200,6 +200,47 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    public void testAllFilesInSysAreNotWritable() throws Exception {
+        assertAllFilesInDirAndSubDirAreNotWritable(new File("/sys"));
+    }
+
+    private static void
+    assertAllFilesInDirAndSubDirAreNotWritable(File dir) throws Exception {
+        assertTrue(dir.isDirectory());
+
+        if (isSymbolicLink(dir)) {
+            // don't examine symbolic links.
+            return;
+        }
+
+        File[] subDirectories = dir.listFiles(new FileFilter() {
+            @Override public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+
+
+        /* recurse into subdirectories */
+        if (subDirectories != null) {
+            for (File f : subDirectories) {
+                assertAllFilesInDirAndSubDirAreNotWritable(f);
+            }
+        }
+
+        File[] filesInThisDirectory = dir.listFiles(new FileFilter() {
+            @Override public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        });
+        if (filesInThisDirectory == null) {
+            return;
+        }
+
+        for (File f: filesInThisDirectory) {
+            assertFalse(f.getCanonicalPath(), f.canWrite());
+        }
+    }
+
     public void testAllBlockDevicesAreNotReadableWritable() throws Exception {
         assertBlockDevicesInDirAndSubDirAreNotWritable(new File("/dev"));
     }
@@ -242,8 +283,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
             return;
         }
 
-        if (!dir.getAbsolutePath().equals(dir.getCanonicalPath())) {
-            // don't follow symbolic links.
+        if (isSymbolicLink(dir)) {
+            // don't examine symbolic links.
             return;
         }
 
@@ -265,5 +306,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         for (File f : subFiles) {
             assertDirectoryAndSubdirectoriesNotWritable(f);
         }
+    }
+
+    private static boolean isSymbolicLink(File f) throws IOException {
+        return !f.getAbsolutePath().equals(f.getCanonicalPath());
     }
 }

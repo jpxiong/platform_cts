@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ -z "${SDK_ROOT}" ]; then
-# CONFIGURATION
-# Set this variable to the root of your Android SDK installation.
-SDK_ROOT=NOT_CONFIGURED
-fi;
-
 if [ -z "${CTS_ROOT}" ]; then
 # CONFIGURATION
 # Set this variable to the root of unzipped CTS directory
@@ -46,26 +40,35 @@ checkFile() {
     fi;
 }
 
+checkPath() {
+    if ! type -P $1 &> /dev/null; then
+        echo "Unable to find $1 in path."
+        exit
+    fi;
+}
+
 checkDir ${CTS_ROOT} "Error: Cannot locate CTS in \"${CTS_DIR}\". Please check your configuration in $0"
-checkDir ${SDK_ROOT} "Error: Cannot locate SDK installation in \"${SDK_ROOT}\". Please check your configuration in $0"
 
 DDM_LIB=${CTS_ROOT}/tools/ddmlib-prebuilt.jar
 CTS_LIB=${CTS_ROOT}/tools/cts.jar
 JUNIT_LIB=${CTS_ROOT}/tools/junit.jar
 HOSTTEST_LIB=${CTS_ROOT}/tools/hosttestlib.jar
 CTS_TEST_ANNOTATIONS_HOST_LIB=${CTS_ROOT}/tools/CtsTestAnnotationsHostLib.jar
-ADB_PATH=${SDK_ROOT}/tools
-ADB_EXE=${ADB_PATH}/adb
 
 checkFile ${DDM_LIB}
 checkFile ${CTS_LIB}
 checkFile ${JUNIT_LIB}
 checkFile ${HOSTTEST_LIB}
-checkFile ${ADB_EXE}
 
 JARS=${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB}:${HOSTTEST_LIB}:${CTS_TEST_ANNOTATIONS_HOST_LIB}
 
-PATH=${ADB_PATH}:${PATH}
+# Add SDK_ROOT to the PATH for backwards compatibility with prior startcts
+# commands that required SDK_ROOT to find adb.
+if [ -n "${SDK_ROOT}" ]; then
+  PATH=${SDK_ROOT}/platform-tools:${SDK_ROOT}/tools:${PATH}
+fi
+
+checkPath adb
 
 # options for the JVM
 JAVA_OPTS="-Xmx512M"

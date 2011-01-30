@@ -74,7 +74,7 @@ export DYLD_LIBRARY_PATH=$base/system/lib
 debug_opts="-Xcheck:jni"
 exe=$base/system/bin/dalvikvm
 bpath=$framework/core.jar
-BASEDIR=$ANDROID_BUILD_TOP/out/target/common/cts/dxconverter
+BASEDIR=$progdir/../cts/dxconverter
 
 echo "--------------------------------------------------"
 echo "DX Converter Test Suite"

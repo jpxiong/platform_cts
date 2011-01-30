@@ -18,11 +18,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,6 +44,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import vogar.ExpectationStore;
+import vogar.Expectation;
+import vogar.ModeId;
 
 public class CollectAllTests extends DescriptionGenerator {
 
@@ -97,10 +103,12 @@ public class CollectAllTests extends DescriptionGenerator {
     private static String MANIFESTFILE = "";
     private static String TESTSUITECLASS = "";
     private static String ANDROID_MAKE_FILE = "";
+    private static String EXPECTATION_DIR = null;
 
     private static Test TESTSUITE;
 
     static XMLGenerator xmlGenerator;
+    private static ExpectationStore vogarExpectationStore;
 
     public static void main(String[] args) {
         if (args.length > 2) {
@@ -108,11 +116,14 @@ public class CollectAllTests extends DescriptionGenerator {
             MANIFESTFILE = args [1];
             TESTSUITECLASS = args[2];
             if (args.length > 3) {
-                ANDROID_MAKE_FILE = args[3];
+                EXPECTATION_DIR = args[3];
+            }
+            if (args.length > 4) {
+                ANDROID_MAKE_FILE = args[4];
             }
         } else {
             System.out.println("usage: \n" +
-                "\t... CollectAllTests <output-file> <manifest-file> <testsuite-class-name> <makefile-file>");
+                "\t... CollectAllTests <output-file> <manifest-file> <testsuite-class-name> <makefile-file> <expectation-dir>");
             System.exit(1);
         }
 
@@ -180,6 +191,14 @@ public class CollectAllTests extends DescriptionGenerator {
             xmlGenerator = new MyXMLGenerator(OUTPUTFILE + ".xml");
         } catch (ParserConfigurationException e) {
             System.err.println("Can't initialize XML Generator");
+            System.exit(1);
+        }
+
+        try {
+            vogarExpectationStore = provideExpectationStore(EXPECTATION_DIR);
+        } catch (IOException e) {
+            System.err.println("Can't initialize vogar expectation store");
+            e.printStackTrace(System.err);
             System.exit(1);
         }
 
@@ -302,6 +321,20 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
     }
 
+    private boolean hasSideEffects(final Class<? extends TestCase> testClass,
+            final String testName) {
+        return getAnnotation(testClass, testName, SIDE_EFFECT) != null;
+    }
+
+    private boolean isVogarKnownFailure(final Class<? extends TestCase> testClass,
+            final String testName) {
+        if (vogarExpectationStore == null) {
+            return false;
+        }
+        String fullTestName = String.format("%s#%s", testClass.getName(), testName);
+        return vogarExpectationStore.get(fullTestName) != Expectation.SUCCESS;
+    }
+
     private String getAnnotation(final Class<? extends TestCase> testClass,
             final String testName, final String annotationName) {
         try {
@@ -349,6 +382,12 @@ public class CollectAllTests extends DescriptionGenerator {
         } else if (isSuppressed(test.getClass(), testName)) {
             System.out.println("ignoring suppressed test: " + test);
             return;
+        } else if (hasSideEffects(test.getClass(), testName)) {
+            System.out.println("ignoring test with side effects: " + test);
+            return;
+        } else if (isVogarKnownFailure(test.getClass(), testName)) {
+            System.out.println("ignoring vogar known failure: " + test);
+            return;
         }
 
         if (!testName.startsWith("test")) {
@@ -376,5 +415,27 @@ public class CollectAllTests extends DescriptionGenerator {
         } catch (NoSuchMethodException e) {
             failed.add(test.getClass().getName());
         }
+    }
+
+    public static ExpectationStore provideExpectationStore(String dir) throws IOException {
+        if (dir == null) {
+            return null;
+        }
+        ExpectationStore result = ExpectationStore.parse(getExpectationFiles(dir), ModeId.DEVICE);
+        return result;
+    }
+
+    private static Set<File> getExpectationFiles(String dir) {
+        Set<File> expectSet = new HashSet<File>();
+        File[] files = new File(dir).listFiles(new FilenameFilter() {
+            // ignore obviously temporary files
+            public boolean accept(File dir, String name) {
+                return !name.endsWith("~") && !name.startsWith(".");
+            }
+        });
+        if (files != null) {
+            expectSet.addAll(Arrays.asList(files));
+        }
+        return expectSet;
     }
 }
