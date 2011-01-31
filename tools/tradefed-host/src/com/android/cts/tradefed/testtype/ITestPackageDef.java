@@ -38,10 +38,14 @@ interface ITestPackageDef {
      * Creates a runnable {@link IRemoteTest} from info stored in this definition.
      *
      * @param testCaseDir {@link File} representing directory of test case data
+     * @param className the test class to restrict this run to or <code>null</code> to run all tests
+     *            in package
+     * @param methodName the optional test method to restrict this run to, or <code>null</code> to
+     *            run all tests in class/package
      * @return a {@link IRemoteTest} with all necessary data populated to run the test or
      *         <code>null</code> if test could not be created
      */
-    public IRemoteTest createTest(File testCaseDir);
+    public IRemoteTest createTest(File testCaseDir, String className, String methodName);
 
     /**
      * Determine if given test is defined in this package.
@@ -50,5 +54,13 @@ interface ITestPackageDef {
      * @return <code>true</code> if test is defined
      */
     public boolean isKnownTest(TestIdentifier testDef);
+
+    /**
+     * Determine if given test class is defined in this package.
+     *
+     * @param testClassName the fully qualified test class name
+     * @return <code>true</code> if test class is defined
+     */
+    public boolean isKnownTestClass(String testClassName);
 
 }
