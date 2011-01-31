@@ -139,14 +139,6 @@ public class TextUtilsTest extends AndroidTestCase {
         } catch (NullPointerException e) {
             // issue 1688347, not clear what is supposed to happen if TextPaint is null.
         }
-
-        try {
-            TextUtils.commaEllipsize(text, p, textWidth, "plus 1", null);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-            // issue 1688347, not clear what is supposed to happen
-            // if the string for "%d more" in the current locale is null.
-        }
     }
 
     @TestTargetNew(
@@ -365,11 +357,11 @@ public class TextUtilsTest extends AndroidTestCase {
             "   In other methods, MARQUEE is equivalent to END, except for the first line.")
     public void testEllipsize() {
         TextPaint p = new TextPaint();
-        
+
         // turn off kerning. with kerning enabled, different methods of measuring the same text
         // produce different results.
         p.setFlags(p.getFlags() & ~p.DEV_KERN_TEXT_FLAG);
-        
+
         CharSequence text = "long string to truncate";
 
         float textWidth = p.measureText(mEllipsis + "uncate");
@@ -391,16 +383,14 @@ public class TextUtilsTest extends AndroidTestCase {
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.MARQUEE).toString());
 
         textWidth = p.measureText(mEllipsis);
-        assertEquals(mEllipsis, TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
+        assertEquals("", TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
         assertEquals("", TextUtils.ellipsize(text, p, textWidth - 1, TruncateAt.END).toString());
         assertEquals("", TextUtils.ellipsize(text, p, -1f, TruncateAt.END).toString());
         assertEquals(text,
                 TextUtils.ellipsize(text, p, Float.MAX_VALUE, TruncateAt.END).toString());
 
-        assertEquals(mEllipsis,
-                TextUtils.ellipsize(text, p, textWidth, TruncateAt.START).toString());
-        assertEquals(mEllipsis,
-                TextUtils.ellipsize(text, p, textWidth, TruncateAt.MIDDLE).toString());
+        assertEquals("", TextUtils.ellipsize(text, p, textWidth, TruncateAt.START).toString());
+        assertEquals("", TextUtils.ellipsize(text, p, textWidth, TruncateAt.MIDDLE).toString());
 
         try {
             TextUtils.ellipsize(text, null, textWidth, TruncateAt.MIDDLE);
@@ -436,7 +426,7 @@ public class TextUtilsTest extends AndroidTestCase {
         // turn off kerning. with kerning enabled, different methods of measuring the same text
         // produce different results.
         p.setFlags(p.getFlags() & ~p.DEV_KERN_TEXT_FLAG);
-        
+
         TextUtils.EllipsizeCallback callback = new TextUtils.EllipsizeCallback() {
             public void ellipsized(final int start, final int end) {
                 mStart = start;
@@ -523,14 +513,14 @@ public class TextUtilsTest extends AndroidTestCase {
 
         // avail is long enough for ELLIPSIS, and preserveLength is specified.
         resetRange();
-        assertEquals(getBlankString(true, text.length()),
+        assertEquals(getBlankString(false, text.length()),
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.END, true, callback).toString());
         assertEquals(0, mStart);
         assertEquals(text.length(), mEnd);
 
         // avail is long enough for ELLIPSIS, and preserveLength doesn't be specified.
         resetRange();
-        assertEquals(mEllipsis,
+        assertEquals("",
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.END, false,
                         callback).toString());
         assertEquals(0, mStart);
