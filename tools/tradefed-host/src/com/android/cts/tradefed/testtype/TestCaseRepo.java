@@ -116,4 +116,17 @@ class TestCaseRepo implements ITestCaseRepo {
     public ITestPackageDef getTestPackage(String testUri) {
         return mTestMap.get(testUri);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String findPackageForTest(String testClassName) {
+        for (Map.Entry<String, TestPackageDef> entry : mTestMap.entrySet()) {
+            if (entry.getValue().isKnownTestClass(testClassName)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 }

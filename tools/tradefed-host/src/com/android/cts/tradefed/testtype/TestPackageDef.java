@@ -23,6 +23,7 @@ import com.android.tradefed.testtype.InstrumentationTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * Container for CTS test info.
@@ -42,10 +43,10 @@ class TestPackageDef implements ITestPackageDef {
     private boolean mIsSignatureTest = false;
     private boolean mIsReferenceAppTest = false;
 
-    private Collection<TestIdentifier> mTests = new ArrayList<TestIdentifier>();
-
-    /** the cached {@link IRemoteTest} */
-    private IRemoteTest mRemoteTest;
+    // use a LinkedHashSet for predictable iteration insertion-order, and fast lookups
+    private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
+    // also maintain an index of known test classes
+    private Collection<String> mTestClasses = new LinkedHashSet<String>();
 
     void setUri(String uri) {
         mUri = uri;
@@ -118,25 +119,14 @@ class TestPackageDef implements ITestPackageDef {
     /**
      * {@inheritDoc}
      */
-    public IRemoteTest createTest(File testCaseDir) {
-        if (mRemoteTest == null) {
-            mRemoteTest = doCreateTest(testCaseDir);
-        }
-        return mRemoteTest;
-    }
-
-    /**
-     * @param testCaseDir
-     * @return
-     */
-    private IRemoteTest doCreateTest(File testCaseDir) {
+    public IRemoteTest createTest(File testCaseDir, String className, String methodName) {
         if (mIsHostSideTest) {
             Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(mName);
             hostTest.setJarFile(new File(testCaseDir, mJarPath));
             hostTest.setTestAppPath(testCaseDir.getAbsolutePath());
-            hostTest.setTests(mTests);
+            hostTest.setTests(filterTests(mTests, className, methodName));
             return hostTest;
         } else if (mIsSignatureTest) {
             // TODO: implement this
@@ -153,6 +143,8 @@ class TestPackageDef implements ITestPackageDef {
             InstrumentationTest instrTest = new InstrumentationTest();
             instrTest.setPackageName(mAppNameSpace);
             instrTest.setRunnerName(mRunner);
+            instrTest.setClassName(className);
+            instrTest.setMethodName(methodName);
             // mName means 'apk file name' for instrumentation tests
             File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
             if (!apkFile.exists()) {
@@ -166,10 +158,38 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
+     * Filter the tests to run based on class and method name
+     *
+     * @param tests the full set of tests in package
+     * @param className the test class name filter. <code>null</code> to run all test classes
+     * @param methodName the test method name. <code>null</code> to run all test methods
+     * @return the filtered collection of tests
+     */
+    private Collection<TestIdentifier> filterTests(Collection<TestIdentifier> tests,
+            String className, String methodName) {
+        Collection<TestIdentifier> filteredTests = new ArrayList<TestIdentifier>(tests.size());
+        for (TestIdentifier test : tests) {
+            if (className == null || test.getClassName().equals(className)) {
+                if (methodName == null || test.getTestName().equals(methodName)) {
+                    filteredTests.add(test);
+                }
+            }
+        }
+        return filteredTests;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public boolean isKnownTest(TestIdentifier testDef) {
         return mTests.contains(testDef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isKnownTestClass(String className) {
+        return mTestClasses.contains(className);
     }
 
     /**
@@ -179,6 +199,7 @@ class TestPackageDef implements ITestPackageDef {
      */
     void addTest(TestIdentifier testDef) {
         mTests.add(testDef);
+        mTestClasses.add(testDef.getClassName());
     }
 
     /**
