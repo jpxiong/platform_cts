@@ -18,6 +18,7 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.ddmlib.Log;
+import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -53,6 +54,8 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
     public static final String TEST_PLANS_DIR_OPTION = "test-plans-path";
     private static final String PLAN_OPTION = "plan";
     private static final String PACKAGE_OPTION = "package";
+    private static final String CLASS_OPTION = "class";
+    private static final String METHOD_OPTION = "method";
 
     private ITestDevice mDevice;
 
@@ -64,6 +67,13 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
 
     @Option(name = "exclude-package", description = "the test packages(s) to exclude from the run")
     private Collection<String> mExcludedPackageNames = new ArrayList<String>();
+
+    @Option(name = CLASS_OPTION, shortName = 'c', description = "run a specific test class")
+    private String mClassName = null;
+
+    @Option(name = METHOD_OPTION, shortName = 'm',
+            description = "run a specific test method, from given --class")
+    private String mMethodName = null;
 
     @Option(name = TEST_CASES_DIR_OPTION, description =
         "file path to directory containing CTS test cases")
@@ -146,6 +156,24 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
     }
 
     /**
+     * Set the test class name to run.
+     * <p/>
+     * Exposed for unit testing
+     */
+    void setClassName(String className) {
+        mClassName = className;
+    }
+
+    /**
+     * Set the test method name to run.
+     * <p/>
+     * Exposed for unit testing
+     */
+    void setMethodName(String methodName) {
+        mMethodName = methodName;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void run(List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
@@ -154,8 +182,8 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
         Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
 
         try {
-            Collection<String> testUris = getTestsToRun();
             ITestCaseRepo testRepo = createTestCaseRepo();
+            Collection<String> testUris = getTestsToRun(testRepo);
             collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
             for (String testUri : testUris) {
                 ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
@@ -179,31 +207,49 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
      * @throws ParseException
      * @throws FileNotFoundException
      */
-    private Collection<String> getTestsToRun() throws ParseException, FileNotFoundException {
+    private Collection<String> getTestsToRun(ITestCaseRepo testRepo) throws ParseException,
+            FileNotFoundException {
         Set<String> testUris = new HashSet<String>();
-        if (mPlanName == null) {
-            testUris.addAll(mPackageNames);
-        } else {
+        if (mPlanName != null) {
             String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
             File ctsPlanFile = new File(mTestPlanDir, ctsPlanRelativePath);
             IPlanXmlParser parser = createXmlParser();
             parser.parse(createXmlStream(ctsPlanFile));
             testUris.addAll(parser.getTestUris());
+        } else if (mPackageNames.size() > 0){
+            testUris.addAll(mPackageNames);
+        } else if (mClassName != null) {
+            // try to find package to run from class name
+            String packageUri = testRepo.findPackageForTest(mClassName);
+            if (packageUri != null) {
+                testUris.add(packageUri);
+            } else {
+                Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
+                        "Could not find package for test class %s", mClassName));
+            }
+        } else {
+            // should never get here - was checkFields() not called?
+            throw new IllegalStateException("nothing to run?");
         }
         testUris.removeAll(mExcludedPackageNames);
         return testUris;
     }
 
     private void checkFields() {
-        if (mPlanName == null && mPackageNames.size() <= 0) {
+        // for simplicity of command line usage, make --plan, --package, and --class mutually
+        // exclusive
+        boolean mutualExclusiveArgs = xor(mPlanName != null, mPackageNames.size() > 0,
+                mClassName != null);
+
+        if (!mutualExclusiveArgs) {
             throw new IllegalArgumentException(String.format(
-                    "Missing the --%s or --%s(s) to run", PLAN_OPTION, PACKAGE_OPTION));
+                    "Ambiguous or missing arguments. " +
+                    "One and only of --%s --%s(s) or --%s to run can be specified",
+                    PLAN_OPTION, PACKAGE_OPTION, CLASS_OPTION));
         }
-        // for simplicity of command line usage, don't allow both --plan and --package
-        if (mPlanName != null && mPackageNames.size() > 0) {
+        if (mMethodName != null && mClassName == null) {
             throw new IllegalArgumentException(String.format(
-                    "Only one of a --%s or --%s(s) to run can be specified", PLAN_OPTION,
-                    PACKAGE_OPTION));
+                    "Must specify --%s when --%s is used", CLASS_OPTION, METHOD_OPTION));
         }
         if (getDevice() == null) {
             throw new IllegalArgumentException("missing device");
@@ -218,6 +264,24 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
     }
 
     /**
+     * Helper method to perform exclusive or on list of boolean arguments
+     *
+     * @param args set of booleans on which to perform exclusive or
+     * @return <code>true</code> if one and only one of <var>args</code> is <code>true</code>.
+     *         Otherwise return <code>false</code>.
+     */
+    private boolean xor(boolean... args) {
+        boolean currentVal = args[0];
+        for (int i=1; i < args.length; i++) {
+            if (currentVal && args[i]) {
+                return false;
+            }
+            currentVal |= args[i];
+        }
+        return currentVal;
+    }
+
+    /**
      * Runs the test.
      *
      * @param listeners
@@ -226,7 +290,7 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
      */
     private void runTest(List<ITestInvocationListener> listeners, ITestPackageDef testPackage)
             throws DeviceNotAvailableException {
-        IRemoteTest test = testPackage.createTest(mTestCaseDir);
+        IRemoteTest test = testPackage.createTest(mTestCaseDir, mClassName, mMethodName);
         if (test != null) {
             if (test instanceof IDeviceTest) {
                 ((IDeviceTest)test).setDevice(getDevice());
@@ -278,5 +342,4 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
     InputStream createXmlStream(File xmlFile) throws FileNotFoundException {
         return new BufferedInputStream(new FileInputStream(xmlFile));
     }
-
 }
