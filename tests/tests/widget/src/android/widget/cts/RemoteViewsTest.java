@@ -18,7 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -218,14 +217,11 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
         method = "setImageViewUri",
         args = {int.class, android.net.Uri.class}
     )
-    @BrokenTest("needs investigation")
     public void testSetImageViewUri() throws IOException {
-        File imageFile = null;
+        String path = getTestImagePath();
+        File imageFile = new File(path);
 
         try {
-            // create the test image first
-            String path = getTestImagePath();
-            imageFile = new File(path);
             createSampleImage(imageFile, R.raw.testimage);
 
             Uri uri = Uri.parse(path);
@@ -234,15 +230,13 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
 
             mRemoteViews.setImageViewUri(R.id.remoteView_image, uri);
             mRemoteViews.reapply(mActivity, mResult);
-            BitmapDrawable d = (BitmapDrawable) mActivity
-            .getResources().getDrawable(R.drawable.testimage);
-            WidgetTestUtils.assertEquals(d.getBitmap(),
-                    ((BitmapDrawable) image.getDrawable()).getBitmap());
+
+            Bitmap imageViewBitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+            Bitmap expectedBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(
+                    mActivity.getResources(), R.raw.testimage, imageViewBitmap.getConfig());
+            WidgetTestUtils.assertEquals(expectedBitmap, imageViewBitmap);
         } finally {
-            if (imageFile != null) {
-                // remove the test image file
-                imageFile.delete();
-            }
+            imageFile.delete();
         }
     }
 
@@ -602,34 +596,36 @@ public class RemoteViewsTest extends ActivityInstrumentationTestCase2<RemoteView
         method = "setUri",
         args = {int.class, java.lang.String.class, android.net.Uri.class}
     )
-    @BrokenTest("needs investigation")
     public void testSetUri() throws IOException {
-        // create the test image first
         String path = getTestImagePath();
         File imagefile = new File(path);
-        createSampleImage(imagefile, R.raw.testimage);
 
-        Uri uri = Uri.parse(path);
-        ImageView image = (ImageView) mResult.findViewById(R.id.remoteView_image);
-        assertNull(image.getDrawable());
-
-        mRemoteViews.setUri(R.id.remoteView_image, "setImageURI", uri);
-        mRemoteViews.reapply(mActivity, mResult);
-        BitmapDrawable d = (BitmapDrawable) mActivity
-                .getResources().getDrawable(R.drawable.testimage);
-        WidgetTestUtils.assertEquals(d.getBitmap(),
-                ((BitmapDrawable) image.getDrawable()).getBitmap());
-
-        mRemoteViews.setUri(R.id.remoteView_absolute, "setImageURI", uri);
         try {
-            mRemoteViews.reapply(mActivity, mResult);
-            fail("Should throw ActionException");
-        } catch (ActionException e) {
-            // expected
-        }
+            createSampleImage(imagefile, R.raw.testimage);
 
-        // remove the test image file
-        imagefile.delete();
+            Uri uri = Uri.parse(path);
+            ImageView image = (ImageView) mResult.findViewById(R.id.remoteView_image);
+            assertNull(image.getDrawable());
+
+            mRemoteViews.setUri(R.id.remoteView_image, "setImageURI", uri);
+            mRemoteViews.reapply(mActivity, mResult);
+
+            Bitmap imageViewBitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+            Bitmap expectedBitmap = WidgetTestUtils.getUnscaledAndDitheredBitmap(
+                    mActivity.getResources(), R.raw.testimage, imageViewBitmap.getConfig());
+            WidgetTestUtils.assertEquals(expectedBitmap, imageViewBitmap);
+
+            mRemoteViews.setUri(R.id.remoteView_absolute, "setImageURI", uri);
+            try {
+                mRemoteViews.reapply(mActivity, mResult);
+                fail("Should throw ActionException");
+            } catch (ActionException e) {
+                // expected
+            }
+        } finally {
+            // remove the test image file
+            imagefile.delete();
+        }
     }
 
     @TestTargetNew(
