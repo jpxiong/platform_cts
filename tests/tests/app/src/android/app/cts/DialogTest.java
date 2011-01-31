@@ -40,6 +40,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -57,8 +58,6 @@ import java.lang.ref.WeakReference;
 public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
 
     protected static final long SLEEP_TIME = 200;
-    private static final long MOTION_DOWN_TIME = 0L;
-    private static final long MOTION_EVENT_TIME = 0L;
     private static final float MOTION_X = -20.0f;
     private static final float MOTION_Y = -20.0f;
     private static final String STUB_ACTIVITY_PACKAGE = "com.android.cts.stub";
@@ -545,8 +544,9 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         assertNull(d.touchEvent);
         assertFalse(d.isOnTouchEventCalled);
 
-        MotionEvent touchMotionEvent = MotionEvent.obtain(MOTION_DOWN_TIME,
-                MOTION_EVENT_TIME, MotionEvent.ACTION_DOWN,
+        long eventTime = SystemClock.uptimeMillis();
+        MotionEvent touchMotionEvent = MotionEvent.obtain(eventTime,
+                eventTime, MotionEvent.ACTION_DOWN,
                 MOTION_X, MOTION_Y, 0);
         // send a touch motion event, and System will call onTouchEvent
         mInstrumentation.sendPointerSync(touchMotionEvent);
@@ -561,8 +561,8 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
 
         // set cancel on touch out side
         d.setCanceledOnTouchOutside(true);
-        touchMotionEvent = MotionEvent.obtain(MOTION_DOWN_TIME + 1,
-                MOTION_EVENT_TIME, MotionEvent.ACTION_DOWN,
+        touchMotionEvent = MotionEvent.obtain(eventTime + 1,
+                eventTime, MotionEvent.ACTION_DOWN,
                 MOTION_X, MOTION_Y, 0);
         // send a out side touch motion event, then the dialog will dismiss
         mInstrumentation.sendPointerSync(touchMotionEvent);
@@ -590,7 +590,8 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
     public void testTrackballEvent() {
         startDialogActivity(DialogStubActivity.TEST_ONSTART_AND_ONSTOP);
         final TestDialog d = (TestDialog) mActivity.getDialog();
-        final MotionEvent trackBallEvent = MotionEvent.obtain(MOTION_DOWN_TIME, MOTION_EVENT_TIME,
+        long eventTime = SystemClock.uptimeMillis();
+        final MotionEvent trackBallEvent = MotionEvent.obtain(eventTime, eventTime,
                 MotionEvent.ACTION_DOWN, MOTION_X, MOTION_Y, 0);
 
         assertNull(d.trackballEvent);
