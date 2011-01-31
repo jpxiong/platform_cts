@@ -16,10 +16,7 @@
 
 package android.os.cts;
 
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -30,77 +27,92 @@ import android.os.SystemClock;
 import android.os.MessageQueue.IdleHandler;
 import android.test.AndroidTestCase;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 @TestTargetClass(MessageQueue.class)
 public class MessageQueueTest extends AndroidTestCase {
 
-    private boolean mResult;
-    // Action flag: true means addIdleHanlder, false means removeIdleHanlder
-    private boolean mActionFlag;
     private static final long TIMEOUT = 1000;
-    private static final long INTERVAL = 50;
-    private IdleHandler mIdleHandler = new IdleHandler() {
-        public boolean queueIdle() {
-            MessageQueueTest.this.mResult = true;
-            return true;
-        }
-    };
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mResult = false;
-    }
+    public void testAddIdleHandler() throws InterruptedException {
+        TestLooperThread looperThread = new TestLooperThread(Test.ADD_IDLE_HANDLER);
+        looperThread.start();
 
-    /**
-     * After calling addIdleHandler (called by MessageQueueTestHelper#doTest), the size of
-     * idleHanlder list is not 0 (before calling addIdleHandler, there is no idleHanlder in
-     * the test looper we started, that means no idleHanlder with flag mResult), and in doTest,
-     * we start a looper, which will queueIdle (Looper.loop()) if idleHanlder list has element,
-     * then mResult will be set true. It can make sure addIdleHandler works. If no idleHanlder
-     * with flag mResult, mResult will be false.
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addIdleHandler",
-        args = {android.os.MessageQueue.IdleHandler.class}
-    )
-    @BrokenTest("needs investigation")
-    public void testAddIdleHandler() throws RuntimeException, InterruptedException {
         try {
-            Looper.myQueue().addIdleHandler(null);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-            // expected
+            if (!looperThread.hasIdleHandlerBeenCalled()) {
+                fail("IdleHandler#queueIdle was NOT called: " + looperThread.getTestProgress());
+            }
+        } finally {
+            assertTrue("The looper should have been running.", looperThread.quit());
         }
-        // If mActionFlag is true, doTest will call addIdleHandler
-        mActionFlag = true;
-        mResult = false;
-        MessageQueueTestHelper tester = new MessageQueueTestHelper();
-        tester.doTest(TIMEOUT, INTERVAL);
-
-        tester.quit();
-        assertTrue(mResult);
     }
 
-    /**
-     * In this test method, at the beginning of the LooperThread, we call addIdleHandler then
-     * removeIdleHandler, there should be no element in idleHanlder list. So the Looper.loop()
-     * will not call queueIdle(), mResult will not be set true.
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeIdleHandler",
-        args = {android.os.MessageQueue.IdleHandler.class}
-    )
-    @BrokenTest("needs investigation")
-    public void testRemoveIdleHandler() throws RuntimeException, InterruptedException {
-        mActionFlag = false;
-        mResult = false;
-        MessageQueueTestHelper tester = new MessageQueueTestHelper();
-        tester.doTest(TIMEOUT, INTERVAL);
+    public void testRemoveIdleHandler() throws InterruptedException {
+        TestLooperThread looperThread = new TestLooperThread(Test.REMOVE_IDLE_HANDLER);
+        looperThread.start();
 
-        tester.quit();
-        assertFalse(mResult);
+        try {
+            if (looperThread.hasIdleHandlerBeenCalled()) {
+                fail("IdleHandler#queueIdle was called: " + looperThread.getTestProgress());
+            }
+        } finally {
+            assertTrue("The looper should have been running.", looperThread.quit());
+        }
+    }
+
+    private enum Test {ADD_IDLE_HANDLER, REMOVE_IDLE_HANDLER};
+
+    /**
+     * {@link HandlerThread} that adds or removes an idle handler depending on the {@link Test}
+     * given. It uses a {@link CountDownLatch} with an initial count of 2. The first count down
+     * occurs right before the looper's run thread had started running. The final count down
+     * occurs when the idle handler was executed. Tests can call {@link #hasIdleHandlerBeenCalled()}
+     * to see if the countdown reached to 0 or not.
+     */
+    private static class TestLooperThread extends HandlerThread {
+
+        private final Test mTestMode;
+
+        private final CountDownLatch mIdleLatch = new CountDownLatch(2);
+
+        TestLooperThread(Test testMode) {
+            super("TestLooperThread");
+            mTestMode = testMode;
+        }
+
+        @Override
+        protected void onLooperPrepared() {
+            super.onLooperPrepared();
+
+            IdleHandler idleHandler = new IdleHandler() {
+                public boolean queueIdle() {
+                    mIdleLatch.countDown();
+                    return false;
+                }
+            };
+
+            if (mTestMode == Test.ADD_IDLE_HANDLER) {
+                Looper.myQueue().addIdleHandler(idleHandler);
+            } else {
+                Looper.myQueue().addIdleHandler(idleHandler);
+                Looper.myQueue().removeIdleHandler(idleHandler);
+            }
+        }
+
+        @Override
+        public void run() {
+            mIdleLatch.countDown();
+            super.run();
+        }
+
+        public boolean hasIdleHandlerBeenCalled() throws InterruptedException {
+            return mIdleLatch.await(TIMEOUT, TimeUnit.MILLISECONDS);
+        }
+
+        public long getTestProgress() {
+            return mIdleLatch.getCount();
+        }
     }
 
     /**
@@ -152,68 +164,6 @@ public class MessageQueueTest extends AndroidTestCase {
         };
 
         tester.doTest(1000, 50);
-    }
-
-    /**
-     * Helper class used to test addIdleHandler, removeIdleHandler
-     */
-    private class MessageQueueTestHelper {
-
-        private boolean mDone;
-        private Looper mLooper;
-
-        public void doTest(long timeout, long interval) throws InterruptedException {
-            (new LooperThread()).start();
-            synchronized (this) {
-                long now = System.currentTimeMillis();
-                long endTime = now + timeout;
-                // Wait and frequently check if mDone is set.
-                while (!mDone && now < endTime) {
-                    wait(interval);
-                    now = System.currentTimeMillis();
-                }
-            }
-            mLooper.quit();
-            if (!mDone) {
-                throw new RuntimeException("test timed out");
-            }
-        }
-
-        private class LooperThread extends HandlerThread {
-            public LooperThread() {
-                super("MessengeQueueLooperThread");
-            }
-
-            public void onLooperPrepared() {
-                mLooper = getLooper();
-                if (mActionFlag) {
-                    // If mActionFlag is true, just addIdleHandler, and
-                    // Looper.loop() will set mResult true.
-                    Looper.myQueue().addIdleHandler(mIdleHandler);
-                } else {
-                    // If mActionFlag is false, addIdleHandler and remove it, then Looper.loop()
-                    // will not set mResult true because the idleHandler list is empty.
-                    Looper.myQueue().addIdleHandler(mIdleHandler);
-                    Looper.myQueue().removeIdleHandler(mIdleHandler);
-                }
-            }
-
-            @Override
-            public void run() {
-                super.run();
-                synchronized (MessageQueueTestHelper.this) {
-                    mDone = true;
-                    MessageQueueTestHelper.this.notifyAll();
-                }
-            }
-        }
-
-        public void quit() {
-            synchronized (this) {
-                mDone = true;
-                notifyAll();
-            }
-        }
     }
 
     /**
