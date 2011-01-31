@@ -21,12 +21,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.ToBeFixed;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
 import android.text.Layout;
 import android.text.Spannable;
@@ -77,53 +72,6 @@ public class LayoutTest extends AndroidTestCase {
             new MockLayout(null, null, -1, null, 0, 0);
             fail("should throw IllegalArgumentException here");
         } catch (IllegalArgumentException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testDraw1() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        layout.draw(new Canvas());
-
-        try {
-            layout.draw(new Canvas(Bitmap.createBitmap(200, 200, Config.ARGB_4444)));
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, android.graphics.Path.class,
-                android.graphics.Paint.class, int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testDraw2() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        layout.draw(new Canvas(), null, null, 0);
-
-        try {
-            Bitmap bitmap = Bitmap.createBitmap(200, 200,Config.ARGB_4444);
-            layout.draw(new Canvas(bitmap), null, null, 0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            Bitmap bitmap = Bitmap.createBitmap(200, 200, null);
-            layout.draw(new Canvas(bitmap), new Path(), new Paint(), 2);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
         }
     }
 
@@ -280,66 +228,6 @@ public class LayoutTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "getPrimaryHorizontal",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetPrimaryHorizontal() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getPrimaryHorizontal(0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSecondaryHorizontal",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetSecondaryHorizontal() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getSecondaryHorizontal(0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineLeft",
-        args = {int.class}
-    )
-    public void testGetLineLeft() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        assertEquals(2.0f, layout.getLineLeft(0));
-        assertEquals(4.0f, layout.getLineLeft(1));
-        assertEquals(1.0f, layout.getLineLeft(2));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineRight",
-        args = {int.class}
-    )
-    public void testGetLineRight() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        assertEquals(9.0f, layout.getLineRight(0));
-        assertEquals(7.0f, layout.getLineRight(1));
-        assertEquals(10.0f, layout.getLineRight(2));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "getLineForVertical",
         args = {int.class}
     )
@@ -364,23 +252,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(1, layout.getLineForOffset(1));
         assertEquals(LINE_COUNT - 1, layout.getLineForOffset(LINE_COUNT - 1));
         assertEquals(LINE_COUNT - 1, layout.getLineForOffset(1000));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOffsetForHorizontal",
-        args = {int.class, float.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetOffsetForHorizontal() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getOffsetForHorizontal(0, 0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
@@ -446,84 +317,6 @@ public class LayoutTest extends AndroidTestCase {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(-8, layout.getLineAscent(0));
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOffsetToLeftOf",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetOffsetToLeftOf() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getOffsetToLeftOf(0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOffsetToRightOf",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetOffsetToRightOf() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getOffsetToRightOf(0);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCursorPath",
-        args = {int.class, android.graphics.Path.class, java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetCursorPath() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        try {
-            layout.getCursorPath(0, new Path(), "test");
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSelectionPath",
-        args = {int.class, int.class, android.graphics.Path.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "can not get the" +
-            " package protected class Directions")
-    public void testGetSelectionPath() {
-        Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
-                mAlign, mSpacingmult, mSpacingadd);
-        Path path = new Path();
-
-        layout.getSelectionPath(0, 0, path);
-
-        try {
-            layout.getSelectionPath(1, 0, path);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            layout.getSelectionPath(0, 1, path);
-            fail("should throw NullPointerException here");
-        } catch (NullPointerException e) {
-        }
     }
 
     @TestTargetNew(
