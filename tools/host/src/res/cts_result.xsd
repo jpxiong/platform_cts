@@ -148,11 +148,12 @@
 
 <xs:complexType name="testPackageType">
   <xs:sequence>
-    <xs:element name="TestSuite" type="testSuiteType"/>
+    <xs:element name="TestSuite" type="testSuiteType" minOccurs="0" maxOccurs="unbounded" />
   </xs:sequence>
   <xs:attribute name="appPackageName" type="xs:string"/>
   <xs:attribute name="digest" type="xs:hexBinary"/>
   <xs:attribute name="name" type="xs:string" use="required"/>
+  <xs:attribute name="signatureCheck" type="xs:boolean" />
 </xs:complexType>
 
 <xs:complexType name="testSuiteType">
