@@ -18,7 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -26,7 +25,6 @@ import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
@@ -34,7 +32,6 @@ import android.os.Parcelable;
 import android.test.InstrumentationTestCase;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.CycleInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ProgressBar;
@@ -72,7 +69,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
 
         new ProgressBar(mContext, null);
 
-        new ProgressBar(mContext, null, com.android.internal.R.attr.progressBarStyle);
+        new ProgressBar(mContext, null, android.R.attr.progressBarStyle);
     }
 
     @TestTargets({
@@ -98,8 +95,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
         // because default is Indeterminate only progressBar, can't change the status
         assertTrue(progressBar.isIndeterminate());
 
-        progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+        progressBar = new ProgressBar(mContext, null, android.R.attr.progressBarStyleHorizontal);
         assertFalse(progressBar.isIndeterminate());
 
         progressBar.setIndeterminate(true);
@@ -152,7 +148,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     })
     public void testAccessProgressDrawable() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                        com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
 
         // set ProgressDrawable
         // normal value
@@ -182,7 +178,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     })
     public void testAccessProgress() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
         assertEquals(0, progressBar.getProgress());
 
         final int maxProgress = progressBar.getMax();
@@ -221,7 +217,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     })
     public void testAccessSecondaryProgress() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
         assertEquals(0, progressBar.getSecondaryProgress());
 
         final int maxProgress = progressBar.getMax();
@@ -253,7 +249,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     )
     public void testIncrementProgressBy() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
 
         // normal value
         int increment = 1;
@@ -283,7 +279,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     )
     public void testIncrementSecondaryProgressBy() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
 
         // normal value
         int increment = 1;
@@ -319,8 +315,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
         )
     })
     public void testAccessInterpolator() {
-        ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyle);
+        ProgressBar progressBar = new ProgressBar(mContext);
 
         // default should be LinearInterpolator
         assertTrue(progressBar.getInterpolator() instanceof LinearInterpolator);
@@ -329,54 +324,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         Interpolator i = new AccelerateDecelerateInterpolator();
         progressBar.setInterpolator(i);
         assertEquals(i, progressBar.getInterpolator());
-
-        // exceptional value
-        progressBar.setInterpolator(null);
-        assertNull(progressBar.getInterpolator());
-
-        // TODO: test whether setInterpolator takes effect? How to get the animation?
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInterpolator",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInterpolator",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setInterpolator() is incomplete." +
-            "1. not clear what is supposed to happen if context or resID is exceptional.")
-    @BrokenTest("Initial setInterpolator() call occasionally fails with NPE. context null?")
-    public void testAccessInterpolatorContext() {
-        ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyle);
-
-        // default is LinearInterpolator
-        assertTrue(progressBar.getInterpolator() instanceof LinearInterpolator);
-
-        // normal value
-        progressBar.setInterpolator(mContext.getApplicationContext(), R.anim.move_cycle);
-        assertTrue(progressBar.getInterpolator() instanceof CycleInterpolator);
-
-        // exceptional value
-        try {
-            progressBar.setInterpolator(null, R.anim.move_ani);
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-            // issue 1695243, not clear what is supposed to happen if context is null.
-        }
-
-        try {
-            progressBar.setInterpolator(mContext.getApplicationContext(), -1);
-            fail("Should throw NotFoundException");
-        } catch (NotFoundException e) {
-            // issue 1695243, not clear what is supposed to happen if resID is exceptional.
-        }
     }
 
     @TestTargetNew(
@@ -388,7 +335,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
             "1. not clear what is supposed result if visibility isn't VISIBLE, INVISIBLE or GONE.")
     public void testSetVisibility() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
 
         // set visibility
         // normal value
@@ -472,7 +419,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     })
     public void testAccessMax() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
 
         // set Progress
         int progress = 10;
@@ -612,7 +559,7 @@ public class ProgressBarTest extends InstrumentationTestCase {
     })
     public void testOnSaveAndRestoreInstanceState() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
-                com.android.internal.R.attr.progressBarStyleHorizontal);
+                android.R.attr.progressBarStyleHorizontal);
         int oldProgress = 1;
         int oldSecondaryProgress = progressBar.getMax() - 1;
         progressBar.setProgress(oldProgress);
