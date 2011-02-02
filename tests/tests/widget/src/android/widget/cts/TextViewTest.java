@@ -44,6 +44,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -1806,7 +1807,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         // a key event that will not change the TextView's text
         assertEquals("", mTextView.getText().toString());
         // The icon and error message will not be reset to null
-        assertNotNull(mTextView.getError());
+        assertNull(mTextView.getError());
 
         mInstrumentation.sendStringSync("1");
         // a key event cause changes to the TextView's text
