@@ -249,12 +249,7 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertEquals(3, c.getInt(0));
         // close the database and see if requery throws an exception
         mDatabase.close();
-        try {
-            c.requery();
-            fail("expected IllegalStateException");
-        } catch (IllegalStateException e) {
-            // expected
-        }
+        assertFalse(c.requery());
     }
 
     @TestTargets({
