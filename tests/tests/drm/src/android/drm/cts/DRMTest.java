@@ -16,8 +16,6 @@
 
 package android.drm.cts;
 
-import com.android.cts.drm.R;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
