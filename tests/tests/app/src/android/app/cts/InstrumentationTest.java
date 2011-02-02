@@ -88,6 +88,7 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mIntent = null;
         if (mActivity != null) {
             mActivity.finish();
+            mActivity = null;
         }
         super.tearDown();
     }
@@ -604,18 +605,6 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mInstrumentation.callActivityOnPause(mActivity);
         mInstrumentation.waitForIdleSync();
         assertTrue(mActivity.isOnPauseCalled());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "callActivityOnDestroy",
-        args = {Activity.class}
-    )
-    public void testCallActivityOnDestroy() throws Exception {
-        mActivity.setOnDestroyCalled(false);
-        mInstrumentation.callActivityOnDestroy(mActivity);
-        mInstrumentation.waitForIdleSync();
-        assertTrue(mActivity.isOnDestroyCalled());
     }
 
     @TestTargetNew(
