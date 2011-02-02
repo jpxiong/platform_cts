@@ -16,6 +16,11 @@
 
 package android.app.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -27,10 +32,6 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
 import android.test.suitebuilder.annotation.MediumTest;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Service.class)
 public class ServiceTest extends ActivityTestsBase {
@@ -49,8 +50,8 @@ public class ServiceTest extends ActivityTestsBase {
     private Intent mLocalService;
     private Intent mLocalDeniedService;
     private Intent mLocalGrantedService;
-    private Intent mLocalServiceGranted;
-    private Intent mLocalServiceDenied;
+    private Intent mLocalService_ApplicationHasPermission;
+    private Intent mLocalService_ApplicationDoesNotHavePermission;
 
     private IBinder mStateReceiver;
 
@@ -317,8 +318,8 @@ public class ServiceTest extends ActivityTestsBase {
         mLocalService = new Intent(mContext, LocalService.class);
         mLocalDeniedService = new Intent(mContext, LocalDeniedService.class);
         mLocalGrantedService = new Intent(mContext, LocalGrantedService.class);
-        mLocalServiceGranted = new Intent(LocalService.SERVICE_LOCAL_GRANTED);
-        mLocalServiceDenied = new Intent(LocalService.SERVICE_LOCAL_DENIED);
+        mLocalService_ApplicationHasPermission = new Intent(LocalService.SERVICE_LOCAL_GRANTED);
+        mLocalService_ApplicationDoesNotHavePermission = new Intent(LocalService.SERVICE_LOCAL_DENIED);
         mStateReceiver = new MockBinder();
     }
 
@@ -388,7 +389,7 @@ public class ServiceTest extends ActivityTestsBase {
         super.tearDown();
         mContext.stopService(mLocalService);
         mContext.stopService(mLocalGrantedService);
-        mContext.stopService(mLocalServiceGranted);
+        mContext.stopService(mLocalService_ApplicationHasPermission);
     }
 
     @TestTargets({
@@ -634,8 +635,9 @@ public class ServiceTest extends ActivityTestsBase {
         )
     })
     @MediumTest
-    public void testLocalStartClassPermissionGranted() throws Exception {
+    public void testLocalStartClassPermissions() throws Exception {
         startExpectResult(mLocalGrantedService);
+        startExpectResult(mLocalDeniedService);
     }
 
     @TestTargets({
@@ -666,8 +668,9 @@ public class ServiceTest extends ActivityTestsBase {
         )
     })
     @MediumTest
-    public void testLocalStartActionPermissionGranted() throws Exception {
-        startExpectResult(mLocalServiceGranted);
+    public void testLocalStartActionPermissions() throws Exception {
+        startExpectResult(mLocalService_ApplicationHasPermission);
+        startExpectResult(mLocalService_ApplicationDoesNotHavePermission);
     }
 
     @TestTargets({
@@ -698,8 +701,9 @@ public class ServiceTest extends ActivityTestsBase {
         )
     })
     @MediumTest
-    public void testLocalBindClassPermissionGranted() throws Exception {
+    public void testLocalBindClassPermissions() throws Exception {
         bindExpectResult(mLocalGrantedService);
+        bindExpectResult(mLocalDeniedService);
     }
 
     @TestTargets({
@@ -730,8 +734,9 @@ public class ServiceTest extends ActivityTestsBase {
         )
     })
     @MediumTest
-    public void testLocalBindActionPermissionGranted() throws Exception {
-        bindExpectResult(mLocalServiceGranted);
+    public void testLocalBindActionPermissions() throws Exception {
+        bindExpectResult(mLocalService_ApplicationHasPermission);
+        bindExpectResult(mLocalService_ApplicationDoesNotHavePermission);
     }
 
     @TestTargets({
@@ -795,135 +800,7 @@ public class ServiceTest extends ActivityTestsBase {
     })
     @MediumTest
     public void testLocalBindAutoActionPermissionGranted() throws Exception {
-        bindAutoExpectResult(mLocalServiceGranted);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
-    @MediumTest
-    public void testLocalStartClassPermissionDenied() throws Exception {
-        startExpectNoPermission(mLocalDeniedService);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
-    @MediumTest
-    public void testLocalStartActionPermissionDenied() throws Exception {
-        startExpectNoPermission(mLocalServiceDenied);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
-    @MediumTest
-    public void testLocalBindClassPermissionDenied() throws Exception {
-        bindExpectNoPermission(mLocalDeniedService);
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
-    @MediumTest
-    public void testLocalBindActionPermissionDenied() throws Exception {
-        bindExpectNoPermission(mLocalServiceDenied);
+        bindAutoExpectResult(mLocalService_ApplicationHasPermission);
     }
 
     @TestTargets({
@@ -957,7 +834,7 @@ public class ServiceTest extends ActivityTestsBase {
     public void testLocalUnbindTwice() throws Exception {
         EmptyConnection conn = new EmptyConnection();
         mContext.bindService(
-                mLocalServiceGranted, conn, 0);
+                mLocalService_ApplicationHasPermission, conn, 0);
         mContext.unbindService(conn);
         try {
             mContext.unbindService(conn);
