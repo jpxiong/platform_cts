@@ -16,6 +16,11 @@
 
 package android.view.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
@@ -24,10 +29,6 @@ import android.test.AndroidTestCase;
 import android.text.SpannedString;
 import android.view.Gravity;
 import android.view.WindowManager;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(WindowManager.LayoutParams.class)
 public class WindowManager_LayoutParamsTest extends AndroidTestCase {
@@ -167,18 +168,15 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
         params.setTitle(PARAMS_TITLE);
         params.alpha = ALPHA - 0.5f;
         params.windowAnimations = WINDOW_ANIMATIONS;
-        params.memoryType = WindowManager.LayoutParams.MEMORY_TYPE_HARDWARE;
         params.dimAmount = DIM_AMOUNT - 1.0f;
         mLayoutParams = new WindowManager.LayoutParams();
         assertEquals(WindowManager.LayoutParams.TITLE_CHANGED
                 | WindowManager.LayoutParams.ALPHA_CHANGED
-                | WindowManager.LayoutParams.MEMORY_TYPE_CHANGED
                 | WindowManager.LayoutParams.ANIMATION_CHANGED
                 | WindowManager.LayoutParams.DIM_AMOUNT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.getTitle(), mLayoutParams.getTitle());
         assertEquals(params.alpha, mLayoutParams.alpha);
-        assertEquals(params.memoryType, mLayoutParams.memoryType);
         assertEquals(params.dimAmount, mLayoutParams.dimAmount);
 
         params = new WindowManager.LayoutParams();
