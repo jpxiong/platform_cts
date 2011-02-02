@@ -16,7 +16,14 @@
 
 package android.content.cts;
 
-import java.io.IOException;
+import com.android.cts.stub.R;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -28,14 +35,7 @@ import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
-import com.android.cts.stub.R;
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.io.IOException;
 
 @TestTargetClass(Context.class)
 public class ContextTest extends AndroidTestCase {
@@ -132,7 +132,6 @@ public class ContextTest extends AndroidTestCase {
             args = {android.util.AttributeSet.class, int[].class}
         )
     })
-    @ToBeFixed(bug=" ", explanation = "Wrong resource ID can not result in a exception.")
     public void testObtainStyledAttributes() {
         // Test obtainStyledAttributes(int[])
         TypedArray testTypedArray = mContext
@@ -165,17 +164,18 @@ public class ContextTest extends AndroidTestCase {
         testTypedArray.recycle();
 
         // Test obtainStyledAttributes(AttributeSet, int[])
+        int[] attrs = android.R.styleable.DatePicker;
         testTypedArray = mContext.obtainStyledAttributes(getAttributeSet(R.layout.context_layout),
-                com.android.internal.R.styleable.DatePicker);
+                attrs);
         assertNotNull(testTypedArray);
-        assertEquals(2, testTypedArray.length());
+        assertEquals(attrs.length, testTypedArray.length());
         testTypedArray.recycle();
 
         // Test obtainStyledAttributes(AttributeSet, int[], int, int)
         testTypedArray = mContext.obtainStyledAttributes(getAttributeSet(R.layout.context_layout),
-                com.android.internal.R.styleable.DatePicker, 0, 0);
+                attrs, 0, 0);
         assertNotNull(testTypedArray);
-        assertEquals(2, testTypedArray.length());
+        assertEquals(attrs.length, testTypedArray.length());
         testTypedArray.recycle();
     }
 
