@@ -35,10 +35,10 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -247,11 +247,15 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
-    public void testStoreImagesMediaExternal() {
+    public void testStoreImagesMediaExternal() throws Exception {
         final String externalPath = Environment.getExternalStorageDirectory().getPath() +
                 "/testimage.jpg";
         final String externalPath2 = Environment.getExternalStorageDirectory().getPath() +
                 "/testimage1.jpg";
+
+        int numBytes = 1337;
+        FileCopyHelper.createFile(new File(externalPath), numBytes);
+
         ContentValues values = new ContentValues();
         values.put(Media.ORIENTATION, 0);
         values.put(Media.PICASA_ID, 0);
@@ -265,7 +269,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         values.put(Media.DATA, externalPath);
         values.put(Media.DISPLAY_NAME, "testimage");
         values.put(Media.MIME_TYPE, "image/jpeg");
-        values.put(Media.SIZE, 86853);
+        values.put(Media.SIZE, numBytes);
         values.put(Media.TITLE, "testimage");
         long dateAdded = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_ADDED, dateAdded);
@@ -296,7 +300,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             assertEquals("testimage", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("image/jpeg", c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals("testimage", c.getString(c.getColumnIndex(Media.TITLE)));
-            assertEquals(86853, c.getInt(c.getColumnIndex(Media.SIZE)));
+            assertEquals(numBytes, c.getInt(c.getColumnIndex(Media.SIZE)));
             long realDateAdded = c.getLong(c.getColumnIndex(Media.DATE_ADDED));
             assertTrue(realDateAdded >= dateAdded);
             assertEquals(dateModified, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
