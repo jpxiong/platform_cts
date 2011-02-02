@@ -136,20 +136,19 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         int initialHour = 13;
         int initialMinute = 50;
         mTimePicker = new TimePicker(mContext);
-        mTimePicker.setCurrentHour(Integer.valueOf(initialHour));
-        mTimePicker.setCurrentMinute(Integer.valueOf(initialMinute));
+
         MockOnTimeChangeListener listener = new MockOnTimeChangeListener();
         mTimePicker.setOnTimeChangedListener(listener);
+        mTimePicker.setCurrentHour(Integer.valueOf(initialHour));
+        mTimePicker.setCurrentMinute(Integer.valueOf(initialMinute));
+        assertEquals(initialHour, listener.getNotifiedHourOfDay());
+        assertEquals(initialMinute, listener.getNotifiedMinute());
 
         // set the same hour as current
         listener.reset();
         mTimePicker.setCurrentHour(Integer.valueOf(initialHour));
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour, listener.getNotifiedHourOfDay());
-        assertEquals(initialMinute, listener.getNotifiedMinute());
-        assertSame(mTimePicker, listener.getNotifiedView());
+        assertFalse(listener.hasCalledOnTimeChanged());
 
-        listener.reset();
         mTimePicker.setCurrentHour(Integer.valueOf(initialHour + 1));
         assertTrue(listener.hasCalledOnTimeChanged());
         assertEquals(initialHour + 1, listener.getNotifiedHourOfDay());
@@ -159,10 +158,7 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         // set the same minute as current
         listener.reset();
         mTimePicker.setCurrentMinute(initialMinute);
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour + 1, listener.getNotifiedHourOfDay());
-        assertEquals(initialMinute, listener.getNotifiedMinute());
-        assertSame(mTimePicker, listener.getNotifiedView());
+        assertFalse(listener.hasCalledOnTimeChanged());
 
         listener.reset();
         mTimePicker.setCurrentMinute(initialMinute + 1);
@@ -174,10 +170,7 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         // change time picker mode
         listener.reset();
         mTimePicker.setIs24HourView( !mTimePicker.is24HourView() );
-        assertTrue(listener.hasCalledOnTimeChanged());
-        assertEquals(initialHour + 1, listener.getNotifiedHourOfDay());
-        assertEquals(initialMinute + 1, listener.getNotifiedMinute());
-        assertSame(mTimePicker, listener.getNotifiedView());
+        assertFalse(listener.hasCalledOnTimeChanged());
     }
 
     @TestTargets({
