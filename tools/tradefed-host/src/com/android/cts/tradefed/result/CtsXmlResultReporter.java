@@ -26,7 +26,6 @@ import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestRunResult;
-import com.android.tradefed.result.TestResult.TestStatus;
 import com.android.tradefed.targetsetup.IBuildInfo;
 import com.android.tradefed.targetsetup.IFolderBuildInfo;
 import com.android.tradefed.util.FileUtil;
@@ -44,7 +43,6 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -60,15 +58,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     private static final String TEST_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "2.0";
+    private static final String CTS_RESULT_FILE_VERSION = "1.10";
     private static final String CTS_VERSION = "99";
-
 
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
 
     /** the XML namespace */
-    private static final String ns = null;
+    static final String ns = null;
 
     private static final String REPORT_DIR_NAME = "output-file-path";
     @Option(name=REPORT_DIR_NAME, description="root file system path to directory to store xml " +
@@ -79,6 +76,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     protected IBuildInfo mBuildInfo;
 
     private String mStartTime;
+
+    private String mReportPath = "";
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -115,7 +114,17 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     @Override
     public void testLog(String dataName, LogDataType dataType, InputStream dataStream) {
-        // TODO: implement this
+        // save as zip file in report dir
+        // TODO: ensure uniqueness of file name
+        // TODO: use dataType.getFileExt() when its made public
+        String fileName = String.format("%s.%s", dataName, dataType.name().toLowerCase());
+        // TODO: consider compressing large files
+        File logFile = new File(mReportDir, fileName);
+        try {
+            FileUtil.writeToFile(dataStream, logFile);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, String.format("Failed to write log %s", logFile.getAbsolutePath()));
+        }
     }
 
     /**
@@ -171,7 +180,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             serializer.endDocument();
             // TODO: output not executed timeout omitted counts
             String msg = String.format("XML test result file generated at %s. Total tests %d, " +
-                    "Failed %d, Error %d", reportDir.getAbsolutePath(), getNumTotalTests(),
+                    "Failed %d, Error %d", getReportPath(), getNumTotalTests(),
                     getNumFailedTests(), getNumErrorTests());
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, msg);
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Time: %s",
@@ -188,6 +197,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
     }
 
+    private String getReportPath() {
+        return mReportPath;
+    }
+
     /**
      * Output the results XML.
      *
@@ -201,7 +214,6 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.startTag(ns, "TestResult");
         // TODO: output test plan and profile values
         serializer.attribute(ns, "testPlan", "unknown");
-        serializer.attribute(ns, "profile", "unknown");
         serializer.attribute(ns, "starttime", startTime);
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
@@ -387,12 +399,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.startTag(ns, "Summary");
         serializer.attribute(ns, "failed", Integer.toString(getNumErrorTests() +
                 getNumFailedTests()));
-        // TODO: output notExecuted, timeout, and omitted count
+        // TODO: output notExecuted, timeout count
         serializer.attribute(ns, "notExecuted", "0");
         serializer.attribute(ns, "timeout", "0");
-        serializer.attribute(ns, "omitted", "0");
         serializer.attribute(ns, "pass", Integer.toString(getNumPassedTests()));
-        serializer.attribute(ns, "total", Integer.toString(getNumTotalTests()));
         serializer.endTag(ns, "Summary");
     }
 
@@ -423,130 +433,34 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
         serializer.startTag(ns, "TestPackage");
         serializer.attribute(ns, "name", runResult.getName());
-        serializer.attribute(ns, "runTime", formatElapsedTime(runResult.getElapsedTime()));
-        // TODO: generate digest
-        serializer.attribute(ns, "digest", "");
-        serializer.attribute(ns, "failed", Integer.toString(runResult.getNumErrorTests() +
-                runResult.getNumFailedTests()));
-        // TODO: output notExecuted, timeout, and omitted count
-        serializer.attribute(ns, "notExecuted", "0");
-        serializer.attribute(ns, "timeout", "0");
-        serializer.attribute(ns, "omitted", "0");
-        serializer.attribute(ns, "pass", Integer.toString(runResult.getNumPassedTests()));
-        serializer.attribute(ns, "total", Integer.toString(runResult.getNumTests()));
+        serializer.attribute(ns, "appPackageName", runResult.getName());
+        serializer.attribute(ns, "digest", getMetric(runResult, "digest"));
 
-        // the results XML needs to organize test's by class. Build a nested data structure that
-        // group's the results by class name
-        Map<String, Map<TestIdentifier, TestResult>> classResultsMap = buildClassNameMap(
-                runResult.getTestResults());
+        // Dump the results.
 
-        for (Map.Entry<String, Map<TestIdentifier, TestResult>> resultsEntry :
-                classResultsMap.entrySet()) {
-            serializer.startTag(ns, "TestCase");
-            serializer.attribute(ns, "name", resultsEntry.getKey());
-            serializeTests(serializer, resultsEntry.getValue());
-            serializer.endTag(ns, "TestCase");
+        // organize the tests into data structures that mirror the expected xml output.
+        TestSuiteRoot suiteRoot = new TestSuiteRoot();
+        for (Map.Entry<TestIdentifier, TestResult> testEntry : runResult.getTestResults()
+                .entrySet()) {
+            suiteRoot.insertTest(testEntry.getKey(), testEntry.getValue());
         }
+        suiteRoot.serialize(serializer);
         serializer.endTag(ns, "TestPackage");
     }
 
     /**
-     * Organizes the test run results into a format organized by class name.
-     */
-    private Map<String, Map<TestIdentifier, TestResult>> buildClassNameMap(
-            Map<TestIdentifier, TestResult> results) {
-        // use a linked hashmap to have predictable iteration order
-        Map<String, Map<TestIdentifier, TestResult>> classResultMap =
-            new LinkedHashMap<String, Map<TestIdentifier, TestResult>>();
-        for (Map.Entry<TestIdentifier, TestResult> resultEntry : results.entrySet()) {
-            String className = resultEntry.getKey().getClassName();
-            Map<TestIdentifier, TestResult> resultsForClass = classResultMap.get(className);
-            if (resultsForClass == null) {
-                resultsForClass = new LinkedHashMap<TestIdentifier, TestResult>();
-                classResultMap.put(className, resultsForClass);
-            }
-            resultsForClass.put(resultEntry.getKey(), resultEntry.getValue());
-        }
-        return classResultMap;
-    }
-
-    /**
-     * Output XML for given map of tests their results
+     * Helper method to retrieve the metric value with given name, or blank if not found
      *
-     * @param serializer
-     * @param results
-     * @throws IOException
-     */
-    private void serializeTests(KXmlSerializer serializer, Map<TestIdentifier, TestResult> results)
-            throws IOException {
-        for (Map.Entry<TestIdentifier, TestResult> resultEntry : results.entrySet()) {
-            serializeTest(serializer, resultEntry.getKey(), resultEntry.getValue());
-        }
-    }
-
-    /**
-     * Output the XML for given test and result.
-     *
-     * @param serializer
-     * @param testId
-     * @param result
-     * @throws IOException
-     */
-    private void serializeTest(KXmlSerializer serializer, TestIdentifier testId, TestResult result)
-            throws IOException {
-        serializer.startTag(ns, "Test");
-        serializer.attribute(ns, "name", testId.getTestName());
-        serializer.attribute(ns, "result", convertStatus(result.getStatus()));
-
-        if (result.getStackTrace() != null) {
-            String sanitizedStack = sanitizeStackTrace(result.getStackTrace());
-            serializer.startTag(ns, "FailedScene");
-            serializer.attribute(ns, "message", getFailureMessageFromStackTrace(sanitizedStack));
-            serializer.text(sanitizedStack);
-            serializer.endTag(ns, "FailedScene");
-        }
-        serializer.endTag(ns, "Test");
-    }
-
-    /**
-     * Convert a {@link TestStatus} to the result text to output in XML
-     *
-     * @param status the {@link TestStatus}
+     * @param runResult
+     * @param string
      * @return
      */
-    private String convertStatus(TestStatus status) {
-        switch (status) {
-            case ERROR:
-                return "fail";
-            case FAILURE:
-                return "fail";
-            case PASSED:
-                return "pass";
-            // TODO add notExecuted, omitted timeout
+    private String getMetric(TestRunResult runResult, String keyName) {
+        String value = runResult.getRunMetrics().get(keyName);
+        if (value == null) {
+            return "";
         }
-        return "omitted";
-    }
-
-    /**
-     * Strip out any invalid XML characters that might cause the report to be unviewable.
-     * http://www.w3.org/TR/REC-xml/#dt-character
-     */
-    private static String sanitizeStackTrace(String trace) {
-        if (trace != null) {
-            return trace.replaceAll("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD]", "");
-        } else {
-            return null;
-        }
-    }
-
-    private static String getFailureMessageFromStackTrace(String stack) {
-        // This is probably too simplistic to work in all cases, but for now, just return first
-        // line of stack as failure message
-        int firstNewLine = stack.indexOf('\n');
-        if (firstNewLine != -1) {
-            return stack.substring(0, firstNewLine);
-        }
-        return stack;
+        return value;
     }
 
     /**
@@ -594,11 +508,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
     /**
      * Creates the output stream to use for test results. Exposed for mocking.
+     * @param mReportPath
      */
     OutputStream createOutputResultStream(File reportDir) throws IOException {
         File reportFile = new File(reportDir, TEST_RESULT_FILE_NAME);
         Log.i(LOG_TAG, String.format("Created xml report file at %s",
                 reportFile.getAbsolutePath()));
+        // TODO: convert to path relative to cts root
+        mReportPath = reportFile.getAbsolutePath();
         return new FileOutputStream(reportFile);
     }
 
@@ -610,7 +527,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private void copyFormattingFiles(File resultsDir) {
         for (String resultFileName : CTS_RESULT_RESOURCES) {
             InputStream configStream = getClass().getResourceAsStream(
-                    String.format("/result/%s", resultFileName));
+                    String.format("%s", resultFileName));
             if (configStream != null) {
                 File resultFile = new File(resultsDir, resultFileName);
                 try {
