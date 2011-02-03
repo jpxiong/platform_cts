@@ -4144,30 +4144,25 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     @UiThreadTest
     public void testScrolling() {
         MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
-
         view.reset();
         assertEquals(0, view.getScrollX());
         assertEquals(0, view.getScrollY());
         assertFalse(view.hasCalledOnScrollChanged());
-        assertFalse(view.hasCalledInvalidate());
 
         view.scrollTo(0, 0);
         assertEquals(0, view.getScrollX());
         assertEquals(0, view.getScrollY());
         assertFalse(view.hasCalledOnScrollChanged());
-        assertFalse(view.hasCalledInvalidate());
 
         view.scrollBy(0, 0);
         assertEquals(0, view.getScrollX());
         assertEquals(0, view.getScrollY());
         assertFalse(view.hasCalledOnScrollChanged());
-        assertFalse(view.hasCalledInvalidate());
 
         view.scrollTo(10, 100);
         assertEquals(10, view.getScrollX());
         assertEquals(100, view.getScrollY());
         assertTrue(view.hasCalledOnScrollChanged());
-        assertTrue(view.hasCalledInvalidate());
 
         view.reset();
         assertFalse(view.hasCalledOnScrollChanged());
@@ -4175,7 +4170,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertEquals(0, view.getScrollX());
         assertEquals(0, view.getScrollY());
         assertTrue(view.hasCalledOnScrollChanged());
-        assertTrue(view.hasCalledInvalidate());
 
         view.reset();
         assertFalse(view.hasCalledOnScrollChanged());
@@ -4183,7 +4177,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertEquals(-1, view.getScrollX());
         assertEquals(-2, view.getScrollY());
         assertTrue(view.hasCalledOnScrollChanged());
-        assertTrue(view.hasCalledInvalidate());
     }
 
     @TestTargets({
