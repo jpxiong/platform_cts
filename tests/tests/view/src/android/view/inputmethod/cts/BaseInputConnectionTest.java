@@ -224,7 +224,7 @@ public class BaseInputConnectionTest extends
             args = {int.class, int.class}
         )
     })
-    public void testOpTextMethods() {
+    public void testOpTextMethods() throws Throwable {
         // return is an default Editable instance with empty source
         final Editable text = mConnection.getEditable();
         assertNotNull(text);
@@ -248,6 +248,13 @@ public class BaseInputConnectionTest extends
         expected = str.subSequence(0, offLength);
         assertEquals(expected.toString(), mConnection.getTextAfterCursor(offLength,
                 BaseInputConnection.GET_TEXT_WITH_STYLES).toString());
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mView.requestFocus());
+                assertTrue(mView.isFocused());
+            }
+        });
 
         // dummy mode
         BaseInputConnection dummyConnection = new BaseInputConnection(mView, false);
@@ -291,7 +298,7 @@ public class BaseInputConnectionTest extends
             args = {CharSequence.class, int.class}
         )
     })
-    public void testFinishComposingText() {
+    public void testFinishComposingText() throws Throwable {
         CharSequence str = "TestFinish";
         Editable inputText = Editable.Factory.getInstance().newEditable(str);
         mConnection.commitText(inputText, inputText.length());
@@ -303,6 +310,14 @@ public class BaseInputConnectionTest extends
         mConnection.finishComposingText();
         assertTrue(BaseInputConnection.getComposingSpanStart(text) == -1);
         assertTrue(BaseInputConnection.getComposingSpanEnd(text) == -1);
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mView.requestFocus());
+                assertTrue(mView.isFocused());
+            }
+        });
+
         // dummy mode
         BaseInputConnection dummyConnection = new BaseInputConnection(mView, false);
         dummyConnection.setComposingText(str, str.length());
@@ -324,7 +339,14 @@ public class BaseInputConnectionTest extends
         method = "sendKeyEvent",
         args = {KeyEvent.class}
     )
-    public void testSendKeyEvent() {
+    public void testSendKeyEvent() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mView.requestFocus());
+                assertTrue(mView.isFocused());
+            }
+        });
+
         mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
         new DelayedCheck() {
             @Override
