@@ -30,3 +30,14 @@ LOCAL_PACKAGE_NAME := TestDeviceSetup
 
 include $(BUILD_PACKAGE)
 
+# ======================================================
+# also build a static host library for the device info constants
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := src/android/tests/getinfo/DeviceInfoConstants.java
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_MODULE := ctsdeviceinfolib
+
+include $(BUILD_HOST_JAVA_LIBRARY)
