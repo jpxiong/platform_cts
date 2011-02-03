@@ -150,6 +150,8 @@ public class InputMethodManagerTest
     public void testInputMethodManager() {
         Window window = mActivity.getWindow();
         EditText view = (EditText) window.findViewById(R.id.entry);
+        assertTrue(view.requestFocus());
+        assertTrue(view.isFocused());
 
         BaseInputConnection connection = new BaseInputConnection(view, false);
         Context context = mInstrumentation.getTargetContext();
