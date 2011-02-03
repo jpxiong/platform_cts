@@ -29,6 +29,8 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Media;
 import android.test.InstrumentationTestCase;
 
+import java.io.File;
+
 @TestTargetClass(MediaStore.Video.Media.class)
 public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
@@ -56,11 +58,15 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
-    public void testStoreVideoMediaExternal() {
+    public void testStoreVideoMediaExternal() throws Exception {
         final String externalVideoPath = Environment.getExternalStorageDirectory().getPath() +
                  "/video/testvideo.3gp";
         final String externalVideoPath2 = Environment.getExternalStorageDirectory().getPath() +
                 "/video/testvideo1.3gp";
+
+        int numBytes = 1337;
+        FileCopyHelper.createFile(new File(externalVideoPath), numBytes);
+
         ContentValues values = new ContentValues();
         values.put(Media.ALBUM, "cts");
         values.put(Media.ARTIST, "cts team");
@@ -79,11 +85,11 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
         values.put(Media.DATA, externalVideoPath);
         values.put(Media.DISPLAY_NAME, "testvideo");
         values.put(Media.MIME_TYPE, "video/3gpp");
-        values.put(Media.SIZE, 86853);
+        values.put(Media.SIZE, numBytes);
         values.put(Media.TITLE, "testvideo");
-        long dateAdded = System.currentTimeMillis();
+        long dateAdded = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_ADDED, dateAdded);
-        long dateModified = System.currentTimeMillis();
+        long dateModified = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_MODIFIED, dateModified);
 
         // insert
@@ -115,9 +121,9 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
             assertEquals("testvideo.3gp", c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals("video/3gpp", c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals("testvideo", c.getString(c.getColumnIndex(Media.TITLE)));
-            assertEquals(86853, c.getInt(c.getColumnIndex(Media.SIZE)));
+            assertEquals(numBytes, c.getInt(c.getColumnIndex(Media.SIZE)));
             long realDateAdded = c.getLong(c.getColumnIndex(Media.DATE_ADDED));
-            assertTrue(realDateAdded > 0);
+            assertTrue(realDateAdded >= dateAdded);
             assertEquals(dateModified, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
             c.close();
 
