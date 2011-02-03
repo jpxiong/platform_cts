@@ -64,7 +64,7 @@ public class DeviceInfoActivity extends Activity {
             touchScreen = "finger";
         }
         if (touchScreen != null) {
-            DeviceInfoInstrument.addResult(DeviceInfoInstrument.TOUCH_SCREEN,
+            DeviceInfoInstrument.addResult(DeviceInfoConstants.TOUCH_SCREEN,
                     touchScreen);
         }
 
@@ -82,7 +82,7 @@ public class DeviceInfoActivity extends Activity {
         }
 
         if (navigation != null) {
-            DeviceInfoInstrument.addResult(DeviceInfoInstrument.NAVIGATION,
+            DeviceInfoInstrument.addResult(DeviceInfoConstants.NAVIGATION,
                     navigation);
         }
 
@@ -97,7 +97,7 @@ public class DeviceInfoActivity extends Activity {
             keypad = "12key";
         }
         if (keypad != null) {
-            DeviceInfoInstrument.addResult(DeviceInfoInstrument.KEYPAD, keypad);
+            DeviceInfoInstrument.addResult(DeviceInfoConstants.KEYPAD, keypad);
         }
 
         String[] locales = getAssets().getLocales();
@@ -110,7 +110,7 @@ public class DeviceInfoActivity extends Activity {
             }
             localeList.append(";");
         }
-        DeviceInfoInstrument.addResult(DeviceInfoInstrument.LOCALES,
+        DeviceInfoInstrument.addResult(DeviceInfoConstants.LOCALES,
                 localeList.toString());
 
         synchronized (sync) {

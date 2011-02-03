@@ -32,6 +32,8 @@ import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.log.LogReceiver;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -400,42 +402,7 @@ public class TestDevice implements DeviceObserver {
     /**
      * Store the build information of a device
      */
-    public static final class DeviceParameterCollector{
-        // the device info keys expected to be sent from device info instrumentation
-        // these constants should match exactly with those defined in DeviceInfoInstrument.jaa
-        public static final String PRODUCT_NAME = "buildName";
-        public static final String BUILD_VERSION = "buildVersion";
-        public static final String BUILD_ID = "buildID";
-        public static final String BUILD_FINGERPRINT = "build_fingerprint";
-        public static final String BUILD_TAGS = "build_tags";
-        public static final String BUILD_TYPE = "build_type";
-        public static final String BUILD_MANUFACTURER = "build_manufacturer";
-        public static final String BUILD_MODEL = "build_model";
-        public static final String BUILD_BRAND = "build_brand";
-        public static final String BUILD_BOARD = "build_board";
-        public static final String BUILD_DEVICE = "build_device";
-        public static final String BUILD_ABI = "build_abi";
-        public static final String BUILD_ABI2 = "build_abi2";
-        public static final String SCREEN_SIZE = "screen_size";
-        public static final String SCREEN_HEIGHT = "screen_height";
-        public static final String SCREEN_WIDTH = "screen_width";
-        public static final String SCREEN_DENSITY = "screen_density";
-        public static final String SCREEN_DENSITY_BUCKET = "screen_density_bucket";
-        public static final String SERIAL_NUMBER = "serialNumber";
-        public static final String VERSION_SDK = "androidPlatformVersion";
-        public static final String LOCALES = "locales";
-        public static final String SCREEN_Y_DENSITY = "Ydpi";
-        public static final String SCREEN_X_DENSITY = "Xdpi";
-        public static final String TOUCH_SCREEN = "touch";
-        public static final String NAVIGATION = "navigation";
-        public static final String KEYPAD = "keypad";
-        public static final String NETWORK = "network";
-        public static final String IMEI = "imei";
-        public static final String IMSI = "imsi";
-        public static final String PHONE_NUMBER = "phoneNumber";
-        public static final String FEATURES = "features";
-        public static final String PROCESSES = "processes";
-        public static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
+    public static final class DeviceParameterCollector implements DeviceInfoConstants {
 
         private HashMap<String, String> mInfoMap;
 
