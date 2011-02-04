@@ -129,7 +129,9 @@ public class SmsManagerTest extends AndroidTestCase {
     })
     public void testSendMessages() throws InterruptedException {
         PackageManager packageManager = getContext().getPackageManager();
-        boolean hasTelephony = packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
 
         mSendIntent = new Intent(SMS_SEND_ACTION);
         mDeliveryIntent = new Intent(SMS_DELIVERY_ACTION);
@@ -148,7 +150,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendTextMessage(mDestAddr, mDestAddr, mSentIntent, mDeliveredIntent);
         assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
         }
 
         if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
@@ -164,7 +166,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
         assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
         }
 
         // send multi parts text sms
@@ -180,7 +182,7 @@ public class SmsManagerTest extends AndroidTestCase {
         sendMultiPartTextMessage(mDestAddr, parts, sentIntents, deliveryIntents);
         assertTrue(mSendReceiver.waitForCalls(numParts, TIME_OUT));
         if (mDeliveryReportSupported) {
-            assertEquals(hasTelephony, mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
+            assertTrue(mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
         }
     }
 
