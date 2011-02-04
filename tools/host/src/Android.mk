@@ -23,6 +23,8 @@ LOCAL_JAR_MANIFEST := ../etc/manifest.txt
 LOCAL_JAVA_LIBRARIES := \
     ddmlib-prebuilt junit hosttestlib CtsTestAnnotationsHostLib
 
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib
+
 LOCAL_MODULE := cts
 
 include $(BUILD_HOST_JAVA_LIBRARY)
