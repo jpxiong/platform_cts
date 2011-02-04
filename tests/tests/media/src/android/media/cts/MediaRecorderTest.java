@@ -15,7 +15,6 @@
  */
 package android.media.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -27,6 +26,7 @@ import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.Surface;
 
 import java.io.File;
@@ -89,6 +89,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         }
         if (mCamera != null)  {
             mCamera.release();
+            mCamera = null;
         }
         super.tearDown();
     }
@@ -159,10 +160,10 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         method = "setCamera",
         args = {Camera.class}
     )
-    @BrokenTest(value="No longer works in Donut. CameraService reports: " +
-            "Attempt to use locked camera from different process")
+    @UiThreadTest
     public void testSetCamera() throws Exception {
         mCamera = Camera.open();
+        mCamera.unlock();
         mMediaRecorder.setCamera(mCamera);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
