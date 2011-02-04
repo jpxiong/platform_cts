@@ -52,7 +52,7 @@ if [ ! -z ${ANDROID_BUILD_TOP} ]; then
         echo "Unrecognized OS"
         exit
     fi;
-    CTS_ROOT=${ANDROID_BUILD_TOP}/out/host/${OS}/cts/android-cts
+    CTS_ROOT=${ANDROID_BUILD_TOP}/out/host/${OS}/cts
     if [ ! -d ${CTS_ROOT} ]; then
         echo "Could not find $CTS_ROOT in Android build environment. Try 'make cts'"
         exit
@@ -61,10 +61,10 @@ fi;
 
 if [ -z ${CTS_ROOT} ]; then
     # assume we're in an extracted cts install
-    CTS_ROOT="$(dirname $0)/.."
+    CTS_ROOT="$(dirname $0)/../.."
 fi;
 
-JAR_DIR=${CTS_ROOT}/tools
+JAR_DIR=${CTS_ROOT}/android-cts/tools
 JARS="ddmlib-prebuilt.jar tradefed-prebuilt.jar hosttestlib.jar cts-tradefed.jar"
 
 for JAR in $JARS; do
