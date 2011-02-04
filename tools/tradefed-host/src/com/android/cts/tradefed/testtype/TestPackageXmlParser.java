@@ -70,6 +70,8 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String jarPath = attributes.getValue("jarPath");
                 final String signatureCheck = attributes.getValue("signatureCheck");
                 final String referenceApp = attributes.getValue("referenceAppTest");
+                final String apkToTest = attributes.getValue("apkToTestName");
+                final String packageToTest = attributes.getValue("packageToTest");
 
                 mPackageDef = new TestPackageDef();
                 mPackageDef.setUri(entryUriValue);
@@ -80,6 +82,8 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setJarPath(jarPath);
                 mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
                 mPackageDef.setIsReferenceApp(parseBoolean(referenceApp));
+                mPackageDef.setApkToTest(apkToTest);
+                mPackageDef.setPackageToTest(packageToTest);
 
                 // reset the class name
                 mClassNameStack = new Stack<String>();
