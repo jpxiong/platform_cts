@@ -42,6 +42,8 @@ class TestPackageDef implements ITestPackageDef {
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
     private boolean mIsReferenceAppTest = false;
+    private String mPackageToTest = null;
+    private String mApkToTestName = null;
 
     // use a LinkedHashSet for predictable iteration insertion-order, and fast lookups
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
@@ -116,6 +118,14 @@ class TestPackageDef implements ITestPackageDef {
         return mIsReferenceAppTest;
     }
 
+    void setPackageToTest(String packageName) {
+        mPackageToTest = packageName;
+    }
+
+    void setApkToTest(String apkName) {
+        mApkToTestName = apkName;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -134,27 +144,47 @@ class TestPackageDef implements ITestPackageDef {
                     mName));
             return null;
         } else if (mIsReferenceAppTest) {
-            // TODO: implement this
-            Log.w(LOG_TAG, String.format("Skipping currently unsupported reference app test %s",
-                    mName));
-            return null;
-        } else {
-            Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
-            InstrumentationTest instrTest = new InstrumentationTest();
-            instrTest.setPackageName(mAppNameSpace);
-            instrTest.setRunnerName(mRunner);
-            instrTest.setClassName(className);
-            instrTest.setMethodName(methodName);
-            // mName means 'apk file name' for instrumentation tests
-            File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
+            // a reference app test is just a InstrumentationTest with one extra apk to install
+            InstrumentationAppTest instrTest = new InstrumentationAppTest();
+            File apkFile = new File(testCaseDir, String.format("%s.apk", mApkToTestName));
             if (!apkFile.exists()) {
                 Log.w(LOG_TAG, String.format("Could not find apk file %s",
                         apkFile.getAbsolutePath()));
                 return null;
             }
-            instrTest.setInstallFile(apkFile);
-            return instrTest;
+            instrTest.addInstallApp(apkFile, mPackageToTest);
+            return setInstrumentationTest(testCaseDir, className, methodName, instrTest);
+        } else {
+            Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
+            InstrumentationTest instrTest = new InstrumentationTest();
+            return setInstrumentationTest(testCaseDir, className, methodName, instrTest);
         }
+    }
+
+    /**
+     * Populates given {@link InstrumentationTest} with data from the package xml
+     *
+     * @param testCaseDir
+     * @param className
+     * @param methodName
+     * @param instrTest
+     * @return the populated {@link InstrumentationTest} or <code>null</code>
+     */
+    private InstrumentationTest setInstrumentationTest(File testCaseDir, String className,
+            String methodName, InstrumentationTest instrTest) {
+        instrTest.setPackageName(mAppNameSpace);
+        instrTest.setRunnerName(mRunner);
+        instrTest.setClassName(className);
+        instrTest.setMethodName(methodName);
+        // mName means 'apk file name' for instrumentation tests
+        File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
+        if (!apkFile.exists()) {
+            Log.w(LOG_TAG, String.format("Could not find apk file %s",
+                    apkFile.getAbsolutePath()));
+            return null;
+        }
+        instrTest.setInstallFile(apkFile);
+        return instrTest;
     }
 
     /**
