@@ -33,6 +33,8 @@ import java.util.LinkedHashSet;
 class TestPackageDef implements ITestPackageDef {
 
     private static final String LOG_TAG = "TestPackageDef";
+    private static final String SIGNATURE_TEST_METHOD = "testSignature";
+    private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
 
     private String mUri = null;
     private String mAppNameSpace = null;
@@ -129,10 +131,26 @@ class TestPackageDef implements ITestPackageDef {
             hostTest.setTests(filterTests(mTests, className, methodName));
             return hostTest;
         } else if (mIsSignatureTest) {
-            // TODO: implement this
-            Log.w(LOG_TAG, String.format("Skipping currently unsupported signature test %s",
-                    mName));
-            return null;
+            // TODO: hardcode the runner/class/method for now, since current package xml
+            // points to specialized instrumentation. Eventually this special case for signatureTest
+            // can be removed, and it can be treated just like a normal InstrumentationTest
+            Log.d(LOG_TAG, String.format("Creating signature test %s", mName));
+            InstrumentationTest instrTest = new InstrumentationTest();
+            instrTest.setPackageName(mAppNameSpace);
+            instrTest.setRunnerName("android.test.InstrumentationTestRunner");
+            instrTest.setClassName(SIGNATURE_TEST_CLASS);
+            instrTest.setMethodName(SIGNATURE_TEST_METHOD);
+            // add signature test to list of known tests
+            addTest(new TestIdentifier(SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD));
+            // mName means 'apk file name' for instrumentation tests
+            File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
+            if (!apkFile.exists()) {
+                Log.w(LOG_TAG, String.format("Could not find apk file %s",
+                        apkFile.getAbsolutePath()));
+                return null;
+            }
+            instrTest.setInstallFile(apkFile);
+            return instrTest;
         } else if (mIsReferenceAppTest) {
             // TODO: implement this
             Log.w(LOG_TAG, String.format("Skipping currently unsupported reference app test %s",
