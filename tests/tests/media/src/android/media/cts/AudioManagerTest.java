@@ -561,44 +561,27 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                 assertEquals(k - 1, mAudioManager.getStreamVolume(streams[i]));
             }
 
+            // test ringer modes changes
             mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
             assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
             mAudioManager.setStreamVolume(streams[i], 1, FLAG_SHOW_UI);
             assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
-            if (streams[i] == AudioManager.STREAM_RING) {
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
-                assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
-                // adjusting the volume to zero should result in either silent or vibrate mode
-                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
-                        mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
-                mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
-                assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
-                assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
-            } else {
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
-                assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
-                // lowering the volume should NOT have changed the ringer mode
-                assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
-                // API quirk: volume must be decremented from 1 to get ringer mode change
-                mAudioManager.setStreamVolume(streams[i], 1, FLAG_SHOW_UI);
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_ALLOW_RINGER_MODES);
-                // lowering the volume should have changed the ringer mode
-                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
-                        mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_ALLOW_RINGER_MODES);
-                // adjusting the volume to zero should result in either silent or vibrate mode
-                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE ||
-                        mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
-                // There are two possible ways the device may work. It may have a silent/vibrate
-                // mode or it may have distinct silent and vibrate modes.
-                assertTrue(mAudioManager.getRingerMode() == RINGER_MODE_NORMAL ||
-                        mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE);
-                // Increase the volume one more time to get out of the vibrate mode which may
-                // be separate from silent mode.
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_ALLOW_RINGER_MODES);
-                assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
-            }
+
+            // decreasing the volume from 1 to 0 shouldn't change ringer modes
+            adjustStreamVolumeAndRingerMode(streams[i], ADJUST_LOWER);
+            assertEquals("Stream: " + i, 0, mAudioManager.getStreamVolume(streams[i]));
+            assertEquals("Stream: " + i, RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
+
+            // decreasing the volume from 0 should change ringer modes
+            adjustStreamVolumeAndRingerMode(streams[i], ADJUST_LOWER);
+            assertEquals("Stream: " + i, 0, mAudioManager.getStreamVolume(streams[i]));
+            assertTrue("Stream: " + i, mAudioManager.getRingerMode() == RINGER_MODE_VIBRATE
+                    || mAudioManager.getRingerMode() == RINGER_MODE_SILENT);
+
+            // increasing the volume from 0 should change back to normal
+            adjustStreamVolumeAndRingerMode(streams[i], ADJUST_RAISE);
+            assertEquals("Stream: " + i, 0, mAudioManager.getStreamVolume(streams[i]));
+            assertTrue("Stream: " + i, mAudioManager.getRingerMode() == RINGER_MODE_NORMAL);
 
             // volume raise
             mAudioManager.setStreamVolume(streams[i], 0, FLAG_SHOW_UI);
@@ -651,6 +634,17 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
         mp.release();
         Thread.sleep(TIME_TO_PLAY);
         assertFalse(mAudioManager.isMusicActive());
+    }
+
+    /**
+     * Imitate how pressing the volume key adjusts the volume either up or down and releasing the
+     * key causes an ADJUST_SAME direction afterwards.
+     */
+    private void adjustStreamVolumeAndRingerMode(int streamType, int direction) {
+        mAudioManager.adjustStreamVolume(streamType, direction,
+                FLAG_SHOW_UI | FLAG_ALLOW_RINGER_MODES);
+        mAudioManager.adjustStreamVolume(streamType, ADJUST_SAME,
+                FLAG_SHOW_UI | FLAG_ALLOW_RINGER_MODES);
     }
 
     public void setResult(int resultCode) {
