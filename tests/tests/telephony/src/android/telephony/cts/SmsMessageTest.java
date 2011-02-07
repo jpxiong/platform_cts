@@ -22,6 +22,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
@@ -30,6 +31,7 @@ import android.test.AndroidTestCase;
 public class SmsMessageTest extends AndroidTestCase{
 
     private TelephonyManager mTelephonyManager;
+    private PackageManager mPackageManager;
 
     private static final String DISPLAY_MESSAGE_BODY = "test subject /test body";
     private static final String DMB = "{ testBody[^~\\] }";
@@ -69,7 +71,7 @@ public class SmsMessageTest extends AndroidTestCase{
         super.setUp();
         mTelephonyManager =
             (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        assertNotNull(mTelephonyManager);
+        mPackageManager = getContext().getPackageManager();
     }
 
     @SuppressWarnings("deprecation")
@@ -171,10 +173,12 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testCreateFromPdu() throws Exception {
-        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+                || mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA)) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
+
         String pdu = "07916164260220F0040B914151245584F600006060605130308A04D4F29C0E";
         SmsMessage sms = SmsMessage.createFromPdu(hexStringToByteArray(pdu));
         assertEquals(SCA1, sms.getServiceCenterAddress());
@@ -254,7 +258,8 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testCPHSVoiceMail() throws Exception {
-        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+                || mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA)) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
@@ -302,7 +307,8 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testGetUserData() throws Exception {
-        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+                || mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA)) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
@@ -331,6 +337,10 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testGetSubmitPdu() throws Exception {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
+
         String scAddress = null, destinationAddress = null;
         String message = null;
         boolean statusReportRequested = false;
@@ -403,10 +413,12 @@ public class SmsMessageTest extends AndroidTestCase{
         )
     })
     public void testEmailGateway() throws Exception {
-        if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+                || mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_CDMA)) {
             // TODO: temp workaround, need to adjust test to use CDMA pdus
             return;
         }
+
         String pdu = "07914151551512f204038105f300007011103164638a28e6f71b50c687db" +
                          "7076d9357eb7412f7a794e07cdeb6275794c07bde8e5391d247e93f3";
 
