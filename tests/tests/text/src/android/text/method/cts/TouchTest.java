@@ -39,6 +39,9 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private Activity mActivity;
     private static final String LONG_TEXT = "Scrolls the specified widget to the specified " +
             "coordinates, except constrains the X scrolling position to the horizontal regions " +
+            "of the text that will be visible after scrolling to the specified Y position." +
+            "Scrolls the specified widget to the specified " +
+            "coordinates, except constrains the X scrolling position to the horizontal regions " +
             "of the text that will be visible after scrolling to the specified Y position.";
     private boolean mReturnFromTouchEvent;
 
