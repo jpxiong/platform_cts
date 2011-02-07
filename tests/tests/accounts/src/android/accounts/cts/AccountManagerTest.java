@@ -819,7 +819,7 @@ public class AccountManagerTest extends AndroidTestCase {
         validateOptions(OPTIONS_BUNDLE, mockAuthenticator.mOptionsAddAccount);
         validateOptions(null, mockAuthenticator.mOptionsUpdateCredentials);
         validateOptions(null, mockAuthenticator.mOptionsConfirmCredentials);
-        validateOptions(null, mockAuthenticator.mOptionsGetAuthToken);
+        assertNotNull(mockAuthenticator.mOptionsGetAuthToken);
 
         mockAuthenticator.clearData();
 
