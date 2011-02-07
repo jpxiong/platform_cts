@@ -16,7 +16,13 @@
 
 package android.view.cts;
 
-import java.util.ArrayList;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import android.app.cts.CTSResult;
 import android.content.Context;
@@ -55,13 +61,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.widget.TextView;
 import android.widget.cts.ViewGroupStubActivity;
 
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
+import java.util.ArrayList;
 
 @TestTargetClass(ViewGroup.class)
 public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
@@ -1555,20 +1555,6 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
         vg.requestFocus(View.FOCUS_DOWN, new Rect());
         assertTrue(vg.isOnRequestFocusInDescendantsCalled);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "recomputeViewAttributes",
-        args = {android.view.View.class}
-    )
-    public void testRecomputeViewAttributes() {
-        MockViewGroup father = new MockViewGroup(mContext);
-        MockViewGroup son = new MockViewGroup(mContext);
-        father.addView(son);
-
-        son.recomputeViewAttributes(null);
-        assertTrue(father.isRecomputeViewAttributesCalled);
     }
 
     @TestTargets({
