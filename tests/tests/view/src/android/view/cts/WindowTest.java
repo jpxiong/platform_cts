@@ -313,69 +313,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     public void testCloseAllPanels() throws Throwable {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "closePanel",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openPanel",
-            args = {int.class, android.view.KeyEvent.class}
-        )
-    })
-    public void testOpPanel() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWindow.openPanel(Window.FEATURE_OPTIONS_PANEL, null);
-                assertTrue(mActivity.isOnCreateOptionsMenuCalled());
-                mWindow.closePanel(Window.FEATURE_OPTIONS_PANEL);
-                assertTrue(mActivity.isOnOptionsMenuClosedCalled());
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-    }
-
-    /**
-     * togglePanel: When the panel is closing, open it; when open, close it.
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "togglePanel",
-        args = {int.class, android.view.KeyEvent.class}
-    )
-    public void testTogglePanelClose() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWindow.openPanel(Window.FEATURE_OPTIONS_PANEL, null);
-                assertTrue(mActivity.isOnCreateOptionsMenuCalled());
-                // close panel
-                mWindow.togglePanel(Window.FEATURE_OPTIONS_PANEL, null);
-                assertTrue(mActivity.isOnOptionsMenuClosedCalled());
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "togglePanel",
-        args = {int.class, android.view.KeyEvent.class}
-    )
-    public void testTogglePanelOpen() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                // open panel
-                mWindow.togglePanel(Window.FEATURE_OPTIONS_PANEL, null);
-                assertTrue(mActivity.isOnCreateOptionsMenuCalled());
-                mWindow.closePanel(Window.FEATURE_OPTIONS_PANEL);
-                assertTrue(mActivity.isOnOptionsMenuClosedCalled());
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-    }
-
     /**
      * getCurrentFocus: Return the view in this Window that currently has focus, or null if
      *                  there are none.
@@ -444,7 +381,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         int screenWidth = dm.widthPixels;
         int screenHeight = dm.heightPixels;
         assertEquals(screenWidth, decor.getWidth());
-        assertEquals(screenHeight, decor.getHeight());
+        assertTrue(screenHeight > decor.getHeight());
         assertSame(mWindow.getContext(), decor.getContext());
     }
 
@@ -562,29 +499,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     public void testIsFloating() throws Exception {
         // Default system theme defined by themes.xml, the windowIsFloating is set false.
         assertFalse(mWindow.isFloating());
-    }
-
-    /**
-     * isShortcutKey: check if a key is the shortcut key for this window
-     */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "We set 'q' & 'a' key as shortcut key in WindowStubActivity.java,"
-              + " other keys are not shortcut key",
-        method = "isShortcutKey",
-        args = {int.class, android.view.KeyEvent.class}
-    )
-    public void testIsShortcutKey() throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.openOptionsMenu();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
-        assertTrue(mWindow.isShortcutKey(KeyEvent.KEYCODE_Q, new KeyEvent(KeyEvent.ACTION_DOWN,
-                KeyEvent.KEYCODE_Q)));
-        assertFalse(mWindow.isShortcutKey(KeyEvent.KEYCODE_F, new KeyEvent(KeyEvent.ACTION_DOWN,
-                KeyEvent.KEYCODE_F)));
     }
 
     @TestTargets({
@@ -1151,7 +1065,7 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
         public void invalidatePanelMenu(int featureId) {
         }
-        
+
         public boolean performPanelShortcut(int featureId, int keyCode, KeyEvent event, int flags) {
             return true;
         }
@@ -1260,11 +1174,11 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         public void setDefaultWindowFormat(int format) {
             super.setDefaultWindowFormat(format);
         }
-        
+
         @Override
         public void takeSurface(SurfaceHolder.Callback2 callback) {
         }
-        
+
         @Override
         public void takeInputQueue(InputQueue.Callback callback) {
         }
