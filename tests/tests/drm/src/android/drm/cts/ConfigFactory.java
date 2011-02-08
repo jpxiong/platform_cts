@@ -19,7 +19,6 @@ package android.drm.cts;
 import android.util.Log;
 
 import android.drm.cts.configs.PassthruConfig;
-import android.drm.cts.configs.MarlinConfig;
 
 public final class ConfigFactory {
     private static final String TAG = "ConfigFactory";
@@ -33,8 +32,6 @@ public final class ConfigFactory {
     public static Config getConfig(String plugInName) {
         if (plugInName.equals("Passthru plug-in")) {
             return PassthruConfig.getInstance();
-        } else if (plugInName.equals("Marlin BB plug-in")) {
-            return MarlinConfig.getInstance();
         } else {
             Log.e(TAG, "Configuration for " + plugInName + " is not registered.");
             return null;
