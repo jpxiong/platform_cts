@@ -408,13 +408,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // Dispose of activity.
         ReceiveUriActivity.finishCurInstanceSync();
 
-        if (false) {
-            synchronized (this) {
-                Log.i("**", "******************************* WAITING!!!");
-                try {
-                    wait(10000);
-                } catch (InterruptedException e) {
-                }
+        synchronized (this) {
+            Log.i("**", "******************************* WAITING!!!");
+            try {
+                wait(100);
+            } catch (InterruptedException e) {
             }
         }
 
@@ -495,13 +493,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // Dispose of activity.
         ReceiveUriActivity.finishCurInstanceSync();
 
-        if (false) {
-            synchronized (this) {
-                Log.i("**", "******************************* WAITING!!!");
-                try {
-                    wait(10000);
-                } catch (InterruptedException e) {
-                }
+        synchronized (this) {
+            Log.i("**", "******************************* WAITING!!!");
+            try {
+                wait(100);
+            } catch (InterruptedException e) {
             }
         }
 
