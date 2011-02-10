@@ -71,8 +71,8 @@ public class InstrumentationTest extends InstrumentationTestCase {
         final long eventTime = SystemClock.uptimeMillis();
         // use coordinates for MotionEvent that do not include the status bar
         // TODO: is there a more deterministic way to get these values
-        final long x = 50;
-        final long y = 50;
+        final long x = 55;
+        final long y = 55;
         final int metaState = 0;
         mMotionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y,
                 metaState);
