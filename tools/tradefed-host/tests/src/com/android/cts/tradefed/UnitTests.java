@@ -16,7 +16,7 @@
 package com.android.cts.tradefed;
 
 import com.android.cts.tradefed.result.CtsXmlResultReporterTest;
-import com.android.cts.tradefed.targetsetup.CtsSetupTest;
+import com.android.cts.tradefed.targetprep.CtsSetupTest;
 import com.android.cts.tradefed.testtype.JarHostTestTest;
 import com.android.cts.tradefed.testtype.CtsTestTest;
 import com.android.cts.tradefed.testtype.PlanXmlParserTest;

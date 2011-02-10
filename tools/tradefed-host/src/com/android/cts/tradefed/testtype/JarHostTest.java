@@ -21,12 +21,11 @@ import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.JUnitToInvocationResultForwarder;
-import com.android.tradefed.testtype.AbstractRemoteTest;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.CommandStatus;
-import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.IRunUtil.IRunnableResult;
+import com.android.tradefed.util.RunUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -43,7 +41,7 @@ import junit.framework.TestResult;
 /**
  * A {@link IRemoteTest} that can run a set of JUnit tests from a jar.
  */
-public class JarHostTest extends AbstractRemoteTest implements IDeviceTest {
+public class JarHostTest implements IDeviceTest, IRemoteTest {
 
     private static final String LOG_TAG = "JarHostTest";
 
@@ -121,48 +119,27 @@ public class JarHostTest extends AbstractRemoteTest implements IDeviceTest {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public int countTestCases() {
-        if (mTests == null) {
-            throw new IllegalStateException();
-        }
-        return mTests.size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void run(List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+    public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
         checkFields();
         Log.i(LOG_TAG, String.format("Running %s test package from jar, contains %d tests.",
-                mRunName, countTestCases()));
+                mRunName, mTests.size()));
         // create a junit listener to forward the JUnit test results to the
         // {@link ITestInvocationListener}s
         JUnitToInvocationResultForwarder resultForwarder =
-                new JUnitToInvocationResultForwarder(listeners);
+                new JUnitToInvocationResultForwarder(listener);
         TestResult junitResult = new TestResult();
         junitResult.addListener(resultForwarder);
         long startTime = System.currentTimeMillis();
-        reportRunStarted(listeners);
+        listener.testRunStarted(mRunName, mTests.size());
         for (TestIdentifier testId : mTests) {
             Test junitTest = loadTest(testId.getClassName(), testId.getTestName());
             if (junitTest != null) {
                 runTest(testId, junitTest, junitResult);
             }
         }
-        reportRunEnded(System.currentTimeMillis() - startTime, listeners);
-    }
-
-    /**
-     * Report the start of the test run.
-     *
-     * @param listeners
-     */
-    private void reportRunStarted(List<ITestInvocationListener> listeners) {
-        for (ITestInvocationListener listener : listeners) {
-            listener.testRunStarted(mRunName, countTestCases());
-        }
+        listener.testRunEnded(System.currentTimeMillis() - startTime, Collections.EMPTY_MAP);
     }
 
     /**
@@ -194,19 +171,6 @@ public class JarHostTest extends AbstractRemoteTest implements IDeviceTest {
         if (status.equals(CommandStatus.TIMED_OUT)) {
             junitResult.addError(junitTest, new TestTimeoutException());
             junitResult.endTest(junitTest);
-        }
-    }
-
-    /**
-     * Report the end of the test run.
-     *
-     * @param elapsedTime
-     * @param listeners
-     */
-    @SuppressWarnings("unchecked")
-    private void reportRunEnded(long elapsedTime, List<ITestInvocationListener> listeners) {
-        for (ITestInvocationListener listener : listeners) {
-            listener.testRunEnded(elapsedTime, Collections.EMPTY_MAP);
         }
     }
 

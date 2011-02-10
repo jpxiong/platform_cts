@@ -23,7 +23,6 @@ import com.android.tradefed.testtype.InstrumentationTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A {@link InstrumentationTest] that will install other dependent apks before test execution,
@@ -50,7 +49,7 @@ public class InstrumentationAppTest extends InstrumentationTest {
     }
 
     @Override
-    public void run(final List<ITestInvocationListener> listeners)
+    public void run(final ITestInvocationListener listener)
             throws DeviceNotAvailableException {
         if (getDevice() == null) {
             throw new IllegalStateException("missing device");
@@ -61,7 +60,7 @@ public class InstrumentationAppTest extends InstrumentationTest {
                         getDevice().getSerialNumber()));
                 getDevice().installPackage(apkFile, true);
             }
-            super.run(listeners);
+            super.run(listener);
         } finally {
             for (String packageName : mInstallPackages) {
                 Log.d(LOG_TAG, String.format("Uninstalling %s on %s", packageName,
