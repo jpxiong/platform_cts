@@ -36,6 +36,8 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.Suppress;
+
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestLevel;
@@ -1532,6 +1534,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
      *</p>
      * @throws InterruptedException
      */
+    @Suppress
     @LargeTest
     public void testReaderGetsOldVersionOfDataWhenWriterIsInXact() throws InterruptedException {
         // redo setup to create WAL enabled database
@@ -1606,12 +1609,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test exceptions from enableWriteAheadLogging().",
-            method = "enableWriteAheadLogging",
-            args = {}
-        )
+    @Suppress
     public void testExceptionsFromEnableWriteAheadLogging() {
         // attach a database
         // redo setup to create WAL enabled database
