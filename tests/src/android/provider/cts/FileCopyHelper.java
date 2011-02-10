@@ -99,6 +99,10 @@ public class FileCopyHelper {
     }
 
     public static void createFile(File file, int numBytes) throws IOException {
+        File parentFile = file.getParentFile();
+        if (parentFile != null) {
+            parentFile.mkdirs();
+        }
         byte[] buffer = new byte[numBytes];
         FileOutputStream output = new FileOutputStream(file);
         try {
