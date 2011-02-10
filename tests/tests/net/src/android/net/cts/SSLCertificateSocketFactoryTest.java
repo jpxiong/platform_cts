@@ -102,11 +102,10 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
             args = {int.class}
         )
     })
-    @BrokenTest("flaky")
     public void testCreateSocket() throws Exception {
         new SSLCertificateSocketFactory(100);
         int port = 443;
-        String host = "www.fortify.net";
+        String host = "www.google.com";
         InetAddress inetAddress = null;
         inetAddress = InetAddress.getLocalHost();
         try {
