@@ -16,7 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -24,7 +23,6 @@ import dalvik.annotation.TestTargetNew;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Media;
 import android.provider.MediaStore.Audio.Playlists;
@@ -128,42 +126,13 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
       method = "getContentUri",
       args = {String.class, long.class}
     )
-    @BrokenTest("brittle test")
     public void testGetContentUri() {
-        // this verification seems brittle - will break if there happens to be a playlist with Id 1
-        // present in external volume
-        // setUp should create a playlist which this method should verify can be queried
-        Cursor c = mContentResolver.query(
-                Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME, 1),
-                mMembersProjection, null, null, Members.DEFAULT_SORT_ORDER);
-        assertEquals(0, c.getCount());
-        c.close();
-
-        // test querying media provider with null projection, should return all columns
-        c = mContentResolver.query(
-                Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME, 1), null,
-                Members.ALBUM + "=?", new String[] { Audio1.ALBUM },
-                Members.DEFAULT_SORT_ORDER);
-        assertEquals(0, c.getCount());
-        // TODO: need a way to verify all expected columns are returned. Purely testing for number
-        // of columns returned is brittle
-        assertEquals(31, c.getColumnCount());
-        c.close();
-
-        try {
-            mContentResolver.query(
-                    Members.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME, 1),
-                    mMembersProjection, null, null, Members.DEFAULT_SORT_ORDER);
-            fail("Should throw SQLException as the internal datatbase has no playlist");
-        } catch (SQLException e) {
-            // expected
-        }
-
-        String volume = "fakeVolume";
-        assertNull(mContentResolver.query(Members.getContentUri(volume, 1), null, null, null,
-                null));
+        assertEquals("content://media/external/audio/playlists/1337/members",
+                Members.getContentUri("external", 1337).toString());
+        assertEquals("content://media/internal/audio/playlists/3007/members",
+                Members.getContentUri("internal", 3007).toString());
     }
-    @BrokenTest("needs investigation")
+
     public void testStoreAudioPlaylistsMembersExternal() {
         ContentValues values = new ContentValues();
         values.put(Playlists.NAME, "My favourites");
