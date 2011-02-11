@@ -19,12 +19,14 @@ package com.android.cts.tradefed.testtype;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
+import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.BufferedInputStream;
@@ -34,7 +36,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -44,7 +48,7 @@ import junit.framework.Test;
  * <p/>
  * Supports running all the tests contained in a CTS plan, or individual test packages.
  */
-public class CtsTest implements IDeviceTest, IRemoteTest {
+public class CtsTest implements IDeviceTest, IResumableTest {
 
     private static final String LOG_TAG = "PlanTest";
 
@@ -84,6 +88,33 @@ public class CtsTest implements IDeviceTest, IRemoteTest {
     @Option(name = "collect-device-info", description =
         "flag to control whether to collect info from device. Default true")
     private boolean mCollectDeviceInfo = true;
+
+    @Option(name = "resume", description =
+        "flag to attempt to automatically resume aborted test run on another connected device. " +
+        "Default false.")
+    private boolean mResume = false;
+
+    /** data structure for a {@link IRemoteTest} and its known tests */
+    private class KnownTests {
+        private final IRemoteTest mTestForPackage;
+        private final Collection<TestIdentifier> mKnownTests;
+
+        KnownTests(IRemoteTest testForPackage, Collection<TestIdentifier> knownTests) {
+            mTestForPackage = testForPackage;
+            mKnownTests = knownTests;
+        }
+
+        IRemoteTest getTestForPackage() {
+            return mTestForPackage;
+        }
+
+        Collection<TestIdentifier> getKnownTests() {
+            return mKnownTests;
+        }
+    }
+
+    /** list of remaining tests to execute */
+    private List<KnownTests> mRemainingTests = null;
 
     /**
      * {@inheritDoc}
@@ -174,49 +205,107 @@ public class CtsTest implements IDeviceTest, IRemoteTest {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public boolean isResumable() {
+        return mResume;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
         checkFields();
 
-        Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
+        if (mRemainingTests == null) {
+            mRemainingTests = buildTestsToRun();
+        }
+        // always collect the device info, even for resumed runs, since test will likely be running
+        // on a different device
+        collectDeviceInfo(getDevice(), mTestCaseDir, listener);
 
+        while (!mRemainingTests.isEmpty()) {
+            KnownTests testPair = mRemainingTests.get(0);
+            IRemoteTest test = testPair.getTestForPackage();
+            if (test instanceof IDeviceTest) {
+                ((IDeviceTest)test).setDevice(getDevice());
+            }
+            ResultFilter filter = new ResultFilter(listener, testPair.getKnownTests());
+            test.run(filter);
+            mRemainingTests.remove(0);
+        }
+    }
+
+    /**
+     * Build the list of test packages to run
+     *
+     * @return
+     */
+    private List<KnownTests> buildTestsToRun() {
+        List<KnownTests> testList = new LinkedList<KnownTests>();
         try {
             ITestCaseRepo testRepo = createTestCaseRepo();
-            Collection<String> testUris = getTestsToRun(testRepo);
-            collectDeviceInfo(getDevice(), mTestCaseDir, listener);
+            Collection<String> testUris = getTestPackageUrisToRun(testRepo);
+
             for (String testUri : testUris) {
                 ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
-                if (testPackage != null) {
-                    runTest(listener, testPackage);
-                } else {
-                    Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
-                }
+                addTestPackage(testList, testUri, testPackage);
+            }
+            if (testList.isEmpty()) {
+                Log.logAndDisplay(LogLevel.WARN, LOG_TAG, "No tests to run");
             }
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("failed to find CTS plan file", e);
         } catch (ParseException e) {
             throw new IllegalArgumentException("failed to parse CTS plan file", e);
         }
+        return testList;
     }
 
     /**
-     * Return the list of test uris to run
+     * Adds a test package to the list of packages to test
      *
-     * @return the list of test uris to run
+     * @param testList
+     * @param testUri
+     * @param testPackage
+     */
+    private void addTestPackage(List<KnownTests> testList, String testUri,
+            ITestPackageDef testPackage) {
+        if (testPackage != null) {
+            IRemoteTest testForPackage = testPackage.createTest(mTestCaseDir, mClassName,
+                    mMethodName);
+            if (testForPackage != null) {
+                Collection<TestIdentifier> knownTests = testPackage.getTests();
+                testList.add(new KnownTests(testForPackage, knownTests));
+            }
+        } else {
+            Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
+        }
+    }
+
+    /**
+     * Return the list of test package uris to run
+     *
+     * @return the list of test package uris to run
      * @throws ParseException
      * @throws FileNotFoundException
      */
-    private Collection<String> getTestsToRun(ITestCaseRepo testRepo) throws ParseException,
-            FileNotFoundException {
-        Set<String> testUris = new HashSet<String>();
+    private Collection<String> getTestPackageUrisToRun(ITestCaseRepo testRepo)
+            throws ParseException, FileNotFoundException {
+        // use LinkedHashSet to have predictable iteration order
+        Set<String> testUris = new LinkedHashSet<String>();
         if (mPlanName != null) {
+            Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
             String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
             File ctsPlanFile = new File(mTestPlanDir, ctsPlanRelativePath);
             IPlanXmlParser parser = createXmlParser();
             parser.parse(createXmlStream(ctsPlanFile));
             testUris.addAll(parser.getTestUris());
         } else if (mPackageNames.size() > 0){
+            Log.i(LOG_TAG, String.format("Executing CTS test packages %s", mPackageNames));
             testUris.addAll(mPackageNames);
         } else if (mClassName != null) {
+            Log.i(LOG_TAG, String.format("Executing CTS test class %s", mClassName));
             // try to find package to run from class name
             String packageUri = testRepo.findPackageForTest(mClassName);
             if (packageUri != null) {
@@ -231,6 +320,49 @@ public class CtsTest implements IDeviceTest, IRemoteTest {
         }
         testUris.removeAll(mExcludedPackageNames);
         return testUris;
+    }
+
+    /**
+     * Runs the device info collector instrumentation on device, and forwards it to test listeners
+     * as run metrics.
+     * <p/>
+     * Exposed so unit tests can mock.
+     *
+     * @param listeners
+     * @throws DeviceNotAvailableException
+     */
+    void collectDeviceInfo(ITestDevice device, File testApkDir, ITestInvocationListener listener)
+            throws DeviceNotAvailableException {
+        if (mCollectDeviceInfo) {
+            DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listener);
+        }
+    }
+
+    /**
+     * Factory method for creating a {@link ITestCaseRepo}.
+     * <p/>
+     * Exposed for unit testing
+     */
+    ITestCaseRepo createTestCaseRepo() {
+        return new TestCaseRepo(mTestCaseDir);
+    }
+
+    /**
+     * Factory method for creating a {@link PlanXmlParser}.
+     * <p/>
+     * Exposed for unit testing
+     */
+    IPlanXmlParser createXmlParser() {
+        return new PlanXmlParser();
+    }
+
+    /**
+     * Factory method for creating a {@link InputStream} from a plan xml file.
+     * <p/>
+     * Exposed for unit testing
+     */
+    InputStream createXmlStream(File xmlFile) throws FileNotFoundException {
+        return new BufferedInputStream(new FileInputStream(xmlFile));
     }
 
     private void checkFields() {
@@ -277,67 +409,5 @@ public class CtsTest implements IDeviceTest, IRemoteTest {
             currentVal |= args[i];
         }
         return currentVal;
-    }
-
-    /**
-     * Runs the test.
-     *
-     * @param listeners
-     * @param testPackage
-     * @throws DeviceNotAvailableException
-     */
-    private void runTest(ITestInvocationListener listener, ITestPackageDef testPackage)
-            throws DeviceNotAvailableException {
-        IRemoteTest test = testPackage.createTest(mTestCaseDir, mClassName, mMethodName);
-        if (test != null) {
-            if (test instanceof IDeviceTest) {
-                ((IDeviceTest)test).setDevice(getDevice());
-            }
-            ResultFilter filter = new ResultFilter(listener, testPackage);
-            test.run(filter);
-        }
-    }
-
-    /**
-     * Runs the device info collector instrumentation on device, and forwards it to test listeners
-     * as run metrics.
-     * <p/>
-     * Exposed so unit tests can mock.
-     *
-     * @param listeners
-     * @throws DeviceNotAvailableException
-     */
-    void collectDeviceInfo(ITestDevice device, File testApkDir, ITestInvocationListener listener)
-            throws DeviceNotAvailableException {
-        if (mCollectDeviceInfo) {
-            DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listener);
-        }
-    }
-
-    /**
-     * Factory method for creating a {@link ITestCaseRepo}.
-     * <p/>
-     * Exposed for unit testing
-     */
-    ITestCaseRepo createTestCaseRepo() {
-        return new TestCaseRepo(mTestCaseDir);
-    }
-
-    /**
-     * Factory method for creating a {@link PlanXmlParser}.
-     * <p/>
-     * Exposed for unit testing
-     */
-    IPlanXmlParser createXmlParser() {
-        return new PlanXmlParser();
-    }
-
-    /**
-     * Factory method for creating a {@link InputStream} from a plan xml file.
-     * <p/>
-     * Exposed for unit testing
-     */
-    InputStream createXmlStream(File xmlFile) throws FileNotFoundException {
-        return new BufferedInputStream(new FileInputStream(xmlFile));
     }
 }

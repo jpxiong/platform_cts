@@ -252,10 +252,9 @@ class TestPackageDef implements ITestPackageDef {
 
     /**
      * Get the collection of tests in this test package.
-     * <p/>
-     * Exposed for unit testing.
      */
-    Collection<TestIdentifier> getTests() {
+    @Override
+    public Collection<TestIdentifier> getTests() {
         return mTests;
     }
 }

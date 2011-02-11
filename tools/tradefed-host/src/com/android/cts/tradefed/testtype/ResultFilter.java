@@ -20,6 +20,7 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.ResultForwarder;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -28,17 +29,17 @@ import java.util.Map;
  */
 class ResultFilter extends ResultForwarder {
 
-    private final ITestPackageDef mTestPackage;
+    private final Collection<TestIdentifier> mKnownTests;
 
     /**
      * Create a {@link ResultFilter}.
      *
      * @param listener the real {@link ITestInvocationListener} to forward results to
-     * @param testPackage the {@link ITestPackageDef} that defines the expected tests
+     * @param expectedTests the full collection of known tests to expect
      */
-    ResultFilter(ITestInvocationListener listener, ITestPackageDef testPackage) {
+    ResultFilter(ITestInvocationListener listener, Collection<TestIdentifier> knownTests) {
         super(listener);
-        mTestPackage = testPackage;
+        mKnownTests = knownTests;
     }
 
     /**
@@ -88,6 +89,6 @@ class ResultFilter extends ResultForwarder {
      * @return
      */
     private boolean isKnownTest(TestIdentifier test) {
-        return mTestPackage.isKnownTest(test);
+        return mKnownTests.contains(test);
     }
 }
