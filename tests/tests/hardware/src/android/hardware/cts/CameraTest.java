@@ -409,6 +409,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             waitForPreviewDone();
             assertTrue(mPreviewCallbackResult);
             mCamera.stopPreview();
+            try {
+                // Wait for a while to throw away the remaining preview frames.
+                Thread.sleep(1000);
+            } catch(Exception e) {
+                // ignore
+            }
+            mPreviewDone.close();
         }
         terminateMessageLooper();
     }
