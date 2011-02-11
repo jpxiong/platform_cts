@@ -16,18 +16,18 @@
 
 package com.android.cts.tradefed.result;
 
+import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
-import com.android.cts.tradefed.targetsetup.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestRunResult;
-import com.android.tradefed.targetsetup.IBuildInfo;
-import com.android.tradefed.targetsetup.IFolderBuildInfo;
 import com.android.tradefed.util.FileUtil;
 
 import org.kxml2.io.KXmlSerializer;

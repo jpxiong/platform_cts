@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.cts.tradefed.targetsetup;
+package com.android.cts.tradefed.build;
 
 import java.io.File;
 import java.io.FileNotFoundException;

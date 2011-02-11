@@ -18,31 +18,26 @@ package com.android.cts.tradefed.testtype;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.result.ITestInvocationListener;
-import com.android.tradefed.result.LogDataType;
-import com.android.tradefed.result.TestSummary;
-import com.android.tradefed.targetsetup.IBuildInfo;
+import com.android.tradefed.result.ResultForwarder;
 
-import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
  * A {@link ITestInvocationListener} that filters test results based on the set of expected tests
  * in CTS test package xml files.
  */
-class ResultFilter implements ITestInvocationListener {
+class ResultFilter extends ResultForwarder {
 
-    private final List<ITestInvocationListener> mListeners;
     private final ITestPackageDef mTestPackage;
 
     /**
      * Create a {@link ResultFilter}.
      *
-     * @param listeners the real {@link ITestInvocationListener} to forward results to
+     * @param listener the real {@link ITestInvocationListener} to forward results to
      * @param testPackage the {@link ITestPackageDef} that defines the expected tests
      */
-    ResultFilter(List<ITestInvocationListener> listeners, ITestPackageDef testPackage) {
-        mListeners = listeners;
+    ResultFilter(ITestInvocationListener listener, ITestPackageDef testPackage) {
+        super(listener);
         mTestPackage = testPackage;
     }
 
@@ -50,91 +45,9 @@ class ResultFilter implements ITestInvocationListener {
      * {@inheritDoc}
      */
     @Override
-    public void invocationStarted(IBuildInfo buildInfo) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.invocationStarted(buildInfo);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void invocationFailed(Throwable cause) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.invocationFailed(cause);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void invocationEnded(long elapsedTime) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.invocationEnded(elapsedTime);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TestSummary getSummary() {
-        // should never be called
-        return null;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testLog(String dataName, LogDataType dataType, InputStream dataStream) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.testLog(dataName, dataType, dataStream);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testRunStarted(String runName, int testCount) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.testRunStarted(runName, testCount);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testRunFailed(String errorMessage) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.testRunFailed(errorMessage);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testRunStopped(long elapsedTime) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.testRunStopped(elapsedTime);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
-        for (ITestInvocationListener listener : mListeners) {
-            listener.testRunEnded(elapsedTime, runMetrics);
-        }
-        // TODO: consider reporting all remaining tests in mTestPackage as failed tests with
+        super.testRunEnded(elapsedTime, runMetrics);
+        // TODO: report all remaining tests in mTestPackage as failed tests with
         // notExecuted result
     }
 
@@ -144,9 +57,7 @@ class ResultFilter implements ITestInvocationListener {
     @Override
     public void testStarted(TestIdentifier test) {
         if (isKnownTest(test)) {
-            for (ITestInvocationListener listener : mListeners) {
-                listener.testStarted(test);
-            }
+            super.testStarted(test);
         } else {
             Log.d("ResultFilter", String.format("Skipping reporting unknown test %s", test));
         }
@@ -158,9 +69,7 @@ class ResultFilter implements ITestInvocationListener {
     @Override
     public void testFailed(TestFailure status, TestIdentifier test, String trace) {
         if (isKnownTest(test)) {
-            for (ITestInvocationListener listener : mListeners) {
-                listener.testFailed(status, test, trace);
-            }
+            super.testFailed(status, test, trace);
         }
     }
 
@@ -170,9 +79,7 @@ class ResultFilter implements ITestInvocationListener {
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
         if (isKnownTest(test)) {
-            for (ITestInvocationListener listener : mListeners) {
-                listener.testEnded(test, testMetrics);
-            }
+            super.testEnded(test, testMetrics);
         }
     }
 
