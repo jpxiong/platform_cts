@@ -102,8 +102,6 @@ public class CtsTestTest extends TestCase {
         verifyMocks(mockTest, mockPackageDef);
     }
 
-
-
     /**
      * Test normal case {@link CtsTest#run(java.util.List)} when running a package.
      */
@@ -185,8 +183,8 @@ public class CtsTestTest extends TestCase {
     }
 
     /**
-     * Test {@link CtsTest#run(java.util.List)} when --plan and --package options have been
-     * specified
+     * Test {@link CtsTest#run(ITestInvocationListener))} when --plan and --package options have
+     * been specified.
      */
     public void testRun_packagePlan() throws DeviceNotAvailableException {
         mCtsTest.setPlanName(PLAN_NAME);

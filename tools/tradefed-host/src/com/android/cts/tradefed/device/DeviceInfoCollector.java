@@ -22,7 +22,6 @@ import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.InstrumentationTest;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Collects info from device under test.
@@ -48,14 +47,14 @@ public class DeviceInfoCollector {
 
     /**
      * Installs and runs the device info collector instrumentation, and forwards results
-     * to the <var>listeners</var>
+     * to the <var>listener</var>
      *
      * @param device
-     * @param listeners
+     * @param listener
      * @throws DeviceNotAvailableException
      */
     public static void collectDeviceInfo(ITestDevice device, File testApkDir,
-            List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+            ITestInvocationListener listener) throws DeviceNotAvailableException {
         File apkFile = new File(testApkDir, String.format("%s.apk", APK_NAME));
         if (!apkFile.exists()) {
             Log.e(LOG_TAG, String.format("Could not find %s", apkFile.getAbsolutePath()));
@@ -69,6 +68,6 @@ public class DeviceInfoCollector {
         instrTest.setRerunMode(false);
         instrTest.setPackageName(APP_PACKAGE_NAME);
         instrTest.setRunnerName(INSTRUMENTATION_NAME);
-        instrTest.run(listeners);
+        instrTest.run(listener);
     }
 }

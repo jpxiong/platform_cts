@@ -17,8 +17,8 @@ package com.android.cts.tradefed.result;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
+import com.android.tradefed.build.BuildInfo;
 import com.android.tradefed.result.XmlResultReporter;
-import com.android.tradefed.targetsetup.BuildInfo;
 import com.android.tradefed.util.FileUtil;
 
 import java.io.ByteArrayOutputStream;

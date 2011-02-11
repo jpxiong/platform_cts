@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.tradefed.targetsetup;
+package com.android.cts.tradefed.targetprep;
 
+import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
+import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
-import com.android.tradefed.targetsetup.BuildError;
-import com.android.tradefed.targetsetup.DeviceSetup;
-import com.android.tradefed.targetsetup.IBuildInfo;
-import com.android.tradefed.targetsetup.IFolderBuildInfo;
-import com.android.tradefed.targetsetup.ITargetPreparer;
-import com.android.tradefed.targetsetup.TargetSetupError;
+import com.android.tradefed.targetprep.BuildError;
+import com.android.tradefed.targetprep.DeviceSetup;
+import com.android.tradefed.targetprep.ITargetPreparer;
+import com.android.tradefed.targetprep.TargetSetupError;
 
 import java.io.FileNotFoundException;
 

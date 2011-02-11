@@ -87,5 +87,4 @@ public class JarHostTestTest extends TestCase {
         mJarTest.run(listener);
         EasyMock.verify(listener);
     }
-
 }

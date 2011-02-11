@@ -15,15 +15,12 @@
  */
 package com.android.cts.tradefed.device;
 
+import com.android.tradefed.build.BuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.CollectingTestListener;
-import com.android.tradefed.result.ITestInvocationListener;
-import com.android.tradefed.targetsetup.BuildInfo;
 import com.android.tradefed.testtype.DeviceTestCase;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,11 +34,8 @@ public class DeviceInfoCollectorFuncTest extends DeviceTestCase {
         CollectingTestListener testListener = new CollectingTestListener();
 
         testListener.invocationStarted(new BuildInfo());
-        List<ITestInvocationListener> listeners = new ArrayList<ITestInvocationListener>(1);
-        listeners.add(testListener);
         DeviceInfoCollector.collectDeviceInfo(getDevice(), new File(
-                System.getProperty("java.io.tmpdir")),
-                listeners);
+                System.getProperty("java.io.tmpdir")), testListener);
         assertNotNull(testListener.getCurrentRunResults());
         assertTrue(testListener.getCurrentRunResults().getRunMetrics().size() > 0);
         for (Map.Entry<String, String> metricEntry : testListener.getCurrentRunResults().getRunMetrics().entrySet()) {
