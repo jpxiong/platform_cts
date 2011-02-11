@@ -34,7 +34,7 @@ public class AudioAssets {
     }
 
     public static byte[] getPinkNoise(Context context, int ampl, int duration) {
-        return readAsset(context, "pink_" + ampl + "_" + duration + "s");
+        return readAsset(context, "audioquality/pink_" + ampl + "_" + duration + "s");
     }
 
     private static byte[] readAsset(Context context, String filename) {
@@ -43,7 +43,7 @@ public class AudioAssets {
         try {
             ais = assetManager.open(filename);
         } catch (IOException e) {
-            Log.e(TAG, "Cannot load asset " + filename);
+            Log.e(TAG, "Cannot load asset " + filename, e);
             return null;
         }
         byte[] buffer = Utils.readFile(ais);
