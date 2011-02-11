@@ -234,7 +234,7 @@ public class Utils {
             fos.write(data);
             fos.close();
         } catch (IOException e) {
-            Log.e(TAG, "Error writing to file " + filename);
+            Log.e(TAG, "Error writing to file " + filename, e);
         }
     }
 

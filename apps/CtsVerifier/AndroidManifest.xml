@@ -21,9 +21,12 @@
       android:versionName="1.0">
       
     <uses-sdk android:minSdkVersion="5"></uses-sdk>
-    
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application android:label="@string/app_name">
 
@@ -58,7 +61,7 @@
         </activity>
 
         <activity android:name=".sensors.AccelerometerTestActivity" android:label="@string/snsr_accel_test"
-        android:screenOrientation="nosensor">
+                android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -67,7 +70,7 @@
         </activity>
 
         <activity android:name=".sensors.MagnetometerTestActivity" android:label="@string/snsr_mag_test"
-        android:screenOrientation="nosensor">
+                android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -76,8 +79,7 @@
         </activity>
 
       <activity android:name=".audioquality.AudioQualityVerifierActivity"
-                android:label="@string/aq_verifier"
-                android:screenOrientation="portrait">
+              android:label="@string/aq_verifier">
           <intent-filter>
               <action android:name="android.intent.action.MAIN" />
               <category android:name="android.cts.intent.category.MANUAL_TEST" />
