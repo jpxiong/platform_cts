@@ -23,7 +23,6 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
-import com.android.tradefed.testtype.AbstractRemoteTest;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
@@ -36,7 +35,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -46,7 +44,7 @@ import junit.framework.Test;
  * <p/>
  * Supports running all the tests contained in a CTS plan, or individual test packages.
  */
-public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteTest {
+public class CtsTest implements IDeviceTest, IRemoteTest {
 
     private static final String LOG_TAG = "PlanTest";
 
@@ -176,7 +174,7 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
     /**
      * {@inheritDoc}
      */
-    public void run(List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+    public void run(ITestInvocationListener listener) throws DeviceNotAvailableException {
         checkFields();
 
         Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
@@ -184,11 +182,11 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
         try {
             ITestCaseRepo testRepo = createTestCaseRepo();
             Collection<String> testUris = getTestsToRun(testRepo);
-            collectDeviceInfo(getDevice(), mTestCaseDir, listeners);
+            collectDeviceInfo(getDevice(), mTestCaseDir, listener);
             for (String testUri : testUris) {
                 ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
                 if (testPackage != null) {
-                    runTest(listeners, testPackage);
+                    runTest(listener, testPackage);
                 } else {
                     Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
                 }
@@ -288,14 +286,14 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
      * @param testPackage
      * @throws DeviceNotAvailableException
      */
-    private void runTest(List<ITestInvocationListener> listeners, ITestPackageDef testPackage)
+    private void runTest(ITestInvocationListener listener, ITestPackageDef testPackage)
             throws DeviceNotAvailableException {
         IRemoteTest test = testPackage.createTest(mTestCaseDir, mClassName, mMethodName);
         if (test != null) {
             if (test instanceof IDeviceTest) {
                 ((IDeviceTest)test).setDevice(getDevice());
             }
-            ResultFilter filter = new ResultFilter(listeners, testPackage);
+            ResultFilter filter = new ResultFilter(listener, testPackage);
             test.run(filter);
         }
     }
@@ -309,10 +307,10 @@ public class CtsTest extends AbstractRemoteTest implements IDeviceTest, IRemoteT
      * @param listeners
      * @throws DeviceNotAvailableException
      */
-    void collectDeviceInfo(ITestDevice device, File testApkDir,
-            List<ITestInvocationListener> listeners) throws DeviceNotAvailableException {
+    void collectDeviceInfo(ITestDevice device, File testApkDir, ITestInvocationListener listener)
+            throws DeviceNotAvailableException {
         if (mCollectDeviceInfo) {
-            DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listeners);
+            DeviceInfoCollector.collectDeviceInfo(device, testApkDir, listener);
         }
     }
 

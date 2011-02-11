@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.tradefed.targetsetup;
+package com.android.cts.tradefed.build;
 
+import com.android.tradefed.build.BuildRetrievalError;
+import com.android.tradefed.build.FolderBuildInfo;
+import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.build.IBuildProvider;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
-import com.android.tradefed.targetsetup.FolderBuildInfo;
-import com.android.tradefed.targetsetup.IBuildInfo;
-import com.android.tradefed.targetsetup.IBuildProvider;
-import com.android.tradefed.targetsetup.IFolderBuildInfo;
-import com.android.tradefed.targetsetup.TargetSetupError;
 
 import java.io.File;
 
@@ -35,7 +35,7 @@ public class CtsBuildProvider implements IBuildProvider {
     /**
      * {@inheritDoc}
      */
-    public IBuildInfo getBuild() throws TargetSetupError {
+    public IBuildInfo getBuild() throws BuildRetrievalError {
         if (mCtsRootDir == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
