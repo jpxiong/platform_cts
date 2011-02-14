@@ -151,7 +151,9 @@ public class AccountManagerTest extends AndroidTestCase {
 
     private void validateOptions(Bundle expectedOptions, Bundle actualOptions) {
         if (expectedOptions == null) {
-            assertNull(actualOptions);
+            if (actualOptions != null) {
+                assertTrue(actualOptions.isEmpty());
+            }
         } else {
             assertNotNull(actualOptions);
             assertEquals(expectedOptions.get(OPTION_NAME_1), actualOptions.get(OPTION_NAME_1));
