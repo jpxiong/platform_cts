@@ -93,13 +93,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             if (!(buildInfo instanceof IFolderBuildInfo)) {
                 throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
             }
+
             IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
             try {
                 CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
+                buildHelper.validateStructure();
                 mReportDir = buildHelper.getResultsDir();
-
             } catch (FileNotFoundException e) {
-                throw new IllegalArgumentException("unrecognized cts structure", e);
+                throw new IllegalArgumentException("Invalid CTS build", e);
             }
         }
         // create a unique directory for saving results, using old cts host convention
@@ -107,6 +108,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         mReportDir = new File(mReportDir, getResultTimestamp());
         mReportDir.mkdirs();
         mStartTime = getTimestamp();
+        Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Using ctsbuild %s",
+                mReportDir.getAbsolutePath()));
     }
 
     /**
