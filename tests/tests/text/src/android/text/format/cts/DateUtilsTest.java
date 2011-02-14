@@ -37,7 +37,6 @@ public class DateUtilsTest extends AndroidTestCase {
     private static final long HOUR_DURATION = 2 * 60 * 60 * 1000;
     private static final long DAY_DURATION = 5 * 24 * 60 * 60 * 1000;
     private long mBaseTime;
-    private Locale mDefaultLocale;
     private Context mContext;
 
     @Override
@@ -45,18 +44,6 @@ public class DateUtilsTest extends AndroidTestCase {
         super.setUp();
         mContext = getContext();
         mBaseTime = System.currentTimeMillis();
-        mDefaultLocale = Locale.getDefault();
-        if (!mDefaultLocale.equals(Locale.US)) {
-            Locale.setDefault(Locale.US);
-        }
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        if (!Locale.getDefault().equals(mDefaultLocale)) {
-            Locale.setDefault(mDefaultLocale);
-        }
-        super.tearDown();
     }
 
     @TestTargetNew(
@@ -65,6 +52,10 @@ public class DateUtilsTest extends AndroidTestCase {
         args = {int.class, int.class}
     )
     public void testGetDayOfWeekString() {
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
+            return;
+        }
+
         assertEquals("Sunday",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_LONG));
         assertEquals("Sun",
@@ -86,6 +77,9 @@ public class DateUtilsTest extends AndroidTestCase {
         args = {int.class, int.class}
     )
     public void testGetMonthString() {
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
+            return;
+        }
         assertEquals("January", DateUtils.getMonthString(Calendar.JANUARY, DateUtils.LENGTH_LONG));
         assertEquals("Jan",
                 DateUtils.getMonthString(Calendar.JANUARY, DateUtils.LENGTH_MEDIUM));
@@ -104,6 +98,9 @@ public class DateUtilsTest extends AndroidTestCase {
         args = {int.class}
     )
     public void testGetAMPMString() {
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
+            return;
+        }
         assertEquals("am", DateUtils.getAMPMString(Calendar.AM));
         assertEquals("pm", DateUtils.getAMPMString(Calendar.PM));
     }
@@ -142,6 +139,9 @@ public class DateUtilsTest extends AndroidTestCase {
     })
 
     public void testGetSpanString() {
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
+            return;
+        }
         assertEquals("0 minutes ago",
                 DateUtils.getRelativeTimeSpanString(mBaseTime - MIN_DURATION).toString());
         assertEquals("in 0 minutes",
@@ -198,8 +198,7 @@ public class DateUtilsTest extends AndroidTestCase {
     })
     @SuppressWarnings("deprecation")
     public void testFormatMethods() {
-        if (!LocaleUtils.isSupportedLocale(mContext, Locale.US)) {
-            // Locale is set to US in setUp method.
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
         }
 
