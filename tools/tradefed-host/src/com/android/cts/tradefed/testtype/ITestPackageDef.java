@@ -20,6 +20,7 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.testtype.IRemoteTest;
 
 import java.io.File;
+import java.util.Collection;
 
 /**
  * Container for CTS test info.
@@ -62,5 +63,10 @@ interface ITestPackageDef {
      * @return <code>true</code> if test class is defined
      */
     public boolean isKnownTestClass(String testClassName);
+
+    /**
+     * Get the collection of tests in this test package.
+     */
+    public Collection<TestIdentifier> getTests();
 
 }
