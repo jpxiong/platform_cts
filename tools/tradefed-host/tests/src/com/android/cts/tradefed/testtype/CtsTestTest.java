@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
@@ -95,6 +96,7 @@ public class CtsTestTest extends TestCase {
         EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
         EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
                 (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
         mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks(mockTest, mockPackageDef);
@@ -113,9 +115,42 @@ public class CtsTestTest extends TestCase {
         EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
         EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
                 (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
         mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks(mockTest, mockPackageDef);
+        mCtsTest.run(mMockListener);
+        verifyMocks(mockTest, mockPackageDef);
+    }
+
+    /**
+     * Test a resumed run
+     */
+    @SuppressWarnings("unchecked")
+    public void testRun_resume() throws DeviceNotAvailableException {
+        mCtsTest.addPackageName(PACKAGE_NAME);
+        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
+        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
+        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
+        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
+                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
+
+        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        // abort the first run
+        EasyMock.expectLastCall().andThrow(new DeviceNotAvailableException());
+
+        // now expect test to be resumed
+        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+
+        replayMocks(mockTest, mockPackageDef);
+        try {
+            mCtsTest.run(mMockListener);
+            fail("Did not throw DeviceNotAvailableException");
+        } catch (DeviceNotAvailableException e) {
+            // expected
+        }
+        // now resume, and expect same test's run method to be called again
         mCtsTest.run(mMockListener);
         verifyMocks(mockTest, mockPackageDef);
     }
@@ -137,6 +172,7 @@ public class CtsTestTest extends TestCase {
         IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
         EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
                 EasyMock.eq(className), EasyMock.eq(methodName))).andReturn(mockTest);
+        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
         mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
         replayMocks(mockTest, mockPackageDef);
