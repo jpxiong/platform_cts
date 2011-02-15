@@ -217,6 +217,7 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
 
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
+        Thread.sleep(3000);
     }
 
     /**
