@@ -21,6 +21,7 @@
     <classpathentry kind="src" path="cts/tests/tests/database/src"/>
     <classpathentry kind="src" path="cts/tests/tests/dpi/src"/>
     <classpathentry kind="src" path="cts/tests/tests/dpi2/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/drm/src"/>
     <classpathentry kind="src" path="cts/tests/tests/example/src"/>
     <classpathentry kind="src" path="cts/tests/tests/gesture/src"/>
     <classpathentry kind="src" path="cts/tests/tests/graphics/src"/>
