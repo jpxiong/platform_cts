@@ -16,6 +16,8 @@
 
 package com.android.cts.tradefed.build;
 
+import com.android.tradefed.build.IFolderBuildInfo;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -37,15 +39,21 @@ public class CtsBuildHelper {
      *
      * @param rootDir the parent folder that contains the "android-cts" directory and all its
      *            contents.
-     * @throws FileNotFoundException if file does not exist
      */
-    public CtsBuildHelper(File rootDir) throws FileNotFoundException {
+    public CtsBuildHelper(File rootDir) {
         mRootDir = rootDir;
         mCtsDir = new File(mRootDir, CTS_DIR_NAME);
-        if (!mCtsDir.exists()) {
-            throw new FileNotFoundException(String.format(
-                    "CTS install folder %s does not exist", mCtsDir.getAbsolutePath()));
-        }
+    }
+
+    /**
+     * Alternate {@link CtsBuildHelper} constructor that takes the {@link IFolderBuildInfo}
+     * representation of a CTS build.
+     *
+     * @param build the {@link IFolderBuildInfo}
+     * @throws FileNotFoundException
+     */
+    public CtsBuildHelper(IFolderBuildInfo build) throws FileNotFoundException {
+        this(build.getRootDir());
     }
 
     /**
@@ -88,27 +96,36 @@ public class CtsBuildHelper {
 
     /**
      * @return a {@link File} representing the test cases directory
-     * @throws FileNotFoundException if dir does not exist
      */
-    public File getTestCasesDir() throws FileNotFoundException {
-        File dir = new File(getRepositoryDir(), "testcases");
-        if (!dir.exists()) {
-            throw new FileNotFoundException(String.format(
-                    "CTS test cases directory %s does not exist", dir.getAbsolutePath()));
-        }
-        return dir;
+    public File getTestCasesDir() {
+        return new File(getRepositoryDir(), "testcases");
     }
 
     /**
      * @return a {@link File} representing the test plan directory
-     * @throws FileNotFoundException if dir does not exist
      */
     public File getTestPlansDir() throws FileNotFoundException {
-        File dir = new File(getRepositoryDir(), "plans");
-        if (!dir.exists()) {
+        return new File(getRepositoryDir(), "plans");
+    }
+
+    /**
+     * Check the validity of the CTS build file system structure.
+     * @throws FileNotFoundException if any major directories are missing
+     */
+    public void validateStructure() throws FileNotFoundException {
+        if (!getCtsDir().exists()) {
             throw new FileNotFoundException(String.format(
-                    "CTS test plans directory %s does not exist", dir.getAbsolutePath()));
+                    "CTS install folder %s does not exist", getCtsDir().getAbsolutePath()));
         }
-        return dir;
+        if (!getTestCasesDir().exists()) {
+            throw new FileNotFoundException(String.format(
+                    "CTS test cases folder %s does not exist",
+                    getTestCasesDir().getAbsolutePath()));
+        }
+        if (!getTestPlansDir().exists()) {
+            throw new FileNotFoundException(String.format(
+                    "CTS test plans folder %s does not exist",
+                    getTestPlansDir().getAbsolutePath()));
+        }
     }
 }

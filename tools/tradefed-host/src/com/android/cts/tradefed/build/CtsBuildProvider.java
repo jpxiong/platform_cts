@@ -30,17 +30,17 @@ import java.io.File;
 public class CtsBuildProvider implements IBuildProvider {
 
     @Option(name="cts-install-path", description="the path to the cts installation to use")
-    private File mCtsRootDir;
+    private String mCtsRootDirPath = System.getProperty("CTS_ROOT");
 
     /**
      * {@inheritDoc}
      */
     public IBuildInfo getBuild() throws BuildRetrievalError {
-        if (mCtsRootDir == null) {
+        if (mCtsRootDirPath == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
         IFolderBuildInfo ctsBuild = new FolderBuildInfo(0, "cts", "cts");
-        ctsBuild.setRootDir(mCtsRootDir);
+        ctsBuild.setRootDir(new File(mCtsRootDirPath));
         return ctsBuild;
     }
 

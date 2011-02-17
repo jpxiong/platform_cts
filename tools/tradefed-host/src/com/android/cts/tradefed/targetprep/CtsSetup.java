@@ -16,12 +16,8 @@
 package com.android.cts.tradefed.targetprep;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
-import com.android.tradefed.config.ConfigurationException;
-import com.android.tradefed.config.IConfiguration;
-import com.android.tradefed.config.IConfigurationReceiver;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.targetprep.BuildError;
@@ -36,13 +32,11 @@ import java.io.FileNotFoundException;
  * <p/>
  * All the actions performed in this class must work on a production device.
  */
-public class CtsSetup implements ITargetPreparer, IConfigurationReceiver {
+public class CtsSetup implements ITargetPreparer {
 
     private static final String RUNNER_APK_NAME = "android.core.tests.runner.apk";
     // TODO: read this from configuration file rather than hardcoding
     private static final String TEST_STUBS_APK = "CtsTestStubs.apk";
-
-    private IConfiguration mConfiguration = null;
 
     /**
      * Factory method to create a {@link CtsBuildHelper}.
@@ -56,34 +50,17 @@ public class CtsSetup implements ITargetPreparer, IConfigurationReceiver {
     /**
      * {@inheritDoc}
      */
-    public void setConfiguration(IConfiguration configuration) {
-        mConfiguration = configuration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void setUp(ITestDevice device, IBuildInfo buildInfo) throws TargetSetupError,
             BuildError, DeviceNotAvailableException {
         if (!(buildInfo instanceof IFolderBuildInfo)) {
             throw new IllegalArgumentException("Provided buildInfo is not a IFolderBuildInfo");
         }
-        if (mConfiguration == null) {
-            throw new IllegalStateException("setConfiguration() was not called before setUp");
-        }
         IFolderBuildInfo ctsBuildInfo = (IFolderBuildInfo)buildInfo;
         try {
             CtsBuildHelper buildHelper = createBuildHelper(ctsBuildInfo.getRootDir());
-            // pass necessary build information to the other config objects
-            mConfiguration.injectOptionValue(CtsTest.TEST_CASES_DIR_OPTION,
-                    buildHelper.getTestCasesDir().getAbsolutePath());
-            mConfiguration.injectOptionValue(CtsTest.TEST_PLANS_DIR_OPTION,
-                    buildHelper.getTestPlansDir().getAbsolutePath());
             installCtsPrereqs(device, buildHelper);
         } catch (FileNotFoundException e) {
             throw new TargetSetupError("Invalid CTS installation", e);
-        } catch (ConfigurationException e) {
-            throw new TargetSetupError("Failed to set repository directory options", e);
         }
     }
 
