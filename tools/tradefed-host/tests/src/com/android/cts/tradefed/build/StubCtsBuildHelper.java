@@ -15,40 +15,25 @@
  */
 package com.android.cts.tradefed.build;
 
-import com.android.tradefed.util.FileUtil;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * Stub implementation of CtsBuildHelper that returns empty files for all methods
  */
 public class StubCtsBuildHelper extends CtsBuildHelper {
 
-    public static StubCtsBuildHelper createStubHelper() throws IOException {
-        File tmpFolder= FileUtil.createTempDir("ctstmp");
-        File ctsinstall = new File(tmpFolder, CtsBuildHelper.CTS_DIR_NAME);
-        ctsinstall.mkdirs();
-        return new StubCtsBuildHelper(tmpFolder);
+    public StubCtsBuildHelper()  {
+        super(new File("tmp"));
     }
 
-    private StubCtsBuildHelper(File rootDir) throws FileNotFoundException {
-        super(rootDir);
+    @Override
+    public void validateStructure() {
+        // ignore
     }
 
     @Override
     public File getTestApp(String appFileName) throws FileNotFoundException {
-        return new File("tmp");
-    }
-
-    @Override
-    public File getTestPlansDir() throws FileNotFoundException {
-        return new File("tmp");
-    }
-
-    @Override
-    public File getTestCasesDir() {
         return new File("tmp");
     }
 }

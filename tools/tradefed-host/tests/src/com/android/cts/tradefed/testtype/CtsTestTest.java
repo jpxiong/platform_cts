@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.build.StubCtsBuildHelper;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -45,6 +46,7 @@ public class CtsTestTest extends TestCase {
     private IPlanXmlParser mMockPlanParser;
     private ITestDevice mMockDevice;
     private ITestInvocationListener mMockListener;
+    private StubCtsBuildHelper mStubBuildHelper;
 
     private static final String PLAN_NAME = "CTS";
 
@@ -58,6 +60,7 @@ public class CtsTestTest extends TestCase {
         mMockPlanParser = EasyMock.createMock(IPlanXmlParser.class);
         mMockDevice = EasyMock.createMock(ITestDevice.class);
         mMockListener = EasyMock.createNiceMock(ITestInvocationListener.class);
+        mStubBuildHelper = new StubCtsBuildHelper();
 
         mCtsTest = new CtsTest() {
             @Override
@@ -77,9 +80,7 @@ public class CtsTestTest extends TestCase {
             }
         };
         mCtsTest.setDevice(mMockDevice);
-        // not used, but needs to be non-null
-        mCtsTest.setTestCaseDir(new File("tmp"));
-        mCtsTest.setTestPlanDir(new File("tmp"));
+        mCtsTest.setBuildHelper(mStubBuildHelper);
         // turn off device collection for simplicity
         mCtsTest.setCollectDeviceInfo(false);
     }

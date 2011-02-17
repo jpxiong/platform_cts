@@ -17,10 +17,8 @@ package com.android.cts.tradefed.targetprep;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.build.StubCtsBuildHelper;
-import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
-import com.android.tradefed.config.IConfiguration;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.targetprep.BuildError;
@@ -29,7 +27,6 @@ import com.android.tradefed.targetprep.TargetSetupError;
 import org.easymock.EasyMock;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -37,8 +34,6 @@ import junit.framework.TestCase;
  * Unit tests for {@link CtsSetup}.
  */
 public class CtsSetupTest extends TestCase {
-
-    private static final String LOG_TAG = "CtsSetupTest";
 
     private CtsSetup mSetup;
     private ITestDevice mMockDevice;
@@ -52,13 +47,7 @@ public class CtsSetupTest extends TestCase {
         mSetup = new CtsSetup() {
             @Override
             CtsBuildHelper createBuildHelper(File rootDir) {
-                try {
-                    return StubCtsBuildHelper.createStubHelper();
-                } catch (IOException e) {
-                    Log.e(LOG_TAG, e);
-                    fail("failed to create stub helper");
-                    return null;
-                }
+                return new StubCtsBuildHelper();
             }
         };
         mMockDevice = EasyMock.createMock(ITestDevice.class);
@@ -79,20 +68,6 @@ public class CtsSetupTest extends TestCase {
     }
 
     /**
-     * Test {@link CtsSetup#setUp(ITestDevice, IBuildInfo)} when a {@link IConfiguration} has not
-     * been provided.
-     */
-    public void testSetUp_missingConfig() throws TargetSetupError, BuildError,
-            DeviceNotAvailableException {
-        try {
-            mSetup.setUp(mMockDevice,  EasyMock.createMock(IFolderBuildInfo.class));
-            fail("IllegalStateException not thrown");
-        } catch (IllegalStateException e) {
-            // expected
-        }
-    }
-
-    /**
      * Test normal case for {@link CtsSetup#setUp(ITestDevice, IBuildInfo)}
      */
     public void testSetUp() throws TargetSetupError, BuildError, DeviceNotAvailableException {
@@ -104,7 +79,6 @@ public class CtsSetupTest extends TestCase {
                 mMockDevice.installPackage((File)EasyMock.anyObject(), EasyMock.anyBoolean()))
                 .andReturn(null)
                 .anyTimes();
-        mSetup.setConfiguration(EasyMock.createMock(IConfiguration.class));
         EasyMock.replay(ctsBuild, mMockDevice);
         mSetup.setUp(mMockDevice, ctsBuild);
     }
