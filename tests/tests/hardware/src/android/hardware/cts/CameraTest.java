@@ -223,7 +223,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class TestErrorCallback implements ErrorCallback {
         public void onError(int error, Camera camera) {
             mErrorCallbackResult = true;
-            fail("The Error code is: " + error);
+            fail("Got camera error from ErrorCallback: " + error);
         }
     }
 
@@ -1891,6 +1891,41 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         parameters = mCamera.getParameters();
         assertEquals(originalSize, parameters.getPreviewSize());
 
+        terminateMessageLooper();
+    }
+
+    public void testGetParameterDuringFocus() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testGetParameterDuringFocusByCamera(id);
+        }
+    }
+
+    private void testGetParameterDuringFocusByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.setErrorCallback(mErrorCallback);
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        for (String focusMode: parameters.getSupportedFocusModes()) {
+            if (focusMode.equals(parameters.FOCUS_MODE_AUTO)
+                    || focusMode.equals(parameters.FOCUS_MODE_MACRO)) {
+                parameters.setFocusMode(focusMode);
+                mCamera.setParameters(parameters);
+                mCamera.autoFocus(mAutoFocusCallback);
+                // This should not crash or throw exception.
+                mCamera.getParameters();
+                waitForFocusDone();
+
+
+                mCamera.autoFocus(mAutoFocusCallback);
+                // Add a small delay to make sure focus has started.
+                Thread.sleep(100);
+                // This should not crash or throw exception.
+                mCamera.getParameters();
+            }
+        }
         terminateMessageLooper();
     }
 }
