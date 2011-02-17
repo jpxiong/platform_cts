@@ -72,5 +72,5 @@ for JAR in $JARS; do
     JAR_PATH=${JAR_PATH}:${JAR_DIR}/${JAR}
 done
 
-java -cp ${JAR_PATH} com.android.tradefed.command.Command "$@" --cts-install-path ${CTS_ROOT} cts
+java -cp ${JAR_PATH} -DCTS_ROOT=${CTS_ROOT} com.android.tradefed.command.Console "$@"
 
