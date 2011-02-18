@@ -31,7 +31,8 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
+import android.webkit.WebChromeClient;
+ 
 @TestTargetClass(android.webkit.WebViewClient.class)
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
@@ -47,6 +48,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+        mWebView.setWebChromeClient(new WebChromeClient());
     }
 
     @Override
