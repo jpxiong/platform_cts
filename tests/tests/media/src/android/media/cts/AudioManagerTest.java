@@ -537,7 +537,7 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                           AudioManager.STREAM_VOICE_CALL,
                           AudioManager.STREAM_RING };
 
-        mAudioManager.adjustVolume(ADJUST_RAISE, 100);
+        mAudioManager.adjustVolume(ADJUST_RAISE, 0);
         mAudioManager.adjustSuggestedStreamVolume(
                 ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, FLAG_SHOW_UI);
 
@@ -602,7 +602,7 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
 
         // adjust volume
         int maxVolume = mAudioManager.getStreamMaxVolume(STREAM_MUSIC);
-        mAudioManager.adjustVolume(ADJUST_RAISE, 100);
+        mAudioManager.adjustVolume(ADJUST_RAISE, 0);
 
         MediaPlayer mp = MediaPlayer.create(mContext, MP3_TO_PLAY);
         mp.setAudioStreamType(STREAM_MUSIC);
