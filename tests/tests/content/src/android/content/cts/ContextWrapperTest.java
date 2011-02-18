@@ -18,7 +18,6 @@ package android.content.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -247,7 +246,6 @@ public class ContextWrapperTest extends AndroidTestCase {
             args = {int.class}
         )
     })
-    @BrokenTest("needs investigation")
     public void testAccessTheme() {
         mContextWrapper.setTheme(R.style.Test_Theme);
         final Theme testTheme = mContextWrapper.getTheme();
@@ -258,11 +256,18 @@ public class ContextWrapperTest extends AndroidTestCase {
             android.R.attr.panelColorForeground,
             android.R.attr.panelColorBackground
         };
-        TypedArray attrArray = testTheme.obtainStyledAttributes(attrs);
-
-        assertTrue(attrArray.getBoolean(0, false));
-        assertEquals(0xff000000, attrArray.getColor(1, 0));
-        assertEquals(0xffffffff, attrArray.getColor(2, 0));
+        TypedArray attrArray = null;
+        try {
+            attrArray = testTheme.obtainStyledAttributes(attrs);
+            assertTrue(attrArray.getBoolean(0, false));
+            assertEquals(0xff000000, attrArray.getColor(1, 0));
+            assertEquals(0xffffffff, attrArray.getColor(2, 0));
+        } finally {
+            if (attrArray != null) {
+                attrArray.recycle();
+                attrArray = null;
+            }
+        }
 
         // setTheme only works for the first time
         mContextWrapper.setTheme(android.R.style.Theme_Black);

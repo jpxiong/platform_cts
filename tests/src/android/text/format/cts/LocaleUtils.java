@@ -22,14 +22,10 @@ import java.util.Locale;
 
 public class LocaleUtils {
 
-    /** Return whether or not the specified locale is available on the system. */
-    public static boolean isSupportedLocale(Context context, Locale locale) {
-        String[] locales = context.getAssets().getLocales();
-        for (String availableLocale : locales) {
-            if (locale.toString().equals(availableLocale)) {
-                return true;
-            }
-        }
-        return false;
+    /** Return whether or not the given locale is the device's current locale. */
+    public static boolean isCurrentLocale(Context context, Locale locale) {
+        // TODO: Change the locale on the device using public API if it becomes available.
+        Locale currentLocale = context.getResources().getConfiguration().locale;
+        return locale.equals(currentLocale);
     }
 }

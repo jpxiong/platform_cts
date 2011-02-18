@@ -16,7 +16,6 @@
 
 package android.permission.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestTargetClass;
 
 import android.app.Activity;
