@@ -897,6 +897,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals((float)latitude, latLong[0], 0.0001f);
         assertEquals((float)longitude, latLong[1], 0.0001f);
         assertEquals(altitude, exif.getAltitude(-1), 1);
+        assertEquals(timestamp, exif.getGpsDateTime() / 1000);
     }
 
     private void checkGpsDataNull(ExifInterface exif) {
