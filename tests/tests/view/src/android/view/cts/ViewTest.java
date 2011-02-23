@@ -3936,6 +3936,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 fitWindowsView.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
         assertTrue(mockView.isFocusableInTouchMode());
         assertFalse(fitWindowsView.isFocusableInTouchMode());
         assertTrue(mockView.isFocusable());
@@ -3953,12 +3954,14 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 mockView.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
         assertTrue(mockView.isFocused());
         runTestOnUiThread(new Runnable() {
             public void run() {
                 fitWindowsView.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
         assertFalse(fitWindowsView.isFocused());
         assertTrue(mockView.isInTouchMode());
         assertTrue(fitWindowsView.isInTouchMode());
@@ -3972,6 +3975,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 fitWindowsView.requestFocus();
             }
         });
+        getInstrumentation().waitForIdleSync();
         assertFalse(mockView.isFocused());
         assertTrue(fitWindowsView.isFocused());
         assertFalse(mockView.isInTouchMode());
