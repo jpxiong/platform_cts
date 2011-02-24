@@ -24,13 +24,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Retrieves CTS test case definitions from the repository.
  */
-class TestCaseRepo implements ITestCaseRepo {
+public class TestCaseRepo implements ITestCaseRepo {
 
     private static final String LOG_TAG = "TestCaseRepo";
 
@@ -128,5 +132,16 @@ class TestCaseRepo implements ITestCaseRepo {
             }
         }
         return null;
+    }
+
+    /**
+     * Return a list of all package names found in repo.
+     * @return
+     */
+    public Collection<String> getPackageNames() {
+        List<String> packageNames = new ArrayList<String>();
+        packageNames.addAll(mTestMap.keySet());
+        Collections.sort(packageNames);
+        return packageNames;
     }
 }
