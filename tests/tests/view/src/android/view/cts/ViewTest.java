@@ -571,6 +571,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         runTestOnUiThread(new Runnable() {
             public void run() {
                 view.requestLayout();
+                view.invalidate();
             }
         });
         getInstrumentation().waitForIdleSync();
