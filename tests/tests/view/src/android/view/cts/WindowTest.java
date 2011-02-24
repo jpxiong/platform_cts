@@ -39,6 +39,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.Gravity;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -578,10 +579,19 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertTrue(mWindow.isShortcutKey(KeyEvent.KEYCODE_Q, new KeyEvent(KeyEvent.ACTION_DOWN,
-                KeyEvent.KEYCODE_Q)));
-        assertFalse(mWindow.isShortcutKey(KeyEvent.KEYCODE_F, new KeyEvent(KeyEvent.ACTION_DOWN,
-                KeyEvent.KEYCODE_F)));
+        KeyCharacterMap keymap
+                = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            assertTrue(mWindow.isShortcutKey(KeyEvent.KEYCODE_1, new KeyEvent(KeyEvent.ACTION_DOWN,
+                    KeyEvent.KEYCODE_1)));
+            assertFalse(mWindow.isShortcutKey(KeyEvent.KEYCODE_5, new KeyEvent(KeyEvent.ACTION_DOWN,
+                    KeyEvent.KEYCODE_5)));
+        } else {
+            assertTrue(mWindow.isShortcutKey(KeyEvent.KEYCODE_Q, new KeyEvent(KeyEvent.ACTION_DOWN,
+                    KeyEvent.KEYCODE_Q)));
+            assertFalse(mWindow.isShortcutKey(KeyEvent.KEYCODE_F, new KeyEvent(KeyEvent.ACTION_DOWN,
+                    KeyEvent.KEYCODE_F)));
+        }
     }
 
     @TestTargets({
