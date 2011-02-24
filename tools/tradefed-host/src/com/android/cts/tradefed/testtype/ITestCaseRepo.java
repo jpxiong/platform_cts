@@ -16,11 +16,13 @@
 
 package com.android.cts.tradefed.testtype;
 
+import java.util.Collection;
+
 
 /**
  * Interface for accessing tests from the CTS repository.
  */
-interface ITestCaseRepo {
+public interface ITestCaseRepo {
 
     /**
      * Get a {@link TestPackageDef} given a uri
@@ -37,5 +39,10 @@ interface ITestCaseRepo {
      * @return the package uri or <code>null</code> if the package cannot be found
      */
     public String findPackageForTest(String testClassName);
+
+    /**
+     * Return a sorted {@link Collection} of all package names found in repo.
+     */
+    public Collection<String> getPackageNames();
 
 }
