@@ -577,7 +577,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Parameters constants
         final int PICTURE_FORMAT = ImageFormat.JPEG;
         final int PREVIEW_FORMAT = ImageFormat.NV21;
-        final int PREVIEW_FRAMERATE = 10;
 
         // Before setting Parameters
         final int origPictureFormat = parameters.getPictureFormat();
@@ -623,7 +622,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int jpegThumnailQuality = parameters.getJpegThumbnailQuality();
         assertTrue(previewSizes != null && previewSizes.size() != 0);
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
-        assertTrue(previewFormats != null && previewFormats.size() != 0);
+        assertTrue(previewFormats != null && previewFormats.size() >= 2);
+        assertTrue(previewFormats.contains(ImageFormat.NV21));
+        assertTrue(previewFormats.contains(ImageFormat.YV12));
         assertTrue(pictureFormats != null && pictureFormats.size() != 0);
         assertTrue(frameRates != null && frameRates.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
