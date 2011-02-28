@@ -776,6 +776,30 @@ public class ParcelTest extends AndroidTestCase {
             assertEquals(c[i], d[i]);
         }
         p.recycle();
+
+        // Test array bounds checks (null already checked above).
+        p = Parcel.obtain();
+        try {
+            p.writeByteArray(c, -1, 1); // Negative offset.
+            fail();
+        } catch (RuntimeException expected) {
+        }
+        try {
+            p.writeByteArray(c, 0, -1); // Negative count.
+            fail();
+        } catch (RuntimeException expected) {
+        }
+        try {
+            p.writeByteArray(c, c.length + 1, 1); // High offset.
+            fail();
+        } catch (RuntimeException expected) {
+        }
+        try {
+            p.writeByteArray(c, 0, c.length + 1); // High count.
+            fail();
+        } catch (RuntimeException expected) {
+        }
+        p.recycle();
     }
 
     @TestTargets({
@@ -875,12 +899,11 @@ public class ParcelTest extends AndroidTestCase {
         d = new byte[c.length - 2];
         p.setDataPosition(0);
         p.readByteArray(d);
-        assertEquals(7, d.length);;
         for (int i = 0; i < d.length; i++) {
             Log.d("Trace", "i=" + i + " d[i]=" + d[i]);
         }
         for (int i = 0; i < 7; i++) {
-            assertEquals(c[i], d[i]);
+            assertEquals(c[i + 1], d[i]);
         }
         p.recycle();
     }
