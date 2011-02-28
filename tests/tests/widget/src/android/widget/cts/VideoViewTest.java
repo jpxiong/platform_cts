@@ -23,7 +23,6 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -462,9 +461,6 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
         method = "onKeyDown",
         args = {int.class, android.view.KeyEvent.class}
     )
-    @ToBeFixed(bug = "", explanation = "After pressing KEYCODE_HEADSETHOOK, "
-            + "the video should be playing, but it did not until time out.")
-    @BrokenTest("Video starts playing automatically after setting the path.")
     public void testOnKeyDown() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -480,7 +476,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
         new DelayedCheck(TIME_OUT) {
             @Override
             protected boolean check() {
-                return !mVideoView.isPlaying();
+                return mVideoView.isPlaying();
             }
         }.run();
         assertFalse(mMediaController.isShowing());
@@ -493,7 +489,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
             }
         }.run();
         // MediaController should show
-        assertFalse(mMediaController.isShowing());
+        assertTrue(mMediaController.isShowing());
 
         runTestOnUiThread(new Runnable() {
             public void run() {
