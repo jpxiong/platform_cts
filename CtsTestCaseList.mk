@@ -45,6 +45,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsJniTestCases \
 	CtsLocationTestCases \
 	CtsMediaTestCases \
+	CtsNdefTestCases \
 	CtsOsTestCases \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
