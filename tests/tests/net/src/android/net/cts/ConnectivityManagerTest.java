@@ -16,8 +16,6 @@
 
 package android.net.cts;
 
-import com.android.internal.telephony.Phone;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -294,7 +292,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             fail("Broadcast receiver waiting for ConnectivityManager interrupted.");
         } finally {
             mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                    Phone.FEATURE_ENABLE_HIPRI);
+                    FEATURE_ENABLE_HIPRI);
             if (!isWifiConnected) {
                 mWifiManager.setWifiEnabled(false);
             }
