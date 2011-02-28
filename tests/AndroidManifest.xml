@@ -867,8 +867,6 @@
             </intent-filter>
         </service>
 
-        <activity android:name="android.app.cts.ListActivityTestHelper"
-            android:label="ListActivityTestHelper" />
         <activity android:name="android.app.ActivityGroup"
             android:label="ActivityGroup" />
 
