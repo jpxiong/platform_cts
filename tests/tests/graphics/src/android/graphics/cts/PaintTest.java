@@ -16,6 +16,12 @@
 
 package android.graphics.cts;
 
+import dalvik.annotation.BrokenTest;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.graphics.ColorFilter;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
@@ -34,11 +40,6 @@ import android.test.AndroidTestCase;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Paint.class)
 public class PaintTest extends AndroidTestCase {
@@ -74,67 +75,60 @@ public class PaintTest extends AndroidTestCase {
         method = "breakText",
         args = {char[].class, int.class, int.class, float.class, float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testBreakText1() {
+    public void testBreakText_charArray() {
         Paint p = new Paint();
 
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[1];
 
+        float[] widths = new float[chars.length];
+        assertEquals(chars.length, p.getTextWidths(chars, 0, chars.length, widths));
+
+        float totalWidth = 0.0f;
         for (int i = 0; i < chars.length; i++) {
-            assertEquals(1, p.breakText(chars, i, 1, 20.0f, f));
-            assertEquals(width[i], f[0]);
+            totalWidth += widths[i];
         }
 
-        // start from 'H'
-        int indexH = 0;
-        assertEquals(4, p.breakText(chars, indexH, 4, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-        assertEquals(3, p.breakText(chars, indexH, 3, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(2, p.breakText(chars, indexH, 2, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(1, p.breakText(chars, indexH, 1, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(0, p.breakText(chars, indexH, 0, 30.0f, f));
-        assertEquals(0.0f, f[0]);
-
-        assertEquals(1, p.breakText(chars, indexH + 2, 1, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-        assertEquals(1, p.breakText(chars, indexH + 2, -1, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-
-        assertEquals(1, p.breakText(chars, indexH, -1, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(2, p.breakText(chars, indexH, -2, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(3, p.breakText(chars, indexH, -3, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(4, p.breakText(chars, indexH, -4, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-
-        assertEquals(7, p.breakText(chars, indexH, 7, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(chars, indexH, 7, 40.0f, f));
-        assertEquals(38.0f, f[0]);
-
-        assertEquals(7, p.breakText(chars, indexH, -7, 50.0f, null));
-        assertEquals(7, p.breakText(chars, indexH, 7, 50.0f, null));
-
-        try {
-            p.breakText(chars, 0, 8, 60.0f, null);
-            fail("Should throw an ArrayIndexOutOfboundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.breakText(chars, -1, 7, 50.0f, null);
-            fail("Should throw an ArrayIndexOutOfboundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
+        float[] measured = new float[1];
+        for (int i = 0; i < chars.length; i++) {
+            assertEquals(1, p.breakText(chars, i, 1, totalWidth, measured));
+            assertEquals(widths[i], measured[0]);
         }
 
+        // Measure empty string
+        assertEquals(0, p.breakText(chars, 0, 0, totalWidth, measured));
+        assertEquals(0.0f, measured[0]);
+
+        // Measure substring from front: "HIJ"
+        assertEquals(3, p.breakText(chars, 0, 3, totalWidth, measured));
+        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+
+        // Reverse measure substring from front: "HIJ"
+        assertEquals(3, p.breakText(chars, 0, -3, totalWidth, measured));
+        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+
+        // Measure substring from back: "MN"
+        assertEquals(2, p.breakText(chars, 5, 2, totalWidth, measured));
+        assertEquals(widths[5] + widths[6], measured[0]);
+
+        // Reverse measure substring from back: "MN"
+        assertEquals(2, p.breakText(chars, 5, -2, totalWidth, measured));
+        assertEquals(widths[5] + widths[6], measured[0]);
+
+        // Measure substring in the middle: "JKL"
+        assertEquals(3, p.breakText(chars, 2, 3, totalWidth, measured));
+        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+
+        // Reverse measure substring in the middle: "JKL"
+        assertEquals(3, p.breakText(chars, 2, -3, totalWidth, measured));
+        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+
+        // Measure substring in the middle and restrict width to the first 2 characters.
+        assertEquals(2, p.breakText(chars, 2, 3, widths[2] + widths[3], measured));
+        assertEquals(widths[2] + widths[3], measured[0]);
+
+        // Reverse measure substring in the middle and restrict width to the last 2 characters.
+        assertEquals(2, p.breakText(chars, 2, -3, widths[3] + widths[4], measured));
+        assertEquals(widths[3] + widths[4], measured[0]);
     }
 
     @TestTargetNew(
@@ -143,7 +137,6 @@ public class PaintTest extends AndroidTestCase {
         args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class,
                 float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
     public void testBreakText2() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -227,7 +220,6 @@ public class PaintTest extends AndroidTestCase {
         method = "breakText",
         args = {java.lang.String.class, boolean.class, float.class, float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
     public void testBreakText3() {
         Paint p = new Paint();
         String string = "HIJKLMN";
