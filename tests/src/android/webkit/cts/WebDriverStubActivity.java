@@ -49,7 +49,6 @@ public class WebDriverStubActivity extends Activity {
         setContentView(view);
     }
 
-
     public WebDriver getDriver() {
         return mDriver;
     }
