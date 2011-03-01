@@ -28,6 +28,7 @@ import android.provider.Settings.System;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.Editable;
 import android.text.method.PasswordTransformationMethod;
+import android.view.KeyCharacterMap;
 import android.view.View;
 import android.view.animation.cts.DelayedCheck;
 import android.widget.Button;
@@ -145,7 +146,16 @@ public class PasswordTransformationMethodTest extends
         });
 
         mMethod.reset();
-        sendKeys("H E 2*L O");
+        // 12-key support
+        KeyCharacterMap keymap
+                = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            // "HELLO" in case of 12-key(NUMERIC) keyboard
+            sendKeys("6*4 6*3 7*5 DPAD_RIGHT 7*5 7*6 DPAD_RIGHT");
+        }
+        else {
+            sendKeys("H E 2*L O");
+        }
         assertTrue(mMethod.hasCalledBeforeTextChanged());
         assertTrue(mMethod.hasCalledOnTextChanged());
         assertTrue(mMethod.hasCalledAfterTextChanged());

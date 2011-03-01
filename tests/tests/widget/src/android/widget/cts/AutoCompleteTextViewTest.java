@@ -29,6 +29,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,7 @@ public class AutoCompleteTextViewTest extends
     /** The m instrumentation. */
     private Instrumentation mInstrumentation;
     private AutoCompleteTextView mAutoCompleteTextView;
+    private boolean mNumeric = false;
     ArrayAdapter<String> mAdapter;
     private final String[] WORDS = new String[] { "testOne", "testTwo", "testThree", "testFour" };
     boolean isOnFilterComplete = false;
@@ -95,6 +97,11 @@ public class AutoCompleteTextViewTest extends
                 .findViewById(R.id.autocompletetv_edit);
         mAdapter = new ArrayAdapter<String>(mActivity,
                 android.R.layout.simple_dropdown_item_1line, WORDS);
+        KeyCharacterMap keymap
+                = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            mNumeric = true;
+        }
     }
 
     @TestTargets({
@@ -501,7 +508,13 @@ public class AutoCompleteTextViewTest extends
 
         inflatePopup();
         assertTrue(mAutoCompleteTextView.isPopupShowing());
-        String testString = "tes";
+        String testString = "";
+        if (mNumeric) {
+            // "tes" in case of 12-key(NUMERIC) keyboard
+            testString = "8337777";
+        } else {
+            testString = "tes";
+        }
         // Test the filter if the input string is not long enough to threshold
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -517,7 +530,12 @@ public class AutoCompleteTextViewTest extends
 
         inflatePopup();
         assertTrue(mAutoCompleteTextView.isPopupShowing());
-        testString = "that";
+        if (mNumeric) {
+            // "that" in case of 12-key(NUMERIC) keyboard
+            testString = "84428";
+        } else {
+            testString = "that";
+        }
         mInstrumentation.sendStringSync(testString);
         assertFalse(mAutoCompleteTextView.isPopupShowing());
 
@@ -529,7 +547,12 @@ public class AutoCompleteTextViewTest extends
                 mAutoCompleteTextView.setText("");
             }
         });
-        mInstrumentation.sendStringSync("test");
+        if (mNumeric) {
+            // "test" in case of 12-key(NUMERIC) keyboard
+            mInstrumentation.sendStringSync("83377778");
+        } else {
+            mInstrumentation.sendStringSync("test");
+        }
         assertTrue(mAutoCompleteTextView.hasFocus());
         assertTrue(mAutoCompleteTextView.hasWindowFocus());
         // give some time for UI to settle
@@ -594,10 +617,18 @@ public class AutoCompleteTextViewTest extends
 
         // performFiltering will be indirectly invoked by onKeyDown
         assertNull(filter.getResult());
-        mInstrumentation.sendStringSync(STRING_TEST);
-        // give some time for UI to settle
-        Thread.sleep(100);
-        assertEquals(STRING_TEST, filter.getResult());
+        // 12-key support
+        if (mNumeric) {
+            // "numeric" in case of 12-key(NUMERIC) keyboard
+            mInstrumentation.sendStringSync("6688633777444222");
+            Thread.sleep(100);
+            assertEquals("numeric", filter.getResult());
+        } else {
+            mInstrumentation.sendStringSync(STRING_TEST);
+            // give some time for UI to settle
+            Thread.sleep(100);
+            assertEquals(STRING_TEST, filter.getResult());
+        }
     }
 
     @TestTargets({
