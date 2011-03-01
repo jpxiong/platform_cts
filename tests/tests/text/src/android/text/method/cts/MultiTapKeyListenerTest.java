@@ -176,8 +176,7 @@ public class MultiTapKeyListenerTest extends
         callOnKeyDown(keyListener, KeyEvent.KEYCODE_1, 1);
         assertEquals("Hi.", mTextView.getText().toString());
 
-        callOnKeyDown(keyListener, KeyEvent.KEYCODE_POUND, 1);
-        assertEquals("Hi. ", mTextView.getText().toString());
+        addSpace();
 
         callOnKeyDown(keyListener, KeyEvent.KEYCODE_2, 2);
         assertEquals("Hi. B", mTextView.getText().toString());
@@ -201,8 +200,7 @@ public class MultiTapKeyListenerTest extends
         callOnKeyDown(keyListener, KeyEvent.KEYCODE_4, 3);
         assertEquals("Hi", mTextView.getText().toString());
 
-        callOnKeyDown(keyListener, KeyEvent.KEYCODE_POUND, 1);
-        assertEquals("Hi ", mTextView.getText().toString());
+        addSpace();
 
         callOnKeyDown(keyListener, KeyEvent.KEYCODE_2, 2);
         assertEquals("Hi B", mTextView.getText().toString());
@@ -243,6 +241,15 @@ public class MultiTapKeyListenerTest extends
         } catch (InterruptedException e) {
             fail("thrown unexpected InterruptedException when sleep.");
         }
+    }
+
+    private void addSpace() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.append(" ");
+            }
+        });
+        mInstrumentation.waitForIdleSync();
     }
 
     @TestTargetNew(
