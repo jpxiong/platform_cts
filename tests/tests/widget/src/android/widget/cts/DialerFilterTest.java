@@ -37,6 +37,7 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.widget.DialerFilter;
 import android.widget.EditText;
@@ -129,7 +130,16 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        mInstrumentation.sendStringSync("adg");
+        // 12-key support
+        KeyCharacterMap keymap
+                = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            // "adg" in case of 12-key(NUMERIC) keyboard
+            mInstrumentation.sendStringSync("234");
+        }
+        else {
+            mInstrumentation.sendStringSync("adg");
+        }
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         assertEquals("", mDialerFilter.getDigits().toString());
 
@@ -141,7 +151,14 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         });
         mInstrumentation.waitForIdleSync();
 
-        mInstrumentation.sendStringSync("adg");
+        // 12-key support
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            // "adg" in case of 12-key(NUMERIC) keyboard
+            mInstrumentation.sendStringSync("234");
+        }
+        else {
+            mInstrumentation.sendStringSync("adg");
+        }
         assertEquals("ADG", mDialerFilter.getLetters().toString());
         // A, D, K may map to numbers on some keyboards. Don't test.
 

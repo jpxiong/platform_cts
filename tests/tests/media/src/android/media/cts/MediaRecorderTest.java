@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
 
     private final String OUTPUT_PATH;
+    private final String OUTPUT_PATH2;
     private static final int RECORD_TIME = 3000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
@@ -46,6 +47,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private boolean mOnInfoCalled;
     private boolean mOnErrorCalled;
     private File mOutFile;
+    private File mOutFile2;
     private Camera mCamera;
 
     /*
@@ -61,11 +63,14 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         super("com.android.cts.stub", MediaStubActivity.class);
         OUTPUT_PATH = new File(Environment.getExternalStorageDirectory(),
                 "record.out").getAbsolutePath();
+        OUTPUT_PATH2 = new File(Environment.getExternalStorageDirectory(),
+                "record2.out").getAbsolutePath();
     }
 
     @Override
     protected void setUp() throws Exception {
         mOutFile = new File(OUTPUT_PATH);
+        mOutFile2 = new File(OUTPUT_PATH2);
         mMediaRecorder.reset();
         mMediaRecorder.setOutputFile(OUTPUT_PATH);
         mMediaRecorder.setOnInfoListener(new OnInfoListener() {
@@ -86,6 +91,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.release();
         if (mOutFile != null && mOutFile.exists()) {
             mOutFile.delete();
+        }
+        if (mOutFile2 != null && mOutFile2.exists()) {
+            mOutFile2.delete();
         }
         if (mCamera != null)  {
             mCamera.release();
@@ -251,15 +259,16 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     public void testRecorderVideo() throws Exception {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        mMediaRecorder.setOutputFile(OUTPUT_PATH2);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
         mMediaRecorder.setVideoFrameRate(FRAME_RATE);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-        FileOutputStream fos = new FileOutputStream(OUTPUT_PATH);
+        FileOutputStream fos = new FileOutputStream(OUTPUT_PATH2);
         FileDescriptor fd = fos.getFD();
         mMediaRecorder.setOutputFile(fd);
         long maxFileSize = MAX_FILE_SIZE * 10;
-        recordMedia(maxFileSize);
+        recordMedia(maxFileSize, mOutFile2);
     }
 
     @TestTargets({
@@ -318,8 +327,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         assertEquals(0, mMediaRecorder.getMaxAmplitude());
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mMediaRecorder.setOutputFile(OUTPUT_PATH);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recordMedia(MAX_FILE_SIZE);
+        recordMedia(MAX_FILE_SIZE, mOutFile);
     }
 
     @TestTargets({
@@ -432,22 +442,21 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-        recordMedia(MAX_FILE_SIZE);
+        recordMedia(MAX_FILE_SIZE, mOutFile);
         // TODO: how can we trigger a recording error?
         assertFalse(mOnErrorCalled);
     }
 
-    private void recordMedia(long maxFileSize) throws Exception {
+    private void recordMedia(long maxFileSize, File outFile) throws Exception {
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.prepare();
         mMediaRecorder.start();
         Thread.sleep(RECORD_TIME);
         mMediaRecorder.stop();
-        assertTrue(mOutFile.exists());
+        assertTrue(outFile.exists());
         // The max file size is always guaranteed.
         // We just make sure that the margin is not too big
-        assertTrue(mOutFile.length() < 1.1 * maxFileSize);
-        assertTrue(mOutFile.length() > 0);
+        assertTrue(outFile.length() < 1.1 * maxFileSize);
+        assertTrue(outFile.length() > 0);
     }
-
 }
