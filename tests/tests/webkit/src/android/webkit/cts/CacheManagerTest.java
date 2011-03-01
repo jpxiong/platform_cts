@@ -32,6 +32,7 @@ import java.util.Map;
 
 @TestTargetClass(android.webkit.CacheManager.class)
 public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+    private static final long CACHEMANAGER_INIT_TIMEOUT = 5000l;
     private static final long NETWORK_OPERATION_DELAY = 10000l;
 
     private WebView mWebView;
@@ -95,6 +96,14 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
     public void testCacheFile() throws Exception {
         mWebServer = new CtsTestServer(getActivity());
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.EMBEDDED_IMG_URL);
+
+        // Wait for CacheManager#init() finish.
+        new DelayedCheck(CACHEMANAGER_INIT_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return CacheManager.getCacheFileBaseDir() != null;
+            }
+        }.run();
 
         mWebView.clearCache(true);
         new DelayedCheck(NETWORK_OPERATION_DELAY) {
