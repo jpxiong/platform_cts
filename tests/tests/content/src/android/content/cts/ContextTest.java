@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.content.res.Resources.NotFoundException;
+import android.content.res.Resources.Theme;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
@@ -45,6 +46,7 @@ public class ContextTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getContext();
+        mContext.setTheme(R.style.Test_Theme);
     }
 
     @TestTargets({
@@ -109,6 +111,46 @@ public class ContextTest extends AndroidTestCase {
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
+            method = "getTheme",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setTheme",
+            args = {int.class}
+        )
+    })
+    public void testAccessTheme() {
+        mContext.setTheme(R.style.Test_Theme);
+        final Theme testTheme = mContext.getTheme();
+        assertNotNull(testTheme);
+
+        int[] attrs = {
+            android.R.attr.windowNoTitle,
+            android.R.attr.panelColorForeground,
+            android.R.attr.panelColorBackground
+        };
+        TypedArray attrArray = null;
+        try {
+            attrArray = testTheme.obtainStyledAttributes(attrs);
+            assertTrue(attrArray.getBoolean(0, false));
+            assertEquals(0xff000000, attrArray.getColor(1, 0));
+            assertEquals(0xffffffff, attrArray.getColor(2, 0));
+        } finally {
+            if (attrArray != null) {
+                attrArray.recycle();
+                attrArray = null;
+            }
+        }
+
+        // setTheme only works for the first time
+        mContext.setTheme(android.R.style.Theme_Black);
+        assertSame(testTheme, mContext.getTheme());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
             notes = "",
             method = "obtainStyledAttributes",
             args = {int[].class}
@@ -135,7 +177,7 @@ public class ContextTest extends AndroidTestCase {
     public void testObtainStyledAttributes() {
         // Test obtainStyledAttributes(int[])
         TypedArray testTypedArray = mContext
-                .obtainStyledAttributes(com.android.internal.R.styleable.View);
+                .obtainStyledAttributes(android.R.styleable.View);
         assertNotNull(testTypedArray);
         assertTrue(testTypedArray.length() > 2);
         assertTrue(testTypedArray.length() > 0);
@@ -143,7 +185,7 @@ public class ContextTest extends AndroidTestCase {
 
         // Test obtainStyledAttributes(int, int[])
         testTypedArray = mContext.obtainStyledAttributes(android.R.style.TextAppearance_Small,
-                com.android.internal.R.styleable.TextAppearance);
+                android.R.styleable.TextAppearance);
         assertNotNull(testTypedArray);
         assertTrue(testTypedArray.length() > 2);
         testTypedArray.recycle();
