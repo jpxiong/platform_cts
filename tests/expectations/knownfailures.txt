@@ -6,6 +6,11 @@
 { name: "android.webkit.cts.WebSettingsTest#testSetAppCacheEnabled" },
 { name: "android.net.cts.SSLCertificateSocketFactoryTest" },
 
+{
+  description: "testGetDuration causes testOnKeyDown to fail for some reason",
+  name: "android.widget.cts.VideoViewTest#testOnKeyDown"
+},
+
 /* These tests pass when executed individually but fail when running CTS as a whole on GRH78. */
 {
   name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection",
