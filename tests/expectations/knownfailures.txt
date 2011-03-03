@@ -11,6 +11,18 @@
   name: "android.widget.cts.VideoViewTest#testOnKeyDown"
 },
 
+{
+  description: "Flaky tests that need to be rewritten or deleted.",
+  names: [
+    "android.media.cts.MediaRecorderTest#testSetCamera",
+    "android.webkit.cts.CacheManagerTest#testCacheFile",
+    "android.widget.cts.AutoCompleteTextViewTest#testOnFilterComplete",
+    "android.util.cts.EventLogTest#testReadEvents",
+    "android.util.cts.EventLogTest#testWriteEvent",
+    "android.util.cts.EventLogTest#testWriteEventWithOversizeValue"
+  ]
+},
+
 /* These tests pass when executed individually but fail when running CTS as a whole on GRH78. */
 {
   name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection",
