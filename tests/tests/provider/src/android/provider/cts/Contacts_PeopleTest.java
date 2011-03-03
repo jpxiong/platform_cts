@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.Contacts;
 import android.provider.Contacts.Groups;
+import android.provider.Contacts.GroupsColumns;
 import android.provider.Contacts.People;
 import android.test.InstrumentationTestCase;
 
@@ -148,6 +149,11 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
     public void testAddToGroup() {
         Cursor cursor;
         try {
+            // Add the My Contacts group, since it is no longer automatically created.
+            ContentValues testValues = new ContentValues();
+            testValues.put(GroupsColumns.SYSTEM_ID, Groups.GROUP_MY_CONTACTS);
+            mProvider.insert(Groups.CONTENT_URI, testValues);
+
             // People: test_people_0, Group: Groups.GROUP_MY_CONTACTS
             cursor = mProvider.query(mPeopleRowsAdded.get(0), PEOPLE_PROJECTION,
                     null, null, null);
