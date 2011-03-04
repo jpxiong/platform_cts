@@ -17,7 +17,7 @@ public class DeviceUtil {
 
     /**
      * Executes the command and its arguments in a native process.
-     * 
+     *
      * @param commandAndArgs a string array to be passed containing the
      *            executable and its arguments
      * @param okIndicator if not null, this String must occur in the stdout of
@@ -93,8 +93,20 @@ public class DeviceUtil {
 
     public static void adbPush(IDevice device, String source, String target)
             throws IOException {
-        DeviceUtil.digestCommand(new String[] {"adb", "-s", device.getSerialNumber(), "push",
-            DeviceUtil.createFilePath(source), target}, null);
+        String tmp_source = null;
+        try {
+            tmp_source = DeviceUtil.createFilePath(source);
+            DeviceUtil.digestCommand(new String[] {"adb", "-s", device.getSerialNumber(), "push",
+                tmp_source, target}, null);
+        } finally {
+            // Clean up local temp file after pushing it to device.
+            if (tmp_source != null) {
+                File f = new File(tmp_source);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
+        }
     }
 
     public static void adbExec(IDevice device, String classpath, String mainclass) {
