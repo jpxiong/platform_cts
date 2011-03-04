@@ -37,6 +37,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsDatabaseTestCases \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
+	CtsDrmTestCases \
 	CtsExampleTestCases \
 	CtsGestureTestCases \
 	CtsGraphicsTestCases \
@@ -50,6 +51,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsPermission2TestCases \
 	CtsPreferenceTestCases \
 	CtsProviderTestCases \
+	CtsRenderscriptTestCases \
 	CtsSaxTestCases \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \

@@ -38,7 +38,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/etc/starttests $(LOCAL_PATH)/etc/compileall
 	@echo "Copy: $(PRIVATE_MODULE) ($@)"
 	$(copy-file-to-new-target)
 	$(hide) chmod 755 $@
-	@$(PRIVATE_CURRENT_MODULE_SCRIPT) "$(PRIVATE_BASE)" "$(HOST_JAVAC)" "$(PRIVATE_INTERMEDIATES)" "$(HOST_OUT_JAVA_LIBRARIES)/dx.jar:$(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar" "$(HOST_OUT)"
+	$(hide) PATH=$(HOST_OUT_EXECUTABLES):$$PATH $(PRIVATE_CURRENT_MODULE_SCRIPT) "$(PRIVATE_BASE)" "$(HOST_JAVAC)" "$(PRIVATE_INTERMEDIATES)" "$(HOST_OUT_JAVA_LIBRARIES)/dx.jar:$(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar" "$(HOST_OUT)"
 
 # cfassembler host module
 #============================================================

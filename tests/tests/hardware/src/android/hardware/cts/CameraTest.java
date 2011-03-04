@@ -223,7 +223,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class TestErrorCallback implements ErrorCallback {
         public void onError(int error, Camera camera) {
             mErrorCallbackResult = true;
-            fail("The Error code is: " + error);
+            fail("Got camera error from ErrorCallback: " + error);
         }
     }
 
@@ -577,7 +577,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Parameters constants
         final int PICTURE_FORMAT = ImageFormat.JPEG;
         final int PREVIEW_FORMAT = ImageFormat.NV21;
-        final int PREVIEW_FRAMERATE = 10;
 
         // Before setting Parameters
         final int origPictureFormat = parameters.getPictureFormat();
@@ -623,7 +622,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int jpegThumnailQuality = parameters.getJpegThumbnailQuality();
         assertTrue(previewSizes != null && previewSizes.size() != 0);
         assertTrue(pictureSizes != null && pictureSizes.size() != 0);
-        assertTrue(previewFormats != null && previewFormats.size() != 0);
+        assertTrue(previewFormats != null && previewFormats.size() >= 2);
+        assertTrue(previewFormats.contains(ImageFormat.NV21));
+        assertTrue(previewFormats.contains(ImageFormat.YV12));
         assertTrue(pictureFormats != null && pictureFormats.size() != 0);
         assertTrue(frameRates != null && frameRates.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
@@ -897,6 +898,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals((float)latitude, latLong[0], 0.0001f);
         assertEquals((float)longitude, latLong[1], 0.0001f);
         assertEquals(altitude, exif.getAltitude(-1), 1);
+        assertEquals(timestamp, exif.getGpsDateTime() / 1000);
     }
 
     private void checkGpsDataNull(ExifInterface exif) {
@@ -1891,6 +1893,41 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         parameters = mCamera.getParameters();
         assertEquals(originalSize, parameters.getPreviewSize());
 
+        terminateMessageLooper();
+    }
+
+    public void testGetParameterDuringFocus() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testGetParameterDuringFocusByCamera(id);
+        }
+    }
+
+    private void testGetParameterDuringFocusByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.setErrorCallback(mErrorCallback);
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        for (String focusMode: parameters.getSupportedFocusModes()) {
+            if (focusMode.equals(parameters.FOCUS_MODE_AUTO)
+                    || focusMode.equals(parameters.FOCUS_MODE_MACRO)) {
+                parameters.setFocusMode(focusMode);
+                mCamera.setParameters(parameters);
+                mCamera.autoFocus(mAutoFocusCallback);
+                // This should not crash or throw exception.
+                mCamera.getParameters();
+                waitForFocusDone();
+
+
+                mCamera.autoFocus(mAutoFocusCallback);
+                // Add a small delay to make sure focus has started.
+                Thread.sleep(100);
+                // This should not crash or throw exception.
+                mCamera.getParameters();
+            }
+        }
         terminateMessageLooper();
     }
 }

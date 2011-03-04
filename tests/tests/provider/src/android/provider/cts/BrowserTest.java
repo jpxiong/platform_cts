@@ -52,6 +52,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
     private ContentResolver mContentResolver;
     private IContentProvider mProvider;
     private BrowserStubActivity mActivity;
+    private boolean mMasterSyncEnabled;
 
     // the backup for the 2 tables which we will modify in test cases
     private ArrayList<ContentValues> mBookmarksBackup;
@@ -72,14 +73,23 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         mBookmarksBackup = new ArrayList<ContentValues>();
         mSearchesBackup = new ArrayList<ContentValues>();
 
-        // backup the current contents in database (_id=1 is a fixed id root)
-        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, "_id != 1", null, null);
+        // Disable sync
+        mMasterSyncEnabled = ContentResolver.getMasterSyncAutomatically();
+        ContentResolver.setMasterSyncAutomatically(false);
+
+        // backup the current contents in database
+        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, null, null, null);
         if (cursor.moveToFirst()) {
             String[] colNames = cursor.getColumnNames();
             while (!cursor.isAfterLast()) {
                 ContentValues value = new ContentValues();
 
                 for (int i = 0; i < colNames.length; i++) {
+                    if (Bookmarks.PARENT_SOURCE_ID.equals(colNames[i])
+                            || Bookmarks.INSERT_AFTER_SOURCE_ID.equals(colNames[i])) {
+                        // These aren't actual columns, so skip them in the backup
+                        continue;
+                    }
                     switch (cursor.getType(i)) {
                     case Cursor.FIELD_TYPE_BLOB:
                         value.put(colNames[i], cursor.getBlob(i));
@@ -130,6 +140,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
     @Override
     protected void tearDown() throws Exception {
         try {
+
             // clear all new contents added in test cases.
             Uri uri = Bookmarks.CONTENT_URI.buildUpon()
                 .appendQueryParameter(BrowserContract.CALLER_IS_SYNCADAPTER, "true")
@@ -139,12 +150,15 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
             // recover the old backup contents
             for (ContentValues value : mBookmarksBackup) {
-                mProvider.insert(Bookmarks.CONTENT_URI, value);
+                mProvider.insert(uri, value);
             }
 
             for (ContentValues value : mSearchesBackup) {
                 mProvider.insert(Browser.SEARCHES_URI, value);
             }
+
+            // Re-enable sync
+            ContentResolver.setMasterSyncAutomatically(mMasterSyncEnabled);
         } finally {
             super.tearDown();
         }

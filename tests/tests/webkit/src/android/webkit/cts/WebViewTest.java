@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -1397,8 +1398,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         handler.reset();
         int[] location = new int[2];
         mWebView.getLocationOnScreen(location);
+        long time = SystemClock.uptimeMillis();
         getInstrumentation().sendPointerSync(
-                MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN,
+                MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN,
                         location[0] + imgWidth / 2,
                         location[1] + imgHeight / 2, 0));
         mWebView.requestImageRef(msg);

@@ -16,11 +16,13 @@
 
 package android.content.cts;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Set;
+import com.android.internal.app.ResolverActivity;
+import com.android.internal.util.XmlUtils;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -45,13 +47,11 @@ import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
 
-import com.android.internal.app.ResolverActivity;
-import com.android.internal.util.XmlUtils;
-
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Set;
 
 @TestTargetClass(Intent.class)
 public class IntentTest extends AndroidTestCase {
@@ -1746,7 +1746,7 @@ public class IntentTest extends AndroidTestCase {
         assertEquals(Intent.FILL_IN_DATA, destIntent.fillIn(sourceIntent, Intent.FILL_IN_DATA));
         assertEquals(TEST_URI, destIntent.getData());
     }
-    
+
     /**
      * Test that fillIn copies data type.
      */
@@ -2086,8 +2086,6 @@ public class IntentTest extends AndroidTestCase {
         target.addCategory(TEST_CATEGORY);
         assertFalse(mIntent.filterEquals(target));
         mIntent.addCategory(TEST_CATEGORY + "test");
-        assertFalse(mIntent.filterEquals(target));
-        mIntent.addCategory(null);
         assertFalse(mIntent.filterEquals(target));
         mIntent.addCategory(TEST_CATEGORY);
         assertFalse(mIntent.filterEquals(target));
