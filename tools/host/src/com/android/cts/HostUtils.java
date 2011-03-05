@@ -46,10 +46,10 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class HostUtils {
-    
+
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy",
             Locale.ENGLISH);
-    
+
     /**
      * Check if the given file exists
      *
@@ -162,14 +162,21 @@ public class HostUtils {
             ZipEntry ze = new ZipEntry(path);
             try {
                 zipOutputStream.putNextEntry(ze);
-                InputStream is = new BufferedInputStream(new FileInputStream(f));
-                byte[] buffer = new byte[4096];
-                int bytesRead = is.read(buffer);
-                while (bytesRead > 0) {
-                    zipOutputStream.write(buffer, 0, bytesRead);
-                    bytesRead = is.read(buffer);
+                InputStream is = null;
+                try {
+                    is = new BufferedInputStream(new FileInputStream(f));
+                    byte[] buffer = new byte[4096];
+                    int bytesRead = is.read(buffer);
+                    while (bytesRead > 0) {
+                        zipOutputStream.write(buffer, 0, bytesRead);
+                        bytesRead = is.read(buffer);
+                    }
+                    zipOutputStream.closeEntry();
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
                 }
-                zipOutputStream.closeEntry();
             } catch (IOException e) {
                 ok = false;
                 caughtException = e;
@@ -281,10 +288,10 @@ public class HostUtils {
 
         return fmt.toString();
     }
-    
+
     /**
      * Convert the given byte array into a lowercase hex string.
-     * 
+     *
      * @param arr The array to convert.
      * @return The hex encoded string.
      */
@@ -295,7 +302,7 @@ public class HostUtils {
         }
         return buf.toString();
     }
-    
+
     /**
      * Strip control characters from the given string.
      */
@@ -307,7 +314,7 @@ public class HostUtils {
     public static Date dateFromString(String s) throws ParseException {
         return dateFormat.parse(s);
     }
-    
+
     public static String dateToString(Date d) {
         return dateFormat.format(d);
     }
