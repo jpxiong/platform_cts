@@ -52,6 +52,11 @@ public class NoReceiveSmsPermissionTest extends AndroidTestCase {
      * Note: this test requires that the device under test reports a valid phone number
      */
     public void testReceiveTextMessage() {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            return;
+        }
+
         // register our test receiver to receive SMSs. This won't throw a SecurityException,
         // so test needs to wait to determine if it actual receives an SMS
         // admittedly, this is a weak verification
@@ -73,14 +78,9 @@ public class NoReceiveSmsPermissionTest extends AndroidTestCase {
             }
         }
 
-        PackageManager packageManager = getContext().getPackageManager();
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
-            assertTrue("Sms not sent successfully, test environment problem?",
-                    receiver.isMessageSent());
-            assertFalse("Sms received without proper permissions", receiver.isSmsReceived());
-        } else {
-            assertFalse(receiver.isMessageSent());
-        }
+        assertTrue("Sms not sent successfully, test environment problem?",
+                receiver.isMessageSent());
+        assertFalse("Sms received without proper permissions", receiver.isSmsReceived());
     }
 
     private void sendSMSToSelf() {
