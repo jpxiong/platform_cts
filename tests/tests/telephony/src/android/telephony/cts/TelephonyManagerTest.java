@@ -288,7 +288,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
         int phoneType = mTelephonyManager.getPhoneType();
         switch (phoneType) {
             case TelephonyManager.PHONE_TYPE_GSM:
-                assertImeiDeviceId(deviceId);
+                assertGsmDeviceId(deviceId);
                 break;
 
             case TelephonyManager.PHONE_TYPE_CDMA:
@@ -305,17 +305,15 @@ public class TelephonyManagerTest extends AndroidTestCase {
         }
     }
 
-    private static void assertImeiDeviceId(String deviceId) {
-        assertImeiFormat(deviceId);
-        assertImeiCheckDigit(deviceId);
-        assertReportingBodyIdentifier(deviceId, true); // Must be decimal identifier
-    }
-
-    private static void assertImeiFormat(String deviceId) {
-        // IMEI must include the check digit
-        String imeiPattern = "[0-9]{15}";
+    private static void assertGsmDeviceId(String deviceId) {
+        // IMEI may include the check digit
+        String imeiPattern = "[0-9]{14,15}";
         assertTrue("IMEI device id " + deviceId + " does not match pattern " + imeiPattern,
                 Pattern.matches(imeiPattern, deviceId));
+        if (deviceId.length() == 15) {
+            // if the ID is 15 digits, the 15th must be a check digit.
+            assertImeiCheckDigit(deviceId);
+        }
     }
 
     private static void assertImeiCheckDigit(String deviceId) {
@@ -355,19 +353,10 @@ public class TelephonyManagerTest extends AndroidTestCase {
         return sum == 0 ? 0 : 10 - sum;
     }
 
-    private static void assertReportingBodyIdentifier(String deviceId, boolean decimalIdentifier) {
-        // Check the reporting body identifier
-        int reportingBodyIdentifier = Integer.parseInt(deviceId.substring(0, 2), 16);
-        int decimalBound = 0xA0;
-        String message = String.format("%s RR %x not %s than %x",
-                decimalIdentifier ? "IMEI" : "MEID",
-                reportingBodyIdentifier,
-                decimalIdentifier ? "<" : ">=",
-                decimalBound);
-        assertEquals(message, decimalIdentifier, reportingBodyIdentifier < decimalBound);
-    }
-
     private static void assertCdmaDeviceId(String deviceId) {
+        // CDMA device IDs may either be a 14-hex-digit MEID or an
+        // 8-hex-digit ESN.  If it's an ESN, it may not be a
+        // pseudo-ESN.
         if (deviceId.length() == 14) {
             assertMeidFormat(deviceId);
         } else if (deviceId.length() == 8) {
@@ -386,18 +375,10 @@ public class TelephonyManagerTest extends AndroidTestCase {
     }
 
     private static void assertMeidFormat(String deviceId) {
-        if (deviceId.substring(0, 2).matches("99|98|97")) {
-            // MEID must NOT include the check digit.
-            String meidPattern = "(99|98|97)[0-9]{12}";
-            assertTrue("MEID device id " + deviceId + " does not match pattern " + meidPattern,
-                    Pattern.matches(meidPattern, deviceId));
-        } else {
-            // MEID must NOT include the check digit.
-            String meidPattern = "[0-9a-fA-F]{14}";
-            assertTrue("MEID device id " + deviceId + " does not match pattern " + meidPattern,
-                    Pattern.matches(meidPattern, deviceId));
-            assertReportingBodyIdentifier(deviceId, false);
-        }
+        // MEID must NOT include the check digit.
+        String meidPattern = "[0-9a-fA-F]{14}";
+        assertTrue("MEID device id " + deviceId + " does not match pattern " + meidPattern,
+                   Pattern.matches(meidPattern, deviceId));
     }
 
     private void assertSerialNumber() {
