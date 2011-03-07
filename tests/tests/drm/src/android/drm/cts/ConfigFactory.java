@@ -20,6 +20,7 @@ import android.util.Log;
 
 import android.drm.cts.configs.PassthruConfig;
 import android.drm.cts.configs.FwdLockConfig;
+import android.drm.cts.configs.WidevineConfig;
 
 public final class ConfigFactory {
     private static final String TAG = "ConfigFactory";
@@ -33,6 +34,8 @@ public final class ConfigFactory {
     public static Config getConfig(String plugInName) {
         if (plugInName.equals("Passthru plug-in")) {
             return PassthruConfig.getInstance();
+        } else if (plugInName.equals("Widevine DRM plug-in")) {
+            return WidevineConfig.getInstance();
         } else if (plugInName.equals("OMA V1 Forward Lock")) {
             return FwdLockConfig.getInstance();
         } else {
