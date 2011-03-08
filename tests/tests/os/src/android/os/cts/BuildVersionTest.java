@@ -45,6 +45,10 @@ public class BuildVersionTest extends TestCase {
         assertEquals(EXPECTED_SDK, Build.VERSION.SDK_INT);
     }
 
+    public void testIncremental() {
+        assertNotEmpty(Build.VERSION.INCREMENTAL);
+    }
+
     /**
      * Verifies {@link Build.FINGERPRINT} follows expected format:
      * <p/>
@@ -74,5 +78,10 @@ public class BuildVersionTest extends TestCase {
         assertTrue(fingerprintSegs[4].contains(":"));
         // no strict requirement for TAGS
         //assertEquals(Build.TAGS, fingerprintSegs[5]);
+    }
+
+    private void assertNotEmpty(String value) {
+        assertNotNull(value);
+        assertFalse(value.isEmpty());
     }
 }
