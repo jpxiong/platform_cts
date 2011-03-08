@@ -62,6 +62,7 @@ public class CookieSyncManagerTest
         assertSame(csm1, csm2);
 
         final CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptFileSchemeCookies(true);
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
