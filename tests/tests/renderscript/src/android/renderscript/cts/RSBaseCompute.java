@@ -18,6 +18,7 @@ package android.renderscript.cts;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.renderscript.RenderScript;
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.test.AndroidTestCase;
 import com.android.cts.stub.R;
@@ -26,46 +27,23 @@ import com.android.cts.stub.R;
  * Base RenderScript test class. This class provides a message handler and a
  * convenient way to wait for compute scripts to complete their execution.
  */
-class RSBase extends AndroidTestCase {
-
-    Context mCtx;
-    Resources mRes;
-
-    public int result;
-    private boolean msgHandled;
-
-    public static final int RS_MSG_TEST_PASSED = 100;
-    public static final int RS_MSG_TEST_FAILED = 101;
-
-    RSMessageHandler mRsMessage = new RSMessageHandler() {
-        public void run() {
-            if (result == 0) {
-                switch (mID) {
-                    case RS_MSG_TEST_PASSED:
-                    case RS_MSG_TEST_FAILED:
-                        result = mID;
-                        break;
-                    default:
-                        fail("Got unexpected RS message");
-                        return;
-                }
-            }
-            msgHandled = true;
-        }
-    };
-
-    protected void waitForMessage() {
-        while (!msgHandled) {
-            Thread.yield();
-        }
-    }
+class RSBaseCompute extends RSBase {
+    RenderScript mRS;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        result = 0;
-        msgHandled = false;
-        mCtx = getContext();
-        mRes = mCtx.getResources();
+        mRS = RenderScript.create(mCtx);
+        mRS.setMessageHandler(mRsMessage);
     }
+
+    @Override
+    protected void tearDown() throws Exception {
+        if (mRS != null) {
+            mRS.destroy();
+            mRS = null;
+        }
+        super.tearDown();
+    }
+
 }
