@@ -23,24 +23,8 @@ import android.renderscript.ProgramStore.Builder;
 import android.renderscript.ProgramStore.DepthFunc;
 import android.renderscript.ProgramStore.BlendSrcFunc;
 import android.renderscript.ProgramStore.BlendDstFunc;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScriptGL;
-import android.renderscript.RenderScriptGL.SurfaceConfig;
-import android.test.AndroidTestCase;
 
-public class ProgramStoreTest extends AndroidTestCase {
-
-    RenderScript mRS;
-    @Override
-    protected void setUp() throws Exception {
-        mRS = new RenderScriptGL(getContext(), new SurfaceConfig());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        mRS.destroy();
-        mRS = null;
-    }
+public class ProgramStoreTest extends RSBaseGraphics {
 
     void varyBuilderColorAndDither(ProgramStore.Builder pb) {
         for (int r = 0; r <= 1; r++) {

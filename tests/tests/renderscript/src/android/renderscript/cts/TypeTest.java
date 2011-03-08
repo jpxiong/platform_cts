@@ -21,26 +21,10 @@ import com.android.cts.stub.R;
 import android.renderscript.Element;
 import android.renderscript.Element.DataType;
 import android.renderscript.Element.DataKind;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScriptGL;
-import android.renderscript.RenderScriptGL.SurfaceConfig;
 import android.renderscript.Type;
 import android.renderscript.Type.Builder;
-import android.test.AndroidTestCase;
 
-public class TypeTest extends AndroidTestCase {
-
-    RenderScript mRS;
-    @Override
-    protected void setUp() throws Exception {
-        mRS = RenderScript.create(getContext());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        mRS.destroy();
-        mRS = null;
-    }
+public class TypeTest extends RSBaseCompute {
 
     void testBuilderSizes(Type.Builder b, int min, int max) {
         for (int x = min; x < max; x ++) {

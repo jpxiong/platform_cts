@@ -21,24 +21,8 @@ import com.android.cts.stub.R;
 import android.renderscript.Element;
 import android.renderscript.Element.DataType;
 import android.renderscript.Element.DataKind;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScriptGL;
-import android.renderscript.RenderScriptGL.SurfaceConfig;
-import android.test.AndroidTestCase;
 
-public class ElementTest extends AndroidTestCase {
-
-    RenderScript mRS;
-    @Override
-    protected void setUp() throws Exception {
-        mRS = RenderScript.create(getContext());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        mRS.destroy();
-        mRS = null;
-    }
+public class ElementTest extends RSBaseCompute {
 
     public void testCreatePixel() {
         assertTrue(Element.createPixel(mRS,
