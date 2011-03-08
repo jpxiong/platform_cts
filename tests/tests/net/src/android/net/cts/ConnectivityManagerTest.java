@@ -36,8 +36,8 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
     private static final int HOST_ADDRESS = 0x7f000001;// represent ip 127.0.0.1
     private ConnectivityManager mCm;
-    // must include both mobile data + wifi
-    private static final int MIN_NUM_NETWORK_TYPES = 2;
+    // device could have only one interface: data, wifi.
+    private static final int MIN_NUM_NETWORK_TYPES = 1;
 
     @Override
     protected void setUp() throws Exception {
@@ -51,28 +51,27 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         args = {int.class}
     )
     public void testGetNetworkInfo() {
-
-        // this test assumes that there are at least two network types.
         assertTrue(mCm.getAllNetworkInfo().length >= MIN_NUM_NETWORK_TYPES);
-        NetworkInfo ni = mCm.getNetworkInfo(1);
-        State state = ni.getState();
-        assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
-                && state.ordinal() >= State.CONNECTING.ordinal());
-        DetailedState ds = ni.getDetailedState();
-        assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
-                && ds.ordinal() >= DetailedState.IDLE.ordinal());
-
-        ni = mCm.getNetworkInfo(0);
-        state = ni.getState();
-        assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
-                && state.ordinal() >= State.CONNECTING.ordinal());
-        ds = ni.getDetailedState();
-        assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
-                && ds.ordinal() >= DetailedState.IDLE.ordinal());
-
+        NetworkInfo ni = mCm.getNetworkInfo(TYPE_WIFI);
+        if (ni != null) {
+            State state = ni.getState();
+            assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
+                       && state.ordinal() >= State.CONNECTING.ordinal());
+            DetailedState ds = ni.getDetailedState();
+            assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
+                       && ds.ordinal() >= DetailedState.IDLE.ordinal());
+        }
+        ni = mCm.getNetworkInfo(TYPE_MOBILE);
+        if (ni != null) {
+            State state = ni.getState();
+            assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
+                    && state.ordinal() >= State.CONNECTING.ordinal());
+            DetailedState ds = ni.getDetailedState();
+            assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
+                    && ds.ordinal() >= DetailedState.IDLE.ordinal());
+        }
         ni = mCm.getNetworkInfo(-1);
         assertNull(ni);
-
     }
 
     @TestTargets({
@@ -125,9 +124,21 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         final String invalidateFeature = "invalidateFeature";
         final String mmsFeature = "enableMMS";
         final int failureCode = -1;
+        final int wifiOnlyStartFailureCode = 3;
+        final int wifiOnlyStopFailureCode = 1;
 
-        assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_MOBILE, invalidateFeature));
-        assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE, invalidateFeature));
+        NetworkInfo ni = mCm.getNetworkInfo(TYPE_MOBILE);
+        if (ni != null) {
+            assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_MOBILE,
+                    invalidateFeature));
+            assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE,
+                    invalidateFeature));
+        } else {
+            assertEquals(wifiOnlyStartFailureCode, mCm.startUsingNetworkFeature(TYPE_MOBILE,
+                    invalidateFeature));
+            assertEquals(wifiOnlyStopFailureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE,
+                    invalidateFeature));
+        }
 
         // Should return failure(-1) because MMS is not supported on WIFI.
         assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_WIFI, mmsFeature));
