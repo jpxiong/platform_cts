@@ -181,6 +181,24 @@ public class ComponentInfoTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "isEnabled",
+        args = {}
+    )
+    public void testIsEnabled() {
+        mComponentInfo = new ComponentInfo();
+        mComponentInfo.applicationInfo = new ApplicationInfo();
+        assertTrue(mComponentInfo.isEnabled());
+
+        mComponentInfo.enabled = false;
+        assertFalse(mComponentInfo.isEnabled());
+
+        mComponentInfo.enabled = true;
+        mComponentInfo.applicationInfo.enabled = false;
+        assertFalse(mComponentInfo.isEnabled());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "dumpFront",
         args = {android.util.Printer.class, java.lang.String.class}
     )
