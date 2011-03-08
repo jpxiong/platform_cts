@@ -162,7 +162,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         public void onPreviewFrame(byte [] data, Camera camera) {
             assertNotNull(data);
             Size size = camera.getParameters().getPreviewSize();
-            assertEquals(size.width * size.height * 3 / 2, data.length);
+            int format = camera.getParameters().getPreviewFormat();
+            int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
+            assertEquals(size.width * size.height * bitsPerPixel / 8, data.length);
             mPreviewCallbackResult = true;
             mCamera.stopPreview();
             if (LOGV) Log.v(TAG, "notify the preview callback");
@@ -1039,9 +1041,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             callback.mNumCbWithBuffer1 = 0;
             callback.mNumCbWithBuffer2 = 0;
             callback.mNumCbWithBuffer3 = 0;
-            callback.mBuffer1 = new byte[size.width * size.height * 3 / 2];
-            callback.mBuffer2 = new byte[size.width * size.height * 3 / 2];
-            callback.mBuffer3 = new byte[size.width * size.height * 3 / 2];
+            int format = mCamera.getParameters().getPreviewFormat();
+            int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
+            callback.mBuffer1 = new byte[size.width * size.height * bitsPerPixel / 8];
+            callback.mBuffer2 = new byte[size.width * size.height * bitsPerPixel / 8];
+            callback.mBuffer3 = new byte[size.width * size.height * bitsPerPixel / 8];
 
             // Test if we can get the preview callbacks with specified buffers.
             mCamera.addCallbackBuffer(callback.mBuffer1);
@@ -1548,7 +1552,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             assertNotNull(data);
             Size size = camera.getParameters().getPreviewSize();
             assertEquals(expectedPreviewSize, size);
-            assertEquals(size.width * size.height * 3 / 2, data.length);
+            int format = camera.getParameters().getPreviewFormat();
+            int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
+            assertEquals(size.width * size.height * bitsPerPixel / 8, data.length);
             camera.setPreviewCallback(null);
             mPreviewCallbackResult = true;
             mPreviewDone.open();
@@ -1597,9 +1603,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Test if the actual fps is within fps range.
         Size size = parameters.getPreviewSize();
-        byte[] buffer1 = new byte[size.width * size.height * 3 / 2];
-        byte[] buffer2 = new byte[size.width * size.height * 3 / 2];
-        byte[] buffer3 = new byte[size.width * size.height * 3 / 2];
+        int format = mCamera.getParameters().getPreviewFormat();
+        int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
+        byte[] buffer1 = new byte[size.width * size.height * bitsPerPixel / 8];
+        byte[] buffer2 = new byte[size.width * size.height * bitsPerPixel / 8];
+        byte[] buffer3 = new byte[size.width * size.height * bitsPerPixel / 8];
         FpsRangePreviewCb callback = new FpsRangePreviewCb();
         int[] readBackFps = new int[2];
         for (int[] fps: fpsList) {
@@ -1927,6 +1935,31 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // This should not crash or throw exception.
                 mCamera.getParameters();
             }
+        }
+        terminateMessageLooper();
+    }
+
+    public void testPreviewFormats() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testPreviewFormatsByCamera(id);
+        }
+    }
+
+    private void testPreviewFormatsByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.setErrorCallback(mErrorCallback);
+        Parameters parameters = mCamera.getParameters();
+        for (int format: parameters.getSupportedPreviewFormats()) {
+            Log.v(TAG, "Test preview format " + format);
+            parameters.setPreviewFormat(format);
+            mCamera.setParameters(parameters);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
+            mCamera.startPreview();
+            waitForPreviewDone();
+            assertTrue(mPreviewCallbackResult);
         }
         terminateMessageLooper();
     }
