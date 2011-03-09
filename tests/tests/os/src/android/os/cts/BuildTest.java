@@ -106,14 +106,56 @@ public class BuildTest extends TestCase {
         }
     }
 
+    private static final Pattern BOARD_PATTERN =
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
+    private static final Pattern BRAND_PATTERN =
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
     private static final Pattern DEVICE_PATTERN =
-        Pattern.compile("^([0-9A-Za-z_-]+)$");
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
+    private static final Pattern ID_PATTERN =
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
+    private static final Pattern PRODUCT_PATTERN =
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
     private static final Pattern SERIAL_NUMBER_PATTERN =
         Pattern.compile("^([0-9A-Za-z]{0,20})$");
+    private static final Pattern TAGS_PATTERN =
+        Pattern.compile("^([0-9A-Za-z.,_-]+)$");
+    private static final Pattern TYPE_PATTERN =
+        Pattern.compile("^([0-9A-Za-z._-]+)$");
 
     /** Tests that check for valid values of constants in Build. */
     public void testBuildConstants() {
-        assertTrue(SERIAL_NUMBER_PATTERN.matcher(Build.SERIAL).matches());
+        // Build.VERSION.* constants tested by BuildVersionTest
+
+        assertTrue(BOARD_PATTERN.matcher(Build.BOARD).matches());
+
+        assertTrue(BRAND_PATTERN.matcher(Build.BRAND).matches());
+
         assertTrue(DEVICE_PATTERN.matcher(Build.DEVICE).matches());
+
+        // Build.FINGERPRINT tested by BuildVersionTest
+
+        assertNotEmpty(Build.HOST);
+
+        assertTrue(ID_PATTERN.matcher(Build.ID).matches());
+
+        assertNotEmpty(Build.MODEL);
+
+        assertTrue(PRODUCT_PATTERN.matcher(Build.PRODUCT).matches());
+
+        assertTrue(SERIAL_NUMBER_PATTERN.matcher(Build.SERIAL).matches());
+
+        assertTrue(TAGS_PATTERN.matcher(Build.TAGS).matches());
+
+        // No format requirements stated in CDD for Build.TIME
+
+        assertTrue(TYPE_PATTERN.matcher(Build.TYPE).matches());
+
+        assertNotEmpty(Build.USER);
+    }
+
+    private void assertNotEmpty(String value) {
+        assertNotNull(value);
+        assertFalse(value.isEmpty());
     }
 }
