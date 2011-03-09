@@ -23,6 +23,11 @@
   ]
 },
 
+{
+  description: "Broken test that is fixed in a future release.",
+  name: "android.provider.cts.MediaStore_Audio_Playlists_MembersTest"
+},
+
 /* These tests pass when executed individually but fail when running CTS as a whole on GRH78. */
 {
   name: "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection",
