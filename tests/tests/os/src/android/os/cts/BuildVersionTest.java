@@ -32,8 +32,8 @@ public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
     private static final Set<String> EXPECTED_RELEASES =
-        new HashSet<String>(Arrays.asList("2.3", "2.3.1", "2.3.2"));
-    private static final int EXPECTED_SDK = 9;
+        new HashSet<String>(Arrays.asList("2.3.3"));
+    private static final int EXPECTED_SDK = 10;
 
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
@@ -43,6 +43,10 @@ public class BuildVersionTest extends TestCase {
 
         assertEquals("" + EXPECTED_SDK, Build.VERSION.SDK);
         assertEquals(EXPECTED_SDK, Build.VERSION.SDK_INT);
+    }
+
+    public void testIncremental() {
+        assertNotEmpty(Build.VERSION.INCREMENTAL);
     }
 
     /**
@@ -74,5 +78,10 @@ public class BuildVersionTest extends TestCase {
         assertTrue(fingerprintSegs[4].contains(":"));
         // no strict requirement for TAGS
         //assertEquals(Build.TAGS, fingerprintSegs[5]);
+    }
+
+    private void assertNotEmpty(String value) {
+        assertNotNull(value);
+        assertFalse(value.isEmpty());
     }
 }

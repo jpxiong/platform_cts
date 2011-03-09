@@ -16,6 +16,12 @@
 
 package android.graphics.cts;
 
+import dalvik.annotation.BrokenTest;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.graphics.ColorFilter;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
@@ -34,11 +40,6 @@ import android.test.AndroidTestCase;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(Paint.class)
 public class PaintTest extends AndroidTestCase {
@@ -74,67 +75,60 @@ public class PaintTest extends AndroidTestCase {
         method = "breakText",
         args = {char[].class, int.class, int.class, float.class, float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testBreakText1() {
+    public void testBreakText_charArray() {
         Paint p = new Paint();
 
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[1];
 
+        float[] widths = new float[chars.length];
+        assertEquals(chars.length, p.getTextWidths(chars, 0, chars.length, widths));
+
+        float totalWidth = 0.0f;
         for (int i = 0; i < chars.length; i++) {
-            assertEquals(1, p.breakText(chars, i, 1, 20.0f, f));
-            assertEquals(width[i], f[0]);
+            totalWidth += widths[i];
         }
 
-        // start from 'H'
-        int indexH = 0;
-        assertEquals(4, p.breakText(chars, indexH, 4, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-        assertEquals(3, p.breakText(chars, indexH, 3, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(2, p.breakText(chars, indexH, 2, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(1, p.breakText(chars, indexH, 1, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(0, p.breakText(chars, indexH, 0, 30.0f, f));
-        assertEquals(0.0f, f[0]);
-
-        assertEquals(1, p.breakText(chars, indexH + 2, 1, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-        assertEquals(1, p.breakText(chars, indexH + 2, -1, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-
-        assertEquals(1, p.breakText(chars, indexH, -1, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(2, p.breakText(chars, indexH, -2, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(3, p.breakText(chars, indexH, -3, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(4, p.breakText(chars, indexH, -4, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-
-        assertEquals(7, p.breakText(chars, indexH, 7, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(chars, indexH, 7, 40.0f, f));
-        assertEquals(38.0f, f[0]);
-
-        assertEquals(7, p.breakText(chars, indexH, -7, 50.0f, null));
-        assertEquals(7, p.breakText(chars, indexH, 7, 50.0f, null));
-
-        try {
-            p.breakText(chars, 0, 8, 60.0f, null);
-            fail("Should throw an ArrayIndexOutOfboundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.breakText(chars, -1, 7, 50.0f, null);
-            fail("Should throw an ArrayIndexOutOfboundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
+        float[] measured = new float[1];
+        for (int i = 0; i < chars.length; i++) {
+            assertEquals(1, p.breakText(chars, i, 1, totalWidth, measured));
+            assertEquals(widths[i], measured[0]);
         }
 
+        // Measure empty string
+        assertEquals(0, p.breakText(chars, 0, 0, totalWidth, measured));
+        assertEquals(0.0f, measured[0]);
+
+        // Measure substring from front: "HIJ"
+        assertEquals(3, p.breakText(chars, 0, 3, totalWidth, measured));
+        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+
+        // Reverse measure substring from front: "HIJ"
+        assertEquals(3, p.breakText(chars, 0, -3, totalWidth, measured));
+        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+
+        // Measure substring from back: "MN"
+        assertEquals(2, p.breakText(chars, 5, 2, totalWidth, measured));
+        assertEquals(widths[5] + widths[6], measured[0]);
+
+        // Reverse measure substring from back: "MN"
+        assertEquals(2, p.breakText(chars, 5, -2, totalWidth, measured));
+        assertEquals(widths[5] + widths[6], measured[0]);
+
+        // Measure substring in the middle: "JKL"
+        assertEquals(3, p.breakText(chars, 2, 3, totalWidth, measured));
+        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+
+        // Reverse measure substring in the middle: "JKL"
+        assertEquals(3, p.breakText(chars, 2, -3, totalWidth, measured));
+        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+
+        // Measure substring in the middle and restrict width to the first 2 characters.
+        assertEquals(2, p.breakText(chars, 2, 3, widths[2] + widths[3], measured));
+        assertEquals(widths[2] + widths[3], measured[0]);
+
+        // Reverse measure substring in the middle and restrict width to the last 2 characters.
+        assertEquals(2, p.breakText(chars, 2, -3, widths[3] + widths[4], measured));
+        assertEquals(widths[3] + widths[4], measured[0]);
     }
 
     @TestTargetNew(
@@ -143,7 +137,6 @@ public class PaintTest extends AndroidTestCase {
         args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class,
                 float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
     public void testBreakText2() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -227,7 +220,6 @@ public class PaintTest extends AndroidTestCase {
         method = "breakText",
         args = {java.lang.String.class, boolean.class, float.class, float[].class}
     )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
     public void testBreakText3() {
         Paint p = new Paint();
         String string = "HIJKLMN";
@@ -831,427 +823,48 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "getTextWidths",
-        args = {char[].class, int.class, int.class, float[].class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testGetTextWidths1() throws Exception {
-        Paint p = new Paint();
-        char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[7];
+    public void testGetTextWidths() throws Exception {
+        String text = "HIJKLMN";
+        char[] textChars = text.toCharArray();
+        SpannedString textSpan = new SpannedString(text);
 
-        assertEquals(7, p.getTextWidths(chars, 0, 7, f));
-        for (int i = 0; i < chars.length; i++) {
-            assertEquals(width[i], f[i]);
-        }
+        // Test measuring the widths of the entire text
+        assertGetTextWidths(text, textChars, textSpan, 0, 7);
 
-        assertEquals(4, p.getTextWidths(chars, 3, 4, f));
-        for (int i = 3; i < chars.length; i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
+        // Test measuring a substring of the text
+        assertGetTextWidths(text, textChars, textSpan, 1, 3);
 
-        assertEquals(1, p.getTextWidths(chars, 6, 1, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(chars, 6, 0, f));
+        // Test measuring a substring of zero length.
+        assertGetTextWidths(text, textChars, textSpan, 3, 3);
 
-        try {
-            p.getTextWidths(chars, -1, 6, f);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(chars, 0, -1, f);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(chars, 1, 8, f);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        float[] f2 = new float[3];
-        try {
-            p.getTextWidths(chars, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
+        // Test measuring substrings from the front and back
+        assertGetTextWidths(text, textChars, textSpan, 0, 2);
+        assertGetTextWidths(text, textChars, textSpan, 4, 7);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "getTextWidths",
-        args = {java.lang.CharSequence.class, int.class, int.class, float[].class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testGetTextWidths2() throws Exception {
+    /** Tests all four overloads of getTextWidths are the same. */
+    private void assertGetTextWidths(String text, char[] textChars, SpannedString textSpan,
+            int start, int end) {
         Paint p = new Paint();
+        int count = end - start;
+        float[][] widths = new float[][] {
+            new float[count],
+            new float[count],
+            new float[count],
+            new float[count]
+        };
 
-        // CharSequence of String
-        String string = "HIJKLMN";
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[7];
+        String textSlice = text.substring(start, end);
+        assertEquals(count, p.getTextWidths(textSlice, widths[0]));
+        assertEquals(count, p.getTextWidths(textChars, start, count, widths[1]));
+        assertEquals(count, p.getTextWidths(textSpan, start, end, widths[2]));
+        assertEquals(count, p.getTextWidths(text, start, end, widths[3]));
 
-        assertEquals(7, p.getTextWidths((CharSequence) string, 0, 7, f));
-        for (int i = 0; i < string.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths((CharSequence) string, 3, 7, f));
-        for (int i = 3; i < string.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths((CharSequence) string, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths((CharSequence) string, 7, 7, f));
-
-        try {
-            p.getTextWidths((CharSequence) string, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.getTextWidths((CharSequence) string, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths((CharSequence) string, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths((CharSequence) string, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        float[] f2 = new float[3];
-        try {
-            p.getTextWidths((CharSequence) string, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-        // CharSequence of SpannedString
-        SpannedString spannedString = new SpannedString("HIJKLMN");
-
-        assertEquals(7, p.getTextWidths(spannedString, 0, 7, f));
-        for (int i = 0; i < spannedString.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths(spannedString, 3, 7, f));
-        for (int i = 3; i < spannedString.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths(spannedString, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(spannedString, 7, 7, f));
-
-        try {
-            p.getTextWidths(spannedString, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannedString, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannedString, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannedString, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannedString, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        // CharSequence of SpannableString
-        SpannableString spannableString = new SpannableString("HIJKLMN");
-
-        assertEquals(7, p.getTextWidths(spannableString, 0, 7, f));
-        for (int i = 0; i < spannableString.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths(spannableString, 3, 7, f));
-        for (int i = 3; i < spannableString.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths(spannableString, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(spannableString, 7, 7, f));
-
-        try {
-            p.getTextWidths(spannableString, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableString, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableString, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableString, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableString, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        // CharSequence of SpannableStringBuilder (GraphicsOperations)
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("HIJKLMN");
-
-        assertEquals(7, p.getTextWidths(spannableStringBuilder, 0, 7, f));
-        for (int i = 0; i < spannableStringBuilder.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths(spannableStringBuilder, 3, 7, f));
-        for (int i = 3; i < spannableStringBuilder.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths(spannableStringBuilder, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(spannableStringBuilder, 7, 7, f));
-
-        try {
-            p.getTextWidths(spannableStringBuilder, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableStringBuilder, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableStringBuilder, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableStringBuilder, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(spannableStringBuilder, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-        // CharSequence of StringBuilder
-        StringBuilder stringBuilder = new StringBuilder("HIJKLMN");
-
-        assertEquals(7, p.getTextWidths(stringBuilder, 0, 7, f));
-        for (int i = 0; i < stringBuilder.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths(stringBuilder, 3, 7, f));
-        for (int i = 3; i < stringBuilder.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths(stringBuilder, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(stringBuilder, 7, 7, f));
-
-        try {
-            p.getTextWidths(stringBuilder, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(stringBuilder, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(stringBuilder, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(stringBuilder, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(stringBuilder, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-
-    }
-
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "getTextWidths",
-        args = {java.lang.String.class, int.class, int.class, float[].class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testGetTextWidths3() {
-        Paint p = new Paint();
-        String string = "HIJKLMN";
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[7];
-
-        assertEquals(7, p.getTextWidths(string, 0, 7, f));
-        for (int i = 0; i < string.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(4, p.getTextWidths(string, 3, 7, f));
-        for (int i = 3; i < string.length(); i++) {
-            assertEquals(width[i], f[i - 3]);
-        }
-
-        assertEquals(1, p.getTextWidths(string, 6, 7, f));
-        assertEquals(width[6], f[0]);
-        assertEquals(0, p.getTextWidths(string, 7, 7, f));
-
-        try {
-            p.getTextWidths(string, -1, 6, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(string, 0, -1, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(string, 4, 3, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextWidths(string, 1, 8, f);
-            fail("Should throw an IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-        float[] f2 = new float[3];
-        try {
-            p.getTextWidths(string, 0, 6, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "getTextWidths",
-        args = {java.lang.String.class, float[].class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testGetTextWidths4() throws Exception {
-        Paint p = new Paint();
-        String string = "HIJKLMN";
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[7];
-
-        assertEquals(7, p.getTextWidths(string, f));
-        for (int i = 0; i < string.length(); i++) {
-            assertEquals(width[i], f[i]);
-        }
-
-        assertEquals(0, p.getTextWidths("", f));
-
-        try {
-            p.getTextWidths(null, f);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        float[] f2 = new float[3];
-        try {
-            p.getTextWidths(string, f2);
-            fail("Should throw an ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //except here
+        // Check that the widths returned by the overloads are the same.
+        for (int i = 0; i < count; i++) {
+            assertEquals(widths[0][i], widths[1][i]);
+            assertEquals(widths[1][i], widths[2][i]);
+            assertEquals(widths[2][i], widths[3][i]);
         }
     }
 

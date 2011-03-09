@@ -16,7 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -84,7 +83,6 @@ public class LauncherActivityTest extends InstrumentationTestCase {
             args = {int.class}
         )
     })
-    @BrokenTest("flaky test, assertTrue(mActivity.isOnListItemClick) intermittently fails")
     public void testLaunchActivity() {
         // Constructor of LaunchActivity can't be invoked directly.
         new LauncherActivityStub();
@@ -109,6 +107,9 @@ public class LauncherActivityTest extends InstrumentationTestCase {
         // There should be an activity(but with uncertain content) in position 0.
         assertNotNull(mActivity.intentForPosition(0));
         // Test onListItemClick
+        sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
+        sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
+        sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
         sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
         assertTrue(mActivity.isOnListItemClick);
     }

@@ -35,8 +35,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
-import android.content.res.Resources.Theme;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
@@ -232,46 +230,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(VALUE_ADDED, resultExtras.getString(KEY_ADDED));
         assertEquals(VALUE_KEPT, resultExtras.getString(KEY_KEPT));
         assertNull(resultExtras.getString(KEY_REMOVED));
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTheme",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTheme",
-            args = {int.class}
-        )
-    })
-    public void testAccessTheme() {
-        mContextWrapper.setTheme(R.style.Test_Theme);
-        final Theme testTheme = mContextWrapper.getTheme();
-        assertNotNull(testTheme);
-
-        int[] attrs = {
-            android.R.attr.windowNoTitle,
-            android.R.attr.panelColorForeground,
-            android.R.attr.panelColorBackground
-        };
-        TypedArray attrArray = null;
-        try {
-            attrArray = testTheme.obtainStyledAttributes(attrs);
-            assertTrue(attrArray.getBoolean(0, false));
-            assertEquals(0xff000000, attrArray.getColor(1, 0));
-            assertEquals(0xffffffff, attrArray.getColor(2, 0));
-        } finally {
-            if (attrArray != null) {
-                attrArray.recycle();
-                attrArray = null;
-            }
-        }
-
-        // setTheme only works for the first time
-        mContextWrapper.setTheme(android.R.style.Theme_Black);
-        assertSame(testTheme, mContextWrapper.getTheme());
     }
 
     @TestTargets({
