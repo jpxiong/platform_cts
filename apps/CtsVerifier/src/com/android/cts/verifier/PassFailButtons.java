@@ -34,7 +34,8 @@ import android.view.View.OnClickListener;
  *     <li>Include the pass fail buttons layout in your layout:
  *         <pre><include layout="@layout/pass_fail_buttons" /></pre>
  *     </li>
- *     <li>Extend one of the activities to get the click handler for the buttons.</li>
+ *     <li>Extend one of the activities and call setPassFailButtonClickListeners after
+ *         setting your content view.</li>
  *     <li>Make sure to call setResult(RESULT_CANCEL) in your Activity initially.</li>
  *     <li>Optionally call setInfoTextResources to add an info button that will show a
  *         dialog with instructional text.</li>
@@ -44,6 +45,13 @@ public class PassFailButtons {
 
     // Interface mostly for making documentation and refactoring easier...
     private interface PassFailActivity {
+
+        /**
+         * Hooks up the pass and fail buttons to click listeners that will record the test results.
+         * <p>
+         * Call from {@link Activity#onCreate} after {@link Activity #setContentView(int)}.
+         */
+        void setPassFailButtonClickListeners();
 
         /**
          * Adds an initial informational dialog that appears when entering the test activity for
@@ -56,34 +64,40 @@ public class PassFailButtons {
          * @param messageId for the text shown in the dialog's body area
          */
         void setInfoResources(int titleId, int messageId, int viewId);
-
-        /**
-         * Click handler for the pass and fail buttons. No need to call this ever as the XML
-         * view layout will bind to this automatically.
-         */
-        void passFailButtonsClickHandler(View target);
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
 
-        public void setInfoResources(int titleId, int messageId, int viewId) {
-            setInfo(this, titleId, messageId, viewId);
+        public void setPassFailButtonClickListeners() {
+            setPassFailClickListeners(this);
         }
 
-        public void passFailButtonsClickHandler(View target) {
-            setTestResultAndFinish(this, target);
+        public void setInfoResources(int titleId, int messageId, int viewId) {
+            setInfo(this, titleId, messageId, viewId);
         }
     }
 
     public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
 
+        public void setPassFailButtonClickListeners() {
+            setPassFailClickListeners(this);
+        }
+
         public void setInfoResources(int titleId, int messageId, int viewId) {
             setInfo(this, titleId, messageId, viewId);
         }
+    }
 
-        public void passFailButtonsClickHandler(View target) {
-            setTestResultAndFinish(this, target);
-        }
+    private static void setPassFailClickListeners(final android.app.Activity activity) {
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View target) {
+                setTestResultAndFinish(activity, target);
+            }
+        };
+
+        activity.findViewById(R.id.pass_button).setOnClickListener(clickListener);
+        activity.findViewById(R.id.fail_button).setOnClickListener(clickListener);
     }
 
     private static void setInfo(final android.app.Activity activity, final int titleId,
