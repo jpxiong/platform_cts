@@ -155,8 +155,9 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         Uri membersUri = Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME,
                 playlistId);
         Uri audioUri = mContentResolver.insert(membersUri, values);
+
         assertNotNull(audioUri);
-        assertEquals(Uri.withAppendedPath(membersUri, Long.toString(mIdOfAudio1)), audioUri);
+        assertTrue(audioUri.toString().startsWith(membersUri.toString()));
 
         try {
             // query the audio info
@@ -164,7 +165,7 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
             assertEquals(1, c.getCount());
             c.moveToFirst();
             long memberId = c.getLong(c.getColumnIndex(Members._ID));
-            assertTrue(memberId > 0);
+            assertEquals(memberId, Long.parseLong(audioUri.getPathSegments().get(5)));
             assertEquals(Audio1.EXTERNAL_DATA, c.getString(c.getColumnIndex(Members.DATA)));
             assertTrue(c.getLong(c.getColumnIndex(Members.DATE_ADDED)) > 0);
             assertEquals(Audio1.DATE_MODIFIED, c.getLong(c.getColumnIndex(Members.DATE_MODIFIED)));
