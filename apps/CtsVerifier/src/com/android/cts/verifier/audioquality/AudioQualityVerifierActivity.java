@@ -94,8 +94,8 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aq_verifier_activity);
+        setPassFailButtonClickListeners();
         setInfoResources(R.string.aq_verifier, R.string.aq_verifier_info, -1);
-        setResult(RESULT_CANCELED);
 
         mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
         mRunAllButton = (Button) findViewById(R.id.runAllButton);
