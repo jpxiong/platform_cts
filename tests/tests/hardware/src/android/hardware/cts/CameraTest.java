@@ -1176,7 +1176,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         public void onZoomChange(int value, boolean stopped, Camera camera) {
             mValues.add(value);
-            assertEquals(value, camera.getParameters().getZoom());
             assertFalse(mStopped);
             mStopped = stopped;
             if (stopped) {
