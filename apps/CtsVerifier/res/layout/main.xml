@@ -29,7 +29,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:onClick="continueButtonClickHandler"
         android:text="@string/continue_button_text"
         />
 </RelativeLayout>

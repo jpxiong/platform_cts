@@ -41,7 +41,6 @@ public class AccelerometerTestActivity extends PassFailButtons.Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setResult(RESULT_CANCELED);
 
         mSensorManager = (SensorManager) getApplicationContext().getSystemService(
                 Context.SENSOR_SERVICE);
@@ -49,6 +48,7 @@ public class AccelerometerTestActivity extends PassFailButtons.Activity {
         mListener = renderer;
 
         setContentView(R.layout.pass_fail_gl);
+        setPassFailButtonClickListeners();
         setInfoResources(R.string.snsr_accel_test, R.string.snsr_accel_test_info, -1);
         mGLSurfaceView = (GLSurfaceView) findViewById(R.id.gl_surface_view);
         mGLSurfaceView.setRenderer(renderer);
