@@ -73,7 +73,7 @@ public class SmsManagerTest extends AndroidTestCase {
     private Intent mDeliveryIntent;
     private boolean mDeliveryReportSupported;
 
-    private static final int TIME_OUT = 1000 * 60 * 4;
+    private static final int TIME_OUT = 1000 * 60 * 5;
 
     @Override
     protected void setUp() throws Exception {
