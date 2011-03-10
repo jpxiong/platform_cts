@@ -136,8 +136,10 @@ public class CamcorderProfileTest extends AndroidTestCase {
 
             case CamcorderProfile.QUALITY_1080P:
             case CamcorderProfile.QUALITY_TIME_LAPSE_1080P:
+                // 1080p could be either 1920x1088 or 1920x1080.
                 assertEquals(1920, profile.videoFrameWidth);
-                assertEquals(1088, profile.videoFrameHeight);
+                assertTrue(1088 == profile.videoFrameHeight ||
+                           1080 == profile.videoFrameHeight);
                 break;
         }
     }
