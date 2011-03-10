@@ -16,21 +16,12 @@
 
 package android.graphics.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.KnownFailure;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
 
 @TestTargetClass(android.graphics.Typeface.class)
@@ -174,28 +165,5 @@ public class TypefaceTest extends AndroidTestCase {
 
         Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "samplefont.ttf");
         assertNotNull(typeface);
-
-        Bitmap bitmap = Bitmap.createBitmap(100, 100, Config.ARGB_8888);
-        bitmap.eraseColor(Color.BLACK);
-        Canvas canvas = new Canvas(bitmap);
-        Paint p = new Paint();
-        p.setTypeface(typeface);
-        p.setColor(Color.WHITE);
-        p.setTextAlign(Paint.Align.CENTER);
-        p.setTextSize(50);
-        p.setFlags(0); // clear all flags (not sure what defaults flags are set)
-        canvas.drawText("test", bitmap.getWidth() / 2, 3 * bitmap.getHeight() / 4 , p);
-
-        BitmapFactory.Options opt = new BitmapFactory.Options();
-        opt.inScaled = false;
-        Bitmap expected = BitmapFactory.decodeResource(
-                getContext().getResources(), R.drawable.typeface_test, opt);
-        assertEquals(expected.getWidth(), bitmap.getWidth());
-        assertEquals(expected.getHeight(), bitmap.getHeight());
-        for (int y = 0; y < bitmap.getHeight(); y++) {
-            for (int x = 0; x < bitmap.getWidth(); x++) {
-                assertEquals(expected.getPixel(x, y), bitmap.getPixel(x, y));
-            }
-        }
     }
 }
