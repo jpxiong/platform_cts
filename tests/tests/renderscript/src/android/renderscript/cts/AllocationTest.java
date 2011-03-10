@@ -21,26 +21,10 @@ import com.android.cts.stub.R;
 import android.renderscript.Allocation;
 import android.renderscript.Allocation.MipmapControl;
 import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScriptGL;
-import android.renderscript.RenderScriptGL.SurfaceConfig;
 import android.renderscript.Type;
 import android.renderscript.Type.Builder;
-import android.test.AndroidTestCase;
 
-public class AllocationTest extends AndroidTestCase {
-
-    RenderScript mRS;
-    @Override
-    protected void setUp() throws Exception {
-        mRS = new RenderScriptGL(getContext(), new SurfaceConfig());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        mRS.destroy();
-        mRS = null;
-    }
+public class AllocationTest extends RSBaseGraphics {
 
     // Test power of two and non power of two, equal and non-equal sizes
     void createTypedHelper(Element e) {
