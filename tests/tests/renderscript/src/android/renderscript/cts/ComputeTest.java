@@ -23,7 +23,7 @@ import android.renderscript.RenderScript.RSMessageHandler;
 import android.test.AndroidTestCase;
 import com.android.cts.stub.R;
 
-public class ComputeTest extends RSBase {
+public class ComputeTest extends RSBaseCompute {
 
     private boolean initializeGlobals(ScriptC_primitives s) {
         float pF = s.get_floatTest();
