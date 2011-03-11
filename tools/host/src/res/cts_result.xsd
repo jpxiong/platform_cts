@@ -74,6 +74,7 @@
         <xs:attribute name="network" type="xs:string"/>
         <xs:attribute name="touch" type="xs:string"/>
         <xs:attribute name="openGlEsVersion" type="xs:string"/>
+        <xs:attribute name="partitions" type="xs:string"/>
         <xs:attribute name="build_abi" type="xs:string"/>
         <xs:attribute name="build_abi2" type="xs:string"/>
       </xs:complexType>
