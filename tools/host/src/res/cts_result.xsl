@@ -252,6 +252,19 @@
                                                 </UL>
                                             </TD>
                                         </TR>
+                                        <TR>
+                                            <TD class="rowtitle">Partitions</TD>
+                                            <TD>
+                                                <UL>
+                                                    <pre>
+                                                        <xsl:call-template name="formatDelimitedString">
+                                                            <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@partitions" />
+                                                            <xsl:with-param name="numTokensPerRow" select="1" />
+                                                        </xsl:call-template>
+                                                    </pre>
+                                                </UL>
+                                            </TD>
+                                        </TR>
                                     </TABLE>
                                 </div>
                             </TD>

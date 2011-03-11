@@ -436,6 +436,7 @@ public class TestDevice implements DeviceObserver {
         public static final String FEATURES = "features";
         public static final String PROCESSES = "processes";
         public static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
+        public static final String PARTITIONS = "partitions";
 
         private HashMap<String, String> mInfoMap;
 
@@ -860,6 +861,15 @@ public class TestDevice implements DeviceObserver {
          */
         public String getOpenGlEsVersion() {
             return mInfoMap.get(OPEN_GL_ES_VERSION);
+        }
+
+        /**
+         * Get partitions.
+         *
+         * @return partitions or error message.
+         */
+        public String getPartitions() {
+            return mInfoMap.get(PARTITIONS);
         }
     }
 
