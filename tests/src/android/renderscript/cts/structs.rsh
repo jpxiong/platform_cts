@@ -36,3 +36,21 @@ typedef struct ConstExtra {
 } ConstExtra_s;
 ConstExtra_s *c3;
 
+typedef struct AllVectorTypes {
+    char2 b2;
+    char3 b3;
+    char4 b4;
+
+    short2 s2;
+    short3 s3;
+    short4 s4;
+
+    int2 i2;
+    int3 i3;
+    int4 i4;
+
+    float2 f2;
+    float3 f3;
+    float4 f4;
+} AllVectorTypes_s;
+AllVectorTypes_s *avt;

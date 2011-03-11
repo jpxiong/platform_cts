@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.renderscript.cts;
+
+import com.android.cts.stub.R;
+
+import android.renderscript.FileA3D;
+import android.renderscript.FileA3D.EntryType;
+import android.renderscript.FileA3D.IndexEntry;
+
+public class FileA3DTest extends RSBaseGraphics {
+
+    public void testCreateFromResource() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+    }
+
+    public void testGetIndexEntryCount() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+    }
+
+    public void testGetIndexEntry() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+        assertTrue(model.getIndexEntry(0) != null);
+    }
+
+    public void testIndexEntryGetEntryType() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+        FileA3D.IndexEntry entry = model.getIndexEntry(0);
+        assertTrue(entry != null);
+        assertTrue(entry.getEntryType() == FileA3D.EntryType.MESH);
+    }
+
+    public void testIndexEntryGetMesh() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+        FileA3D.IndexEntry entry = model.getIndexEntry(0);
+        assertTrue(entry != null);
+        assertTrue(entry.getEntryType() == FileA3D.EntryType.MESH);
+        assertTrue(entry.getMesh() != null);
+    }
+
+    public void testIndexEntryGetName() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+        FileA3D.IndexEntry entry = model.getIndexEntry(0);
+        assertTrue(entry != null);
+        assertTrue(entry.getName() != null);
+    }
+
+    public void testIndexEntryGetObject() {
+        FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
+        assertTrue(model != null);
+        assertTrue(model.getIndexEntryCount() == 1);
+        FileA3D.IndexEntry entry = model.getIndexEntry(0);
+        assertTrue(entry != null);
+        assertTrue(entry.getObject() != null);
+    }
+}
+
+
