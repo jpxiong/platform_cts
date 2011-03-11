@@ -27,8 +27,14 @@ static void drawQuad() {
 }
 
 void testProgramVertex(rs_program_vertex pv) {
-    rsDebug("Set Program, drew quad", 0);
+    rsDebug("Set Program Vertex, drew quad", 0);
     rsgBindProgramVertex(pv);
+    drawQuad();
+}
+
+void testProgramFragment(rs_program_fragment pf) {
+    rsDebug("Set Program Fragment, drew quad", 0);
+    rsgBindProgramFragment(pf);
     drawQuad();
 }
 
