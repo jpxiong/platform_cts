@@ -89,9 +89,6 @@ public class SmsManagerTest extends AndroidTestCase {
         } else if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // CDMA supports SMS delivery report
             mDeliveryReportSupported = true;
-        } else if (mTelephonyManager.getDeviceId().equals("000000000000000")) {
-            // emulator doesn't support SMS delivery report
-            mDeliveryReportSupported = false;
         } else {
             // is this a GSM network that doesn't support SMS delivery report?
             String mccmnc = mTelephonyManager.getSimOperator();
