@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.net.Uri;
+import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.provider.Settings.SettingNotFoundException;
 import android.test.AndroidTestCase;
@@ -177,5 +178,10 @@ public class Settings_SecureTest extends AndroidTestCase {
         Uri uri = Secure.getUriFor(name);
         assertNotNull(uri);
         assertEquals(Uri.withAppendedPath(Secure.CONTENT_URI, name), uri);
+    }
+
+    public void testUnknownSourcesOffByDefault() throws SettingNotFoundException {
+        assertEquals("Device should not ship with 'Unknown Sources' enabled by default.",
+                0, Secure.getInt(cr, Settings.Secure.INSTALL_NON_MARKET_APPS));
     }
 }
