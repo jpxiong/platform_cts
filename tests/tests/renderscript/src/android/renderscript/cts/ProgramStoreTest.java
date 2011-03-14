@@ -37,7 +37,7 @@ public class ProgramStoreTest extends RSBaseGraphics {
                         boolean isA = (a == 1);
                         for (int dither = 0; dither <= 1; dither++) {
                             boolean isDither = (dither == 1);
-                            pb.setDepthMaskEnabled(isDither);
+                            pb.setDitherEnabled(isDither);
                             pb.setColorMaskEnabled(isR, isG, isB, isA);
                             pb.create();
                         }
@@ -69,6 +69,68 @@ public class ProgramStoreTest extends RSBaseGraphics {
         assertTrue(ProgramStore.BLEND_ALPHA_DEPTH_TEST(mRS) != null);
         assertTrue(ProgramStore.BLEND_NONE_DEPTH_NONE(mRS) != null);
         assertTrue(ProgramStore.BLEND_NONE_DEPTH_TEST(mRS) != null);
+    }
+
+    public void testProgramStoreBlendDstFunc() {
+        assertEquals(BlendDstFunc.ZERO,
+                     BlendDstFunc.valueOf("ZERO"));
+        assertEquals(BlendDstFunc.ONE,
+                     BlendDstFunc.valueOf("ONE"));
+        assertEquals(BlendDstFunc.SRC_COLOR,
+                     BlendDstFunc.valueOf("SRC_COLOR"));
+        assertEquals(BlendDstFunc.ONE_MINUS_SRC_COLOR,
+                     BlendDstFunc.valueOf("ONE_MINUS_SRC_COLOR"));
+        assertEquals(BlendDstFunc.SRC_ALPHA,
+                     BlendDstFunc.valueOf("SRC_ALPHA"));
+        assertEquals(BlendDstFunc.ONE_MINUS_SRC_ALPHA,
+                     BlendDstFunc.valueOf("ONE_MINUS_SRC_ALPHA"));
+        assertEquals(BlendDstFunc.DST_ALPHA,
+                     BlendDstFunc.valueOf("DST_ALPHA"));
+        assertEquals(BlendDstFunc.ONE_MINUS_DST_ALPHA,
+                     BlendDstFunc.valueOf("ONE_MINUS_DST_ALPHA"));
+        // Make sure no new enums are added
+        assertEquals(8, BlendDstFunc.values().length);
+    }
+
+    public void testProgramStoreBlendSrcFunc() {
+        assertEquals(BlendSrcFunc.ZERO,
+                     BlendSrcFunc.valueOf("ZERO"));
+        assertEquals(BlendSrcFunc.ONE,
+                     BlendSrcFunc.valueOf("ONE"));
+        assertEquals(BlendSrcFunc.DST_COLOR,
+                     BlendSrcFunc.valueOf("DST_COLOR"));
+        assertEquals(BlendSrcFunc.ONE_MINUS_DST_COLOR,
+                     BlendSrcFunc.valueOf("ONE_MINUS_DST_COLOR"));
+        assertEquals(BlendSrcFunc.SRC_ALPHA,
+                     BlendSrcFunc.valueOf("SRC_ALPHA"));
+        assertEquals(BlendSrcFunc.ONE_MINUS_SRC_ALPHA,
+                     BlendSrcFunc.valueOf("ONE_MINUS_SRC_ALPHA"));
+        assertEquals(BlendSrcFunc.DST_ALPHA,
+                     BlendSrcFunc.valueOf("DST_ALPHA"));
+        assertEquals(BlendSrcFunc.ONE_MINUS_DST_ALPHA,
+                     BlendSrcFunc.valueOf("ONE_MINUS_DST_ALPHA"));
+        assertEquals(BlendSrcFunc.SRC_ALPHA_SATURATE,
+                     BlendSrcFunc.valueOf("SRC_ALPHA_SATURATE"));
+        // Make sure no new enums are added
+        assertEquals(9, BlendSrcFunc.values().length);
+    }
+    public void testProgramStoreDepthFunc() {
+        assertEquals(DepthFunc.ALWAYS,
+                     DepthFunc.valueOf("ALWAYS"));
+        assertEquals(DepthFunc.LESS,
+                     DepthFunc.valueOf("LESS"));
+        assertEquals(DepthFunc.LESS_OR_EQUAL,
+                     DepthFunc.valueOf("LESS_OR_EQUAL"));
+        assertEquals(DepthFunc.GREATER,
+                     DepthFunc.valueOf("GREATER"));
+        assertEquals(DepthFunc.GREATER_OR_EQUAL,
+                     DepthFunc.valueOf("GREATER_OR_EQUAL"));
+        assertEquals(DepthFunc.EQUAL,
+                     DepthFunc.valueOf("EQUAL"));
+        assertEquals(DepthFunc.NOT_EQUAL,
+                     DepthFunc.valueOf("NOT_EQUAL"));
+        // Make sure no new enums are added
+        assertEquals(7, DepthFunc.values().length);
     }
 }
 

@@ -119,6 +119,18 @@ public class SamplerTest extends RSBaseGraphics {
         assertTrue(Sampler.WRAP_LINEAR_MIP_LINEAR(mRS) != null);
         assertTrue(Sampler.WRAP_NEAREST(mRS) != null);
     }
+
+    public void testSamplerValue() {
+        assertEquals(Value.NEAREST, Value.valueOf("NEAREST"));
+        assertEquals(Value.LINEAR, Value.valueOf("LINEAR"));
+        assertEquals(Value.LINEAR_MIP_LINEAR, Value.valueOf("LINEAR_MIP_LINEAR"));
+        assertEquals(Value.LINEAR_MIP_NEAREST, Value.valueOf("LINEAR_MIP_NEAREST"));
+        assertEquals(Value.WRAP, Value.valueOf("WRAP"));
+        assertEquals(Value.CLAMP, Value.valueOf("CLAMP"));
+
+        // Make sure no new enums are added
+        assertEquals(6, Value.values().length);
+    }
 }
 
 

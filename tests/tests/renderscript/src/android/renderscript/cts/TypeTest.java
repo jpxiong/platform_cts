@@ -19,10 +19,11 @@ package android.renderscript.cts;
 import com.android.cts.stub.R;
 
 import android.renderscript.Element;
-import android.renderscript.Element.DataType;
 import android.renderscript.Element.DataKind;
+import android.renderscript.Element.DataType;
 import android.renderscript.Type;
 import android.renderscript.Type.Builder;
+import android.renderscript.Type.CubemapFace;
 
 public class TypeTest extends RSBaseCompute {
 
@@ -126,6 +127,59 @@ public class TypeTest extends RSBaseCompute {
         t = b.setX(7).setY(3).create();
         expectedCount = 7*3 + 3*1 + 1;
         assertTrue(t.getCount() == expectedCount);
+    }
+
+    public void testGetElement() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(1);
+        assertTrue(b.create().getElement() == Element.F32(mRS));
+    }
+
+    public void testGetX() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(3);
+        assertTrue(b.create().getX() == 3);
+    }
+
+    public void testGetY() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(3).setY(4);
+        Type t = b.create();
+        assertTrue(t.getX() == 3);
+        assertTrue(t.getY() == 4);
+    }
+
+    public void testGetZ() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(3).setY(4);
+        assertTrue(b.create().getZ() == 0);
+    }
+
+    public void testHasFaces() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(4).setY(4).setFaces(true);
+        assertTrue(b.create().hasFaces());
+        b.setFaces(false);
+        assertFalse(b.create().hasFaces());
+    }
+
+    public void testGetMipmaps() {
+        Type.Builder b = new Type.Builder(mRS, Element.F32(mRS));
+        b.setX(4).setY(4).setMipmaps(true);
+        assertTrue(b.create().hasMipmaps());
+        b.setMipmaps(false);
+        assertFalse(b.create().hasMipmaps());
+    }
+
+    public void testTypeCubemapFace() {
+        assertEquals(Type.CubemapFace.NEGATIVE_X, Type.CubemapFace.valueOf("NEGATIVE_X"));
+        assertEquals(Type.CubemapFace.NEGATIVE_Y, Type.CubemapFace.valueOf("NEGATIVE_Y"));
+        assertEquals(Type.CubemapFace.NEGATIVE_Z, Type.CubemapFace.valueOf("NEGATIVE_Z"));
+        assertEquals(Type.CubemapFace.POSITVE_X, Type.CubemapFace.valueOf("POSITVE_X"));
+        assertEquals(Type.CubemapFace.POSITVE_Y, Type.CubemapFace.valueOf("POSITVE_Y"));
+        assertEquals(Type.CubemapFace.POSITVE_Z, Type.CubemapFace.valueOf("POSITVE_Z"));
+        // Make sure no new enums are added
+        assertEquals(6, Type.CubemapFace.values().length);
     }
 }
 

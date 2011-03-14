@@ -28,6 +28,8 @@ import android.renderscript.Mesh.AllocationBuilder;
 import android.renderscript.Mesh.Builder;
 import android.renderscript.Mesh.TriangleMeshBuilder;
 
+import android.util.Log;
+
 public class MeshTest extends RSBaseGraphics {
 
     Allocation mAttrAlloc;
@@ -66,7 +68,15 @@ public class MeshTest extends RSBaseGraphics {
             mab.addIndexSetAllocation(mIndexAlloc, prim);
             mab.getCurrentIndexSetIndex();
             mab.addIndexSetType(prim);
-            assertTrue(mab.create() != null);
+
+            Mesh mesh = mab.create();
+            assertTrue(mesh != null);
+            assertTrue(mesh.getVertexAllocationCount() == 1);
+            assertTrue(mesh.getVertexAllocation(0) == mAttrAlloc);
+            assertTrue(mesh.getPrimitiveCount() == 2);
+            assertTrue(mesh.getPrimitive(0) == prim);
+            assertTrue(mesh.getPrimitive(1) == prim);
+            assertTrue(mesh.getIndexSetAllocation(0) == mIndexAlloc);
         }
     }
 
@@ -79,7 +89,9 @@ public class MeshTest extends RSBaseGraphics {
             mb.addVertexType(mPosElem, 3);
             mb.getCurrentVertexTypeIndex();
             mb.addIndexSetType(prim);
-            assertTrue(mb.create() != null);
+            Mesh mesh = mb.create();
+            assertTrue(mesh != null);
+            assertTrue(mesh.getVertexAllocationCount() != 0);
 
             mb = new Mesh.Builder(mRS,
                                   Allocation.USAGE_SCRIPT |
@@ -88,7 +100,10 @@ public class MeshTest extends RSBaseGraphics {
             mb.getCurrentVertexTypeIndex();
             mb.addIndexSetType(Element.U16(mRS), 3, prim);
             mb.getCurrentIndexSetIndex();
-            assertTrue(mb.create() != null);
+            mesh = mb.create();
+            assertTrue(mesh != null);
+            assertTrue(mesh.getVertexAllocationCount() != 0);
+            assertTrue(mesh.getPrimitiveCount() != 0);
 
             mb = new Mesh.Builder(mRS,
                                   Allocation.USAGE_SCRIPT |
@@ -175,6 +190,17 @@ public class MeshTest extends RSBaseGraphics {
                                             TriangleMeshBuilder.TEXTURE_0);
             triangleMeshBuilderHelper(size, TriangleMeshBuilder.TEXTURE_0);
         }
+    }
+
+    public void testMeshPrimitive() {
+        assertEquals(Mesh.Primitive.POINT, Mesh.Primitive.valueOf("POINT"));
+        assertEquals(Mesh.Primitive.LINE, Mesh.Primitive.valueOf("LINE"));
+        assertEquals(Mesh.Primitive.LINE_STRIP, Mesh.Primitive.valueOf("LINE_STRIP"));
+        assertEquals(Mesh.Primitive.TRIANGLE, Mesh.Primitive.valueOf("TRIANGLE"));
+        assertEquals(Mesh.Primitive.TRIANGLE_STRIP, Mesh.Primitive.valueOf("TRIANGLE_STRIP"));
+        assertEquals(Mesh.Primitive.TRIANGLE_FAN, Mesh.Primitive.valueOf("TRIANGLE_FAN"));
+        // Make sure no new enums are added
+        assertEquals(6, Mesh.Primitive.values().length);
     }
 }
 

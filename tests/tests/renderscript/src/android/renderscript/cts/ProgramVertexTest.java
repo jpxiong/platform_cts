@@ -24,6 +24,7 @@ import android.renderscript.FieldPacker;
 import android.renderscript.Float3;
 import android.renderscript.Float4;
 import android.renderscript.Matrix4f;
+import android.renderscript.Program;
 import android.renderscript.ProgramVertex;
 import android.renderscript.ProgramVertex.Builder;
 import android.renderscript.ScriptC;
@@ -96,6 +97,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
 
     ProgramVertex buildShader(Element[] input, Allocation[] constInput, String shader) {
         ProgramVertex.Builder pvb = new ProgramVertex.Builder(mRS);
+        Program.BaseProgramBuilder bpb = pvb;
         if (input != null) {
             for (int i = 0; i < input.length; i++) {
                 pvb.addInput(input[i]);
@@ -103,15 +105,21 @@ public class ProgramVertexTest extends RSBaseGraphics {
         }
         if (constInput != null) {
             for (int i = 0; i < constInput.length; i++) {
-                pvb.addConstant(constInput[i].getType());
+                // Add constants through the base builder class to
+                // tick cts test coverage (doesn't register through subclass)
+                bpb.addConstant(constInput[i].getType());
+                bpb.getCurrentConstantIndex();
             }
         }
 
-        pvb.setShader(shader);
+        bpb.setShader(shader);
         ProgramVertex pv = pvb.create();
         if (constInput != null) {
             for (int i = 0; i < constInput.length; i++) {
                 pv.bindConstants(constInput[i], i);
+                // Go through the base class code as well
+                Program p = pv;
+                p.bindConstants(constInput[i], i);
             }
         }
         return pv;

@@ -16,22 +16,46 @@
 
 package android.renderscript.cts;
 
+import java.io.File;
+
 import com.android.cts.stub.R;
 
+import android.os.Environment;
 import android.renderscript.Font;
+import android.renderscript.Font.Style;
 
 public class FontTest extends RSBaseGraphics {
 
-    public void testCreateFont() {
+    public void testCreate() {
         for (int fontSize = 8; fontSize <= 12; fontSize += 2) {
-            Font.create(mRS, mRes, "sans-serif", Font.Style.NORMAL, fontSize);
-            Font.create(mRS, mRes, "serif", Font.Style.NORMAL, fontSize);
-            // Create fonts by family and style
-            Font.create(mRS, mRes, "serif", Font.Style.BOLD, fontSize);
-            Font.create(mRS, mRes, "serif", Font.Style.ITALIC, fontSize);
-            Font.create(mRS, mRes, "serif", Font.Style.BOLD_ITALIC, fontSize);
-            Font.create(mRS, mRes, "mono", Font.Style.NORMAL, fontSize);
+            for (Font.Style style : Font.Style.values()) {
+                assertTrue(Font.create(mRS, mRes, "sans-serif", style, fontSize) != null);
+                assertTrue(Font.create(mRS, mRes, "serif", style, fontSize) != null);
+                assertTrue(Font.create(mRS, mRes, "mono", style, fontSize) != null);
+            }
         }
+    }
+
+    public void testCreateFromFile() {
+        String fontFile = "DroidSans.ttf";
+        String fontPath = Environment.getRootDirectory().getAbsolutePath();
+        fontPath += "/fonts/" + fontFile;
+        File fileDesc = new File(fontPath);
+        assertTrue(Font.createFromFile(mRS, mRes, fontPath, 8) != null);
+        assertTrue(Font.createFromFile(mRS, mRes, fileDesc, 8) != null);
+    }
+
+    public void testCreateFromAsset() {
+        assertTrue(Font.createFromAsset(mRS, mRes, "samplefont.ttf", 8) != null);
+    }
+
+    public void testFontStyle() {
+        assertEquals(Font.Style.NORMAL, Font.Style.valueOf("NORMAL"));
+        assertEquals(Font.Style.BOLD, Font.Style.valueOf("BOLD"));
+        assertEquals(Font.Style.ITALIC, Font.Style.valueOf("ITALIC"));
+        assertEquals(Font.Style.BOLD_ITALIC, Font.Style.valueOf("BOLD_ITALIC"));
+        // Make sure no new enums are added
+        assertEquals(4, Font.Style.values().length);
     }
 }
 
