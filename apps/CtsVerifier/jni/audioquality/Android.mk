@@ -20,7 +20,7 @@ LOCAL_CPP_EXTENSION := .cpp
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_PRELINK_MODULE := false
+
 
 LOCAL_MODULE    := libaudioquality
 LOCAL_SRC_FILES := Fft.cpp Window.cpp GlitchTest.cpp MeasureRms.cpp \

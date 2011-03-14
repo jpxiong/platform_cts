@@ -21,9 +21,6 @@ LOCAL_MODULE := libctspermission_jni
 # Don't include this package in any configuration by default.
 LOCAL_MODULE_TAGS := optional
 
-# This isn't part of the system, so don't prelink it.
-LOCAL_PRELINK_MODULE := false
-
 LOCAL_SRC_FILES := \
 		CtsPermissionsJniOnLoad.cpp \
 		android_permission_cts_FileUtils.cpp

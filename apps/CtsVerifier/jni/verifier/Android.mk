@@ -21,7 +21,7 @@ LOCAL_MODULE := libctsverifier_jni
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_PRELINK_MODULE := false
+
 
 LOCAL_SRC_FILES := \
 		CtsVerifierJniOnLoad.cpp \
