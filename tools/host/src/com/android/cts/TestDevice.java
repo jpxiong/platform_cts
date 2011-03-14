@@ -828,6 +828,15 @@ public class TestDevice implements DeviceObserver {
         public String getOpenGlEsVersion() {
             return mInfoMap.get(OPEN_GL_ES_VERSION);
         }
+
+        /**
+         * Get partitions.
+         *
+         * @return partitions or error message.
+         */
+        public String getPartitions() {
+            return mInfoMap.get(PARTITIONS);
+        }
     }
 
     /**
