@@ -78,10 +78,10 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
 
         // calculate pixel positions from dpi constants.
         final float density = getActivity().getResources().getDisplayMetrics().density;
-        mItemWidth = (int) (ITEM_WIDTH_DPI * density);
-        mItemHeight = (int) (ITEM_HEIGHT_DPI * density);
-        mPageWidth = (int) (PAGE_WIDTH_DPI * density);
-        mPageHeight = (int) (PAGE_HEIGHT_DPI * density);
+        mItemWidth = (int) (ITEM_WIDTH_DPI * density + 0.5f);
+        mItemHeight = (int) (ITEM_HEIGHT_DPI * density + 0.5f);
+        mPageWidth = (int) (PAGE_WIDTH_DPI * density + 0.5f);
+        mPageHeight = (int) (PAGE_HEIGHT_DPI * density + 0.5f);
 
         mScrollBottom = mItemHeight * ITEM_COUNT - mPageHeight;
         mScrollRight = mItemWidth - mPageWidth;
