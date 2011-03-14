@@ -18,18 +18,10 @@ package android.renderscript.cts;
 
 import com.android.cts.stub.R;
 
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.FieldPacker;
-import android.renderscript.Float3;
-import android.renderscript.Float4;
-import android.renderscript.Matrix4f;
-import android.renderscript.Program;
+import android.renderscript.*;
+import android.renderscript.Program.BaseProgramBuilder;
 import android.renderscript.Program.TextureType;
-import android.renderscript.ProgramFragment;
 import android.renderscript.ProgramFragment.Builder;
-import android.renderscript.ScriptC;
-import android.renderscript.Type;
 
 public class ProgramFragmentTest extends RSBaseGraphics {
 
@@ -86,32 +78,44 @@ public class ProgramFragmentTest extends RSBaseGraphics {
 
     ProgramFragment buildShader(Allocation[] textures, Allocation[] constInput, String shader) {
         ProgramFragment.Builder pfb = new ProgramFragment.Builder(mRS);
+        Program.BaseProgramBuilder bpb = pfb;
         if (textures != null) {
             for (int i = 0; i < textures.length; i++) {
                 Program.TextureType tType = Program.TextureType.TEXTURE_2D;
                 if (textures[i].getType().hasFaces()) {
                     tType = Program.TextureType.TEXTURE_CUBE;
                 }
-                pfb.addTexture(tType);
+                // Add textures through the base program builder
+                bpb.addTexture(tType);
+                bpb.getCurrentTextureIndex();
             }
         }
 
         if (constInput != null) {
             for (int i = 0; i < constInput.length; i++) {
-                pfb.addConstant(constInput[i].getType());
+                bpb.addConstant(constInput[i].getType());
+                bpb.getCurrentConstantIndex();
             }
         }
 
-        pfb.setShader(shader);
+        bpb.setShader(shader);
         ProgramFragment pf = pfb.create();
         if (constInput != null) {
             for (int i = 0; i < constInput.length; i++) {
                 pf.bindConstants(constInput[i], i);
+                // Test the base class path too
+                Program p = pf;
+                p.bindConstants(constInput[i], i);
             }
         }
         if (textures != null) {
             for (int i = 0; i < textures.length; i++) {
                 pf.bindTexture(textures[i], i);
+                pf.bindSampler(Sampler.CLAMP_NEAREST(mRS), i);
+                // Test the base class path too
+                Program p = pf;
+                p.bindTexture(textures[i], i);
+                p.bindSampler(Sampler.CLAMP_NEAREST(mRS), i);
             }
         }
         return pf;
@@ -191,6 +195,20 @@ public class ProgramFragmentTest extends RSBaseGraphics {
 
     public void testProgramFragmentCreation() {
         testProgramFragmentBuilderHelper(true);
+    }
+
+    public void testProgramTextureType() {
+        assertEquals(Program.TextureType.TEXTURE_2D,
+                     Program.TextureType.valueOf("TEXTURE_2D"));
+        assertEquals(Program.TextureType.TEXTURE_CUBE,
+                     Program.TextureType.valueOf("TEXTURE_CUBE"));
+        // Make sure no new enums are added
+        assertEquals(2, Program.TextureType.values().length);
+
+        ProgramFragment.Builder pfb = new ProgramFragment.Builder(mRS);
+        for (Program.TextureType tt : Program.TextureType.values()) {
+            pfb.addTexture(tt);
+        }
     }
 }
 

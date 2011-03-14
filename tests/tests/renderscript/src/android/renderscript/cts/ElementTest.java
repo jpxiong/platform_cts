@@ -86,6 +86,7 @@ public class ElementTest extends RSBaseCompute {
         assertTrue(Element.MATRIX_2X2(mRS) != null);
         assertTrue(Element.MATRIX_3X3(mRS) != null);
         assertTrue(Element.MATRIX_4X4(mRS) != null);
+        assertTrue(Element.MATRIX4X4(mRS) != null);
         assertTrue(Element.MESH(mRS) != null);
         assertTrue(Element.PROGRAM_FRAGMENT(mRS) != null);
         assertTrue(Element.PROGRAM_RASTER(mRS) != null);
@@ -126,6 +127,7 @@ public class ElementTest extends RSBaseCompute {
             eb.add(Element.MATRIX_2X2(mRS), "MATRIX_2X2", arraySize);
             eb.add(Element.MATRIX_3X3(mRS), "MATRIX_3X3", arraySize);
             eb.add(Element.MATRIX_4X4(mRS), "MATRIX_4X4", arraySize);
+            eb.add(Element.MATRIX4X4(mRS), "MATRIX4X4", arraySize);
             eb.add(Element.MESH(mRS), "MESH", arraySize);
             eb.add(Element.PROGRAM_FRAGMENT(mRS), "PROGRAM_FRAGMENT", arraySize);
             eb.add(Element.PROGRAM_RASTER(mRS), "PROGRAM_RASTER", arraySize);
@@ -165,6 +167,7 @@ public class ElementTest extends RSBaseCompute {
         assertFalse(Element.MATRIX_2X2(mRS).isComplex());
         assertFalse(Element.MATRIX_3X3(mRS).isComplex());
         assertFalse(Element.MATRIX_4X4(mRS).isComplex());
+        assertFalse(Element.MATRIX4X4(mRS).isComplex());
         assertFalse(Element.MESH(mRS).isComplex());
         assertFalse(Element.PROGRAM_FRAGMENT(mRS).isComplex());
         assertFalse(Element.PROGRAM_RASTER(mRS).isComplex());
@@ -193,6 +196,64 @@ public class ElementTest extends RSBaseCompute {
         eb.add(e1, "e1");
         eb.add(e2, "e2");
         assertTrue(eb.create().isComplex());
+    }
+
+    public void testDataType() {
+        assertEquals(DataType.FLOAT_32, DataType.valueOf("FLOAT_32"));
+        assertEquals(DataType.FLOAT_64, DataType.valueOf("FLOAT_64"));
+        assertEquals(DataType.SIGNED_8, DataType.valueOf("SIGNED_8"));
+        assertEquals(DataType.SIGNED_16, DataType.valueOf("SIGNED_16"));
+        assertEquals(DataType.SIGNED_32, DataType.valueOf("SIGNED_32"));
+        assertEquals(DataType.SIGNED_64, DataType.valueOf("SIGNED_64"));
+        assertEquals(DataType.UNSIGNED_8, DataType.valueOf("UNSIGNED_8"));
+        assertEquals(DataType.UNSIGNED_16, DataType.valueOf("UNSIGNED_16"));
+        assertEquals(DataType.UNSIGNED_32, DataType.valueOf("UNSIGNED_32"));
+        assertEquals(DataType.UNSIGNED_64, DataType.valueOf("UNSIGNED_64"));
+
+        assertEquals(DataType.BOOLEAN, DataType.valueOf("BOOLEAN"));
+
+        assertEquals(DataType.UNSIGNED_5_6_5, DataType.valueOf("UNSIGNED_5_6_5"));
+        assertEquals(DataType.UNSIGNED_5_5_5_1, DataType.valueOf("UNSIGNED_5_5_5_1"));
+        assertEquals(DataType.UNSIGNED_4_4_4_4, DataType.valueOf("UNSIGNED_4_4_4_4"));
+
+        assertEquals(DataType.MATRIX_4X4, DataType.valueOf("MATRIX_4X4"));
+        assertEquals(DataType.MATRIX_3X3, DataType.valueOf("MATRIX_3X3"));
+        assertEquals(DataType.MATRIX_2X2, DataType.valueOf("MATRIX_2X2"));
+
+        assertEquals(DataType.RS_ELEMENT, DataType.valueOf("RS_ELEMENT"));
+        assertEquals(DataType.RS_TYPE, DataType.valueOf("RS_TYPE"));
+        assertEquals(DataType.RS_ALLOCATION, DataType.valueOf("RS_ALLOCATION"));
+        assertEquals(DataType.RS_SAMPLER, DataType.valueOf("RS_SAMPLER"));
+        assertEquals(DataType.RS_SCRIPT, DataType.valueOf("RS_SCRIPT"));
+        assertEquals(DataType.RS_MESH, DataType.valueOf("RS_MESH"));
+        assertEquals(DataType.RS_PROGRAM_FRAGMENT, DataType.valueOf("RS_PROGRAM_FRAGMENT"));
+        assertEquals(DataType.RS_PROGRAM_VERTEX, DataType.valueOf("RS_PROGRAM_VERTEX"));
+        assertEquals(DataType.RS_PROGRAM_RASTER, DataType.valueOf("RS_PROGRAM_RASTER"));
+        assertEquals(DataType.RS_PROGRAM_STORE, DataType.valueOf("RS_PROGRAM_STORE"));
+        // Make sure no new enums are added
+        assertEquals(27, DataType.values().length);
+
+        for (DataType dt : DataType.values()) {
+            Element.createVector(mRS, dt, 2);
+        }
+    }
+
+    public void testDataKind() {
+        assertEquals(DataKind.USER, DataKind.valueOf("USER"));
+
+        assertEquals(DataKind.PIXEL_L, DataKind.valueOf("PIXEL_L"));
+        assertEquals(DataKind.PIXEL_A, DataKind.valueOf("PIXEL_A"));
+        assertEquals(DataKind.PIXEL_LA, DataKind.valueOf("PIXEL_LA"));
+        assertEquals(DataKind.PIXEL_RGB, DataKind.valueOf("PIXEL_RGB"));
+        assertEquals(DataKind.PIXEL_RGBA, DataKind.valueOf("PIXEL_RGBA"));
+        // Make sure no new enums are added
+        assertEquals(6, DataKind.values().length);
+
+        for (DataKind dk : DataKind.values()) {
+            if (dk != DataKind.USER) {
+                Element.createPixel(mRS, DataType.UNSIGNED_8, dk);
+            }
+        }
     }
 }
 

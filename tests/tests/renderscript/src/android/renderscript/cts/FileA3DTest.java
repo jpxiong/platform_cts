@@ -49,6 +49,14 @@ public class FileA3DTest extends RSBaseGraphics {
         FileA3D.IndexEntry entry = model.getIndexEntry(0);
         assertTrue(entry != null);
         assertTrue(entry.getEntryType() == FileA3D.EntryType.MESH);
+        boolean isOneOfEntries = false;
+        for(FileA3D.EntryType et : FileA3D.EntryType.values()) {
+            if (et == entry.getEntryType()) {
+                isOneOfEntries = true;
+                break;
+            }
+        }
+        assertTrue(isOneOfEntries);
     }
 
     public void testIndexEntryGetMesh() {
@@ -77,6 +85,13 @@ public class FileA3DTest extends RSBaseGraphics {
         FileA3D.IndexEntry entry = model.getIndexEntry(0);
         assertTrue(entry != null);
         assertTrue(entry.getObject() != null);
+    }
+
+    public void testFileA3DEntryType() {
+        assertEquals(FileA3D.EntryType.UNKNOWN, FileA3D.EntryType.valueOf("UNKNOWN"));
+        assertEquals(FileA3D.EntryType.MESH, FileA3D.EntryType.valueOf("MESH"));
+        // Make sure no new enums are added
+        assertEquals(2, FileA3D.EntryType.values().length);
     }
 }
 

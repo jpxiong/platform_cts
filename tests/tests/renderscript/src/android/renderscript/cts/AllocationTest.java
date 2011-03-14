@@ -19,10 +19,12 @@ package android.renderscript.cts;
 import com.android.cts.stub.R;
 
 import android.renderscript.Allocation;
+import android.renderscript.AllocationAdapter;
 import android.renderscript.Allocation.MipmapControl;
 import android.renderscript.Element;
 import android.renderscript.Type;
 import android.renderscript.Type.Builder;
+import android.renderscript.Type.CubemapFace;
 
 public class AllocationTest extends RSBaseGraphics {
 
@@ -175,6 +177,36 @@ public class AllocationTest extends RSBaseGraphics {
          createSizedHelper(Element.SAMPLER(mRS));
          createSizedHelper(Element.SCRIPT(mRS));
          createSizedHelper(Element.TYPE(mRS));
+    }
+
+    public void testAllocationMipmapControl() {
+        assertEquals(MipmapControl.MIPMAP_NONE,
+                     MipmapControl.valueOf("MIPMAP_NONE"));
+        assertEquals(MipmapControl.MIPMAP_FULL,
+                     MipmapControl.valueOf("MIPMAP_FULL"));
+        assertEquals(MipmapControl.MIPMAP_ON_SYNC_TO_TEXTURE,
+                     MipmapControl.valueOf("MIPMAP_ON_SYNC_TO_TEXTURE"));
+        // Make sure no new enums are added
+        assertEquals(3, Allocation.MipmapControl.values().length);
+
+        for (Allocation.MipmapControl mc : Allocation.MipmapControl.values()) {
+            Type.Builder b = new Type.Builder(mRS, Element.U8(mRS));
+            b.setX(8).setY(8);
+            Allocation.createTyped(mRS, b.create(), mc,
+                                   Allocation.USAGE_GRAPHICS_TEXTURE);
+        }
+    }
+
+    public void testCubemapFaces() {
+        Type.Builder b = new Type.Builder(mRS, Element.U8(mRS));
+        b.setX(8).setY(8).setFaces(true);
+        Allocation cubemap = Allocation.createTyped(mRS, b.create(),
+                                                    MipmapControl.MIPMAP_NONE,
+                                                    Allocation.USAGE_SCRIPT);
+        AllocationAdapter adapter = AllocationAdapter.create2D(mRS, cubemap);
+        for (Type.CubemapFace cf : Type.CubemapFace.values()) {
+            adapter.setFace(cf);
+        }
     }
 }
 
