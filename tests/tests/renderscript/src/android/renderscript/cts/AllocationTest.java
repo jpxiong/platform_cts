@@ -18,10 +18,12 @@ package android.renderscript.cts;
 
 import com.android.cts.stub.R;
 
+import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.AllocationAdapter;
 import android.renderscript.Allocation.MipmapControl;
 import android.renderscript.Element;
+import android.renderscript.RSIllegalArgumentException;
 import android.renderscript.Type;
 import android.renderscript.Type.Builder;
 import android.renderscript.Type.CubemapFace;
@@ -102,7 +104,9 @@ public class AllocationTest extends RSBaseGraphics {
 
     void createSizedHelper(Element e) {
         for (int i = 1; i <= 8; i ++) {
-            Allocation.createSized(mRS, e, i);
+            Allocation A = Allocation.createSized(mRS, e, i);
+            assertEquals(A.getType().getElement(), e);
+            assertEquals(A.getType().getX(), i);
         }
     }
 
@@ -179,6 +183,74 @@ public class AllocationTest extends RSBaseGraphics {
          createSizedHelper(Element.TYPE(mRS));
     }
 
+    static int bDimX = 48;
+    static int bDimY = 8;
+
+    void helperCreateFromBitmap(Bitmap B,
+                                Allocation.MipmapControl mc) {
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                for (int k = 0; k < 1; k++) {
+                    for (int l = 0; l < 1; l++) {
+                        int u = 0;
+                        u |= (i * Allocation.USAGE_SCRIPT);
+                        u |= (j * Allocation.USAGE_GRAPHICS_TEXTURE);
+                        u |= (k * Allocation.USAGE_GRAPHICS_VERTEX);
+                        u |= (l * Allocation.USAGE_GRAPHICS_CONSTANTS);
+                        assertTrue(null !=
+                            Allocation.createFromBitmap(mRS, B, mc, u));
+                        assertTrue(null !=
+                            Allocation.createCubemapFromBitmap(mRS, B, mc, u));
+                    }
+                }
+            }
+        }
+    }
+
+    public void testCreateFromBitmap() {
+        Bitmap B = Bitmap.createBitmap(bDimX, bDimY, Bitmap.Config.ARGB_8888);
+        Allocation.createFromBitmap(mRS, B);
+        Allocation.createCubemapFromBitmap(mRS, B);
+        for (Allocation.MipmapControl mc : Allocation.MipmapControl.values()) {
+            helperCreateFromBitmap(B, mc);
+        }
+
+        try {
+            int invalidUsage = 0x0010;
+            Allocation.createFromBitmap(mRS, B,
+                Allocation.MipmapControl.MIPMAP_NONE, invalidUsage);
+            fail("should throw RSIllegalArgumentException.");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            // width % 6 != 0
+            Bitmap badB = Bitmap.createBitmap(47, 8, Bitmap.Config.ARGB_8888);
+            Allocation.createCubemapFromBitmap(mRS, badB,
+                Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+            fail("should throw RSIllegalArgumentException.");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            // width / 6 != height
+            Bitmap badB = Bitmap.createBitmap(48, 4, Bitmap.Config.ARGB_8888);
+            Allocation.createCubemapFromBitmap(mRS, badB,
+                Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+            fail("should throw RSIllegalArgumentException.");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            // height not power of 2
+            Bitmap badB = Bitmap.createBitmap(36, 6, Bitmap.Config.ARGB_8888);
+            Allocation.createCubemapFromBitmap(mRS, badB,
+                Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+            fail("should throw RSIllegalArgumentException.");
+        } catch (RSIllegalArgumentException e) {
+        }
+    }
+
     public void testAllocationMipmapControl() {
         assertEquals(MipmapControl.MIPMAP_NONE,
                      MipmapControl.valueOf("MIPMAP_NONE"));
@@ -207,6 +279,138 @@ public class AllocationTest extends RSBaseGraphics {
         for (Type.CubemapFace cf : Type.CubemapFace.values()) {
             adapter.setFace(cf);
         }
+    }
+
+    /*
+     * Test all copy from/to routines for byte/short/int/float
+     */
+
+    void helperFloatCopy(int nElems) {
+        Allocation A = Allocation.createSized(mRS, Element.F32(mRS), nElems);
+
+        float src[], dst[];
+        src = new float[nElems];
+        dst = new float[nElems];
+        for (int i = 0; i < nElems; i++) {
+            src[i] = (float)i;
+            dst[i] = -1.0f;
+        }
+
+        A.copyFrom(src);
+        A.copyTo(dst);
+
+        for (int i = 0; i < nElems; i++) {
+            assertEquals(dst[i], src[i]);
+        }
+    }
+
+    void helperByteCopy(int nElems) {
+        Allocation A = Allocation.createSized(mRS, Element.I8(mRS), nElems);
+
+        byte src[], dst[];
+        src = new byte[nElems];
+        dst = new byte[nElems];
+        for (int i = 0; i < nElems; i++) {
+            src[i] = (byte)i;
+            dst[i] = -1;
+        }
+
+        A.copyFrom(src);
+        A.copyTo(dst);
+
+        for (int i = 0; i < nElems; i++) {
+            assertEquals(dst[i], src[i]);
+        }
+    }
+
+    void helperShortCopy(int nElems) {
+        Allocation A = Allocation.createSized(mRS, Element.I16(mRS), nElems);
+
+        short src[], dst[];
+        src = new short[nElems];
+        dst = new short[nElems];
+        for (int i = 0; i < nElems; i++) {
+            src[i] = (short)i;
+            dst[i] = -1;
+        }
+
+        A.copyFrom(src);
+        A.copyTo(dst);
+
+        for (int i = 0; i < nElems; i++) {
+            assertEquals(dst[i], src[i]);
+        }
+    }
+
+    void helperIntCopy(int nElems) {
+        Allocation A = Allocation.createSized(mRS, Element.I32(mRS), nElems);
+
+        int src[], dst[];
+        src = new int[nElems];
+        dst = new int[nElems];
+        for (int i = 0; i < nElems; i++) {
+            src[i] = i;
+            dst[i] = -1;
+        }
+
+        A.copyFrom(src);
+        A.copyTo(dst);
+
+        for (int i = 0; i < nElems; i++) {
+            assertEquals(dst[i], src[i]);
+        }
+    }
+
+    void helperBaseObjCopy(int nElems) {
+        Allocation A =
+            Allocation.createSized(mRS, Element.ELEMENT(mRS), nElems);
+        Element E[] = new Element[nElems];
+        for (int i = 0; i < nElems; i++) {
+            E[i] = Element.BOOLEAN(mRS);
+        }
+
+        A.copyFrom(E);
+    }
+
+    void helperBitmapCopy(int x, int y) {
+        Bitmap bSrc = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+        Bitmap bDst = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+
+        for (int j = 0; j < y; j++) {
+            for (int i = 0; i < x; i++) {
+                bSrc.setPixel(i, j, 9);
+                bDst.setPixel(i, j, 0);
+            }
+        }
+
+        Type.Builder typeBuilder =
+            new Type.Builder(mRS, Element.RGBA_8888(mRS));
+        typeBuilder.setMipmaps(false);
+        typeBuilder.setFaces(false);
+        typeBuilder.setX(x).setY(y);
+        Allocation A = Allocation.createTyped(mRS, typeBuilder.create());
+
+        A.copyFrom(bSrc);
+        A.copyTo(bDst);
+
+        for (int j = 0; j < y; j++) {
+            for (int i = 0; i < x; i++) {
+                assertEquals(bSrc.getPixel(i, j), bDst.getPixel(i, j));
+            }
+        }
+    }
+
+    static int elemsToTest = 20;
+
+    public void testCopyOperations() {
+        for (int s = 8; s <= elemsToTest; s += 2) {
+            helperFloatCopy(s);
+            helperByteCopy(s);
+            helperShortCopy(s);
+            helperIntCopy(s);
+            helperBaseObjCopy(s);
+        }
+        helperBitmapCopy(bDimX, bDimY);
     }
 }
 
