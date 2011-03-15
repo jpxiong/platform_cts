@@ -408,10 +408,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             parameters.setPreviewSize(size.width, size.height);
             mCamera.setParameters(parameters);
             assertEquals(size, mCamera.getParameters().getPreviewSize());
-            mCamera.startPreview();
-            waitForPreviewDone();
+            checkPreviewCallback();
             assertTrue(mPreviewCallbackResult);
-            mCamera.stopPreview();
             try {
                 // Wait for a while to throw away the remaining preview frames.
                 Thread.sleep(1000);
