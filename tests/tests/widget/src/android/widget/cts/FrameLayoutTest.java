@@ -379,8 +379,8 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         int topDelta = rect.top - container.getTop();
         int bottomDelta = container.getBottom() - rect.bottom;
 
-        assertTrue(Math.abs(leftDelta - rightDelta) < 1);
-        assertTrue(Math.abs(topDelta - bottomDelta) < 1);
+        assertTrue(Math.abs(leftDelta - rightDelta) <= 1);
+        assertTrue(Math.abs(topDelta - bottomDelta) <= 1);
     }
 
     private AttributeSet getAttributeSet() throws XmlPullParserException, IOException {
