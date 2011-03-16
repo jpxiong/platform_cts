@@ -29,6 +29,8 @@ import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.util.StringBuilderPrinter;
 
+import java.text.DecimalFormat;
+
 @TestTargetClass(Location.class)
 public class LocationTest extends AndroidTestCase {
     private static final float DELTA = 0.1f;
@@ -141,22 +143,23 @@ public class LocationTest extends AndroidTestCase {
         args = {double.class, int.class}
     )
     public void testConvert_CoordinateToRepresentation() {
+        DecimalFormat df = new DecimalFormat("###.#####");
         String result;
 
         result = Location.convert(-80.0, Location.FORMAT_DEGREES);
-        assertEquals("-80", result);
+        assertEquals("-" + df.format(80.0), result);
 
         result = Location.convert(-80.085, Location.FORMAT_MINUTES);
-        assertEquals("-80:5.1", result);
+        assertEquals("-80:" + df.format(5.1), result);
 
         result = Location.convert(-80, Location.FORMAT_MINUTES);
-        assertEquals("-80:0", result);
+        assertEquals("-80:" + df.format(0), result);
 
         result = Location.convert(-80.075, Location.FORMAT_MINUTES);
-        assertEquals("-80:4.5", result);
+        assertEquals("-80:" + df.format(4.5), result);
 
         result = Location.convert(-80.075, Location.FORMAT_DEGREES);
-        assertEquals("-80.075", result);
+        assertEquals("-" + df.format(80.075), result);
 
         result = Location.convert(-80.075, Location.FORMAT_SECONDS);
         assertEquals("-80:4:30", result);
