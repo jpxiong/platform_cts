@@ -201,13 +201,12 @@ public class DRMTest extends AndroidTestCase {
         }
 
         @Override
-        public void onEvent(DrmManagerClient client, DrmEvent event,
-                    HashMap<String, Object> attributes) {
+        public void onEvent(DrmManagerClient client, DrmEvent event) {
             switch (event.getType()) {
             case DrmEvent.TYPE_DRM_INFO_PROCESSED:
                 Log.d(TAG, "processDrmInfo() completed");
                 DrmInfoStatus infoStatus
-                        = (DrmInfoStatus) attributes.get(DrmEvent.DRM_INFO_STATUS_OBJECT);
+                        = (DrmInfoStatus) event.getAttribute(DrmEvent.DRM_INFO_STATUS_OBJECT);
                 switch (infoStatus.infoType) {
                 case DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO:
                     mDrmRights = new DrmRights(infoStatus.data, infoStatus.mimeType);
