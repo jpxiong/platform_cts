@@ -394,8 +394,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -453,8 +453,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -519,8 +519,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -586,8 +586,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -661,8 +661,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -728,8 +728,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -790,8 +790,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
 
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -848,8 +848,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -964,8 +964,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         int outputSR = AudioTrack.getNativeOutputSampleRate(TEST_STREAM_TYPE);
         // -------- test --------------
         track.write(data, OFFSET_DEFAULT, data.length);
@@ -1028,8 +1028,8 @@ public class AudioTrackTest extends AndroidTestCase {
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize / 2];
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
         // -------- test --------------
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
