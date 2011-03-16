@@ -599,4 +599,71 @@ public class MotionEventTest extends AndroidTestCase {
             android.util.Log.i("TEST", msg.toString());
         }
     }
+
+    public void testPointerCoordsDefaultConstructor() {
+        PointerCoords coords = new PointerCoords();
+
+        assertEquals(0f, coords.x);
+        assertEquals(0f, coords.y);
+        assertEquals(0f, coords.pressure);
+        assertEquals(0f, coords.size);
+        assertEquals(0f, coords.touchMajor);
+        assertEquals(0f, coords.touchMinor);
+        assertEquals(0f, coords.toolMajor);
+        assertEquals(0f, coords.toolMinor);
+        assertEquals(0f, coords.orientation);
+    }
+
+    public void testPointerCoordsCopyConstructor() {
+        PointerCoords coords = new PointerCoords();
+        coords.x = 1;
+        coords.y = 2;
+        coords.pressure = 3;
+        coords.size = 4;
+        coords.touchMajor = 5;
+        coords.touchMinor = 6;
+        coords.toolMajor = 7;
+        coords.toolMinor = 8;
+        coords.orientation = 9;
+        coords.setAxisValue(MotionEvent.AXIS_GENERIC_1, 10);
+
+        PointerCoords copy = new PointerCoords(coords);
+        assertEquals(1f, copy.x);
+        assertEquals(2f, copy.y);
+        assertEquals(3f, copy.pressure);
+        assertEquals(4f, copy.size);
+        assertEquals(5f, copy.touchMajor);
+        assertEquals(6f, copy.touchMinor);
+        assertEquals(7f, copy.toolMajor);
+        assertEquals(8f, copy.toolMinor);
+        assertEquals(9f, copy.orientation);
+        assertEquals(10f, coords.getAxisValue(MotionEvent.AXIS_GENERIC_1));
+    }
+
+    public void testPointerCoordsCopyFrom() {
+        PointerCoords coords = new PointerCoords();
+        coords.x = 1;
+        coords.y = 2;
+        coords.pressure = 3;
+        coords.size = 4;
+        coords.touchMajor = 5;
+        coords.touchMinor = 6;
+        coords.toolMajor = 7;
+        coords.toolMinor = 8;
+        coords.orientation = 9;
+        coords.setAxisValue(MotionEvent.AXIS_GENERIC_1, 10);
+
+        PointerCoords copy = new PointerCoords();
+        copy.copyFrom(coords);
+        assertEquals(1f, copy.x);
+        assertEquals(2f, copy.y);
+        assertEquals(3f, copy.pressure);
+        assertEquals(4f, copy.size);
+        assertEquals(5f, copy.touchMajor);
+        assertEquals(6f, copy.touchMinor);
+        assertEquals(7f, copy.toolMajor);
+        assertEquals(8f, copy.toolMinor);
+        assertEquals(9f, copy.orientation);
+        assertEquals(10f, coords.getAxisValue(MotionEvent.AXIS_GENERIC_1));
+    }
 }
