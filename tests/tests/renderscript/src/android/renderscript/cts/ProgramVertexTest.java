@@ -20,14 +20,8 @@ import com.android.cts.stub.R;
 
 import android.renderscript.Allocation;
 import android.renderscript.Element;
-import android.renderscript.FieldPacker;
-import android.renderscript.Float3;
-import android.renderscript.Float4;
-import android.renderscript.Matrix4f;
 import android.renderscript.Program;
 import android.renderscript.ProgramVertex;
-import android.renderscript.ProgramVertex.Builder;
-import android.renderscript.ScriptC;
 
 public class ProgramVertexTest extends RSBaseGraphics {
 

@@ -16,8 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.ProgramRaster;
 import android.renderscript.ProgramRaster.Builder;
 import android.renderscript.ProgramRaster.CullMode;

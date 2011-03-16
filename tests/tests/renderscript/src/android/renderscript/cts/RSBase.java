@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.test.AndroidTestCase;
-import com.android.cts.stub.R;
 
 /**
  * Base RenderScript test class. This class provides a message handler and a

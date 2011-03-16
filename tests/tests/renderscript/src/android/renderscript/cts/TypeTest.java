@@ -16,14 +16,8 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.Element;
-import android.renderscript.Element.DataKind;
-import android.renderscript.Element.DataType;
 import android.renderscript.Type;
-import android.renderscript.Type.Builder;
-import android.renderscript.Type.CubemapFace;
 
 public class TypeTest extends RSBaseCompute {
 

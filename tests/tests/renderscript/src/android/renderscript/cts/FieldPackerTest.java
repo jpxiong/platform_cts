@@ -16,9 +16,25 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
-import android.renderscript.*;
+import android.renderscript.Byte2;
+import android.renderscript.Byte3;
+import android.renderscript.Byte4;
+import android.renderscript.FieldPacker;
+import android.renderscript.Float2;
+import android.renderscript.Float3;
+import android.renderscript.Float4;
+import android.renderscript.Int2;
+import android.renderscript.Int3;
+import android.renderscript.Int4;
+import android.renderscript.Long2;
+import android.renderscript.Long3;
+import android.renderscript.Long4;
+import android.renderscript.Matrix2f;
+import android.renderscript.Matrix3f;
+import android.renderscript.Matrix4f;
+import android.renderscript.Short2;
+import android.renderscript.Short3;
+import android.renderscript.Short4;
 
 public class FieldPackerTest extends RSBaseCompute {
 

@@ -16,10 +16,7 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.Sampler;
-import android.renderscript.Sampler.Builder;
 import android.renderscript.Sampler.Value;
 
 public class SamplerTest extends RSBaseGraphics {

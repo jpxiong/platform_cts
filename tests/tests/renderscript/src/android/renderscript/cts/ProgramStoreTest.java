@@ -16,10 +16,7 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.ProgramStore;
-import android.renderscript.ProgramStore.Builder;
 import android.renderscript.ProgramStore.DepthFunc;
 import android.renderscript.ProgramStore.BlendSrcFunc;
 import android.renderscript.ProgramStore.BlendDstFunc;

@@ -16,14 +16,8 @@
 
 package android.renderscript.cts;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScript.RSMessageHandler;
 import android.renderscript.RenderScriptGL;
 import android.renderscript.RenderScriptGL.SurfaceConfig;
-import android.test.AndroidTestCase;
-import com.android.cts.stub.R;
 
 /**
  * Base RenderScript test class. This class provides a message handler and a

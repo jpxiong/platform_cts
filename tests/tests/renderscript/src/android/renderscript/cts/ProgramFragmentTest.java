@@ -18,10 +18,12 @@ package android.renderscript.cts;
 
 import com.android.cts.stub.R;
 
-import android.renderscript.*;
-import android.renderscript.Program.BaseProgramBuilder;
-import android.renderscript.Program.TextureType;
-import android.renderscript.ProgramFragment.Builder;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.Program;
+import android.renderscript.ProgramFragment;
+import android.renderscript.Sampler;
+import android.renderscript.Type;
 
 public class ProgramFragmentTest extends RSBaseGraphics {
 
