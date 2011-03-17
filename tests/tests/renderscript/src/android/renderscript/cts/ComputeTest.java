@@ -16,11 +16,6 @@
 
 package android.renderscript.cts;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.renderscript.RenderScript;
-import android.renderscript.RenderScript.RSMessageHandler;
-
 import android.renderscript.Allocation;
 
 import android.renderscript.Byte2;
@@ -43,7 +38,6 @@ import android.renderscript.Short2;
 import android.renderscript.Short3;
 import android.renderscript.Short4;
 
-import android.test.AndroidTestCase;
 import com.android.cts.stub.R;
 
 public class ComputeTest extends RSBaseCompute {

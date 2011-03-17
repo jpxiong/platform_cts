@@ -16,8 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.Element;
 import android.renderscript.Element.DataType;
 import android.renderscript.Element.DataKind;

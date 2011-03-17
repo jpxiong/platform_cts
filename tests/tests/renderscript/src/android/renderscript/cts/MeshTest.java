@@ -16,10 +16,7 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.Allocation;
-import android.renderscript.Allocation.MipmapControl;
 import android.renderscript.Element;
 import android.renderscript.Type;
 import android.renderscript.Mesh;
@@ -27,8 +24,6 @@ import android.renderscript.Mesh.Primitive;
 import android.renderscript.Mesh.AllocationBuilder;
 import android.renderscript.Mesh.Builder;
 import android.renderscript.Mesh.TriangleMeshBuilder;
-
-import android.util.Log;
 
 public class MeshTest extends RSBaseGraphics {
 

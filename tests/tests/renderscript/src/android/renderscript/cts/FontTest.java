@@ -18,20 +18,46 @@ package android.renderscript.cts;
 
 import java.io.File;
 
-import com.android.cts.stub.R;
-
 import android.os.Environment;
 import android.renderscript.Font;
 import android.renderscript.Font.Style;
+import android.renderscript.RSIllegalArgumentException;
 
 public class FontTest extends RSBaseGraphics {
 
     public void testCreate() {
         for (int fontSize = 8; fontSize <= 12; fontSize += 2) {
             for (Font.Style style : Font.Style.values()) {
-                assertTrue(Font.create(mRS, mRes, "sans-serif", style, fontSize) != null);
-                assertTrue(Font.create(mRS, mRes, "serif", style, fontSize) != null);
-                assertTrue(Font.create(mRS, mRes, "mono", style, fontSize) != null);
+                Font F = null;
+                F = Font.create(mRS, mRes, "sans-serif", style, fontSize);
+                assertTrue(F != null);
+                F.setName("sans-serif");
+                try {
+                    F.setName("sans-serif");
+                    fail("set name twice for a font");
+                } catch (RSIllegalArgumentException e) {
+                }
+                F.destroy();
+
+                F = Font.create(mRS, mRes, "serif", style, fontSize);
+                assertTrue(F != null);
+                try {
+                    F.setName("");
+                    fail("set empty name for a font");
+                } catch (RSIllegalArgumentException e) {
+                }
+                F.setName("serif");
+                F.destroy();
+
+                F = Font.create(mRS, mRes, "mono", style, fontSize);
+                assertTrue(F != null);
+                try {
+                    F.setName(null);
+                    fail("set name as null string reference for a font");
+                } catch (RSIllegalArgumentException e) {
+                }
+                F.setName("mono");
+                F.destroy();
             }
         }
     }
@@ -58,5 +84,4 @@ public class FontTest extends RSBaseGraphics {
         assertEquals(4, Font.Style.values().length);
     }
 }
-
 
