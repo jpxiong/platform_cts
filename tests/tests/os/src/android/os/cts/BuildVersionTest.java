@@ -32,7 +32,7 @@ public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
     private static final Set<String> EXPECTED_RELEASES =
-        new HashSet<String>(Arrays.asList("3.0"));
+        new HashSet<String>(Arrays.asList("3.0", "3.0.1"));
     private static final int EXPECTED_SDK = 11;
 
     public void testReleaseVersion() {
