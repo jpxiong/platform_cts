@@ -936,6 +936,11 @@
                     android:resource="@xml/preferences_from_intent" />
         </activity>
 
+        <activity android:name="android.app.cts.ActivityManagerMemoryClassLaunchActivity" />
+
+        <activity android:name="android.app.cts.ActivityManagerMemoryClassTestActivity"
+                android:process=":memoryclass" />
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
