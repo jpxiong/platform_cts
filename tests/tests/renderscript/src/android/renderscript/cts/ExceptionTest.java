@@ -19,6 +19,7 @@ package android.renderscript.cts;
 import android.renderscript.RSIllegalArgumentException;
 import android.renderscript.RSInvalidStateException;
 import android.renderscript.RSRuntimeException;
+import android.renderscript.RSDriverException;
 
 import android.test.AndroidTestCase;
 
@@ -40,6 +41,12 @@ public class ExceptionTest extends AndroidTestCase {
             throw new RSRuntimeException("RE");
         } catch (RSRuntimeException e) {
             assertEquals(e.getMessage(), "RE");
+        }
+
+        try {
+            throw new RSDriverException("DE");
+        } catch (RSDriverException e) {
+            assertEquals(e.getMessage(), "DE");
         }
     }
 }

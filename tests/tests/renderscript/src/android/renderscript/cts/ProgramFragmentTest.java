@@ -166,12 +166,14 @@ public class ProgramFragmentTest extends RSBaseGraphics {
         pf = buildShader(null, constInput, simpleUni);
         if (testBind) {
             mScript.invoke_testProgramFragment(pf);
+            mRS.bindProgramFragment(pf);
         }
 
         constInput[0] = mConstComplex;
         pf = buildShader(null, constInput, multiUni);
         if (testBind) {
             mScript.invoke_testProgramFragment(pf);
+            mRS.bindProgramFragment(pf);
         }
 
         Allocation[] textures = new Allocation[2];
@@ -180,6 +182,7 @@ public class ProgramFragmentTest extends RSBaseGraphics {
         pf = buildShader(textures, constInput, simpleUniTex);
         if (testBind) {
             mScript.invoke_testProgramFragment(pf);
+            mRS.bindProgramFragment(pf);
         }
 
         constInput = new Allocation[2];
@@ -188,6 +191,7 @@ public class ProgramFragmentTest extends RSBaseGraphics {
         pf = buildShader(null, constInput, multiUni);
         if (testBind) {
             mScript.invoke_testProgramFragment(pf);
+            mRS.bindProgramFragment(pf);
         }
     }
 

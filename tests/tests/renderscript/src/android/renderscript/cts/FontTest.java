@@ -17,6 +17,7 @@
 package android.renderscript.cts;
 
 import java.io.File;
+import com.android.cts.stub.R;
 
 import android.os.Environment;
 import android.renderscript.Font;
@@ -82,6 +83,10 @@ public class FontTest extends RSBaseGraphics {
         assertEquals(Font.Style.BOLD_ITALIC, Font.Style.valueOf("BOLD_ITALIC"));
         // Make sure no new enums are added
         assertEquals(4, Font.Style.values().length);
+    }
+
+    public void testCreateFromResource() {
+        assertTrue(Font.createFromResource(mRS, mRes, R.raw.samplefont, 8) != null);
     }
 }
 

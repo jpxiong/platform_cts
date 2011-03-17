@@ -36,7 +36,9 @@ public class ProgramStoreTest extends RSBaseGraphics {
                             boolean isDither = (dither == 1);
                             pb.setDitherEnabled(isDither);
                             pb.setColorMaskEnabled(isR, isG, isB, isA);
-                            pb.create();
+                            ProgramStore ps = pb.create();
+                            assertTrue(ps != null);
+                            mRS.bindProgramStore(ps);
                         }
                     }
                 }
