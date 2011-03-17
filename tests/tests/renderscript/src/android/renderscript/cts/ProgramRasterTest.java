@@ -29,7 +29,9 @@ public class ProgramRasterTest extends RSBaseGraphics {
             b.setPointSpriteEnabled(pSprite);
             for (CullMode cull : CullMode.values()) {
                 b.setCullMode(cull);
-                b.create();
+                ProgramRaster pr = b.create();
+                assertTrue(pr != null);
+                mRS.bindProgramRaster(pr);
             }
         }
     }
@@ -48,5 +50,3 @@ public class ProgramRasterTest extends RSBaseGraphics {
         assertEquals(3, CullMode.values().length);
     }
 }
-
-

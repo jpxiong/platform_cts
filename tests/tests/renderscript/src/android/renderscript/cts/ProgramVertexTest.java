@@ -165,18 +165,21 @@ public class ProgramVertexTest extends RSBaseGraphics {
         ProgramVertex pv = buildShader(inputs, null, simpleAttr);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         inputs[0] = mAttrPosNormTexElem;
         pv = buildShader(inputs, null, multiAttr);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         inputs[0] = mAttrExtra;
         pv = buildShader(inputs, null, multiAttr2);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         // Now with constant inputs
@@ -186,6 +189,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
         pv = buildShader(inputs, constInput, simpleAttrSimpleUni);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         inputs[0] = mAttrPosNormTexElem;
@@ -193,6 +197,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
         pv = buildShader(inputs, constInput, multiAttrMultiUni);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         // Now with multiple input and const structs
@@ -203,6 +208,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
         pv = buildShader(inputs, constInput, multiAttrMultiUni);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         inputs = new Element[2];
@@ -211,6 +217,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
         pv = buildShader(inputs, null, multiAttr);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
 
         constInput[0] = mConstMatrix;
@@ -220,6 +227,7 @@ public class ProgramVertexTest extends RSBaseGraphics {
         pv = buildShader(inputs, constInput, multiAttrMultiUni);
         if (testBind) {
             mScript.invoke_testProgramVertex(pv);
+            mRS.bindProgramVertex(pv);
         }
     }
 

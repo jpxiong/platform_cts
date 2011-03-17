@@ -29,6 +29,11 @@ public class FileA3DTest extends RSBaseGraphics {
         assertTrue(model != null);
     }
 
+    public void testCreateFromAsset() {
+        FileA3D model = FileA3D.createFromAsset(mRS, mRes.getAssets(), "sphere.a3d");
+        assertTrue(model != null);
+    }
+
     public void testGetIndexEntryCount() {
         FileA3D model = FileA3D.createFromResource(mRS, mRes, R.raw.sphere);
         assertTrue(model != null);
