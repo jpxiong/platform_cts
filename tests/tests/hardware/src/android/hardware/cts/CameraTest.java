@@ -1595,7 +1595,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Iterator<Long> it = mFrames.iterator();
             while(it.hasNext()) {
                 long time = it.next();
-                if (arrivalTime - time > 1000 && mFrames.size() > 1) {
+                if (arrivalTime - time > 1000 && mFrames.size() > 2) {
                     it.remove();
                 } else {
                     break;
