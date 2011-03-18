@@ -37,9 +37,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
+
 @TestTargetClass(NumberKeyListener.class)
 public class NumberKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
+
     private MockNumberKeyListener mNumberKeyListener;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
@@ -74,7 +76,7 @@ public class NumberKeyListenerTest extends
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
             "should add NPE description in javadoc.")
     public void testFilter() {
-        mNumberKeyListener = new MockNumberKeyListener();
+        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
         String source = "Android test";
         SpannableString dest = new SpannableString("012345");
         assertEquals("", mNumberKeyListener.filter(source, 0, source.length(),
@@ -122,12 +124,12 @@ public class NumberKeyListenerTest extends
     )
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testLookup() {
-        mNumberKeyListener = new MockNumberKeyListener();
-
+        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
         KeyEvent event1 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
         SpannableString str = new SpannableString("012345");
         assertEquals('0', mNumberKeyListener.lookup(event1, str));
 
+        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.NOTHING);
         KeyEvent event2 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A);
         str = new SpannableString("ABCD");
         assertEquals('\0', mNumberKeyListener.lookup(event2, str));
@@ -147,7 +149,7 @@ public class NumberKeyListenerTest extends
     )
     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testOk() {
-        mNumberKeyListener = new MockNumberKeyListener();
+        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
 
         assertTrue(mNumberKeyListener.callOk(mNumberKeyListener.getAcceptedChars(), '3'));
         assertFalse(mNumberKeyListener.callOk(mNumberKeyListener.getAcceptedChars(), 'e'));
@@ -172,7 +174,8 @@ public class NumberKeyListenerTest extends
     )
     public void testPressKey() {
         final CharSequence text = "123456";
-        final MockNumberKeyListener numberKeyListener = new MockNumberKeyListener();
+        final MockNumberKeyListener numberKeyListener =
+            new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -189,7 +192,7 @@ public class NumberKeyListenerTest extends
         assertEquals("0123456", mTextView.getText().toString());
 
         // an unaccepted key if it exists.
-        int keyCode = TextMethodUtils.getUnacceptedKeyCode(MockNumberKeyListener.CHARACTERS);
+        int keyCode = TextMethodUtils.getUnacceptedKeyCode(MockNumberKeyListener.DIGITS);
         if (-1 != keyCode) {
             sendKeys(keyCode);
             // text of TextView will not be changed.
@@ -209,12 +212,21 @@ public class NumberKeyListenerTest extends
     }
 
     private static class MockNumberKeyListener extends NumberKeyListener {
-        static final char[] CHARACTERS = new char[] {'0', '1', '2',
-                '3', '4', '5', '6', '7', '8', '9'};
+
+        static final char[] DIGITS =
+                new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        static final char[] NOTHING = new char[0];
+
+        private final char[] mAcceptedChars;
+
+        MockNumberKeyListener(char[] acceptedChars) {
+            this.mAcceptedChars = acceptedChars;
+        }
 
         @Override
         protected char[] getAcceptedChars() {
-            return CHARACTERS;
+            return mAcceptedChars;
         }
 
         @Override

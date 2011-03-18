@@ -27,6 +27,7 @@ import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
 import android.text.method.TimeKeyListener;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
@@ -100,13 +101,15 @@ public class TimeKeyListenerTest extends
      * Scenario description:
      * 1. Press '1' key and check if the content of TextView becomes "1"
      * 2. Press '2' key and check if the content of TextView becomes "12"
-     * 3. Press 'a' key and check if the content of TextView becomes "12a"
-     * 4. Press an unaccepted key if it exists and this key could not be entered.
-     * 5. Press 'm' key and check if the content of TextView becomes "12am"
-     * 6. remove TimeKeyListener, '1' key will not be accepted.
+     * 3. Press 'a' key if it is producible
+     * 4. Press 'p' key if it is producible
+     * 5. Press 'm' key if it is producible
+     * 6. Press an unaccepted key if it exists and this key could not be entered.
+     * 7. Remove TimeKeyListener, '1' key will not be accepted.
      */
     public void testTimeKeyListener() {
         final TimeKeyListener timeKeyListener = TimeKeyListener.getInstance();
+        String expectedText = "";
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -115,30 +118,46 @@ public class TimeKeyListenerTest extends
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertEquals("", mTextView.getText().toString());
+        assertEquals(expectedText, mTextView.getText().toString());
 
         // press '1' key.
         mInstrumentation.sendStringSync("1");
-        assertEquals("1", mTextView.getText().toString());
+        expectedText += "1";
+        assertEquals(expectedText, mTextView.getText().toString());
 
         // press '2' key.
         mInstrumentation.sendStringSync("2");
+        expectedText += "2";
         assertEquals("12", mTextView.getText().toString());
 
-        // press 'a' key.
-        mInstrumentation.sendStringSync("a");
-        assertEquals("12a", mTextView.getText().toString());
+        // press 'a' key if producible
+        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        if ('a' == kcm.getMatch(KeyEvent.KEYCODE_A, TimeKeyListener.CHARACTERS)) {
+            expectedText += "a";
+            mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_A);
+            assertEquals(expectedText, mTextView.getText().toString());
+        }
+
+        // press 'p' key if producible
+        if ('p' == kcm.getMatch(KeyEvent.KEYCODE_P, TimeKeyListener.CHARACTERS)) {
+            expectedText += "p";
+            mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_P);
+            assertEquals(expectedText, mTextView.getText().toString());
+        }
+
+        // press 'm' key if producible
+        if ('m' == kcm.getMatch(KeyEvent.KEYCODE_M, TimeKeyListener.CHARACTERS)) {
+            expectedText += "m";
+            mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_M);
+            assertEquals(expectedText, mTextView.getText().toString());
+        }
 
         // press an unaccepted key if it exists.
         int keyCode = TextMethodUtils.getUnacceptedKeyCode(TimeKeyListener.CHARACTERS);
         if (-1 != keyCode) {
             sendKeys(keyCode);
-            assertEquals("12a", mTextView.getText().toString());
+            assertEquals(expectedText, mTextView.getText().toString());
         }
-
-        // press 'm' key.
-        mInstrumentation.sendStringSync("m");
-        assertEquals("12am", mTextView.getText().toString());
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -150,7 +169,7 @@ public class TimeKeyListenerTest extends
 
         // press '1' key.
         mInstrumentation.sendStringSync("1");
-        assertEquals("12am", mTextView.getText().toString());
+        assertEquals(expectedText, mTextView.getText().toString());
     }
 
     private class MyTimeKeyListener extends TimeKeyListener {
