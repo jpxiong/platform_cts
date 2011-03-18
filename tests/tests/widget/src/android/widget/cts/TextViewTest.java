@@ -81,11 +81,9 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Gravity;
-import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
@@ -94,7 +92,6 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
-import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
@@ -236,7 +233,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView = findTextView(R.id.textview_text);
-                mTextView.setText("");
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -248,45 +244,20 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
             }
         });
         mInstrumentation.waitForIdleSync();
         assertSame(digitsKeyListener, mTextView.getKeyListener());
-        assertEquals("", mTextView.getText().toString());
-
-        // press '-' key.
-        mInstrumentation.sendStringSync("-");
-        assertEquals("", mTextView.getText().toString());
-
-        // press '1' key.
-        mInstrumentation.sendStringSync("1");
-        assertEquals("1", mTextView.getText().toString());
-
-        // press '.' key.
-        mInstrumentation.sendStringSync(".");
-        assertEquals("1", mTextView.getText().toString());
-
-        // press 'a' key.
-        mInstrumentation.sendStringSync("a");
-        assertEquals("1", mTextView.getText().toString());
 
         final QwertyKeyListener qwertyKeyListener
                 = QwertyKeyListener.getInstance(false, Capitalize.NONE);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setKeyListener(qwertyKeyListener);
-                mTextView.requestFocus();
             }
         });
         mInstrumentation.waitForIdleSync();
         assertSame(qwertyKeyListener, mTextView.getKeyListener());
-        assertEquals("1", mTextView.getText().toString());
-
-        // press 'a' key.
-        mInstrumentation.sendStringSync("a");
-
-        assertEquals("1a", mTextView.getText().toString());
     }
 
     @TestTargets({
@@ -1790,10 +1761,9 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
         assertNull(mTextView.getError());
 
-        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance();
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
+                mTextView.setKeyListener(DigitsKeyListener.getInstance(""));
                 mTextView.setText("", BufferType.EDITABLE);
                 mTextView.setError(errorText);
                 mTextView.requestFocus();
@@ -1808,6 +1778,16 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals("", mTextView.getText().toString());
         // The icon and error message will not be reset to null
         assertNull(mTextView.getError());
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setKeyListener(DigitsKeyListener.getInstance());
+                mTextView.setText("", BufferType.EDITABLE);
+                mTextView.setError(errorText);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
 
         mInstrumentation.sendStringSync("1");
         // a key event cause changes to the TextView's text
