@@ -1425,13 +1425,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
         final float defaultScale = getInstrumentation().getTargetContext().getResources().
             getDisplayMetrics().density;
-        assertEquals(defaultScale, mWebView.getScale(), 0f);
+        assertEquals(defaultScale, mWebView.getScale(), .01f);
 
         mWebView.setInitialScale(0);
         // modify content to fool WebKit into re-loading
         mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(defaultScale, mWebView.getScale(), 0f);
+        assertEquals(defaultScale, mWebView.getScale(), .01f);
 
         mWebView.setInitialScale(50);
         mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
@@ -1441,7 +1441,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setInitialScale(0);
         mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
-        assertEquals(defaultScale, mWebView.getScale(), 0f);
+        assertEquals(defaultScale, mWebView.getScale(), .01f);
     }
 
     @TestTargetNew(
