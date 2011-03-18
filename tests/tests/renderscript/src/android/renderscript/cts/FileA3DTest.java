@@ -16,8 +16,11 @@
 
 package android.renderscript.cts;
 
+import java.io.File;
+
 import com.android.cts.stub.R;
 
+import android.renderscript.RSRuntimeException;
 import android.renderscript.FileA3D;
 import android.renderscript.FileA3D.EntryType;
 import android.renderscript.FileA3D.IndexEntry;
@@ -97,6 +100,20 @@ public class FileA3DTest extends RSBaseGraphics {
         assertEquals(FileA3D.EntryType.MESH, FileA3D.EntryType.valueOf("MESH"));
         // Make sure no new enums are added
         assertEquals(2, FileA3D.EntryType.values().length);
+    }
+
+    public void testCreateFromFile() {
+        File fileDesc = new File("bogusFile");
+        try {
+            FileA3D model = FileA3D.createFromFile(mRS, fileDesc);
+            fail("should throw RSRuntimeException.");
+        } catch (RSRuntimeException e) {
+        }
+        try {
+            FileA3D model = FileA3D.createFromFile(mRS, "bogus");
+            fail("should throw RSRuntimeException.");
+        } catch (RSRuntimeException e) {
+        }
     }
 }
 

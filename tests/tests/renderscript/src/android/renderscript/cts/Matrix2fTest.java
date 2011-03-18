@@ -177,4 +177,38 @@ public class Matrix2fTest extends RSBaseCompute {
 
         checkData(m, expectedData);
     }
+
+    public void testRotateLoadRotate() {
+
+        float theta = 30.0f * (float)(java.lang.Math.PI / 180.0f);
+        float cosTheta = (float)Math.cos((float)theta);
+        float sinTheta = (float)Math.sin((float)theta);
+        float[] rotate = new float[4];
+        rotate[0] = cosTheta;
+        rotate[1] = -sinTheta;
+        rotate[2] = sinTheta;
+        rotate[3] = cosTheta;
+
+        Matrix2f m = new Matrix2f();
+        m.loadRotate(30.0f);
+        checkData(m, rotate);
+
+        m = new Matrix2f();
+        m.rotate(30.0f);
+        checkData(m, rotate);
+
+        float[] sourceData = {
+            2.0f, 3.0f,
+            4.0f, 5.0f
+        };
+        float[] rotated = new float[4];
+        rotated[0] = rotate[0] * sourceData[0] + rotate[1] * sourceData[2];
+        rotated[1] = rotate[0] * sourceData[1] + rotate[1] * sourceData[3];
+        rotated[2] = rotate[2] * sourceData[0] + rotate[3] * sourceData[2];
+        rotated[3] = rotate[2] * sourceData[1] + rotate[3] * sourceData[3];
+        m = new Matrix2f(sourceData);
+        m.rotate(30.0f);
+
+        checkData(m, rotated);
+    }
 }
