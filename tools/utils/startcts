@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if [ -z "${SDK_ROOT}" ]; then
+# CONFIGURATION
+# Set this variable to the root of your Android SDK installation.
+SDK_ROOT=NOT_CONFIGURED
+fi;
+
 if [ -z "${CTS_ROOT}" ]; then
 # CONFIGURATION
 # Set this variable to the root of unzipped CTS directory
@@ -48,6 +54,7 @@ checkPath() {
 }
 
 checkDir ${CTS_ROOT} "Error: Cannot locate CTS in \"${CTS_DIR}\". Please check your configuration in $0"
+checkDir ${SDK_ROOT} "Error: Cannot locate SDK installation in \"${SDK_ROOT}\".  Please check your configuration in $0"
 
 DDM_LIB=${SDK_ROOT}/tools/lib/ddmlib.jar
 CTS_LIB=${CTS_ROOT}/tools/cts.jar
@@ -62,8 +69,7 @@ checkFile ${HOSTTEST_LIB}
 
 JARS=${CTS_LIB}:${DDM_LIB}:${JUNIT_LIB}:${HOSTTEST_LIB}:${CTS_TEST_ANNOTATIONS_HOST_LIB}
 
-# Add SDK_ROOT to the PATH for backwards compatibility with prior startcts
-# commands that required SDK_ROOT to find adb.
+# Check both tools and platform-tools for ADB.
 if [ -n "${SDK_ROOT}" ]; then
   PATH=${SDK_ROOT}/platform-tools:${SDK_ROOT}/tools:${PATH}
 fi
