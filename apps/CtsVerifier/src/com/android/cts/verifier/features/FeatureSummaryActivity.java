@@ -125,6 +125,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.software.sip.voip", false),
     };
 
+    public static final Feature[] ALL_HONEYCOMB_FEATURES = {
+            new Feature("android.hardware.faketouch", true),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,6 +165,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         }
         if (apiVersion >= Build.VERSION_CODES.GINGERBREAD) {
             Collections.addAll(features, ALL_GINGERBREAD_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
+            Collections.addAll(features, ALL_HONEYCOMB_FEATURES);
         }
         for (Feature f : features) {
             HashMap<String, Object> row = new HashMap<String, Object>();
