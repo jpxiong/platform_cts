@@ -302,6 +302,11 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
     }
 
+    private boolean hasSideEffects(final Class<? extends TestCase> testClass,
+            final String testName) {
+        return getAnnotation(testClass, testName, SIDE_EFFECT) != null;
+    }
+
     private String getAnnotation(final Class<? extends TestCase> testClass,
             final String testName, final String annotationName) {
         try {
@@ -348,6 +353,9 @@ public class CollectAllTests extends DescriptionGenerator {
             return;
         } else if (isSuppressed(test.getClass(), testName)) {
             System.out.println("ignoring suppressed test: " + test);
+            return;
+        } else if (hasSideEffects(test.getClass(), testName)) {
+            System.out.println("ignoring test with side effects: " + test);
             return;
         }
 
