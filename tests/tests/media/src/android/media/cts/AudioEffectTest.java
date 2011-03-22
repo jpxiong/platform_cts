@@ -566,7 +566,7 @@ public class AudioEffectTest extends AndroidTestCase {
             byte[] param = mEffect.intToByteArray(PresetReverb.PARAM_PRESET);
             byte[] value = new byte[2];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             short preset = PresetReverb.PRESET_SMALLROOM;
             if (mEffect.byteArrayToShort(value) == preset) {
                 preset = PresetReverb.PRESET_MEDIUMROOM;
@@ -575,7 +575,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, value);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             assertEquals("get/set Parameter failed", preset,
                     mEffect.byteArrayToShort(value));
 
@@ -609,7 +609,7 @@ public class AudioEffectTest extends AndroidTestCase {
             int param = EnvironmentalReverb.PARAM_DECAY_TIME;
             int[] value = new int[1];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             int time = 500;
             if (value[0] == time) {
                 time = 1000;
@@ -617,7 +617,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, time);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             assertTrue("got incorrect decay time",
                     ((float)value[0] > (float)(time / DELAY_TOLERANCE)) &&
                     ((float)value[0] < (float)(time * DELAY_TOLERANCE)));
@@ -652,7 +652,7 @@ public class AudioEffectTest extends AndroidTestCase {
             int param = PresetReverb.PARAM_PRESET;
             short[] value = new short[1];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             short preset = PresetReverb.PRESET_SMALLROOM;
             if (value[0] == preset) {
                 preset = PresetReverb.PRESET_MEDIUMROOM;
@@ -660,7 +660,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, preset);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             assertEquals("get/set Parameter failed", preset, value[0]);
 
         } catch (IllegalArgumentException e) {
@@ -693,7 +693,7 @@ public class AudioEffectTest extends AndroidTestCase {
             int param = EnvironmentalReverb.PARAM_DECAY_TIME;
             byte[] value = new byte[4];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             int time = 500;
             if (mEffect.byteArrayToInt(value) == time) {
                 time = 1000;
@@ -702,7 +702,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, value);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             int time2 = mEffect.byteArrayToInt(value);
             assertTrue("got incorrect decay time",
                     ((float)time2 > (float)(time / DELAY_TOLERANCE)) &&
@@ -739,7 +739,7 @@ public class AudioEffectTest extends AndroidTestCase {
             int[] value = new int[1];
             param[0] = EnvironmentalReverb.PARAM_DECAY_TIME;
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             int[] time = new int[1];
             time[0] = 500;
             if (value[0] == time[0]) {
@@ -748,7 +748,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, time);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             assertTrue("got incorrect decay time",
                     ((float)value[0] > (float)(time[0] / DELAY_TOLERANCE)) &&
                     ((float)value[0] < (float)(time[0] * DELAY_TOLERANCE)));
@@ -785,7 +785,7 @@ public class AudioEffectTest extends AndroidTestCase {
             param[0] = PresetReverb.PARAM_PRESET;
             short[] value = new short[1];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             short[] preset = new short[1];
             preset[0] = PresetReverb.PRESET_SMALLROOM;
             if (value[0] == preset[0]) {
@@ -794,7 +794,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, preset);
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             assertEquals("get/set Parameter failed", preset[0], value[0]);
 
         } catch (IllegalArgumentException e) {
@@ -828,7 +828,7 @@ public class AudioEffectTest extends AndroidTestCase {
             param[0] = EnvironmentalReverb.PARAM_DECAY_TIME;
             byte[] value = new byte[4];
             int status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 1 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 1 failed", AudioEffect.isError(status));
             int time = 500;
             if (mEffect.byteArrayToInt(value) == time) {
                 time = 1000;
@@ -837,7 +837,7 @@ public class AudioEffectTest extends AndroidTestCase {
             status = mEffect.setParameter(param, mEffect.intToByteArray(time));
             assertEquals("setParameter failed", AudioEffect.SUCCESS, status);
             status = mEffect.getParameter(param, value);
-            assertEquals("getParameter 2 failed", AudioEffect.SUCCESS, status);
+            assertFalse("getParameter 2 failed", AudioEffect.isError(status));
             int time2 = mEffect.byteArrayToInt(value);
             assertTrue("got incorrect decay time",
                     ((float)time2 > (float)(time / DELAY_TOLERANCE)) &&
@@ -1018,8 +1018,8 @@ public class AudioEffectTest extends AndroidTestCase {
 
             short[] value = new short[1];
             status = effect2.getParameter(PresetReverb.PARAM_PRESET, value);
-            assertEquals("Effect2 getParameter failed",
-                    AudioEffect.SUCCESS, status);
+            assertFalse("Effect2 getParameter failed",
+                    AudioEffect.isError(status));
             assertEquals("Effect1 changed parameter", PresetReverb.PRESET_SMALLROOM
                     , value[0]);
 
@@ -1186,7 +1186,7 @@ public class AudioEffectTest extends AndroidTestCase {
             byte[] reply = new byte[4];
             // command 3 is ENABLE
             int status = mEffect.command(3, cmd, reply);
-            assertEquals("command failed", AudioEffect.SUCCESS, status);
+            assertFalse("command failed", AudioEffect.isError(status));
             assertTrue("effect not enabled", mEffect.getEnabled());
 
         } catch (IllegalStateException e) {
