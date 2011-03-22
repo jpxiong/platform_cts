@@ -1194,8 +1194,14 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             }
         });
 
-        newActivity = am.waitForActivityWithTimeout(TIMEOUT);
-        assertNotNull(newActivity);
+        Activity oldActivity = newActivity;
+        while (true) {
+            newActivity = am.waitForActivityWithTimeout(TIMEOUT);
+            assertNotNull(newActivity);
+            if (newActivity != oldActivity) {
+                break;
+            }
+        }
         newActivity.finish();
         instrumentation.removeMonitor(am);
         // the text of TextView is still there.
