@@ -59,6 +59,7 @@ public class SmsManagerTest extends AndroidTestCase {
     private static final List<String> NO_DELIVERY_REPORTS =
             Arrays.asList(
                     "310410"    // AT&T Mobility
+                   ,"44010"     // NTT DOCOMO
             );
 
     private TelephonyManager mTelephonyManager;
