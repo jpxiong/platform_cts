@@ -58,8 +58,11 @@ public class SmsManagerTest extends AndroidTestCase {
     // List of network operators that don't support SMS delivery report
     private static final List<String> NO_DELIVERY_REPORTS =
             Arrays.asList(
-                    "310410"    // AT&T Mobility
-                   ,"44010"     // NTT DOCOMO
+                    "310410",   // AT&T Mobility
+                    "44010",    // NTT DOCOMO
+                    "45005",    // SKT Mobility
+                    "45002",    // SKT Mobility
+                    "45008"     // KT Mobility
             );
 
     private TelephonyManager mTelephonyManager;
