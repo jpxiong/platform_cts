@@ -25,6 +25,7 @@ import junit.framework.Test;
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.InstallException;
 import com.android.ddmlib.Log;
+import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.ITestRunListener;
@@ -53,6 +54,12 @@ public class AppSecurityTests extends DeviceTestCase {
     // testAppFailAccessPrivateData constants
     private static final String APP_WITH_DATA_APK = "CtsAppWithData.apk";
     private static final String APP_WITH_DATA_PKG = "com.android.cts.appwithdata";
+    private static final String APP_WITH_DATA_CLASS =
+            "com.android.cts.appwithdata.CreatePrivateDataTest";
+    private static final String APP_WITH_DATA_CREATE_METHOD =
+            "testCreatePrivateData";
+    private static final String APP_WITH_DATA_CHECK_NOEXIST_METHOD =
+            "testEnsurePrivateDataNotExist";
     private static final String APP_ACCESS_DATA_APK = "CtsAppAccessData.apk";
     private static final String APP_ACCESS_DATA_PKG = "com.android.cts.appaccessdata";
 
@@ -144,7 +151,8 @@ public class AppSecurityTests extends DeviceTestCase {
                     false);
             assertNull("failed to install app with data", installResult);
             // run appwithdata's tests to create private data
-            assertTrue("failed to create app's private data", runDeviceTests(APP_WITH_DATA_PKG));
+            assertTrue("failed to create app's private data", runDeviceTests(APP_WITH_DATA_PKG,
+                    APP_WITH_DATA_CLASS, APP_WITH_DATA_CREATE_METHOD));
 
             installResult = getDevice().installPackage(getTestAppFilePath(APP_ACCESS_DATA_APK),
                     false);
@@ -155,6 +163,37 @@ public class AppSecurityTests extends DeviceTestCase {
         finally {
             getDevice().uninstallPackage(APP_WITH_DATA_PKG);
             getDevice().uninstallPackage(APP_ACCESS_DATA_PKG);
+        }
+    }
+
+    /**
+     * Test that uninstall of an app removes its private data.
+     */
+    public void testUninstallRemovesData() throws Exception {
+        Log.i(LOG_TAG, "Uninstalling app, verifying data is removed.");
+        try {
+            // cleanup test app that might be installed from previous partial test run
+            getDevice().uninstallPackage(APP_WITH_DATA_PKG);
+
+            String installResult = getDevice().installPackage(getTestAppFilePath(APP_WITH_DATA_APK),
+                    false);
+            assertNull("failed to install app with data", installResult);
+            // run appwithdata's tests to create private data
+            assertTrue("failed to create app's private data", runDeviceTests(APP_WITH_DATA_PKG,
+                    APP_WITH_DATA_CLASS, APP_WITH_DATA_CREATE_METHOD));
+
+            getDevice().uninstallPackage(APP_WITH_DATA_PKG);
+
+            installResult = getDevice().installPackage(getTestAppFilePath(APP_WITH_DATA_APK),
+                    false);
+            assertNull("failed to install app with data second time", installResult);
+            // run appwithdata's 'check if file exists' test
+            assertTrue("app's private data still exists after install", runDeviceTests(
+                    APP_WITH_DATA_PKG, APP_WITH_DATA_CLASS, APP_WITH_DATA_CHECK_NOEXIST_METHOD));
+
+        }
+        finally {
+            getDevice().uninstallPackage(APP_WITH_DATA_PKG);
         }
     }
 
@@ -239,10 +278,21 @@ public class AppSecurityTests extends DeviceTestCase {
      * a period longer than the max time to output.
      * @throws IOException if connection to device was lost.
      */
-    private boolean runDeviceTests(String pkgName)
-            throws TimeoutException, AdbCommandRejectedException,
-            ShellCommandUnresponsiveException, IOException {
-        CollectingTestRunListener listener = doRunTests(pkgName);
+    private boolean runDeviceTests(String pkgName) throws AdbCommandRejectedException,
+            ShellCommandUnresponsiveException, IOException, TimeoutException {
+    	return runDeviceTests(pkgName, null, null);
+    }
+
+    /**
+     * Helper method that will the specified packages tests on device.
+     *
+     * @param pkgName Android application package for tests
+     * @return <code>true</code> if all tests passed.
+     */
+    private boolean runDeviceTests(String pkgName, String testClassName, String testMethodName)
+            throws AdbCommandRejectedException, IOException, ShellCommandUnresponsiveException,
+                   TimeoutException {
+        CollectingTestRunListener listener = doRunTests(pkgName, testClassName, testMethodName);
         return listener.didAllTestsPass();
     }
 
@@ -256,26 +306,16 @@ public class AppSecurityTests extends DeviceTestCase {
      * a period longer than the max time to output.
      * @throws IOException if connection to device was lost.
      */
-    private CollectingTestRunListener doRunTests(String pkgName)
-            throws TimeoutException, AdbCommandRejectedException,
-            ShellCommandUnresponsiveException, IOException {
+    private CollectingTestRunListener doRunTests(String pkgName, String testClassName,
+            String testMethodName) throws AdbCommandRejectedException, IOException,
+                    ShellCommandUnresponsiveException, TimeoutException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(pkgName, getDevice());
+        if (testClassName != null && testMethodName != null) {
+            testRunner.setMethodName(testClassName, testMethodName);
+        }
         CollectingTestRunListener listener = new CollectingTestRunListener();
         testRunner.run(listener);
         return listener;
-    }
-
-    /**
-     * Helper method to run the specified packages tests, and return the test run error message.
-     *
-     * @param pkgName Android application package for tests
-     * @return the test run error message or <code>null</code> if test run completed.
-     * @throws IOException if connection to device was lost
-     */
-    private String runDeviceTestsWithRunResult(String pkgName) throws TimeoutException,
-            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        CollectingTestRunListener listener = doRunTests(pkgName);
-        return listener.getTestRunErrorMessage();
     }
 
     private static class CollectingTestRunListener implements ITestRunListener {
@@ -289,7 +329,8 @@ public class AppSecurityTests extends DeviceTestCase {
 
         public void testFailed(TestFailure status, TestIdentifier test,
                 String trace) {
-            Log.w(LOG_TAG, String.format("%s#%s failed: %s", test.getClassName(),
+            Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format("%s#%s failed: %s",
+                    test.getClassName(),
                     test.getTestName(), trace));
             mAllTestsPassed = false;
         }
@@ -299,7 +340,8 @@ public class AppSecurityTests extends DeviceTestCase {
         }
 
         public void testRunFailed(String errorMessage) {
-            Log.w(LOG_TAG, String.format("test run failed: %s", errorMessage));
+            Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format("test run failed: %s",
+                    errorMessage));
             mAllTestsPassed = false;
             mTestRunErrorMessage = errorMessage;
         }
