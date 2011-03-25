@@ -22,10 +22,8 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.os.Bundle;
-import android.os.IBinder;
 import android.test.AndroidTestCase;
 import android.text.TextUtils;
-import android.text.style.CorrectionSpan;
 import android.view.KeyEvent;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.CorrectionInfo;
@@ -226,7 +224,6 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
         public boolean isSendKeyEventCalled;
         public boolean isSetComposingTextCalled;
         public boolean isSetComposingRegionCalled;
-        public boolean isSetCorrectionSpanCalled;
         public boolean isSetSelectionCalled;
 
         public boolean beginBatchEdit() {
@@ -326,12 +323,6 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
 
         public boolean setComposingRegion(int start, int end) {
             isSetComposingRegionCalled = true;
-            return false;
-        }
-
-        public boolean setCorrectionSpan(IBinder token, CorrectionSpan correctionSpan, int start,
-                int end, int flags) {
-            isSetCorrectionSpanCalled = true;
             return false;
         }
 
