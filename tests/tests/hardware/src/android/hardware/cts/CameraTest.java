@@ -127,6 +127,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // after we are done with it.
                 mLooper = Looper.myLooper();
                 mCamera = Camera.open(cameraId);
+                mCamera.setErrorCallback(mErrorCallback);
                 Log.v(TAG, "camera is opened");
                 startDone.open();
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
@@ -388,7 +389,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testPreviewCallbackByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         mCamera.setPreviewCallback(mPreviewCallback);
-        mCamera.setErrorCallback(mErrorCallback);
         checkPreviewCallback();
         terminateMessageLooper();
         assertTrue(mPreviewCallbackResult);
@@ -1913,7 +1913,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testGetParameterDuringFocusByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
-        mCamera.setErrorCallback(mErrorCallback);
         mCamera.startPreview();
         Parameters parameters = mCamera.getParameters();
         for (String focusMode: parameters.getSupportedFocusModes()) {
@@ -1948,7 +1947,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testPreviewFormatsByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
-        mCamera.setErrorCallback(mErrorCallback);
         Parameters parameters = mCamera.getParameters();
         for (int format: parameters.getSupportedPreviewFormats()) {
             Log.v(TAG, "Test preview format " + format);
