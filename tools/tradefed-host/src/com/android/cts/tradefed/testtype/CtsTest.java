@@ -32,6 +32,7 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
+import com.android.tradefed.testtype.InstrumentationTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.BufferedInputStream;
@@ -247,6 +248,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             IRemoteTest test = testPair.getTestForPackage();
             if (test instanceof IDeviceTest) {
                 ((IDeviceTest)test).setDevice(getDevice());
+            }
+            // Increment the timeout for collecting the tests.
+            // TODO: move this to testPackage.createTest() instead and only increase timeout when
+            // tests number is large.
+            if (test instanceof InstrumentationTest) {
+                ((InstrumentationTest)test).setCollectsTestsShellTimeout(10*60*1000);
             }
             ResultFilter filter = new ResultFilter(listener, testPair.getKnownTests());
             test.run(filter);

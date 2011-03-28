@@ -25,6 +25,7 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.result.CollectingTestListener;
+import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestRunResult;
@@ -116,7 +117,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * {@inheritDoc}
      */
     @Override
-    public void testLog(String dataName, LogDataType dataType, InputStream dataStream) {
+    public void testLog(String dataName, LogDataType dataType, InputStreamSource dataStream) {
         // save as zip file in report dir
         // TODO: ensure uniqueness of file name
         // TODO: use dataType.getFileExt() when its made public
@@ -124,7 +125,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         // TODO: consider compressing large files
         File logFile = new File(mReportDir, fileName);
         try {
-            FileUtil.writeToFile(dataStream, logFile);
+            FileUtil.writeToFile(dataStream.createInputStream(), logFile);
         } catch (IOException e) {
             Log.e(LOG_TAG, String.format("Failed to write log %s", logFile.getAbsolutePath()));
         }
