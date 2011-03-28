@@ -104,42 +104,6 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertTrue(firstId != secondId);
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOriginalUrl",
-            args = {}
-    )
-    @ToBeFixed(explanation = "History item does not have the original URL set after a redirect.")
-    @BrokenTest(value = "Bug 2121787: Test times out on the host side. Not 100% reproducible.")
-    public void testRedirect() throws InterruptedException {
-        final WebView view = getActivity().getWebView();
-        view.setWebChromeClient(new WebChromeClient());
-        // set the web view client so that redirects are loaded in the WebView itself
-        view.setWebViewClient(new WebViewClient());
-        WebBackForwardList list = view.copyBackForwardList();
-        assertEquals(0, list.getSize());
-
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        String redirect = mWebServer.getRedirectingAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        assertLoadUrlSuccessfully(view, redirect);
-        // wait for the redirect to take place
-        new DelayedCheck(10000) {
-            @Override
-            protected boolean check() {
-                WebBackForwardList list = view.copyBackForwardList();
-                return list.getSize() >= 1;
-            }
-        }.run();
-        list = view.copyBackForwardList();
-        assertEquals(1, list.getSize());
-        WebHistoryItem item = list.getCurrentItem();
-        assertNotNull(item);
-        assertEquals(url, item.getUrl());
-        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, item.getTitle());
-        // To be fixed: item.getOriginalUrl() returns null
-        // assertEquals(redirect, item.getOriginalUrl());
-    }
-
     private void assertLoadUrlSuccessfully(final WebView view, String url) {
         view.loadUrl(url);
         // wait for the page load to complete
