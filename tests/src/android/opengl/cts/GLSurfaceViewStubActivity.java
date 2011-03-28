@@ -60,7 +60,6 @@ public class GLSurfaceViewStubActivity extends Activity {
         mRenderer = null;
     }
 
-
     private static int mRenderMode = 0;
     private static boolean mRenderModeSet = false;
     public static void setRenderMode(int renderMode) {

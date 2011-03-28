@@ -67,6 +67,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
     private static final String TAG = "CameraGLTest";
     private static final String PACKAGE = "com.android.cts.stub";
     private static final boolean LOGV = false;
+    private static final boolean LOGVV = false;
     private static final int EGL_OPENGL_ES2_BIT = 0x0004;
 
     private boolean mSurfaceTextureCallbackResult = false;
@@ -149,7 +150,6 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
         Log.v(TAG, "start waiting for looper");
         if (!startDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
-            Log.v(TAG, "initializeMessageLooper: start timeout");
             fail("initializeMessageLooper: start timeout");
         }
     }
@@ -174,13 +174,12 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
     private final class PreviewCallback
             implements android.hardware.Camera.PreviewCallback {
         public void onPreviewFrame(byte [] data, Camera camera) {
+            if (LOGV) Log.v(TAG, "PreviewCallback");
             assertNotNull(data);
             Size size = camera.getParameters().getPreviewSize();
             assertEquals(size.width * size.height * 3 / 2, data.length);
             mCamera.stopPreview();
-            if (LOGV) Log.v(TAG, "notify the preview callback");
             mPreviewDone.open();
-            if (LOGV) Log.v(TAG, "Preview callback stop");
         }
     }
 
@@ -203,14 +202,18 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mBurstCount = burstCount;
         }
 
+        public int getBurstCount() {
+            return mBurstCount;
+        }
+
         public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-            if (LOGV) Log.v(TAG, "SurfaceTextureBurstCallback");
-            mBurstCount = mBurstCount-1;
+            if (LOGVV) Log.v(TAG, "SurfaceTextureBurstCallback, frame #" + mBurstCount);
+            mBurstCount--;
             if (!mSurfaceTextureCallbackResult) {
                 if (mBurstCount <= 0) {
-                    if (LOGV) Log.v(TAG, "SurfaceTextureBurstCallback: Stopping preview");
+                    if (LOGV) Log.v(TAG, "SurfaceTextureBurstCallback stopping preview.");
                     mCamera.stopPreview();
-                    if (LOGV) Log.v(TAG, "SurfaceTextureBurstCallback: Preview stopped");
+                    if (LOGVV) Log.v(TAG, "SurfaceTextureBurstCallback preview stopped.");
                     mSurfaceTextureCallbackResult = true;
                 }
                 mSurfaceTextureDone.open();
@@ -222,7 +225,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
     /** Waits until surface texture callbacks have fired */
     private boolean waitForSurfaceTextureDone() {
-        if (LOGV) Log.v(TAG, "Wait for surface texture callback");
+        if (LOGVV) Log.v(TAG, "Wait for surface texture callback");
         if (!mSurfaceTextureDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
             Log.v(TAG, "waitForSurfaceTextureDone: timeout");
@@ -234,7 +237,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
     /** Waits until the camera preview callback has fired */
     private boolean waitForPreviewDone() {
-        if (LOGV) Log.v(TAG, "Wait for preview callback");
+        if (LOGVV) Log.v(TAG, "Wait for preview callback");
         if (!mPreviewDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
             Log.v(TAG, "waitForPreviewDone: timeout");
@@ -484,6 +487,116 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         }
     };
 
+    /** Test all preview sizes and framerates along with SurfaceTexture-provided metadata (texture
+     * transforms and timestamps) */
+    @UiThreadTest
+    public void testCameraToSurfaceTextureMetadata() throws Exception {
+        runForAllCameras(testCameraToSurfaceTextureMetadataByCamera);
+    }
+
+    private RunPerCamera testCameraToSurfaceTextureMetadataByCamera = new RunPerCamera() {
+        public void run(int cameraId) throws Exception {
+            int kLoopCount = 100; // Number of frames to test over
+            boolean noTimeout;
+            initializeMessageLooper(cameraId);
+            Parameters parameters = mCamera.getParameters();
+
+            mSurfaceTexture.setOnFrameAvailableListener(mSurfaceTextureBurstCallback);
+            mCamera.setPreviewTexture(mSurfaceTexture);
+
+            for (Size size: parameters.getSupportedPreviewSizes()) {
+                for (int[] fps: parameters.getSupportedPreviewFpsRange()) {
+                    if (LOGV) {
+                        Log.v(TAG, "Testing camera #" + cameraId +
+                              ", preview size:" + size.width + "x" + size.height +
+                              ", frame rate range: [" +
+                              (fps[Parameters.PREVIEW_FPS_MIN_INDEX] / 1000.) + "," +
+                              (fps[Parameters.PREVIEW_FPS_MAX_INDEX] / 1000.) + "]");
+                    }
+                    parameters.setPreviewSize(size.width, size.height);
+                    parameters.setPreviewFpsRange(fps[Parameters.PREVIEW_FPS_MIN_INDEX],
+                                                  fps[Parameters.PREVIEW_FPS_MAX_INDEX]);
+                    mCamera.setParameters(parameters);
+
+                    assertEquals(size, mCamera.getParameters().getPreviewSize());
+
+                    int[] actualFps = new int[2];
+                    mCamera.getParameters().getPreviewFpsRange(actualFps);
+                    assertEquals(fps[Parameters.PREVIEW_FPS_MIN_INDEX],
+                                 actualFps[Parameters.PREVIEW_FPS_MIN_INDEX]);
+                    assertEquals(fps[Parameters.PREVIEW_FPS_MAX_INDEX],
+                                 actualFps[Parameters.PREVIEW_FPS_MAX_INDEX]);
+
+                    mSurfaceTextureBurstCallback.setBurstCount(kLoopCount);
+                    mSurfaceTextureCallbackResult = false;
+                    mSurfaceTextureDone.close();
+
+                    mRenderer.setCameraSizing(mCamera.getParameters().getPreviewSize());
+                    if (LOGV) Log.v(TAG, "Starting preview");
+                    mCamera.startPreview();
+                    if (LOGVV) Log.v(TAG, "Preview started");
+
+                    long[] timestamps = new long[kLoopCount];
+                    for (int i = 0; i < kLoopCount; i++) {
+                        noTimeout = waitForSurfaceTextureDone();
+                        assertTrue("Timeout waiting for frame " + i +
+                                   " (burst callback thinks " +
+                                   (kLoopCount - mSurfaceTextureBurstCallback.getBurstCount()) +
+                                   ")! (Size " + size.width + "x" + size.height + ", fps [" +
+                                   (fps[Parameters.PREVIEW_FPS_MIN_INDEX] / 1000.) + ", " +
+                                   (fps[Parameters.PREVIEW_FPS_MAX_INDEX] / 1000.) + "])",
+                                   noTimeout);
+
+                        if (LOGVV) Log.v(TAG, "Frame #" + i + " completed");
+                        // Draw the frame (and update the SurfaceTexture)
+                        mGLView.requestRender();
+                        // Wait until frame is drawn, so that the SurfaceTexture has new
+                        // metadata
+                        noTimeout = mRenderer.waitForDrawDone();
+                        assertTrue(noTimeout);
+
+                        // Store timestamps for later
+                        timestamps[i] = mSurfaceTexture.getTimestamp();
+                        // Verify that the surfaceTexture transform has at least one non-zero
+                        // entry
+                        float[] transform = new float[16];
+                        mSurfaceTexture.getTransformMatrix(transform);
+                        boolean nonZero = false;
+                        for (int k = 0; k < 16; k++) {
+                            if (transform[k] != 0.f) {
+                                nonZero = true;
+                                break;
+                            }
+                        }
+                        assertTrue(nonZero);
+                    }
+                    assertTrue(mSurfaceTextureCallbackResult);
+
+                    float expectedMaxFrameDurationMs = 1000.f * 1000.f /
+                            fps[Parameters.PREVIEW_FPS_MIN_INDEX];
+                    float expectedMinFrameDurationMs = 1000.f * 1000.f /
+                            fps[Parameters.PREVIEW_FPS_MAX_INDEX];
+
+                    for (int i = 1; i < kLoopCount; i++) {
+                        float frameDurationMs = (timestamps[i] - timestamps[i - 1]) / 1000000.f;
+                        if (LOGVV) {
+                            Log.v(TAG, "Frame " + i + " duration: " + frameDurationMs +
+                                  " ms, expecting [" + expectedMinFrameDurationMs + "," +
+                                  expectedMaxFrameDurationMs + "]");
+                        }
+                        assertTrue("Frame " + i + " duration out of bounds! ("+
+                                   frameDurationMs + " ms, expecting [" +
+                                   expectedMinFrameDurationMs + "," +
+                                   expectedMaxFrameDurationMs + "] ms)",
+                                   (frameDurationMs > expectedMinFrameDurationMs) &&
+                                   (frameDurationMs < expectedMaxFrameDurationMs) );
+                    }
+                }
+            }
+            terminateMessageLooper();
+        } // void run(int cameraId)
+    };
+
     /** Basic OpenGL ES 2.0 renderer to draw SurfaceTexture-sourced frames to the screen */
     private class Renderer implements GLSurfaceView.Renderer {
         public Renderer() {
@@ -505,7 +618,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         public boolean waitForDrawDone() {
             if (!mDrawDone.block(WAIT_FOR_COMMAND_TO_COMPLETE) ) {
                 // timeout could be expected or unexpected. The caller will decide.
-                Log.v(TAG, "waitForSurfaceTextureDone: timeout");
+                Log.e(TAG, "waitForDrawDone: timeout");
                 return false;
             }
             mDrawDone.close();
@@ -515,7 +628,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         private final ConditionVariable mDrawDone = new ConditionVariable();
 
         public void onDrawFrame(GL10 glUnused) {
-            if (LOGV) Log.v(TAG, "onDrawFrame()");
+            if (LOGVV) Log.v(TAG, "onDrawFrame()");
             if (CameraGLTest.this.mSurfaceTexture != null) {
                 CameraGLTest.this.mSurfaceTexture.updateTexImage();
                 CameraGLTest.this.mSurfaceTexture.getTransformMatrix(mSTMatrix);
