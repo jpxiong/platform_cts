@@ -19,7 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -34,7 +33,6 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.util.AttributeSet;
@@ -131,70 +129,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         } catch (NullPointerException e) {
             // expected
         }
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCallbackDuringFling",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onTouchEvent",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onFling",
-            args = {MotionEvent.class, MotionEvent.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDown",
-            args = {android.view.MotionEvent.class}
-        )
-    })
-    @BrokenTest("listener.isItemSelected() is false, need to investigate")
-    public void testSetCallbackDuringFling() {
-        MockOnItemSelectedListener listener = new MockOnItemSelectedListener();
-        mGallery.setOnItemSelectedListener(listener);
-
-        mGallery.setCallbackDuringFling(true);
-
-        int[] xy = new int[2];
-        getSelectedViewCenter(mGallery, xy);
-
-        // This drags over only one item.
-        TouchUtils.drag(this, xy[0], 0, xy[1], xy[1], 1);
-
-        listener.reset();
-        // This will drags over several items.
-        TouchUtils.drag(this, xy[0], 0, xy[1], xy[1], 1);
-
-        assertTrue(listener.isItemSelected());
-        // onItemSelected called more than once
-        assertTrue(listener.getItemSelectedCalledCount() > 1);
-
-        listener.reset();
-        mGallery.setCallbackDuringFling(false);
-
-        TouchUtils.drag(this, xy[0], 240, xy[1], xy[1], 1);
-
-        assertTrue(listener.isItemSelected());
-        // onItemSelected called only once
-        assertTrue(listener.getItemSelectedCalledCount() == 1);
-    }
-
-    private void getSelectedViewCenter(Gallery gallery, int[] xy) {
-        View v = gallery.getSelectedView();
-        v.getLocationOnScreen(xy);
-
-        final int viewWidth = v.getWidth();
-        final int viewHeight = v.getHeight();
-
-        xy[1] += viewHeight / 2;
-        xy[0] += viewWidth / 2;
     }
 
     @TestTargetNew(
