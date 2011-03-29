@@ -16,7 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -28,7 +27,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rasterizer;
-import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.Xfermode;
@@ -37,8 +35,6 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 
 @TestTargetClass(Paint.class)
@@ -1270,60 +1266,54 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(-26, fmi.top);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "measureText",
-        args = {char[].class, int.class, int.class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testMeasureText1() {
+    public void testMeasureText() {
+        String text = "HIJKLMN";
+        char[] textChars = text.toCharArray();
+        SpannedString textSpan = new SpannedString(text);
+
         Paint p = new Paint();
-
-        // The default text size
-        assertEquals(12.0f, p.getTextSize());
-
-        char[] c = {};
-        char[] c2 = {'H'};
-        char[] c3 = {'H', 'I', 'J', 'H', 'I', 'J'};
-        assertEquals(0.0f, p.measureText(c, 0, 0));
-        assertEquals(8.0f, p.measureText(c2, 0, 1));
-        assertEquals(8.0f, p.measureText(c3, 0, 1));
-        assertEquals(15.0f, p.measureText(c3, 0, 3));
-        assertEquals(15.0f, p.measureText(c3, 3, 3));
-        assertEquals(30.0f, p.measureText(c3, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(c2, 0, 1));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(c2, 0, 1));
-
-        try {
-            p.measureText(c3, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
+        float[] widths = new float[text.length()];
+        for (int i = 0; i < widths.length; i++) {
+            widths[i] = p.measureText(text, i, i + 1);
         }
 
-        try {
-            p.measureText(c3, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
+        float totalWidth = 0;
+        for (int i = 0; i < widths.length; i++) {
+            totalWidth += widths[i];
         }
 
-        try {
-            p.measureText(c3, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
+        // Test measuring the widths of the entire text
+        assertMeasureText(text, textChars, textSpan, 0, 7, totalWidth);
 
-        try {
-            p.measureText((char[]) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
+        // Test measuring a substring of the text
+        assertMeasureText(text, textChars, textSpan, 1, 3, widths[1] + widths[2]);
+
+        // Test measuring a substring of zero length.
+        assertMeasureText(text, textChars, textSpan, 3, 3, 0);
+
+        // Test measuring substrings from the front and back
+        assertMeasureText(text, textChars, textSpan, 0, 2, widths[0] + widths[1]);
+        assertMeasureText(text, textChars, textSpan, 4, 7, widths[4] + widths[5] + widths[6]);
+    }
+
+    /** Tests that all four overloads of measureText are the same and match some value. */
+    private void assertMeasureText(String text, char[] textChars, SpannedString textSpan,
+            int start, int end, float expectedWidth) {
+        Paint p = new Paint();
+        int count = end - start;
+        float[] widths = new float[] {-1, -1, -1, -1};
+
+        String textSlice = text.substring(start, end);
+        widths[0] = p.measureText(textSlice);
+        widths[1] = p.measureText(textChars, start, count);
+        widths[2] = p.measureText(textSpan, start, end);
+        widths[3] = p.measureText(text, start, end);
+
+        // Check that the widths returned by the overloads are the same.
+        assertEquals(widths[0], widths[1]);
+        assertEquals(widths[1], widths[2]);
+        assertEquals(widths[2], widths[3]);
+        assertEquals(widths[3], expectedWidth);
     }
 
     @TestTargetNew(
