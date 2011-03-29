@@ -44,5 +44,14 @@ public class CreatePrivateDataTest extends AndroidTestCase {
                 Context.MODE_PRIVATE);
         outputStream.write("file contents".getBytes());
         outputStream.close();
+        assertTrue(getContext().getFileStreamPath(PRIVATE_FILE_NAME).exists());
+    }
+
+    /**
+     * Check to ensure the private file created in testCreatePrivateData does not exist.
+     * Used to check that uninstall of an app deletes the app's data.
+     */
+    public void testEnsurePrivateDataNotExist() throws IOException {
+        assertFalse(getContext().getFileStreamPath(PRIVATE_FILE_NAME).exists());
     }
 }
