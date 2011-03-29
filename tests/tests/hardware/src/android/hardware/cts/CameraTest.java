@@ -1390,6 +1390,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Ensure the camera can be opened if release is called right after AF.
         mCamera = Camera.open(cameraId);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
         mCamera.release();
