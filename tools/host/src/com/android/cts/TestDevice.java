@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+* Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -827,6 +827,15 @@ public class TestDevice implements DeviceObserver {
          */
         public String getOpenGlEsVersion() {
             return mInfoMap.get(OPEN_GL_ES_VERSION);
+        }
+
+        /**
+         * Get partitions.
+         *
+         * @return partitions or error message.
+         */
+        public String getPartitions() {
+            return mInfoMap.get(PARTITIONS);
         }
     }
 

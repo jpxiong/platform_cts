@@ -33,8 +33,8 @@ public class EqualizerTest extends AndroidTestCase {
 
     private String TAG = "EqualizerTest";
     private final static int MIN_NUMBER_OF_BANDS = 4;
-    private final static int MAX_LEVEL_RANGE_LOW = -1200;         // -12dB
-    private final static int MIN_LEVEL_RANGE_HIGH = 1200;         // +12dB
+    private final static int MAX_LEVEL_RANGE_LOW = 0;             // 0dB
+    private final static int MIN_LEVEL_RANGE_HIGH = 0;            // 0dB
     private final static int TEST_FREQUENCY_MILLIHERTZ = 1000000; // 1kHz
     private final static int MIN_NUMBER_OF_PRESETS = 0;
     private final static float TOLERANCE = 100;                   // +/-1dB

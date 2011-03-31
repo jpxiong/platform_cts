@@ -16,16 +16,16 @@
 
 package android.graphics.cts;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Path.Direction;
 import android.test.AndroidTestCase;
-
-import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
 @TestTargetClass(PathMeasure.class)
 public class PathMeasureTest extends AndroidTestCase {
@@ -119,13 +119,22 @@ public class PathMeasureTest extends AndroidTestCase {
         method = "isClosed",
         args = {}
     )
-    @BrokenTest("Flaky test. new PathMeasure().isClosed() does not return consistent result")
     public void testIsClosed() {
-        assertTrue(mPathMeasure.isClosed());
-        mPathMeasure = null;
-        mPathMeasure = new PathMeasure();
-        mPathMeasure.setPath(mPath, false);
-        assertFalse(mPathMeasure.isClosed());
+        Path circle = new Path();
+        circle.addCircle(0, 0, 1, Direction.CW);
+
+        PathMeasure measure = new PathMeasure(circle, false);
+        assertTrue(measure.isClosed());
+        measure.setPath(circle, true);
+        assertTrue(measure.isClosed());
+
+        Path line = new Path();
+        line.lineTo(5, 5);
+
+        measure.setPath(line, false);
+        assertFalse(measure.isClosed());
+        measure.setPath(line, true);
+        assertTrue(measure.isClosed());
     }
 
     @TestTargetNew(

@@ -31,6 +31,7 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -347,7 +348,17 @@ public class BaseInputConnectionTest extends
             }
         });
 
-        mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
+        // 12-key support
+        KeyCharacterMap keymap
+                = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+        if (keymap.getKeyboardType() == KeyCharacterMap.NUMERIC) {
+            // 'Q' in case of 12-key(NUMERIC) keyboard
+            mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_7));
+            mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_7));
+        }
+        else {
+            mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
+        }
         new DelayedCheck() {
             @Override
             protected boolean check() {

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 /** {@link Activity} that displays an introduction to the verifier. */
 public class CtsVerifierActivity extends Activity {
@@ -29,9 +30,11 @@ public class CtsVerifierActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-    }
-
-    public void continueButtonClickHandler(View target) {
-        startActivity(new Intent(this, TestListActivity.class));
+        findViewById(R.id.continue_button).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CtsVerifierActivity.this, TestListActivity.class));
+            }
+        });
     }
 }

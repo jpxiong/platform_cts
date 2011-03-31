@@ -65,7 +65,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         /**
          * Constructor does not include 'present' because that's a detected
          * value, and not set during creation.
-         * 
+         *
          * @param name value for this.name
          * @param required value for this.required
          */
@@ -92,8 +92,8 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     };
 
     /**
-     * A list of all features added in FroYo (API=8) and Gingerbread (API=9). 
-     * Because we want to run on Eclair devices, 
+     * A list of all features added in FroYo (API=8) and Gingerbread (API=9).
+     * Because we want to run on Eclair devices,
      * we can't use static references to constants added later
      * than Eclair. We could use Reflection, but we'd still need a list of
      * string literals (for constant names) anyway, and there's little point in
@@ -133,8 +133,8 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fs_main);
+        setPassFailButtonClickListeners();
         setInfoResources(R.string.feature_summary, R.string.feature_summary_info, R.layout.fs_info);
-        setResult(RESULT_CANCELED);
 
         // some values used to detect warn-able conditions involving multiple
         // features

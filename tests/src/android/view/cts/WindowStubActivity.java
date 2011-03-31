@@ -39,8 +39,8 @@ public class WindowStubActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, "Quit").setAlphabeticShortcut('q');
-        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, "Action").setAlphabeticShortcut('a');
+        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, "Quit").setShortcut('1', 'q');
+        menu.add(Menu.NONE, Menu.NONE, Menu.NONE, "Action").setShortcut('2', 'a');
         mIsOnCreateOptionsMenuCalled = true;
         return super.onCreateOptionsMenu(menu);
     }
