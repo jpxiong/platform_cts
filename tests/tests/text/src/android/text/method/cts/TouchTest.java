@@ -99,7 +99,7 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertEquals(width - tv.getWidth(), tv.getScrollX());
+        assertEquals(width - tv.getWidth(), tv.getScrollX(), 1.0f);
         assertEquals(5, tv.getScrollY());
 
         runTestOnUiThread(new Runnable() {
@@ -108,7 +108,7 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertEquals(width - tv.getWidth(), tv.getScrollX());
+        assertEquals(width - tv.getWidth(), tv.getScrollX(), 1.0f);
         assertEquals(5, tv.getScrollY());
     }
 

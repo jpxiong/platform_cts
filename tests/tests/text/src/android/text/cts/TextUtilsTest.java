@@ -98,7 +98,7 @@ public class TextUtilsTest extends AndroidTestCase {
         // issue 1688347, the expected result for this case does not be described
         // in the javadoc of commaEllipsize().
         assertEquals("",
-                TextUtils.commaEllipsize(text, p, textWidth - 1, "plus 1", "%d plus").toString());
+                TextUtils.commaEllipsize(text, p, textWidth - 1.4f, "plus 1", "%d plus").toString());
         // avail is long enough for only one item plus the appropriate ellipsis.
         assertEquals("long, 3 plus",
                 TextUtils.commaEllipsize(text, p, textWidth, "plus 1", "%d plus").toString());
