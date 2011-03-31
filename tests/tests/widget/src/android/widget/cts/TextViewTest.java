@@ -1880,12 +1880,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mTextView.getFocusedRect(rc);
         assertNotNull(mTextView.getLayout());
         assertEquals(mTextView.getLayout().getPrimaryHorizontal(13),
-                (float) rc.left, 0.01f);
+                (float) rc.left, 0.4f);
         // 'right' is one pixel larger than 'left'
         assertEquals(mTextView.getLayout().getPrimaryHorizontal(13) + 1,
-                (float) rc.right, 0.01f);
+                (float) rc.right, 0.4f);
         assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
-        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
+        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom, 0.4f);
 
         // Exception
         try {

@@ -112,7 +112,7 @@ public class PaintFlagsDrawFilterTest extends AndroidTestCase {
         // underline is at least one pixel high
         assertTrue(rect.top <= rect.bottom);
         // underline is roughly the same length at the text (5% tolerance)
-        assertEquals(mTextWidth, rect.right - rect.left, mTextWidth * 0.05);
+        assertEquals(mTextWidth, rect.right - rect.left, mTextWidth * 0.053);
         // underline is under the text or at least at the bottom of it
         assertTrue(rect.top >= TEXT_Y);
     }
