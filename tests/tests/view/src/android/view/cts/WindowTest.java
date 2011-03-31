@@ -40,7 +40,6 @@ import android.util.DisplayMetrics;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.InputQueue;
-import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;

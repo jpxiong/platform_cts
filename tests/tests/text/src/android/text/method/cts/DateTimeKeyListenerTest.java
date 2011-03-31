@@ -138,7 +138,7 @@ public class DateTimeKeyListenerTest extends
         assertEquals(expectedText, mTextView.getText().toString());
 
         // press 'a' key if producible
-        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+        KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
         if ('a' == kcm.getMatch(KeyEvent.KEYCODE_A, DateTimeKeyListener.CHARACTERS)) {
             expectedText += "a";
             mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_A);
