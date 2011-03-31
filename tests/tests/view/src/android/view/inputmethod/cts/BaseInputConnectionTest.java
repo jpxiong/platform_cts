@@ -340,7 +340,6 @@ public class BaseInputConnectionTest extends
         method = "sendKeyEvent",
         args = {KeyEvent.class}
     )
-
     public void testSendKeyEvent() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -359,7 +358,6 @@ public class BaseInputConnectionTest extends
         else {
             mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
         }
-
         new DelayedCheck() {
             @Override
             protected boolean check() {

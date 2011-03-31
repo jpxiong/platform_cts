@@ -48,11 +48,13 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public static final int TYPE_MOBILE = ConnectivityManager.TYPE_MOBILE;
     public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
     private static final int HOST_ADDRESS = 0x7f000001;// represent ip 127.0.0.1
+
+    // device could have only one interface: data, wifi.
+    private static final int MIN_NUM_NETWORK_TYPES = 1;
+
     private ConnectivityManager mCm;
     private WifiManager mWifiManager;
     private PackageManager mPackageManager;
-    // device could have only one interface: data, wifi.
-    private static final int MIN_NUM_NETWORK_TYPES = 1;
 
     @Override
     protected void setUp() throws Exception {

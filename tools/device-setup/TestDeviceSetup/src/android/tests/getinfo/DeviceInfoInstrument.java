@@ -31,10 +31,12 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoConstants {
@@ -125,6 +127,9 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         String openGlEsVersion = getOpenGlEsVersion();
         addResult(OPEN_GL_ES_VERSION, openGlEsVersion);
 
+        // partitions
+        String partitions = getPartitions();
+        addResult(PARTITIONS, partitions);
 
         finish(Activity.RESULT_OK, mResults);
     }
@@ -295,5 +300,23 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
             }
         }
         return "No feature for Open GL ES version.";
+    }
+
+    private String getPartitions() {
+        try {
+            StringBuilder builder = new StringBuilder();
+            Process df = new ProcessBuilder("df").start();
+            Scanner scanner = new Scanner(df.getInputStream());
+            try {
+                while (scanner.hasNextLine()) {
+                    builder.append(scanner.nextLine()).append(';');
+                }
+                return builder.toString();
+            } finally {
+                scanner.close();
+            }
+        } catch (IOException e) {
+            return "Not able to run df for partition information.";
+        }
     }
 }

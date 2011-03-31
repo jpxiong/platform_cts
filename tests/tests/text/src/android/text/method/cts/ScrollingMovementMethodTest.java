@@ -187,7 +187,7 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
             }
         }));
         assertTrue(mTextView.getScrollX() > previousScrollX);
-        assertEquals(rightMost, mTextView.getScrollX(), 0f);
+        assertEquals(rightMost, mTextView.getScrollX(), 1.0f);
 
         previousScrollX = mTextView.getScrollX();
         assertTrue(getActionResult(new ActionRunnerWithResult() {

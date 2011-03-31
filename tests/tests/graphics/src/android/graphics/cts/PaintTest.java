@@ -16,7 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.BrokenTest;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -28,7 +27,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rasterizer;
-import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.Xfermode;
@@ -37,8 +35,6 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 
 @TestTargetClass(Paint.class)
@@ -70,216 +66,85 @@ public class PaintTest extends AndroidTestCase {
         new Paint(p);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "breakText",
-        args = {char[].class, int.class, int.class, float.class, float[].class}
-    )
-    public void testBreakText_charArray() {
+    public void testBreakText() {
+        String text = "HIJKLMN";
+        char[] textChars = text.toCharArray();
+        SpannedString textSpan = new SpannedString(text);
+
         Paint p = new Paint();
-
-        char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
-
-        float[] widths = new float[chars.length];
-        assertEquals(chars.length, p.getTextWidths(chars, 0, chars.length, widths));
+        float[] widths = new float[text.length()];
+        assertEquals(text.length(), p.getTextWidths(text, widths));
 
         float totalWidth = 0.0f;
-        for (int i = 0; i < chars.length; i++) {
+        for (int i = 0; i < text.length(); i++) {
             totalWidth += widths[i];
         }
 
         float[] measured = new float[1];
-        for (int i = 0; i < chars.length; i++) {
-            assertEquals(1, p.breakText(chars, i, 1, totalWidth, measured));
-            assertEquals(widths[i], measured[0]);
+        for (int i = 0; i < text.length(); i++) {
+            assertBreakText(text, textChars, textSpan, i, i + 1, true, totalWidth, 1, widths[i]);
         }
 
         // Measure empty string
-        assertEquals(0, p.breakText(chars, 0, 0, totalWidth, measured));
-        assertEquals(0.0f, measured[0]);
+        assertBreakText(text, textChars, textSpan, 0, 0, true, totalWidth, 0, 0);
 
         // Measure substring from front: "HIJ"
-        assertEquals(3, p.breakText(chars, 0, 3, totalWidth, measured));
-        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+        assertBreakText(text, textChars, textSpan, 0, 3, true, totalWidth,
+                3, widths[0] + widths[1] + widths[2]);
 
         // Reverse measure substring from front: "HIJ"
-        assertEquals(3, p.breakText(chars, 0, -3, totalWidth, measured));
-        assertEquals(widths[0] + widths[1] + widths[2], measured[0]);
+        assertBreakText(text, textChars, textSpan, 0, 3, false, totalWidth,
+                3, widths[0] + widths[1] + widths[2]);
 
         // Measure substring from back: "MN"
-        assertEquals(2, p.breakText(chars, 5, 2, totalWidth, measured));
-        assertEquals(widths[5] + widths[6], measured[0]);
+        assertBreakText(text, textChars, textSpan, 5, 7, false, totalWidth,
+                2, widths[5] + widths[6]);
 
         // Reverse measure substring from back: "MN"
-        assertEquals(2, p.breakText(chars, 5, -2, totalWidth, measured));
-        assertEquals(widths[5] + widths[6], measured[0]);
+        assertBreakText(text, textChars, textSpan, 5, 7, false, totalWidth,
+                2, widths[5] + widths[6]);
 
         // Measure substring in the middle: "JKL"
-        assertEquals(3, p.breakText(chars, 2, 3, totalWidth, measured));
-        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+        assertBreakText(text, textChars, textSpan, 2, 5, true, totalWidth,
+                3, widths[2] + widths[3] + widths[4]);
 
         // Reverse measure substring in the middle: "JKL"
-        assertEquals(3, p.breakText(chars, 2, -3, totalWidth, measured));
-        assertEquals(widths[2] + widths[3] + widths[4], measured[0]);
+        assertBreakText(text, textChars, textSpan, 2, 5, false, totalWidth,
+                3, widths[2] + widths[3] + widths[4]);
 
         // Measure substring in the middle and restrict width to the first 2 characters.
-        assertEquals(2, p.breakText(chars, 2, 3, widths[2] + widths[3], measured));
-        assertEquals(widths[2] + widths[3], measured[0]);
+        assertBreakText(text, textChars, textSpan, 2, 5, true, widths[2] + widths[3],
+                2, widths[2] + widths[3]);
 
         // Reverse measure substring in the middle and restrict width to the last 2 characters.
-        assertEquals(2, p.breakText(chars, 2, -3, widths[3] + widths[4], measured));
-        assertEquals(widths[3] + widths[4], measured[0]);
+        assertBreakText(text, textChars, textSpan, 2, 5, false, widths[3] + widths[4],
+                2, widths[3] + widths[4]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "breakText",
-        args = {java.lang.CharSequence.class, int.class, int.class, boolean.class, float.class,
-                float[].class}
-    )
-    public void testBreakText2() {
+    private void assertBreakText(String text, char[] textChars, SpannedString textSpan,
+            int start, int end, boolean measureForwards, float maxWidth, int expectedCount,
+            float expectedWidth) {
         Paint p = new Paint();
-        String string = "HIJKLMN";
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[1];
 
-        assertEquals(7, p.breakText(string, 0, 7, true, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(string, 0, 7, true, 40.0f, f));
-        assertEquals(38.0f, f[0]);
-        assertEquals(7, p.breakText(string, 0, 7, false, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-
-        for (int i = 0; i < string.length(); i++) {
-            assertEquals(1, p.breakText(string, i, i + 1, true, 20.0f, f));
-            assertEquals(width[i], f[0]);
+        int count = end - start;
+        if (!measureForwards) {
+            count = -count;
         }
 
-        assertEquals(4, p.breakText(string, 0, 4, true, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-        assertEquals(3, p.breakText(string, 0, 3, true, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(2, p.breakText(string, 0, 2, true, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(1, p.breakText(string, 0, 1, true, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(0, p.breakText(string, 0, 0, true, 30.0f, f));
-        assertEquals(0.0f, f[0]);
+        float[][] measured = new float[][] {
+            new float[1],
+            new float[1],
+            new float[1]
+        };
+        String textSlice = text.substring(start, end);
+        assertEquals(expectedCount, p.breakText(textSlice, measureForwards, maxWidth, measured[0]));
+        assertEquals(expectedCount, p.breakText(textChars, start, count, maxWidth, measured[1]));
+        assertEquals(expectedCount, p.breakText(textSpan, start, end, measureForwards, maxWidth,
+                measured[2]));
 
-        assertEquals(1, p.breakText(string, 2, 3, true, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-        assertEquals(1, p.breakText(string, 2, 3, false, 30.0f, f));
-        assertEquals(3.0f, f[0]);
-
-        assertEquals(1, p.breakText(string, 0, 1, true, 30.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(2, p.breakText(string, 0, 2, true, 30.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(3, p.breakText(string, 0, 3, true, 30.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(4, p.breakText(string, 0, 4, true, 30.0f, f));
-        assertEquals(22.0f, f[0]);
-
-        assertEquals(7, p.breakText(string, 0, 7, true, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(string, 0, 7, true, 40.0f, f));
-        assertEquals(38.0f, f[0]);
-
-        assertEquals(7, p.breakText(string, 0, 7, false, 50.0f, null));
-        assertEquals(7, p.breakText(string, 0, 7, true, 50.0f, null));
-
-        try {
-            p.breakText(string, 0, 8, true, 60.0f, null);
-            fail("Should throw an StringIndexOutOfboundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //except here
+        for (int i = 0; i < measured.length; i++) {
+            assertEquals("i: " + i, expectedWidth, measured[i][0]);
         }
-        try {
-            p.breakText(string, -1, 7, true, 50.0f, null);
-            fail("Should throw an StringIndexOutOfboundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.breakText(string, 1, -7, true, 50.0f, null);
-            fail("Should throw an StringIndexOutOfboundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.breakText(string, 7, 1, true, 50.0f, null);
-            fail("Should throw an StringIndexOutOfboundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //except here
-        }
-
-    }
-
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "breakText",
-        args = {java.lang.String.class, boolean.class, float.class, float[].class}
-    )
-    public void testBreakText3() {
-        Paint p = new Paint();
-        String string = "HIJKLMN";
-        float[] width = {8.0f, 4.0f, 3.0f, 7.0f, 6.0f, 10.0f, 9.0f};
-        float[] f = new float[1];
-
-        for (int i = 0; i < string.length(); i++) {
-            assertEquals(1, p.breakText(string.substring(i, i+1), true, 20.0f, f));
-            assertEquals(width[i], f[0]);
-            assertEquals(1, p.breakText(string.substring(i, i+1), false, 20.0f, f));
-            assertEquals(width[i], f[0]);
-        }
-
-        assertEquals(0, p.breakText("", false, 20.0f, f));
-        assertEquals(0.0f, f[0]);
-
-        assertEquals(7, p.breakText(string, true, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(7, p.breakText(string, false, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(string, false, 40.0f, f));
-        assertEquals(39.0f, f[0]);
-        assertEquals(5, p.breakText(string, false, 35.0f, f));
-        assertEquals(35.0f, f[0]);
-        assertEquals(4, p.breakText(string, false, 33.0f, f));
-        assertEquals(32.0f, f[0]);
-        assertEquals(3, p.breakText(string, false, 25.0f, f));
-        assertEquals(25.0f, f[0]);
-        assertEquals(2, p.breakText(string, false, 20.0f, f));
-        assertEquals(19.0f, f[0]);
-        assertEquals(1, p.breakText(string, false, 13.0f, f));
-        assertEquals(9.0f, f[0]);
-        assertEquals(0, p.breakText(string, false, 3.0f, f));
-        assertEquals(0.0f, f[0]);
-
-        assertEquals(7, p.breakText(string, true, 50.0f, f));
-        assertEquals(47.0f, f[0]);
-        assertEquals(6, p.breakText(string, true, 40.0f, f));
-        assertEquals(38.0f, f[0]);
-        assertEquals(5, p.breakText(string, true, 35.0f, f));
-        assertEquals(28.0f, f[0]);
-        assertEquals(4, p.breakText(string, true, 25.0f, f));
-        assertEquals(22.0f, f[0]);
-        assertEquals(3, p.breakText(string, true, 20.0f, f));
-        assertEquals(15.0f, f[0]);
-        assertEquals(2, p.breakText(string, true, 12.0f, f));
-        assertEquals(12.0f, f[0]);
-        assertEquals(1, p.breakText(string, true, 10.0f, f));
-        assertEquals(8.0f, f[0]);
-        assertEquals(0, p.breakText(string, true, 3.0f, f));
-        assertEquals(0.0f, f[0]);
-
-        assertEquals(7, p.breakText(string, true, 50.0f, null));
-        assertEquals(6, p.breakText(string, true, 40.0f, null));
-        assertEquals(5, p.breakText(string, true, 35.0f, null));
-        assertEquals(4, p.breakText(string, true, 25.0f, null));
-        assertEquals(3, p.breakText(string, true, 20.0f, null));
-        assertEquals(2, p.breakText(string, true, 12.0f, null));
-        assertEquals(1, p.breakText(string, true, 10.0f, null));
-        assertEquals(0, p.breakText(string, true, 3.0f, null));
     }
 
     @TestTargetNew(
@@ -1020,138 +885,6 @@ public class PaintTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
-        method = "getTextBounds",
-        args = {java.lang.String.class, int.class, int.class, android.graphics.Rect.class}
-    )
-    @BrokenTest("Test result will be different when run in batch mode")
-    public void testGetTextBounds1() throws Exception {
-        Paint p = new Paint();
-        Rect r = new Rect();
-        String s = "HIJKLMN";
-
-        try {
-            p.getTextBounds(s, -1, 2, r);
-        } catch (IndexOutOfBoundsException e) {
-        } catch (RuntimeException e) {
-            fail("Should not throw a RuntimeException");
-        }
-
-        try {
-            p.getTextBounds(s, 0, -2, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(s, 4, 3, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(s, 0, 8, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(s, 0, 2, null);
-        } catch (NullPointerException e) {
-            //except here
-        }
-
-        p.getTextBounds(s, 0, 0, r);
-        assertEquals(0, r.bottom);
-        assertEquals(-1, r.left);
-        assertEquals(0, r.right);
-        assertEquals(-1, r.top);
-
-        p.getTextBounds(s, 0, 1, r);
-        assertEquals(0, r.bottom);
-        assertEquals(1, r.left);
-        assertEquals(8, r.right);
-        assertEquals(-9, r.top);
-
-        p.getTextBounds(s, 1, 2, r);
-        assertEquals(0, r.bottom);
-        assertEquals(0, r.left);
-        assertEquals(4, r.right);
-        assertEquals(-9, r.top);
-
-        p.getTextBounds(s, 0, 6, r);
-        assertEquals(3, r.bottom);
-        assertEquals(1, r.left);
-        assertEquals(38, r.right);
-        assertEquals(-9, r.top);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTextBounds",
-        args = {char[].class, int.class, int.class, android.graphics.Rect.class}
-    )
-    @BrokenTest("Test result will be different when run in batch mode")
-    public void testGetTextBounds2() throws Exception {
-        Paint p = new Paint();
-        Rect r = new Rect();
-        char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
-
-        try {
-            p.getTextBounds(chars, -1, 2, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(chars, 0, -2, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(chars, 4, 3, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-
-        try {
-            p.getTextBounds(chars, 0, 8, r);
-        } catch (IndexOutOfBoundsException e) {
-            //except here
-        }
-        try {
-            p.getTextBounds(chars, 0, 2, null);
-        } catch (NullPointerException e) {
-            //except here
-        }
-
-        p.getTextBounds(chars, 0, 0, r);
-        assertEquals(0, r.bottom);
-        assertEquals(-1, r.left);
-        assertEquals(0, r.right);
-        assertEquals(0, r.top);
-
-        p.getTextBounds(chars, 0, 1, r);
-        assertEquals(0, r.bottom);
-        assertEquals(1, r.left);
-        assertEquals(8, r.right);
-        assertEquals(-9, r.top);
-
-        p.getTextBounds(chars, 1, 2, r);
-        assertEquals(3, r.bottom);
-        assertEquals(0, r.left);
-        assertEquals(7, r.right);
-        assertEquals(-9, r.top);
-
-        p.getTextBounds(chars, 0, 6, r);
-        assertEquals(3, r.bottom);
-        assertEquals(1, r.left);
-        assertEquals(38, r.right);
-        assertEquals(-9, r.top);
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
         method = "setShadowLayer",
         args = {float.class, float.class, float.class, int.class}
     )
@@ -1533,433 +1266,54 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(-26, fmi.top);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "measureText",
-        args = {char[].class, int.class, int.class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testMeasureText1() {
+    public void testMeasureText() {
+        String text = "HIJKLMN";
+        char[] textChars = text.toCharArray();
+        SpannedString textSpan = new SpannedString(text);
+
         Paint p = new Paint();
-
-        // The default text size
-        assertEquals(12.0f, p.getTextSize());
-
-        char[] c = {};
-        char[] c2 = {'H'};
-        char[] c3 = {'H', 'I', 'J', 'H', 'I', 'J'};
-        assertEquals(0.0f, p.measureText(c, 0, 0));
-        assertEquals(8.0f, p.measureText(c2, 0, 1));
-        assertEquals(8.0f, p.measureText(c3, 0, 1));
-        assertEquals(15.0f, p.measureText(c3, 0, 3));
-        assertEquals(15.0f, p.measureText(c3, 3, 3));
-        assertEquals(30.0f, p.measureText(c3, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(c2, 0, 1));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(c2, 0, 1));
-
-        try {
-            p.measureText(c3, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
+        float[] widths = new float[text.length()];
+        for (int i = 0; i < widths.length; i++) {
+            widths[i] = p.measureText(text, i, i + 1);
         }
 
-        try {
-            p.measureText(c3, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
+        float totalWidth = 0;
+        for (int i = 0; i < widths.length; i++) {
+            totalWidth += widths[i];
         }
 
-        try {
-            p.measureText(c3, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
+        // Test measuring the widths of the entire text
+        assertMeasureText(text, textChars, textSpan, 0, 7, totalWidth);
 
-        try {
-            p.measureText((char[]) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
+        // Test measuring a substring of the text
+        assertMeasureText(text, textChars, textSpan, 1, 3, widths[1] + widths[2]);
+
+        // Test measuring a substring of zero length.
+        assertMeasureText(text, textChars, textSpan, 3, 3, 0);
+
+        // Test measuring substrings from the front and back
+        assertMeasureText(text, textChars, textSpan, 0, 2, widths[0] + widths[1]);
+        assertMeasureText(text, textChars, textSpan, 4, 7, widths[4] + widths[5] + widths[6]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "measureText",
-        args = {java.lang.String.class, int.class, int.class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testMeasureText2() {
+    /** Tests that all four overloads of measureText are the same and match some value. */
+    private void assertMeasureText(String text, char[] textChars, SpannedString textSpan,
+            int start, int end, float expectedWidth) {
         Paint p = new Paint();
-        String string = "HIJHIJ";
-
-        // The default text size
-        assertEquals(12.0f, p.getTextSize());
-
-        assertEquals(0.0f, p.measureText("", 0, 0));
-        assertEquals(8.0f, p.measureText("H", 0, 1));
-        assertEquals(4.0f, p.measureText("I", 0, 1));
-        assertEquals(3.0f, p.measureText("J", 0, 1));
-        assertEquals(8.0f, p.measureText(string, 0, 1));
-        assertEquals(15.0f, p.measureText(string, 0, 3));
-        assertEquals(15.0f, p.measureText(string, 3, 6));
-        assertEquals(30.0f, p.measureText(string, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText("H", 0, 1));
-        assertEquals(8.0f, p.measureText("I", 0, 1));
-        assertEquals(7.0f, p.measureText("J", 0, 1));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText("H", 0, 1));
-        assertEquals(7.0f, p.measureText("I", 0, 1));
-        assertEquals(7.0f, p.measureText("J", 0, 1));
-
-        try {
-            p.measureText(string, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(string, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(string, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((String) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "measureText",
-        args = {java.lang.String.class}
-    )
-    @BrokenTest("unknown if hardcoded values being checked are correct")
-    public void testMeasureText3() {
-        Paint p = new Paint();
-
-        // The default text size
-        p.setTextSize(12.0f);
-        assertEquals(12.0f, p.getTextSize());
-
-        assertEquals(0.0f, p.measureText(""));
-        assertEquals(8.0f, p.measureText("H"));
-        assertEquals(4.0f, p.measureText("I"));
-        assertEquals(3.0f, p.measureText("J"));
-        assertEquals(7.0f, p.measureText("K"));
-        assertEquals(6.0f, p.measureText("L"));
-        assertEquals(10.0f, p.measureText("M"));
-        assertEquals(9.0f, p.measureText("N"));
-        assertEquals(12.0f, p.measureText("HI"));
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText("H"));
-        assertEquals(8.0f, p.measureText("I"));
-        assertEquals(7.0f, p.measureText("J"));
-        assertEquals(14.0f, p.measureText("K"));
-        assertEquals(12.0f, p.measureText("L"));
-        assertEquals(21.0f, p.measureText("M"));
-        assertEquals(18.0f, p.measureText("N"));
-        assertEquals(25.0f, p.measureText("HI"));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText("H"));
-        assertEquals(7.0f, p.measureText("I"));
-        assertEquals(7.0f, p.measureText("J"));
-        assertEquals(7.0f, p.measureText("K"));
-        assertEquals(7.0f, p.measureText("L"));
-        assertEquals(7.0f, p.measureText("M"));
-        assertEquals(7.0f, p.measureText("N"));
-        assertEquals(14.0f, p.measureText("HI"));
-
-        try {
-            p.measureText(null);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-    }
-
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "measureText",
-        args = {java.lang.CharSequence.class, int.class, int.class}
-    )
-    @BrokenTest("unknown if hardcoded values being tested are correct")
-    public void testMeasureText4() {
-
-        Paint p = new Paint();
-        // CharSequence of String
-        String string = "HIJHIJ";
-        // The default text size
-        p.setTextSize(12.0f);
-        assertEquals(12.0f, p.getTextSize());
-
-        assertEquals(8.0f, p.measureText((CharSequence) string, 0, 1));
-        assertEquals(15.0f, p.measureText((CharSequence) string, 0, 3));
-        assertEquals(15.0f, p.measureText((CharSequence) string, 3, 6));
-        assertEquals(30.0f, p.measureText((CharSequence) string, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText((CharSequence) string, 0, 1));
-        assertEquals(32.0f, p.measureText((CharSequence) string, 0, 3));
-        assertEquals(32.0f, p.measureText((CharSequence) string, 3, 6));
-        assertEquals(64.0f, p.measureText((CharSequence) string, 0, 6));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText((CharSequence) string, 0, 1));
-        assertEquals(21.0f, p.measureText((CharSequence) string, 0, 3));
-        assertEquals(21.0f, p.measureText((CharSequence) string, 3, 6));
-        assertEquals(42.0f, p.measureText((CharSequence) string, 0, 6));
-
-        try {
-            p.measureText((CharSequence) "HIJHIJ", -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((CharSequence) "HIJHIJ", 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((CharSequence) "HIJHIJ", 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((CharSequence) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        // CharSequence of SpannedString
-        SpannedString spannedString = new SpannedString("HIJHIJ");
-        // The default text size and typeface
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.DEFAULT);
-
-        assertEquals(8.0f, p.measureText(spannedString, 0, 1));
-        assertEquals(15.0f, p.measureText(spannedString, 0, 3));
-        assertEquals(15.0f, p.measureText(spannedString, 3, 6));
-        assertEquals(30.0f, p.measureText(spannedString, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(spannedString, 0, 1));
-        assertEquals(32.0f, p.measureText(spannedString, 0, 3));
-        assertEquals(32.0f, p.measureText(spannedString, 3, 6));
-        assertEquals(64.0f, p.measureText(spannedString, 0, 6));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(spannedString, 0, 1));
-        assertEquals(21.0f, p.measureText(spannedString, 0, 3));
-        assertEquals(21.0f, p.measureText(spannedString, 3, 6));
-        assertEquals(42.0f, p.measureText(spannedString, 0, 6));
-
-        try {
-            p.measureText(spannedString, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannedString, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannedString, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((SpannedString) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        // CharSequence of SpannableString
-        SpannableString spannableString = new SpannableString("HIJHIJ");
-        // The default text size and typeface
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.DEFAULT);
-
-        assertEquals(8.0f, p.measureText(spannableString, 0, 1));
-        assertEquals(15.0f, p.measureText(spannableString, 0, 3));
-        assertEquals(15.0f, p.measureText(spannableString, 3, 6));
-        assertEquals(30.0f, p.measureText(spannableString, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(spannableString, 0, 1));
-        assertEquals(32.0f, p.measureText(spannableString, 0, 3));
-        assertEquals(32.0f, p.measureText(spannableString, 3, 6));
-        assertEquals(64.0f, p.measureText(spannableString, 0, 6));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(spannableString, 0, 1));
-        assertEquals(21.0f, p.measureText(spannableString, 0, 3));
-        assertEquals(21.0f, p.measureText(spannableString, 3, 6));
-        assertEquals(42.0f, p.measureText(spannableString, 0, 6));
-
-        try {
-            p.measureText(spannableString, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannableString, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannableString, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((SpannableString) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        // CharSequence of SpannableStringBuilder (GraphicsOperations)
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("HIJHIJ");
-        // The default text size
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.DEFAULT);
-
-        assertEquals(8.0f, p.measureText(spannableStringBuilder, 0, 1));
-        assertEquals(15.0f, p.measureText(spannableStringBuilder, 0, 3));
-        assertEquals(15.0f, p.measureText(spannableStringBuilder, 3, 6));
-        assertEquals(30.0f, p.measureText(spannableStringBuilder, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(spannableStringBuilder, 0, 1));
-        assertEquals(32.0f, p.measureText(spannableStringBuilder, 0, 3));
-        assertEquals(32.0f, p.measureText(spannableStringBuilder, 3, 6));
-        assertEquals(64.0f, p.measureText(spannableStringBuilder, 0, 6));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(spannableStringBuilder, 0, 1));
-        assertEquals(21.0f, p.measureText(spannableStringBuilder, 0, 3));
-        assertEquals(21.0f, p.measureText(spannableStringBuilder, 3, 6));
-        assertEquals(42.0f, p.measureText(spannableStringBuilder, 0, 6));
-
-        try {
-            p.measureText(spannableStringBuilder, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannableStringBuilder, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(spannableStringBuilder, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((SpannableStringBuilder) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        // CharSequence of StringBuilder
-        StringBuilder stringBuilder = new StringBuilder("HIJHIJ");
-        // The default text size and typeface
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.DEFAULT);
-
-        assertEquals(8.0f, p.measureText(stringBuilder, 0, 1));
-        assertEquals(15.0f, p.measureText(stringBuilder, 0, 3));
-        assertEquals(15.0f, p.measureText(stringBuilder, 3, 6));
-        assertEquals(30.0f, p.measureText(stringBuilder, 0, 6));
-
-        p.setTextSize(24.0f);
-
-        assertEquals(17.0f, p.measureText(stringBuilder, 0, 1));
-        assertEquals(32.0f, p.measureText(stringBuilder, 0, 3));
-        assertEquals(32.0f, p.measureText(stringBuilder, 3, 6));
-        assertEquals(64.0f, p.measureText(stringBuilder, 0, 6));
-
-        p.setTextSize(12.0f);
-        p.setTypeface(Typeface.MONOSPACE);
-
-        assertEquals(7.0f, p.measureText(stringBuilder, 0, 1));
-        assertEquals(21.0f, p.measureText(stringBuilder, 0, 3));
-        assertEquals(21.0f, p.measureText(stringBuilder, 3, 6));
-        assertEquals(42.0f, p.measureText(stringBuilder, 0, 6));
-
-        try {
-            p.measureText(stringBuilder, -1, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(stringBuilder, 4, 3);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText(stringBuilder, 0, 9);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
-        try {
-            p.measureText((StringBuilder) null, 0, 0);
-            fail("Should throw a RuntimeException");
-        } catch (RuntimeException e) {
-        }
-
+        int count = end - start;
+        float[] widths = new float[] {-1, -1, -1, -1};
+
+        String textSlice = text.substring(start, end);
+        widths[0] = p.measureText(textSlice);
+        widths[1] = p.measureText(textChars, start, count);
+        widths[2] = p.measureText(textSpan, start, end);
+        widths[3] = p.measureText(text, start, end);
+
+        // Check that the widths returned by the overloads are the same.
+        assertEquals(widths[0], widths[1]);
+        assertEquals(widths[1], widths[2]);
+        assertEquals(widths[2], widths[3]);
+        assertEquals(widths[3], expectedWidth);
     }
 
     @TestTargetNew(

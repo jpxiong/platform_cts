@@ -58,7 +58,23 @@ public class SmsManagerTest extends AndroidTestCase {
     // List of network operators that don't support SMS delivery report
     private static final List<String> NO_DELIVERY_REPORTS =
             Arrays.asList(
-                    "310410"    // AT&T Mobility
+                    "310410",   // AT&T Mobility
+                    "44010",    // NTT DOCOMO
+                    "45005",    // SKT Mobility
+                    "45002",    // SKT Mobility
+                    "45008"     // KT Mobility
+            );
+
+    // List of network operators that doesn't support Data(binary) SMS message
+    private static final List<String> UNSUPPORT_DATA_SMS_MESSAGES =
+            Arrays.asList(
+                    "44010"    // NTT DOCOMO
+            );
+
+    // List of network operators that doesn't support Maltipart SMS message
+    private static final List<String> UNSUPPORT_MULTIPART_SMS_MESSAGES =
+            Arrays.asList(
+                    "44010"    // NTT DOCOMO
             );
 
     private TelephonyManager mTelephonyManager;
@@ -73,7 +89,7 @@ public class SmsManagerTest extends AndroidTestCase {
     private Intent mDeliveryIntent;
     private boolean mDeliveryReportSupported;
 
-    private static final int TIME_OUT = 1000 * 60 * 4;
+    private static final int TIME_OUT = 1000 * 60 * 5;
 
     @Override
     protected void setUp() throws Exception {
@@ -89,9 +105,6 @@ public class SmsManagerTest extends AndroidTestCase {
         } else if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
             // CDMA supports SMS delivery report
             mDeliveryReportSupported = true;
-        } else if (mTelephonyManager.getDeviceId().equals("000000000000000")) {
-            // emulator doesn't support SMS delivery report
-            mDeliveryReportSupported = false;
         } else {
             // is this a GSM network that doesn't support SMS delivery report?
             String mccmnc = mTelephonyManager.getSimOperator();
@@ -136,6 +149,8 @@ public class SmsManagerTest extends AndroidTestCase {
             return;
         }
 
+        String mccmnc = mTelephonyManager.getSimOperator();
+
         mSendIntent = new Intent(SMS_SEND_ACTION);
         mDeliveryIntent = new Intent(SMS_DELIVERY_ACTION);
 
@@ -162,30 +177,40 @@ public class SmsManagerTest extends AndroidTestCase {
         }
 
         // send data sms
-        byte[] data = mText.getBytes();
-        short port = 19989;
+        if (!UNSUPPORT_DATA_SMS_MESSAGES.contains(mccmnc)) {
+            byte[] data = mText.getBytes();
+            short port = 19989;
 
-        init();
-        sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
-        assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
-        if (mDeliveryReportSupported) {
-            assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            init();
+            sendDataMessage(mDestAddr, port, data, mSentIntent, mDeliveredIntent);
+            assertTrue(mSendReceiver.waitForCalls(1, TIME_OUT));
+            if (mDeliveryReportSupported) {
+                assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
+            }
+        } else {
+            // This GSM network doesn't support Data(binary) SMS message.
+            // Skip the test.
         }
 
         // send multi parts text sms
-        init();
-        ArrayList<String> parts = divideMessage(LONG_TEXT);
-        int numParts = parts.size();
-        ArrayList<PendingIntent> sentIntents = new ArrayList<PendingIntent>();
-        ArrayList<PendingIntent> deliveryIntents = new ArrayList<PendingIntent>();
-        for (int i = 0; i < numParts; i++) {
-            sentIntents.add(PendingIntent.getBroadcast(getContext(), 0, mSendIntent, 0));
-            deliveryIntents.add(PendingIntent.getBroadcast(getContext(), 0, mDeliveryIntent, 0));
-        }
-        sendMultiPartTextMessage(mDestAddr, parts, sentIntents, deliveryIntents);
-        assertTrue(mSendReceiver.waitForCalls(numParts, TIME_OUT));
-        if (mDeliveryReportSupported) {
-            assertTrue(mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
+        if (!UNSUPPORT_MULTIPART_SMS_MESSAGES.contains(mccmnc)) {
+            init();
+            ArrayList<String> parts = divideMessage(LONG_TEXT);
+            int numParts = parts.size();
+            ArrayList<PendingIntent> sentIntents = new ArrayList<PendingIntent>();
+            ArrayList<PendingIntent> deliveryIntents = new ArrayList<PendingIntent>();
+            for (int i = 0; i < numParts; i++) {
+                sentIntents.add(PendingIntent.getBroadcast(getContext(), 0, mSendIntent, 0));
+                deliveryIntents.add(PendingIntent.getBroadcast(getContext(), 0, mDeliveryIntent, 0));
+            }
+            sendMultiPartTextMessage(mDestAddr, parts, sentIntents, deliveryIntents);
+            assertTrue(mSendReceiver.waitForCalls(numParts, TIME_OUT));
+            if (mDeliveryReportSupported) {
+              assertTrue(mDeliveryReceiver.waitForCalls(numParts, TIME_OUT));
+            }
+        } else {
+            // This GSM network doesn't support Multipart SMS message.
+            // Skip the test.
         }
     }
 
