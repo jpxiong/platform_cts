@@ -42,6 +42,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.animation.cts.DelayedCheck;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -60,6 +61,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
     private static final float MOTION_X = -20.0f;
     private static final float MOTION_Y = -20.0f;
     private static final String STUB_ACTIVITY_PACKAGE = "com.android.cts.stub";
+    private static final long TEST_TIMEOUT = 1000L;
 
     /**
      *  please refer to Dialog
@@ -681,7 +683,12 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         });
         mInstrumentation.waitForIdleSync();
 
-        assertTrue(d.isOnWindowFocusChangedCalled);
+        // Wait until TestDialog#OnWindowFocusChanged() is called
+        new DelayedCheck(TEST_TIMEOUT) {
+            protected boolean check() {
+                return d.isOnWindowFocusChangedCalled;
+            }
+        }.run();
     }
 
     @TestTargets({
