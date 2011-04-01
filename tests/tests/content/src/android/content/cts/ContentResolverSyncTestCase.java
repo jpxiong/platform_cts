@@ -229,6 +229,10 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
      * Test if we can set and get the SyncAutomatically switch for an account
      */
     public void testGetAndSetSyncAutomatically() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        }
         // Prevent auto sync
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
