@@ -820,10 +820,20 @@ public class ContactsTest extends InstrumentationTestCase {
                     GroupMembership.CONTENT_URI, GROUP_MEMBERSHIP_PROJECTION,
                     GroupMembership.PERSON_ID + " = " + peopleId,
                     null, null);
-            assertTrue(cursor.moveToNext());
-            assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
-            assertEquals(groupId1, cursor.getInt(GROUP_ID_INDEX));
-            int id = cursor.getInt(ID_INDEX);
+
+            // Check that the person has been associated with the group. The person may be in
+            // additional groups by being added automatically.
+            int id = -1;
+            while(true) {
+                assertTrue(cursor.moveToNext());
+                assertEquals(peopleId, cursor.getInt(PERSON_ID_INDEX));
+                int cursorGroupId = cursor.getInt(GROUP_ID_INDEX);
+                if (groupId1 == cursorGroupId) {
+                    id = cursor.getInt(ID_INDEX);
+                    break;
+                }
+            }
+            assertTrue(id != -1);
             cursor.close();
 
             // Test: update
