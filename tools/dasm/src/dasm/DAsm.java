@@ -16,6 +16,7 @@
 
 package dasm;
 
+import com.android.dx.dex.DexOptions;
 import com.android.dx.dex.code.ArrayData;
 import com.android.dx.dex.code.CodeAddress;
 import com.android.dx.dex.code.CstInsn;
@@ -81,6 +82,9 @@ public class DAsm {
 
     // number of errors reported in a file.
     int errors;
+
+    // options for dex output
+    DexOptions dexOptions = new DexOptions();
 
     // file being processed
     DexFile dexFile;
@@ -1517,7 +1521,7 @@ public class DAsm {
      */
     private void createOutputFinisher() {
         if (output_finisher == null)
-            output_finisher = new OutputFinisher(5, regs_count);
+            output_finisher = new OutputFinisher(dexOptions, 5, regs_count);
     }
 
     /**
