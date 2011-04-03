@@ -17,6 +17,7 @@
 package util.build;
 
 import com.android.dx.command.dexer.Main;
+import java.io.IOException;
 
 public class DexBuildStep extends BuildStep {
 
@@ -39,7 +40,13 @@ public class DexBuildStep extends BuildStep {
 
             args.outName = outputFile.fileName.getAbsolutePath();
 
-            int result = Main.run(args);
+            int result = 0;
+            try {
+                result = Main.run(args);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
 
             if (result == 0) {
                 if (deleteInputFileAfterBuild) {

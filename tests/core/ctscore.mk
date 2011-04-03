@@ -18,7 +18,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner bouncycastle
-LOCAL_STATIC_JAVA_LIBRARIES := CtsTestAnnotationsLib
+LOCAL_STATIC_JAVA_LIBRARIES += CtsTestAnnotationsLib
 
 LOCAL_PROGUARD_ENABLED := disabled
 
@@ -40,16 +40,14 @@ $(PACKAGE_RESOURCES): PRIVATE_LOCAL_PATH := $(LOCAL_PATH)
 $(PACKAGE_RESOURCES): PRIVATE_PRIVATE_KEY := $(private_key)
 $(PACKAGE_RESOURCES): PRIVATE_CERTIFICATE := $(certificate)
 $(PACKAGE_RESOURCES): $(LOCAL_BUILT_MODULE) $(CORETESTS_INTERMEDIATES)/javalib.jar
+# Remove .class files from javalib.jar, we only want the resources
 	@echo "Add resources to package ($@)"
 	@rm -rf $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses
-# javalib.jar should only contain .dex files, but the harmony tests also include
-# some .class files, so get rid of them
 	$(call unzip-jar-files,$(PRIVATE_CORETESTS_INTERMEDIATES_COMMON)/javalib.jar,\
 		$(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses)
 	@find $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses -type f -name "*.class" -delete
-	@rm -f $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses/classes.dex
-	@cp $< $@
-	@jar uf $@ -C $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses .
+	$(hide) cp $< $@
+	$(hide) jar uf $@ -C $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses .
 	$(sign-package)
 	$(align-package)
 	$(hide) cp $@ $<

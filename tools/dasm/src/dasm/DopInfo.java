@@ -16,7 +16,6 @@
 
 package dasm;
 
-import com.android.dx.dex.code.DalvOps;
 import com.android.dx.dex.code.Dop;
 import com.android.dx.dex.code.Dops;
 import com.android.dx.dex.code.InsnFormat;
@@ -44,6 +43,7 @@ import com.android.dx.dex.code.form.Form32x;
 import com.android.dx.dex.code.form.Form35c;
 import com.android.dx.dex.code.form.Form3rc;
 import com.android.dx.dex.code.form.Form51l;
+import com.android.dx.io.Opcodes;
 
 import java.util.Hashtable;
 
@@ -135,24 +135,24 @@ class DopInfo {
         if (format instanceof Form21h) return ARG_REG_LITERAL;
         if (format instanceof Form21c) {
             switch (dop.getOpcode()) {
-            case DalvOps.CONST_CLASS:
-            case DalvOps.CHECK_CAST:
-            case DalvOps.NEW_INSTANCE:
+            case Opcodes.CONST_CLASS:
+            case Opcodes.CHECK_CAST:
+            case Opcodes.NEW_INSTANCE:
                 return ARG_REG_TYPE;
-            case DalvOps.SGET:
-            case DalvOps.SGET_WIDE:
-            case DalvOps.SGET_OBJECT:
-            case DalvOps.SGET_BOOLEAN:
-            case DalvOps.SGET_BYTE:
-            case DalvOps.SGET_CHAR:
-            case DalvOps.SGET_SHORT:
-            case DalvOps.SPUT:
-            case DalvOps.SPUT_WIDE:
-            case DalvOps.SPUT_OBJECT:
-            case DalvOps.SPUT_BOOLEAN:
-            case DalvOps.SPUT_BYTE:
-            case DalvOps.SPUT_CHAR:
-            case DalvOps.SPUT_SHORT:
+            case Opcodes.SGET:
+            case Opcodes.SGET_WIDE:
+            case Opcodes.SGET_OBJECT:
+            case Opcodes.SGET_BOOLEAN:
+            case Opcodes.SGET_BYTE:
+            case Opcodes.SGET_CHAR:
+            case Opcodes.SGET_SHORT:
+            case Opcodes.SPUT:
+            case Opcodes.SPUT_WIDE:
+            case Opcodes.SPUT_OBJECT:
+            case Opcodes.SPUT_BOOLEAN:
+            case Opcodes.SPUT_BYTE:
+            case Opcodes.SPUT_CHAR:
+            case Opcodes.SPUT_SHORT:
                 return ARG_REG_FIELD;
             default:
                 return ARG_REG_STRING;
@@ -164,23 +164,23 @@ class DopInfo {
         if (format instanceof Form22s) return ARG_REG_REG_LITERAL;
         if (format instanceof Form22c) {
             switch (dop.getOpcode()) {
-            case DalvOps.INSTANCE_OF:
-            case DalvOps.NEW_ARRAY:
+            case Opcodes.INSTANCE_OF:
+            case Opcodes.NEW_ARRAY:
                 return ARG_REG_REG_TYPE;
-            case DalvOps.IGET:
-            case DalvOps.IGET_WIDE:
-            case DalvOps.IGET_OBJECT:
-            case DalvOps.IGET_BOOLEAN:
-            case DalvOps.IGET_BYTE:
-            case DalvOps.IGET_CHAR:
-            case DalvOps.IGET_SHORT:
-            case DalvOps.IPUT:
-            case DalvOps.IPUT_WIDE:
-            case DalvOps.IPUT_OBJECT:
-            case DalvOps.IPUT_BOOLEAN:
-            case DalvOps.IPUT_BYTE:
-            case DalvOps.IPUT_CHAR:
-            case DalvOps.IPUT_SHORT:
+            case Opcodes.IGET:
+            case Opcodes.IGET_WIDE:
+            case Opcodes.IGET_OBJECT:
+            case Opcodes.IGET_BOOLEAN:
+            case Opcodes.IGET_BYTE:
+            case Opcodes.IGET_CHAR:
+            case Opcodes.IGET_SHORT:
+            case Opcodes.IPUT:
+            case Opcodes.IPUT_WIDE:
+            case Opcodes.IPUT_OBJECT:
+            case Opcodes.IPUT_BOOLEAN:
+            case Opcodes.IPUT_BYTE:
+            case Opcodes.IPUT_CHAR:
+            case Opcodes.IPUT_SHORT:
                 return ARG_REG_REG_FIELD;
             default:
                 return ARG_REG_REG_STRING;
@@ -193,12 +193,12 @@ class DopInfo {
         if (format instanceof Form31c) return ARG_REG_STRING;
         if (format instanceof Form35c) {
             switch (dop.getOpcode()) {
-            case DalvOps.INVOKE_VIRTUAL:
-            case DalvOps.INVOKE_SUPER:
-            case DalvOps.INVOKE_DIRECT:
-            case DalvOps.INVOKE_STATIC:
+            case Opcodes.INVOKE_VIRTUAL:
+            case Opcodes.INVOKE_SUPER:
+            case Opcodes.INVOKE_DIRECT:
+            case Opcodes.INVOKE_STATIC:
                 return ARG_REGLIST_METHOD;
-            case DalvOps.INVOKE_INTERFACE:
+            case Opcodes.INVOKE_INTERFACE:
                 return ARG_REGLIST_INTFMETHOD;
             default:
                 return ARG_REGLIST_TYPE;
@@ -206,9 +206,9 @@ class DopInfo {
         }
         if (format instanceof Form3rc) {
             switch (dop.getOpcode()) {
-            case DalvOps.FILLED_NEW_ARRAY_RANGE:
+            case Opcodes.FILLED_NEW_ARRAY_RANGE:
                 return ARG_REGRANGE_TYPE;
-            case DalvOps.INVOKE_INTERFACE_RANGE:
+            case Opcodes.INVOKE_INTERFACE_RANGE:
                 return ARG_REGRANGE_INTFMETHOD;
             default:
                 return ARG_REGRANGE_METHOD;
@@ -228,7 +228,7 @@ class DopInfo {
     static {
         dopsTable = new Hashtable<String, DopInfo>();
 
-        for (int i = 0; i < DalvOps.MAX_VALUE - DalvOps.MIN_VALUE + 1; i++) {
+        for (int i = 0; i < Opcodes.MAX_VALUE - Opcodes.MIN_VALUE + 1; i++) {
             try {
                 Dop dop = Dops.get(i);
                 add(dop.getName(), dop, getArgsFormat(dop));
