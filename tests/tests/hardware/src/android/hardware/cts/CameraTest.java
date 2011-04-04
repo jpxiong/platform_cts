@@ -1960,4 +1960,68 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
         terminateMessageLooper();
     }
+
+    @UiThreadTest
+    public void testMultiCameraRelease() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        if (nCameras < 2) {
+            Log.i(TAG, "Test multi-camera release: Skipping test because only 1 camera available");
+            return;
+        }
+        // Start first camera
+        initializeMessageLooper(0);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        SimplePreviewStreamCb callback0 = new SimplePreviewStreamCb(0);
+        mCamera.setPreviewCallback(callback0);
+        mCamera.startPreview();
+        // Run preview for a bit
+        for (int f = 0; f < 100; f++) {
+            mPreviewDone.close();
+            assertTrue("First camera preview timed out on frame " + f + "!",
+                       mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
+        }
+        mCamera.stopPreview();
+        // Save message looper and camera to deterministically release them, instead
+        // of letting GC do it at some point.
+        Camera firstCamera = mCamera;
+        Looper firstLooper = mLooper;
+        //terminateMessageLooper(); // Intentionally not calling this
+
+        // Start second camera without releasing the first one (will
+        // set mCamera and mLooper to new objects)
+        initializeMessageLooper(1);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        SimplePreviewStreamCb callback1 = new SimplePreviewStreamCb(1);
+        mCamera.setPreviewCallback(callback1);
+        mCamera.startPreview();
+        // Run preview for a bit - GC of first camera instance should not impact the second's
+        // operation.
+        for (int f = 0; f < 100; f++) {
+            mPreviewDone.close();
+            assertTrue("Second camera preview timed out on frame " + f + "!",
+                       mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
+            if (f == 50) {
+                // Release first camera mid-preview, should cause no problems
+                firstCamera.release();
+            }
+        }
+        mCamera.stopPreview();
+
+        firstLooper.quit();
+        terminateMessageLooper();
+    }
+
+    // This callback just signals on the condition variable, making it useful for checking that
+    // preview callbacks don't stop unexpectedly
+    private final class SimplePreviewStreamCb
+            implements android.hardware.Camera.PreviewCallback {
+        private int mId;
+        public SimplePreviewStreamCb(int id) {
+            mId = id;
+        }
+        public void onPreviewFrame(byte[] data, android.hardware.Camera camera) {
+            if (LOGV) Log.v(TAG, "Preview frame callback, id " + mId + ".");
+            mPreviewDone.open();
+        }
+    }
 }
