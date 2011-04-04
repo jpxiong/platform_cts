@@ -43,6 +43,11 @@
     "android.webkit.cts.WebChromeClientTest#testOnReceivedIcon",
     "android.widget.cts.AbsListViewTest#testGetContextMenuInfo"
   ]
+},
+
+{
+  description: "Crashes the VM",
+  name: "org.apache.harmony.luni.tests.java.net.InetAddressTest#test_getHostName"
 }
 
 ]
