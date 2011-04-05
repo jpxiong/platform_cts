@@ -47,7 +47,6 @@
     <classpathentry kind="src" path="cts/tests/tests/view/src"/>
     <classpathentry kind="src" path="cts/tests/tests/webkit/src"/>
     <classpathentry kind="src" path="cts/tests/tests/widget/src"/>
-    <classpathentry kind="src" path="cts/tools/annotation-helper/src"/>
     <classpathentry kind="src" path="cts/tools/cts-api-coverage/src"/>
     <classpathentry kind="src" path="cts/tools/cts-reference-app-lib/src"/>
     <classpathentry kind="src" path="cts/tools/dasm/src"/>
@@ -59,7 +58,6 @@
     <classpathentry kind="src" path="cts/tools/signature-tools/src"/>
     <classpathentry kind="src" path="cts/tools/signature-tools/test"/>
     <classpathentry kind="src" path="cts/tools/spec-progress/src"/>
-    <classpathentry kind="src" path="cts/tools/test-progress-new/src"/>
     <classpathentry kind="src" path="cts/tools/utils"/>
     <classpathentry kind="src" path="cts/tools/vm-tests/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsAccessibilityServiceTestCases_intermediates/src/src"/>
