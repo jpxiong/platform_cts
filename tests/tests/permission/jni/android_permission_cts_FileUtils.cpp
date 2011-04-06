@@ -21,7 +21,6 @@
 #include <grp.h>
 #include <pwd.h>
 
-static jclass gFileStatusClass;
 static jfieldID gFileStatusDevFieldID;
 static jfieldID gFileStatusInoFieldID;
 static jfieldID gFileStatusModeFieldID;
@@ -101,19 +100,19 @@ int register_android_permission_cts_FileUtils(JNIEnv* env)
 {
     jclass clazz = env->FindClass("android/permission/cts/FileUtils");
 
-    gFileStatusClass = env->FindClass("android/permission/cts/FileUtils$FileStatus");
-    gFileStatusDevFieldID = env->GetFieldID(gFileStatusClass, "dev", "I");
-    gFileStatusInoFieldID = env->GetFieldID(gFileStatusClass, "ino", "I");
-    gFileStatusModeFieldID = env->GetFieldID(gFileStatusClass, "mode", "I");
-    gFileStatusNlinkFieldID = env->GetFieldID(gFileStatusClass, "nlink", "I");
-    gFileStatusUidFieldID = env->GetFieldID(gFileStatusClass, "uid", "I");
-    gFileStatusGidFieldID = env->GetFieldID(gFileStatusClass, "gid", "I");
-    gFileStatusSizeFieldID = env->GetFieldID(gFileStatusClass, "size", "J");
-    gFileStatusBlksizeFieldID = env->GetFieldID(gFileStatusClass, "blksize", "I");
-    gFileStatusBlocksFieldID = env->GetFieldID(gFileStatusClass, "blocks", "J");
-    gFileStatusAtimeFieldID = env->GetFieldID(gFileStatusClass, "atime", "J");
-    gFileStatusMtimeFieldID = env->GetFieldID(gFileStatusClass, "mtime", "J");
-    gFileStatusCtimeFieldID = env->GetFieldID(gFileStatusClass, "ctime", "J");
+    jclass fileStatusClass = env->FindClass("android/permission/cts/FileUtils$FileStatus");
+    gFileStatusDevFieldID = env->GetFieldID(fileStatusClass, "dev", "I");
+    gFileStatusInoFieldID = env->GetFieldID(fileStatusClass, "ino", "I");
+    gFileStatusModeFieldID = env->GetFieldID(fileStatusClass, "mode", "I");
+    gFileStatusNlinkFieldID = env->GetFieldID(fileStatusClass, "nlink", "I");
+    gFileStatusUidFieldID = env->GetFieldID(fileStatusClass, "uid", "I");
+    gFileStatusGidFieldID = env->GetFieldID(fileStatusClass, "gid", "I");
+    gFileStatusSizeFieldID = env->GetFieldID(fileStatusClass, "size", "J");
+    gFileStatusBlksizeFieldID = env->GetFieldID(fileStatusClass, "blksize", "I");
+    gFileStatusBlocksFieldID = env->GetFieldID(fileStatusClass, "blocks", "J");
+    gFileStatusAtimeFieldID = env->GetFieldID(fileStatusClass, "atime", "J");
+    gFileStatusMtimeFieldID = env->GetFieldID(fileStatusClass, "mtime", "J");
+    gFileStatusCtimeFieldID = env->GetFieldID(fileStatusClass, "ctime", "J");
 
     return env->RegisterNatives(clazz, gMethods, 
             sizeof(gMethods) / sizeof(JNINativeMethod)); 
