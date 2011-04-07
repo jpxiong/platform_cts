@@ -54,7 +54,7 @@ public class WifiInfoTest extends AndroidTestCase {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+            if (action.equals(WifiManager.WIFI_STATE_CHANGED_ACTION)) {
                 synchronized (mMySync) {
                     mMySync.expectedState = STATE_WIFI_CHANGED;
                     mMySync.notify();
@@ -68,14 +68,7 @@ public class WifiInfoTest extends AndroidTestCase {
         super.setUp();
         mMySync = new MySync();
         mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        mIntentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-        mIntentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiManager.NETWORK_IDS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiManager.ACTION_PICK_WIFI_NETWORK);
 
         mContext.registerReceiver(mReceiver, mIntentFilter);
         mWifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);

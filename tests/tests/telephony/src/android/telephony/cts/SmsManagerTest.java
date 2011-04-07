@@ -62,7 +62,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "44010",    // NTT DOCOMO
                     "45005",    // SKT Mobility
                     "45002",    // SKT Mobility
-                    "45008"     // KT Mobility
+                    "45008",    // KT Mobility
+                    "45006"     // LGT
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
