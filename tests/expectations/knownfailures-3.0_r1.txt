@@ -40,6 +40,7 @@
   description: "Flakey",
   names: [
     "android.hardware.cts.CameraTest#testSetPreviewDisplay",
+    "android.view.cts.ViewTest#testWindowVisibilityChanged",
     "android.webkit.cts.WebChromeClientTest#testOnReceivedIcon",
     "android.widget.cts.AbsListViewTest#testGetContextMenuInfo"
   ]
