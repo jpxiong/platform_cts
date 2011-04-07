@@ -46,7 +46,7 @@ import java.io.OutputStream;
 @TestTargetClass(VideoView.class)
 public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStubActivity> {
     /** The maximum time to wait for an operation. */
-    private static final long   TIME_OUT = 10000L;
+    private static final long   TIME_OUT = 15000L;
     /** The interval time to wait for completing an operation. */
     private static final long   OPERATION_INTERVAL  = 1500L;
     /** The duration of R.raw.testvideo. */
