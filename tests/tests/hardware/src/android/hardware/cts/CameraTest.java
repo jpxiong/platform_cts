@@ -1985,23 +1985,43 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     @UiThreadTest
     public void testMultiCameraRelease() throws Exception {
+        // Verify that multiple cameras exist, and that they can be opened at the same time
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Checking pre-conditions.");
         int nCameras = Camera.getNumberOfCameras();
         if (nCameras < 2) {
             Log.i(TAG, "Test multi-camera release: Skipping test because only 1 camera available");
             return;
         }
+
+        Camera testCamera0 = Camera.open(0);
+        Camera testCamera1 = null;
+        try {
+            testCamera1 = Camera.open(1);
+        } catch (RuntimeException e) {
+            // Can't open two cameras at once
+            Log.i(TAG, "testMultiCameraRelease: Skipping test because only 1 camera "+
+                  "could be opened at once. Second open threw: " + e);
+            testCamera0.release();
+            return;
+        }
+        testCamera0.release();
+        testCamera1.release();
+
         // Start first camera
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 0");
         initializeMessageLooper(0);
         mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         SimplePreviewStreamCb callback0 = new SimplePreviewStreamCb(0);
         mCamera.setPreviewCallback(callback0);
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 0");
         mCamera.startPreview();
         // Run preview for a bit
         for (int f = 0; f < 100; f++) {
             mPreviewDone.close();
-            assertTrue("First camera preview timed out on frame " + f + "!",
+            assertTrue("testMultiCameraRelease: First camera preview timed out on frame " + f + "!",
                        mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
         }
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
         mCamera.stopPreview();
         // Save message looper and camera to deterministically release them, instead
         // of letting GC do it at some point.
@@ -2011,22 +2031,26 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Start second camera without releasing the first one (will
         // set mCamera and mLooper to new objects)
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 1");
         initializeMessageLooper(1);
         mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         SimplePreviewStreamCb callback1 = new SimplePreviewStreamCb(1);
         mCamera.setPreviewCallback(callback1);
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 1");
         mCamera.startPreview();
         // Run preview for a bit - GC of first camera instance should not impact the second's
         // operation.
         for (int f = 0; f < 100; f++) {
             mPreviewDone.close();
-            assertTrue("Second camera preview timed out on frame " + f + "!",
+            assertTrue("testMultiCameraRelease: Second camera preview timed out on frame " + f + "!",
                        mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
             if (f == 50) {
                 // Release first camera mid-preview, should cause no problems
+                if (LOGV) Log.v(TAG, "testMultiCameraRelease: Releasing camera 0");
                 firstCamera.release();
             }
         }
+        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
         mCamera.stopPreview();
 
         firstLooper.quit();
