@@ -79,6 +79,7 @@ public class CtsTestServer {
 
     public static final String FAVICON_PATH = "/favicon.ico";
     public static final String USERAGENT_PATH = "/useragent.html";
+    public static final String TEST_DOWNLOAD_PATH = "/download.html";
     public static final String ASSET_PREFIX = "/assets/";
     public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
     public static final String APPCACHE_PATH = "/appcache.html";
@@ -350,6 +351,10 @@ public class CtsTestServer {
         return sb.toString();
     }
 
+    public String getTestDownloadUrl() {
+        return getBaseUri() + TEST_DOWNLOAD_PATH;
+    }
+
     public String getLastRequestUrl() {
         return mLastQuery;
     }
@@ -503,6 +508,10 @@ public class CtsTestServer {
             }
             response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
                     "<body>" + agent + "</body></html>"));
+        } else if (path.equals(TEST_DOWNLOAD_PATH)) {
+            response = createResponse(HttpStatus.SC_OK);
+            response.setHeader("Content-Length", "0");
+            response.setEntity(createEntity(""));
         } else if (path.equals(SHUTDOWN_PREFIX)) {
             response = createResponse(HttpStatus.SC_OK);
             // We cannot close the socket here, because we need to respond.
