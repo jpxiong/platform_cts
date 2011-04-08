@@ -31,7 +31,7 @@ LOCAL_SDK_VERSION := current
 # To be passed in on command line
 CTS_API_VERSION ?= current
 
-android_api_description := $(SRC_API_DIR)/$(CTS_API_VERSION).xml
+android_api_description := $(SRC_API_DIR)/$(CTS_API_VERSION).txt
 
 # Can't call local-intermediates-dir directly here because we have to
 # include BUILD_PACAKGE first.  Can't include BUILD_PACKAGE first
@@ -67,8 +67,14 @@ api_ver_file := $(api_ver_path)/api_ver_is_$(CTS_API_VERSION)
 # sure the generated resources rule depend on it, we can ensure that
 # the proper version of the api resource gets generated.
 $(api_ver_file):
-	@rm -f $(api_ver_path)/api_ver_is_*
+	$(hide) rm -f $(api_ver_path)/api_ver_is_*
 	$(hide) touch $@
+
+android_api_xml_description := $(intermediates.COMMON)/api.xml
+$(android_api_xml_description): PRIVATE_INPUT_FILE := $(android_api_description)
+$(android_api_xml_description): $(android_api_description) $(APICHECK)
+	$(hide) echo "Convert api file to xml: $@"
+	$(hide) $(APICHECK_COMMAND) -convert2xml $(PRIVATE_INPUT_FILE) $@
 
 static_res_deps := $(call find-subdir-assets,$(LOCAL_PATH)/res)
 $(copied_res_stamp): PRIVATE_PATH := $(LOCAL_PATH)
@@ -77,11 +83,11 @@ $(copied_res_stamp): PRIVATE_RES_DIR := $(signature_res_dir)
 $(copied_res_stamp): FAKE_RESOURCE_DIR := $(dir $(fake_resource_check))
 $(copied_res_stamp): FAKE_RESOURCE_CHECK := $(fake_resource_check)
 $(copied_res_stamp): $(foreach res,$(static_res_deps),$(LOCAL_PATH)/res/${res}) | $(ACP)
-	@echo "Copy resources: $(PRIVATE_MODULE)"
-	@rm -f $@
-	@rm -rf $(PRIVATE_RES_DIR)
-	@mkdir -p $(PRIVATE_RES_DIR)
-	@if [ ! -f $(FAKE_RESOURCE_CHECK) ]; \
+	$(hide) echo "Copy resources: $(PRIVATE_MODULE)"
+	$(hide) rm -f $@
+	$(hide) rm -rf $(PRIVATE_RES_DIR)
+	$(hide) mkdir -p $(PRIVATE_RES_DIR)
+	$(hide) if [ ! -f $(FAKE_RESOURCE_CHECK) ]; \
 	  then mkdir -p $(FAKE_RESOURCE_DIR); \
 	  touch $(FAKE_RESOURCE_CHECK); \
 	fi
@@ -94,11 +100,11 @@ $(generated_res_stamp): PRIVATE_PATH := $(LOCAL_PATH)
 $(generated_res_stamp): PRIVATE_MODULE := $(LOCAL_MODULE)
 $(generated_res_stamp): PRIVATE_RES_DIR := $(signature_res_dir)
 $(generated_res_stamp): $(api_ver_file)
-$(generated_res_stamp): $(copied_res_stamp) $(android_api_description)
-	@echo "Copy generated resources: $(PRIVATE_MODULE)"
-	@rm -f $@
+$(generated_res_stamp): $(copied_res_stamp) $(android_api_xml_description)
+	$(hide) echo "Copy generated resources: $(PRIVATE_MODULE)"
+	$(hide) rm -f $@
 	$(hide) python cts/tools/utils/android_api_description_splitter.py \
-		$(android_api_description) $(PRIVATE_RES_DIR) package
+		$(android_api_xml_description) $(PRIVATE_RES_DIR) package
 	$(hide) touch $@
 
 $(R_file_stamp): $(generated_res_stamp) $(copied_res_stamp)
