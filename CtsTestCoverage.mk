@@ -19,20 +19,28 @@
 
 include cts/CtsTestCaseList.mk
 
-CTS_API_COVERAGE_EXE := $(HOST_OUT_EXECUTABLES)/cts-api-coverage
-DEXDEPS_EXE := $(HOST_OUT_EXECUTABLES)/dexdeps
+cts_api_coverage_exe := $(HOST_OUT_EXECUTABLES)/cts-api-coverage
+dexdeps_exe := $(HOST_OUT_EXECUTABLES)/dexdeps
 
-COVERAGE_OUT := $(HOST_OUT)/cts-api-coverage
-cts-test-coverage-report := $(COVERAGE_OUT)/test-coverage.html
-cts-verifier-coverage-report := $(COVERAGE_OUT)/verifier-coverage.html
+coverage_out := $(HOST_OUT)/cts-api-coverage
 
-CTS_API_COVERAGE_DEPENDENCIES := $(CTS_API_COVERAGE_EXE) $(DEXDEPS_EXE) $(ACP)
+api_text_description := $(SRC_API_DIR)/current.txt
+api_xml_description := $(coverage_out)/api.xml
+$(api_xml_description) : $(api_text_description) $(APICHECK)
+	$(hide) echo "Converting API file to XML: $@"
+	$(hide) mkdir -p $(coverage_out)
+	$(hide) $(APICHECK_COMMAND) -convert2xml $(api_text_description) $(api_xml_description)
 
-$(cts-test-coverage-report) : $(CTS_COVERAGE_TEST_CASE_LIST) $(CTS_API_COVERAGE_DEPENDENCIES)
+cts-test-coverage-report := $(coverage_out)/test-coverage.html
+cts-verifier-coverage-report := $(coverage_out)/verifier-coverage.html
+
+cts_api_coverage_dependencies := $(cts_api_coverage_exe) $(dexdeps_exe) $(api_xml_description) $(ACP)
+
+$(cts-test-coverage-report) : $(CTS_COVERAGE_TEST_CASE_LIST) $(cts_api_coverage_dependencies)
 	$(call generate-coverage-report,"CTS Tests API Coverage Report",\
 			$(CTS_COVERAGE_TEST_CASE_LIST),html,test-coverage.html)
 
-$(cts-verifier-coverage-report) : CtsVerifier $(CTS_API_COVERAGE_DEPENDENCIES)
+$(cts-verifier-coverage-report) : CtsVerifier $(cts_api_coverage_dependencies)
 	$(call generate-coverage-report,"CTS Verifier API Coverage Report",\
 			CtsVerifier,html,verifier-coverage.html)
 
@@ -55,11 +63,11 @@ endif
 #  4 - Output file name of the report
 define generate-coverage-report
 	$(foreach testcase,$(2),$(eval $(call add-testcase-apk,$(testcase))))
-	$(hide) mkdir -p $(COVERAGE_OUT)
-	$(hide) $(CTS_API_COVERAGE_EXE) -d $(DEXDEPS_EXE) -f $(3) -o $(COVERAGE_OUT)/$(4) $(TEST_APKS)
-	$(hide) echo $(1): file://$(ANDROID_BUILD_TOP)/$(COVERAGE_OUT)/$(4)
+	$(hide) mkdir -p $(coverage_out)
+	$(hide) $(cts_api_coverage_exe) -d $(dexdeps_exe) -a $(api_xml_description) -f $(3) -o $(coverage_out)/$(4) $(text_apks)
+	$(hide) echo $(1): file://$(ANDROID_BUILD_TOP)/$(coverage_out)/$(4)
 endef
 
 define add-testcase-apk
-	TEST_APKS += $(call intermediates-dir-for,APPS,$(1))/package.apk
+	text_apks += $(call intermediates-dir-for,APPS,$(1))/package.apk
 endef
