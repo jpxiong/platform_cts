@@ -63,7 +63,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "45005",    // SKT Mobility
                     "45002",    // SKT Mobility
                     "45008",    // KT Mobility
-                    "45006"     // LGT
+                    "45006",    // LGT
+                    "311660"    // MetroPCS
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
@@ -103,11 +104,8 @@ public class SmsManagerTest extends AndroidTestCase {
 
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
             mDeliveryReportSupported = false;
-        } else if (mTelephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
-            // CDMA supports SMS delivery report
-            mDeliveryReportSupported = true;
         } else {
-            // is this a GSM network that doesn't support SMS delivery report?
+            // exclude the networks that don't support SMS delivery report
             String mccmnc = mTelephonyManager.getSimOperator();
             mDeliveryReportSupported = !(NO_DELIVERY_REPORTS.contains(mccmnc));
         }
