@@ -114,6 +114,8 @@ public class BuildTest extends TestCase {
         Pattern.compile("^([0-9A-Za-z._-]+)$");
     private static final Pattern ID_PATTERN =
         Pattern.compile("^([0-9A-Za-z._-]+)$");
+    private static final Pattern HARDWARE_PATTERN =
+        Pattern.compile("^([0-9A-Za-z.,_-]+)$");
     private static final Pattern PRODUCT_PATTERN =
         Pattern.compile("^([0-9A-Za-z._-]+)$");
     private static final Pattern SERIAL_NUMBER_PATTERN =
@@ -135,9 +137,13 @@ public class BuildTest extends TestCase {
 
         // Build.FINGERPRINT tested by BuildVersionTest
 
+        assertTrue(HARDWARE_PATTERN.matcher(Build.HARDWARE).matches());
+
         assertNotEmpty(Build.HOST);
 
         assertTrue(ID_PATTERN.matcher(Build.ID).matches());
+
+        assertNotEmpty(Build.MANUFACTURER);
 
         assertNotEmpty(Build.MODEL);
 
