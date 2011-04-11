@@ -665,12 +665,14 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         String url = TestHtmlConstants.EMBEDDED_IMG_URL;
         String ext = MimeTypeMap.getFileExtensionFromUrl(url);
         loadAssetUrl(url);
+        Thread.sleep(1000);
         assertFalse(mWebServer.getLastRequestUrl().endsWith(ext));
 
         mWebView.clearCache(true);
         mSettings.setLoadsImagesAutomatically(false);
         assertFalse(mSettings.getLoadsImagesAutomatically());
         loadAssetUrl(url);
+        Thread.sleep(1000);
         assertTrue(mWebServer.getLastRequestUrl().endsWith(ext));
     }
 
