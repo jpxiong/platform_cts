@@ -58,6 +58,7 @@ public class CtsApiCoverage {
         System.out.println("  -o FILE              output file or standard out if not given");
         System.out.println("  -f [txt|xml|html]    format of output");
         System.out.println("  -d PATH              path to dexdeps or expected to be in $PATH");
+        System.out.println("  -a PATH              path to the API XML file");
         System.out.println();
         System.exit(1);
     }
@@ -67,6 +68,7 @@ public class CtsApiCoverage {
         File outputFile = null;
         int format = FORMAT_TXT;
         String dexDeps = "dexDeps";
+        String apiXmlPath = "";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
@@ -85,6 +87,8 @@ public class CtsApiCoverage {
                     }
                 } else if ("-d".equals(args[i])) {
                     dexDeps = getExpectedArg(args, ++i);
+                } else if ("-a".equals(args[i])) {
+                    apiXmlPath = getExpectedArg(args, ++i);
                 } else {
                     printUsage();
                 }
@@ -104,7 +108,7 @@ public class CtsApiCoverage {
          * 3. Output a report based on the coverage stats in the ApiCoverage object.
          */
 
-        ApiCoverage apiCoverage = getEmptyApiCoverage();
+        ApiCoverage apiCoverage = getEmptyApiCoverage(apiXmlPath);
         for (File testApk : testApks) {
             addApiCoverage(apiCoverage, testApk, dexDeps);
         }
@@ -125,16 +129,17 @@ public class CtsApiCoverage {
      * Creates an object representing the API that will be used later to collect coverage
      * statistics as we iterate over the test APKs.
      *
+     * @param apiXmlPath to the API XML file
      * @return an {@link ApiCoverage} object representing the API in current.xml without any
      *     coverage statistics yet
      */
-    private static ApiCoverage getEmptyApiCoverage()
+    private static ApiCoverage getEmptyApiCoverage(String apiXmlPath)
             throws SAXException, IOException {
         XMLReader xmlReader = XMLReaderFactory.createXMLReader();
         CurrentXmlHandler currentXmlHandler = new CurrentXmlHandler();
         xmlReader.setContentHandler(currentXmlHandler);
 
-        File currentXml = new File("frameworks/base/api/current.xml");
+        File currentXml = new File(apiXmlPath);
         FileReader fileReader = null;
         try {
             fileReader = new FileReader(currentXml);
