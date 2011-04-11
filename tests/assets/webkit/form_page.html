@@ -18,24 +18,70 @@
     <title>Test Page</title>
 </head>
 <body>
-  <a name="text" />
+  <a id="tagA">Tag A</a>
+  <a name="text"></a>
   <a id=someTextId>Some text&nbsp;</a>
   <a id=nestedLinkId>Is not nested, and is not unique!</a>
-  <div id=divId>A div
-    <a id=nestedLinkId>Nested text</a>
+  <a class="divClass">Outter text</a>
+  <a id="outter" name="foo">Foo</a>
+
+  <div id=divId name="firstDiv">A div
+    <a id=nestedLinkId class="divClass" name="nestedLink">Nested text</a>
+    <a id="n1" name="linkn1">a nested link</a>
+    <a id="inner" name="foo">Foo</a>
+    <span id="n1" name="spann1"></span>
+    <a name=nested>Nested text</a>
   </div>
   <p id="spaces">     </p>
   <p id="empty"></p>
-  <a href="foo" id="linkWithEqualsSign">Link=equalssign</a>
+  <a name=foo href="foo" id="linkWithEqualsSign">Link=equalssign</a>
   <p id="self-closed" />Here is some content that should not be in the previous p tag
 
   <p class=" spaceAround ">Spaced out</p>
 
+  <a name="text" id="emptyLink"> </a>
+  <p id="spaces">     </p>
+  <p id="empty"></p>
+  <p id="self-closed"/>
+
+  <div>
+  <a id="id1" href="#">Foo</a>
+  <ul id="id2" />
+  <span id="id3"/>
+  <p id="id3">A paragraph</p>
+  </div>
+
+  <input name="inputDisabled" id="inputDisabled" disabled="disabled"> </input>
   <span id="my_span">
     <div>first_div</div>
     <div>second_div</div>
     <span>first_span</span>
     <span>second_span</span>
+    <a id="Foo">Foo</a>
   </span>
+
+  <select name="selectomatic">
+          <option id="one" selected="selected">One</option>
+          <option id="two">Two</option>
+          <option id="four">Four</option>
+          <option>Still learning how to count, apparently</option>
+  </select>
+
+  <select name="multi" id="multi" multiple="multiple">
+         <option id="eggs" selected="selected">Eggs</option>
+         <option id="ham" >Ham</option>
+         <option selected="selected">Sausages</option>
+         <option>Onion gravy</option>
+  </select>
+
+  <input type="radio" id="cheese" name="snack" value="cheese"/>Cheese<br/>
+  <input type="radio" id="peas" name="snack" value="peas"/>Peas<br/>
+  <input type="radio" id="cheese_and_peas" name="snack" value="cheese and peas" checked/>Cheese and peas<br/>
+  <input type="radio" id="nothing" name="snack" value="nowt" disabled="disabled"/>Not a sausage
+
+  <input type="hidden" name="hidden" value="fromage" />
+  Here's a checkbox: <input type="checkbox" id="checky" name="checky" value="furrfu"/><br/>
+
+
 </body>
 </html>

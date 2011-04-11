@@ -19,9 +19,9 @@ package android.webkit.cts;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.webdriver.By;
 import android.webkit.webdriver.WebDriver;
+import android.webkit.webdriver.WebDriverException;
 import android.webkit.webdriver.WebElement;
 import android.webkit.webdriver.WebElementNotFoundException;
-import android.webkit.webdriver.WebElementStaleException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,12 +39,17 @@ public class WebDriverTest extends
     private WebDriver mDriver;
     private CtsTestServer mWebServer;
     private static final String SOME_TEXT = "Some text";
-    private static final String DIV_TEXT = "A div Nested text";
+    private static final String DIV_TEXT =
+            "A div Nested text a nested link Foo Nested text";
     private static final String NESTED_TEXT = "Nested text";
     private static final String DIV_ID = "divId";
     private static final String SOME_TEXT_ID = "someTextId";
     private static final String BAD_ID = "BadId";
     private static final String NESTED_LINK_ID = "nestedLinkId";
+    private static final String FIRST_DIV = "firstDiv";
+    private static final String INEXISTENT = "inexistent";
+    private static final String ID = "id";
+    private static final String OUTTER = "outter";
 
     public WebDriverTest() {
         super(WebDriverStubActivity.class);
@@ -66,6 +71,134 @@ public class WebDriverTest extends
     public void testGetIsBlocking() {
         mDriver.get(mWebServer.getDelayedAssetUrl(HELLO_WORLD_URL));
         assertTrue(mDriver.getPageSource().contains("hello world!"));
+    }
+
+    // getText
+    public void testGetTextReturnsEmptyString() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement emptyLink = mDriver.findElement(By.id("emptyLink"));
+        assertEquals("", emptyLink.getText());
+    }
+
+    // getAttribute
+    public void testGetValidAttribute() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.linkText("Link=equalssign"));
+        assertEquals("foo", link.getAttribute("href"));
+    }
+
+    public void testGetInvalidAttributeReturnsNull() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.linkText("Link=equalssign"));
+        assertNull(link.getAttribute(INEXISTENT));
+    }
+
+    public void testGetAttributeNotSetReturnsNull() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.linkText("Link=equalssign"));
+        assertNull(link.getAttribute("disabled"));
+    }
+
+    // getTagName
+    public void testTagName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement span = mDriver.findElement(By.tagName("span"));
+        assertEquals("SPAN", span.getTagName());
+    }
+
+    // isEnabled
+    public void testIsEnabled() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElement(By.id(DIV_ID));
+        assertTrue(div.isEnabled());
+
+        WebElement input = mDriver.findElement(By.name("inputDisabled"));
+        assertFalse(input.isEnabled());
+    }
+
+    // isSelected
+    public void testIsSelected() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement optionOne = mDriver.findElement(By.id("one"));
+        assertTrue(optionOne.isSelected());
+
+        WebElement optionTwo = mDriver.findElement(By.id("two"));
+        assertFalse(optionTwo.isSelected());
+
+        WebElement selectEggs = mDriver.findElement(By.id("eggs"));
+        assertTrue(selectEggs.isSelected());
+
+        WebElement selectHam = mDriver.findElement(By.id("ham"));
+        assertFalse(selectHam.isSelected());
+
+        WebElement inputCheese = mDriver.findElement(By.id("cheese"));
+        assertFalse(inputCheese.isSelected());
+
+        WebElement inputCheesePeas = mDriver.findElement(
+                By.id("cheese_and_peas"));
+        assertTrue(inputCheesePeas.isSelected());
+    }
+
+    public void testIsSelectedOnHiddenInputThrows() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement inputHidden = mDriver.findElement(By.name("hidden"));
+        try {
+            inputHidden.isSelected();
+            fail();
+        } catch (WebDriverException e) {
+            // This is expcted
+        }
+    }
+
+    public void testIsSelectedOnNonSelectableElementThrows() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link= mDriver.findElement(By.linkText("Foo"));
+        try {
+            link.isSelected();
+            fail();
+        } catch (WebDriverException e) {
+            // This is expected
+        }
+    }
+
+    // toogle
+    public void testToggleCheckbox() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement check = mDriver.findElement(By.id("checky"));
+        assertFalse(check.isSelected());
+        assertTrue(check.toggle());
+        assertFalse(check.toggle());
+    }
+
+    public void testToggleOnNonTogglableElements() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement inputHidden = mDriver.findElement(By.name("hidden"));
+        try {
+            inputHidden.toggle();
+            fail();
+        } catch (WebDriverException e) {
+            // This is expected
+        }
+    }
+
+    // findElement
+    public void testFindElementThrowsIfNoPageIsLoaded() {
+        try {
+            mDriver.findElement(By.id(SOME_TEXT_ID));
+            fail();
+        } catch (NullPointerException e) {
+            // this is expected
+        }
+    }
+
+    // findElements
+    public void testFindElementsThrowsIfNoPageIsLoaded() {
+        try {
+            mDriver.findElements(By.id(SOME_TEXT_ID));
+            fail();
+        } catch (NullPointerException e) {
+            // this is expected
+        }
     }
 
     // By id
@@ -95,20 +228,39 @@ public class WebDriverTest extends
         assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
     }
 
+    public void testFindElementsById() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.id(ID + "3"));
+        assertEquals(2, elements.size());
+        assertEquals("A paragraph", elements.get(1).getText());
+    }
+
+    public void testFindElementsByIdReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.id(INEXISTENT));
+        assertNotNull(elements);
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsById() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElement(By.name(FIRST_DIV));
+        List<WebElement> elements = div.findElements(By.id("n1"));
+        assertEquals(2, elements.size());
+        assertEquals("spann1", elements.get(1).getAttribute("name"));
+    }
+
     // By linkText
     public void testFindElementByLinkText() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement element = mDriver.findElement(By.id(SOME_TEXT_ID));
-        assertTrue(SOME_TEXT.equals(element.getText()));
-
-        element = mDriver.findElement(By.id(DIV_ID));
-        assertTrue(DIV_TEXT.equals(element.getText()));
+        WebElement element = mDriver.findElement(By.linkText("Nested text"));
+        assertTrue(NESTED_LINK_ID.equals(element.getAttribute(ID)));
     }
 
     public void testFindElementByLinkTextThrowsIfElementDoesNotExists() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            mDriver.findElement(By.id(BAD_ID));
+            mDriver.findElement(By.linkText(INEXISTENT));
             fail("This should have failed.");
         } catch (WebElementNotFoundException e) {
             // This is expected
@@ -118,24 +270,41 @@ public class WebDriverTest extends
     public void testFindNestedElementByLinkText() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement parent = mDriver.findElement(By.id(DIV_ID));
-        WebElement nestedNode = parent.findElement(By.id(NESTED_LINK_ID));
-        assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+        WebElement nestedNode = parent.findElement(By.linkText("Foo"));
+        assertTrue("inner".equals(nestedNode.getAttribute(ID)));
+    }
+
+    public void testFindElementsByLinkText() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.linkText("Foo"));
+        assertEquals(4, elements.size());
+    }
+
+    public void testFindElementsByLinkTextReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.linkText("Boo"));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByLinkText() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElement(By.name(FIRST_DIV));
+        List<WebElement> elements =
+                div.findElements(By.linkText("Nested text"));
+        assertEquals(2, elements.size());
     }
 
     // By partialLinkText
     public void testFindElementByPartialLinkText() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement element = mDriver.findElement(By.id(SOME_TEXT_ID));
+        WebElement element = mDriver.findElement(By.partialLinkText("text"));
         assertTrue(SOME_TEXT.equals(element.getText()));
-
-        element = mDriver.findElement(By.id(DIV_ID));
-        assertTrue(DIV_TEXT.equals(element.getText()));
     }
 
     public void testFindElementByPartialLinkTextThrowsIfElementDoesNotExists() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            mDriver.findElement(By.id(BAD_ID));
+            mDriver.findElement(By.partialLinkText(INEXISTENT));
             fail("This should have failed.");
         } catch (WebElementNotFoundException e) {
             // This is expected
@@ -145,24 +314,44 @@ public class WebDriverTest extends
     public void testFindNestedElementByPartialLinkText() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement parent = mDriver.findElement(By.id(DIV_ID));
-        WebElement nestedNode = parent.findElement(By.id(NESTED_LINK_ID));
+        WebElement nestedNode = parent.findElement(By.partialLinkText("text"));
         assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+    }
+
+    public void testFindElementsByPartialLinkText() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements =
+                mDriver.findElements(By.partialLinkText("text"));
+        assertTrue(elements.size() > 2);
+    }
+
+    public void
+    testFindElementsByPartialLinkTextReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements =
+                mDriver.findElements(By.partialLinkText(INEXISTENT));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByPartialLinkText() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElements(By.name(FIRST_DIV)).get(0);
+        List<WebElement> elements =
+                div.findElements(By.partialLinkText("text"));
+        assertEquals(2, elements.size());
     }
 
     // by name
     public void testFindElementByName() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement element = mDriver.findElement(By.id(SOME_TEXT_ID));
-        assertTrue(SOME_TEXT.equals(element.getText()));
-
-        element = mDriver.findElement(By.id(DIV_ID));
-        assertTrue(DIV_TEXT.equals(element.getText()));
+        WebElement element = mDriver.findElement(By.name("foo"));
+        assertTrue(OUTTER.equals(element.getAttribute(ID)));
     }
 
     public void testFindElementByNameThrowsIfElementDoesNotExists() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            mDriver.findElement(By.id(BAD_ID));
+            mDriver.findElement(By.name(INEXISTENT));
             fail("This should have failed.");
         } catch (WebElementNotFoundException e) {
             // This is expected
@@ -172,24 +361,42 @@ public class WebDriverTest extends
     public void testFindNestedElementByName() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement parent = mDriver.findElement(By.id(DIV_ID));
-        WebElement nestedNode = parent.findElement(By.id(NESTED_LINK_ID));
+        WebElement nestedNode = parent.findElement(By.name("nestedLink"));
         assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+    }
+
+    public void testFindElementsByName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.name("text"));
+        assertEquals(2, elements.size());
+    }
+
+    public void testFindElementsByNameReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.name(INEXISTENT));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElements(By.xpath(
+                "//div[@" + ID + "='divId']"))
+                .get(0);
+        List<WebElement> elements = div.findElements(By.name("foo"));
+        assertEquals(1, elements.size());
     }
 
     // By tagName
     public void testFindElementByTagName() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement element = mDriver.findElement(By.id(SOME_TEXT_ID));
-        assertTrue(SOME_TEXT.equals(element.getText()));
-
-        element = mDriver.findElement(By.id(DIV_ID));
-        assertTrue(DIV_TEXT.equals(element.getText()));
+        WebElement element = mDriver.findElement(By.tagName("a"));
+        assertTrue("Tag A".equals(element.getText()));
     }
 
     public void testFindElementByTagNameThrowsIfElementDoesNotExists() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            mDriver.findElement(By.id(BAD_ID));
+            mDriver.findElement(By.tagName(INEXISTENT));
             fail("This should have failed.");
         } catch (WebElementNotFoundException e) {
             // This is expected
@@ -199,24 +406,47 @@ public class WebDriverTest extends
     public void testFindNestedElementByTagName() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement parent = mDriver.findElement(By.id(DIV_ID));
-        WebElement nestedNode = parent.findElement(By.id(NESTED_LINK_ID));
+        WebElement nestedNode = parent.findElement(By.tagName("a"));
         assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+    }
+
+    public void testFindElementsByTagName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.tagName("a"));
+        assertTrue(elements.size() > 0);
+    }
+
+    public void testFindElementsByTagNameReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(
+                By.tagName(INEXISTENT));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByTagName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElement(By.xpath(
+                "//div[@" + ID + "='divId']"));
+        List<WebElement> elements = div.findElements(By.tagName("span"));
+        assertEquals(1, elements.size());
     }
 
     // By xpath
     public void testFindElementByXPath() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement element = mDriver.findElement(By.id(SOME_TEXT_ID));
+        WebElement element =
+                mDriver.findElement(By.xpath(
+                "//a[@" + ID + "=\"someTextId\"]"));
         assertTrue(SOME_TEXT.equals(element.getText()));
 
-        element = mDriver.findElement(By.id(DIV_ID));
+        element = mDriver.findElement(By.xpath("//div[@name='firstDiv']"));
         assertTrue(DIV_TEXT.equals(element.getText()));
     }
 
     public void testFindElementByXPathThrowsIfElementDoesNotExists() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            mDriver.findElement(By.id(BAD_ID));
+            mDriver.findElement(By.xpath("//a[@" + ID + "='inexistant']"));
             fail("This should have failed.");
         } catch (WebElementNotFoundException e) {
             // This is expected
@@ -225,21 +455,138 @@ public class WebDriverTest extends
 
     public void testFindNestedElementByXPath() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement parent = mDriver.findElement(By.id(DIV_ID));
-        WebElement nestedNode = parent.findElement(By.id(NESTED_LINK_ID));
+        WebElement parent = mDriver.findElement(By.xpath(
+                "//div[@" + ID + "='divId']"));
+        WebElement nestedNode = parent.findElement(
+                By.xpath(".//a[@" + ID + "='nestedLinkId']"));
         assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
     }
 
-    public void testGetTextThrowsIfElementIsStale() {
+    public void testFindElementsByXPath() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        WebElement div = mDriver.findElement(By.id(DIV_ID));
-        mDriver.get(mWebServer.getAssetUrl(HELLO_WORLD_URL));
+        List<WebElement> elements = mDriver.findElements(
+                By.xpath("//a[@name='foo']"));
+        assertTrue(elements.size() > 1);
+    }
+
+    public void testFindElementsByXPathReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements =
+                mDriver.findElements(By.xpath(
+                        "//a[@" + ID + "='inexistant']"));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByXPath() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement div = mDriver.findElements(By.xpath(
+                "//div[@" + ID + "='divId']"))
+                .get(0);
+        List<WebElement> elements = div.findElements(
+                By.xpath(".//a[@name='foo']"));
+        assertEquals(1, elements.size());
+    }
+
+    public void testFindElementByXpathWithInvalidXPath() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         try {
-            div.getText();
+            mDriver.findElement(By.xpath("//a@" + ID + "=inexistant']"));
             fail("This should have failed.");
-        } catch (WebElementStaleException e) {
+        } catch (WebElementNotFoundException e) {
             // This is expected
         }
+    }
+
+    // By className
+    public void testFindElementByClassName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement element = mDriver.findElement(By.className(" spaceAround "));
+        assertTrue("Spaced out".equals(element.getText()));
+    }
+
+    public void testFindElementByClassNameThrowsIfElementDoesNotExists() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        try {
+            mDriver.findElement(By.className("bou"));
+            fail("This should have failed.");
+        } catch (WebElementNotFoundException e) {
+            // This is expected
+        }
+    }
+
+    public void testFindNestedElementByClassName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement parent = mDriver.findElement(By.id(DIV_ID));
+        WebElement nestedNode = parent.findElement(By.className("divClass"));
+        assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+    }
+
+    public void testFindElementsByClassName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements =
+                mDriver.findElements(By.className("divClass"));
+        assertTrue(elements.size() > 1);
+    }
+
+    public void testFindElementsByClassNameReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements =
+                mDriver.findElements(By.className(INEXISTENT));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByClassName() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement parent = mDriver.findElement(By.id(DIV_ID));
+        List<WebElement> nested =
+                parent.findElements(By.className("divClass"));
+        assertTrue(nested.size() > 0);
+    }
+
+    // By css
+    public void testFindElementByCss() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement element = mDriver.findElement(By.css("#" + "outter"));
+        assertTrue("Foo".equals(element.getText()));
+    }
+
+    public void testFindElementByCssThrowsIfElementDoesNotExists() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        try {
+            mDriver.findElement(By.css("bou.foo"));
+            fail("This should have failed.");
+        } catch (WebElementNotFoundException e) {
+            // This is expected
+        }
+    }
+
+    public void testFindNestedElementByCss() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement parent = mDriver.findElement(By.id(DIV_ID));
+        WebElement nestedNode = parent.findElement(
+                By.css("#" + NESTED_LINK_ID));
+        assertTrue(NESTED_TEXT.equals(nestedNode.getText()));
+    }
+
+    public void testFindElementsByCss() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(
+                By.css("#" + SOME_TEXT_ID));
+        assertTrue(elements.size() > 0);
+    }
+
+    public void testFindElementsByCssReturnsEmptyListIfNoResultsFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        List<WebElement> elements = mDriver.findElements(By.css("bou.foo"));
+        assertEquals(0, elements.size());
+    }
+
+    public void testFindNestedElementsByCss() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement parent = mDriver.findElement(By.id(DIV_ID));
+        List<WebElement> nested = parent.findElements(
+                By.css("#" + NESTED_LINK_ID));
+        assertEquals(1, nested.size());
     }
 
     public void testExecuteScriptShouldReturnAString() {
@@ -318,7 +665,7 @@ public class WebDriverTest extends
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         List<WebElement> result = (List<WebElement>) mDriver.executeScript(
                 "return document.getElementsByTagName('a')");
-        assertEquals(5, result.size());
+        assertTrue(result.size() > 1);
     }
 
     public void testExecuteScriptShouldReturnAMap() {
@@ -365,7 +712,8 @@ public class WebDriverTest extends
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement div = mDriver.findElement(By.id(DIV_ID));
         Object result = mDriver.executeScript(
-                "arguments[0]['flibble'] = arguments[0].getAttribute('id');"
+                "arguments[0]['flibble'] = arguments[0].getAttribute('"
+                + ID + "');"
                 + "return arguments[0]['flibble'];", div);
         assertEquals(DIV_ID, (String) result);
     }
@@ -456,9 +804,9 @@ public class WebDriverTest extends
 
     public void testExecuteScriptShouldBeAbleToCreatePersistentValue() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
-        mDriver.executeScript("document.bidule = ['hello']");
+        mDriver.executeScript("document.b" + ID + "ule = ['hello']");
         Object result = mDriver.executeScript(
-                "return document.bidule.shift();");
+                "return document.b" + ID + "ule.shift();");
         assertEquals("hello", (String) result);
     }
 
@@ -477,5 +825,22 @@ public class WebDriverTest extends
         assertTrue((Boolean) mDriver.executeScript(
                 "return \"f\\\"o\\\\o\\\\\\\\\\\"\" == arguments[0];",
                 "f\"o\\o\\\\\""));
+    }
+
+    public void testExecuteScriptReturnsNull() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        Object result = mDriver.executeScript("return null;");
+        assertNull(result);
+        result = mDriver.executeScript("return undefined;");
+        assertNull(result);
+    }
+
+    public void testExecuteScriptShouldThrowIfNoPageIsLoaded() {
+        try {
+            Object result = mDriver.executeScript("return null;");
+            fail();
+        } catch (Exception e) {
+
+        }
     }
 }
