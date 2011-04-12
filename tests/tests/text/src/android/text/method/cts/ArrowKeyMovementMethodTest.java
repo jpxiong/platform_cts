@@ -1139,6 +1139,76 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
     }
 
+    private static final String TEXT_WORDS_WITH_1CHAR_FINAL_WORD = "abc d";
+
+    @UiThreadTest
+    public void testFollowingWordStartToEndWithOneCharFinalWord() {
+
+        initTextViewWithNullLayout(TEXT_WORDS_WITH_1CHAR_FINAL_WORD);
+
+        // |abc d
+        Selection.setSelection(mEditable, 0);
+        assertSelection(0);
+
+        // abc| d
+        assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_RIGHT));
+        assertSelection(3);
+
+        // abc d|
+        assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_RIGHT));
+        assertSelection(mEditable.length());
+
+    }
+
+    @UiThreadTest
+    public void testFollowingWordEndToStartWithOneCharFinalWord() {
+
+        initTextViewWithNullLayout(TEXT_WORDS_WITH_1CHAR_FINAL_WORD);
+
+        // abc d|
+        Selection.setSelection(mEditable, mEditable.length());
+        assertSelection(5);
+
+        // abc |d
+        assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_LEFT));
+        assertSelection(4);
+
+        // |abc d
+        assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_LEFT));
+        assertSelection(0);
+
+    }
+
+    @UiThreadTest
+    public void testMovementFromMiddleOfWord() {
+
+        initTextViewWithNullLayout("before word after");
+        checkMoveFromInsideWord(7, 10);
+
+        // Surrogate characters are not (yet) correctly supported. TODO
+        //final String ANGRY_FACE_EMOJI = "\uDBB8\uDF20";
+        //initTextViewWithNullLayout("before " + ANGRY_FACE_EMOJI + " after");
+        //checkMoveFromInsideWord(7, 9);
+
+    }
+
+    private void checkMoveFromInsideWord(int wordStart, int wordEnd) {
+
+        // Check following always goes at the end of the word
+        for (int offset = wordStart; offset != wordEnd + 1; offset++) {
+            Selection.setSelection(mEditable, offset);
+            assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_RIGHT));
+            assertSelection(wordEnd + 1);
+        }
+
+        // Check preceding always goes at the beginning of the word
+        for (int offset = wordEnd + 1; offset != wordStart; offset--) {
+            Selection.setSelection(mEditable, offset);
+            assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_LEFT));
+            assertSelection(wordStart);
+        }
+    }
+
     private void initTextViewWithNullLayout() {
         initTextViewWithNullLayout(THREE_LINES_TEXT);
     }
