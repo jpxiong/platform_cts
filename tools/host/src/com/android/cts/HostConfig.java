@@ -63,6 +63,7 @@ public class HostConfig extends XMLResourceHandler {
                                                   "logo.gif", "newrule-green.png"};
 
     private String mConfigRoot;
+    private String mLogRoot;
     private CaseRepository mCaseRepos;
     private ResultRepository mResultRepos;
     private PlanRepository mPlanRepos;
@@ -174,6 +175,13 @@ public class HostConfig extends XMLResourceHandler {
         String planRoot = repositoryRoot + File.separator + planCfg;
         String resRoot = repositoryRoot + File.separator + resCfg;
 
+        String logCfg = getStringAttributeValueOpt(doc, "TestLog", "path", fileName);
+        if (null == logCfg) {
+            mLogRoot = mConfigRoot;
+        } else {
+            mLogRoot = repositoryRoot + File.separator + logCfg;
+        }
+
         boolean validCase = true;
         if (!validateDirectory(caseRoot)) {
             validCase = new File(caseRoot).mkdirs();
@@ -189,12 +197,16 @@ public class HostConfig extends XMLResourceHandler {
         if (!validateDirectory(planRoot)) {
             validPlan = new File(planRoot).mkdirs();
         }
+        boolean validLog = true;
+        if (!validateDirectory(mLogRoot)) {
+            validLog = new File(mLogRoot).mkdirs();
+        }
 
         mCaseRepos = new CaseRepository(caseRoot);
         mResultRepos = new ResultRepository(resRoot);
         mPlanRepos = new PlanRepository(planRoot);
 
-        return validCase && validRes && validPlan;
+        return validCase && validRes && validPlan && validLog;
     }
 
     /**
@@ -285,6 +297,15 @@ public class HostConfig extends XMLResourceHandler {
     }
 
     /**
+     * Get the root directory of log files.
+     *
+     * @return the root directory of log files.
+     */
+    public String getLogRoot() {
+        return mLogRoot;
+    }
+
+    /**
      * Get string attribute value.
      *
      * @param doc The document.
@@ -310,6 +331,29 @@ public class HostConfig extends XMLResourceHandler {
             Log.e("Configure error (in " + fileName
                     + "), pls make sure <" + tagName
                     + ">'s value is correctly set.", null);
+            return null;
+        }
+
+        return cfgStr;
+    }
+
+    /**
+     * Get string attribute value if it exists.
+     *
+     * @param doc The document.
+     * @param tagName The tag name.
+     * @param attrName The attribute name.
+     * @param fileName The file name.
+     * @return The attribute value.
+     */
+    private String getStringAttributeValueOpt(final Document doc,
+            final String tagName, final String attrName, final String fileName) {
+
+        String cfgStr = null;
+        try {
+            cfgStr = getStringAttributeValue(doc
+                    .getElementsByTagName(tagName).item(0), attrName);
+        } catch (Exception e) {
             return null;
         }
 
