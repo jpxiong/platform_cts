@@ -22,11 +22,8 @@ import com.android.internal.util.Predicates;
 import dalvik.annotation.BrokenTest;
 import dalvik.annotation.SideEffect;
 
-import android.annotation.cts.RequiredFeatures;
-import android.app.Instrumentation;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.test.suitebuilder.TestMethod;
@@ -36,10 +33,7 @@ import android.util.Log;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 
 import junit.framework.AssertionFailedError;
@@ -66,8 +60,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
     private static final String TAG = "InstrumentationCtsTestRunner";
 
     private static final String REPORT_VALUE_ID = "InstrumentationCtsTestRunner";
-
-    private static final int REPORT_VALUE_RESULT_OMITTED = -3;
 
     /**
      * True if (and only if) we are running in single-test mode (as opposed to
@@ -235,73 +227,11 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 Predicates.not(new HasAnnotation(BrokenTest.class));
         builderRequirements.add(brokenTestPredicate);
 
-        builderRequirements.add(getFeaturePredicate());
-
         if (!mSingleTest) {
             Predicate<TestMethod> sideEffectPredicate =
                     Predicates.not(new HasAnnotation(SideEffect.class));
             builderRequirements.add(sideEffectPredicate);
         }
         return builderRequirements;
-    }
-
-    /**
-     * Send back an indication that a test was omitted. InstrumentationTestRunner won't run omitted
-     * tests, but CTS needs to know that the test was omitted. Otherwise, it will attempt to rerun
-     * the test thinking that ADB must have crashed or something.
-     */
-    private void sendOmittedStatus(TestMethod t) {
-        Bundle bundle = new Bundle();
-        bundle.putString(Instrumentation.REPORT_KEY_IDENTIFIER, REPORT_VALUE_ID);
-        bundle.putInt(InstrumentationTestRunner.REPORT_KEY_NUM_TOTAL, 1);
-        bundle.putInt(InstrumentationTestRunner.REPORT_KEY_NUM_CURRENT, 1);
-        bundle.putString(InstrumentationTestRunner.REPORT_KEY_NAME_CLASS,
-                t.getEnclosingClassname());
-        bundle.putString(InstrumentationTestRunner.REPORT_KEY_NAME_TEST,
-                t.getName());
-
-        // First status message causes CTS to print out the test name like "Class#test..."
-        sendStatus(InstrumentationTestRunner.REPORT_VALUE_RESULT_START, bundle);
-
-        // Second status message causes CTS to complete the line like "Class#test...(omitted)"
-        sendStatus(REPORT_VALUE_RESULT_OMITTED, bundle);
-    }
-
-
-    private Predicate<TestMethod> getFeaturePredicate() {
-        return new Predicate<TestMethod>() {
-            public boolean apply(TestMethod t) {
-                if (isValidTest(t)) {
-                    // InstrumentationTestRunner will run the test and send back results.
-                    return true;
-                } else {
-                    // InstrumentationTestRunner WON'T run the test, so send back omitted status.
-                    sendOmittedStatus(t);
-                    return false;
-                }
-            }
-
-            private boolean isValidTest(TestMethod t) {
-                Set<String> features = new HashSet<String>();
-                add(features, t.getAnnotation(RequiredFeatures.class));
-                add(features, t.getEnclosingClass().getAnnotation(RequiredFeatures.class));
-
-                // Run the test only if the device supports all the features.
-                PackageManager packageManager = getContext().getPackageManager();
-                FeatureInfo[] featureInfos = packageManager.getSystemAvailableFeatures();
-                if (featureInfos != null) {
-                    for (FeatureInfo featureInfo : featureInfos) {
-                        features.remove(featureInfo.name);
-                    }
-                }
-                return features.isEmpty();
-            }
-
-            private void add(Set<String> features, RequiredFeatures annotation) {
-                if (annotation != null) {
-                    Collections.addAll(features, annotation.value());
-                }
-            }
-        };
     }
 }

@@ -2,7 +2,6 @@
 <classpath>
     <classpathentry kind="src" path="cts/apps/CtsVerifier/src"/>
     <classpathentry kind="src" path="cts/apps/CtsVerifier/tests/src"/>
-    <classpathentry kind="src" path="cts/libs/annotation/src"/>
     <classpathentry kind="src" path="cts/libs/vogar-expect/src"/>
     <classpathentry kind="src" path="cts/tests/ApiDemosReferenceTest/src"/>
     <classpathentry kind="src" path="cts/tests/ProcessTest/src"/>

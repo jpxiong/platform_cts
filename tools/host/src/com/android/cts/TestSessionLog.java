@@ -78,7 +78,6 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
     static final String ATTRIBUTE_TIMEOUT = "timeout";
-    static final String ATTRIBUTE_OMITTED = "omitted";
     static final String ATTRIBUTE_NOT_EXECUTED = "notExecuted";
 
     static final String TAG_DEVICEINFO = "DeviceInfo";
@@ -385,14 +384,12 @@ public class TestSessionLog extends XMLResourceHandler {
 
             int passNum = getTestList(CtsTestResult.CODE_PASS).size();
             int failNum = getTestList(CtsTestResult.CODE_FAIL).size();
-            int omittedNum = getTestList(CtsTestResult.CODE_OMITTED).size();
             int notExecutedNum = getTestList(CtsTestResult.CODE_NOT_EXECUTED).size();
             int timeOutNum = getTestList(CtsTestResult.CODE_TIMEOUT).size();
             Node summaryNode = doc.createElement(TAG_SUMMARY);
             root.appendChild(summaryNode);
             setAttribute(doc, summaryNode, ATTRIBUTE_PASS, passNum);
             setAttribute(doc, summaryNode, ATTRIBUTE_FAILED, failNum);
-            setAttribute(doc, summaryNode, ATTRIBUTE_OMITTED, omittedNum);
             setAttribute(doc, summaryNode, ATTRIBUTE_NOT_EXECUTED, notExecutedNum);
             setAttribute(doc, summaryNode, ATTRIBUTE_TIMEOUT, timeOutNum);
 
