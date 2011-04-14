@@ -27,8 +27,8 @@ import com.android.ddmlib.RawImage;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.SyncException;
 import com.android.ddmlib.SyncService;
-import com.android.ddmlib.SyncService.ISyncProgressMonitor;
 import com.android.ddmlib.TimeoutException;
+import com.android.ddmlib.SyncService.ISyncProgressMonitor;
 import com.android.ddmlib.log.LogReceiver;
 import com.android.ddmlib.log.LogReceiver.ILogListener;
 
@@ -1452,10 +1452,6 @@ public class TestDevice implements DeviceObserver {
             case STATUS_ERROR:
                 mResultCode = CtsTestResult.CODE_FAIL;
                 break;
-
-            case STATUS_OMITTED:
-                mResultCode = CtsTestResult.CODE_OMITTED;
-                break;
             }
         }
 
@@ -1521,10 +1517,6 @@ public class TestDevice implements DeviceObserver {
                 case STATUS_PASS:
                     mResultCode = CtsTestResult.CODE_PASS;
                     break;
-
-                case STATUS_OMITTED:
-                    mResultCode = CtsTestResult.CODE_OMITTED;
-                    break;
                 }
                 resultLines.removeAll(resultLines);
             }
@@ -1575,10 +1567,6 @@ public class TestDevice implements DeviceObserver {
                 case STATUS_FAIL:
                     mTest.setResult(new CtsTestResult(
                             CtsTestResult.CODE_FAIL, mFailedMsg, mStackTrace));
-                    break;
-
-                case STATUS_OMITTED:
-                    mTest.setResult(new CtsTestResult(CtsTestResult.CODE_OMITTED));
                     break;
                 }
             }

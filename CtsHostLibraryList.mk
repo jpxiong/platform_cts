@@ -12,5 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CTS_HOST_LIBRARY_JARS := \
-	$(HOST_OUT_JAVA_LIBRARIES)/CtsTestAnnotationsHostLib.jar
+CTS_HOST_LIBRARY_JARS := 
