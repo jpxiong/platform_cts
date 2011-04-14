@@ -57,7 +57,6 @@
     <classpathentry kind="src" path="cts/tools/host/test"/>
     <classpathentry kind="src" path="cts/tools/signature-tools/src"/>
     <classpathentry kind="src" path="cts/tools/signature-tools/test"/>
-    <classpathentry kind="src" path="cts/tools/spec-progress/src"/>
     <classpathentry kind="src" path="cts/tools/utils"/>
     <classpathentry kind="src" path="cts/tools/vm-tests/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsAccessibilityServiceTestCases_intermediates/src/src"/>
