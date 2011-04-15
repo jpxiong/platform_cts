@@ -211,12 +211,13 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
     /**
      * Test if we can set and get the MasterSyncAutomatically switch
      */
-    public void testGetAndSetMasterSyncAutomatically() {
+    public void testGetAndSetMasterSyncAutomatically() throws Exception {
         ContentResolver.setMasterSyncAutomatically(true);
         assertEquals(true, ContentResolver.getMasterSyncAutomatically());
 
         ContentResolver.setMasterSyncAutomatically(false);
         assertEquals(false, ContentResolver.getMasterSyncAutomatically());
+        Thread.sleep(3000);
     }
 
     /**
