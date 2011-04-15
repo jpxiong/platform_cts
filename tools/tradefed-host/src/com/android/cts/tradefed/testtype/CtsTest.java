@@ -32,7 +32,6 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
-import com.android.tradefed.testtype.InstrumentationTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.BufferedInputStream;
@@ -119,6 +118,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private List<KnownTests> mRemainingTests = null;
 
     private CtsBuildHelper mCtsBuild = null;
+    private IBuildInfo mBuildInfo = null;
 
     /**
      * {@inheritDoc}
@@ -207,6 +207,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                     build.getClass().getName()));
         }
         try {
+            mBuildInfo = build;
             mCtsBuild = new CtsBuildHelper((IFolderBuildInfo)build);
             mCtsBuild.validateStructure();
         } catch (FileNotFoundException e) {
@@ -249,12 +250,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             if (test instanceof IDeviceTest) {
                 ((IDeviceTest)test).setDevice(getDevice());
             }
-            // Increment the timeout for collecting the tests.
-            // TODO: move this to testPackage.createTest() instead and only increase timeout when
-            // tests number is large.
-            if (test instanceof InstrumentationTest) {
-                ((InstrumentationTest)test).setCollectsTestsShellTimeout(10*60*1000);
+            if (test instanceof IBuildReceiver) {
+                ((IBuildReceiver)test).setBuild(mBuildInfo);
             }
+
             ResultFilter filter = new ResultFilter(listener, testPair.getKnownTests());
             test.run(filter);
             mRemainingTests.remove(0);

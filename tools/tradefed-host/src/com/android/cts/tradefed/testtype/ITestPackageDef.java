@@ -27,7 +27,7 @@ import java.util.Collection;
  * <p/>
  * Knows how to translate this info into a runnable {@link IRemoteTest}.
  */
-interface ITestPackageDef {
+public interface ITestPackageDef {
 
     /**
      * Get the unique URI of the test package.

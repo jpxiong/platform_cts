@@ -163,24 +163,18 @@ class TestPackageDef implements ITestPackageDef {
             return instrTest;
         } else if (mIsReferenceAppTest) {
             // a reference app test is just a InstrumentationTest with one extra apk to install
-            InstrumentationAppTest instrTest = new InstrumentationAppTest();
-            File apkFile = new File(testCaseDir, String.format("%s.apk", mApkToTestName));
-            if (!apkFile.exists()) {
-                Log.w(LOG_TAG, String.format("Could not find apk file %s",
-                        apkFile.getAbsolutePath()));
-                return null;
-            }
-            instrTest.addInstallApp(apkFile, mPackageToTest);
-            return setInstrumentationTest(testCaseDir, className, methodName, instrTest);
+            InstrumentationApkTest instrTest = new InstrumentationApkTest();
+            instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
+            return setInstrumentationTest(className, methodName, instrTest);
         } else {
             Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
-            InstrumentationTest instrTest = new InstrumentationTest();
-            return setInstrumentationTest(testCaseDir, className, methodName, instrTest);
+            InstrumentationApkTest instrTest = new InstrumentationApkTest();
+            return setInstrumentationTest(className, methodName, instrTest);
         }
     }
 
     /**
-     * Populates given {@link InstrumentationTest} with data from the package xml
+     * Populates given {@link InstrumentationApkTest} with data from the package xml
      *
      * @param testCaseDir
      * @param className
@@ -188,20 +182,18 @@ class TestPackageDef implements ITestPackageDef {
      * @param instrTest
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
-    private InstrumentationTest setInstrumentationTest(File testCaseDir, String className,
-            String methodName, InstrumentationTest instrTest) {
+    private InstrumentationApkTest setInstrumentationTest(String className,
+            String methodName, InstrumentationApkTest instrTest) {
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
         instrTest.setClassName(className);
         instrTest.setMethodName(methodName);
         // mName means 'apk file name' for instrumentation tests
-        File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
-        if (!apkFile.exists()) {
-            Log.w(LOG_TAG, String.format("Could not find apk file %s",
-                    apkFile.getAbsolutePath()));
-            return null;
+        instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
+        if (mTests.size() > 1000) {
+            // TODO: hack, large test suites can take longer to collect tests, increase timeout
+            instrTest.setCollectsTestsShellTimeout(10*60*1000);
         }
-        instrTest.setInstallFile(apkFile);
         return instrTest;
     }
 
