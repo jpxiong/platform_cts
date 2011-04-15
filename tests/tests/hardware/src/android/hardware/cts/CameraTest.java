@@ -1567,7 +1567,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testPreviewFpsRangeByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
-        mCamera.startPreview();
 
         // Test if the parameters exists and minimum fps <= maximum fps.
         int[] defaultFps = new int[2];
