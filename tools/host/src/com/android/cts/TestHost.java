@@ -362,7 +362,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
                 exit();
             }
 
-            Log.initLog(sConfig.getConfigRoot());
+            Log.initLog(sConfig.getLogRoot());
             sConfig.loadRepositories();
         } catch (Exception e) {
             Log.e("Error while parsing cts config file", e);
