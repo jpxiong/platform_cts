@@ -80,7 +80,6 @@ public class ConsoleUi {
         mResultCodeMap.put(CtsTestResult.STR_ERROR, CtsTestResult.CODE_ERROR);
         mResultCodeMap.put(CtsTestResult.STR_NOT_EXECUTED, CtsTestResult.CODE_NOT_EXECUTED);
         mResultCodeMap.put(CtsTestResult.STR_TIMEOUT, CtsTestResult.CODE_TIMEOUT);
-        mResultCodeMap.put(CtsTestResult.STR_OMITTED, CtsTestResult.CODE_OMITTED);
     }
 
     public ConsoleUi(TestHost host) {
@@ -1183,9 +1182,9 @@ public class ConsoleUi {
             CUIOutputStream.println("There aren't any test results!");
         } else {
             CUIOutputStream.println("List of all results: ");
-            CUIOutputStream.println("Session\t\tTest result\t\t\t\t\tStart time\t\tEnd time\t"
+            CUIOutputStream.println("Session\t\tTest result\t\t\t\tStart time\t\tEnd time\t"
                     + "\tTest plan name\t");
-            CUIOutputStream.println("\t\tPass\tFail\tTimeout\tOmitted\tNotExecuted");
+            CUIOutputStream.println("\t\tPass\tFail\tTimeout\tNotExecuted");
 
             for (TestSession session : sessions) {
                 TestSessionLog log = session.getSessionLog();
@@ -1193,8 +1192,6 @@ public class ConsoleUi {
                         CtsTestResult.CODE_PASS).size();
                 int failNum = log.getTestList(
                         CtsTestResult.CODE_FAIL).size();
-                int omittedNum = log.getTestList(
-                        CtsTestResult.CODE_OMITTED).size();
                 int notExecutedNum = log.getTestList(
                         CtsTestResult.CODE_NOT_EXECUTED).size();
                 int timeOutNum = log.getTestList(
@@ -1202,7 +1199,6 @@ public class ConsoleUi {
 
                 String resStr = Long.toString(passNum) + "\t" + failNum;
                 resStr += "\t" + timeOutNum;
-                resStr += "\t" + omittedNum;
                 resStr += "\t" + notExecutedNum;
 
                 String startTimeStr =
