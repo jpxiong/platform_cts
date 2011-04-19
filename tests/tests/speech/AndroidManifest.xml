@@ -24,9 +24,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <!--  self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.android.cts.speech"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+                     android:targetPackage="com.android.cts.stub"
                      android:label="CTS tests of android.speech"/>
 
 </manifest>

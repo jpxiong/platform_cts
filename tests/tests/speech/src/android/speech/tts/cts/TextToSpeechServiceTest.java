@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,15 @@ import android.speech.tts.TextToSpeech;
 import android.test.AndroidTestCase;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
- * Tests for {@link android.speech.tts.TextToSpeech}
+ * Tests for {@link android.speech.tts.TextToSpeechService} using StubTextToSpeechService.
  */
-public class TextToSpeechTest extends AndroidTestCase {
+public class TextToSpeechServiceTest extends AndroidTestCase {
 
     private static final String UTTERANCE_ID = "utterance";
-    private static final String SAMPLE_TEXT = "This is a sample text to speech string";
     private static final String SAMPLE_FILE_NAME = "mytts.wav";
 
     private TextToSpeechWrapper mTts;
@@ -38,9 +36,8 @@ public class TextToSpeechTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mTts = TextToSpeechWrapper.createTextToSpeechWrapper(getContext());
+        mTts = TextToSpeechWrapper.createTextToSpeechMockWrapper(getContext());
         assertNotNull(mTts);
-        assertTrue(checkAndSetLanguageAvailable());
     }
 
     @Override
@@ -53,30 +50,31 @@ public class TextToSpeechTest extends AndroidTestCase {
         return mTts.getTts();
     }
 
-    /**
-     * Ensures at least one language is available for tts
-     */
-    private boolean checkAndSetLanguageAvailable() {
-        // checks if at least one language is available in Tts
-        for (Locale locale : Locale.getAvailableLocales()) {
-            int availability = getTts().isLanguageAvailable(locale);
-            if (availability == TextToSpeech.LANG_AVAILABLE ||
-                availability == TextToSpeech.LANG_COUNTRY_AVAILABLE ||
-                availability == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE) {
-                getTts().setLanguage(locale);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void testSynthesizeToFile() throws Exception {
+    public void testSynthesizeToFileStreaming() throws Exception {
         File sampleFile = new File(Environment.getExternalStorageDirectory(), SAMPLE_FILE_NAME);
         try {
             assertFalse(sampleFile.exists());
 
-            int result = getTts().synthesizeToFile(SAMPLE_TEXT, createParams(),
-                    sampleFile.getPath());
+            int result = getTts().synthesizeToFile(StubTextToSpeechService.TEXT_STREAM,
+                    createParams(), sampleFile.getPath());
+            assertEquals("synthesizeToFile() failed", TextToSpeech.SUCCESS, result);
+
+            assertTrue("synthesizeToFile() completion timeout", mTts.waitForComplete(UTTERANCE_ID));
+            assertTrue("synthesizeToFile() didn't produce a file", sampleFile.exists());
+            assertTrue("synthesizeToFile() produced a non-sound file",
+                    TextToSpeechWrapper.isSoundFile(sampleFile.getPath()));
+        } finally {
+            sampleFile.delete();
+        }
+    }
+
+    public void testSynthesizeToFileComplete() throws Exception {
+        File sampleFile = new File(Environment.getExternalStorageDirectory(), SAMPLE_FILE_NAME);
+        try {
+            assertFalse(sampleFile.exists());
+
+            int result = getTts().synthesizeToFile(StubTextToSpeechService.TEXT_COMPLETE,
+                    createParams(), sampleFile.getPath());
             assertEquals("synthesizeToFile() failed", TextToSpeech.SUCCESS, result);
 
             assertTrue("synthesizeToFile() completion timeout", waitForUtterance());
@@ -88,31 +86,31 @@ public class TextToSpeechTest extends AndroidTestCase {
         }
     }
 
-    public void testSpeak() throws Exception {
-        int result = getTts().speak(SAMPLE_TEXT, TextToSpeech.QUEUE_FLUSH, createParams());
+    public void testSpeakStreaming() throws Exception {
+        int result = getTts().speak(StubTextToSpeechService.TEXT_STREAM, TextToSpeech.QUEUE_FLUSH,
+                createParams());
         assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
         assertTrue("speak() completion timeout", waitForUtterance());
     }
 
-    public void testGetEnginesIncludesDefault() throws Exception {
-        List<TextToSpeech.EngineInfo> engines = getTts().getEngines();
-        assertNotNull("getEngines() returned null", engines);
-        assertContainsEngine(getTts().getDefaultEngine(), engines);
+    public void testSpeakComplete() throws Exception {
+        int result = getTts().speak(StubTextToSpeechService.TEXT_COMPLETE, TextToSpeech.QUEUE_FLUSH,
+                createParams());
+        assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
+        assertTrue("speak() completion timeout", waitForUtterance());
     }
 
-    public void testGetEnginesIncludesMock() throws Exception {
-        List<TextToSpeech.EngineInfo> engines = getTts().getEngines();
-        assertNotNull("getEngines() returned null", engines);
-        assertContainsEngine(TextToSpeechWrapper.MOCK_TTS_ENGINE, engines);
-    }
-
-    private void assertContainsEngine(String engine, List<TextToSpeech.EngineInfo> engines) {
-        for (TextToSpeech.EngineInfo engineInfo : engines) {
-            if (engineInfo.name.equals(engine)) {
-                return;
-            }
+    public void testMediaPlayerFails() throws Exception {
+        File sampleFile = new File(Environment.getExternalStorageDirectory(), "notsound.wav");
+        try {
+            assertFalse(TextToSpeechWrapper.isSoundFile(sampleFile.getPath()));
+            FileOutputStream out = new FileOutputStream(sampleFile);
+            out.write(new byte[] { 0x01, 0x02 });
+            out.close();
+            assertFalse(TextToSpeechWrapper.isSoundFile(sampleFile.getPath()));
+        } finally {
+            sampleFile.delete();
         }
-        fail("Engine " + engine + " not found");
     }
 
     private HashMap<String, String> createParams() {

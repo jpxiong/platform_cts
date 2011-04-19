@@ -951,6 +951,13 @@
         <activity android:name="android.app.cts.ActivityManagerMemoryClassTestActivity"
                 android:process=":memoryclass" />
 
+        <service android:name="android.speech.tts.cts.StubTextToSpeechService">
+            <intent-filter>
+                <action android:name="android.intent.action.TTS_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
