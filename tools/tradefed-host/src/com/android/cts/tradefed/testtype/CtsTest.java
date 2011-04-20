@@ -22,7 +22,6 @@ import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -201,18 +200,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      */
     @Override
     public void setBuild(IBuildInfo build) {
-        if (!(build instanceof IFolderBuildInfo)) {
-            throw new IllegalArgumentException(String.format(
-                    "Wrong build type. Expected %s, received %s", IFolderBuildInfo.class.getName(),
-                    build.getClass().getName()));
-        }
-        try {
-            mBuildInfo = build;
-            mCtsBuild = new CtsBuildHelper((IFolderBuildInfo)build);
-            mCtsBuild.validateStructure();
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Invalid CTS build provided.", e);
-        }
+        mCtsBuild = CtsBuildHelper.createBuildHelper(build);
+        mBuildInfo = build;
     }
 
     /**

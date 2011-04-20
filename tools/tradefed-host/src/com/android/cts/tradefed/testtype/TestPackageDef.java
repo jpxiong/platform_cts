@@ -136,8 +136,7 @@ class TestPackageDef implements ITestPackageDef {
             Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(mName);
-            hostTest.setJarFile(new File(testCaseDir, mJarPath));
-            hostTest.setTestAppPath(testCaseDir.getAbsolutePath());
+            hostTest.setJarFileName(mJarPath);
             hostTest.setTests(filterTests(mTests, className, methodName));
             return hostTest;
         } else if (mIsSignatureTest) {
@@ -145,7 +144,7 @@ class TestPackageDef implements ITestPackageDef {
             // points to specialized instrumentation. Eventually this special case for signatureTest
             // can be removed, and it can be treated just like a normal InstrumentationTest
             Log.d(LOG_TAG, String.format("Creating signature test %s", mName));
-            InstrumentationTest instrTest = new InstrumentationTest();
+            InstrumentationApkTest instrTest = new InstrumentationApkTest();
             instrTest.setPackageName(mAppNameSpace);
             instrTest.setRunnerName("android.test.InstrumentationTestRunner");
             instrTest.setClassName(SIGNATURE_TEST_CLASS);
@@ -153,13 +152,7 @@ class TestPackageDef implements ITestPackageDef {
             // add signature test to list of known tests
             addTest(new TestIdentifier(SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD));
             // mName means 'apk file name' for instrumentation tests
-            File apkFile = new File(testCaseDir, String.format("%s.apk", mName));
-            if (!apkFile.exists()) {
-                Log.w(LOG_TAG, String.format("Could not find apk file %s",
-                        apkFile.getAbsolutePath()));
-                return null;
-            }
-            instrTest.setInstallFile(apkFile);
+            instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
             return instrTest;
         } else if (mIsReferenceAppTest) {
             // a reference app test is just a InstrumentationTest with one extra apk to install

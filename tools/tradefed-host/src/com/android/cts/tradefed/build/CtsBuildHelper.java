@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.build;
 
+import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 
 import java.io.File;
@@ -54,6 +55,29 @@ public class CtsBuildHelper {
      */
     public CtsBuildHelper(IFolderBuildInfo build) throws FileNotFoundException {
         this(build.getRootDir());
+    }
+
+    /**
+     * A helper factory method that creates and validates a {@link CtsBuildHelper} given an
+     * {@link IBuildInfo}.
+     *
+     * @param build the {@link IBuildInfo}
+     * @return the {@link CtsBuildHelper}
+     * @throws IllegalArgumentException if provided <var>build</var> is not a valid CTS build
+     */
+    public static CtsBuildHelper createBuildHelper(IBuildInfo build) {
+        if (!(build instanceof IFolderBuildInfo)) {
+            throw new IllegalArgumentException(String.format(
+                    "Wrong build type. Expected %s, received %s", IFolderBuildInfo.class.getName(),
+                    build.getClass().getName()));
+        }
+        try {
+            CtsBuildHelper ctsBuild = new CtsBuildHelper((IFolderBuildInfo)build);
+            ctsBuild.validateStructure();
+            return ctsBuild;
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("Invalid CTS build provided.", e);
+        }
     }
 
     /**
