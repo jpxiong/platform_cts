@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.build.StubCtsBuildHelper;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -22,7 +23,6 @@ import com.android.tradefed.result.ITestInvocationListener;
 
 import org.easymock.EasyMock;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +37,8 @@ public class JarHostTestTest extends TestCase {
 
     private static final String RUN_NAME = "run";
     private JarHostTest mJarTest;
+    private StubCtsBuildHelper mStubBuildHelper;
+
 
     @Override
     protected void setUp() throws Exception {
@@ -48,6 +50,8 @@ public class JarHostTestTest extends TestCase {
                 return MockTest.class;
             }
         };
+        mStubBuildHelper = new StubCtsBuildHelper();
+        mJarTest.setBuildHelper(mStubBuildHelper);
     }
 
     public static class MockTest extends TestCase {
@@ -80,7 +84,7 @@ public class JarHostTestTest extends TestCase {
         listener.testRunEnded(EasyMock.anyLong(), EasyMock.eq(Collections.EMPTY_MAP));
         mJarTest.setTests(tests);
         mJarTest.setDevice(EasyMock.createMock(ITestDevice.class));
-        mJarTest.setJarFile(new File("fakefile"));
+        mJarTest.setJarFileName("fakefile");
         mJarTest.setRunName(RUN_NAME);
 
         EasyMock.replay(listener);

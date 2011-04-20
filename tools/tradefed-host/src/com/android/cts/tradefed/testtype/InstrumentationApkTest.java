@@ -18,7 +18,6 @@ package com.android.cts.tradefed.testtype;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IBuildReceiver;
@@ -49,17 +48,7 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
      */
     @Override
     public void setBuild(IBuildInfo build) {
-        if (!(build instanceof IFolderBuildInfo)) {
-            throw new IllegalArgumentException(String.format(
-                    "Wrong build type. Expected %s, received %s", IFolderBuildInfo.class.getName(),
-                    build.getClass().getName()));
-        }
-        try {
-            mCtsBuild  = new CtsBuildHelper((IFolderBuildInfo)build);
-            mCtsBuild.validateStructure();
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Invalid CTS build provided.", e);
-        }
+        mCtsBuild  = CtsBuildHelper.createBuildHelper(build);
     }
 
     /**

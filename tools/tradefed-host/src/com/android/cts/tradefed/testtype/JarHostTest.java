@@ -15,12 +15,15 @@
  */
 package com.android.cts.tradefed.testtype;
 
+import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.JUnitToInvocationResultForwarder;
+import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.CommandStatus;
@@ -28,6 +31,7 @@ import com.android.tradefed.util.IRunUtil.IRunnableResult;
 import com.android.tradefed.util.RunUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,29 +43,50 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 /**
- * A {@link IRemoteTest} that can run a set of JUnit tests from a jar.
+ * A {@link IRemoteTest} that can run a set of JUnit tests from a CTS jar.
  */
-public class JarHostTest implements IDeviceTest, IRemoteTest {
+public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
 
     private static final String LOG_TAG = "JarHostTest";
 
     private ITestDevice mDevice;
-    private File mJarFile;
+    private String mJarFileName;
     private Collection<TestIdentifier> mTests;
     private long mTimeoutMs = 10 * 60 * 1000;
     private String mRunName;
-    private String mTestAppPath;
+    private CtsBuildHelper mCtsBuild = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setBuild(IBuildInfo buildInfo) {
+        mCtsBuild = CtsBuildHelper.createBuildHelper(buildInfo);
+    }
+
+    /**
+     * Set the CTS build container.
+     * <p/>
+     * Exposed so unit tests can mock the provided build.
+     *
+     * @param buildHelper
+     */
+    void setBuildHelper(CtsBuildHelper buildHelper) {
+        mCtsBuild = buildHelper;
+    }
 
     /**
      * Set the jar file to load tests from.
-     * @param jarFile
+     *
+     * @param jarFileName the file name of the CTS host test jar to use
      */
-    void setJarFile(File jarFile) {
-        mJarFile = jarFile;
+    void setJarFileName(String jarFileName) {
+        mJarFileName = jarFileName;
     }
 
     /**
      * Sets the collection of tests to run
+     *
      * @param tests
      */
     void setTests(Collection<TestIdentifier> tests) {
@@ -87,17 +112,6 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
      */
     void setRunName(String runName) {
         mRunName = runName;
-    }
-
-    /**
-     * Set the filesystem path to test app artifacts needed to run tests.
-     *
-     * @see {@link com.android.hosttest.DeviceTest#setTestAppPath(String)}
-     *
-     * @param testAppPath
-     */
-    void setTestAppPath(String testAppPath) {
-        mTestAppPath = testAppPath;
     }
 
     /**
@@ -153,7 +167,7 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
             // all host tests are converted to use tradefed
             com.android.hosttest.DeviceTest deviceTest = (com.android.hosttest.DeviceTest)junitTest;
             deviceTest.setDevice(getDevice().getIDevice());
-            deviceTest.setTestAppPath(mTestAppPath);
+            deviceTest.setTestAppPath(mCtsBuild.getTestCasesDir().getAbsolutePath());
         }
         CommandStatus status = RunUtil.getInstance().runTimed(mTimeoutMs, new IRunnableResult() {
 
@@ -183,7 +197,8 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
      */
     private Test loadTest(String className, String testName) {
         try {
-            URL urls[] = {mJarFile.getCanonicalFile().toURI().toURL()};
+            File jarFile = mCtsBuild.getTestApp(mJarFileName);
+            URL urls[] = {jarFile.getCanonicalFile().toURI().toURL()};
             Class<?> testClass = loadClass(className, urls);
 
             if (TestCase.class.isAssignableFrom(testClass)) {
@@ -195,16 +210,16 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
                 return test;
             } else {
                 Log.e(LOG_TAG, String.format("Class '%s' from jar '%s' is not a Test",
-                        className, mJarFile.getAbsolutePath()));
+                        className, mJarFileName));
             }
         } catch (ClassNotFoundException e) {
-            reportLoadError(mJarFile, className, e);
+            reportLoadError(mJarFileName, className, e);
         } catch (IllegalAccessException e) {
-            reportLoadError(mJarFile, className, e);
+            reportLoadError(mJarFileName, className, e);
         } catch (IOException e) {
-            reportLoadError(mJarFile, className, e);
+            reportLoadError(mJarFileName, className, e);
         } catch (InstantiationException e) {
-            reportLoadError(mJarFile, className, e);
+            reportLoadError(mJarFileName, className, e);
         }
         return null;
     }
@@ -225,9 +240,9 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
         return testClass;
     }
 
-    private void reportLoadError(File jarFile, String className, Exception e) {
+    private void reportLoadError(String jarFileName, String className, Exception e) {
         Log.e(LOG_TAG, String.format("Failed to load test class '%s' from jar '%s'",
-                className, jarFile.getAbsolutePath()));
+                className, jarFileName));
         Log.e(LOG_TAG, e);
     }
 
@@ -241,11 +256,21 @@ public class JarHostTest implements IDeviceTest, IRemoteTest {
         if (mDevice == null) {
             throw new IllegalArgumentException("Device has not been set");
         }
-        if (mJarFile == null) {
-            throw new IllegalArgumentException("jar file has not been set");
+        if (mJarFileName == null) {
+            throw new IllegalArgumentException("jar file name has not been set");
         }
         if (mTests == null) {
             throw new IllegalArgumentException("tests has not been set");
+        }
+        if (mCtsBuild == null) {
+            throw new IllegalArgumentException("build has not been set");
+        }
+        try {
+            mCtsBuild.getTestApp(mJarFileName);
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException(String.format(
+                    "Could not find jar %s in CTS build %s", mJarFileName,
+                    mCtsBuild.getRootDir().getAbsolutePath()));
         }
     }
 }
