@@ -332,11 +332,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(mShutterCallbackResult);
         assertTrue(mJpegPictureCallbackResult);
         assertNotNull(mJpegData);
-        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
-        bmpOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length, bmpOptions);
-        assertEquals(pictureSize.width, bmpOptions.outWidth);
-        assertEquals(pictureSize.height, bmpOptions.outHeight);
+        Bitmap b = BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length);
+        assertEquals(pictureSize.width, b.getWidth());
+        assertEquals(pictureSize.height, b.getHeight());
     }
 
     @TestTargets({
@@ -807,11 +805,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertTrue(exif.hasThumbnail());
         byte[] thumb = exif.getThumbnail();
-        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
-        bmpOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(thumb, 0, thumb.length, bmpOptions);
-        assertEquals(size.width, bmpOptions.outWidth);
-        assertEquals(size.height, bmpOptions.outHeight);
+        Bitmap b = BitmapFactory.decodeByteArray(thumb, 0, thumb.length);
+        assertEquals(size.width, b.getWidth());
+        assertEquals(size.height, b.getHeight());
 
         // Test no thumbnail case.
         p.setJpegThumbnailSize(0, 0);
@@ -1532,11 +1528,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 waitForSnapshotDone();
                 assertTrue(mJpegPictureCallbackResult);
                 assertNotNull(mJpegData);
-                BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
-                bmpOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length, bmpOptions);
-                assertEquals(pictureSize.width, bmpOptions.outWidth);
-                assertEquals(pictureSize.height, bmpOptions.outHeight);
+                Bitmap b = BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length);
+                assertEquals(pictureSize.width, b.getWidth());
+                assertEquals(pictureSize.height, b.getHeight());
+                b.recycle();
+                b = null;
             }
         }
         terminateMessageLooper();
