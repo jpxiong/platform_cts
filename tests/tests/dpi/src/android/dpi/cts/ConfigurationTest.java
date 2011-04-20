@@ -205,6 +205,8 @@ public class ConfigurationTest extends AndroidTestCase {
         new ScreenConfiguration(960, 540, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_NORMAL),
         // WSVGA     | high (191-250)   | large
         new ScreenConfiguration(1024, 600, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_LARGE),
+        // WSVGA     | high (191-250)   | normal
+        new ScreenConfiguration(1024, 600, Density.HIGH, Configuration.SCREENLAYOUT_SIZE_NORMAL),
 
         // VGA       | medium (141-190) | large
         new ScreenConfiguration(640, 480, Density.MEDIUM, Configuration.SCREENLAYOUT_SIZE_LARGE),
