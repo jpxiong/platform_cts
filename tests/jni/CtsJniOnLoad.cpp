@@ -21,6 +21,8 @@
 extern int register_android_os_cts_CpuFeatures(JNIEnv*);
 #endif
 
+extern int register_android_os_cts_FileUtils(JNIEnv*);
+
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = NULL;
 
@@ -33,6 +35,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 #endif
+
+    if (register_android_os_cts_FileUtils(env)) {
+        return JNI_ERR;
+    }
 
     return JNI_VERSION_1_4;
 }
