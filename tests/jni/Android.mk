@@ -22,7 +22,8 @@ LOCAL_MODULE := libcts_jni
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := \
-		CtsJniOnLoad.cpp
+		CtsJniOnLoad.cpp \
+		android_os_cts_FileUtils.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
 
