@@ -244,8 +244,9 @@ public class ElementTest extends RSBaseCompute {
         assertEquals(DataKind.PIXEL_LA, DataKind.valueOf("PIXEL_LA"));
         assertEquals(DataKind.PIXEL_RGB, DataKind.valueOf("PIXEL_RGB"));
         assertEquals(DataKind.PIXEL_RGBA, DataKind.valueOf("PIXEL_RGBA"));
+        assertEquals(DataKind.PIXEL_DEPTH, DataKind.valueOf("PIXEL_DEPTH"));
         // Make sure no new enums are added
-        assertEquals(6, DataKind.values().length);
+        assertEquals(7, DataKind.values().length);
 
         for (DataKind dk : DataKind.values()) {
             if (dk != DataKind.USER) {
