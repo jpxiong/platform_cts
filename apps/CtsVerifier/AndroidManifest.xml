@@ -69,32 +69,23 @@
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
         </activity>
 
-        <activity android:name=".sensors.MagnetometerTestActivity" android:label="@string/snsr_mag_test"
-                android:screenOrientation="nosensor">
+        <activity android:name=".audioquality.AudioQualityVerifierActivity"
+                android:label="@string/aq_verifier">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+            <meta-data android:name="test_category" android:value="@string/test_category_audio" />
         </activity>
 
-      <activity android:name=".audioquality.AudioQualityVerifierActivity"
-              android:label="@string/aq_verifier">
-          <intent-filter>
-              <action android:name="android.intent.action.MAIN" />
-              <category android:name="android.cts.intent.category.MANUAL_TEST" />
-          </intent-filter>
-          <meta-data android:name="test_category" android:value="@string/test_category_audio" />
-      </activity>
-      
-      <activity android:name=".audioquality.CalibrateVolumeActivity"
-                android:label="@string/aq_calibrate_volume_name" />
-      
-      <activity android:name=".audioquality.ViewResultsActivity"
-                android:label="@string/aq_view_results_name" />
+        <activity android:name=".audioquality.CalibrateVolumeActivity"
+                  android:label="@string/aq_calibrate_volume_name" />
 
-      <service android:name=".audioquality.ExperimentService" />
-      
+        <activity android:name=".audioquality.ViewResultsActivity"
+                  android:label="@string/aq_view_results_name" />
+
+        <service android:name=".audioquality.ExperimentService" />
+
    </application>
 
 </manifest> 
