@@ -16,16 +16,14 @@
 
 package android.net.cts;
 
+import dalvik.annotation.TestTargetClass;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(NetworkInfo.class)
 public class NetworkInfoTest extends AndroidTestCase {
@@ -35,135 +33,41 @@ public class NetworkInfoTest extends AndroidTestCase {
     public static final String MOBILE_TYPE_NAME = "mobile";
     public static final String WIFI_TYPE_NAME = "WIFI";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConnectedOrConnecting",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFailover",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFailover",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isRoaming",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSubtype",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTypeName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSubtypeName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIsAvailable",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAvailable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConnected",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDetailedState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReason",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExtraInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testAccessNetworkInfoProperties() {
         ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(
                 Context.CONNECTIVITY_SERVICE);
-
         NetworkInfo[] ni = cm.getAllNetworkInfo();
-        assertTrue(ni.length >= 2);
+        assertTrue(ni.length >= 1);
 
-        assertFalse(ni[TYPE_MOBILE].isFailover());
-        assertFalse(ni[TYPE_WIFI].isFailover());
-
-        // test environment:connect as TYPE_MOBILE, and connect to internet.
-        assertEquals(TYPE_MOBILE, ni[TYPE_MOBILE].getType());
-        assertEquals(TYPE_WIFI, ni[TYPE_WIFI].getType());
-
-        // don't know the return value
-        ni[TYPE_MOBILE].getSubtype();
-        ni[TYPE_WIFI].getSubtype();
-
-        assertEquals(MOBILE_TYPE_NAME, ni[TYPE_MOBILE].getTypeName());
-        assertEquals(WIFI_TYPE_NAME, ni[TYPE_WIFI].getTypeName());
-
-        // don't know the return value
-        ni[TYPE_MOBILE].getSubtypeName();
-        ni[TYPE_WIFI].getSubtypeName();
-
-        if(ni[TYPE_MOBILE].isConnectedOrConnecting()) {
-            assertTrue(ni[TYPE_MOBILE].isAvailable());
-            assertTrue(ni[TYPE_MOBILE].isConnected());
-            assertEquals(State.CONNECTED, ni[TYPE_MOBILE].getState());
-            assertEquals(DetailedState.CONNECTED, ni[TYPE_MOBILE].getDetailedState());
-            ni[TYPE_MOBILE].getReason();
-            ni[TYPE_MOBILE].getExtraInfo();
+        for (NetworkInfo netInfo: ni) {
+            switch (netInfo.getType()) {
+                case TYPE_MOBILE:
+                    assertNetworkInfo(netInfo, MOBILE_TYPE_NAME);
+                    break;
+                case TYPE_WIFI:
+                    assertNetworkInfo(netInfo, WIFI_TYPE_NAME);
+                    break;
+                 // TODO: Add BLUETOOTH_TETHER testing
+                 default:
+                     break;
+            }
         }
+    }
 
-        if(ni[TYPE_WIFI].isConnectedOrConnecting()) {
-            assertTrue(ni[TYPE_WIFI].isAvailable());
-            assertTrue(ni[TYPE_WIFI].isConnected());
-            assertEquals(State.CONNECTED, ni[TYPE_WIFI].getState());
-            assertEquals(DetailedState.CONNECTED, ni[TYPE_WIFI].getDetailedState());
-            ni[TYPE_WIFI].getReason();
-            ni[TYPE_WIFI].getExtraInfo();
+    private void assertNetworkInfo(NetworkInfo netInfo, String expectedTypeName) {
+        assertEquals(expectedTypeName, netInfo.getTypeName());
+        if(netInfo.isConnectedOrConnecting()) {
+            assertTrue(netInfo.isAvailable());
+            if (State.CONNECTED == netInfo.getState()) {
+                assertTrue(netInfo.isConnected());
+            }
+            assertTrue(State.CONNECTING == netInfo.getState()
+                    || State.CONNECTED == netInfo.getState());
+            assertTrue(DetailedState.SCANNING == netInfo.getDetailedState()
+                    || DetailedState.CONNECTING == netInfo.getDetailedState()
+                    || DetailedState.AUTHENTICATING == netInfo.getDetailedState()
+                    || DetailedState.CONNECTED == netInfo.getDetailedState());
         }
-
-        assertFalse(ni[TYPE_MOBILE].isRoaming());
-        assertFalse(ni[TYPE_WIFI].isRoaming());
-
-        assertNotNull(ni[TYPE_MOBILE].toString());
-        assertNotNull(ni[TYPE_WIFI].toString());
+        assertNotNull(netInfo.toString());
     }
 }
