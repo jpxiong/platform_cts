@@ -67,6 +67,7 @@ import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.cts.DelayedCheck;
@@ -4629,6 +4630,10 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         protected int[] onCreateDrawableState(int extraSpace) {
             mHasOnCreateDrawableState = true;
             return DEFAULT_PARENT_STATE_SET;
+        }
+
+        public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
+            return false;
         }
 
         public static int[] getDefaultParentStateSet() {
