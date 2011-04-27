@@ -16,16 +16,14 @@
 
 package android.net.cts;
 
+import dalvik.annotation.TestTargetClass;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @TestTargetClass(NetworkInfo.class)
 public class NetworkInfoTest extends AndroidTestCase {
@@ -35,132 +33,41 @@ public class NetworkInfoTest extends AndroidTestCase {
     public static final String MOBILE_TYPE_NAME = "mobile";
     public static final String WIFI_TYPE_NAME = "WIFI";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConnectedOrConnecting",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFailover",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFailover",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isRoaming",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSubtype",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTypeName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSubtypeName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIsAvailable",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAvailable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConnected",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDetailedState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReason",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExtraInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testAccessNetworkInfoProperties() {
         ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(
                 Context.CONNECTIVITY_SERVICE);
         NetworkInfo[] ni = cm.getAllNetworkInfo();
-        assertTrue(ni.length >= 2);
+        assertTrue(ni.length >= 1);
 
         for (NetworkInfo netInfo: ni) {
             switch (netInfo.getType()) {
                 case TYPE_MOBILE:
-                    // don't know the return value
-                    netInfo.getSubtype();
-                    assertEquals(MOBILE_TYPE_NAME, netInfo.getTypeName());
-                    // don't know the return value
-                    netInfo.getSubtypeName();
-                    if(netInfo.isConnectedOrConnecting()) {
-                        assertTrue(netInfo.isAvailable());
-                        assertTrue(netInfo.isConnected());
-                        assertEquals(State.CONNECTED, netInfo.getState());
-                        assertEquals(DetailedState.CONNECTED, netInfo.getDetailedState());
-                        netInfo.getReason();
-                        netInfo.getExtraInfo();
-                    }
-                    assertFalse(netInfo.isRoaming());
-                    assertNotNull(netInfo.toString());
+                    assertNetworkInfo(netInfo, MOBILE_TYPE_NAME);
                     break;
                 case TYPE_WIFI:
-                    netInfo.getSubtype();
-                    assertEquals(WIFI_TYPE_NAME, netInfo.getTypeName());
-                    netInfo.getSubtypeName();
-                    if(netInfo.isConnectedOrConnecting()) {
-                        assertTrue(netInfo.isAvailable());
-                        assertTrue(netInfo.isConnected());
-                        assertEquals(State.CONNECTED, netInfo.getState());
-                        assertEquals(DetailedState.CONNECTED, netInfo.getDetailedState());
-                        netInfo.getReason();
-                        netInfo.getExtraInfo();
-                    }
-                    assertFalse(netInfo.isRoaming());
-                    assertNotNull(netInfo.toString());
+                    assertNetworkInfo(netInfo, WIFI_TYPE_NAME);
                     break;
                  // TODO: Add BLUETOOTH_TETHER testing
                  default:
                      break;
             }
         }
+    }
+
+    private void assertNetworkInfo(NetworkInfo netInfo, String expectedTypeName) {
+        assertEquals(expectedTypeName, netInfo.getTypeName());
+        if(netInfo.isConnectedOrConnecting()) {
+            assertTrue(netInfo.isAvailable());
+            if (State.CONNECTED == netInfo.getState()) {
+                assertTrue(netInfo.isConnected());
+            }
+            assertTrue(State.CONNECTING == netInfo.getState()
+                    || State.CONNECTED == netInfo.getState());
+            assertTrue(DetailedState.SCANNING == netInfo.getDetailedState()
+                    || DetailedState.CONNECTING == netInfo.getDetailedState()
+                    || DetailedState.AUTHENTICATING == netInfo.getDetailedState()
+                    || DetailedState.CONNECTED == netInfo.getDetailedState());
+        }
+        assertNotNull(netInfo.toString());
     }
 }
