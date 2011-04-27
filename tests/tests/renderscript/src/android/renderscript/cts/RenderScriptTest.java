@@ -59,4 +59,34 @@ public class RenderScriptTest extends AndroidTestCase {
         mRS.destroy();
     }
 
+    /**
+     * Verify Priority enum properties.
+     */
+    public void testPriority() {
+        assertEquals(RenderScript.Priority.LOW,
+            RenderScript.Priority.valueOf("LOW"));
+        assertEquals(RenderScript.Priority.NORMAL,
+            RenderScript.Priority.valueOf("NORMAL"));
+        assertEquals(2, RenderScript.Priority.values().length);
+    }
+
+    /**
+     * Create a base RSMessageHandler object and run() it.
+     * Note that most developers will subclass RSMessageHandler and use
+     * their own non-empty implementation.
+     */
+    public void testRSMessageHandler() {
+        RenderScript.RSMessageHandler mMH = new RenderScript.RSMessageHandler();
+        mMH.run();
+    }
+
+    /**
+     * Create a base RSErrorHandler object and run() it.
+     * Note that most developers will subclass RSErrorHandler and use
+     * their own non-empty implementation.
+     */
+    public void testRSErrorHandler() {
+        RenderScript.RSErrorHandler mEH = new RenderScript.RSErrorHandler();
+        mEH.run();
+    }
 }

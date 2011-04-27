@@ -1,4 +1,5 @@
 #include "shared.rsh"
+#include "structs.rsh"
 
 // Testing primitive types
 float floatTest = 1.99f;
@@ -47,9 +48,65 @@ static bool test_primitive_types() {
     return failed;
 }
 
+static bool test_vector_types() {
+    bool failed = false;
+    start();
+    _RS_ASSERT(avt->b2.x == 1);
+    _RS_ASSERT(avt->b2.y == 2);
+    _RS_ASSERT(avt->b3.x == 1);
+    _RS_ASSERT(avt->b3.y == 2);
+    _RS_ASSERT(avt->b3.z == 3);
+    _RS_ASSERT(avt->b4.x == 1);
+    _RS_ASSERT(avt->b4.y == 2);
+    _RS_ASSERT(avt->b4.z == 3);
+    _RS_ASSERT(avt->b4.w == 4);
+
+    _RS_ASSERT(avt->s2.x == 1);
+    _RS_ASSERT(avt->s2.y == 2);
+    _RS_ASSERT(avt->s3.x == 1);
+    _RS_ASSERT(avt->s3.y == 2);
+    _RS_ASSERT(avt->s3.z == 3);
+    _RS_ASSERT(avt->s4.x == 1);
+    _RS_ASSERT(avt->s4.y == 2);
+    _RS_ASSERT(avt->s4.z == 3);
+    _RS_ASSERT(avt->s4.w == 4);
+
+    _RS_ASSERT(avt->i2.x == 1);
+    _RS_ASSERT(avt->i2.y == 2);
+    _RS_ASSERT(avt->i3.x == 1);
+    _RS_ASSERT(avt->i3.y == 2);
+    _RS_ASSERT(avt->i3.z == 3);
+    _RS_ASSERT(avt->i4.x == 1);
+    _RS_ASSERT(avt->i4.y == 2);
+    _RS_ASSERT(avt->i4.z == 3);
+    _RS_ASSERT(avt->i4.w == 4);
+
+    _RS_ASSERT(avt->f2.x == 1.0f);
+    _RS_ASSERT(avt->f2.y == 2.0f);
+    _RS_ASSERT(avt->f3.x == 1.0f);
+    _RS_ASSERT(avt->f3.y == 2.0f);
+    _RS_ASSERT(avt->f3.z == 3.0f);
+    _RS_ASSERT(avt->f4.x == 1.0f);
+    _RS_ASSERT(avt->f4.y == 2.0f);
+    _RS_ASSERT(avt->f4.z == 3.0f);
+    _RS_ASSERT(avt->f4.w == 4.0f);
+
+    float time = end();
+
+    if (failed) {
+        rsDebug("test_vector_types FAILED", time);
+    }
+    else {
+        rsDebug("test_vector_types PASSED", time);
+    }
+
+    return failed;
+}
+
 void test() {
     bool failed = false;
     failed |= test_primitive_types();
+    failed |= test_vector_types();
 
     if (failed) {
         rsSendToClientBlocking(RS_MSG_TEST_FAILED);
