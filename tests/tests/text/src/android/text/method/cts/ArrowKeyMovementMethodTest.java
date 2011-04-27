@@ -1185,17 +1185,38 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         initTextViewWithNullLayout("before word after");
         checkMoveFromInsideWord(7, 10);
 
-        // Surrogate characters are not (yet) correctly supported. TODO
-        //final String ANGRY_FACE_EMOJI = "\uDBB8\uDF20";
-        //initTextViewWithNullLayout("before " + ANGRY_FACE_EMOJI + " after");
-        //checkMoveFromInsideWord(7, 9);
+        // Surrogate characters: bairkan should be considered as a standard letter
+        final String BAIRKAN = "\uD800\uDF31";
 
+        initTextViewWithNullLayout("before wo" + BAIRKAN + "rd after");
+        checkMoveFromInsideWord(7, 12);
+
+        initTextViewWithNullLayout("before " + BAIRKAN + BAIRKAN + "xx after");
+        checkMoveFromInsideWord(7, 12);
+
+        initTextViewWithNullLayout("before xx" + BAIRKAN + BAIRKAN + " after");
+        checkMoveFromInsideWord(7, 12);
+
+        initTextViewWithNullLayout("before x" + BAIRKAN + "x" + BAIRKAN + " after");
+        checkMoveFromInsideWord(7, 12);
+
+        initTextViewWithNullLayout("before " + BAIRKAN + "x" + BAIRKAN + "x after");
+        checkMoveFromInsideWord(7, 12);
+
+        initTextViewWithNullLayout("before " + BAIRKAN + BAIRKAN + BAIRKAN + " after");
+        checkMoveFromInsideWord(7, 12);
     }
 
     private void checkMoveFromInsideWord(int wordStart, int wordEnd) {
 
+        CharSequence text = mTextView.getText();
+
         // Check following always goes at the end of the word
         for (int offset = wordStart; offset != wordEnd + 1; offset++) {
+            // Skip positions located between a pair of surrogate characters
+            if (Character.isSurrogatePair(text.charAt(offset - 1), text.charAt(offset))) {
+                continue;
+            }
             Selection.setSelection(mEditable, offset);
             assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_RIGHT));
             assertSelection(wordEnd + 1);
@@ -1203,6 +1224,9 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         // Check preceding always goes at the beginning of the word
         for (int offset = wordEnd + 1; offset != wordStart; offset--) {
+            if (Character.isSurrogatePair(text.charAt(offset - 1), text.charAt(offset))) {
+                continue;
+            }
             Selection.setSelection(mEditable, offset);
             assertTrue(pressCtrlChord(KeyEvent.KEYCODE_DPAD_LEFT));
             assertSelection(wordStart);
