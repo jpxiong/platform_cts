@@ -67,6 +67,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String packageName = attributes.getValue("name");
                 final String runnerName = attributes.getValue("runner");
                 final String hostSideTest = attributes.getValue("hostSideOnly");
+                final String vmHostTest = attributes.getValue("vmHostTest");
                 final String jarPath = attributes.getValue("jarPath");
                 final String signatureCheck = attributes.getValue("signatureCheck");
                 final String referenceApp = attributes.getValue("referenceAppTest");
@@ -79,6 +80,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setName(packageName);
                 mPackageDef.setRunner(runnerName);
                 mPackageDef.setIsHostSideTest(parseBoolean(hostSideTest));
+                mPackageDef.setIsVMHostTest(parseBoolean(vmHostTest));
                 mPackageDef.setJarPath(jarPath);
                 mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
                 mPackageDef.setIsReferenceApp(parseBoolean(referenceApp));

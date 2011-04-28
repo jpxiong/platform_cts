@@ -41,6 +41,7 @@ class TestPackageDef implements ITestPackageDef {
     private String mName = null;
     private String mRunner = null;
     private boolean mIsHostSideTest = false;
+    private boolean mIsVMHostTest = false;
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
     private boolean mIsReferenceAppTest = false;
@@ -96,6 +97,14 @@ class TestPackageDef implements ITestPackageDef {
         return mIsHostSideTest;
     }
 
+    void setIsVMHostTest(boolean vmHostTest) {
+        mIsVMHostTest = vmHostTest;
+
+    }
+
+    boolean isVMHostTest() {
+        return mIsVMHostTest;
+    }
     void setJarPath(String jarPath) {
         mJarPath = jarPath;
     }
@@ -139,6 +148,13 @@ class TestPackageDef implements ITestPackageDef {
             hostTest.setJarFileName(mJarPath);
             hostTest.setTests(filterTests(mTests, className, methodName));
             return hostTest;
+        } else if (mIsVMHostTest) {
+            Log.d(LOG_TAG, String.format("Creating vm host test for %s", mName));
+            VMHostTest vmHostTest = new VMHostTest();
+            vmHostTest.setRunName(mName);
+            vmHostTest.setJarFileName(mJarPath);
+            vmHostTest.setTests(filterTests(mTests, className, methodName));
+            return vmHostTest;
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml
             // points to specialized instrumentation. Eventually this special case for signatureTest

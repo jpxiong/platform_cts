@@ -61,6 +61,7 @@ public class CollectAllTests extends DescriptionGenerator {
     static final String ATTRIBUTE_TARGET = "targetNameSpace";
     static final String ATTRIBUTE_TARGET_BINARY = "targetBinaryName";
     static final String ATTRIBUTE_HOST_SIDE_ONLY = "hostSideOnly";
+    static final String ATTRIBUTE_VM_HOST_TEST = "vmHostTest";
     static final String ATTRIBUTE_JAR_PATH = "jarPath";
 
     static final String JAR_PATH = "LOCAL_JAR_PATH :=";
@@ -68,6 +69,7 @@ public class CollectAllTests extends DescriptionGenerator {
 
     static final int HOST_SIDE_ONLY = 1;
     static final int DEVICE_SIDE_ONLY = 2;
+    static final int VM_HOST_TEST = 3;
 
     private static String runner;
     private static String packageName;
@@ -92,6 +94,11 @@ public class CollectAllTests extends DescriptionGenerator {
 
             if (testType == HOST_SIDE_ONLY) {
                 setAttribute(testPackageElem, ATTRIBUTE_HOST_SIDE_ONLY, "true");
+                setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, jarPath);
+            }
+
+            if (testType == VM_HOST_TEST) {
+                setAttribute(testPackageElem, ATTRIBUTE_VM_HOST_TEST, "true");
                 setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, jarPath);
             }
 
@@ -245,7 +252,11 @@ public class CollectAllTests extends DescriptionGenerator {
 
             while ((line =reader.readLine())!=null) {
                 if (line.startsWith(TEST_TYPE)) {
-                    type = HOST_SIDE_ONLY;
+                    if (line.indexOf(ATTRIBUTE_VM_HOST_TEST) >= 0) {
+                        type = VM_HOST_TEST;
+                    } else {
+                        type = HOST_SIDE_ONLY;
+                    }
                 } else if (line.startsWith(JAR_PATH)) {
                     jarPath = line.substring(JAR_PATH.length(), line.length()).trim();
                 }
