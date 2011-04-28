@@ -39,7 +39,7 @@ void testProgramFragment(rs_program_fragment pf) {
 }
 
 // Just draw a quad with previously setup state
-int root(int launchID) {
+int root(void) {
     rsDebug("Running script", 0);
     return 0;
 }
