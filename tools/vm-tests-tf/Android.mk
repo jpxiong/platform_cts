@@ -38,7 +38,7 @@ include $(BUILD_HOST_JAVA_LIBRARY)
 
 $(LOCAL_BUILT_MODULE): PRIVATE_CLASS_INTERMEDIATES_DIR := $(intermediates)/classes
 
-BUILD_UTIL_INTERMEDIATES_CLASSES := $(intermediates)/classes
+TF_BUILD_UTIL_INTERMEDIATES_CLASSES := $(intermediates)/classes
 
 include $(CLEAR_VARS)
 
@@ -69,7 +69,7 @@ $(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-tf-dalvik-buildutil.jar $(HOS
 # copy Util class to compile later together with the generated host side junit tests
 	$(hide) mkdir -p $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit && cp $(PRIVATE_SRC_FOLDER)/util/build/DeviceUtil.java.template $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit/DeviceUtil.java
 # generated and compile the host side junit tests
-	$(hide) java -cp $(subst $(space),$(colon),$^):$(HOST_JDK_TOOLS_JAR) util.build.BuildDalvikSuite $(PRIVATE_SRC_FOLDER) $(PRIVATE_INTERMEDIATES) $<:$(PRIVATE_LIB_FOLDER)/junit.jar:$(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar:$(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar $(PRIVATE_INTERMEDIATES_MAIN_FILES) $(BUILD_UTIL_INTERMEDIATES_CLASSES) $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES) $$RUN_VM_TESTS_RTO
+	$(hide) java -cp $(subst $(space),$(colon),$^):$(HOST_JDK_TOOLS_JAR) util.build.BuildDalvikSuite $(PRIVATE_SRC_FOLDER) $(PRIVATE_INTERMEDIATES) $<:$(PRIVATE_LIB_FOLDER)/junit.jar:$(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar:$(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar $(PRIVATE_INTERMEDIATES_MAIN_FILES) $(TF_BUILD_UTIL_INTERMEDIATES_CLASSES) $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES) $$RUN_VM_TESTS_RTO
 	@echo "wrote generated Main_*.java files to $(PRIVATE_INTERMEDIATES_MAIN_FILES)"
 INSTALLED_TESTS := $(dir $(LOCAL_INSTALLED_MODULE))../cts_dalviktests/timestamp
 
@@ -93,7 +93,7 @@ $(intermediates)/android.core.vm-tests-tf.jar: $(INSTALLED_TESTS)
 	
 
 define get-class-path
-	$(BUILD_UTIL_INTERMEDIATES_CLASSES)/$(strip $(1))
+	$(TF_BUILD_UTIL_INTERMEDIATES_CLASSES)/$(strip $(1))
 endef
 
 define dex-classes
@@ -110,4 +110,4 @@ endef
 $(call get-class-path,dot/junit/DxUtil.class) $(call get-class-path,dot/junit/DxAbstractMain.class):  $(HOST_OUT_JAVA_LIBRARIES)/cts-tf-dalvik-buildutil.jar $(DX)
 
 $(GENERATED_FILES)/dot/junit/dexcore.jar: $(call get-class-path,dot/junit/DxUtil.class) $(call get-class-path,dot/junit/DxAbstractMain.class)
-	$(call dex-classes,$(BUILD_UTIL_INTERMEDIATES_CLASSES),dot/junit/DxUtil.class dot/junit/DxAbstractMain.class)
+	$(call dex-classes,$(TF_BUILD_UTIL_INTERMEDIATES_CLASSES),dot/junit/DxUtil.class dot/junit/DxAbstractMain.class)
