@@ -1,5 +1,4 @@
 [
-/* Framework problems. */
 {
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
@@ -8,22 +7,28 @@
   name: "android.webkit.cts.WebViewTest#testRequestFocusNodeHref",
   bug: 3241968
 },
-
+{
+  name: "android.webkit.cts.CookieSyncManagerTest#testCookieSyncManager",
+  bug: 4442572
+},
+{
+  name: "android.graphics.cts.PaintTest#testBreakText",
+  bug: 4355524
+},
+{
+  name: "android.graphics.cts.PaintTest#testMeasureText",
+  bug: 4361123
+},
 {
   description: "Need investigation.",
   names: [
+    "android.content.cts.ContextWrapperTest#testAccessTheme",
     "android.provider.cts.Contacts_PeopleTest#testAddToGroup",
     "android.provider.cts.MediaStore_Audio_Playlists_MembersTest",
     "android.webkit.cts.WebViewTest#testRequestImageRef",
     "tests.api.java.util.CalendarTest#test_getInstance"
   ]
 },
-
-{
-  description: "Test should be made independent from theme.",
-  name: "android.content.cts.ContextWrapperTest#testAccessTheme"
-},
-  
 {
   description: "Flakey",
   names: [
@@ -34,5 +39,4 @@
     "android.widget.cts.AbsListViewTest#testGetContextMenuInfo"
   ]
 }
-
 ]
