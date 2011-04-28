@@ -106,6 +106,7 @@ class CtsBuilder(object):
       packages.append(doc.GetAttr('TestPackage', 'appPackageName'))
 
     plan = tools.TestPlan(packages)
+    plan.Exclude(r'android\.core\.vm-tests-tf')
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
     plan.Exclude(r'android\.tests\.sigtest')
@@ -118,7 +119,12 @@ class CtsBuilder(object):
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.core\.vm-tests')
+    plan.Exclude(r'android\.core\.vm-tests-tf')
     self.__WritePlan(plan, 'VM')
+
+    plan = tools.TestPlan(packages)
+    plan.Include(r'android\.core\.vm-tests-tf')
+    self.__WritePlan(plan, 'VM-TF')
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.tests\.sigtest')

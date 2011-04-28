@@ -76,6 +76,15 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
     }
 
     /**
+     * Get the CTS build container.
+     *
+     * @return {@link CtsBuildHelper}
+     */
+    CtsBuildHelper getBuildHelper() {
+        return mCtsBuild;
+    }
+
+    /**
      * Set the jar file to load tests from.
      *
      * @param jarFileName the file name of the CTS host test jar to use
@@ -85,12 +94,30 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
     }
 
     /**
+     * Gets the jar file to load tests from.
+     *
+     * @return jarFileName the file name of the CTS host test jar to use
+     */
+    String getJarFileName() {
+        return mJarFileName;
+    }
+
+    /**
      * Sets the collection of tests to run
      *
      * @param tests
      */
     void setTests(Collection<TestIdentifier> tests) {
         mTests = tests;
+    }
+
+    /**
+     * Gets the collection of tests to run
+     *
+     * @return Collection<{@link TestIdentifier}>
+     */
+    Collection<TestIdentifier> getTests() {
+        return mTests;
     }
 
     /**
@@ -249,7 +276,7 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
     /**
      * Checks that all mandatory member fields has been set.
      */
-    private void checkFields() {
+    protected void checkFields() {
         if (mRunName == null) {
             throw new IllegalArgumentException("run name has not been set");
         }
