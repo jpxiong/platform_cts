@@ -73,6 +73,36 @@ public class WebDriverTest extends
         assertTrue(mDriver.getPageSource().contains("hello world!"));
     }
 
+    // Navigation
+    public void testNavigateBack() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.id("inner"));
+        link.click();
+        assertEquals("test hello world", mDriver.getTitle());
+        mDriver.navigate().back();
+        assertEquals("Form Test Page", mDriver.getTitle());
+    }
+
+    public void testNavigateForward() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.id("inner"));
+        link.click();
+        mDriver.navigate().back();
+        assertEquals("Form Test Page", mDriver.getTitle());
+        mDriver.navigate().forward();
+        assertEquals("test hello world", mDriver.getTitle());
+    }
+
+    public void testRefresh() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        Long result = (Long) mDriver.executeScript(
+                "document.bou = 1;return document.bou;");
+        assertEquals(1, result.intValue());
+        mDriver.navigate().refresh();
+        String result2 = (String) mDriver.executeScript("return document.bou;");
+        assertNull(result2);
+    }
+
     // getText
     public void testGetTextReturnsEmptyString() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
@@ -96,7 +126,7 @@ public class WebDriverTest extends
     public void testGetAttributeNotSetReturnsNull() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         WebElement link = mDriver.findElement(By.linkText("Link=equalssign"));
-        assertNull(link.getAttribute("disabled"));
+        assertNull(link.getAttribute(INEXISTENT));
     }
 
     // getTagName
@@ -181,12 +211,89 @@ public class WebDriverTest extends
         }
     }
 
+    // getCssValue
+    public void testGetCssValue() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement text = mDriver.findElement(By.name("textinput"));
+        assertEquals("red", text.getCssValue("background-color"));
+    }
+
+    public void testGetCssValueReturnsNullWhenPropertyNotFound() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement text = mDriver.findElement(By.name("textinput"));
+        assertNull(text.getCssValue(INEXISTENT));
+    }
+
+    // getSize
+    public void testGetSize() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement text = mDriver.findElements(By.name("textinput")).get(0);
+        assertEquals(100, text.getSize().x);
+        assertEquals(50, text.getSize().y);
+    }
+
+    // getLocation
+    public void testGetLocation () {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement tag = mDriver.findElement(By.linkText("Tag A"));
+        assertEquals(8, tag.getLocation().x);
+        assertEquals(8, tag.getLocation().y);
+    }
+
+    // isDisplayed
+    public void testIsDisplayed() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement hidden = mDriver.findElement(By.id("fromage"));
+        assertFalse(hidden.isDisplayed());
+        WebElement checky = mDriver.findElement(By.id("checky"));
+        assertTrue(checky.isDisplayed());
+    }
+
+    // click
+    public void testClickOnWebElement() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.id("inner"));
+        link.click();
+        assertEquals("test hello world", mDriver.getTitle());
+    }
+
+    // sendKeys
+    public void testSendKeys() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement type = mDriver.findElement(By.id("typehere"));
+        assertEquals("", type.getAttribute("value"));
+        type.sendKeys("hello");
+
+        assertEquals("hello", type.getAttribute("value"));
+        type.sendKeys(" ", "world", "!");
+        assertEquals("hello world!", type.getAttribute("value"));
+    }
+
+    // submit
+    public void testSubmit() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement link = mDriver.findElement(By.id("fromage"));
+        link.submit();
+        assertEquals("test hello world", mDriver.getTitle());
+    }
+
+    // clear
+    public void testClear() {
+        mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
+        WebElement type = mDriver.findElement(By.id("typehere"));
+        assertEquals("", type.getAttribute("value"));
+        type.sendKeys("hello");
+        assertEquals("hello", type.getAttribute("value"));
+        type.clear();
+        assertEquals("", type.getAttribute("value"));
+    }
+
     // findElement
     public void testFindElementThrowsIfNoPageIsLoaded() {
         try {
             mDriver.findElement(By.id(SOME_TEXT_ID));
             fail();
-        } catch (NullPointerException e) {
+        } catch (WebDriverException e) {
             // this is expected
         }
     }
@@ -196,7 +303,7 @@ public class WebDriverTest extends
         try {
             mDriver.findElements(By.id(SOME_TEXT_ID));
             fail();
-        } catch (NullPointerException e) {
+        } catch (WebDriverException e) {
             // this is expected
         }
     }
@@ -492,7 +599,7 @@ public class WebDriverTest extends
         try {
             mDriver.findElement(By.xpath("//a@" + ID + "=inexistant']"));
             fail("This should have failed.");
-        } catch (WebElementNotFoundException e) {
+        } catch (WebDriverException e) {
             // This is expected
         }
     }
@@ -592,7 +699,7 @@ public class WebDriverTest extends
     public void testExecuteScriptShouldReturnAString() {
         mDriver.get(mWebServer.getAssetUrl(FORM_PAGE_URL));
         Object result = mDriver.executeScript("return document.title");
-        assertEquals("Test Page", (String) result);
+        assertEquals("Form Test Page", (String) result);
     }
 
     public void testExecuteScriptShouldReturnAWebElement() {
@@ -696,7 +803,7 @@ public class WebDriverTest extends
         try {
             mDriver.executeScript("return bou();");
             fail("This should have failed");
-        } catch (RuntimeException e) {
+        } catch (WebDriverException e) {
             // This is expected.
         }
     }
@@ -778,7 +885,7 @@ public class WebDriverTest extends
         try {
             mDriver.executeScript("return arguments[0];", mDriver);
             fail("This should have failed");
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             // This is expected.
         }
     }
@@ -797,7 +904,7 @@ public class WebDriverTest extends
         try {
             mDriver.executeScript("return 'bou';");
             fail("This should have failed");
-        } catch (RuntimeException e) {
+        } catch (WebDriverException e) {
             // This is expected.
         }
     }
