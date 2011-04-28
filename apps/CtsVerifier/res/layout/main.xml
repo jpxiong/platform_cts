@@ -18,17 +18,30 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <TextView  
-        android:id="@+id/welcome"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:text="@string/welcome_text"
-        />
     <Button
         android:id="@+id/continue_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="@string/continue_button_text"
+        />
+    <TextView
+        android:id="@+id/welcome_text"
+        android:gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/continue_button"
+        android:padding="10dip"
+        android:text="@string/welcome_text"
+        style="@style/WelcomeFont"
+        />
+    <ImageView
+        android:id="@+id/detective_logo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/welcome_text"
+        android:padding="10dip"
+        android:src="@drawable/detective"
         />
 </RelativeLayout>
