@@ -16,8 +16,6 @@
 
 package android.renderscript.cts;
 
-import com.android.cts.stub.R;
-
 import android.renderscript.ProgramRaster;
 import android.renderscript.ProgramRaster.Builder;
 import android.renderscript.ProgramRaster.CullMode;
@@ -31,7 +29,9 @@ public class ProgramRasterTest extends RSBaseGraphics {
             b.setPointSpriteEnabled(pSprite);
             for (CullMode cull : CullMode.values()) {
                 b.setCullMode(cull);
-                b.create();
+                ProgramRaster pr = b.create();
+                assertTrue(pr != null);
+                mRS.bindProgramRaster(pr);
             }
         }
     }
@@ -39,7 +39,14 @@ public class ProgramRasterTest extends RSBaseGraphics {
     public void testPrebuiltProgramRaster() {
         assertTrue(ProgramRaster.CULL_BACK(mRS) != null);
         assertTrue(ProgramRaster.CULL_FRONT(mRS) != null);
+        assertTrue(ProgramRaster.CULL_NONE(mRS) != null);
+    }
+
+    public void testProgramRasterCullMode() {
+        assertEquals(CullMode.BACK, CullMode.valueOf("BACK"));
+        assertEquals(CullMode.FRONT, CullMode.valueOf("FRONT"));
+        assertEquals(CullMode.NONE, CullMode.valueOf("NONE"));
+        // Make sure no new enums are added
+        assertEquals(3, CullMode.values().length);
     }
 }
-
-
