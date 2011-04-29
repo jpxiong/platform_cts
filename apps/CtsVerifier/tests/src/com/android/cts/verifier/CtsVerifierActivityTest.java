@@ -44,7 +44,7 @@ public class CtsVerifierActivityTest
         super.setUp();
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
-        mWelcomeTextView = (TextView) mActivity.findViewById(R.id.welcome);
+        mWelcomeTextView = (TextView) mActivity.findViewById(R.id.welcome_text);
         mWelcomeText = mActivity.getString(R.string.welcome_text);
         mContinueButton = (Button) mActivity.findViewById(R.id.continue_button);
         mContinueText = mActivity.getString(R.string.continue_button_text);
