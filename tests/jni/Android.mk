@@ -25,7 +25,8 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_PRELINK_MODULE := false
 
 LOCAL_SRC_FILES := \
-		CtsJniOnLoad.cpp
+		CtsJniOnLoad.cpp \
+		android_net_cts_NetlinkSocket.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
 
