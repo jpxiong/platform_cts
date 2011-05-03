@@ -59,7 +59,7 @@ if [ "$selection" = "--portable" ]; then
 fi
 
 datadir=/tmp/${USER}
-rm -rf --preserve-root $datadir/dalvik-cache
+rm -rf $datadir/dalvik-cache
 mkdir -p $datadir
 mkdir -p $datadir/dalvik-cache
 
@@ -209,7 +209,7 @@ do
         (( jallcnt += 1 ))   
     
     
-        rm -rf --preserve-root $dxtmpdir/*
+        rm -rf $dxtmpdir/*
         mkdir -p $dxtmpdir
         cd $dxtmpdir            
         

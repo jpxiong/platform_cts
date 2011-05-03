@@ -71,8 +71,8 @@ if [ "$tmpdir" = "" ]; then
 else
     echo "tmp/intermediates dir (rel): $tmpdir"
 fi
-rm -rf --preserve-root $javac_out
-rm -rf --preserve-root $javafiles
+rm -rf $javac_out
+rm -rf $javafiles
 
 # compile all files from javafiles
 echo "compiling all java files (with package dxc.junit.**)"
