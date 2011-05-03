@@ -66,6 +66,8 @@ import android.widget.LinearLayout;
 import java.io.File;
 import java.io.FileInputStream;
 
+import junit.framework.Assert;
+
 @TestTargetClass(android.webkit.WebView.class)
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
@@ -525,19 +527,43 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
+        final class DummyJavaScriptInterface {
+            private boolean mWasProvideResultCalled;
+            private String mResult;
+
+            private synchronized String waitForResult() {
+                while (!mWasProvideResultCalled) {
+                    try {
+                        wait(TEST_TIMEOUT);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                    if (!mWasProvideResultCalled) {
+                        Assert.fail("Unexpected timeout");
+                    }
+                }
+                return mResult;
+            }
+
+            public synchronized boolean wasProvideResultCalled() {
+                return mWasProvideResultCalled;
+            }
+
+            public synchronized void provideResult(String result) {
+                mWasProvideResultCalled = true;
+                mResult = result;
+                notify();
+            }
+        }
+
         final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
         mWebView.addJavascriptInterface(obj, "dummy");
-        assertFalse(obj.hasChangedTitle());
+        assertFalse(obj.wasProvideResultCalled());
 
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.ADD_JAVA_SCRIPT_INTERFACE_URL);
         assertLoadUrlSuccessfully(url);
-        new DelayedCheck() {
-            @Override
-            protected boolean check() {
-                return obj.hasChangedTitle();
-            }
-        }.run();
+        assertEquals("Original title", obj.waitForResult());
     }
 
     @TestTargetNew(
@@ -563,7 +589,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("undefined", mWebView.getTitle());
 
         // Test that adding an object gives an object type.
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
         mWebView.addJavascriptInterface(obj, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
         waitForLoadComplete();
@@ -591,7 +617,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testAddJavascriptInterfaceOddName() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
 
         // We should be able to use any character other than a single quote.
         // TODO: We currently fail when the name contains '#', '\', '\n' or '\r'.
@@ -629,7 +655,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
 
         // Test that adding an object gives an object type.
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
         mWebView.addJavascriptInterface(obj, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
         waitForLoadComplete();
@@ -2223,23 +2249,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             Thread.sleep(TIME_FOR_LAYOUT);
         } catch (InterruptedException e) {
             Log.w(LOGTAG, "waitForLoadComplete() interrupted while sleeping for layout delay.");
-        }
-    }
-
-    private final class DummyJavaScriptInterface {
-        private boolean mTitleChanged;
-
-        private boolean hasChangedTitle() {
-            return mTitleChanged;
-        }
-
-        public void onLoad(String oldTitle) {
-            mWebView.getHandler().post(new Runnable() {
-                public void run() {
-                    mWebView.loadUrl("javascript:changeTitle(\"new title\")");
-                    mTitleChanged = true;
-                }
-            });
         }
     }
 
