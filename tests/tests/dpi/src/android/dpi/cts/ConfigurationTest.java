@@ -22,6 +22,9 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Test for verifying a device's screen configuration.
  */
@@ -49,5 +52,15 @@ public class ConfigurationTest extends AndroidTestCase {
         boolean format4x3 = Math.ceil(max * 3.0d / 4.0d) >= min;
         assertTrue("Aspect ratio must be between 4:3 and 16:9. It was " + max + ":" + min,
                 format4x3 && format16x9);
+
+        Set<Integer> allowedDensities = new HashSet<Integer>();
+        allowedDensities.add(DisplayMetrics.DENSITY_LOW);
+        allowedDensities.add(DisplayMetrics.DENSITY_MEDIUM);
+        allowedDensities.add(DisplayMetrics.DENSITY_HIGH);
+        allowedDensities.add(DisplayMetrics.DENSITY_XHIGH);
+        assertTrue("DisplayMetrics#densityDpi must be one of the DisplayMetrics.DENSITY_* values: "
+                + allowedDensities, allowedDensities.contains(metrics.densityDpi));
+
+        assertEquals(metrics.density, (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
