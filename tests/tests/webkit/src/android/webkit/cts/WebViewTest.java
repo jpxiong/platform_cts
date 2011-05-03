@@ -931,21 +931,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "text/html", "UTF-8");
         waitForLoadComplete();
         assertEquals("Hello,World!", mWebView.getTitle());
-
-        startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete();
-
-        AssetManager assets = getActivity().getAssets();
-        Bitmap b1 = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.SMALL_IMG_URL));
-        b1 = b1.copy(Config.ARGB_8888, true);
-
-        Picture p = mWebView.capturePicture();
-        Bitmap b2 = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-        p.draw(new Canvas(b2));
-        assertTrue(checkBitmapInsideAnother(b1, b2));
     }
 
     @TestTargets({
