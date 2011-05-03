@@ -178,7 +178,7 @@ public class DateFormatTest extends AndroidTestCase {
 
     @TestTargetNew(level = TestLevel.ADDITIONAL)
     public void test2038() {
-        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT+00:00"));
 
         calendar.setTimeInMillis(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L);
         assertEquals("Sun Nov 24 17:31:44 GMT+00:00 1833",
