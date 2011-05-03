@@ -1194,43 +1194,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @TestTargetNew(
         level = TestLevel.SUFFICIENT,
-        notes = "Cannot test whether the view is cleared.",
-        method = "clearView",
-        args = {}
-    )
-    public void testClearView() throws Throwable {
-        startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete();
-
-        AssetManager assets = getActivity().getAssets();
-        Bitmap b1 = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.SMALL_IMG_URL));
-        b1 = b1.copy(Config.ARGB_8888, true);
-
-        Picture p = mWebView.capturePicture();
-        Bitmap b2 = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-        p.draw(new Canvas(b2));
-        // the image is painted
-        assertTrue(checkBitmapInsideAnother(b1, b2));
-
-        mWebView.clearView();
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.invalidate();
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        // Can not check whether method clearView() take effect by automatic testing:
-        // 1. Can not use getMeasuredHeight() and getMeasuredWidth() to
-        //    check that the onMeasure() returns 0
-        // 2. Can not use capturePicture() to check that the content has been cleared.
-        //    The result of capturePicture() is not updated after clearView() is called.
-    }
-
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
         method = "clearCache",
         args = {boolean.class}
     )
