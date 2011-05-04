@@ -15,11 +15,7 @@
 
 <html>
     <title>Original title</title>
-    <script type="text/javascript">
-        /* This function is invoked by the activity */
-        function changeTitle(title) { document.title = title; }
-    </script>
     <!-- Calls into the javascript interface for the activity -->
-    <body onload='window.dummy.onLoad(document.title)'>
+    <body onload='window.dummy.provideResult(document.title)'>
     </body>
 </html>

@@ -43,6 +43,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -65,8 +66,11 @@ import android.widget.LinearLayout;
 import java.io.File;
 import java.io.FileInputStream;
 
+import junit.framework.Assert;
+
 @TestTargetClass(android.webkit.WebView.class)
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+    private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
     private static long TIME_FOR_LAYOUT = 1000L;
@@ -191,7 +195,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(settings.supportZoom());
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         mWebView.invokeZoomPicker();
     }
 
@@ -379,7 +383,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(100, mWebView.getProgress());
         assertEquals(url, mWebView.getUrl());
         assertEquals(url, mWebView.getOriginalUrl());
@@ -409,7 +413,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setWebViewClient(new WebViewClient());
         mWebView.loadUrl(redirect);
 
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(url, mWebView.getUrl());
         assertEquals(redirect, mWebView.getOriginalUrl());
     }
@@ -477,17 +481,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url2 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2);
         String url3 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
-        assertLoadUrlSuccessfully(mWebView, url1);
+        assertLoadUrlSuccessfully(url1);
         delayedCheckWebBackForwardList(url1, 0, 1);
         assertGoBackOrForwardBySteps(false, -1);
         assertGoBackOrForwardBySteps(false, 1);
 
-        assertLoadUrlSuccessfully(mWebView, url2);
+        assertLoadUrlSuccessfully(url2);
         delayedCheckWebBackForwardList(url2, 1, 2);
         assertGoBackOrForwardBySteps(true, -1);
         assertGoBackOrForwardBySteps(false, 1);
 
-        assertLoadUrlSuccessfully(mWebView, url3);
+        assertLoadUrlSuccessfully(url3);
         delayedCheckWebBackForwardList(url3, 2, 3);
         assertGoBackOrForwardBySteps(true, -2);
         assertGoBackOrForwardBySteps(false, 1);
@@ -523,19 +527,43 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
+        final class DummyJavaScriptInterface {
+            private boolean mWasProvideResultCalled;
+            private String mResult;
+
+            private synchronized String waitForResult() {
+                while (!mWasProvideResultCalled) {
+                    try {
+                        wait(TEST_TIMEOUT);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                    if (!mWasProvideResultCalled) {
+                        Assert.fail("Unexpected timeout");
+                    }
+                }
+                return mResult;
+            }
+
+            public synchronized boolean wasProvideResultCalled() {
+                return mWasProvideResultCalled;
+            }
+
+            public synchronized void provideResult(String result) {
+                mWasProvideResultCalled = true;
+                mResult = result;
+                notify();
+            }
+        }
+
         final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
         mWebView.addJavascriptInterface(obj, "dummy");
-        assertFalse(obj.hasChangedTitle());
+        assertFalse(obj.wasProvideResultCalled());
 
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.ADD_JAVA_SCRIPT_INTERFACE_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
-        new DelayedCheck() {
-            @Override
-            protected boolean check() {
-                return obj.hasChangedTitle();
-            }
-        }.run();
+        assertLoadUrlSuccessfully(url);
+        assertEquals("Original title", obj.waitForResult());
     }
 
     @TestTargetNew(
@@ -551,26 +579,26 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // Test that the property is initially undefined.
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
 
         // Test that adding a null object has no effect.
         mWebView.addJavascriptInterface(null, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
 
         // Test that adding an object gives an object type.
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
         mWebView.addJavascriptInterface(obj, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
 
         // Test that trying to replace with a null object has no effect.
         mWebView.addJavascriptInterface(null, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
     }
 
@@ -589,7 +617,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testAddJavascriptInterfaceOddName() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
 
         // We should be able to use any character other than a single quote.
         // TODO: We currently fail when the name contains '#', '\', '\n' or '\r'.
@@ -605,12 +633,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
             mWebView.addJavascriptInterface(obj, name);
             mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-            waitForLoadComplete(mWebView, TEST_TIMEOUT);
+            waitForLoadComplete();
             assertEquals("object", mWebView.getTitle());
 
             mWebView.removeJavascriptInterface(name);
             mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-            waitForLoadComplete(mWebView, TEST_TIMEOUT);
+            waitForLoadComplete();
             assertEquals("undefined", mWebView.getTitle());
         }
     }
@@ -627,16 +655,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
 
         // Test that adding an object gives an object type.
-        final DummyJavaScriptInterface obj = new DummyJavaScriptInterface();
+        final Object obj = new Object();
         mWebView.addJavascriptInterface(obj, "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
 
         // Test that removing the object leaves the property undefined.
         mWebView.removeJavascriptInterface("injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
     }
 
@@ -661,7 +689,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
         // showing the blank page will make the picture filled with background color
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         Picture p = mWebView.capturePicture();
         Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
         p.draw(new Canvas(b));
@@ -670,7 +698,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         mWebView.setBackgroundColor(Color.CYAN);
         mWebView.reload();
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         // the content of the picture will not be updated automatically
         p.draw(new Canvas(b));
         assertBitmapFillWithColor(b, Color.WHITE);
@@ -690,7 +718,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setPictureListener(listener);
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         new DelayedCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > 0;
@@ -701,7 +729,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         final int oldCallCount = listener.callCount;
         url = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         new DelayedCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > oldCallCount;
@@ -731,7 +759,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setBackgroundColor(Color.CYAN);
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
 
         final Bundle bundle = new Bundle();
         final File f = getActivity().getFileStreamPath("snapshot");
@@ -761,7 +789,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
             mWebView.setBackgroundColor(Color.WHITE);
             mWebView.reload();
-            waitForLoadComplete(mWebView, TEST_TIMEOUT);
+            waitForLoadComplete();
 
             b = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Config.ARGB_8888);
             mWebView.draw(new Canvas(b));
@@ -901,23 +929,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNull(mWebView.getTitle());
         mWebView.loadData("<html><head><title>Hello,World!</title></head><body></body></html>",
                 "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("Hello,World!", mWebView.getTitle());
-
-        startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
-
-        AssetManager assets = getActivity().getAssets();
-        Bitmap b1 = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.SMALL_IMG_URL));
-        b1 = b1.copy(Config.ARGB_8888, true);
-
-        Picture p = mWebView.capturePicture();
-        Bitmap b2 = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-        p.draw(new Canvas(b2));
-        assertTrue(checkBitmapInsideAnother(b1, b2));
     }
 
     @TestTargets({
@@ -948,7 +961,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.loadDataWithBaseURL(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", failUrl);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         // check that image was retrieved from the server
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
         // the fail URL is used for the history entry, even if the load succeeds
@@ -958,7 +971,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.loadDataWithBaseURL(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", null);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         // check that image was retrieved from the server
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
         // no history item saved, URL is still the last one
@@ -972,11 +985,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         notes = "Cannot check highlighting"
     )
     @UiThreadTest
-    public void testFindAll() throws InterruptedException {
+    public void testFindAll() {
         String p = "<p>Find all instances of find on the page and highlight them.</p>";
 
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         assertEquals(2, mWebView.findAll("find"));
     }
@@ -1009,7 +1022,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "Find all instances of a word on the page and highlight them.</p>";
 
         mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         // highlight all the strings found
         runTestOnUiThread(new Runnable() {
@@ -1075,7 +1088,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
         mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         // create the handler in other thread
         final DocumentHasImageCheckHandler handler =
@@ -1111,7 +1124,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String p = "<p style=\"height:" + dimension + "px;\">" +
                 "Scroll by half the size of the page.</p>";
         mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         assertTrue(pageDownOnUiThread(false));
 
@@ -1145,9 +1158,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "getContentHeight",
         args = {}
     )
-    public void testGetContentHeight() throws InterruptedException {
+    public void testGetContentHeight() {
         mWebView.loadData("<html><body></body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(mWebView.getHeight(), mWebView.getContentHeight() * mWebView.getScale(), 2f);
 
         final int pageHeight = 600;
@@ -1155,50 +1168,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String p = "<p style=\"height:" + pageHeight + "px;margin:0px auto;\">Get the height of "
                 + "HTML content.</p>";
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertTrue(mWebView.getContentHeight() > pageHeight);
         int extraSpace = mWebView.getContentHeight() - pageHeight;
 
         mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(pageHeight + pageHeight + extraSpace, mWebView.getContentHeight());
-    }
-
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        notes = "Cannot test whether the view is cleared.",
-        method = "clearView",
-        args = {}
-    )
-    public void testClearView() throws Throwable {
-        startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
-
-        AssetManager assets = getActivity().getAssets();
-        Bitmap b1 = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.SMALL_IMG_URL));
-        b1 = b1.copy(Config.ARGB_8888, true);
-
-        Picture p = mWebView.capturePicture();
-        Bitmap b2 = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-        p.draw(new Canvas(b2));
-        // the image is painted
-        assertTrue(checkBitmapInsideAnother(b1, b2));
-
-        mWebView.clearView();
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.invalidate();
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-        // Can not check whether method clearView() take effect by automatic testing:
-        // 1. Can not use getMeasuredHeight() and getMeasuredWidth() to
-        //    check that the onMeasure() returns 0
-        // 2. Can not use capturePicture() to check that the content has been cleared.
-        //    The result of capturePicture() is not updated after clearView() is called.
     }
 
     @TestTargetNew(
@@ -1214,7 +1190,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         startWebServer(false);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         new DelayedCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -1300,7 +1276,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String p = "<p style=\"height:" + dimension + "px;" +
                 "width:" + dimension + "px\">Test fling scroll.</p>";
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         int previousScrollX = mWebView.getScrollX();
         int previousScrollY = mWebView.getScrollY();
@@ -1333,12 +1309,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "requestFocusNodeHref",
         args = {android.os.Message.class}
     )
-    public void testRequestFocusNodeHref() throws InterruptedException {
+    public void testRequestFocusNodeHref() {
         String links = "<DL><p><DT><A HREF=\"" + TestHtmlConstants.HTML_URL1
                 + "\">HTML_URL1</A><DT><A HREF=\"" + TestHtmlConstants.HTML_URL2
                 + "\">HTML_URL2</A></DL><p>";
         mWebView.loadData("<html><body>" + links + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         final HrefCheckHandler handler = new HrefCheckHandler(mWebView.getHandler().getLooper());
         Message hrefMsg = new Message();
@@ -1388,7 +1364,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.LARGE_IMG_URL);
         mWebView.loadData("<html><title>Title</title><body><img src=\"" + imgUrl
                 + "\"/></body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         final HrefCheckHandler handler = new HrefCheckHandler(mWebView.getHandler().getLooper());
         Message msg = new Message();
@@ -1441,7 +1417,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String geo = "<p><a href=\"geo:0,0?q=" + location + "\">Location</a></p>";
         mWebView.loadDataWithBaseURL("fake://home", "<html><body>" + anchor + blankAnchor + form
                 + tel + mailto + geo + "</body></html>", "text/html", "UTF-8", null);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
 
         // anchor
         moveFocusDown();
@@ -1491,10 +1467,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "setInitialScale",
         args = {int.class}
     )
-    public void testSetInitialScale() throws InterruptedException {
+    public void testSetInitialScale() {
         String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         final float defaultScale = getInstrumentation().getTargetContext().getResources().
             getDisplayMetrics().density;
         assertEquals(defaultScale, mWebView.getScale(), .01f);
@@ -1502,17 +1478,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setInitialScale(0);
         // modify content to fool WebKit into re-loading
         mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(defaultScale, mWebView.getScale(), .01f);
 
         mWebView.setInitialScale(50);
         mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(0.5f, mWebView.getScale(), .02f);
 
         mWebView.setInitialScale(0);
         mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals(defaultScale, mWebView.getScale(), .01f);
     }
 
@@ -1526,7 +1502,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testGetFavicon() throws Exception {
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.TEST_FAVICON_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         mWebView.getFavicon();
         // ToBeFixed: Favicon is not loaded automatically.
         // assertNotNull(mWebView.getFavicon());
@@ -1543,13 +1519,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url2 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2);
         String url3 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
-        assertLoadUrlSuccessfully(mWebView, url1);
+        assertLoadUrlSuccessfully(url1);
         delayedCheckWebBackForwardList(url1, 0, 1);
 
-        assertLoadUrlSuccessfully(mWebView, url2);
+        assertLoadUrlSuccessfully(url2);
         delayedCheckWebBackForwardList(url2, 1, 2);
 
-        assertLoadUrlSuccessfully(mWebView, url3);
+        assertLoadUrlSuccessfully(url3);
         delayedCheckWebBackForwardList(url3, 2, 3);
 
         mWebView.clearHistory();
@@ -1586,11 +1562,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url3 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
         // make a history list
-        assertLoadUrlSuccessfully(mWebView, url1);
+        assertLoadUrlSuccessfully(url1);
         delayedCheckWebBackForwardList(url1, 0, 1);
-        assertLoadUrlSuccessfully(mWebView, url2);
+        assertLoadUrlSuccessfully(url2);
         delayedCheckWebBackForwardList(url2, 1, 2);
-        assertLoadUrlSuccessfully(mWebView, url3);
+        assertLoadUrlSuccessfully(url3);
         delayedCheckWebBackForwardList(url3, 2, 3);
 
         // save the list
@@ -1718,7 +1694,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
         String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
         mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         getInstrumentation().waitForIdleSync();
 
         runTestOnUiThread(new Runnable() {
@@ -1759,7 +1735,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setDownloadListener(listener);
         mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
                 "text/html", "UTF-8");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         // focus on the link
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -1814,17 +1790,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         settings.setJavaScriptEnabled(true);
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.NETWORK_STATE_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        assertLoadUrlSuccessfully(url);
         assertEquals("ONLINE", mWebView.getTitle());
 
         mWebView.setNetworkAvailable(false);
         mWebView.reload();
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("OFFLINE", mWebView.getTitle());
 
         mWebView.setNetworkAvailable(true);
         mWebView.reload();
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("ONLINE", mWebView.getTitle());
     }
 
@@ -2205,37 +2181,22 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         return true;
     }
 
-    private void assertLoadUrlSuccessfully(WebView webView, String url)
-            throws InterruptedException {
-        webView.loadUrl(url);
-        waitForLoadComplete(webView, TEST_TIMEOUT);
+    private void assertLoadUrlSuccessfully(String url) {
+        mWebView.loadUrl(url);
+        waitForLoadComplete();
     }
 
-    private void waitForLoadComplete(final WebView webView, long timeout)
-            throws InterruptedException {
-        new DelayedCheck(timeout) {
+    private void waitForLoadComplete() {
+        new DelayedCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
-                return webView.getProgress() == 100;
+                return mWebView.getProgress() == 100;
             }
         }.run();
-        Thread.sleep(TIME_FOR_LAYOUT);
-    }
-
-    private final class DummyJavaScriptInterface {
-        private boolean mTitleChanged;
-
-        private boolean hasChangedTitle() {
-            return mTitleChanged;
-        }
-
-        public void onLoad(String oldTitle) {
-            mWebView.getHandler().post(new Runnable() {
-                public void run() {
-                    mWebView.loadUrl("javascript:changeTitle(\"new title\")");
-                    mTitleChanged = true;
-                }
-            });
+        try {
+            Thread.sleep(TIME_FOR_LAYOUT);
+        } catch (InterruptedException e) {
+            Log.w(LOGTAG, "waitForLoadComplete() interrupted while sleeping for layout delay.");
         }
     }
 
