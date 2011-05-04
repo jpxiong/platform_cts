@@ -1835,13 +1835,36 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {WebChromeClient.class}
     )
     public void testSetWebChromeClient() throws Throwable {
-        final MockWebChromeClient webChromeClient = new MockWebChromeClient();
-        mWebView.setWebChromeClient(webChromeClient);
+        final class MockWebChromeClient extends WebChromeClient {
+            private boolean mOnProgressChanged = false;
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                mOnProgressChanged = true;
+            }
+            public boolean onProgressChangedCalled() {
+                return mOnProgressChanged;
+            }
+        }
 
+        final MockWebChromeClient webChromeClient = new MockWebChromeClient();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebChromeClient(webChromeClient);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertFalse(webChromeClient.onProgressChangedCalled());
+
         startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mWebView.loadUrl(url);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadUrl(url);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         new DelayedCheck(TEST_TIMEOUT) {
             @Override
@@ -1950,20 +1973,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     })
     public void testInternals() {
         // Do not test these APIs. They are implementation details.
-    }
-
-    private static class MockWebChromeClient extends WebChromeClient {
-        private boolean mOnProgressChanged = false;
-
-        public boolean onProgressChangedCalled() {
-            return mOnProgressChanged;
-        }
-
-        @Override
-        public void onProgressChanged(WebView view, int newProgress) {
-            super.onProgressChanged(view, newProgress);
-            mOnProgressChanged = true;
-        }
     }
 
     private static class HrefCheckHandler extends Handler {
