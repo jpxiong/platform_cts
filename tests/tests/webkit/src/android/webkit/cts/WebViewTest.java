@@ -1655,62 +1655,79 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {}
     )
     public void testGetHitTestResult() throws Throwable {
-        String anchor = "<p><a href=\"" + TestHtmlConstants.EXT_WEB_URL1
+        class HitTestResultRunnable implements Runnable {
+            private HitTestResult mHitTestResult;
+            public void run() {
+                mHitTestResult = mWebView.getHitTestResult();
+            }
+            public HitTestResult getHitTestResult() {
+                return mHitTestResult;
+            }
+        }
+
+        final String anchor = "<p><a href=\"" + TestHtmlConstants.EXT_WEB_URL1
                 + "\">normal anchor</a></p>";
-        String blankAnchor = "<p><a href=\"\">blank anchor</a></p>";
-        String form = "<p><form><input type=\"text\" name=\"Test\"><br>"
+        final String blankAnchor = "<p><a href=\"\">blank anchor</a></p>";
+        final String form = "<p><form><input type=\"text\" name=\"Test\"><br>"
                 + "<input type=\"submit\" value=\"Submit\"></form></p>";
         String phoneNo = "3106984000";
-        String tel = "<p><a href=\"tel:" + phoneNo + "\">Phone</a></p>";
+        final String tel = "<p><a href=\"tel:" + phoneNo + "\">Phone</a></p>";
         String email = "test@gmail.com";
-        String mailto = "<p><a href=\"mailto:" + email + "\">Email</a></p>";
+        final String mailto = "<p><a href=\"mailto:" + email + "\">Email</a></p>";
         String location = "shanghai";
-        String geo = "<p><a href=\"geo:0,0?q=" + location + "\">Location</a></p>";
-        mWebView.loadDataWithBaseURL("fake://home", "<html><body>" + anchor + blankAnchor + form
-                + tel + mailto + geo + "</body></html>", "text/html", "UTF-8", null);
-        waitForLoadComplete();
+        final String geo = "<p><a href=\"geo:0,0?q=" + location + "\">Location</a></p>";
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadDataWithBaseURL("fake://home", "<html><body>" + anchor + blankAnchor + form
+                        + tel + mailto + geo + "</body></html>", "text/html", "UTF-8", null);
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        HitTestResultRunnable runnable = new HitTestResultRunnable();
 
         // anchor
         moveFocusDown();
-        HitTestResult result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.SRC_ANCHOR_TYPE, result.getType());
-        assertEquals(TestHtmlConstants.EXT_WEB_URL1, result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.SRC_ANCHOR_TYPE, runnable.getHitTestResult().getType());
+        assertEquals(TestHtmlConstants.EXT_WEB_URL1, runnable.getHitTestResult().getExtra());
 
         // blank anchor
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.SRC_ANCHOR_TYPE, result.getType());
-        assertEquals("fake://home", result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.SRC_ANCHOR_TYPE, runnable.getHitTestResult().getType());
+        assertEquals("fake://home", runnable.getHitTestResult().getExtra());
 
         // text field
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.EDIT_TEXT_TYPE, result.getType());
-        assertNull(result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.EDIT_TEXT_TYPE, runnable.getHitTestResult().getType());
+        assertNull(runnable.getHitTestResult().getExtra());
 
         // submit button
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.UNKNOWN_TYPE, result.getType());
-        assertNull(result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.UNKNOWN_TYPE, runnable.getHitTestResult().getType());
+        assertNull(runnable.getHitTestResult().getExtra());
 
         // phone number
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.PHONE_TYPE, result.getType());
-        assertEquals(phoneNo, result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.PHONE_TYPE, runnable.getHitTestResult().getType());
+        assertEquals(phoneNo, runnable.getHitTestResult().getExtra());
 
         // email
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.EMAIL_TYPE, result.getType());
-        assertEquals(email, result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.EMAIL_TYPE, runnable.getHitTestResult().getType());
+        assertEquals(email, runnable.getHitTestResult().getExtra());
 
         // geo address
         moveFocusDown();
-        result = mWebView.getHitTestResult();
-        assertEquals(HitTestResult.GEO_TYPE, result.getType());
-        assertEquals(location, result.getExtra());
+        runTestOnUiThread(runnable);
+        assertEquals(HitTestResult.GEO_TYPE, runnable.getHitTestResult().getType());
+        assertEquals(location, runnable.getHitTestResult().getExtra());
     }
 
     @TestTargetNew(
