@@ -2012,11 +2012,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {View.class, Rect.class, boolean.class}
     )
     public void testRequestChildRectangleOnScreen() throws Throwable {
-        DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
-        final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
-        String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
+                final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+                String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
         getInstrumentation().waitForIdleSync();
 
         runTestOnUiThread(new Runnable() {
@@ -2024,6 +2028,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 int origX = mWebView.getScrollX();
                 int origY = mWebView.getScrollY();
 
+                DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
+                final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
                 int half = dimension / 2;
                 Rect rect = new Rect(half, half, half + 1, half + 1);
                 assertTrue(mWebView.requestChildRectangleOnScreen(mWebView, rect, true));
