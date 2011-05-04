@@ -101,8 +101,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @Override
     protected void tearDown() throws Exception {
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
+        try {
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    mWebView.clearHistory();
+                    mWebView.clearCache(true);
+                }
+            });
+        } catch(Throwable t) {
+            Log.w(LOGTAG, "tearDown(): Caught exception when posting Runnable to UI thread");
+        }
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -131,6 +139,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {Context.class, AttributeSet.class, int.class}
         )
     })
+    @UiThreadTest
     public void testConstructor() {
         new WebView(getActivity());
         new WebView(getActivity(), null);
@@ -142,6 +151,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "findAddress",
         args = {String.class}
     )
+    @UiThreadTest
     public void testFindAddress() {
         /*
          * Info about USPS
@@ -197,6 +207,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {},
         notes = "Cannot test the effect of this method"
     )
+    @UiThreadTest
     public void testInvokeZoomPicker() throws Exception {
         WebSettings settings = mWebView.getSettings();
         assertTrue(settings.supportZoom());
@@ -348,6 +359,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testScrollBarOverlay() throws Throwable {
         mWebView.setHorizontalScrollbarOverlay(true);
         mWebView.setVerticalScrollbarOverlay(false);
@@ -382,6 +394,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testLoadUrl() throws Exception {
         assertNull(mWebView.getUrl());
         assertNull(mWebView.getOriginalUrl());
@@ -409,6 +422,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testGetOriginalUrl() throws Exception {
         assertNull(mWebView.getUrl());
         assertNull(mWebView.getOriginalUrl());
@@ -430,6 +444,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "stopLoading",
         args = {}
     )
+    @UiThreadTest
     public void testStopLoading() throws Exception {
         assertNull(mWebView.getUrl());
         assertEquals(INITIAL_PROGRESS, mWebView.getProgress());
@@ -479,6 +494,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {int.class}
         )
     })
+    @UiThreadTest
     public void testGoBackAndForward() throws Exception {
         assertGoBackOrForwardBySteps(false, -1);
         assertGoBackOrForwardBySteps(false, 1);
@@ -529,6 +545,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "addJavascriptInterface",
         args = {Object.class, String.class}
     )
+    @UiThreadTest
     public void testAddJavascriptInterface() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -578,6 +595,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "addJavascriptInterface",
         args = {Object.class, String.class}
     )
+    @UiThreadTest
     public void testAddJavascriptInterfaceNullObject() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -621,6 +639,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {String.class}
         )
     })
+    @UiThreadTest
     public void testAddJavascriptInterfaceOddName() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -655,6 +674,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "removeJavascriptInterface",
         args = {String.class}
     )
+    @UiThreadTest
     public void testRemoveJavascriptInterface() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -892,6 +912,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {String.class, String.class}
         )
     })
+    @UiThreadTest
     public void testAccessHttpAuthUsernamePassword() {
         try {
             WebViewDatabase.getInstance(getActivity()).clearHttpAuthUsernamePassword();
@@ -958,6 +979,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "savePassword",
         args = {String.class, String.class, String.class}
     )
+    @UiThreadTest
     public void testSavePassword() {
         WebViewDatabase db = WebViewDatabase.getInstance(getActivity());
         try {
@@ -996,6 +1018,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testLoadData() throws Exception {
         assertNull(mWebView.getTitle());
         mWebView.loadData("<html><head><title>Hello,World!</title></head><body></body></html>",
@@ -1021,6 +1044,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testLoadDataWithBaseUrl() throws Exception {
         assertNull(mWebView.getTitle());
         assertNull(mWebView.getUrl());
@@ -1390,6 +1414,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "clearCache",
         args = {boolean.class}
     )
+    @UiThreadTest
     public void testClearCache() throws Exception {
         final File cacheFileBaseDir = CacheManager.getCacheFileBaseDir();
         mWebView.clearCache(true);
@@ -1438,6 +1463,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             notes = "Cannot simulate data state or proxy changes"
         )
     })
+    @UiThreadTest
     public void testPlatformNotifications() {
         WebView.enablePlatformNotifications();
         WebView.disablePlatformNotifications();
@@ -1455,6 +1481,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {boolean.class}
         )
     })
+    @UiThreadTest
     public void testAccessPluginList() {
         assertNotNull(WebView.getPluginList());
 
@@ -1467,6 +1494,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "destroy",
         args = {}
     )
+    @UiThreadTest
     public void testDestroy() {
         // Create a new WebView, since we cannot call destroy() on a view in the hierarchy
         WebView localWebView = new WebView(getActivity());
@@ -1652,6 +1680,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "debugDump",
         args = {}
     )
+    @UiThreadTest
     public void testDebugDump() {
         mWebView.debugDump();
     }
@@ -1803,6 +1832,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {}
     )
     @ToBeFixed(explanation = "Favicon is not loaded automatically.")
+    @UiThreadTest
     public void testGetFavicon() throws Exception {
         startWebServer(false);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.TEST_FAVICON_URL);
@@ -1817,6 +1847,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "clearHistory",
         args = {}
     )
+    @UiThreadTest
     public void testClearHistory() throws Exception {
         startWebServer(false);
         String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
@@ -1856,6 +1887,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     @ToBeFixed(explanation="Web history items do not get inflated after restore.")
+    @UiThreadTest
     public void testSaveAndRestoreState() throws Throwable {
         // nothing to save
         assertNull(mWebView.saveState(new Bundle()));
@@ -2020,6 +2052,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "clearSslPreferences",
         args = {}
     )
+    @UiThreadTest
     public void testClearSslPreferences() {
         mWebView.clearSslPreferences();
     }
@@ -2139,6 +2172,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "setMapTrackballToArrowKeys",
         args = {boolean.class}
     )
+    @UiThreadTest
     public void testSetMapTrackballToArrowKeys() {
         mWebView.setMapTrackballToArrowKeys(true);
     }
@@ -2148,6 +2182,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "setNetworkAvailable",
         args = {boolean.class}
     )
+    @UiThreadTest
     public void testSetNetworkAvailable() throws Exception {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -2309,6 +2344,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
+    @UiThreadTest
     public void testInternals() {
         // Do not test these APIs. They are implementation details.
     }
