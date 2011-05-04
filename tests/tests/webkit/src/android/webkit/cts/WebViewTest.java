@@ -1076,52 +1076,78 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testFindNext() throws Throwable {
-        // Reset the scaling so that finding the next "all" text will require scrolling.
-        mWebView.setInitialScale(100);
+        final ScrollRunnable runnable = new ScrollRunnable();
 
-        DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
-        int dimension = Math.max(metrics.widthPixels, metrics.heightPixels);
-        // create a paragraph high enough to take up the entire screen
-        String p = "<p style=\"height:" + dimension + "px;\">" +
-                "Find all instances of a word on the page and highlight them.</p>";
+        final class StopScrollingDelayedCheck extends DelayedCheck {
+            private int mPreviousScrollY = -1;
+            @Override
+            protected boolean check() {
+                try {
+                    runTestOnUiThread(runnable);
+                } catch (Throwable t) {}
+                boolean hasStopped =
+                    (mPreviousScrollY == -1 ? false : (runnable.getScrollY() == mPreviousScrollY));
+                mPreviousScrollY = runnable.getScrollY();
+                return hasStopped;
+            }
+        }
 
-        mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
+        final class FindNextRunnable implements Runnable {
+            private boolean mForward;
+            FindNextRunnable(boolean forward) {
+                mForward = forward;
+            }
+            public void run() {
+                mWebView.findNext(mForward);
+            }
+        }
 
-        // highlight all the strings found
         runTestOnUiThread(new Runnable() {
             public void run() {
+                // Reset the scaling so that finding the next "all" text will require scrolling.
+                mWebView.setInitialScale(100);
+
+                DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
+                int dimension = Math.max(metrics.widthPixels, metrics.heightPixels);
+                // create a paragraph high enough to take up the entire screen
+                String p = "<p style=\"height:" + dimension + "px;\">" +
+                        "Find all instances of a word on the page and highlight them.</p>";
+
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+
+                // highlight all the strings found
                 mWebView.findAll("all");
             }
         });
         getInstrumentation().waitForIdleSync();
-        int previousScrollY = mWebView.getScrollY();
 
-        // Can not use @UiThreadTest here as we need wait in other thread until the scroll in UI
-        // thread finishes
-        findNextOnUiThread(true);
-        delayedCheckStopScrolling();
-        // assert that the view scrolls and focuses "all" in the second page
-        assertTrue(mWebView.getScrollY() > previousScrollY);
-        previousScrollY = mWebView.getScrollY();
+        runTestOnUiThread(runnable);
+        int previousScrollY = runnable.getScrollY();
 
-        findNextOnUiThread(true);
-        delayedCheckStopScrolling();
-        // assert that the view scrolls and focuses "all" in the first page
-        assertTrue(mWebView.getScrollY() < previousScrollY);
-        previousScrollY = mWebView.getScrollY();
+        // Focus "all" in the second page and assert that the view scrolls.
+        runTestOnUiThread(new FindNextRunnable(true));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() > previousScrollY);
+        previousScrollY = runnable.getScrollY();
 
-        findNextOnUiThread(false);
-        delayedCheckStopScrolling();
-        // assert that the view scrolls and focuses "all" in the second page
-        assertTrue(mWebView.getScrollY() > previousScrollY);
-        previousScrollY = mWebView.getScrollY();
+        // Focus "all" in the first page and assert that the view scrolls.
+        runTestOnUiThread(new FindNextRunnable(true));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() < previousScrollY);
+        previousScrollY = runnable.getScrollY();
 
-        findNextOnUiThread(false);
-        delayedCheckStopScrolling();
-        // assert that the view scrolls and focuses "all" in the first page
-        assertTrue(mWebView.getScrollY() < previousScrollY);
-        previousScrollY = mWebView.getScrollY();
+        // Focus "all" in the second page and assert that the view scrolls.
+        runTestOnUiThread(new FindNextRunnable(false));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() > previousScrollY);
+        previousScrollY = runnable.getScrollY();
+
+        // Focus "all" in the first page and assert that the view scrolls.
+        runTestOnUiThread(new FindNextRunnable(false));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() < previousScrollY);
+        previousScrollY = runnable.getScrollY();
 
         // clear the result
         runTestOnUiThread(new Runnable() {
@@ -1132,14 +1158,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         getInstrumentation().waitForIdleSync();
 
         // can not scroll any more
-        findNextOnUiThread(false);
-        delayedCheckStopScrolling();
-        assertTrue(mWebView.getScrollY() == previousScrollY);
+        runTestOnUiThread(new FindNextRunnable(false));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() == previousScrollY);
 
-        findNextOnUiThread(true);
-        delayedCheckStopScrolling();
-
-        assertTrue(mWebView.getScrollY() == previousScrollY);
+        runTestOnUiThread(new FindNextRunnable(true));
+        new StopScrollingDelayedCheck().run();
+        assertTrue(runnable.getScrollY() == previousScrollY);
     }
 
     @TestTargetNew(
@@ -2231,15 +2256,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    private void findNextOnUiThread(final boolean forward) throws Throwable {
-        runTestOnUiThread(new Runnable() {
-            public void run() {
-                mWebView.findNext(forward);
-            }
-        });
-        getInstrumentation().waitForIdleSync();
-    }
-
     private void moveFocusDown() throws Throwable {
         // send down key and wait for idle
         sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
@@ -2261,22 +2277,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         public int getScrollY() {
             return mScrollY;
         }
-    }
-
-    private void delayedCheckStopScrolling() {
-        new DelayedCheck() {
-            private int scrollY = mWebView.getScrollY();
-
-            @Override
-            protected boolean check() {
-                if (scrollY == mWebView.getScrollY()){
-                    return true;
-                } else {
-                    scrollY = mWebView.getScrollY();
-                    return false;
-                }
-            }
-        }.run();
     }
 
     private void delayedCheckWebBackForwardList(final String currUrl, final int currIndex,
