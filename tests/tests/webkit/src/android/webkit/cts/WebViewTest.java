@@ -713,12 +713,28 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "setPictureListener",
         args = {PictureListener.class}
     )
-    public void testSetPictureListener() throws Exception {
+    public void testSetPictureListener() throws Exception, Throwable {
+        final class MyPictureListener implements PictureListener {
+            public int callCount;
+            public WebView webView;
+            public Picture picture;
+
+            public void onNewPicture(WebView view, Picture picture) {
+                this.callCount += 1;
+                this.webView = view;
+                this.picture = picture;
+            }
+        }
+
         final MyPictureListener listener = new MyPictureListener();
-        mWebView.setPictureListener(listener);
         startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        assertLoadUrlSuccessfully(url);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setPictureListener(listener);
+                assertLoadUrlSuccessfully(url);
+            }
+        });
         new DelayedCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > 0;
@@ -728,8 +744,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNotNull(listener.picture);
 
         final int oldCallCount = listener.callCount;
-        url = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        assertLoadUrlSuccessfully(url);
+        final String newUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertLoadUrlSuccessfully(newUrl);
+            }
+        });
         new DelayedCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > oldCallCount;
@@ -2228,18 +2248,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             this.mimeType = mimetype;
             this.contentLength = contentLength;
             this.contentDisposition = contentDisposition;
-        }
-    }
-
-    private static class MyPictureListener implements PictureListener {
-        public int callCount;
-        public WebView webView;
-        public Picture picture;
-
-        public void onNewPicture(WebView view, Picture picture) {
-            this.callCount += 1;
-            this.webView = view;
-            this.picture = picture;
         }
     }
 }
