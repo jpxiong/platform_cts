@@ -1209,38 +1209,90 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testPageScroll() throws Throwable {
-        DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
-        String p = "<p style=\"height:" + dimension + "px;\">" +
-                "Scroll by half the size of the page.</p>";
-        mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-
-        assertTrue(pageDownOnUiThread(false));
-
-        // scroll to the bottom
-        while (pageDownOnUiThread(false)) {
-            // do nothing
+        final class PageUpRunnable implements Runnable {
+            private boolean mResult;
+            public void run() {
+                mResult = mWebView.pageUp(false);
+            }
+            public boolean getResult() {
+                return mResult;
+            }
         }
-        assertFalse(pageDownOnUiThread(false));
-        int bottomScrollY = mWebView.getScrollY();
 
-        assertTrue(pageUpOnUiThread(false));
-
-        // scroll to the top
-        while (pageUpOnUiThread(false)) {
-            // do nothing
+        final class PageDownRunnable implements Runnable {
+            private boolean mResult;
+            public void run() {
+                mResult = mWebView.pageDown(false);
+            }
+            public boolean getResult() {
+                return mResult;
+            }
         }
-        assertFalse(pageUpOnUiThread(false));
-        int topScrollY = mWebView.getScrollY();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
+                int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+                String p = "<p style=\"height:" + dimension + "px;\">" +
+                        "Scroll by half the size of the page.</p>";
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mWebView.pageDown(false));
+            }
+        });
+
+        PageDownRunnable pageDownRunnable = new PageDownRunnable();
+        do {
+            getInstrumentation().waitForIdleSync();
+            runTestOnUiThread(pageDownRunnable);
+        } while (pageDownRunnable.getResult());
+
+        ScrollRunnable scrollRunnable = new ScrollRunnable();
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(scrollRunnable);
+        int bottomScrollY = scrollRunnable.getScrollY();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mWebView.pageUp(false));
+            }
+        });
+
+        PageUpRunnable pageUpRunnable = new PageUpRunnable();
+        do {
+            getInstrumentation().waitForIdleSync();
+            runTestOnUiThread(pageUpRunnable);
+        } while (pageUpRunnable.getResult());
+
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(scrollRunnable);
+        int topScrollY = scrollRunnable.getScrollY();
 
         // jump to the bottom
-        assertTrue(pageDownOnUiThread(true));
-        assertEquals(bottomScrollY, mWebView.getScrollY());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mWebView.pageDown(true));
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(scrollRunnable);
+        assertEquals(bottomScrollY, scrollRunnable.getScrollY());
 
         // jump to the top
-        assertTrue(pageUpOnUiThread(true));
-        assertEquals(topScrollY, mWebView.getScrollY());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertTrue(mWebView.pageUp(true));
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(scrollRunnable);
+        assertEquals(topScrollY, scrollRunnable.getScrollY());
     }
 
     @TestTargetNew(
@@ -2195,41 +2247,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         Thread.sleep(500);
     }
 
-    private boolean pageDownOnUiThread(final boolean bottom) throws Throwable {
-        PageDownRunner runner = new PageDownRunner(bottom);
-        runTestOnUiThread(runner);
-        getInstrumentation().waitForIdleSync();
-        return runner.mResult;
-    }
-
-    private class PageDownRunner implements Runnable {
-        private boolean mResult, mBottom;
-
-        public PageDownRunner(boolean bottom) {
-            mBottom = bottom;
-        }
-
+    private final class ScrollRunnable implements Runnable {
+        private int mScrollX;
+        private int mScrollY;
+        @Override
         public void run() {
-            mResult = mWebView.pageDown(mBottom);
+            mScrollX = mWebView.getScrollX();
+            mScrollY = mWebView.getScrollY();
         }
-    }
-
-    private boolean pageUpOnUiThread(final boolean top) throws Throwable {
-        PageUpRunner runner = new PageUpRunner(top);
-        runTestOnUiThread(runner);
-        getInstrumentation().waitForIdleSync();
-        return runner.mResult;
-    }
-
-    private class PageUpRunner implements Runnable {
-        private boolean mResult, mTop;
-
-        public PageUpRunner(boolean top) {
-            this.mTop = top;
+        public int getScrollX() {
+            return mScrollX;
         }
-
-        public void run() {
-            mResult = mWebView.pageUp(mTop);
+        public int getScrollY() {
+            return mScrollY;
         }
     }
 
