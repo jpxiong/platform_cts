@@ -1513,29 +1513,58 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "setInitialScale",
         args = {int.class}
     )
-    public void testSetInitialScale() {
-        String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        final float defaultScale = getInstrumentation().getTargetContext().getResources().
-            getDisplayMetrics().density;
-        assertEquals(defaultScale, mWebView.getScale(), .01f);
+    public void testSetInitialScale() throws Throwable {
+        final String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
+        final float defaultScale =
+            getInstrumentation().getTargetContext().getResources().getDisplayMetrics().density;
 
-        mWebView.setInitialScale(0);
-        // modify content to fool WebKit into re-loading
-        mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals(defaultScale, mWebView.getScale(), .01f);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
-        mWebView.setInitialScale(50);
-        mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals(0.5f, mWebView.getScale(), .02f);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(defaultScale, mWebView.getScale(), .01f);
 
-        mWebView.setInitialScale(0);
-        mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals(defaultScale, mWebView.getScale(), .01f);
+                mWebView.setInitialScale(0);
+                // modify content to fool WebKit into re-loading
+                mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(defaultScale, mWebView.getScale(), .01f);
+
+                mWebView.setInitialScale(50);
+                mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(0.5f, mWebView.getScale(), .02f);
+
+                mWebView.setInitialScale(0);
+                mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(defaultScale, mWebView.getScale(), .01f);
+            }
+        });
     }
 
     @TestTargetNew(
