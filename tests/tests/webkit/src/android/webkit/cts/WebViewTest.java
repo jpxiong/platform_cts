@@ -1472,15 +1472,23 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {int.class, int.class}
     )
     public void testFlingScroll() throws Throwable {
-        DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
-        String p = "<p style=\"height:" + dimension + "px;" +
-                "width:" + dimension + "px\">Test fling scroll.</p>";
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
+                int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+                String p = "<p style=\"height:" + dimension + "px;" +
+                        "width:" + dimension + "px\">Test fling scroll.</p>";
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
-        int previousScrollX = mWebView.getScrollX();
-        int previousScrollY = mWebView.getScrollY();
+        ScrollRunnable runnable = new ScrollRunnable();
+        runTestOnUiThread(runnable);
+        int previousScrollX = runnable.getScrollX();
+        int previousScrollY = runnable.getScrollY();
+
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView.flingScroll(100, 100);
@@ -1489,20 +1497,23 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         int timeSlice = 500;
         Thread.sleep(timeSlice);
-        assertTrue(mWebView.getScrollX() > previousScrollX);
-        assertTrue(mWebView.getScrollY() > previousScrollY);
+        runTestOnUiThread(runnable);
+        assertTrue(runnable.getScrollX() > previousScrollX);
+        assertTrue(runnable.getScrollY() > previousScrollY);
 
-        previousScrollY = mWebView.getScrollY();
-        previousScrollX = mWebView.getScrollX();
+        previousScrollY = runnable.getScrollY();
+        previousScrollX = runnable.getScrollX();
         Thread.sleep(timeSlice);
-        assertTrue(mWebView.getScrollX() >= previousScrollX);
-        assertTrue(mWebView.getScrollY() >= previousScrollY);
+        runTestOnUiThread(runnable);
+        assertTrue(runnable.getScrollX() >= previousScrollX);
+        assertTrue(runnable.getScrollY() >= previousScrollY);
 
-        previousScrollY = mWebView.getScrollY();
-        previousScrollX = mWebView.getScrollX();
+        previousScrollY = runnable.getScrollY();
+        previousScrollX = runnable.getScrollX();
         Thread.sleep(timeSlice);
-        assertTrue(mWebView.getScrollX() >= previousScrollX);
-        assertTrue(mWebView.getScrollY() >= previousScrollY);
+        runTestOnUiThread(runnable);
+        assertTrue(runnable.getScrollX() >= previousScrollX);
+        assertTrue(runnable.getScrollY() >= previousScrollY);
     }
 
     @TestTargetNew(
