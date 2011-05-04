@@ -1621,10 +1621,27 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {WebViewClient.class}
     )
     public void testSetWebViewClient() throws Throwable {
-        final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        final class MockWebViewClient extends WebViewClient {
+            private boolean mOnScaleChangedCalled = false;
+            @Override
+            public void onScaleChanged(WebView view, float oldScale, float newScale) {
+                super.onScaleChanged(view, oldScale, newScale);
+                mOnScaleChangedCalled = true;
+            }
+            public boolean onScaleChangedCalled() {
+                return mOnScaleChangedCalled;
+            }
+        }
 
+        final MockWebViewClient webViewClient = new MockWebViewClient();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(webViewClient);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertFalse(webViewClient.onScaleChangedCalled());
+
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView.zoomIn();
@@ -1647,6 +1664,14 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testAccessCertificate() throws Throwable {
+        final class MockWebViewClient extends WebViewClient {
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler,
+                                           SslError error) {
+                handler.proceed();
+            }
+        }
+
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView = new WebView(getActivity());
@@ -1925,26 +1950,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     })
     public void testInternals() {
         // Do not test these APIs. They are implementation details.
-    }
-
-    private static class MockWebViewClient extends WebViewClient {
-        private boolean mOnScaleChangedCalled = false;
-
-        public boolean onScaleChangedCalled() {
-            return mOnScaleChangedCalled;
-        }
-
-        @Override
-        public void onScaleChanged(WebView view, float oldScale, float newScale) {
-            super.onScaleChanged(view, oldScale, newScale);
-            mOnScaleChangedCalled = true;
-        }
-
-        @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler,
-                                       SslError error) {
-            handler.proceed();
-        }
     }
 
     private static class MockWebChromeClient extends WebChromeClient {
