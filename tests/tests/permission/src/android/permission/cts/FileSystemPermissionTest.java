@@ -21,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -36,9 +37,9 @@ import java.util.Set;
  *
  * TODO: Combine this file with {@link android.os.cts.FileAccessPermissionTest}
  */
-@MediumTest
 public class FileSystemPermissionTest extends AndroidTestCase {
 
+    @MediumTest
     public void testCreateFileHasSanePermissions() throws Exception {
         File myFile = new File(getContext().getFilesDir(), "hello");
         FileOutputStream stream = new FileOutputStream(myFile);
@@ -59,6 +60,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    @MediumTest
     public void testCreateDirectoryHasSanePermissions() throws Exception {
         File myDir = new File(getContext().getFilesDir(), "helloDirectory");
         assertTrue(myDir.mkdir());
@@ -79,6 +81,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    @MediumTest
     public void testOtherApplicationDirectoriesAreNotWritable() throws Exception {
         List<ApplicationInfo> apps = getContext()
                 .getPackageManager()
@@ -91,36 +94,44 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    @MediumTest
     public void testApplicationParentDirectoryNotWritable() throws Exception {
         String myDataDir = getContext().getApplicationInfo().dataDir;
         File parentDir = new File(myDataDir).getParentFile();
         assertDirectoryNotWritable(parentDir);
     }
 
+    @MediumTest
     public void testDataDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(Environment.getDataDirectory());
     }
 
+    @MediumTest
     public void testAndroidRootDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(Environment.getRootDirectory());
     }
 
+    @MediumTest
     public void testDownloadCacheDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(Environment.getDownloadCacheDirectory());
     }
 
+    @MediumTest
     public void testRootDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(new File("/"));
     }
 
+    @MediumTest
     public void testDevDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(new File("/dev"));
     }
 
+    @MediumTest
     public void testProcDirectoryNotWritable() throws Exception {
         assertDirectoryNotWritable(new File("/proc"));
     }
 
+    @MediumTest
     public void testDevMemSane() throws Exception {
         File f = new File("/dev/mem");
         assertFalse(f.canRead());
@@ -128,6 +139,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canExecute());
     }
 
+    @MediumTest
     public void testDevkmemSane() throws Exception {
         File f = new File("/dev/kmem");
         assertFalse(f.canRead());
@@ -135,6 +147,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canExecute());
     }
 
+    @MediumTest
     public void testDevPortSane() throws Exception {
         File f = new File("/dev/port");
         assertFalse(f.canRead());
@@ -163,6 +176,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
      * test only.  Writable directories within unreadable subdirectories
      * will NOT be detected by this code.
      */
+    @LargeTest
     public void testAllOtherDirectoriesNotWritable() throws Exception {
         File start = new File("/");
         assertDirectoryAndSubdirectoriesNotWritable(start);
@@ -193,6 +207,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
      * poke around in there looking for bad directories.  There has to be
      * a better way...
      */
+    @LargeTest
     public void testOtherRandomDirectoriesNotWritable() throws Exception {
         for (String dir : OTHER_RANDOM_DIRECTORIES) {
             File start = new File(dir);
@@ -200,6 +215,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
+    @LargeTest
     public void testAllFilesInSysAreNotWritable() throws Exception {
         assertAllFilesInDirAndSubDirAreNotWritable(new File("/sys"));
     }
