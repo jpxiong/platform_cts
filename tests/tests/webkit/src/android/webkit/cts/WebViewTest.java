@@ -1371,21 +1371,30 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "requestFocusNodeHref",
         args = {android.os.Message.class}
     )
-    public void testRequestFocusNodeHref() {
-        String links = "<DL><p><DT><A HREF=\"" + TestHtmlConstants.HTML_URL1
+    public void testRequestFocusNodeHref() throws Throwable {
+        final String links = "<DL><p><DT><A HREF=\"" + TestHtmlConstants.HTML_URL1
                 + "\">HTML_URL1</A><DT><A HREF=\"" + TestHtmlConstants.HTML_URL2
                 + "\">HTML_URL2</A></DL><p>";
-        mWebView.loadData("<html><body>" + links + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><body>" + links + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         final HrefCheckHandler handler = new HrefCheckHandler(mWebView.getHandler().getLooper());
-        Message hrefMsg = new Message();
+        final Message hrefMsg = new Message();
         hrefMsg.setTarget(handler);
 
         // focus on first link
         handler.reset();
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
-        mWebView.requestFocusNodeHref(hrefMsg);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.requestFocusNodeHref(hrefMsg);
+            }
+        });
         new DelayedCheck() {
             @Override
             protected boolean check() {
@@ -1396,10 +1405,14 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // focus on second link
         handler.reset();
-        hrefMsg = new Message();
-        hrefMsg.setTarget(handler);
+        final Message hrefMsg2 = new Message();
+        hrefMsg2.setTarget(handler);
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
-        mWebView.requestFocusNodeHref(hrefMsg);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.requestFocusNodeHref(hrefMsg2);
+            }
+        });
         new DelayedCheck() {
             @Override
             protected boolean check() {
@@ -1408,7 +1421,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
         assertEquals(TestHtmlConstants.HTML_URL2, handler.getResultUrl());
 
-        mWebView.requestFocusNodeHref(null);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.requestFocusNodeHref(null);
+            }
+        });
     }
 
     @TestTargetNew(
