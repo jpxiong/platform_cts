@@ -1103,20 +1103,46 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "documentHasImages",
         args = {android.os.Message.class}
     )
-    public void testDocumentHasImages() throws Exception {
-        startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
-        mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete();
+    public void testDocumentHasImages() throws Exception, Throwable {
+        final class DocumentHasImageCheckHandler extends Handler {
+            private boolean mReceived;
+            private int mMsgArg1;
+            public DocumentHasImageCheckHandler(Looper looper) {
+                super(looper);
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                synchronized(this) {
+                    mReceived = true;
+                    mMsgArg1 = msg.arg1;
+                }
+            }
+            public synchronized boolean hasCalledHandleMessage() {
+                return mReceived;
+            }
+            public synchronized int getMsgArg1() {
+                return mMsgArg1;
+            }
+        }
 
-        // create the handler in other thread
+        startWebServer(false);
+        final String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
+
+        // Create a handler on the UI thread.
         final DocumentHasImageCheckHandler handler =
             new DocumentHasImageCheckHandler(mWebView.getHandler().getLooper());
-        Message response = new Message();
-        response.setTarget(handler);
-        assertFalse(handler.hasCalledHandleMessage());
-        mWebView.documentHasImages(response);
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
+                        "text/html", "UTF-8");
+                waitForLoadComplete();
+                Message response = new Message();
+                response.setTarget(handler);
+                assertFalse(handler.hasCalledHandleMessage());
+                mWebView.documentHasImages(response);
+            }
+        });
         new DelayedCheck() {
             @Override
             protected boolean check() {
@@ -2040,35 +2066,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             mResultUrl = msg.getData().getString("url");
         }
     }
-
-    private static class DocumentHasImageCheckHandler extends Handler {
-        private boolean mReceived;
-
-        private int mMsgArg1;
-
-        public DocumentHasImageCheckHandler(Looper looper) {
-            super(looper);
-        }
-
-        public boolean hasCalledHandleMessage() {
-            return mReceived;
-        }
-
-        public int getMsgArg1() {
-            return mMsgArg1;
-        }
-
-        public void reset(){
-            mMsgArg1 = -1;
-            mReceived = false;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            mReceived = true;
-            mMsgArg1 = msg.arg1;
-        }
-    };
 
     private void findNextOnUiThread(final boolean forward) throws Throwable {
         runTestOnUiThread(new Runnable() {
