@@ -1416,32 +1416,54 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "requestImageRef",
         args = {android.os.Message.class}
     )
-    public void testRequestImageRef() throws Exception {
+    public void testRequestImageRef() throws Exception, Throwable {
+        final class GetLocationRunnable implements Runnable {
+            private int[] mLocation;
+            public void run() {
+                mLocation = new int[2];
+                mWebView.getLocationOnScreen(mLocation);
+            }
+            public int[] getLocation() {
+                return mLocation;
+            }
+        }
+
         AssetManager assets = getActivity().getAssets();
         Bitmap bitmap = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.LARGE_IMG_URL));
         int imgWidth = bitmap.getWidth();
         int imgHeight = bitmap.getHeight();
 
         startWebServer(false);
-        String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.LARGE_IMG_URL);
-        mWebView.loadData("<html><title>Title</title><body><img src=\"" + imgUrl
-                + "\"/></body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
+        final String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.LARGE_IMG_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><title>Title</title><body><img src=\"" + imgUrl
+                        + "\"/></body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         final HrefCheckHandler handler = new HrefCheckHandler(mWebView.getHandler().getLooper());
-        Message msg = new Message();
+        final Message msg = new Message();
         msg.setTarget(handler);
 
         // touch the image
         handler.reset();
-        int[] location = new int[2];
-        mWebView.getLocationOnScreen(location);
+        GetLocationRunnable runnable = new GetLocationRunnable();
+        runTestOnUiThread(runnable);
+        int[] location = runnable.getLocation();
+
         long time = SystemClock.uptimeMillis();
         getInstrumentation().sendPointerSync(
                 MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN,
                         location[0] + imgWidth / 2,
                         location[1] + imgHeight / 2, 0));
-        mWebView.requestImageRef(msg);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.requestImageRef(msg);
+            }
+        });
         new DelayedCheck() {
             @Override
             protected boolean check() {
