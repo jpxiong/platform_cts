@@ -1770,20 +1770,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     })
     @ToBeFixed(explanation="Mime type and content length passed to listener are incorrect.")
     public void testSetDownloadListener() throws Throwable {
+        final class MyDownloadListener implements DownloadListener {
+            public String url;
+            public String mimeType;
+            public long contentLength;
+            public String contentDisposition;
+            public boolean called;
+
+            public void onDownloadStart(String url, String userAgent, String contentDisposition,
+                    String mimetype, long contentLength) {
+                this.called = true;
+                this.url = url;
+                this.mimeType = mimetype;
+                this.contentLength = contentLength;
+                this.contentDisposition = contentDisposition;
+            }
+        }
+
         final String mimeType = "application/octet-stream";
         final int length = 100;
         final MyDownloadListener listener = new MyDownloadListener();
 
         startWebServer(false);
-        String url = mWebServer.getBinaryUrl(mimeType, length);
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.setDownloadListener(listener);
-        mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete();
-        // focus on the link
+        final String url = mWebServer.getBinaryUrl(mimeType, length);
+
         runTestOnUiThread(new Runnable() {
             public void run() {
+                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.setDownloadListener(listener);
+                mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
+                        "text/html", "UTF-8");
+                waitForLoadComplete();
                 assertTrue(mWebView.requestFocus(View.FOCUS_DOWN, null));
             }
         });
@@ -2231,23 +2248,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             Thread.sleep(TIME_FOR_LAYOUT);
         } catch (InterruptedException e) {
             Log.w(LOGTAG, "waitForLoadComplete() interrupted while sleeping for layout delay.");
-        }
-    }
-
-    private final class MyDownloadListener implements DownloadListener {
-        public String url;
-        public String mimeType;
-        public long contentLength;
-        public String contentDisposition;
-        public boolean called;
-
-        public void onDownloadStart(String url, String userAgent, String contentDisposition,
-                String mimetype, long contentLength) {
-            this.called = true;
-            this.url = url;
-            this.mimeType = mimetype;
-            this.contentLength = contentLength;
-            this.contentDisposition = contentDisposition;
         }
     }
 }
