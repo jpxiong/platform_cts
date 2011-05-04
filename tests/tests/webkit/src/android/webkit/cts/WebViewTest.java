@@ -1325,23 +1325,57 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         method = "getContentHeight",
         args = {}
     )
-    public void testGetContentHeight() {
-        mWebView.loadData("<html><body></body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals(mWebView.getHeight(), mWebView.getContentHeight() * mWebView.getScale(), 2f);
+    public void testGetContentHeight() throws Throwable {
+        final class HeightRunnable implements Runnable {
+            private int mHeight;
+            private int mContentHeight;
+            public void run() {
+                mHeight = mWebView.getHeight();
+                mContentHeight = mWebView.getContentHeight();
+            }
+            public int getHeight() {
+                return mHeight;
+            }
+            public int getContentHeight() {
+                return mContentHeight;
+            }
+        }
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><body></body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         final int pageHeight = 600;
         // set the margin to 0
-        String p = "<p style=\"height:" + pageHeight + "px;margin:0px auto;\">Get the height of "
-                + "HTML content.</p>";
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertTrue(mWebView.getContentHeight() > pageHeight);
-        int extraSpace = mWebView.getContentHeight() - pageHeight;
+        final String p = "<p style=\"height:" + pageHeight
+                + "px;margin:0px auto;\">Get the height of HTML content.</p>";
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(mWebView.getHeight(), mWebView.getContentHeight() * mWebView.getScale(), 2f);
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
-        mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals(pageHeight + pageHeight + extraSpace, mWebView.getContentHeight());
+        HeightRunnable runnable = new HeightRunnable();
+        runTestOnUiThread(runnable);
+        assertTrue(runnable.getContentHeight() > pageHeight);
+        int extraSpace = runnable.getContentHeight() - pageHeight;
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(runnable);
+        assertEquals(pageHeight + pageHeight + extraSpace, runnable.getContentHeight());
     }
 
     @TestTargetNew(
