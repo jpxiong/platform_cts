@@ -685,27 +685,55 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
-    public void testCapturePicture() throws Exception {
+    public void testCapturePicture() throws Exception, Throwable {
         startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
-        // showing the blank page will make the picture filled with background color
-        assertLoadUrlSuccessfully(url);
-        Picture p = mWebView.capturePicture();
-        Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-        p.draw(new Canvas(b));
-        // default color is white
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                // showing the blank page will make the picture filled with background color
+                mWebView.loadUrl(url);
+                waitForLoadComplete();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        class PictureRunnable implements Runnable {
+            private Picture mPicture;
+            public void run() {
+                mPicture = mWebView.capturePicture();
+                Bitmap b = Bitmap.createBitmap(mPicture.getWidth(), mPicture.getHeight(),
+                        Config.ARGB_8888);
+                mPicture.draw(new Canvas(b));
+                // default color is white
+                assertBitmapFillWithColor(b, Color.WHITE);
+
+                mWebView.setBackgroundColor(Color.CYAN);
+                mWebView.reload();
+                waitForLoadComplete();
+            }
+            public Picture getPicture() {
+                return mPicture;
+            }
+        }
+        PictureRunnable runnable = new PictureRunnable();
+        runTestOnUiThread(runnable);
+        getInstrumentation().waitForIdleSync();
+
+        // the content of the picture will not be updated automatically
+        Picture picture = runnable.getPicture();
+        Bitmap b = Bitmap.createBitmap(picture.getWidth(), picture.getHeight(), Config.ARGB_8888);
+        picture.draw(new Canvas(b));
         assertBitmapFillWithColor(b, Color.WHITE);
 
-        mWebView.setBackgroundColor(Color.CYAN);
-        mWebView.reload();
-        waitForLoadComplete();
-        // the content of the picture will not be updated automatically
-        p.draw(new Canvas(b));
-        assertBitmapFillWithColor(b, Color.WHITE);
-        // update the content
-        p = mWebView.capturePicture();
-        p.draw(new Canvas(b));
-        assertBitmapFillWithColor(b, Color.CYAN);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                // update the content
+                Picture p = mWebView.capturePicture();
+                Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
+                p.draw(new Canvas(b));
+                assertBitmapFillWithColor(b, Color.CYAN);
+            }
+        });
     }
 
     @TestTargetNew(
