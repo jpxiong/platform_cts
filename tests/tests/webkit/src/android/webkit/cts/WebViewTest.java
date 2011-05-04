@@ -77,9 +77,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     private WebView mWebView;
     private CtsTestServer mWebServer;
+    private boolean mIsUiThreadDone;
 
     public WebViewTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
+    }
+
+    @Override
+    public void runTestOnUiThread(Runnable runnable) throws Throwable {
+        mIsUiThreadDone = false;
+        super.runTestOnUiThread(runnable);
     }
 
     @Override
@@ -1963,37 +1970,48 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testAccessCertificate() throws Throwable {
         final class MockWebViewClient extends WebViewClient {
             @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler,
-                                           SslError error) {
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
             }
         }
 
+        final class LoadCompleteWebChromeClient extends WebChromeClient {
+            @Override
+            public void onProgressChanged(WebView webView, int progress) {
+                super.onProgressChanged(webView, progress);
+                if (progress == 100) {
+                    notifyUiThreadDone();
+                }
+            }
+        }
+
+        startWebServer(true);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView = new WebView(getActivity());
-                getActivity().setContentView(mWebView);
+                // need the client to handle error
+                mWebView.setWebViewClient(new MockWebViewClient());
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.setCertificate(null);
+                // attempt to load the url.
+                mWebView.loadUrl(url);
             }
         });
-        getInstrumentation().waitForIdleSync();
+        waitForUiThreadDone();
 
-        // need the client to handle error
-        mWebView.setWebViewClient(new MockWebViewClient());
-
-        mWebView.setCertificate(null);
-        startWebServer(true);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        // attempt to load the url.
-        mWebView.loadUrl(url);
-        new DelayedCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getCertificate() != null;
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                new DelayedCheck(TEST_TIMEOUT) {
+                    @Override
+                    protected boolean check() {
+                        return mWebView.getCertificate() != null;
+                    }
+                }.run();
+                SslCertificate cert = mWebView.getCertificate();
+                assertNotNull(cert);
+                assertEquals("Android", cert.getIssuedTo().getUName());
             }
-        }.run();
-        SslCertificate cert = mWebView.getCertificate();
-        assertNotNull(cert);
-        assertEquals("Android", cert.getIssuedTo().getUName());
+        });
     }
 
     @TestTargetNew(
@@ -2455,6 +2473,24 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             Thread.sleep(TIME_FOR_LAYOUT);
         } catch (InterruptedException e) {
             Log.w(LOGTAG, "waitForLoadComplete() interrupted while sleeping for layout delay.");
+        }
+    }
+
+    private synchronized void notifyUiThreadDone() {
+        mIsUiThreadDone = true;
+        notify();
+    }
+
+    private synchronized void waitForUiThreadDone() throws InterruptedException {
+        while (!mIsUiThreadDone) {
+            try {
+                wait(TEST_TIMEOUT);
+            } catch (InterruptedException e) {
+                continue;
+            }
+            if (!mIsUiThreadDone) {
+                Assert.fail("Unexpected timeout");
+            }
         }
     }
 }
