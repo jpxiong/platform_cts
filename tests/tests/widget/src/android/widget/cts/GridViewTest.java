@@ -848,6 +848,12 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
                 R.drawable.animated, R.drawable.black,
                 R.drawable.blue, R.drawable.failed,
                 R.drawable.pass, R.drawable.red,
+                R.drawable.failed, R.drawable.pass,
+                R.drawable.animated, R.drawable.black,
+                R.drawable.blue, R.drawable.red,
+                R.drawable.animated, R.drawable.black,
+                R.drawable.blue, R.drawable.failed,
+                R.drawable.pass, R.drawable.red,
         };
 
         private final DataSetObservable mDataSetObservable = new DataSetObservable();
