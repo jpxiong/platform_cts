@@ -778,8 +778,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testSaveAndRestorePicture() throws Throwable {
         mWebView.setBackgroundColor(Color.CYAN);
         startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
-        assertLoadUrlSuccessfully(url);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertLoadUrlSuccessfully(url);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         final Bundle bundle = new Bundle();
         final File f = getActivity().getFileStreamPath("snapshot");
@@ -790,7 +795,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         try {
             assertTrue(bundle.isEmpty());
             assertEquals(0, f.length());
-            assertTrue(mWebView.savePicture(bundle, f));
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    assertTrue(mWebView.savePicture(bundle, f));
+                }
+            });
 
             // File saving is done in a separate thread.
             new DelayedCheck() {
@@ -807,15 +816,22 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             p.draw(new Canvas(b));
             assertBitmapFillWithColor(b, Color.CYAN);
 
-            mWebView.setBackgroundColor(Color.WHITE);
-            mWebView.reload();
-            waitForLoadComplete();
-
-            b = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(), Config.ARGB_8888);
-            mWebView.draw(new Canvas(b));
-            assertBitmapFillWithColor(b, Color.WHITE);
             runTestOnUiThread(new Runnable() {
                 public void run() {
+                    mWebView.setBackgroundColor(Color.WHITE);
+                    mWebView.reload();
+                    waitForLoadComplete();
+                }
+            });
+            getInstrumentation().waitForIdleSync();
+
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    Bitmap b = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(),
+                            Config.ARGB_8888);
+                    mWebView.draw(new Canvas(b));
+                    assertBitmapFillWithColor(b, Color.WHITE);
+
                     assertTrue(mWebView.restorePicture(bundle, f));
                 }
             });
