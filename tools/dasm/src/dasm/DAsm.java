@@ -52,7 +52,6 @@ import com.android.dx.rop.cst.CstNat;
 import com.android.dx.rop.cst.CstShort;
 import com.android.dx.rop.cst.CstString;
 import com.android.dx.rop.cst.CstType;
-import com.android.dx.rop.cst.CstUtf8;
 import com.android.dx.rop.type.StdTypeList;
 import com.android.dx.rop.type.Type;
 import com.android.dx.rop.type.TypeList;
@@ -147,7 +146,7 @@ public class DAsm {
      * output_finisher.
      */
     int current_insn_number;
-    Hashtable<Integer, CodeAddress> unprocessed_relative_goto_addr = 
+    Hashtable<Integer, CodeAddress> unprocessed_relative_goto_addr =
             new Hashtable<Integer, CodeAddress>();
 
     // fill-array-data data
@@ -329,7 +328,7 @@ public class DAsm {
                 .internClassName(class_name)), class_acc,
                 superclass_name != null ? CstType.intern(Type
                         .internClassName(superclass_name)) : null, tl,
-                new CstUtf8(source_name));
+                new CstString(source_name));
         dexFile.add(classDef);
         class_header = false;
     }
@@ -367,7 +366,7 @@ public class DAsm {
                     + ", " + access + ", "
                     + (value == null ? "null" : value.toString()) + ")");
 
-        CstNat nat = new CstNat(new CstUtf8(name), new CstUtf8(desc));
+        CstNat nat = new CstNat(new CstString(name), new CstString(desc));
         CstFieldRef field = new CstFieldRef(classDef.getThisClass(), nat);
         EncodedField ef = new EncodedField(field, access);
         if ((access & AccessFlags.ACC_STATIC) != 0) {
@@ -403,7 +402,7 @@ public class DAsm {
         current_insn_number = 0;
         regs_count = 1;
 
-        method_nat = new CstNat(new CstUtf8(name), new CstUtf8(descriptor));
+        method_nat = new CstNat(new CstString(name), new CstString(descriptor));
         if (method_nat.isClassInit()) access |= AccessFlags.ACC_STATIC;
         if (method_nat.isInstanceInit()) access |= AccessFlags.ACC_CONSTRUCTOR;
 
@@ -678,7 +677,7 @@ public class DAsm {
                         + v1 + ")");
             }
             RegisterSpec reg1_spec = RegisterSpec.make(reg1_num, Type.STRING);
-            Constant constant = new CstString(new CstUtf8(v2));
+            Constant constant = new CstString(v2);
             DalvInsn dalvInsn = new CstInsn(insn.opcode,
                     createSourcePosition(), RegisterSpecList.make(reg1_spec),
                     constant);
@@ -748,8 +747,8 @@ public class DAsm {
             } else {
                 // invoke-kind
                 String[] names = Utils.getClassMethodSignatureFromString(v2);
-                CstNat method_nat = new CstNat(new CstUtf8(names[1]),
-                        new CstUtf8(names[2]));
+                CstNat method_nat = new CstNat(new CstString(names[1]),
+                        new CstString(names[2]));
 
                 /*
                  * if(insn.args.compareToIgnoreCase(
@@ -822,8 +821,8 @@ public class DAsm {
             } else {
                 // invoke-kind/range
                 String[] names = Utils.getClassMethodSignatureFromString(v2);
-                CstNat method_nat = new CstNat(new CstUtf8(names[1]),
-                        new CstUtf8(names[2]));
+                CstNat method_nat = new CstNat(new CstString(names[1]),
+                        new CstString(names[2]));
 
                 /*
                  * if(insn.args.compareToIgnoreCase(
@@ -922,7 +921,7 @@ public class DAsm {
                 reg1_spec = RegisterSpec.make(reg1_num, Type.FLOAT);
                 constant = CstFloat.make(Float.floatToIntBits(v2.floatValue()));
             } else if (v2 instanceof Double
-                    || (v2 instanceof Float && 
+                    || (v2 instanceof Float &&
                             insn.opcode.getFormat() == Form51l.THE_ONE)) {
                 reg1_spec = RegisterSpec.make(reg1_num, Type.DOUBLE);
                 constant = CstDouble.make(Double.doubleToLongBits(v2
@@ -1033,8 +1032,8 @@ public class DAsm {
 
             String[] names = Utils.getClassFieldFromString(v2);
 
-            CstNat field_nat = new CstNat(new CstUtf8(names[1]),
-                    new CstUtf8(v3));
+            CstNat field_nat = new CstNat(new CstString(names[1]),
+                    new CstString(v3));
 
             Constant constant = new CstFieldRef(CstType.intern(Type
                     .internClassName(names[0])), field_nat);
@@ -1105,8 +1104,8 @@ public class DAsm {
 
             String[] names = Utils.getClassFieldFromString(v3);
 
-            CstNat field_nat = new CstNat(new CstUtf8(names[1]),
-                    new CstUtf8(v4));
+            CstNat field_nat = new CstNat(new CstString(names[1]),
+                    new CstString(v4));
 
             Constant constant = new CstFieldRef(CstType.intern(Type
                     .internClassName(names[0])), field_nat);
@@ -1495,7 +1494,7 @@ public class DAsm {
      * Creates instance of SourcePosition for current line
      */
     protected SourcePosition createSourcePosition() {
-        return new SourcePosition(new CstUtf8(filename), -1, line_num);
+        return new SourcePosition(new CstString(filename), -1, line_num);
     }
 
     /**
@@ -1580,7 +1579,7 @@ public class DAsm {
      * Parses a .d file, converting it internally into a binary representation.
      * If something goes wrong, this throws one of an IOException, or a
      * dasmError, or one of a few other exceptions.
-     * 
+     *
      * @param input
      *            is the stream containing the Dalvik assembly code for the
      *            class.
