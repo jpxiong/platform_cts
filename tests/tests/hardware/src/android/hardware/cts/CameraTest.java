@@ -24,7 +24,9 @@ import dalvik.annotation.TestTargets;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.Area;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.ErrorCallback;
 import android.hardware.Camera.Parameters;
@@ -2026,5 +2028,114 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             if (LOGV) Log.v(TAG, "Preview frame callback, id " + mId + ".");
             mPreviewDone.open();
         }
+    }
+
+    public void testFocusAreas() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testFocusAreasByCamera(id);
+        }
+    }
+
+    private void testFocusAreasByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        Parameters parameters = mCamera.getParameters();
+        int maxNumFocusAreas = parameters.getMaxNumFocusAreas();
+        if (maxNumFocusAreas == 0) return;
+
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
+        mCamera.startPreview();
+
+        // Test various valid cases.
+        testValidFocusAreas(null);                         // Test the default focus area.
+        testValidFocusAreas(-1000, -1000, 1000, 1000, 1);  // biggest area
+        testValidFocusAreas(-500, -500, 500, 500, 1000);   // medium area and biggest weight
+        testValidFocusAreas(0, 0, 1, 1, 1);                // smallest area
+
+        ArrayList<Area> areas = new ArrayList();
+        if (maxNumFocusAreas > 1) {
+            // Test overlapped focus areas.
+            testValidFocusAreas(-250, -250, 250, 250, 1,
+                    0, 0, 500, 500, 2);
+
+            // Test completely disjoint areas.
+            testValidFocusAreas(-250, -250, 0, 0, 1,
+                    900, 900, 1000, 1000, 1);
+
+            // Test the maximum number of focus areas.
+            for (int i = 0; i < maxNumFocusAreas; i++) {
+                areas.add(new Area(new Rect(-1000, -1000, 1000, 1000), 1000));
+            }
+            testValidFocusAreas(areas);
+        }
+
+        // Test various invalid cases.
+        testInvalidFocusAreas(-1001, -1000, 1000, 1000, 1);    // left should >= -1000
+        testInvalidFocusAreas(-1000, -1001, 1000, 1000, 1);    // top should >= -1000
+        testInvalidFocusAreas(-1000, -1000, 1001, 1000, 1);    // right should <= 1000
+        testInvalidFocusAreas(-1000, -1000, 1000, 1001, 1);    // bottom should <= 1000
+        testInvalidFocusAreas(-1000, -1000, 1000, 1000, 0);    // weight should > not be 0
+        testInvalidFocusAreas(-1000, -1000, 1000, 1001, 1001); // weight should <= 1000
+        testInvalidFocusAreas(500, -1000, 500, 1000, 1);       // left and right should not equal
+        testInvalidFocusAreas(-1000, 500, 1000, 500, 1);       // top and bottom should not equal
+        testInvalidFocusAreas(500, -1000, 499, 1000, 1);       // left should < right
+        testInvalidFocusAreas(-1000, 500, 100, 499, 1);        // top should < bottom
+        testInvalidFocusAreas(-250, -250, 250, 250, -1);       // weight cannot be negative
+
+        // Test when the number of focus areas exceeds maximum.
+        areas.clear();
+        for (int i = 0; i <= maxNumFocusAreas; i++) {
+            areas.add(new Area(new Rect(-1000, -1000, 1000, 1000), 1000));
+        }
+        testInvalidFocusAreas(areas);
+
+        terminateMessageLooper();
+    }
+
+    private void testInvalidFocusAreas(int left, int top, int right, int bottom,
+            int weight) {
+        ArrayList<Area> areas = new ArrayList<Area>();
+        areas.add(new Area(new Rect(left, top, right, bottom), weight));
+        testInvalidFocusAreas(areas);
+    }
+
+    private void testInvalidFocusAreas(ArrayList<Area> areas) {
+        Parameters parameters = mCamera.getParameters();
+        List<Area> originalAreas = parameters.getFocusAreas();
+        try {
+            parameters.setFocusAreas(areas);
+            mCamera.setParameters(parameters);
+            fail("Should throw exception when focus area is invalid.");
+        } catch (RuntimeException e) {
+            parameters = mCamera.getParameters();
+            assertEquals(originalAreas, parameters.getFocusAreas());
+        }
+    }
+
+    private void testValidFocusAreas(int left, int top, int right, int bottom,
+            int weight) {
+        ArrayList<Area> areas = new ArrayList<Area>();
+        areas.add(new Area(new Rect(left, top, right, bottom), weight));
+        testValidFocusAreas(areas);
+    }
+
+    private void testValidFocusAreas(int left1, int top1, int right1,
+            int bottom1, int weight1, int left2, int top2, int right2,
+            int bottom2, int weight2) {
+        ArrayList<Area> areas = new ArrayList<Area>();
+        areas.add(new Area(new Rect(left1, top1, right1, bottom1), weight1));
+        areas.add(new Area(new Rect(left2, top2, right2, bottom2), weight2));
+        testValidFocusAreas(areas);
+    }
+
+    private void testValidFocusAreas(ArrayList<Area> areas) {
+        Parameters parameters = mCamera.getParameters();
+        parameters.setFocusAreas(areas);
+        mCamera.setParameters(parameters);
+        parameters = mCamera.getParameters();
+        assertEquals(areas, parameters.getFocusAreas());
+        mCamera.autoFocus(mAutoFocusCallback);
+        waitForFocusDone();
     }
 }
