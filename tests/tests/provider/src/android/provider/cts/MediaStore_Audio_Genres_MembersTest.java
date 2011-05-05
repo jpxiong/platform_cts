@@ -96,7 +96,7 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
     }
 
     @ToBeFixed(bug = "", explanation = "The result cursor of query for all columns does not "
-            + "contain the column Members.ALBUM_ART, Members.GENRE_ID and  Members.AUDIO_ID.")
+            + "contain the column Members.GENRE_ID and Members.AUDIO_ID.")
     public void testStoreAudioGenresMembersExternal() {
         ContentValues values = new ContentValues();
         values.put(Genres.NAME, Audio1.GENRE);
@@ -117,14 +117,6 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
         try {
             // query
             c = mContentResolver.query(membersUri, null, null, null, null);
-            // the ALBUM_ART column does not exist
-            try {
-                c.getColumnIndexOrThrow(Members.ALBUM_ART);
-                fail("Should throw IllegalArgumentException because there is no column with name"
-                        + " \"Members.ALBUM_ART\" in the table");
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
 
             try {
                 c.getColumnIndexOrThrow(Members.AUDIO_ID);

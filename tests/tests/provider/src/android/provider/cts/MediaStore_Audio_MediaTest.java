@@ -76,12 +76,10 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
                 null, null));
     }
 
-    @ToBeFixed(bug = "", explanation = "The column Media.ALBUM_ART does not exist.")
     public void testStoreAudioMediaInternal() {
         testStoreAudioMedia(true);
     }
 
-    @ToBeFixed(bug = "", explanation = "The column Media.ALBUM_ART does not exist.")
     public void testStoreAudioMediaExternal() {
         testStoreAudioMedia(false);
     }
@@ -131,14 +129,6 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             assertEquals(Audio1.YEAR, c.getInt(c.getColumnIndex(Media.YEAR)));
             String titleKey = c.getString(c.getColumnIndex(Media.TITLE_KEY));
             assertNotNull(titleKey);
-            // the ALBUM_ART column does not exist
-            try {
-                c.getColumnIndexOrThrow(Media.ALBUM_ART);
-                fail("Should throw IllegalArgumentException because there is no column with name"
-                        + " \"Media.ALBUM_ART\" in the table");
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
             c.close();
 
             // update
