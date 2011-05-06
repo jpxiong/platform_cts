@@ -110,8 +110,12 @@ public class SmsManagerTest extends AndroidTestCase {
         super.setUp();
         mTelephonyManager =
             (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        mPackageManager = mContext.getPackageManager();
+        mPackageManager = getContext().getPackageManager();
         mDestAddr = mTelephonyManager.getLine1Number();
+        if (mDestAddr == null || mDestAddr.isEmpty()) {
+           mDestAddr = System.getProperty("cts.phoneNumber", "");
+        }
+
         mText = "This is a test message";
 
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {

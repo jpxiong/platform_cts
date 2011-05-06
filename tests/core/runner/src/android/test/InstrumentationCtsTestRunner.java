@@ -59,7 +59,7 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
      */
     private static final String TAG = "InstrumentationCtsTestRunner";
 
-    private static final String REPORT_VALUE_ID = "InstrumentationCtsTestRunner";
+    private static final String ARGUMENT_PHONE_NUMBER = "phoneNumber";
 
     /**
      * True if (and only if) we are running in single-test mode (as opposed to
@@ -88,6 +88,9 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         if (arguments != null) {
             String classArg = arguments.getString(ARGUMENT_TEST_CLASS);
             mSingleTest = classArg != null && classArg.contains("#");
+
+            System.setProperty("cts.phoneNumber",
+                    arguments.getString(ARGUMENT_PHONE_NUMBER));
         }
 
         // attempt to disable keyguard,  if current test has permission to do so
