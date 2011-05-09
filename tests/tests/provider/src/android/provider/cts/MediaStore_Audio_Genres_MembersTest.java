@@ -167,6 +167,16 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertNotNull(titleKey);
             c.close();
 
+            // Query with a constraint on _id. Note that _id corresponds to the _id
+            // column in the audio table, not the one in the audio_genres_map table.
+            // We need to preserve this behavior for backward compatibility.
+            c = mContentResolver.query(membersUri, null,
+                    Members._ID + "=?", new String[] {Long.toString(mAudioIdOfJam)}, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members._ID)));
+            c.close();
+
             // update the member
             values.clear();
             values.put(Members.AUDIO_ID, mAudioIdOfJamLive);
