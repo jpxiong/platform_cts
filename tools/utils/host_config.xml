@@ -42,4 +42,7 @@
     <!-- Time to wait [ms] after a package installation or removal. -->
     <IntValue name="postInstallWaitMs" value="10000" />
 
+    <!-- Phone number that will be used in tests if not available from the SIM card. -->
+    <StringValue name="phoneNumber" value="" />
+
 </HostConfiguration>
