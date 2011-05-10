@@ -136,7 +136,7 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
 
             assertEquals(1, c.getCount());
             c.moveToFirst();
-            assertTrue(c.getLong(c.getColumnIndex(Members._ID)) > 0);
+            assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members._ID)));
             assertEquals(Audio1.EXTERNAL_DATA, c.getString(c.getColumnIndex(Members.DATA)));
             assertTrue(c.getLong(c.getColumnIndex(Members.DATE_ADDED)) > 0);
             assertEquals(Audio1.DATE_MODIFIED, c.getLong(c.getColumnIndex(Members.DATE_MODIFIED)));
