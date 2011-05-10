@@ -273,7 +273,8 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         values.put(Media.TITLE, "testimage");
         long dateAdded = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_ADDED, dateAdded);
-        long dateModified = System.currentTimeMillis() / 1000;
+        File externalFile = new File(externalPath);
+        long dateModified = externalFile.lastModified() / 1000;
         values.put(Media.DATE_MODIFIED, dateModified);
 
         // insert
