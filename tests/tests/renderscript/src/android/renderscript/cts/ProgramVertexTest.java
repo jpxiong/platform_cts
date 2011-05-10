@@ -143,11 +143,11 @@ public class ProgramVertexTest extends RSBaseGraphics {
                             "}";
 
         String simpleAttrSimpleUni = "void main() {\n"+
-                                     "  gl_Position = UNI_MVP * ATTRIB_position;\n"+
+                                     "  gl_Position = UNI_MATRIX * ATTRIB_position;\n"+
                                      "}";
 
         String multiAttrMultiUni = "void main() {\n"+
-                                   "  vec4 temp = UNI_MVP * ATTRIB_position;\n"+
+                                   "  vec4 temp = UNI_MATRIX * ATTRIB_position;\n"+
                                    "  temp = UNI_EXTRA * temp;\n"+
                                    "  temp.xyz += ATTRIB_normal;\n"+
                                    "  temp.xy += ATTRIB_texture0;\n"+
