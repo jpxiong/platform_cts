@@ -51,11 +51,11 @@ public class StorageManagerTest extends AndroidTestCase {
     public void testMountAndUnmountObbNormal() {
         final File outFile = getFilePath("test1.obb");
 
-        mountObb(R.raw.test1, outFile, OnObbStateChangeListener.MOUNTED);
+        final String canonPath = mountObb(R.raw.test1, outFile, OnObbStateChangeListener.MOUNTED);
 
         mountObb(R.raw.test1, outFile, OnObbStateChangeListener.ERROR_ALREADY_MOUNTED);
 
-        final String mountPath = checkMountedPath(outFile);
+        final String mountPath = checkMountedPath(canonPath);
         final File mountDir = new File(mountPath);
 
         assertTrue("OBB mounted path should be a directory", mountDir.isDirectory());
@@ -96,15 +96,15 @@ public class StorageManagerTest extends AndroidTestCase {
         ObbObserver oo2 = mountObbWithoutWait(R.raw.test1, file2);
 
         Log.d(TAG, "Waiting for OBB #1 to complete mount");
-        waitForObbActionCompletion(file1, oo1, OnObbStateChangeListener.MOUNTED, false);
+        waitForObbActionCompletion(file1, oo1, OnObbStateChangeListener.MOUNTED);
         Log.d(TAG, "Waiting for OBB #2 to complete mount");
-        waitForObbActionCompletion(file2, oo2, OnObbStateChangeListener.MOUNTED, false);
+        waitForObbActionCompletion(file2, oo2, OnObbStateChangeListener.MOUNTED);
 
-        final String mountPath1 = checkMountedPath(file1);
+        final String mountPath1 = checkMountedPath(oo1.getPath());
         final File mountDir1 = new File(mountPath1);
         assertTrue("OBB mounted path should be a directory", mountDir1.isDirectory());
 
-        final String mountPath2 = checkMountedPath(file2);
+        final String mountPath2 = checkMountedPath(oo2.getPath());
         final File mountDir2 = new File(mountPath2);
         assertTrue("OBB mounted path should be a directory", mountDir2.isDirectory());
 
@@ -187,7 +187,7 @@ public class StorageManagerTest extends AndroidTestCase {
                 | FileUtils.S_IRWXO);
     }
 
-    private void mountObb(final int resource, final File file, int expectedState) {
+    private String mountObb(final int resource, final File file, int expectedState) {
         copyRawToFile(resource, file);
 
         final ObbObserver observer = new ObbObserver();
@@ -198,13 +198,12 @@ public class StorageManagerTest extends AndroidTestCase {
                 observer.waitForCompletion());
 
         if (expectedState == OnObbStateChangeListener.MOUNTED) {
-            assertTrue("OBB should be mounted", mStorageManager.isObbMounted(file.getPath()));
+            assertTrue("OBB should be mounted", mStorageManager.isObbMounted(observer.getPath()));
         }
 
-        assertEquals("Actual file and resolved file should be the same",
-                file.getPath(), observer.getPath());
-
         assertEquals(expectedState, observer.getState());
+
+        return observer.getPath();
     }
 
     private ObbObserver mountObbWithoutWait(final int resource, final File file) {
@@ -217,22 +216,17 @@ public class StorageManagerTest extends AndroidTestCase {
         return observer;
     }
 
-    private void waitForObbActionCompletion(final File file,
-            final ObbObserver observer, int expectedState, boolean checkPath) {
+    private void waitForObbActionCompletion(final File file, final ObbObserver observer,
+            int expectedState) {
         assertTrue("Mount should have completed", observer.waitForCompletion());
 
-        assertTrue("OBB should be mounted", mStorageManager.isObbMounted(file.getPath()));
-
-        if (checkPath) {
-            assertEquals("Actual file and resolved file should be the same", file.getPath(),
-                    observer.getPath());
-        }
+        assertTrue("OBB should be mounted", mStorageManager.isObbMounted(observer.getPath()));
 
         assertEquals(expectedState, observer.getState());
     }
 
-    private String checkMountedPath(final File file) {
-        final String mountPath = mStorageManager.getMountedObbPath(file.getPath());
+    private String checkMountedPath(final String path) {
+        final String mountPath = mStorageManager.getMountedObbPath(path);
         assertStartsWith("Path should be in " + OBB_MOUNT_PREFIX,
                 OBB_MOUNT_PREFIX,
                 mountPath);
