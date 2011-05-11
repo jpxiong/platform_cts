@@ -170,22 +170,27 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     )
     @UiThreadTest
     public void testSetCamera() throws Exception {
-        mCamera = Camera.open();
-        mCamera.unlock();
-        mMediaRecorder.setCamera(mCamera);
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setVideoFrameRate(FRAME_RATE);
-        mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-        mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
-        mMediaRecorder.setOutputFile(OUTPUT_PATH);
+        int nCamera = Camera.getNumberOfCameras();
+        for (int cameraId = 0; cameraId < nCamera; cameraId++) {
+            mCamera = Camera.open(cameraId);
+            mCamera.unlock();
+            mMediaRecorder.setCamera(mCamera);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            mMediaRecorder.setVideoFrameRate(FRAME_RATE);
+            mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+            mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
+            mMediaRecorder.setOutputFile(OUTPUT_PATH);
 
-        mMediaRecorder.prepare();
-        mMediaRecorder.start();
-        Thread.sleep(1000);
-        mMediaRecorder.stop();
-        assertTrue(mOutFile.exists());
+            mMediaRecorder.prepare();
+            mMediaRecorder.start();
+            Thread.sleep(1000);
+            mMediaRecorder.stop();
+            assertTrue(mOutFile.exists());
+
+            mCamera.release();
+        }
     }
 
     private void checkOutputExist() {
