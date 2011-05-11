@@ -315,30 +315,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(5.0f, cfgNew.fontScale, 0.001f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDisplayMetrics",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "updateSystemConfiguration",
-            args = {Configuration.class, DisplayMetrics.class}
-        )
-    })
-    public void testGetDisplayMetrics() {
-        final DisplayMetrics dM1 = mResources.getDisplayMetrics();
-        dM1.widthPixels = 11;
-        dM1.heightPixels = 27;
-
-        Resources.updateSystemConfiguration(new Configuration(), dM1);
-
-        final DisplayMetrics dM2 = mResources.getDisplayMetrics();
-        assertEquals(11, dM2.widthPixels);
-        assertEquals(27, dM2.heightPixels);
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "getDimensionPixelSize",
