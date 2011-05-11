@@ -16,6 +16,7 @@
 
 package com.android.cts;
 
+import com.android.cts.HostConfig.Strings;
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.Client;
 import com.android.ddmlib.ClientData;
@@ -857,7 +858,6 @@ public class TestDevice implements DeviceObserver {
      * @param test The test to be run.
      */
     public void runTest(Test test) throws DeviceDisconnectedException {
-
         final String appNameSpace = test.getAppNameSpace();
         String runner = test.getInstrumentationRunner();
         if (runner == null) {
@@ -869,7 +869,7 @@ public class TestDevice implements DeviceObserver {
         final String testName = test.getFullName().replaceAll("\\$", "\\\\\\$");
 
         final String commandStr = "am instrument -w -r -e class " + testName
-                + " " + appNameSpace + "/" + runner;
+                + getTestArguments() + " " + appNameSpace + "/" + runner;
         Log.d(commandStr);
         executeShellCommand(commandStr, new IndividualModeResultParser(test));
     }
@@ -894,7 +894,8 @@ public class TestDevice implements DeviceObserver {
             name = javaPkgName;
         }
 
-        String cmdHeader = "am instrument -w -r -e package " + name + " ";
+        String cmdHeader = "am instrument -w -r -e package " + name + " "
+                + getTestArguments() + " ";
         final String commandStr = cmdHeader + appNameSpace + "/" + runner;
         Log.d(commandStr);
 
@@ -902,31 +903,8 @@ public class TestDevice implements DeviceObserver {
         executeShellCommand(commandStr, mBatchModeResultParser);
     }
 
-    /**
-     * Run a in batch mode of a TestPackage.
-     *
-     * @param testPackage The testPackage to be run.
-     * @param javaClassName The java class name.
-     */
-    public void runTestCaseInBatchMode(TestPackage testPackage, final String javaClassName,
-            String profile) throws DeviceDisconnectedException {
-        if (javaClassName == null) {
-            return;
-        }
-
-        String appNameSpace = testPackage.getAppNameSpace();
-        String runner = testPackage.getInstrumentationRunner();
-        if (runner == null) {
-            runner = DEFAULT_TEST_RUNNER_NAME;
-        }
-
-        String cmdHeader = "am instrument -w -r -e class " + javaClassName
-                + " -e profile " + profile + " ";
-        final String commandStr = cmdHeader + appNameSpace + "/" + runner;
-        Log.d(commandStr);
-
-        mBatchModeResultParser = new BatchModeResultParser(testPackage);
-        executeShellCommand(commandStr, mBatchModeResultParser);
+    private String getTestArguments() {
+        return "-e phoneNumber " + Strings.phoneNumber.value();
     }
 
     /**
