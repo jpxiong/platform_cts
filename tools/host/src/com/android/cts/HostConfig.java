@@ -15,11 +15,6 @@
  */
 package com.android.cts;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,6 +34,11 @@ import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Holds CTS host configuration information, such as:
@@ -101,25 +101,6 @@ public class HostConfig extends XMLResourceHandler {
         }
 
         void setValue(int value) {
-            this.value = value;
-        }
-    }
-
-    enum Strings {
-        // Phone number that will be used in tests if not available from the SIM card
-        phoneNumber ("");
-
-        private String value;
-
-        Strings(String value) {
-            this.value = value;
-        }
-
-        String value() {
-            return value;
-        }
-
-        void setValue(String value) {
             this.value = value;
         }
     }
@@ -188,8 +169,7 @@ public class HostConfig extends XMLResourceHandler {
             return false;
         }
 
-        loadIntConfigValues(doc);
-        loadStringConfigValues(doc);
+        getConfigValues(doc);
 
         String caseRoot = repositoryRoot + File.separator + caseCfg;
         String planRoot = repositoryRoot + File.separator + planCfg;
@@ -380,35 +360,24 @@ public class HostConfig extends XMLResourceHandler {
         return cfgStr;
     }
 
-    /** Load the integer configuration values from the config. */
-    private void loadIntConfigValues(final Document doc) {
+    /**
+     * Load configuration values from config file.
+     *
+     * @param doc The document from which to load the values.
+     */
+    private void getConfigValues(final Document doc) {
         NodeList intValues = doc.getElementsByTagName("IntValue");
         for (int i = 0; i < intValues.getLength(); i++) {
-            Node node = intValues.item(i);
-            String name = getStringAttributeValue(node, "name");
-            String value = getStringAttributeValue(node, "value");
+            Node n = intValues.item(i);
+            String name = getStringAttributeValue(n, "name");
+            String value = getStringAttributeValue(n, "value");
             try {
-                Integer intValue = Integer.parseInt(value);
-                Ints.valueOf(name).setValue(intValue);
+                Integer v = Integer.parseInt(value);
+                Ints.valueOf(name).setValue(v);
             } catch (NumberFormatException e) {
                 Log.e("Configuration error. Illegal value for " + name, e);
             } catch (IllegalArgumentException e) {
-                Log.e("Unknown int configuration value " + name, e);
-            }
-        }
-    }
-
-    /** Load the String configuration values from the config. */
-    private void loadStringConfigValues(final Document doc) {
-        NodeList stringValues = doc.getElementsByTagName("StringValue");
-        for (int i = 0; i < stringValues.getLength(); i++) {
-            Node node = stringValues.item(i);
-            String name = getStringAttributeValue(node, "name");
-            String value = getStringAttributeValue(node, "value");
-            try {
-                Strings.valueOf(name).setValue(value);
-            } catch (IllegalArgumentException e) {
-                Log.e("Unknown string configuration value " + name, e);
+                Log.e("Unknown configuration value " + name, e);
             }
         }
     }
