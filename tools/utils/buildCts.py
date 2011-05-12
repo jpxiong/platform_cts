@@ -109,6 +109,12 @@ class CtsBuilder(object):
     plan.Exclude(r'android\.core\.vm-tests-tf')
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
+
+    plan.Exclude('android\.core\.vm-tests')
+    plan.Exclude('android\.performance.*')
+    plan.Include(r'android\.core\.vm-tests-tf')
+    self.__WritePlan(plan, 'CTS-TF')
+
     plan.Exclude(r'android\.tests\.sigtest')
     plan.Exclude(r'android\.core.*')
     self.__WritePlan(plan, 'Android')
