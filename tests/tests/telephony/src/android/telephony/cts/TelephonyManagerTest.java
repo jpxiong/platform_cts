@@ -296,6 +296,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
+                assertNull(deviceId);
                 assertSerialNumber();
                 assertMacAddressReported();
                 break;
