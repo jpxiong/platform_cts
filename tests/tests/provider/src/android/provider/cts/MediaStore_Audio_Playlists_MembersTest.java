@@ -24,6 +24,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
 import android.provider.MediaStore.Audio.Playlists;
 import android.provider.MediaStore.Audio.Playlists.Members;
@@ -239,9 +240,61 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
             assertNotNull(c.getString(c.getColumnIndex(Members.TITLE_KEY)));
             c.close();
 
-            // delete the member
-            result = mContentResolver.delete(membersUri, null, null);
+            // update the member back to its original state
+            values.clear();
+            values.put(Members.PLAY_ORDER, 1);
+            values.put(Members.AUDIO_ID, mIdOfAudio1);
+            result = mContentResolver.update(membersUri, values, Members.AUDIO_ID + "="
+                    + mIdOfAudio2, null);
             assertEquals(1, result);
+
+            // insert another member into the playlist
+            values.clear();
+            values.put(Members.AUDIO_ID, mIdOfAudio2);
+            values.put(Members.PLAY_ORDER, 2);
+            Uri audioUri2 = mContentResolver.insert(membersUri, values);
+            // the playlist should now have id1 at position 1 and id2 at position2, check that
+            c = mContentResolver.query(membersUri, new String[] { Members.AUDIO_ID, Members.PLAY_ORDER }, null, null, Members.PLAY_ORDER);
+            assertEquals(2, c.getCount());
+            c.moveToFirst();
+            assertEquals(mIdOfAudio1, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(1, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.moveToNext();
+            assertEquals(mIdOfAudio2, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(2, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.close();
+
+            // swap the items around
+            assertTrue(MediaStore.Audio.Playlists.Members.moveItem(mContentResolver, playlistId, 2, 1));
+
+            // check the new positions
+            c = mContentResolver.query(membersUri, new String[] { Members.AUDIO_ID, Members.PLAY_ORDER }, null, null, Members.PLAY_ORDER);
+            assertEquals(2, c.getCount());
+            c.moveToFirst();
+            assertEquals(mIdOfAudio2, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(1, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.moveToNext();
+            assertEquals(mIdOfAudio1, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(2, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.close();
+
+            // swap the items around in the other direction
+            assertTrue(MediaStore.Audio.Playlists.Members.moveItem(mContentResolver, playlistId, 1, 2));
+
+            // check the positions again
+            c = mContentResolver.query(membersUri, new String[] { Members.AUDIO_ID, Members.PLAY_ORDER }, null, null, Members.PLAY_ORDER);
+            assertEquals(2, c.getCount());
+            c.moveToFirst();
+            assertEquals(mIdOfAudio1, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(1, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.moveToNext();
+            assertEquals(mIdOfAudio2, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(2, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.close();
+
+            // delete the members
+            result = mContentResolver.delete(membersUri, null, null);
+            assertEquals(2, result);
         } finally {
             // delete the playlist
             mContentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
