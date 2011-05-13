@@ -18,14 +18,16 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.content.ContentResolver;
 import android.content.res.Resources;
@@ -35,20 +37,16 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Drawable.Callback;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.util.Xml;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(Drawable.class)
 public class DrawableTest extends AndroidTestCase {
@@ -696,6 +694,22 @@ public class DrawableTest extends AndroidTestCase {
         assertSame(mockDrawable, mockDrawable.mutate());
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "isLayoutRtlSelf",
+        args = {java.lang.Runnable.class}
+    )
+    public void testIsLayoutRtlSelf() {
+        MockDrawable mockDrawable = new MockDrawable();
+        MockCallback mockCallback = new MockCallback(true);
+        mockDrawable.setCallback(mockCallback);
+        assertEquals(true, mockDrawable.isLayoutRtlSelf());
+
+        mockCallback = new MockCallback(false);
+        mockDrawable.setCallback(mockCallback);
+        assertEquals(false, mockDrawable.isLayoutRtlSelf());
+    }
+
     private static class MockDrawable extends Drawable {
         private ColorFilter mColorFilter;
 
@@ -730,11 +744,20 @@ public class DrawableTest extends AndroidTestCase {
         }
     }
 
-    private static class MockCallback implements Callback {
+    private static class MockCallback implements Drawable.Callback2 {
         private Drawable mInvalidateDrawable;
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;
         private long mWhen;
+        private boolean mIsRtl;
+
+        public MockCallback() {
+            this(false);
+        }
+
+        public MockCallback(boolean isRtl) {
+            mIsRtl = isRtl;
+        }
 
         public Drawable getInvalidateDrawable() {
             return mInvalidateDrawable;
@@ -765,6 +788,10 @@ public class DrawableTest extends AndroidTestCase {
         public void unscheduleDrawable(Drawable who, Runnable what) {
             mScheduleDrawable = who;
             mRunnable = what;
+        }
+
+        public boolean isLayoutRtl(Drawable who) {
+            return mIsRtl;
         }
     }
 }

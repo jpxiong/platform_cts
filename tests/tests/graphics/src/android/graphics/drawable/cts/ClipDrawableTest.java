@@ -18,32 +18,30 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.IOException;
+
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.graphics.Bitmap.Config;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Drawable.Callback;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.util.Xml;
 import android.view.Gravity;
-
-import java.io.IOException;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(android.graphics.drawable.ClipDrawable.class)
 public class ClipDrawableTest extends AndroidTestCase {
@@ -523,7 +521,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         }
     }
 
-    private class MockCallback implements Callback {
+    private class MockCallback implements Drawable.Callback2 {
         private Drawable mInvalidateDrawable;
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;
@@ -558,6 +556,10 @@ public class ClipDrawableTest extends AndroidTestCase {
         public void unscheduleDrawable(Drawable who, Runnable what) {
             mScheduleDrawable = who;
             mRunnable = what;
+        }
+
+        public boolean isLayoutRtl(Drawable who) {
+            return false;
         }
     }
 }
