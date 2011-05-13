@@ -31,6 +31,7 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.MotionEvent.PointerCoords;
+import android.view.MotionEvent.PointerProperties;
 
 /**
  * Test {@link MotionEvent}.
@@ -665,5 +666,33 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(8f, copy.toolMinor);
         assertEquals(9f, copy.orientation);
         assertEquals(10f, coords.getAxisValue(MotionEvent.AXIS_GENERIC_1));
+    }
+
+    public void testPointerPropertiesDefaultConstructor() {
+        PointerProperties properties = new PointerProperties();
+
+        assertEquals(MotionEvent.INVALID_POINTER_ID, properties.id);
+        assertEquals(MotionEvent.TOOL_TYPE_UNKNOWN, properties.toolType);
+    }
+
+    public void testPointerPropertiesCopyConstructor() {
+        PointerProperties properties = new PointerProperties();
+        properties.id = 1;
+        properties.toolType = MotionEvent.TOOL_TYPE_MOUSE;
+
+        PointerProperties copy = new PointerProperties(properties);
+        assertEquals(1, copy.id);
+        assertEquals(MotionEvent.TOOL_TYPE_MOUSE, copy.toolType);
+    }
+
+    public void testPointerPropertiesCopyFrom() {
+        PointerProperties properties = new PointerProperties();
+        properties.id = 1;
+        properties.toolType = MotionEvent.TOOL_TYPE_MOUSE;
+
+        PointerProperties copy = new PointerProperties();
+        copy.copyFrom(properties);
+        assertEquals(1, copy.id);
+        assertEquals(MotionEvent.TOOL_TYPE_MOUSE, copy.toolType);
     }
 }
