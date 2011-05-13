@@ -15,7 +15,7 @@
 
 <html>
 <head>
-    <title>Test Page</title>
+    <title>Form Test Page</title>
 </head>
 <body>
   <a id="tagA">Tag A</a>
@@ -28,7 +28,7 @@
   <div id=divId name="firstDiv">A div
     <a id=nestedLinkId class="divClass" name="nestedLink">Nested text</a>
     <a id="n1" name="linkn1">a nested link</a>
-    <a id="inner" name="foo">Foo</a>
+    <a id="inner" href="test_hello_world.html" name="foo">Foo</a>
     <span id="n1" name="spann1"></span>
     <a name=nested>Nested text</a>
   </div>
@@ -79,9 +79,12 @@
   <input type="radio" id="cheese_and_peas" name="snack" value="cheese and peas" checked/>Cheese and peas<br/>
   <input type="radio" id="nothing" name="snack" value="nowt" disabled="disabled"/>Not a sausage
 
-  <input type="hidden" name="hidden" value="fromage" />
-  Here's a checkbox: <input type="checkbox" id="checky" name="checky" value="furrfu"/><br/>
-
-
+  <form action="test_hello_world.html" method="get">
+    <input type="hidden" name="hidden" value="fromage" id="fromage" />
+    Here's a checkbox: <input type="checkbox" id="checky" name="checky" value="furrfu"/><br/>
+    <input type="text" value="enter text here" name="textinput" style="background-color:red;width:100px;height:50px"></input>
+    <input type="text" id="typehere"/>
+    <a style="position:absolute;left:200px;top:250px">B</a>
+  </form>
 </body>
 </html>
