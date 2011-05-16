@@ -95,8 +95,6 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
                 null));
     }
 
-    @ToBeFixed(bug = "", explanation = "The result cursor of query for all columns does not "
-            + "contain the column Members.GENRE_ID and Members.AUDIO_ID.")
     public void testStoreAudioGenresMembersExternal() {
         ContentValues values = new ContentValues();
         values.put(Genres.NAME, Audio1.GENRE);
@@ -115,27 +113,14 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
         assertNotNull(mContentResolver.insert(membersUri, values));
 
         try {
-            // query
+            // query, slow path
             c = mContentResolver.query(membersUri, null, null, null, null);
-
-            try {
-                c.getColumnIndexOrThrow(Members.AUDIO_ID);
-                fail("Should throw IllegalArgumentException because there is no column with name"
-                        + " \"Members.AUDIO_ID\" in the table");
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
-
-            try {
-                c.getColumnIndexOrThrow(Members.GENRE_ID);
-                fail("Should throw IllegalArgumentException because there is no column with name"
-                        + " \"Members.GENRE_ID\" in the table");
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
 
             assertEquals(1, c.getCount());
             c.moveToFirst();
+
+            assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
             assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members._ID)));
             assertEquals(Audio1.EXTERNAL_DATA, c.getString(c.getColumnIndex(Members.DATA)));
             assertTrue(c.getLong(c.getColumnIndex(Members.DATE_ADDED)) > 0);
@@ -167,6 +152,16 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertNotNull(titleKey);
             c.close();
 
+            // query again, fast path
+            c = mContentResolver.query(membersUri,
+                    new String[] { Members.AUDIO_ID, Members.GENRE_ID},
+                    null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
+            c.close();
+
             // Query with a constraint on _id. Note that _id corresponds to the _id
             // column in the audio table, not the one in the audio_genres_map table.
             // We need to preserve this behavior for backward compatibility.
@@ -188,14 +183,14 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
                 // expected
             }
 
-            // delete the member
-            try {
-                mContentResolver.delete(membersUri, null, null);
-                fail("Should throw SQLException because there is no column with name "
-                        + "\"Members.GENRE_ID\" in the table");
-            } catch (SQLException e) {
-                // expected
-            }
+            // Delete the members, note that this does not delete the genre itself
+            assertEquals(mContentResolver.delete(membersUri, null, null), 1); // check number of rows deleted
+
+            // verify the genre is now empty
+            c = mContentResolver.query(membersUri, null, null, null, null);
+            assertEquals(0, c.getCount());
+            c.close();
+
         } finally {
             // the members are deleted when deleting the genre which they belong to
             mContentResolver.delete(Genres.EXTERNAL_CONTENT_URI, Genres._ID + "=" + genreId, null);
