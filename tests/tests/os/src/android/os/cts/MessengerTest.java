@@ -90,6 +90,9 @@ public class MessengerTest extends AndroidTestCase {
         public void dump(FileDescriptor fd, String[] args) throws RemoteException {
         }
 
+        public void dumpAsync(FileDescriptor fd, String[] args) throws RemoteException {
+        }
+
     };
 
     // Create another messenger to send msg.
