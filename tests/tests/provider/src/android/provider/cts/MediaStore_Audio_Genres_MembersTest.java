@@ -172,6 +172,30 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members._ID)));
             c.close();
 
+            // Query members across all genres
+            Uri allMembersUri = Uri.parse("content://media/external/audio/genres/all/members");
+            c = mContentResolver.query(allMembersUri, null, null, null, null);
+            int colidx = c.getColumnIndex(Members.AUDIO_ID);
+            int jamcnt = 0;
+            // The song should appear only once, for the genre we used when inserting it
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mAudioIdOfJam) {
+                    jamcnt++;
+                    assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
+                }
+            }
+            assertEquals(jamcnt, 1);
+            c.close();
+
+            // Query the same Uri, but add a where clause to restrict it to the one entry we added
+            c = mContentResolver.query(allMembersUri, null,
+                    Members.AUDIO_ID + "=?", new String[] {Long.toString(mAudioIdOfJam)}, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
+            assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
+            c.close();
+
             // update the member
             values.clear();
             values.put(Members.AUDIO_ID, mAudioIdOfJamLive);
