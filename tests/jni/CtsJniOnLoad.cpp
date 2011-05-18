@@ -16,6 +16,7 @@
 
 #include <jni.h>
 #include <stdio.h>
+#include "android_net_cts_NetlinkSocket.h"
 
 #ifndef CTS_TARGET_SIMULATOR
 extern int register_android_os_cts_CpuFeatures(JNIEnv*);
@@ -37,6 +38,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 #endif
 
     if (register_android_os_cts_FileUtils(env)) {
+      return JNI_ERR;
+    }
+
+    if (register_android_net_cts_NetlinkSocket(env)) {
         return JNI_ERR;
     }
 
