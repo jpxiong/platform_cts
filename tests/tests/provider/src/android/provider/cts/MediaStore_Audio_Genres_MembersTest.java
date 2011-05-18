@@ -103,7 +103,11 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
         c.moveToFirst();
 
         long genreId = c.getLong(c.getColumnIndex(Genres._ID));
+        long genre2Id = -1; // used later
         c.close();
+
+        // verify that the Uri has the correct format and genre value
+        assertEquals(uri.toString(), "content://media/external/audio/genres/" + genreId);
 
         // insert audio as the member of the genre
         values.clear();
@@ -184,7 +188,7 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
                     assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
                 }
             }
-            assertEquals(jamcnt, 1);
+            assertEquals(1, jamcnt);
             c.close();
 
             // Query the same Uri, but add a where clause to restrict it to the one entry we added
@@ -195,6 +199,45 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
             assertEquals(mAudioIdOfJam, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
             c.close();
+
+            // create another genre
+            values.clear();
+            values.put(Genres.NAME, Audio1.GENRE + "-2");
+            uri = mContentResolver.insert(Genres.EXTERNAL_CONTENT_URI, values);
+            c = mContentResolver.query(uri, null, null, null, null);
+            c.moveToFirst();
+            genre2Id = c.getLong(c.getColumnIndex(Genres._ID));
+            c.close();
+
+            // insert the song into the second genre
+            values.clear();
+            values.put(Members.AUDIO_ID, mAudioIdOfJam);
+            Uri members2Uri = Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME,
+                genre2Id);
+            assertNotNull(mContentResolver.insert(members2Uri, values));
+
+            // Query members across all genres again
+            c = mContentResolver.query(allMembersUri, null, null, null, null);
+            colidx = c.getColumnIndex(Members.AUDIO_ID);
+            int jamcnt1 = 0;
+            int jamcnt2 = 0;
+            // This time the song should appear twice, once for each genre
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mAudioIdOfJam) {
+                    long g = c.getLong(c.getColumnIndex(Members.GENRE_ID));
+                    if (g == genreId) {
+                        jamcnt1++;
+                    } else if (g == genre2Id) {
+                        jamcnt2++;
+                    } else {
+                        fail("wrong genre found");
+                    }
+                }
+            }
+            assertEquals(1, jamcnt1);
+            assertEquals(1, jamcnt2);
+            c.close();
+
 
             // update the member
             values.clear();
@@ -208,7 +251,7 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             }
 
             // Delete the members, note that this does not delete the genre itself
-            assertEquals(mContentResolver.delete(membersUri, null, null), 1); // check number of rows deleted
+            assertEquals(1, mContentResolver.delete(membersUri, null, null)); // check number of rows deleted
 
             // verify the genre is now empty
             c = mContentResolver.query(membersUri, null, null, null, null);
@@ -218,6 +261,9 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
         } finally {
             // the members are deleted when deleting the genre which they belong to
             mContentResolver.delete(Genres.EXTERNAL_CONTENT_URI, Genres._ID + "=" + genreId, null);
+            if (genre2Id >= 0) {
+                mContentResolver.delete(Genres.EXTERNAL_CONTENT_URI, Genres._ID + "=" + genre2Id, null);
+            }
             c = mContentResolver.query(membersUri, null, null, null, null);
             assertEquals(0, c.getCount());
             c.close();
