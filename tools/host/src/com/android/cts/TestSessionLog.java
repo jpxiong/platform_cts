@@ -489,7 +489,7 @@ public class TestSessionLog extends XMLResourceHandler {
         String[] processNames = rootProcesses.split(";");
         for (String processName : processNames) {
             processName = processName.trim();
-            if (processName.length() > 0) {
+            if (!processName.isEmpty()) {
                 Node process = document.createElement(TAG_PROCESS);
                 processInfo.appendChild(process);
 

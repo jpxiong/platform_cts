@@ -55,138 +55,128 @@ import junit.textui.TestRunner;
 
 public class CollectAllTests extends DescriptionGenerator {
 
-    static final String ATTRIBUTE_RUNNER = "runner";
-    static final String ATTRIBUTE_PACKAGE = "appPackageName";
-    static final String ATTRIBUTE_NS = "appNameSpace";
-    static final String ATTRIBUTE_TARGET = "targetNameSpace";
-    static final String ATTRIBUTE_TARGET_BINARY = "targetBinaryName";
-    static final String ATTRIBUTE_HOST_SIDE_ONLY = "hostSideOnly";
-    static final String ATTRIBUTE_VM_HOST_TEST = "vmHostTest";
-    static final String ATTRIBUTE_JAR_PATH = "jarPath";
+    private static final String ATTRIBUTE_RUNNER = "runner";
+    private static final String ATTRIBUTE_PACKAGE = "appPackageName";
+    private static final String ATTRIBUTE_NS = "appNameSpace";
+    private static final String ATTRIBUTE_TARGET = "targetNameSpace";
+    private static final String ATTRIBUTE_TARGET_BINARY = "targetBinaryName";
+    private static final String ATTRIBUTE_HOST_SIDE_ONLY = "hostSideOnly";
+    private static final String ATTRIBUTE_VM_HOST_TEST = "vmHostTest";
+    private static final String ATTRIBUTE_JAR_PATH = "jarPath";
+    private static final String ATTRIBUTE_JAVA_PACKAGE_FILTER = "javaPackageFilter";
 
-    static final String JAR_PATH = "LOCAL_JAR_PATH :=";
-    static final String TEST_TYPE = "LOCAL_TEST_TYPE :";
-
-    static final int HOST_SIDE_ONLY = 1;
-    static final int DEVICE_SIDE_ONLY = 2;
-    static final int VM_HOST_TEST = 3;
-
-    private static String runner;
-    private static String packageName;
-    private static String target;
-    private static String xmlName;
-    private static int testType;
-    private static String jarPath;
-
-    private static Map<String,TestClass> testCases;
-
-    private static class MyXMLGenerator extends XMLGenerator {
-
-        MyXMLGenerator(String outputPath) throws ParserConfigurationException {
-            super(outputPath);
-
-            Node testPackageElem = mDoc.getDocumentElement();
-
-            setAttribute(testPackageElem, ATTRIBUTE_NAME, xmlName);
-            setAttribute(testPackageElem, ATTRIBUTE_RUNNER, runner);
-            setAttribute(testPackageElem, ATTRIBUTE_PACKAGE, packageName);
-            setAttribute(testPackageElem, ATTRIBUTE_NS, packageName);
-
-            if (testType == HOST_SIDE_ONLY) {
-                setAttribute(testPackageElem, ATTRIBUTE_HOST_SIDE_ONLY, "true");
-                setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, jarPath);
-            }
-
-            if (testType == VM_HOST_TEST) {
-                setAttribute(testPackageElem, ATTRIBUTE_VM_HOST_TEST, "true");
-                setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, jarPath);
-            }
-
-            if (!packageName.equals(target)) {
-                setAttribute(testPackageElem, ATTRIBUTE_TARGET, target);
-                setAttribute(testPackageElem, ATTRIBUTE_TARGET_BINARY, target);
-            }
-        }
-    }
-
-    private static String OUTPUTFILE;
-    private static String MANIFESTFILE;
-    private static String JARFILE;
-    private static String LIBCORE_EXPECTATION_DIR;
-    private static String ANDROID_MAKE_FILE = "";
-
-    static XMLGenerator xmlGenerator;
-    private static ExpectationStore libcoreVogarExpectationStore;
-    private static ExpectationStore ctsVogarExpectationStore;
+    private static final String JAR_PATH = "LOCAL_JAR_PATH :=";
+    private static final String TEST_TYPE = "LOCAL_TEST_TYPE :";
 
     public static void main(String[] args) {
-        if (args.length >= 3 && args.length <= 5) {
-            OUTPUTFILE = args[0];
-            MANIFESTFILE = args[1];
-            JARFILE = args[2];
-            if (args.length >= 4) {
-                LIBCORE_EXPECTATION_DIR = args[3];
-                if (args.length >= 5) {
-                    ANDROID_MAKE_FILE = args[4];
+        if (args.length < 4 || args.length > 6) {
+            System.err.println("usage: CollectAllTests <output-file> <manifest-file> <jar-file> "
+                               + "<java-package> [expectation-dir [makefile-file]]");
+            if (args.length != 0) {
+                System.err.println("received:");
+                for (String arg : args) {
+                    System.err.println("  " + arg);
                 }
             }
-        } else {
-            System.err.println("usage: CollectAllTests <output-file> <manifest-file> <jar-file>"
-                               + "[expectation-dir [makefile-file]]");
             System.exit(1);
         }
 
-        if (ANDROID_MAKE_FILE.length() > 0) {
-            testType = getTestType(ANDROID_MAKE_FILE);
-        }
+        final String outputPathPrefix = args[0];
+        File manifestFile = new File(args[1]);
+        String jarFileName = args[2];
+        final String javaPackageFilter = args[3];
+        String libcoreExpectationDir = (args.length > 4) ? args[4] : null;
+        String androidMakeFile = (args.length > 5) ? args[5] : null;
 
-        Document manifest = null;
+        final TestType testType = TestType.getTestType(androidMakeFile);
+
+        Document manifest;
         try {
             manifest = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                    new FileInputStream(MANIFESTFILE));
+                  new FileInputStream(manifestFile));
         } catch (Exception e) {
-            System.err.println("cannot open manifest " + MANIFESTFILE);
+            System.err.println("cannot open manifest " + manifestFile);
             e.printStackTrace();
             System.exit(1);
+            return;
         }
 
         Element documentElement = manifest.getDocumentElement();
-
         documentElement.getAttribute("package");
+        final String runner = getElementAttribute(documentElement,
+                                                  "instrumentation",
+                                                  "android:name");
+        final String packageName = documentElement.getAttribute("package");
+        final String target = getElementAttribute(documentElement,
+                                                  "instrumentation",
+                                                  "android:targetPackage");
 
-        xmlName = new File(OUTPUTFILE).getName();
-        runner = getElementAttribute(documentElement, "instrumentation", "android:name");
-        packageName = documentElement.getAttribute("package");
-        target = getElementAttribute(documentElement, "instrumentation", "android:targetPackage");
-
+        String outputXmlFile = outputPathPrefix + ".xml";
+        final String xmlName = new File(outputPathPrefix).getName();
+        XMLGenerator xmlGenerator;
         try {
-            xmlGenerator = new MyXMLGenerator(OUTPUTFILE + ".xml");
+            xmlGenerator = new XMLGenerator(outputXmlFile) {
+                {
+                    Node testPackageElem = mDoc.getDocumentElement();
+
+                    setAttribute(testPackageElem, ATTRIBUTE_NAME, xmlName);
+                    setAttribute(testPackageElem, ATTRIBUTE_RUNNER, runner);
+                    setAttribute(testPackageElem, ATTRIBUTE_PACKAGE, packageName);
+                    setAttribute(testPackageElem, ATTRIBUTE_NS, packageName);
+                    setAttribute(testPackageElem, ATTRIBUTE_JAVA_PACKAGE_FILTER, javaPackageFilter);
+
+                    if (testType.type == TestType.HOST_SIDE_ONLY) {
+                        setAttribute(testPackageElem, ATTRIBUTE_HOST_SIDE_ONLY, "true");
+                        setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, testType.jarPath);
+                    }
+
+                    if (testType.type == TestType.VM_HOST_TEST) {
+                        setAttribute(testPackageElem, ATTRIBUTE_VM_HOST_TEST, "true");
+                        setAttribute(testPackageElem, ATTRIBUTE_JAR_PATH, testType.jarPath);
+                    }
+
+                    if (!packageName.equals(target)) {
+                        setAttribute(testPackageElem, ATTRIBUTE_TARGET, target);
+                        setAttribute(testPackageElem, ATTRIBUTE_TARGET_BINARY, target);
+                    }
+                }
+            };
         } catch (ParserConfigurationException e) {
-            System.err.println("Can't initialize XML Generator " + OUTPUTFILE + ".xml");
+            System.err.println("Can't initialize XML Generator " + outputXmlFile);
             System.exit(1);
+            return;
         }
+
+        ExpectationStore libcoreVogarExpectationStore;
+        ExpectationStore ctsVogarExpectationStore;
 
         try {
             libcoreVogarExpectationStore
-                    = VogarUtils.provideExpectationStore(LIBCORE_EXPECTATION_DIR);
+                    = VogarUtils.provideExpectationStore(libcoreExpectationDir);
             ctsVogarExpectationStore = VogarUtils.provideExpectationStore(CTS_EXPECTATION_DIR);
         } catch (IOException e) {
             System.err.println("Can't initialize vogar expectation store from "
-                               + LIBCORE_EXPECTATION_DIR);
+                               + libcoreExpectationDir);
             e.printStackTrace(System.err);
             System.exit(1);
+            return;
         }
+        ExpectationStore[] expectations = new ExpectationStore[] {
+            libcoreVogarExpectationStore, ctsVogarExpectationStore
+        };
 
         JarFile jarFile = null;
         try {
-            jarFile = new JarFile(JARFILE);
+            jarFile = new JarFile(jarFileName);
         } catch (Exception e) {
-            System.err.println("cannot open jarfile " + JARFILE);
+            System.err.println("cannot open jarfile " + jarFileName);
             e.printStackTrace();
             System.exit(1);
         }
 
-        testCases = new LinkedHashMap<String, TestClass>();
+        Map<String,TestClass> testCases = new LinkedHashMap<String, TestClass>();
+
+        String javaPackagePrefix = javaPackageFilter.isEmpty() ? "" : (javaPackageFilter + ".");
 
         Enumeration<JarEntry> jarEntries = jarFile.entries();
         while (jarEntries.hasMoreElements()) {
@@ -197,6 +187,9 @@ public class CollectAllTests extends DescriptionGenerator {
             }
             String className
                     = name.substring(0, name.length() - ".class".length()).replace('/', '.');
+            if (!className.startsWith(javaPackagePrefix)) {
+                continue;
+            }
             try {
                 Class<?> klass = Class.forName(className,
                                                false,
@@ -212,13 +205,13 @@ public class CollectAllTests extends DescriptionGenerator {
                 }
                 try {
                     klass.getConstructor(new Class<?>[] { String.class } );
-                    addToTests(klass.asSubclass(TestCase.class));
+                    addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
                     continue;
                 } catch (NoSuchMethodException e) {
                 }
                 try {
                     klass.getConstructor(new Class<?>[0]);
-                    addToTests(klass.asSubclass(TestCase.class));
+                    addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
                     continue;
                 } catch (NoSuchMethodException e) {
                 }
@@ -237,35 +230,51 @@ public class CollectAllTests extends DescriptionGenerator {
         try {
             xmlGenerator.dump();
         } catch (Exception e) {
-            System.err.println("cannot dump xml to " + OUTPUTFILE + ".xml");
+            System.err.println("cannot dump xml to " + outputXmlFile);
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private static int getTestType(String makeFileName) {
+    private static class TestType {
+        private static final int HOST_SIDE_ONLY = 1;
+        private static final int DEVICE_SIDE_ONLY = 2;
+        private static final int VM_HOST_TEST = 3;
 
-        int type = DEVICE_SIDE_ONLY;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(makeFileName));
-            String line;
+        private final int type;
+        private final String jarPath;
 
-            while ((line =reader.readLine())!=null) {
-                if (line.startsWith(TEST_TYPE)) {
-                    if (line.indexOf(ATTRIBUTE_VM_HOST_TEST) >= 0) {
-                        type = VM_HOST_TEST;
-                    } else {
-                        type = HOST_SIDE_ONLY;
-                    }
-                } else if (line.startsWith(JAR_PATH)) {
-                    jarPath = line.substring(JAR_PATH.length(), line.length()).trim();
-                }
-            }
-            reader.close();
-        } catch (IOException e) {
+        private TestType (int type, String jarPath) {
+            this.type = type;
+            this.jarPath = jarPath;
         }
 
-        return type;
+        private static TestType getTestType(String makeFileName) {
+            if (makeFileName == null || makeFileName.isEmpty()) {
+                return new TestType(DEVICE_SIDE_ONLY, null);
+            }
+            int type = TestType.DEVICE_SIDE_ONLY;
+            String jarPath = null;
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(makeFileName));
+                String line;
+
+                while ((line =reader.readLine())!=null) {
+                    if (line.startsWith(TEST_TYPE)) {
+                        if (line.indexOf(ATTRIBUTE_VM_HOST_TEST) >= 0) {
+                            type = VM_HOST_TEST;
+                        } else {
+                            type = HOST_SIDE_ONLY;
+                        }
+                    } else if (line.startsWith(JAR_PATH)) {
+                        jarPath = line.substring(JAR_PATH.length(), line.length()).trim();
+                    }
+                }
+                reader.close();
+            } catch (IOException e) {
+            }
+            return new TestType(type, jarPath);
+        }
     }
 
     private static Element getElement(Element element, String tagName) {
@@ -339,13 +348,15 @@ public class CollectAllTests extends DescriptionGenerator {
 
             }
 
-        } catch (java.lang.NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
         }
 
         return null;
     }
 
-    private static void addToTests(Class<? extends TestCase> test) {
+    private static void addToTests(ExpectationStore[] expectations,
+                                   Map<String,TestClass> testCases,
+                                   Class<? extends TestCase> test) {
         Class testClass = test;
         Set<String> testNames = new HashSet<String>();
         while (TestCase.class.isAssignableFrom(testClass)) {
@@ -368,13 +379,16 @@ public class CollectAllTests extends DescriptionGenerator {
                     continue;
                 }
                 testNames.add(testName);
-                addToTests(test, testName);
+                addToTests(expectations, testCases, test, testName);
             }
             testClass = testClass.getSuperclass();
         }
     }
 
-    private static void addToTests(Class<? extends TestCase> test, String testName) {
+    private static void addToTests(ExpectationStore[] expectations,
+                                   Map<String,TestClass> testCases,
+                                   Class<? extends TestCase> test,
+                                   String testName) {
 
         String testClassName = test.getName();
         String knownFailure = getKnownFailure(test, testName);
@@ -391,16 +405,10 @@ public class CollectAllTests extends DescriptionGenerator {
         } else if (hasSideEffects(test, testName)) {
             System.out.println("ignoring test with side effects: " + test + "#" + testName);
             return;
-        } else if (VogarUtils.isVogarKnownFailure(libcoreVogarExpectationStore,
+        } else if (VogarUtils.isVogarKnownFailure(expectations,
                                                   testClassName,
                                                   testName)) {
-            System.out.println("ignoring libcore expectation known failure: " + test
-                               + "#" + testName);
-            return;
-        } else if (VogarUtils.isVogarKnownFailure(ctsVogarExpectationStore,
-                                                  testClassName,
-                                                  testName)) {
-            System.out.println("ignoring cts expectation known failure: " + test
+            System.out.println("ignoring expectation known failure: " + test
                                + "#" + testName);
             return;
         }

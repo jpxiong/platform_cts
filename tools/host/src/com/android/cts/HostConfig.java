@@ -230,9 +230,9 @@ public class HostConfig extends XMLResourceHandler {
     }
 
     /**
-     * Get the test package by the JAVA package name of the test package.
+     * Get the test package by the name of the test package.
      *
-     * @param packageName The JAVA package name.
+     * @param packageName The package name.
      * @return The test package.
      */
     public TestPackage getTestPackage(final String packageName) {
@@ -275,7 +275,7 @@ public class HostConfig extends XMLResourceHandler {
     /**
      * Get the package binary name.
      *
-     * @param appPackageName The JAVA package name.
+     * @param appPackageName The package name.
      * @return The binary name of the package.
      */
     public String getPackageBinaryName(String appPackageName) {
@@ -531,7 +531,7 @@ public class HostConfig extends XMLResourceHandler {
                 }
             }
         }
-     }
+    }
 
     /**
      * Storing the information of case repository.
@@ -544,7 +544,7 @@ public class HostConfig extends XMLResourceHandler {
         /**
          * Get package names.
          *
-         * @return The JAVA package names.
+         * @return The package names.
          */
         public ArrayList<String> getPackageNames() {
             ArrayList<String> packageNames = new ArrayList<String>();

@@ -61,7 +61,7 @@ public class SignatureCheckPackage extends TestPackage {
             final String androidVersion, final String jarPath, final String appNameSpace,
             final String appPackageName) throws NoSuchAlgorithmException {
         super(instrumentationRunner, testPkgBinaryName, targetNameSpace, targetBinaryName, version,
-                androidVersion, jarPath, appNameSpace, appPackageName);
+                androidVersion, jarPath, appNameSpace, appPackageName, null);
     }
 
     /**

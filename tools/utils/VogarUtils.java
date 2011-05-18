@@ -27,6 +27,17 @@ import java.util.Set;
 
 public class VogarUtils {
 
+    public static boolean isVogarKnownFailure(ExpectationStore[] expectationStores,
+            final String testClassName,
+            final String testMethodName) {
+        for (ExpectationStore expectationStore : expectationStores) {
+            if (isVogarKnownFailure(expectationStore, testClassName, testMethodName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isVogarKnownFailure(ExpectationStore expectationStore,
             final String testClassName,
             final String testMethodName) {

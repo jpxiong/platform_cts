@@ -890,7 +890,7 @@ public class TestDevice implements DeviceObserver {
         }
 
         String name = testPackage.getAppPackageName();
-        if ((javaPkgName != null) && (javaPkgName.length() != 0)) {
+        if ((javaPkgName != null) && !javaPkgName.isEmpty()) {
             name = javaPkgName;
         }
 

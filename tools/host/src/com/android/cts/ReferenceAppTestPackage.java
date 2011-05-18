@@ -64,7 +64,7 @@ public class ReferenceAppTestPackage extends TestPackage {
             String appNameSpace, String appPackageName,
             String apkToTestName, String packageUnderTest) throws NoSuchAlgorithmException {
         super(instrumentationRunner, testPkgBinaryName, targetNameSpace, targetBinaryName, version,
-                androidVersion, jarPath, appNameSpace, appPackageName);
+                androidVersion, jarPath, appNameSpace, appPackageName, null);
         this.apkToTestName = apkToTestName;
         this.packageUnderTest = packageUnderTest;
     }

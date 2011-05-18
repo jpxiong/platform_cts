@@ -15,7 +15,7 @@
  */
 package android.webkit.cts;
 
-import org.apache.harmony.luni.util.Base64;
+import libcore.io.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;

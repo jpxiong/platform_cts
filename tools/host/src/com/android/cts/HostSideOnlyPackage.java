@@ -36,7 +36,7 @@ public class HostSideOnlyPackage extends TestPackage {
             final String androidVersion, final String jarPath,
             final String appPackageName) {
         super(null, testPkgBinaryName, null, null, version,
-                androidVersion, jarPath, null, appPackageName);
+                androidVersion, jarPath, null, appPackageName, null);
     }
 
     /** {@inheritDoc} */

@@ -47,6 +47,7 @@ class TestPackageDef implements ITestPackageDef {
     private boolean mIsReferenceAppTest = false;
     private String mPackageToTest = null;
     private String mApkToTestName = null;
+    private String mTestPackageName = null;
 
     // use a LinkedHashSet for predictable iteration insertion-order, and fast lookups
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
@@ -133,6 +134,10 @@ class TestPackageDef implements ITestPackageDef {
         mPackageToTest = packageName;
     }
 
+    void setTestPackageName(String testPackageName) {
+        mTestPackageName = testPackageName;
+    }
+
     void setApkToTest(String apkName) {
         mApkToTestName = apkName;
     }
@@ -195,6 +200,7 @@ class TestPackageDef implements ITestPackageDef {
             String methodName, InstrumentationApkTest instrTest) {
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
+        instrTest.setTestPackageName(mTestPackageName);
         instrTest.setClassName(className);
         instrTest.setMethodName(methodName);
         // mName means 'apk file name' for instrumentation tests
