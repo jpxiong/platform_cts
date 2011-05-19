@@ -20,6 +20,7 @@ import android.os.Message;
 import android.os.Parcel;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityRecord;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -34,10 +35,10 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 16;
+    private static final int NON_STATIC_FIELD_COUNT = 21;
 
     @MediumTest
-    public void testMarshalling() throws Exception {
+    public void testMarshaling() throws Exception {
         // no new fields, so we are testing marshaling of all such
         assertNoNewNonStaticFieldsAdded();
 
@@ -90,13 +91,17 @@ public class AccessibilityEventTest extends TestCase {
     private void assertNoNewNonStaticFieldsAdded() {
         int nonStaticFieldCount = 0;
 
-        for (Field field : AccessibilityEvent.class.getDeclaredFields()) {
-            if ((field.getModifiers() & Modifier.STATIC) == 0) {
-                nonStaticFieldCount++;
+        Class<?> clazz = AccessibilityEvent.class;
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if ((field.getModifiers() & Modifier.STATIC) == 0) {
+                    nonStaticFieldCount++;
+                }
             }
+            clazz = clazz.getSuperclass();
         }
 
-        String message = "New fields have been added, so add code to test marchalling them.";
+        String message = "New fields have been added, so add code to test marshaling them.";
         assertEquals(message, NON_STATIC_FIELD_COUNT, nonStaticFieldCount);
     }
 
@@ -123,6 +128,23 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.setPassword(true);
         sentEvent.setRemovedCount(1);
         sentEvent.getText().add("Foo");
+
+        AccessibilityRecord record = AccessibilityRecord.obtain();
+        record.setAddedCount(1);
+        record.setBeforeText("BeforeText");
+        record.setChecked(true);
+        record.setClassName("foo.bar.baz.Class");
+        record.setContentDescription("ContentDescription");
+        record.setCurrentItemIndex(1);
+        record.setEnabled(true);
+        record.setFromIndex(1);
+        record.setFullScreen(true);
+        record.setItemCount(1);
+        record.setParcelableData(Message.obtain(null, 1, 2, 3));
+        record.setPassword(true);
+        record.setRemovedCount(1);
+        record.getText().add("Foo");
+        sentEvent.appendRecord(record);
     }
 
     /**
@@ -158,7 +180,38 @@ public class AccessibilityEventTest extends TestCase {
                 .isPassword());
         assertEquals("removedCount has incorrect value", expectedEvent.getRemovedCount(),
                 receivedEvent.getRemovedCount());
-        assertEqualsText(expectedEvent, receivedEvent);
+        assertEqualsText(expectedEvent.getText(), receivedEvent.getText());
+        assertEquals("must have one record", expectedEvent.getRecordCount(),
+                receivedEvent.getRecordCount());
+
+        AccessibilityRecord expectedRecord = expectedEvent.getRecord(0);
+        AccessibilityRecord receivedRecord = receivedEvent.getRecord(0);
+
+        assertEquals("addedCount has incorrect value", expectedRecord.getAddedCount(),
+                receivedRecord.getAddedCount());
+        assertEquals("beforeText has incorrect value", expectedRecord.getBeforeText(),
+                receivedRecord.getBeforeText());
+        assertEquals("checked has incorrect value", expectedRecord.isChecked(),
+                receivedRecord.isChecked());
+        assertEquals("className has incorrect value", expectedRecord.getClassName(),
+                receivedRecord.getClassName());
+        assertEquals("contentDescription has incorrect value",
+                expectedRecord.getContentDescription(), receivedRecord.getContentDescription());
+        assertEquals("currentItemIndex has incorrect value", expectedRecord.getCurrentItemIndex(),
+                receivedRecord.getCurrentItemIndex());
+        assertEquals("enabled has incorrect value", expectedRecord.isEnabled(),
+                receivedRecord.isEnabled());
+        assertEquals("fromIndex has incorrect value", expectedRecord.getFromIndex(),
+                receivedRecord.getFromIndex());
+        assertEquals("fullScreen has incorrect value", expectedRecord.isFullScreen(),
+                receivedRecord.isFullScreen());
+        assertEquals("itemCount has incorrect value", expectedRecord.getItemCount(),
+                receivedRecord.getItemCount());
+        assertEquals("password has incorrect value", expectedRecord.isPassword(),
+                receivedRecord.isPassword());
+        assertEquals("removedCount has incorrect value", expectedRecord.getRemovedCount(),
+                receivedRecord.getRemovedCount());
+        assertEqualsText(expectedRecord.getText(), receivedRecord.getText());
     }
 
     /**
@@ -166,11 +219,9 @@ public class AccessibilityEventTest extends TestCase {
      * <code>receivedEvent</code> by comparing the string representation of the
      * corresponding {@link CharSequence}s.
      */
-    public static void assertEqualsText(AccessibilityEvent expectedEvent,
-            AccessibilityEvent receivedEvent) {
+    public static void assertEqualsText(List<CharSequence> expectedText,
+            List<CharSequence> receivedText ) {
         String message = "text has incorrect value";
-        List<CharSequence> expectedText = expectedEvent.getText();
-        List<CharSequence> receivedText = receivedEvent.getText();
 
         TestCase.assertEquals(message, expectedText.size(), receivedText.size());
 
