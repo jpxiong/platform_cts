@@ -242,9 +242,11 @@ public class HostConfig extends XMLResourceHandler {
     /**
      * Load repositories.
      */
-    public void loadRepositories() throws NoSuchAlgorithmException {
+    public void loadRepositories(boolean quick) throws NoSuchAlgorithmException {
         loadTestPackages();
-        loadTestResults();
+        if (!quick) {
+            loadTestResults();
+        }
     }
 
     /**

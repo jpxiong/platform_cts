@@ -70,6 +70,7 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
 
     private static TestHost sInstance;
     static MODE sMode = MODE.UNINITIALIZED;
+    private static boolean sQuick = false;
 
     public static void main(final String[] mainArgs) {
         CUIOutputStream.println("Android CTS version " + Version.asString());
@@ -349,6 +350,10 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
                     }
                 }
             }
+
+            if (cp.containsKey(CTSCommand.OPTION_QUICK)) {
+                sQuick = true;
+            }
         }
 
         if ((cfgPath == null) || (cfgPath.length() == 0)) {
@@ -361,9 +366,12 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
             if (loadConfig(filePath) == false) {
                 exit();
             }
+            if (sQuick) {
+                HostConfig.Ints.valueOf("postInstallWaitMs").setValue(1);
+            }
 
             Log.initLog(sConfig.getLogRoot());
-            sConfig.loadRepositories();
+            sConfig.loadRepositories(sQuick);
         } catch (Exception e) {
             Log.e("Error while parsing cts config file", e);
             exit();
@@ -459,7 +467,9 @@ public class TestHost extends XMLResourceHandler implements SessionObserver {
         TestSessionLog sessionLog = ts.getSessionLog();
         ts.setTestDevice(device);
         ts.getDevice().installDeviceSetupApp();
-        sessionLog.setDeviceInfo(ts.getDevice().getDeviceInfo());
+        if (!sQuick) {
+            sessionLog.setDeviceInfo(ts.getDevice().getDeviceInfo());
+        }
 
         boolean finish = false;
         while (!finish) {
