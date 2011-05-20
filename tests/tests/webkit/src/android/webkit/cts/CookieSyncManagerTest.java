@@ -52,7 +52,7 @@ public class CookieSyncManagerTest
             args = {}
         )
     })
-    public void testCookieSyncManager() {
+    public void testCookieSyncManager() throws Exception {
         CookieSyncManager csm1 = CookieSyncManager.createInstance(getActivity());
         assertNotNull(csm1);
 
@@ -62,7 +62,6 @@ public class CookieSyncManagerTest
         assertSame(csm1, csm2);
 
         final CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptFileSchemeCookies(true);
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
@@ -76,7 +75,8 @@ public class CookieSyncManagerTest
         cookieManager.setAcceptCookie(true);
         assertTrue(cookieManager.acceptCookie());
 
-        String url = TestHtmlConstants.getFileUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        CtsTestServer server = new CtsTestServer(getActivity(), false);
+        String url = server.getCookieUrl("conquest.html");
         String cookieValue = "a=b";
         cookieManager.setCookie(url, cookieValue);
         assertEquals(cookieValue, cookieManager.getCookie(url));
