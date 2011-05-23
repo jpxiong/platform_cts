@@ -1,5 +1,9 @@
 [
 {
+  name: "android.media.cts.MediaRecorderTest#testSetCamera",
+  bug: 4464677
+},
+{
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
 },
