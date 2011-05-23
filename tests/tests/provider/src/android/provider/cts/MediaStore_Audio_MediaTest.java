@@ -100,7 +100,8 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             Cursor c = mContentResolver.query(uri, null, null, null, null);
             assertEquals(1, c.getCount());
             c.moveToFirst();
-            assertTrue(c.getLong(c.getColumnIndex(Media._ID)) > 0);
+            long id = c.getLong(c.getColumnIndex(Media._ID));
+            assertTrue(id > 0);
             String expected = isInternal ? Audio1.INTERNAL_DATA : Audio1.EXTERNAL_DATA;
             assertEquals(expected, c.getString(c.getColumnIndex(Media.DATA)));
             assertTrue(c.getLong(c.getColumnIndex(Media.DATE_ADDED)) > 0);
@@ -141,6 +142,8 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             c = mContentResolver.query(uri, null, null, null, null);
             assertEquals(1, c.getCount());
             c.moveToFirst();
+            long id2 = c.getLong(c.getColumnIndex(Media._ID));
+            assertTrue(id == id2);
             expected = isInternal ? Audio2.INTERNAL_DATA : Audio2.EXTERNAL_DATA;
             assertEquals(expected, c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals(Audio2.DATE_MODIFIED, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
@@ -164,6 +167,22 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             assertEquals(Audio2.TRACK, c.getInt(c.getColumnIndex(Media.TRACK)));
             assertEquals(Audio2.YEAR, c.getInt(c.getColumnIndex(Media.YEAR)));
             assertTrue(titleKey.equals(c.getString(c.getColumnIndex(Media.TITLE_KEY))));
+            c.close();
+
+            // test filtering
+            Uri baseUri = isInternal ? Media.INTERNAL_CONTENT_URI : Media.EXTERNAL_CONTENT_URI;
+            Uri filterUri = baseUri.buildUpon()
+                .appendQueryParameter("filter", Audio2.ARTIST).build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            long fid = c.getLong(c.getColumnIndex(Media._ID));
+            assertTrue(id == fid);
+            c.close();
+
+            filterUri = baseUri.buildUpon().appendQueryParameter("filter", "xyzfoo").build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(0, c.getCount());
             c.close();
         } finally {
             // delete

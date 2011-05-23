@@ -96,7 +96,8 @@ public class MediaStore_Audio_AlbumsTest extends InstrumentationTestCase {
                     null);
             assertEquals(1, c.getCount());
             c.moveToFirst();
-            assertTrue(c.getLong(c.getColumnIndex(Albums._ID)) > 0);
+            long id = c.getLong(c.getColumnIndex(Albums._ID));
+            assertTrue(id > 0);
             assertEquals(Audio1.ALBUM, c.getString(c.getColumnIndex(Albums.ALBUM)));
             assertNull(c.getString(c.getColumnIndex(Albums.ALBUM_ART)));
             assertNotNull(c.getString(c.getColumnIndex(Albums.ALBUM_KEY)));
@@ -140,6 +141,20 @@ public class MediaStore_Audio_AlbumsTest extends InstrumentationTestCase {
                 // expected
             }
 
+            // test filtering
+            Uri filterUri = audioAlbumsUri.buildUpon()
+                .appendQueryParameter("filter", Audio1.ARTIST).build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            long fid = c.getLong(c.getColumnIndex(Albums._ID));
+            assertTrue(id == fid);
+            c.close();
+
+            filterUri = audioAlbumsUri.buildUpon().appendQueryParameter("filter", "xyzfoo").build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(0, c.getCount());
+            c.close();
         } finally {
             mContentResolver.delete(audioMediaUri, null, null);
         }

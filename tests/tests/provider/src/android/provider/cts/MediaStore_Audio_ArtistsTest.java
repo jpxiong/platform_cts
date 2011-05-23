@@ -91,7 +91,8 @@ public class MediaStore_Audio_ArtistsTest extends InstrumentationTestCase {
             c.moveToFirst();
 
             assertEquals(Audio1.ARTIST, c.getString(c.getColumnIndex(Artists.ARTIST)));
-            assertTrue(c.getLong(c.getColumnIndex(Artists._ID)) > 0);
+            long id = c.getLong(c.getColumnIndex(Artists._ID));
+            assertTrue(id > 0);
             assertNotNull(c.getString(c.getColumnIndex(Artists.ARTIST_KEY)));
             assertEquals(1, c.getInt(c.getColumnIndex(Artists.NUMBER_OF_ALBUMS)));
             assertEquals(1, c.getInt(c.getColumnIndex(Artists.NUMBER_OF_TRACKS)));
@@ -114,6 +115,21 @@ public class MediaStore_Audio_ArtistsTest extends InstrumentationTestCase {
             } catch (UnsupportedOperationException e) {
                 // expected
             }
+
+            // test filtering
+            Uri filterUri = artistsUri.buildUpon()
+                .appendQueryParameter("filter", Audio1.ARTIST).build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            long fid = c.getLong(c.getColumnIndex(Artists._ID));
+            assertTrue(id == fid);
+            c.close();
+
+            filterUri = artistsUri.buildUpon().appendQueryParameter("filter", "xyzfoo").build();
+            c = mContentResolver.query(filterUri, null, null, null, null);
+            assertEquals(0, c.getCount());
+            c.close();
         } finally {
             mContentResolver.delete(uri, null, null);
         }
