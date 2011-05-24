@@ -1514,7 +1514,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                         previewSize.height + ") pictureSize=(" +
                         pictureSize.width + "," + pictureSize.height + ")");
                 mPreviewCallbackResult = false;
-                mCamera.setPreviewCallback(callback);
                 callback.expectedPreviewSize = previewSize;
                 parameters.setPreviewSize(previewSize.width, previewSize.height);
                 parameters.setPictureSize(pictureSize.width, pictureSize.height);
@@ -1524,6 +1523,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
                 // Check if the preview size is the same as requested.
                 mCamera.startPreview();
+                mCamera.setOneShotPreviewCallback(callback);
                 waitForPreviewDone();
                 assertTrue(mPreviewCallbackResult);
 
@@ -1550,7 +1550,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Size size = camera.getParameters().getPreviewSize();
             assertEquals(expectedPreviewSize, size);
             assertEquals(size.width * size.height * 3 / 2, data.length);
-            camera.setPreviewCallback(null);
             mPreviewCallbackResult = true;
             mPreviewDone.open();
         }
