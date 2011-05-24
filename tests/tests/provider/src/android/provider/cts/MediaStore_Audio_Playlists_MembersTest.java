@@ -148,6 +148,10 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         Cursor c = mContentResolver.query(uri, null, null, null, null);
         c.moveToFirst();
         long playlistId = c.getLong(c.getColumnIndex(Playlists._ID));
+        long playlist2Id = -1; // used later
+
+        // verify that the Uri has the correct format and playlist value
+        assertEquals(uri.toString(), "content://media/external/audio/playlists/" + playlistId);
 
         // insert audio as the member of the playlist
         values.clear();
@@ -285,20 +289,72 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
             c = mContentResolver.query(membersUri, new String[] { Members.AUDIO_ID, Members.PLAY_ORDER }, null, null, Members.PLAY_ORDER);
             assertEquals(2, c.getCount());
             c.moveToFirst();
-            assertEquals(mIdOfAudio1, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(mIdOfAudio1, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
             assertEquals(1, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
             c.moveToNext();
-            assertEquals(mIdOfAudio2, c.getInt(c.getColumnIndex(Members.AUDIO_ID)));
+            assertEquals(mIdOfAudio2, c.getLong(c.getColumnIndex(Members.AUDIO_ID)));
             assertEquals(2, c.getInt(c.getColumnIndex(Members.PLAY_ORDER)));
+            c.close();
+
+            // create another playlist
+            values.clear();
+            values.put(Playlists.NAME, "My favourites 2");
+            values.put(Playlists.DATA, "");
+            values.put(Playlists.DATE_ADDED, dateAdded);
+            values.put(Playlists.DATE_MODIFIED, dateModified);
+            // insert
+            uri = mContentResolver.insert(Playlists.EXTERNAL_CONTENT_URI, values);
+            assertNotNull(uri);
+            c = mContentResolver.query(uri, null, null, null, null);
+            c.moveToFirst();
+            playlist2Id = c.getLong(c.getColumnIndex(Playlists._ID));
+            c.close();
+
+            // insert audio into 2nd playlist
+            values.clear();
+            values.put(Members.AUDIO_ID, mIdOfAudio1);
+            values.put(Members.PLAY_ORDER, 1);
+            Uri members2Uri = Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME,
+                    playlist2Id);
+            Uri audio2Uri = mContentResolver.insert(members2Uri, values);
+
+            // check that the audio exists in both playlist
+            c = mContentResolver.query(membersUri, null, null, null, null);
+            assertEquals(2, c.getCount());
+            int cnt = 0;
+            int colidx = c.getColumnIndex(Members.AUDIO_ID);
+            assertTrue(colidx >= 0);
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mIdOfAudio1) {
+                    cnt++;
+                }
+            }
+            assertEquals(1, cnt);
+            c.close();
+            c = mContentResolver.query(members2Uri, null, null, null, null);
+            assertEquals(1, c.getCount());
+            cnt = 0;
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mIdOfAudio1) {
+                    cnt++;
+                }
+            }
+            assertEquals(1, cnt);
             c.close();
 
             // delete the members
             result = mContentResolver.delete(membersUri, null, null);
             assertEquals(2, result);
+            result = mContentResolver.delete(members2Uri, null, null);
+            assertEquals(1, result);
         } finally {
-            // delete the playlist
+            // delete the playlists
             mContentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
                     Playlists._ID + "=" + playlistId, null);
+            if (playlist2Id >= 0) {
+                mContentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+                        Playlists._ID + "=" + playlist2Id, null);
+            }
         }
     }
 
