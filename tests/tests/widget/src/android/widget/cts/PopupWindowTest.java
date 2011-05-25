@@ -128,29 +128,17 @@ public class PopupWindowTest extends
 
         new PopupWindow(mActivity, null, com.android.internal.R.attr.popupWindowStyle);
 
-        try {
-            mPopupWindow = new PopupWindow();
-            assertEquals(0, mPopupWindow.getWidth());
-            assertEquals(0, mPopupWindow.getHeight());
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
+        mPopupWindow = new PopupWindow();
+        assertEquals(0, mPopupWindow.getWidth());
+        assertEquals(0, mPopupWindow.getHeight());
 
-        try {
-            mPopupWindow = new PopupWindow(50, 50);
-            assertEquals(50, mPopupWindow.getWidth());
-            assertEquals(50, mPopupWindow.getHeight());
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
+        mPopupWindow = new PopupWindow(50, 50);
+        assertEquals(50, mPopupWindow.getWidth());
+        assertEquals(50, mPopupWindow.getHeight());
 
-        try {
-            mPopupWindow = new PopupWindow(-1, -1);
-            assertEquals(-1, mPopupWindow.getWidth());
-            assertEquals(-1, mPopupWindow.getHeight());
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-        }
+        mPopupWindow = new PopupWindow(-1, -1);
+        assertEquals(-1, mPopupWindow.getWidth());
+        assertEquals(-1, mPopupWindow.getHeight());
 
         TextView contentView = new TextView(mActivity);
         mPopupWindow = new PopupWindow(contentView);
