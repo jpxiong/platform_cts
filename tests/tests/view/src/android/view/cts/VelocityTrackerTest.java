@@ -96,7 +96,7 @@ public class VelocityTrackerTest extends AndroidTestCase {
         VelocityTracker vt = VelocityTracker.obtain();
         assertNotNull(vt);
 
-        MotionEvent me = MotionEvent.obtain(0L, 10, 1, .0f, .0f, 0);
+        MotionEvent me = MotionEvent.obtain(0L, 10L, MotionEvent.ACTION_MOVE, .0f, .0f, 0);
 
         vt.clear();
         me.addBatch(20L, 20, 20, .0f, .0f, 0);
@@ -112,14 +112,14 @@ public class VelocityTrackerTest extends AndroidTestCase {
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
-        for (int i = 30; i < 100; i += 10) {
-            me.addBatch((long)i, (float)i, (float)i, .0f, .0f, 0);
+        for (int i = 3; i < 10; i++) {
+            me.addBatch((long)i * 10, (float)i * 10, (float)i * 10, .0f, .0f, 0);
         }
         vt.clear();
         vt.addMovement(me);
         vt.computeCurrentVelocity(1);
-        XVelocity = 1.1875744f;
-        YVelocity = 1.1875744f;
+        XVelocity = 1.1479408f;
+        YVelocity = 1.1479408f;
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
@@ -127,11 +127,21 @@ public class VelocityTrackerTest extends AndroidTestCase {
         me.addBatch(100L, 100, 100, .0f, .0f, 0);
         vt.addMovement(me);
         vt.computeCurrentVelocity(1);
-        XVelocity = 1.1562872f;
-        YVelocity = 1.1562872f;
+        XVelocity = 1.1284428f;
+        YVelocity = 1.1284428f;
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
+        me.recycle();
+        me = MotionEvent.obtain(0L, 110L, MotionEvent.ACTION_UP, 100f, 100f, 0);
+        vt.addMovement(me);
+        vt.computeCurrentVelocity(1);
+        XVelocity = 1.1284428f;
+        YVelocity = 1.1284428f;
+        assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
+        assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
+
+        me.recycle();
         vt.recycle();
     }
 }
