@@ -14,6 +14,12 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-BUILD_CTSCORE_PACKAGE:=$(LOCAL_PATH)/../ctscore.mk
+ifeq ($(BUILD_CTSCORE_PACKAGE),)
+    $(error BUILD_CTSCORE_PACKAGE must be defined)
+endif
 
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES := ../src/Dummy.java
+LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.tests
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests
+include $(BUILD_CTSCORE_PACKAGE)

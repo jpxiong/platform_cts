@@ -65,6 +65,7 @@ public class TestSessionBuilder extends XMLResourceHandler {
     private static final String ATTRIBUTE_FRAMEWORK_VERSION = "AndroidFramework";
     private static final String ATTRIBUTE_APK_TO_TEST_NAME = "apkToTestName";
     private static final String ATTRIBUTE_PACKAGE_TO_TEST = "packageToTest";
+    private static final String ATTRIBUTE_JAVA_PACKAGE_FILTER = "javaPackageFilter";
     private static TestSessionBuilder sInstance;
 
     private DocumentBuilder mDocBuilder;
@@ -208,22 +209,21 @@ public class TestSessionBuilder extends XMLResourceHandler {
     public TestPackage loadPackage(final Node pkgNode, ArrayList<String> excludedList)
                                 throws NoSuchAlgorithmException {
 
-        String appBinaryName, targetNameSpace, targetBinaryName, version, frameworkVersion,
-               runner, jarPath, appNameSpace, appPackageName, hostSideOnly;
         NodeList suiteList = pkgNode.getChildNodes();
 
-        appBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_NAME);
-        targetNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_NAME_SPACE);
-        targetBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_BINARY_NAME);
-        version = getStringAttributeValue(pkgNode, ATTRIBUTE_VERSION);
-        frameworkVersion = getStringAttributeValue(pkgNode, ATTRIBUTE_FRAMEWORK_VERSION);
-        runner = getStringAttributeValue(pkgNode, ATTRIBUTE_RUNNER);
-        jarPath = getStringAttributeValue(pkgNode, ATTRIBUTE_JAR_PATH);
-        appNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_NAME_SPACE);
-        appPackageName = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_PACKAGE_NAME);
-        hostSideOnly = getStringAttributeValue(pkgNode, ATTRIBUTE_HOST_SIDE_ONLY);
+        String appBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_NAME);
+        String targetNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_NAME_SPACE);
+        String targetBinaryName = getStringAttributeValue(pkgNode, ATTRIBUTE_TARGET_BINARY_NAME);
+        String version = getStringAttributeValue(pkgNode, ATTRIBUTE_VERSION);
+        String frameworkVersion = getStringAttributeValue(pkgNode, ATTRIBUTE_FRAMEWORK_VERSION);
+        String runner = getStringAttributeValue(pkgNode, ATTRIBUTE_RUNNER);
+        String jarPath = getStringAttributeValue(pkgNode, ATTRIBUTE_JAR_PATH);
+        String appNameSpace = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_NAME_SPACE);
+        String appPackageName = getStringAttributeValue(pkgNode, ATTRIBUTE_APP_PACKAGE_NAME);
+        String hostSideOnly = getStringAttributeValue(pkgNode, ATTRIBUTE_HOST_SIDE_ONLY);
         String signature = getStringAttributeValue(pkgNode, ATTRIBUTE_SIGNATURE_CHECK);
         String referenceAppTest = getStringAttributeValue(pkgNode, ATTRIBUTE_REFERENCE_APP_TEST);
+        String javaPackageFilter = getStringAttributeValue(pkgNode, ATTRIBUTE_JAVA_PACKAGE_FILTER);
         TestPackage pkg = null;
 
         if ("true".equals(referenceAppTest)) {
@@ -241,8 +241,8 @@ public class TestSessionBuilder extends XMLResourceHandler {
             pkg = new HostSideOnlyPackage(appBinaryName, version, frameworkVersion,
                     jarPath, appPackageName);
         } else {
-            pkg = new TestPackage(runner, appBinaryName, targetNameSpace, targetBinaryName,
-                    version, frameworkVersion, jarPath, appNameSpace, appPackageName);
+            pkg = new TestPackage(runner, appBinaryName, targetNameSpace, targetBinaryName, version,
+                    frameworkVersion, jarPath, appNameSpace, appPackageName, javaPackageFilter);
         }
 
         for (int i = 0; i < suiteList.getLength(); i++) {

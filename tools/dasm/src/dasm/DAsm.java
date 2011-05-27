@@ -1600,7 +1600,7 @@ public class DAsm {
         source_name = name;
         class_header = false;
         classDef = null;
-        dexFile = new DexFile();
+        dexFile = new DexFile(dexOptions);
 
         scanner = new Scanner(input);
         parser parse_obj = new parser(this, scanner);

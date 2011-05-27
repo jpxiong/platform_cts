@@ -49,13 +49,18 @@ public class TestPackage implements DeviceObserver {
     public static final String FINISH = "finish";
     public static final String START = "start";
 
-    private String mName, mVersion, mAndroidVersion;
-    private String mTargetNameSpace, mTargetBinaryName, mInstrumentationRunner;
-    private Collection<TestSuite> mSuites;
+    private final String mName;
+    private final String mVersion;
+    private final String mAndroidVersion;
+    private final String mTargetNameSpace;
+    private final String mTargetBinaryName;
+    private final String mInstrumentationRunner;
+    private final Collection<TestSuite> mSuites;
     private String mDigest;
-    private String mJarPath;
-    private String mAppNameSpace;
-    private String mAppPackageName;
+    private final String mJarPath;
+    private final String mAppNameSpace;
+    private final String mAppPackageName;
+    private final String mJavaPackageFilter;
 
     protected TestSuite mCurrentTestSuite;
 
@@ -79,13 +84,14 @@ public class TestPackage implements DeviceObserver {
      * @param androidVersion The version of the Anroid platform allowed.
      * @param jarPath The host controller's jar path and file.
      * @param appNameSpace The package name space.
-     * @param appPackageName The Java package name of the test package.
+     * @param appPackageName The package name of the test package.
+     * @param javaPackageFilter The prefix used to select which Java packages to run
      */
     public TestPackage(final String instrumentationRunner,
             final String testPkgBinaryName, final String targetNameSpace,
             final String targetBinaryName, final String version,
             final String androidVersion, final String jarPath, final String appNameSpace,
-            final String appPackageName) {
+            final String appPackageName, final String javaPackageFilter) {
         mInstrumentationRunner = instrumentationRunner;
         mName = testPkgBinaryName;
         mTargetNameSpace = targetNameSpace;
@@ -96,6 +102,7 @@ public class TestPackage implements DeviceObserver {
         mJarPath = jarPath;
         mAppNameSpace = appNameSpace;
         mAppPackageName = appPackageName;
+        mJavaPackageFilter = javaPackageFilter;
 
         mDevice = null;
         mTestStop = false;
@@ -114,9 +121,9 @@ public class TestPackage implements DeviceObserver {
     }
 
     /**
-     * Get the app JAVA package name.
+     * Get the app package name.
      *
-     * @return The app JAVA package name.
+     * @return The app package name.
      */
     public String getAppPackageName() {
         return mAppPackageName;
@@ -858,7 +865,7 @@ public class TestPackage implements DeviceObserver {
         mTimeOutTimer.start();
         mProgressObserver = new ProgressObserver();
 
-        if ((javaPkgName != null) && (javaPkgName.length() > 0)) {
+        if ((javaPkgName != null) && !javaPkgName.isEmpty()) {
             runInBatchModeImpl(javaPkgName);
         } else {
             for (String pkgName : getPackageNames()) {
@@ -995,14 +1002,15 @@ public class TestPackage implements DeviceObserver {
             return;
         }
 
-        setup(device, javaPkgName);
-        runImpl(javaPkgName);
+        String javaPackage = (javaPkgName != null) ? javaPkgName : mJavaPackageFilter;
+        setup(device, javaPackage);
+        runImpl(javaPackage);
     }
 
     /**
      * Implementation of running the test package.
      *
-     * @param javaPkgName The JAVA package name.
+     * @param javaPkgName The Java package name.
      * @param profile The profile of the device being tested.
      */
     protected void runImpl(final String javaPkgName) throws IOException,
@@ -1050,7 +1058,7 @@ public class TestPackage implements DeviceObserver {
      * Set up before running.
      *
      * @param device The device to run this package.getName
-     * @param javaPkgName The JAVA package name.
+     * @param javaPkgName The Java package name.
      */
     protected void setup(final TestDevice device, final String javaPkgName) {
         if (!TestSession.isADBServerRestartedMode() || noTestsExecuted()) {
