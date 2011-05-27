@@ -208,7 +208,7 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
             public void cancel() {
                 // ignore
             }
-        });
+        }, true);
         if (status.equals(CommandStatus.TIMED_OUT)) {
             junitResult.addError(junitTest, new TestTimeoutException());
             junitResult.endTest(junitTest);
