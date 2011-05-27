@@ -15,16 +15,9 @@
 -->
 
 <resources>
-    <item type="configVarying" name="simple">simple default</item>
+    <item type="configVarying" name="simple">simple sw600 land</item>
     <bag type="configVarying" name="bag">
-        <item name="testString">bag default</item>
+        <item name="testString">bag sw600 land</item>
     </bag>
-    <item type="configVarying" name="small">default</item>
-    <item type="configVarying" name="normal">default</item>
-    <item type="configVarying" name="large">default</item>
-    <item type="configVarying" name="xlarge">default</item>
-    <item type="configVarying" name="sw">default</item>
-    <item type="configVarying" name="w">default</item>
-    <item type="configVarying" name="h">default</item>
-    <item type="configVarying" name="wh">default</item>
+    <item type="configVarying" name="sw">600 land</item>
 </resources>
