@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 21;
+    private static final int NON_STATIC_FIELD_COUNT = 19;
 
     @MediumTest
     public void testMarshaling() throws Exception {
