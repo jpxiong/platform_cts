@@ -208,12 +208,18 @@ public class CollectAllTests extends DescriptionGenerator {
                     addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
                     continue;
                 } catch (NoSuchMethodException e) {
+                } catch (SecurityException e) {
+                    System.out.println("problem with class " + className);
+                    e.printStackTrace();
                 }
                 try {
                     klass.getConstructor(new Class<?>[0]);
                     addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
                     continue;
                 } catch (NoSuchMethodException e) {
+                } catch (SecurityException e) {
+                    System.out.println("problem with class " + className);
+                    e.printStackTrace();
                 }
             } catch (ClassNotFoundException e) {
                 System.out.println("class not found " + className);
