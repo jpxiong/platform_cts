@@ -16,15 +16,14 @@
 
 package android.view.cts;
 
-import com.android.cts.stub.R;
-import com.android.internal.view.menu.ContextMenuBuilder;
 import com.google.android.collect.Lists;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import com.android.cts.stub.R;
+import com.android.internal.view.menu.ContextMenuBuilder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -48,6 +47,7 @@ import android.util.SparseArray;
 import android.util.Xml;
 import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -55,11 +55,6 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
 import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.WindowManagerImpl;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -67,6 +62,10 @@ import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManagerImpl;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -80,10 +79,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.cts.StubActivity;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link View}.
@@ -4437,6 +4437,40 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(editText.hasCalledCheckInputConnectionProxy());
         imm.isActive(view);
         assertTrue(editText.hasCalledCheckInputConnectionProxy());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setHorizontalDirection",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getHorizontalDirection",
+            args = {}
+        )
+    })
+    @UiThreadTest
+    public void testHorizontalDirection() {
+        View view = new View(mActivity);
+        assertEquals(View.HORIZONTAL_DIRECTION_INHERIT, view.getHorizontalDirection());
+
+        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_LTR);
+        assertEquals(View.HORIZONTAL_DIRECTION_LTR, view.getHorizontalDirection());
+
+        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_RTL);
+        assertEquals(View.HORIZONTAL_DIRECTION_RTL, view.getHorizontalDirection());
+
+        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_INHERIT);
+        assertEquals(View.HORIZONTAL_DIRECTION_INHERIT, view.getHorizontalDirection());
+
+        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_LOCALE);
+        assertEquals(View.HORIZONTAL_DIRECTION_LOCALE, view.getHorizontalDirection());
+
+        // View.HORIZONTAL_DIRECTION_MASK = 0xC0000000
+        view.setHorizontalDirection(0xffffffff);
+        assertEquals(0xC0000000, view.getHorizontalDirection());
     }
 
     private static class MockEditText extends EditText {
