@@ -18,13 +18,9 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 import android.R.attr;
 import android.content.res.Resources;
@@ -37,19 +33,21 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable.ConstantState;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RotateDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.Drawable.Callback;
-import android.graphics.drawable.Drawable.ConstantState;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.view.View;
-
-import java.io.IOException;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(android.graphics.drawable.LayerDrawable.class)
 public class LayerDrawableTest extends AndroidTestCase {
@@ -418,7 +416,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertFalse(cb.hasCalledUnschedule());
     }
 
-    private static class MockCallback implements Callback {
+    private static class MockCallback implements Drawable.Callback2 {
         private boolean mCalledInvalidate;
         private boolean mCalledSchedule;
         private boolean mCalledUnschedule;
@@ -445,6 +443,10 @@ public class LayerDrawableTest extends AndroidTestCase {
 
         public boolean hasCalledUnschedule() {
             return mCalledUnschedule;
+        }
+
+        public boolean isLayoutRtl(Drawable who) {
+            return true;
         }
 
         public void reset() {

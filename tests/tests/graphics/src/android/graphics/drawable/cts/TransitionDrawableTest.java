@@ -18,20 +18,18 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.test.InstrumentationTestCase;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
-
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Bitmap.Config;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
-import android.graphics.drawable.Drawable.Callback;
-import android.test.InstrumentationTestCase;
 
 @TestTargetClass(TransitionDrawable.class)
 public class TransitionDrawableTest extends InstrumentationTestCase {
@@ -314,7 +312,7 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    private class MockCallBack implements Callback {
+    private class MockCallBack implements Drawable.Callback2 {
         private boolean mHasCalledInvalidateDrawable;
 
         public boolean hasCalledInvalidateDrawable() {
@@ -332,6 +330,10 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         }
 
         public void unscheduleDrawable(Drawable who, Runnable what) {
+        }
+
+        public boolean isLayoutRtl(Drawable who) {
+            return false;
         }
     }
 }

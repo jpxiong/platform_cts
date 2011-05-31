@@ -16,11 +16,9 @@
 
 package android.graphics.drawable.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
+import junit.framework.TestCase;
+
+import java.util.Arrays;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -28,13 +26,13 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.LevelListDrawable;
-import android.graphics.drawable.Drawable.Callback;
 import android.graphics.drawable.DrawableContainer.DrawableContainerState;
-
-import java.util.Arrays;
-
-import junit.framework.TestCase;
+import android.graphics.drawable.LevelListDrawable;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 @TestTargetClass(DrawableContainer.class)
 public class DrawableContainerTest extends TestCase {
@@ -1098,7 +1096,7 @@ public class DrawableContainerTest extends TestCase {
         }
     }
 
-    private class MockCallBack implements Callback {
+    private class MockCallBack implements Drawable.Callback2 {
         private boolean mCalledInvalidateDrawable;
 
         private boolean mCalledScheduleDrawable;
@@ -1133,6 +1131,10 @@ public class DrawableContainerTest extends TestCase {
 
         public void unscheduleDrawable(Drawable who, Runnable what) {
             mCalledUnscheduleDrawable = true;
+        }
+
+        public boolean isLayoutRtl(Drawable who) {
+            return false;
         }
     }
 }
