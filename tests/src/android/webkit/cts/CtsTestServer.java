@@ -27,6 +27,7 @@ import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultHttpServerConnection;
@@ -38,10 +39,15 @@ import org.apache.http.params.HttpParams;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -79,7 +85,11 @@ public class CtsTestServer {
 
     public static final String FAVICON_PATH = "/favicon.ico";
     public static final String USERAGENT_PATH = "/useragent.html";
+
     public static final String TEST_DOWNLOAD_PATH = "/download.html";
+    private static final String DOWNLOAD_ID_PARAMETER = "downloadId";
+    private static final String NUM_BYTES_PARAMETER = "numBytes";
+
     public static final String ASSET_PREFIX = "/assets/";
     public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
     public static final String APPCACHE_PATH = "/appcache.html";
@@ -351,8 +361,19 @@ public class CtsTestServer {
         return sb.toString();
     }
 
-    public String getTestDownloadUrl() {
-        return getBaseUri() + TEST_DOWNLOAD_PATH;
+    /**
+     * @param downloadId used to differentiate the files created for each test
+     * @param numBytes of the content that the CTS server should send back
+     * @return url to get the file from
+     */
+    public String getTestDownloadUrl(String downloadId, int numBytes) {
+        return Uri.parse(getBaseUri())
+                .buildUpon()
+                .path(TEST_DOWNLOAD_PATH)
+                .appendQueryParameter(DOWNLOAD_ID_PARAMETER, downloadId)
+                .appendQueryParameter(NUM_BYTES_PARAMETER, Integer.toString(numBytes))
+                .build()
+                .toString();
     }
 
     public String getLastRequestUrl() {
@@ -384,8 +405,9 @@ public class CtsTestServer {
     /**
      * Generate a response to the given request.
      * @throws InterruptedException
+     * @throws IOException
      */
-    private HttpResponse getResponse(HttpRequest request) throws InterruptedException {
+    private HttpResponse getResponse(HttpRequest request) throws InterruptedException, IOException {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
         mRequestCount += 1;
@@ -509,9 +531,7 @@ public class CtsTestServer {
             response.setEntity(createEntity("<html><head><title>" + agent + "</title></head>" +
                     "<body>" + agent + "</body></html>"));
         } else if (path.equals(TEST_DOWNLOAD_PATH)) {
-            response = createResponse(HttpStatus.SC_OK);
-            response.setHeader("Content-Length", "0");
-            response.setEntity(createEntity(""));
+            response = createTestDownloadResponse(Uri.parse(uriString));
         } else if (path.equals(SHUTDOWN_PREFIX)) {
             response = createResponse(HttpStatus.SC_OK);
             // We cannot close the socket here, because we need to respond.
@@ -605,6 +625,37 @@ public class CtsTestServer {
             Log.w(TAG, e);
         }
         return null;
+    }
+
+    private HttpResponse createTestDownloadResponse(Uri uri) throws IOException {
+        String downloadId = uri.getQueryParameter(DOWNLOAD_ID_PARAMETER);
+        int numBytes = uri.getQueryParameter(NUM_BYTES_PARAMETER) != null
+                ? Integer.parseInt(uri.getQueryParameter(NUM_BYTES_PARAMETER))
+                : 0;
+        HttpResponse response = createResponse(HttpStatus.SC_OK);
+        response.setHeader("Content-Length", Integer.toString(numBytes));
+        response.setEntity(createFileEntity(downloadId, numBytes));
+        return response;
+    }
+
+    private FileEntity createFileEntity(String downloadId, int numBytes) throws IOException {
+        String storageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equalsIgnoreCase(storageState)) {
+            File storageDir = Environment.getExternalStorageDirectory();
+            File file = new File(storageDir, downloadId + ".bin");
+            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
+            try {
+                for (int i = 0; i < numBytes; i++) {
+                    stream.write(1);
+                }
+                stream.flush();
+            } finally {
+                stream.close();
+            }
+            return new FileEntity(file, "application/octet-stream");
+        } else {
+            throw new IllegalStateException("External storage must be mounted for this test!");
+        }
     }
 
     private static class ServerThread extends Thread {

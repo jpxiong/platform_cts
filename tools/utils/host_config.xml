@@ -30,7 +30,7 @@
     <IntValue name="maxTestsInBatchMode" value="5000" />
 
     <!-- Max time [ms] between test status updates. -->
-    <IntValue name="testStatusTimeoutMs" value="300000" />
+    <IntValue name="testStatusTimeoutMs" value="600000" />
     <!-- Max time [ms] from start of package in batch mode and the first test status update. -->
     <IntValue name="batchStartTimeoutMs" value="1800000" />
     <!-- Max time [ms] from start of test in individual mode to the first test status update. -->
@@ -41,8 +41,5 @@
     <IntValue name="packageInstallTimeoutMs" value="120000" />
     <!-- Time to wait [ms] after a package installation or removal. -->
     <IntValue name="postInstallWaitMs" value="10000" />
-
-    <!-- Phone number that will be used in tests if not available from the SIM card. -->
-    <StringValue name="phoneNumber" value="" />
 
 </HostConfiguration>

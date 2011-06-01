@@ -43,12 +43,18 @@ public class Camera_SizeTest extends TestCase {
         args = {int.class, int.class}
     )
     public void testConstructor() {
-        Camera camera = Camera.open();
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
+
+        Camera camera = Camera.open(0);
         Parameters parameters = camera.getParameters();
 
         checkSize(parameters, WIDTH1, HEIGHT1);
         checkSize(parameters, WIDTH2, HEIGHT2);
         checkSize(parameters, WIDTH3, HEIGHT3);
+
+        camera.release();
     }
 
     private void checkSize(Parameters parameters, int width, int height) {
