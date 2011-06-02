@@ -32,6 +32,7 @@
     <!-- Strings for TestListActivity -->
     <string name="test_list_title">Manual Test List</string>
     <string name="test_category_audio">Audio</string>
+    <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
     <string name="test_category_security">Security</string>
     <string name="test_category_features">Features</string>
@@ -40,6 +41,50 @@
     <string name="test_results_cleared">Test results cleared.</string>
     <string name="share">Share</string>
     <string name="share_test_results">Share Test Results</string>
+
+    <!-- Strings for BluetoothActivity -->
+    <string name="bluetooth_test">Bluetooth Test</string>
+    <string name="bluetooth_test_info">The Bluetooth Control tests check whether or not the device 
+        can disable and enable Bluetooth properly.\n\nThe Device Communication tests require two
+        devices to pair and exchange messages. The two devices must be:
+        \n\n1. a candidate device implementation running the software build to be tested
+        \n\n2. a separate device implementation already known to be compatible</string>
+
+    <string name="bt_not_available_title">Bluetooth is not available?</string>
+    <string name="bt_not_available_message">If your device is supposed to have Bluetooth, your API implementation is not behaving correctly!</string>
+
+    <string name="bt_control">Bluetooth Control</string>
+    <string name="bt_device_communication">Device Communication</string>
+
+    <string name="bt_toggle_bluetooth">Toggle Bluetooth</string>
+    <string name="bt_toggle_instructions">Disable and enable Bluetooth to successfully complete this test.</string>
+    <string name="bt_enable_bluetooth">Enable Bluetooth</string>
+    <string name="bt_disable_bluetooth">Disable Bluetooth</string>
+    <string name="bt_disabling">Disabling Bluetooth...</string>
+    <string name="bt_disabling_error">Could not disable Bluetooth...</string>
+
+    <string name="bt_secure_server">Secure Server</string>
+    <string name="bt_secure_server_instructions">Start the CTS Verifier on another device, start the Bluetooth test, and choose \"Secure Client\" to complete the test.</string>
+    <string name="bt_insecure_server">Insecure Server</string>
+    <string name="bt_insecure_server_instructions">Start the CTS Verifier on another device, start the Bluetooth test, and choose \"Insecure Client\" to complete the test.</string>
+    <string name="bt_waiting">Waiting for client...</string>
+    <string name="bt_connecting">Connecting...</string>
+    <string name="bt_received_messages">Received Messages</string>
+    <string name="bt_sent_messages">Sent Messages</string>
+    <string name="bt_no_messages">No messages</string>
+    <string name="bt_make_discoverable">Make Discoverable</string>
+
+    <string name="bt_secure_client">Secure Client</string>
+    <string name="bt_insecure_client">Insecure Client</string>
+
+    <string name="bt_device_picker">Device Picker</string>
+    <string name="bt_paired_devices">Paired Devices</string>
+    <string name="bt_new_devices">New Devices</string>
+    <string name="bt_no_devices">No devices</string>
+    <string name="bt_scan">Scan for Devices</string>
+    <string name="bt_scanning">Scanning...</string>
+    <string name="bt_unpair">Device must be unpaired via Bluetooth settings before completing the test.\n\nUnpair the device in settings, make the server discoverable, and rescan to pick this device.</string>
+    <string name="bt_settings">Bluetooth Settings</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
