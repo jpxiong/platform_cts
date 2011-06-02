@@ -15,16 +15,10 @@
 -->
 
 <resources>
-    <item type="configVarying" name="simple">simple default</item>
+    <item type="configVarying" name="simple">simple h550</item>
     <bag type="configVarying" name="bag">
-        <item name="testString">bag default</item>
+        <item name="testString">bag h550</item>
     </bag>
-    <item type="configVarying" name="small">default</item>
-    <item type="configVarying" name="normal">default</item>
-    <item type="configVarying" name="large">default</item>
-    <item type="configVarying" name="xlarge">default</item>
-    <item type="configVarying" name="sw">default</item>
-    <item type="configVarying" name="w">default</item>
-    <item type="configVarying" name="h">default</item>
-    <item type="configVarying" name="wh">default</item>
+    <item type="configVarying" name="h">550</item>
+    <item type="configVarying" name="wh">550</item>
 </resources>
