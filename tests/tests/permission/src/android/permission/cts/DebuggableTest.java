@@ -20,7 +20,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Verify that pre-installed packages don't have the debuggable
@@ -30,13 +32,16 @@ import java.util.List;
 public class DebuggableTest extends AndroidTestCase {
 
     public void testNoDebuggable() {
+        Set<String> debuggableApps = new HashSet<String>();
         List<ApplicationInfo> apps = getContext()
                 .getPackageManager()
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
         for (ApplicationInfo app : apps) {
             String appName = app.packageName;
-            assertTrue("Package " + appName + " is marked as debuggable.",
-                    (app.flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0);
+            if ((app.flags & ApplicationInfo.FLAG_DEBUGGABLE) == ApplicationInfo.FLAG_DEBUGGABLE) {
+                debuggableApps.add(appName);
+            }
         }
+        assertTrue("Packages marked debuggable: " + debuggableApps, debuggableApps.isEmpty());
     }
 }
