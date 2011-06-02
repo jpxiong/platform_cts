@@ -78,15 +78,48 @@ public class FieldPackerTest extends RSBaseCompute {
         fp.addU8(new Short3());
     }
 
-    public void testAlign() {
-        /*
-        fp.align(int v);
-        final byte[]     getData();
-        fp.reset(int i);
-        fp.reset();
-        fp.skip(int i);
-        */
+    public void testAlignResetSkip() {
+        for (int alignAmount = 1; alignAmount < 16; alignAmount <<= 1) {
+            FieldPacker fp = new FieldPacker(256);
+            for (int i = 0; i < 32; i++) {
+                fp.align(alignAmount);
+                fp.addI8((byte)i);
+            }
+
+            byte[] b = fp.getData();
+            for (int i = 0; i < 32; i++) {
+                assertEquals(i, b[alignAmount * i]);
+            }
+
+            // Check that align is zeroing out bytes in between
+            fp.reset();
+            fp.addI8((byte)0);
+            fp.align(256);
+            b = fp.getData();
+            for (int i = 0; i < 256; i++) {
+                assertEquals(0, b[i]);
+            }
+        }
+
+        for (int skipAmount = 1; skipAmount < 4; skipAmount++) {
+            FieldPacker fp = new FieldPacker(256);
+            for (int i = 0; i < 32; i++) {
+                fp.addI8((byte)i);
+                fp.skip(skipAmount);
+            }
+            fp.reset(1);
+            for (int i = 0; i < 32; i++) {
+                fp.addI8((byte)i);
+                fp.skip(skipAmount);
+            }
+
+            byte[] b = fp.getData();
+            for (int i = 0; i < 32; i++) {
+                // Check that skip is not altering any other bytes
+                assertEquals(i, b[i * (skipAmount + 1)]);
+                assertEquals(i, b[(i * (skipAmount + 1)) + 1]);
+            }
+        }
     }
 }
-
 
