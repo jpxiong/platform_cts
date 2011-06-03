@@ -32,6 +32,7 @@ import android.renderscript.Long4;
 import android.renderscript.Matrix2f;
 import android.renderscript.Matrix3f;
 import android.renderscript.Matrix4f;
+import android.renderscript.RSIllegalArgumentException;
 import android.renderscript.Short2;
 import android.renderscript.Short3;
 import android.renderscript.Short4;
@@ -118,6 +119,37 @@ public class FieldPackerTest extends RSBaseCompute {
                 // Check that skip is not altering any other bytes
                 assertEquals(i, b[i * (skipAmount + 1)]);
                 assertEquals(i, b[(i * (skipAmount + 1)) + 1]);
+            }
+        }
+
+        // Error cases
+        FieldPacker fp = new FieldPacker(256);
+
+        int[] badAlignArgs = {-4, -3, -2, -1, 0, 3, 5, 127};
+        for (int arg: badAlignArgs) {
+            try {
+                fp.align(arg);
+                fail("should throw RSIllegalArgumentException.");
+            } catch (RSIllegalArgumentException e) {
+            }
+        }
+
+        int[] badResetArgs = {-1000, -2, -1, 256, 257, 1000};
+        for (int arg: badResetArgs) {
+            try {
+                fp.reset(arg);
+                fail("should throw RSIllegalArgumentException.");
+            } catch (RSIllegalArgumentException e) {
+            }
+        }
+
+        int[] badSkipArgs = {-1000, -6, -5, 252, 253, 1000};
+        for (int arg: badSkipArgs) {
+            try {
+                fp.reset(4);
+                fp.skip(arg);
+                fail("should throw RSIllegalArgumentException.");
+            } catch (RSIllegalArgumentException e) {
             }
         }
     }
