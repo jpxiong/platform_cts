@@ -87,6 +87,7 @@ public class CtsTestServer {
     public static final String COOKIE_PREFIX = "/cookie";
     public static final String AUTH_PREFIX = "/auth";
     public static final String SHUTDOWN_PREFIX = "/shutdown";
+    public static final String NOLENGTH_POSTFIX = "nolength";
     public static final int DELAY_MILLIS = 2000;
 
     public static final String AUTH_REALM = "Android CTS";
@@ -381,6 +382,7 @@ public class CtsTestServer {
         mLastQuery = uriString;
         URI uri = URI.create(uriString);
         String path = uri.getPath();
+        String query = uri.getQuery();
         if (path.equals(FAVICON_PATH)) {
             path = FAVICON_ASSET_PATH;
         }
@@ -449,7 +451,9 @@ public class CtsTestServer {
                 }
                 entity.setContentType(mimeType);
                 response.setEntity(entity);
-                response.setHeader("Content-Length", "" + entity.getContentLength());
+                if (query == null || !query.contains(NOLENGTH_POSTFIX)) {
+                    response.setHeader("Content-Length", "" + entity.getContentLength());
+                }
             } catch (IOException e) {
                 response = null;
                 // fall through, return 404 at the end
