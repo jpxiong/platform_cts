@@ -33,6 +33,11 @@ import android.view.WindowManager;
 public class ActivityManagerMemoryClassTest
         extends ActivityInstrumentationTestCase2<ActivityManagerMemoryClassLaunchActivity> {
 
+    /**
+     * A density value used by some TV devices, but not yet in {link DisplayMetrics}.
+     */
+    private static final int DENSITY_TV = 213;
+
     public ActivityManagerMemoryClassTest() {
         super(ActivityManagerMemoryClassLaunchActivity.class);
     }
@@ -83,6 +88,7 @@ public class ActivityManagerMemoryClassTest
 
             case DisplayMetrics.DENSITY_HIGH:
             case DisplayMetrics.DENSITY_XHIGH:
+            case DENSITY_TV:
                 expectedMinimumMemory = isXLarge ? 48 : 24;
                 break;
 
