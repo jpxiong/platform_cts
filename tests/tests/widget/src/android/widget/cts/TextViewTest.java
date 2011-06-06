@@ -44,7 +44,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -358,10 +357,10 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mActivity.setContentView(R.layout.textview_gravity);
 
         mTextView = findTextView(R.id.gravity_default);
-        assertEquals(Gravity.TOP | Gravity.BEFORE, mTextView.getGravity());
+        assertEquals(Gravity.TOP | Gravity.START, mTextView.getGravity());
 
         mTextView = findTextView(R.id.gravity_bottom);
-        assertEquals(Gravity.BOTTOM | Gravity.BEFORE, mTextView.getGravity());
+        assertEquals(Gravity.BOTTOM | Gravity.START, mTextView.getGravity());
 
         mTextView = findTextView(R.id.gravity_right);
         assertEquals(Gravity.TOP | Gravity.RIGHT, mTextView.getGravity());
@@ -383,13 +382,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(Gravity.CENTER, mTextView.getGravity());
 
         mTextView.setGravity(Gravity.NO_GRAVITY);
-        assertEquals(Gravity.TOP | Gravity.BEFORE, mTextView.getGravity());
+        assertEquals(Gravity.TOP | Gravity.START, mTextView.getGravity());
 
         mTextView.setGravity(Gravity.RIGHT);
         assertEquals(Gravity.TOP | Gravity.RIGHT, mTextView.getGravity());
 
         mTextView.setGravity(Gravity.FILL_VERTICAL);
-        assertEquals(Gravity.FILL_VERTICAL | Gravity.BEFORE, mTextView.getGravity());
+        assertEquals(Gravity.FILL_VERTICAL | Gravity.START, mTextView.getGravity());
 
         //test negative input value.
         mTextView.setGravity(-1);
