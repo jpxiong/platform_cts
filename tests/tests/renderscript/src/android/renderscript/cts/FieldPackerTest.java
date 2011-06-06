@@ -143,7 +143,8 @@ public class FieldPackerTest extends RSBaseCompute {
             }
         }
 
-        int[] badSkipArgs = {-1000, -6, -5, 252, 253, 1000};
+        // Skip allows us to move 1 past the final element in the FieldPacker
+        int[] badSkipArgs = {-1000, -6, -5, 253, 1000};
         for (int arg: badSkipArgs) {
             try {
                 fp.reset(4);
