@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 
 /**
  * {@link Activity}s to handle clicks to the pass and fail buttons of the pass fail buttons layout.
@@ -64,6 +65,8 @@ public class PassFailButtons {
          * @param messageId for the text shown in the dialog's body area
          */
         void setInfoResources(int titleId, int messageId, int viewId);
+
+        Button getPassButton();
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
@@ -75,6 +78,10 @@ public class PassFailButtons {
         public void setInfoResources(int titleId, int messageId, int viewId) {
             setInfo(this, titleId, messageId, viewId);
         }
+
+        public Button getPassButton() {
+            return getPassButtonView(this);
+        }
     }
 
     public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
@@ -85,6 +92,10 @@ public class PassFailButtons {
 
         public void setInfoResources(int titleId, int messageId, int viewId) {
             setInfo(this, titleId, messageId, viewId);
+        }
+
+        public Button getPassButton() {
+            return getPassButtonView(this);
         }
     }
 
@@ -184,5 +195,9 @@ public class PassFailButtons {
         }
 
         activity.finish();
+    }
+
+    private static Button getPassButtonView(android.app.Activity activity) {
+        return (Button) activity.findViewById(R.id.pass_button);
     }
 }
