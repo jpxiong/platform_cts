@@ -4442,35 +4442,35 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setHorizontalDirection",
+            method = "setLayoutDirection",
             args = {int.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "getHorizontalDirection",
+            method = "getLayoutDirection",
             args = {}
         )
     })
     @UiThreadTest
-    public void testHorizontalDirection() {
+    public void testLayoutDirection() {
         View view = new View(mActivity);
-        assertEquals(View.HORIZONTAL_DIRECTION_INHERIT, view.getHorizontalDirection());
+        assertEquals(View.LAYOUT_DIRECTION_INHERIT, view.getLayoutDirection());
 
-        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_LTR);
-        assertEquals(View.HORIZONTAL_DIRECTION_LTR, view.getHorizontalDirection());
+        view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, view.getLayoutDirection());
 
-        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_RTL);
-        assertEquals(View.HORIZONTAL_DIRECTION_RTL, view.getHorizontalDirection());
+        view.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, view.getLayoutDirection());
 
-        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_INHERIT);
-        assertEquals(View.HORIZONTAL_DIRECTION_INHERIT, view.getHorizontalDirection());
+        view.setLayoutDirection(View.LAYOUT_DIRECTION_INHERIT);
+        assertEquals(View.LAYOUT_DIRECTION_INHERIT, view.getLayoutDirection());
 
-        view.setHorizontalDirection(View.HORIZONTAL_DIRECTION_LOCALE);
-        assertEquals(View.HORIZONTAL_DIRECTION_LOCALE, view.getHorizontalDirection());
+        view.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
+        assertEquals(View.LAYOUT_DIRECTION_LOCALE, view.getLayoutDirection());
 
-        // View.HORIZONTAL_DIRECTION_MASK = 0xC0000000
-        view.setHorizontalDirection(0xffffffff);
-        assertEquals(0xC0000000, view.getHorizontalDirection());
+        // View.LAYOUT_DIRECTION_MASK = 0xC0000000
+        view.setLayoutDirection(0xffffffff);
+        assertEquals(0xC0000000, view.getLayoutDirection());
     }
 
     private static class MockEditText extends EditText {
