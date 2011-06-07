@@ -18,6 +18,7 @@ package com.android.cts.verifier.audioquality;
 
 import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.os.Environment;
 import android.util.Log;
@@ -37,6 +38,38 @@ import java.nio.ByteOrder;
 public class Utils {
     public static final String TAG = "AudioQualityVerifier";
     public static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
+
+    /**
+     * @param minBufferSize requested
+     * @return the buffer size or a negative {@link AudioTrack} ERROR value
+     */
+    public static int getAudioTrackBufferSize(int minBufferSize) {
+        int minHardwareBufferSize = AudioTrack.getMinBufferSize(
+                AudioQualityVerifierActivity.SAMPLE_RATE,
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioQualityVerifierActivity.AUDIO_FORMAT);
+        if (minHardwareBufferSize < 0) {
+            return minHardwareBufferSize;
+        } else {
+            return Math.max(minHardwareBufferSize, minBufferSize);
+        }
+    }
+
+    /**
+     * @param minBufferSize requested
+     * @return the buffer size or a negative {@link AudioRecord} ERROR value
+     */
+    public static int getAudioRecordBufferSize(int minBufferSize) {
+        int minHardwareBufferSize = AudioRecord.getMinBufferSize(
+                AudioQualityVerifierActivity.SAMPLE_RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioQualityVerifierActivity.AUDIO_FORMAT);
+        if (minHardwareBufferSize < 0) {
+            return minHardwareBufferSize;
+        } else {
+            return Math.max(minHardwareBufferSize, minBufferSize);
+        }
+    }
 
     /**
      *  Time delay.
