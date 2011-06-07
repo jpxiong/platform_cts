@@ -16,11 +16,12 @@
 
 package android.net.cts;
 
-import android.net.NetworkInfo.DetailedState;
-import android.test.AndroidTestCase;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
+
+import android.net.NetworkInfo.DetailedState;
+import android.test.AndroidTestCase;
 
 @TestTargetClass(DetailedState.class)
 public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
@@ -52,7 +53,7 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
     )
     public void testValues() {
         DetailedState[] expected = DetailedState.values();
-        assertEquals(10, expected.length);
+        assertEquals(11, expected.length);
         assertEquals(DetailedState.IDLE, expected[0]);
         assertEquals(DetailedState.SCANNING, expected[1]);
         assertEquals(DetailedState.CONNECTING, expected[2]);
@@ -63,6 +64,7 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
         assertEquals(DetailedState.DISCONNECTING, expected[7]);
         assertEquals(DetailedState.DISCONNECTED, expected[8]);
         assertEquals(DetailedState.FAILED, expected[9]);
+        assertEquals(DetailedState.FAILED, expected[10]);
     }
 
 }
