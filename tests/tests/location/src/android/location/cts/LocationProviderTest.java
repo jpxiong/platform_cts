@@ -28,6 +28,8 @@ import android.test.AndroidTestCase;
 
 @TestTargetClass(LocationProvider.class)
 public class LocationProviderTest extends AndroidTestCase {
+    private static final String PROVIDER_NAME = "location_provider_test";
+
     private LocationManager mLocationManager;
 
     @Override
@@ -35,6 +37,31 @@ public class LocationProviderTest extends AndroidTestCase {
         super.setUp();
         mLocationManager =
             (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        addTestProvider(PROVIDER_NAME);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        mLocationManager.removeTestProvider(PROVIDER_NAME);
+        super.tearDown();
+    }
+
+    /**
+     * Adds a test provider with the given name.
+     */
+    private void addTestProvider(String providerName) {
+        mLocationManager.addTestProvider(
+                providerName,
+                true,  // requiresNetwork,
+                false, // requiresSatellite,
+                false, // requiresCell,
+                false, // hasMonetaryCost,
+                true,  // supportsAltitude,
+                false, // supportsSpeed,
+                true,  // supportsBearing,
+                Criteria.POWER_MEDIUM,   // powerRequirement,
+                Criteria.ACCURACY_FINE); // accuracy
+        mLocationManager.setTestProviderEnabled(providerName, true);
     }
 
     @TestTargetNew(
@@ -43,9 +70,8 @@ public class LocationProviderTest extends AndroidTestCase {
         args = {}
     )
     public void testGetName() {
-        String name = "gps";
-        LocationProvider locationProvider = mLocationManager.getProvider(name);
-        assertEquals(name, locationProvider.getName());
+        LocationProvider locationProvider = mLocationManager.getProvider(PROVIDER_NAME);
+        assertEquals(PROVIDER_NAME, locationProvider.getName());
     }
 
     @TestTargetNew(
@@ -54,7 +80,7 @@ public class LocationProviderTest extends AndroidTestCase {
         args = {android.location.Criteria.class}
     )
     public void testMeetsCriteria() {
-        LocationProvider locationProvider = mLocationManager.getProvider("gps");
+        LocationProvider locationProvider = mLocationManager.getProvider(PROVIDER_NAME);
 
         Criteria criteria = new Criteria();
         criteria.setAltitudeRequired(true);
