@@ -72,6 +72,10 @@ public class PaintTest extends AndroidTestCase {
         SpannedString textSpan = new SpannedString(text);
 
         Paint p = new Paint();
+
+        // We need to turn off kerning in order to get accurate comparisons
+        p.setFlags(p.getFlags() & ~Paint.DEV_KERN_TEXT_FLAG);
+
         float[] widths = new float[text.length()];
         assertEquals(text.length(), p.getTextWidths(text, widths));
 
@@ -125,6 +129,9 @@ public class PaintTest extends AndroidTestCase {
             int start, int end, boolean measureForwards, float maxWidth, int expectedCount,
             float expectedWidth) {
         Paint p = new Paint();
+
+        // We need to turn off kerning in order to get accurate comparisons
+        p.setFlags(p.getFlags() & ~Paint.DEV_KERN_TEXT_FLAG);
 
         int count = end - start;
         if (!measureForwards) {
@@ -1272,6 +1279,10 @@ public class PaintTest extends AndroidTestCase {
         SpannedString textSpan = new SpannedString(text);
 
         Paint p = new Paint();
+
+        // We need to turn off kerning in order to get accurate comparisons
+        p.setFlags(p.getFlags() & ~Paint.DEV_KERN_TEXT_FLAG);
+
         float[] widths = new float[text.length()];
         for (int i = 0; i < widths.length; i++) {
             widths[i] = p.measureText(text, i, i + 1);
@@ -1300,6 +1311,10 @@ public class PaintTest extends AndroidTestCase {
     private void assertMeasureText(String text, char[] textChars, SpannedString textSpan,
             int start, int end, float expectedWidth) {
         Paint p = new Paint();
+
+        // We need to turn off kerning in order to get accurate comparisons
+        p.setFlags(p.getFlags() & ~Paint.DEV_KERN_TEXT_FLAG);
+
         int count = end - start;
         float[] widths = new float[] {-1, -1, -1, -1};
 
