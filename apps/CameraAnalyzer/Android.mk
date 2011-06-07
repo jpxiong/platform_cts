@@ -31,7 +31,7 @@ LOCAL_SHARED_LIBRARIES := libandroid \
                           libcutils \
                           libutils
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
 
 #####################
 # Build JNI library
@@ -46,9 +46,10 @@ LOCAL_SRC_FILES := jni/com_android_cts_cameraanalyzer_colorchecker.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include $(JNI_H_INCLUDE)
 
+LOCAL_STATIC_LIBRARIES := libcolorchecker
 LOCAL_SHARED_LIBRARIES := libandroid \
-                          libcolorchecker \
                           libjnigraphics \
+                          libstlport \
                           libcutils \
                           libutils
 
@@ -62,8 +63,7 @@ include $(CLEAR_VARS)
 LOCAL_PACKAGE_NAME := CameraAnalyzer
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_SHARED_LIBRARIES := libcameraanalyzer_jni \
-                          libcolorchecker
+LOCAL_JNI_SHARED_LIBRARIES := libcameraanalyzer_jni
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
 
