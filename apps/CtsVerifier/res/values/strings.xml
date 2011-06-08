@@ -75,6 +75,8 @@
     <string name="bt_sent_messages">Sent Messages</string>
     <string name="bt_no_messages">No messages</string>
     <string name="bt_make_discoverable">Make Discoverable</string>
+    <string name="bt_insecure_pairing_error_title">Pairing dialog shown?</string>
+    <string name="bt_insecure_pairing_error_message">Insecure connections should not show the pairing dialog!</string>
 
     <string name="bt_secure_client">Secure Client</string>
     <string name="bt_insecure_client">Insecure Client</string>
