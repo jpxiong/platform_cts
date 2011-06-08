@@ -58,6 +58,18 @@ public class TextToSpeechTest extends AndroidTestCase {
      */
     private boolean checkAndSetLanguageAvailable() {
         // checks if at least one language is available in Tts
+        final Locale defaultLocale = Locale.getDefault();
+        // If the language for the default locale is available, then
+        // use that.
+        int defaultAvailability = getTts().isLanguageAvailable(defaultLocale);
+
+        if (defaultAvailability == TextToSpeech.LANG_AVAILABLE ||
+            defaultAvailability == TextToSpeech.LANG_COUNTRY_AVAILABLE ||
+            defaultAvailability == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE) {
+            getTts().setLanguage(defaultLocale);
+            return true;
+        }
+
         for (Locale locale : Locale.getAvailableLocales()) {
             int availability = getTts().isLanguageAvailable(locale);
             if (availability == TextToSpeech.LANG_AVAILABLE ||
