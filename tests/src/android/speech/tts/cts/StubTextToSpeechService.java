@@ -16,6 +16,7 @@
 package android.speech.tts.cts;
 
 import android.media.AudioFormat;
+import android.speech.tts.SynthesisCallback;
 import android.speech.tts.SynthesisRequest;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeechService;
@@ -49,30 +50,30 @@ public class StubTextToSpeechService extends TextToSpeechService {
     }
 
     @Override
-    protected void onSynthesizeText(SynthesisRequest request) {
+    protected void onSynthesizeText(SynthesisRequest request, SynthesisCallback callback) {
         if (TEXT_STREAM.equals(request.getText())) {
-            synthesizeStreaming(request);
+            synthesizeStreaming(request, callback);
         } else {
-            synthesizeComplete(request);
+            synthesizeComplete(request, callback);
         }
     }
 
-    private void synthesizeStreaming(SynthesisRequest request) {
-        if (request.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1) != TextToSpeech.SUCCESS) {
+    private void synthesizeStreaming(SynthesisRequest request, SynthesisCallback callback) {
+        if (callback.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1) != TextToSpeech.SUCCESS) {
             return;
         }
         byte[] data = { 0x01, 0x2 };
-        if (request.audioAvailable(data, 0, data.length) != TextToSpeech.SUCCESS) {
+        if (callback.audioAvailable(data, 0, data.length) != TextToSpeech.SUCCESS) {
             return;
         }
-        if (request.done() != TextToSpeech.SUCCESS) {
+        if (callback.done() != TextToSpeech.SUCCESS) {
             return;
         }
     }
 
-    private void synthesizeComplete(SynthesisRequest request) {
+    private void synthesizeComplete(SynthesisRequest request, SynthesisCallback callback) {
         byte[] data = { 0x01, 0x2 };
-        if (request.completeAudioAvailable(16000, AudioFormat.ENCODING_PCM_16BIT, 1,
+        if (callback.completeAudioAvailable(16000, AudioFormat.ENCODING_PCM_16BIT, 1,
                 data, 0, data.length) != TextToSpeech.SUCCESS) {
             return;
         }
