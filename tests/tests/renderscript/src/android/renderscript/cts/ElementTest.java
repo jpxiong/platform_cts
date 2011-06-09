@@ -98,6 +98,35 @@ public class ElementTest extends RSBaseCompute {
         assertTrue(Element.ELEMENT(mRS) != null);
     }
 
+    public void testEquals() {
+        assertTrue(Element.A_8(mRS).equals(Element.A_8(mRS)));
+        assertFalse(Element.A_8(mRS).equals(Element.I8(mRS)));
+
+        Element.Builder eb1 = new Element.Builder(mRS);
+        eb1.add(Element.I8(mRS), "Test");
+        Element e1 = eb1.add(Element.U8(mRS), "UTest").create();
+
+        assertTrue(e1.equals(e1));
+
+        Element.Builder eb2 = new Element.Builder(mRS);
+        eb2.add(Element.I8(mRS), "Test");
+        Element e2 = eb2.add(Element.U8(mRS), "UTest").create();
+
+        assertTrue(e1.equals(e2));
+        assertTrue(e2.equals(e1));
+        assertTrue(e1.hashCode() == e2.hashCode());
+
+        Element.Builder eb3 = new Element.Builder(mRS);
+        Element e3 = eb3.add(Element.I8(mRS), "Different").create();
+
+        assertFalse(e1.equals(e3));
+        assertFalse(e3.equals(e1));
+
+        eb1.add(Element.I8(mRS), "Another");
+        assertFalse(e1.equals(eb1.create()));
+        assertFalse(eb1.create().equals(e1));
+    }
+
     public void testElementBuilder() {
         for (int arraySize = 1; arraySize <= 3; arraySize++) {
             // Now test array size
