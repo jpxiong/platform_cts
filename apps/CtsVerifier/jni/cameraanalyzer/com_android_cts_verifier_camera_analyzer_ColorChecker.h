@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 JNIEXPORT jboolean JNICALL
-Java_com_android_cts_cameraanalyzer_ColorChecker_findNative(
+Java_com_android_cts_verifier_camera_analyzer_ColorChecker_findNative(
     JNIEnv *env,
     jobject thiz,
     jobject inputBitmap);

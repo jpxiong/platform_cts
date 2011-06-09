@@ -25,7 +25,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni libaudioquality
+LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni libaudioquality libcameraanalyzer
 
 LOCAL_SDK_VERSION := current
 
