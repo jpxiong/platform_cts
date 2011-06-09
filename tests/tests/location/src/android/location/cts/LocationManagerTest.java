@@ -27,6 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -186,7 +187,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertTrue(providers.size() >= 2);
         assertTrue(hasTestProvider(providers));
 
-        assertTrue(hasGpsProvider(providers));
+        assertEquals(hasGpsFeature(), hasGpsProvider(providers));
 
         int oldSizeAllProviders = providers.size();
 
@@ -222,6 +223,11 @@ public class LocationManagerTest extends InstrumentationTestCase {
         return hasProvider(providers, LocationManager.GPS_PROVIDER);
     }
 
+    private boolean hasGpsFeature() {
+        return mContext.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_LOCATION_GPS);
+    }
+
     private boolean hasProvider(List<String> providers, String providerName) {
         for (String provider : providers) {
             if (provider != null && provider.equals(providerName)) {
@@ -242,8 +248,12 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(TEST_MOCK_PROVIDER_NAME, p.getName());
 
         p = mManager.getProvider(LocationManager.GPS_PROVIDER);
-        assertNotNull(p);
-        assertEquals(LocationManager.GPS_PROVIDER, p.getName());
+        if (hasGpsFeature()) {
+            assertNotNull(p);
+            assertEquals(LocationManager.GPS_PROVIDER, p.getName());
+        } else {
+            assertNull(p);
+        }
 
         p = mManager.getProvider(UNKNOWN_PROVIDER_NAME);
         assertNull(p);
