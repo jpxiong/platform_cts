@@ -45,8 +45,8 @@ import java.util.ArrayList;
 /**
  * Main UI for the Android Audio Quality Verifier.
  */
-public class AudioQualityVerifierActivity extends PassFailButtons.Activity implements View.OnClickListener,
-        OnItemClickListener {
+public class AudioQualityVerifierActivity extends PassFailButtons.Activity
+        implements View.OnClickListener, OnItemClickListener {
     public static final String TAG = "AudioQualityVerifier";
 
     public static final int SAMPLE_RATE = 16000;
@@ -90,6 +90,8 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
 
     private boolean mRunningExperiment;
 
+    private BroadcastReceiver mReceiver;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,7 +120,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
 
         mExperiments = VerifierExperiments.getExperiments(this);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 experimentReplied(intent);
@@ -127,7 +129,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_EXP_STARTED);
         filter.addAction(ACTION_EXP_FINISHED);
-        registerReceiver(receiver, filter);
+        registerReceiver(mReceiver, filter);
 
         fillAdapter();
         mList.setAdapter(mAdapter);
@@ -139,6 +141,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
     public void onResume() {
         super.onResume();
         mAdapter.notifyDataSetChanged(); // Update List UI
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         checkNotSilent();
     }
 
@@ -274,5 +277,11 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity imple
             exp.reset();
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 }

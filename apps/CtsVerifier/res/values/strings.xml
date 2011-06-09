@@ -170,6 +170,8 @@
     <string name="aq_linearity_exp">Gain linearity test</string>
     <string name="aq_overflow_exp">Overflow check</string>
     <string name="aq_bias_exp">Bias measurement</string>
+    <string name="aq_cold_latency">Cold recording latency</string>
+    <string name="aq_warm_latency">Warm recording latency</string>
     
     <!-- Experiment outcomes -->
     <string name="aq_fail">Fail</string>
@@ -191,4 +193,16 @@
     <string name="aq_level_report">RMS = %1$.0f, target = %2$.0f\nTolerance = %3$.1f%%\nDuration = %4$.1fs</string>
     <string name="aq_spectrum_report_error">Cannot perform test.\nCheck volume is sufficiently high?</string>
     <string name="aq_spectrum_report_normal">RMS deviation = %1$.2f\nMax allowed deviation = %2$.1f</string>
+    <string name="aq_cold_latency_report">Latency = %1$dms, maximum allowed = %2$dms</string>
+    <string name="aq_warm_latency_report_error">RMS = %1$.0f, target = %2$.0f</string>
+    <string name="aq_warm_latency_report_normal">Latency = %1$dms</string>
+    
+    <!-- General experiment messages -->    
+    <string name="aq_audiorecord_buffer_size_error">Error getting minimum AudioRecord buffer size: %1$d</string>
+    <string name="aq_audiotrack_buffer_size_error">Error getting minimum AudioTrack buffer size: %1$d</string>
+    <string name="aq_init_audiorecord_error">Error initializing AudioRecord instance</string>
+    <string name="aq_init_audiotrack_error">Error initializing AudioTrack instance</string>
+    <string name="aq_recording_error">Error reading data from AudioRecord instance</string>
+    <string name="aq_exception_error">Exception thrown during test: %1$s</string>
+
 </resources>
