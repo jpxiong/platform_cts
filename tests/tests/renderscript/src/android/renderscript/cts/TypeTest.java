@@ -175,6 +175,22 @@ public class TypeTest extends RSBaseCompute {
         // Make sure no new enums are added
         assertEquals(6, Type.CubemapFace.values().length);
     }
+
+    public void testEquals() {
+        Type.Builder b1 = new Type.Builder(mRS, Element.F32(mRS));
+        Type t1 = b1.setX(5).setY(5).create();
+
+        Type.Builder b2 = new Type.Builder(mRS, Element.F32(mRS));
+        Type t2 = b2.setX(5).setY(5).create();
+
+        assertTrue(t1.equals(t2));
+        assertTrue(t2.equals(t1));
+        assertTrue(t1.hashCode() == t2.hashCode());
+
+        t2 = b2.setX(4).create();
+        assertFalse(t1.equals(t2));
+        assertFalse(t2.equals(t1));
+    }
 }
 
 
