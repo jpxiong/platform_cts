@@ -51,6 +51,7 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
     private static String TAG = "CtsMediaPlayerTest";
     private static final int SLEEP_TIME = 1000;
+    private static final int LONG_SLEEP_TIME = 6000;
     private final String mSourceMediaOnSdcard;
     private Monitor mOnVideoSizeChangedCalled = new Monitor();
     private Monitor mOnBufferingUpdateCalled = new Monitor();
@@ -88,6 +89,10 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
     private static class Monitor {
         private boolean signalled;
+
+        public synchronized void reset() {
+            signalled = false;
+        }
 
         public synchronized void signal() {
             signalled = true;
@@ -419,15 +424,49 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
             args = {}
         )
     })
-    public void testPlayStream() throws Throwable {
-        mServer = new CtsTestServer(mContext);
-        final String stream_mp3 = mServer.getAssetUrl("ringer.mp3");
 
-        mMediaPlayer.setDataSource(stream_mp3);
+    public void testPlayMp3Stream1() throws Throwable {
+        streamTest("ringer.mp3", false, false);
+    }
+    public void testPlayMp3Stream2() throws Throwable {
+        streamTest("ringer.mp3", false, false);
+    }
+    public void testPlayMp3StreamRedirect() throws Throwable {
+        streamTest("ringer.mp3", true, false);
+    }
+    public void testPlayMp3StreamNoLength() throws Throwable {
+        streamTest("noiseandchirps.mp3", false, true);
+    }
+    public void testPlayOggStream() throws Throwable {
+        streamTest("noiseandchirps.ogg", false, false);
+    }
+    public void testPlayOggStreamRedirect() throws Throwable {
+        streamTest("noiseandchirps.ogg", true, false);
+    }
+    public void testPlayOggStreamNoLength() throws Throwable {
+        streamTest("noiseandchirps.ogg", false, true);
+    }
+
+    private void streamTest(String name, boolean redirect, boolean nolength) throws Throwable {
+        mServer = new CtsTestServer(mContext);
+        String stream_url = null;
+        if (redirect) {
+            // Stagefright doesn't have a limit, but we can't test support of infinite redirects
+            // Up to 4 redirects seems reasonable though.
+            stream_url = mServer.getRedirectingAssetUrl(name, 4);
+        } else {
+            stream_url = mServer.getAssetUrl(name);
+        }
+        if (nolength) {
+            stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
+        }
+
+        mMediaPlayer.setDataSource(stream_url);
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
 
+        mOnBufferingUpdateCalled.reset();
         mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
             public void onBufferingUpdate(MediaPlayer mp, int percent) {
                 mOnBufferingUpdateCalled.signal();
@@ -436,11 +475,18 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
         assertFalse(mOnBufferingUpdateCalled.signalled);
         mMediaPlayer.prepare();
-        mOnBufferingUpdateCalled.waitForSignal();
 
-        mMediaPlayer.start();
-        Thread.sleep(SLEEP_TIME);
+        if (nolength) {
+            mMediaPlayer.start();
+            Thread.sleep(LONG_SLEEP_TIME);
+            assertFalse(mMediaPlayer.isPlaying());
+        } else {
+            mOnBufferingUpdateCalled.waitForSignal();
+            mMediaPlayer.start();
+            Thread.sleep(SLEEP_TIME);
+        }
         mMediaPlayer.stop();
+        mMediaPlayer.reset();
     }
 
     @TestTargets({
@@ -537,6 +583,7 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
             }
         });
 
+        mOnCompletionCalled.reset();
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
                 mOnCompletionCalled.signal();
