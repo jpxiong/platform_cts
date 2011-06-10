@@ -179,9 +179,4 @@ public class Settings_SecureTest extends AndroidTestCase {
         assertNotNull(uri);
         assertEquals(Uri.withAppendedPath(Secure.CONTENT_URI, name), uri);
     }
-
-    public void testUnknownSourcesOffByDefault() throws SettingNotFoundException {
-        assertEquals("Device should not ship with 'Unknown Sources' enabled by default.",
-                0, Secure.getInt(cr, Settings.Secure.INSTALL_NON_MARKET_APPS));
-    }
 }
