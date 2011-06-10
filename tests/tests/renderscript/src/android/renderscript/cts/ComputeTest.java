@@ -26,6 +26,8 @@ import android.renderscript.Double2;
 import android.renderscript.Double3;
 import android.renderscript.Double4;
 
+import android.renderscript.Element;
+
 import android.renderscript.Float2;
 import android.renderscript.Float3;
 import android.renderscript.Float4;
@@ -38,9 +40,13 @@ import android.renderscript.Long2;
 import android.renderscript.Long3;
 import android.renderscript.Long4;
 
+import android.renderscript.RSRuntimeException;
+
 import android.renderscript.Short2;
 import android.renderscript.Short3;
 import android.renderscript.Short4;
+
+import android.renderscript.Type;
 
 import com.android.cts.stub.R;
 
@@ -318,4 +324,52 @@ public class ComputeTest extends RSBaseCompute {
         assertEquals(result, RS_MSG_TEST_PASSED);
     }
 
+    void setUpAllocation(Allocation a, int val) {
+        Type t = a.getType();
+        int x = t.getX();
+
+        int[] arr = new int[x];
+        for (int i = 0; i < x; i++) {
+            arr[i] = val;
+        }
+        a.copyFrom(arr);
+    }
+
+    void checkAllocation(Allocation a, int val) {
+        Type t = a.getType();
+        int x = t.getX();
+
+        int[] arr = new int[x];
+        a.copyTo(arr);
+        for (int i = 0; i < x; i++) {
+            assertTrue(arr[i] == val);
+        }
+    }
+
+    /**
+     * Test support for reflected forEach() as well as validation of parameters.
+     */
+    public void testForEach() {
+        ScriptC_negate s = new ScriptC_negate(mRS,
+                                              mRes,
+                                              R.raw.negate);
+
+        int x = 7;
+        Type t = new Type.Builder(mRS, Element.I32(mRS)).setX(x).create();
+        Allocation in = Allocation.createTyped(mRS, t);
+        Allocation out = Allocation.createTyped(mRS, t);
+
+        int val = 5;
+        setUpAllocation(in, val);
+        s.forEach_root(in, out);
+        checkAllocation(out, -val);
+
+        Type badT = new Type.Builder(mRS, Element.I32(mRS)).setX(x-1).create();
+        Allocation badOut = Allocation.createTyped(mRS, badT);
+        try {
+            s.forEach_root(in, badOut);
+            fail("should throw RSRuntimeException");
+        } catch (RSRuntimeException e) {
+        }
+    }
 }
