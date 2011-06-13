@@ -908,14 +908,21 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {String.class},
         notes = "Cannot check highlighting"
     )
-    @UiThreadTest
-    public void testFindAll() throws InterruptedException {
-        String p = "<p>Find all instances of find on the page and highlight them.</p>";
+    public void testFindAll() throws Throwable {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                String p = "<p>Find all instances of find on the page and highlight them.</p>";
 
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p +"</body></html>", "text/html", "UTF-8");
+            }
+        });
         waitForLoadComplete(mWebView, TEST_TIMEOUT);
 
-        assertEquals(2, mWebView.findAll("find"));
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(2, mWebView.findAll("find"));
+            }
+        });
     }
 
     @TestTargets({
