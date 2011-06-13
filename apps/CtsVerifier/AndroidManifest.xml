@@ -24,6 +24,7 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     
@@ -108,6 +109,15 @@
                   android:label="@string/aq_view_results_name" />
 
         <service android:name=".audioquality.ExperimentService" />
+
+        <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
+                android:label="@string/camera_analyzer">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+        </activity>
 
    </application>
 

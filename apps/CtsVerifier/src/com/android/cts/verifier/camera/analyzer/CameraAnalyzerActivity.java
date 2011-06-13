@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.cameraanalyzer;
+package com.android.cts.verifier.camera.analyzer;
+
+import com.android.cts.verifier.R;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -21,16 +23,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.View;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
 
 import java.io.IOException;
 
-public class CameraAnalyzer extends Activity {
+public class CameraAnalyzerActivity extends Activity {
 
     Bitmap mInputImage;
     TextView mResultText;
@@ -42,7 +43,7 @@ public class CameraAnalyzer extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.ca_main);
 
         findViewById(R.id.runbutton).setOnClickListener(mRunListener);
 

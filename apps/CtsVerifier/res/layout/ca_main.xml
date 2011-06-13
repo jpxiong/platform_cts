@@ -20,11 +20,11 @@
   android:layout_height="fill_parent">
 
   <Button android:id="@+id/runbutton" android:layout_width="fill_parent"
-    android:layout_height="wrap_content" android:text="@string/run_label" />
+    android:layout_height="wrap_content" android:text="@string/ca_run_label" />
 
   <TextView android:id="@+id/resulttext" android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/result_label"
+            android:text="@string/ca_result_label"
             android:textSize="15sp" />
 
   <LinearLayout android:orientation="horizontal"

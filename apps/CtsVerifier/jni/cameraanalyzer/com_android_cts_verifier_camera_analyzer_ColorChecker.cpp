@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "com_android_cts_cameraanalyzer_colorchecker.h"
+#include "com_android_cts_verifier_camera_analyzer_ColorChecker.h"
 
 #include "utils/Log.h"
 #include "android/bitmap.h"
 #include "colorchecker.h"
 
-jboolean Java_com_android_cts_cameraanalyzer_ColorChecker_findNative(
+jboolean Java_com_android_cts_verifier_camera_analyzer_ColorChecker_findNative(
     JNIEnv*      env,
     jobject      thiz,
     jobject      inputBitmap) {

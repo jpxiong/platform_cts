@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.cts.cameraanalyzer;
+package com.android.cts.verifier.camera.analyzer;
 
 import android.graphics.Bitmap;
-import android.util.Log;
-
-import java.lang.RuntimeException;
 
 /** The ColorChecker class is used to locate a Xrite Classic Color Checker grid
  * pattern in an image, and return the average value of each color patch.
@@ -102,6 +99,6 @@ class ColorChecker {
     native boolean findNative(Bitmap input);
 
     static {
-        System.loadLibrary("cameraanalyzer_jni");
+        System.loadLibrary("cameraanalyzer");
     }
 }
