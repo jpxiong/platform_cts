@@ -32,6 +32,7 @@ import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.Rect;
 import android.graphics.Bitmap.Config;
+import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Bundle;
@@ -658,12 +659,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                     "</head><body onload=\"updateTitle();\"></body></html>";
 
             mWebView.addJavascriptInterface(obj, name);
-            mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", "UTF-8");
             waitForLoadComplete();
             assertEquals("object", mWebView.getTitle());
 
             mWebView.removeJavascriptInterface(name);
-            mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", "UTF-8");
             waitForLoadComplete();
             assertEquals("undefined", mWebView.getTitle());
         }
