@@ -16,6 +16,7 @@
 
 package android.view.cts;
 
+import android.view.View;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -51,6 +52,11 @@ public class GravityTest extends AndroidTestCase {
         new Gravity();
     }
 
+    private void applyGravity(int gravity, int w, int h, Rect container, Rect outRect, boolean bRtl) {
+        final int layoutDirection = bRtl ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+        Gravity.apply(gravity, w, h, mInRect, mOutRect, layoutDirection);
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -79,12 +85,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(26, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(28, mOutRect.bottom);
-        Gravity.apply(Gravity.TOP, 2, 3, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.TOP, 2, 3, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(20, mOutRect.top);
         assertEquals(23, mOutRect.bottom);
-        Gravity.apply(Gravity.TOP, 2, 3, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.TOP, 2, 3, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(20, mOutRect.top);
@@ -100,12 +106,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(26, mOutRect.right);
         assertEquals(32, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.BOTTOM, 2, 3, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.BOTTOM, 2, 3, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(37, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.BOTTOM, 2, 3, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.BOTTOM, 2, 3, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(37, mOutRect.top);
@@ -121,12 +127,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(17, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.LEFT, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.LEFT, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(12, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.LEFT, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.LEFT, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(12, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -142,12 +148,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(17, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.START, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.START, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(12, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.START, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.START, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(28, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -163,12 +169,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(25, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.RIGHT, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.RIGHT, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(28, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.RIGHT, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.RIGHT, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(28, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -184,12 +190,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(25, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.END, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.END, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(28, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.END, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.END, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(12, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -205,12 +211,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(26, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.CENTER_VERTICAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.CENTER_VERTICAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.CENTER_VERTICAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.CENTER_VERTICAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -226,12 +232,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(26, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(45, mOutRect.bottom);
-        Gravity.apply(Gravity.FILL_VERTICAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.FILL_VERTICAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(20, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.FILL_VERTICAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.FILL_VERTICAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(20, mOutRect.top);
@@ -247,12 +253,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(26, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.CENTER_HORIZONTAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.CENTER_HORIZONTAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.CENTER_HORIZONTAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.CENTER_HORIZONTAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(19, mOutRect.left);
         assertEquals(21, mOutRect.right);
         assertEquals(25, mOutRect.top);
@@ -268,12 +274,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(35, mOutRect.right);
         assertEquals(30, mOutRect.top);
         assertEquals(40, mOutRect.bottom);
-        Gravity.apply(Gravity.FILL_HORIZONTAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
+        applyGravity(Gravity.FILL_HORIZONTAL, 2, 10, mInRect, mOutRect, false /* LTR direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);
         assertEquals(35, mOutRect.bottom);
-        Gravity.apply(Gravity.FILL_HORIZONTAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
+        applyGravity(Gravity.FILL_HORIZONTAL, 2, 10, mInRect, mOutRect, true /* RTL direction */);
         assertEquals(10, mOutRect.left);
         assertEquals(30, mOutRect.right);
         assertEquals(25, mOutRect.top);

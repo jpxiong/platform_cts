@@ -1133,8 +1133,8 @@ public class DrawableContainerTest extends TestCase {
             mCalledUnscheduleDrawable = true;
         }
 
-        public boolean isLayoutRtl(Drawable who) {
-            return false;
+        public int getResolvedLayoutDirection(Drawable who) {
+            return 0;
         }
     }
 }
