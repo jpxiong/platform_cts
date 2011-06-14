@@ -100,8 +100,13 @@ public class ElementTest extends RSBaseCompute {
 
     public void testEquals() {
         assertTrue(Element.A_8(mRS).equals(Element.A_8(mRS)));
-        assertFalse(Element.A_8(mRS).equals(Element.I8(mRS)));
+        assertFalse(Element.A_8(mRS).equals(Element.U8(mRS)));
 
+        // Compatible elements
+        assertTrue(Element.A_8(mRS).isCompatible(Element.U8(mRS)));
+        assertTrue(Element.U8(mRS).isCompatible(Element.A_8(mRS)));
+
+        // Verify equivalence of user-built Elements
         Element.Builder eb1 = new Element.Builder(mRS);
         eb1.add(Element.I8(mRS), "Test");
         Element e1 = eb1.add(Element.U8(mRS), "UTest").create();
@@ -115,16 +120,119 @@ public class ElementTest extends RSBaseCompute {
         assertTrue(e1.equals(e2));
         assertTrue(e2.equals(e1));
         assertTrue(e1.hashCode() == e2.hashCode());
+        assertTrue(e1.isCompatible(e2));
+        assertTrue(e2.isCompatible(e1));
 
+        // Check name differences
         Element.Builder eb3 = new Element.Builder(mRS);
-        Element e3 = eb3.add(Element.I8(mRS), "Different").create();
+        eb3.add(Element.I8(mRS), "Test");
+        Element e3 = eb3.add(Element.U8(mRS), "NotUTest").create();
 
         assertFalse(e1.equals(e3));
         assertFalse(e3.equals(e1));
+        assertFalse(e1.isCompatible(e3));
+        assertFalse(e3.isCompatible(e1));
 
         eb1.add(Element.I8(mRS), "Another");
         assertFalse(e1.equals(eb1.create()));
         assertFalse(eb1.create().equals(e1));
+
+        // Compatible sub-elements but neither equal nor compatible
+        Element.Builder eb4 = new Element.Builder(mRS);
+        eb4.add(Element.I8(mRS), "Test");
+        Element e4 = eb4.add(Element.A_8(mRS), "UTest").create();
+
+        assertFalse(e1.equals(e4));
+        assertFalse(e4.equals(e1));
+        assertFalse(e1.isCompatible(e4));
+        assertFalse(e4.isCompatible(e1));
+
+        // Check identity from same builder
+        assertTrue(eb1.create().isCompatible(eb1.create()));
+    }
+
+    public void testIsCompatible() {
+        Element[] ALLOCATION = { Element.ALLOCATION(mRS) };
+        // A_8 is in U8
+        Element[] BOOLEAN = { Element.BOOLEAN(mRS) };
+        Element[] ELEMENT = { Element.ELEMENT(mRS) };
+        Element[] F32 = { Element.F32(mRS) };
+        Element[] F32_2 = { Element.F32_2(mRS),
+            Element.createVector(mRS, Element.DataType.FLOAT_32, 2) };
+        Element[] F32_3 = { Element.F32_3(mRS),
+            Element.createVector(mRS, Element.DataType.FLOAT_32, 3) };
+        Element[] F32_4 = { Element.F32_4(mRS),
+            Element.createVector(mRS, Element.DataType.FLOAT_32, 4) };
+        Element[] F64 = { Element.F64(mRS) };
+        Element[] I16 = { Element.I16(mRS) };
+        Element[] I32 = { Element.I32(mRS) };
+        Element[] I64 = { Element.I64(mRS) };
+        Element[] I8 = { Element.I8(mRS) };
+        // MATRIX4X4 is in MATRIX_4X4
+        Element[] MATRIX_2X2 = { Element.MATRIX_2X2(mRS) };
+        Element[] MATRIX_3X3 = { Element.MATRIX_3X3(mRS) };
+        Element[] MATRIX_4X4 = { Element.MATRIX4X4(mRS),
+                                 Element.MATRIX_4X4(mRS) };
+        Element[] MESH = { Element.MESH(mRS) };
+        Element[] PROGRAM_FRAGMENT = { Element.PROGRAM_FRAGMENT(mRS) };
+        Element[] PROGRAM_RASTER = { Element.PROGRAM_RASTER(mRS) };
+        Element[] PROGRAM_STORE = { Element.PROGRAM_STORE(mRS) };
+        Element[] PROGRAM_VERTEX = { Element.PROGRAM_VERTEX(mRS) };
+        Element[] RGBA_4444 = { Element.RGBA_4444(mRS),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_4_4_4_4,
+                                Element.DataKind.PIXEL_RGBA) };
+        Element[] RGBA_5551 = { Element.RGBA_5551(mRS),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_5_5_5_1,
+                                Element.DataKind.PIXEL_RGBA) };
+        // RGBA_8888 is in U8_4
+        Element[] RGB_565 = { Element.RGB_565(mRS),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_5_6_5,
+                                Element.DataKind.PIXEL_RGB) };
+        // RGB_888 is in U8_3
+        Element[] SAMPLER = { Element.SAMPLER(mRS) };
+        Element[] SCRIPT = { Element.SCRIPT(mRS) };
+        Element[] TYPE = { Element.TYPE(mRS) };
+        Element[] U16 = { Element.U16(mRS) };
+        Element[] U32 = { Element.U32(mRS) };
+        Element[] U64 = { Element.U64(mRS) };
+        Element[] U8 = { Element.A_8(mRS),
+                         Element.U8(mRS),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_8,
+                                Element.DataKind.PIXEL_A) };
+        Element[] U8_3 = { Element.RGB_888(mRS),
+            Element.createVector(mRS, Element.DataType.UNSIGNED_8, 3),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_8,
+                                Element.DataKind.PIXEL_RGB) };
+        Element[] U8_4 = { Element.U8_4(mRS),
+                           Element.RGBA_8888(mRS),
+            Element.createVector(mRS, Element.DataType.UNSIGNED_8, 4),
+            Element.createPixel(mRS, Element.DataType.UNSIGNED_8,
+                                Element.DataKind.PIXEL_RGBA) };
+
+        Element[][] ElementArrs = { ALLOCATION, BOOLEAN, ELEMENT, F32, F32_2,
+                                    F32_3, F32_4, F64, I16, I32, I64, I8,
+                                    MATRIX_2X2, MATRIX_3X3, MATRIX_4X4, MESH,
+                                    PROGRAM_FRAGMENT, PROGRAM_RASTER,
+                                    PROGRAM_STORE, PROGRAM_VERTEX, RGBA_4444,
+                                    RGBA_5551, RGB_565, SAMPLER, SCRIPT, TYPE,
+                                    U16, U32, U64, U8, U8_3, U8_4 };
+
+        int ElementArrsLen = ElementArrs.length;
+        for (int i = 0; i < ElementArrsLen; i++) {
+            for (int j = 0; j < ElementArrsLen; j++) {
+                for (Element el : ElementArrs[i]) {
+                    for (Element er : ElementArrs[j]) {
+                        if (i == j) {
+                            // Elements within a group are compatible
+                            assertTrue(el.isCompatible(er));
+                        } else {
+                            // Elements from different groups are incompatible
+                            assertFalse(el.isCompatible(er));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void testElementBuilder() {
