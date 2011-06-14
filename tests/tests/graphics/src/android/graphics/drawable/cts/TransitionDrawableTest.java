@@ -332,8 +332,8 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         public void unscheduleDrawable(Drawable who, Runnable what) {
         }
 
-        public boolean isLayoutRtl(Drawable who) {
-            return false;
+        public int getResolvedLayoutDirection(Drawable who) {
+            return 0;
         }
     }
 }

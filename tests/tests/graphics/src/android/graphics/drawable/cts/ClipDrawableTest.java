@@ -558,8 +558,8 @@ public class ClipDrawableTest extends AndroidTestCase {
             mRunnable = what;
         }
 
-        public boolean isLayoutRtl(Drawable who) {
-            return false;
+        public int getResolvedLayoutDirection(Drawable who) {
+            return 0;
         }
     }
 }

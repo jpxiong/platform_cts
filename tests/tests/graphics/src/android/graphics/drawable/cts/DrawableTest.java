@@ -701,13 +701,13 @@ public class DrawableTest extends AndroidTestCase {
     )
     public void testIsLayoutRtlSelf() {
         MockDrawable mockDrawable = new MockDrawable();
-        MockCallback mockCallback = new MockCallback(true);
+        MockCallback mockCallback = new MockCallback(1);
         mockDrawable.setCallback(mockCallback);
-        assertEquals(true, mockDrawable.isLayoutRtlSelf());
+        assertEquals(1, mockDrawable.getResolvedLayoutDirectionSelf());
 
-        mockCallback = new MockCallback(false);
+        mockCallback = new MockCallback(0);
         mockDrawable.setCallback(mockCallback);
-        assertEquals(false, mockDrawable.isLayoutRtlSelf());
+        assertEquals(0, mockDrawable.getResolvedLayoutDirectionSelf());
     }
 
     private static class MockDrawable extends Drawable {
@@ -749,14 +749,15 @@ public class DrawableTest extends AndroidTestCase {
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;
         private long mWhen;
-        private boolean mIsRtl;
+        private int mLayoutDirection;
 
         public MockCallback() {
-            this(false);
+            // 0 for LTR layout direction
+            this(0);
         }
 
-        public MockCallback(boolean isRtl) {
-            mIsRtl = isRtl;
+        public MockCallback(int direction) {
+            mLayoutDirection = direction;
         }
 
         public Drawable getInvalidateDrawable() {
@@ -790,8 +791,8 @@ public class DrawableTest extends AndroidTestCase {
             mRunnable = what;
         }
 
-        public boolean isLayoutRtl(Drawable who) {
-            return mIsRtl;
+        public int getResolvedLayoutDirection(Drawable who) {
+            return 0;
         }
     }
 }

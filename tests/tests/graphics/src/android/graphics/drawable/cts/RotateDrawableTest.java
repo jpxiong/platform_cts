@@ -379,8 +379,8 @@ public class RotateDrawableTest extends AndroidTestCase {
             return mCalledUnschedule;
         }
 
-        public boolean isLayoutRtl(Drawable who) {
-            return false;
+        public int getResolvedLayoutDirection(Drawable who) {
+            return 0;
         }
 
         public void reset() {
