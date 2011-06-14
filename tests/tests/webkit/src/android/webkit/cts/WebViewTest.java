@@ -622,26 +622,26 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
 
         // Test that the property is initially undefined.
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
 
         // Test that adding a null object has no effect.
         mWebView.addJavascriptInterface(null, "injectedObject");
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
 
         // Test that adding an object gives an object type.
         final Object obj = new Object();
         mWebView.addJavascriptInterface(obj, "injectedObject");
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
 
         // Test that trying to replace with a null object has no effect.
         mWebView.addJavascriptInterface(null, "injectedObject");
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
     }
@@ -677,12 +677,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                     "</head><body onload=\"updateTitle();\"></body></html>";
 
             mWebView.addJavascriptInterface(obj, name);
-            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", "UTF-8");
+            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", null);
             waitForLoadComplete();
             assertEquals("object", mWebView.getTitle());
 
             mWebView.removeJavascriptInterface(name);
-            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", "UTF-8");
+            mWebView.loadData(Uri.encode(setTitleToPropertyTypeHtml), "text/html", null);
             waitForLoadComplete();
             assertEquals("undefined", mWebView.getTitle());
         }
@@ -702,13 +702,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // Test that adding an object gives an object type.
         mWebView.addJavascriptInterface(new Object(), "injectedObject");
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
 
         // Test that reloading the page after removing the object leaves the property undefined.
         mWebView.removeJavascriptInterface("injectedObject");
-        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
+        mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", null);
         waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
     }
@@ -763,7 +763,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.loadData("<html><head></head>" +
                         "<body onload=\"window.removedObject.remove();" +
                         "resultObject.setResult(removedObject.toString());\"></body></html>",
-                        "text/html", "UTF-8");
+                        "text/html", null);
             }
         });
         assertEquals("removedObject", resultObject.getResult());
@@ -1100,7 +1100,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertNull(mWebView.getTitle());
                 mWebView.loadData("<html><head><title>Hello,World!</title></head><body></body>" +
                         "</html>",
-                        "text/html", "UTF-8");
+                        "text/html", null);
                 waitForLoadComplete();
                 assertEquals("Hello,World!", mWebView.getTitle());
             }
@@ -1138,7 +1138,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                         "document.title = " +
                         "document.getElementById('frame').contentWindow.location.href;" +
                         "\"><iframe id=\"frame\" src=\"" + crossOriginUrl + "\"></body></html>",
-                        "text/html", "UTF-8");
+                        "text/html", null);
             }
         });
         assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel());
@@ -1217,7 +1217,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testFindAll() {
         String p = "<p>Find all instances of find on the page and highlight them.</p>";
 
-        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+        mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", null);
         waitForLoadComplete();
 
         assertEquals(2, mWebView.findAll("find"));
@@ -1278,7 +1278,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 String p = "<p style=\"height:" + dimension + "px;\">" +
                         "Find all instances of a word on the page and highlight them.</p>";
 
-                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
 
                 // highlight all the strings found
@@ -1369,7 +1369,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView.loadData("<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                        "text/html", "UTF-8");
+                        "text/html", null);
                 waitForLoadComplete();
                 Message response = new Message();
                 response.setTarget(handler);
@@ -1425,7 +1425,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
                 String p = "<p style=\"height:" + dimension + "px;\">" +
                         "Scroll by half the size of the page.</p>";
-                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1508,7 +1508,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView.loadData("<html><body></body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body></body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1521,7 +1521,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         runTestOnUiThread(new Runnable() {
             public void run() {
                 assertEquals(mWebView.getHeight(), mWebView.getContentHeight() * mWebView.getScale(), 2f);
-                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1534,7 +1534,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1647,7 +1647,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
                 String p = "<p style=\"height:" + dimension + "px;" +
                         "width:" + dimension + "px\">Test fling scroll.</p>";
-                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1696,7 +1696,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 + "\">HTML_URL2</A></DL><p>";
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView.loadData("<html><body>" + links + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + links + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1774,7 +1774,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView.loadData("<html><title>Title</title><body><img src=\"" + imgUrl
-                        + "\"/></body></html>", "text/html", "UTF-8");
+                        + "\"/></body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1912,7 +1912,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1924,7 +1924,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
                 mWebView.setInitialScale(0);
                 // modify content to fool WebKit into re-loading
-                mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "2" + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1935,7 +1935,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertEquals(defaultScale, mWebView.getScale(), .01f);
 
                 mWebView.setInitialScale(50);
-                mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "3" + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -1946,7 +1946,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertEquals(0.5f, mWebView.getScale(), .02f);
 
                 mWebView.setInitialScale(0);
-                mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -2428,7 +2428,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 DisplayMetrics metrics = mWebView.getContext().getResources().getDisplayMetrics();
                 final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
                 String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
-                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", "UTF-8");
+                mWebView.loadData("<html><body>" + p + "</body></html>", "text/html", null);
                 waitForLoadComplete();
             }
         });
@@ -2497,7 +2497,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.setWebViewClient(new WebViewClient());
                 mWebView.setDownloadListener(listener);
                 mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
-                        "text/html", "UTF-8");
+                        "text/html", null);
                 waitForLoadComplete();
                 assertTrue(mWebView.requestFocus(View.FOCUS_DOWN, null));
             }
