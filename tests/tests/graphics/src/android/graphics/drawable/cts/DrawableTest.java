@@ -699,7 +699,7 @@ public class DrawableTest extends AndroidTestCase {
         method = "isLayoutRtlSelf",
         args = {java.lang.Runnable.class}
     )
-    public void testIsLayoutRtlSelf() {
+    public void getResolvedLayoutDirectionSelf() {
         MockDrawable mockDrawable = new MockDrawable();
         MockCallback mockCallback = new MockCallback(1);
         mockDrawable.setCallback(mockCallback);
@@ -792,7 +792,7 @@ public class DrawableTest extends AndroidTestCase {
         }
 
         public int getResolvedLayoutDirection(Drawable who) {
-            return 0;
+            return mLayoutDirection;
         }
     }
 }
