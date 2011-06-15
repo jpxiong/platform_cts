@@ -51,6 +51,20 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     private int mDefaultDensity;
     private int mTargetDensity;
 
+    // The test images, including baseline JPEG, a PNG, a GIF, a BMP AND a WEBP.
+    private static int[] RES_IDS = new int[] {
+            R.drawable.baseline_jpeg, R.drawable.png_test, R.drawable.gif_test,
+            R.drawable.bmp_test, R.drawable.webp_test
+    };
+    private static String[] NAMES_TEMP_FILES = new String[] {
+        "baseline_temp.jpg", "png_temp.png", "gif_temp.gif",
+        "bmp_temp.bmp", "webp_temp.webp"
+    };
+
+    // The width and height of the above image.
+    private static int WIDTHS[] = new int[] { 1280, 640, 320, 320, 640 };
+    private static int HEIGHTS[] = new int[] { 960, 480, 240, 240, 480 };
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -169,6 +183,22 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "decodeStream",
+        args = {java.io.InputStream.class}
+    )
+    public void testDecodeStream3() throws IOException {
+        for (int i = 0; i < RES_IDS.length; ++i) {
+            InputStream is = obtainInputStream(RES_IDS[i]);
+            Bitmap b = BitmapFactory.decodeStream(is);
+            assertNotNull(b);
+            // Test the bitmap size
+            assertEquals(HEIGHTS[i], b.getHeight());
+            assertEquals(WIDTHS[i], b.getWidth());
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "decodeFileDescriptor",
         args = {java.io.FileDescriptor.class, android.graphics.Rect.class,
                 android.graphics.BitmapFactory.Options.class}
@@ -238,6 +268,10 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
     private InputStream obtainInputStream() {
         return mRes.openRawResource(R.drawable.start);
+    }
+
+    private InputStream obtainInputStream(int resId) {
+        return mRes.openRawResource(resId);
     }
 
     private FileDescriptor obtainDescriptor(String path) throws IOException {
