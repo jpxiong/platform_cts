@@ -203,6 +203,11 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         }
     }
 
+    public void testScreenFeatures() {
+        assertTrue(mPackageManager.hasSystemFeature(PackageManager.FEATURE_SCREEN_LANDSCAPE)
+                || mPackageManager.hasSystemFeature(PackageManager.FEATURE_SCREEN_PORTRAIT));
+    }
+
     /**
      * Check that the sensor features reported by the PackageManager correspond to the sensors
      * returned by {@link SensorManager#getSensorList(int)}.
