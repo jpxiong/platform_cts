@@ -254,6 +254,7 @@ public class BluetoothTestActivity extends PassFailButtons.ListActivity {
         if (data != null) {
             TestResult result = TestResult.fromActivityResult(resultCode, data);
             TestListItem test = secure ? mSecureClientTest : mInsecureClientTest;
+            test.setResult(result.getResult());
             updateTest(test);
         }
     }
