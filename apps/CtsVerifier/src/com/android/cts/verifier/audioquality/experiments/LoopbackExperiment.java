@@ -131,10 +131,7 @@ public class LoopbackExperiment extends Experiment {
         public void run() {
             final int minBufferSize = AudioQualityVerifierActivity.SAMPLE_RATE
                     * AudioQualityVerifierActivity.BYTES_PER_SAMPLE;
-            final int minHardwareBufferSize = AudioRecord.getMinBufferSize(
-                    AudioQualityVerifierActivity.SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO, AudioQualityVerifierActivity.AUDIO_FORMAT);
-            final int bufferSize = Math.max(minHardwareBufferSize, minBufferSize);
+            final int bufferSize = Utils.getAudioRecordBufferSize(minBufferSize);
 
             mRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
                     AudioQualityVerifierActivity.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,

@@ -50,7 +50,7 @@ public class BackgroundAudio extends Thread {
         final int minHardwareBufferSize =
                 AudioTrack.getMinBufferSize(AudioQualityVerifierActivity.SAMPLE_RATE,
                         AudioFormat.CHANNEL_OUT_MONO, AudioQualityVerifierActivity.AUDIO_FORMAT);
-        mBufferSize = Math.max(minHardwareBufferSize, minBufferSize);
+        mBufferSize = Utils.getAudioTrackBufferSize(minBufferSize);
         Log.i(TAG, "minBufferSize = " + minBufferSize + ", minHWSize = " + minHardwareBufferSize
                 + ", bufferSize = " + mBufferSize);
 

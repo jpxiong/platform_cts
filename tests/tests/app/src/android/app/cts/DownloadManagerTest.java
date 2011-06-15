@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.cts.CtsTestServer;
@@ -32,6 +33,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class DownloadManagerTest extends AndroidTestCase {
+
+    /**
+     * According to the CDD Section 7.6.1, the DownloadManager implementation must be able to
+     * download individual files of 55 MB.
+     */
+    private static final int MINIMUM_DOWNLOAD_BYTES = 55 * 1024 * 1024;
 
     private DownloadManager mDownloadManager;
 
@@ -42,6 +49,7 @@ public class DownloadManagerTest extends AndroidTestCase {
         super.setUp();
         mDownloadManager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
         mWebServer = new CtsTestServer(mContext);
+        clearDownloads();
     }
 
     @Override
@@ -51,10 +59,9 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     public void testDownloadManager() throws Exception {
-        DownloadCompleteReceiver receiver = new DownloadCompleteReceiver();
+        DownloadCompleteReceiver receiver =
+                new DownloadCompleteReceiver(2, TimeUnit.SECONDS.toMillis(3));
         try {
-            removeAllDownloads();
-
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             mContext.registerReceiver(receiver, intentFilter);
 
@@ -79,9 +86,50 @@ public class DownloadManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testMinimumDownload() throws Exception {
+        DownloadCompleteReceiver receiver =
+                new DownloadCompleteReceiver(1, TimeUnit.MINUTES.toMillis(2));
+        try {
+            IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+            mContext.registerReceiver(receiver, intentFilter);
+
+            long id = mDownloadManager.enqueue(new Request(getMinimumDownloadUrl()));
+            receiver.waitForDownloadComplete();
+
+            ParcelFileDescriptor fileDescriptor = mDownloadManager.openDownloadedFile(id);
+            assertEquals(MINIMUM_DOWNLOAD_BYTES, fileDescriptor.getStatSize());
+
+            Cursor cursor = null;
+            try {
+                cursor = mDownloadManager.query(new Query().setFilterById(id));
+                assertTrue(cursor.moveToNext());
+                assertEquals(DownloadManager.STATUS_SUCCESSFUL, cursor.getInt(
+                        cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+                assertEquals(MINIMUM_DOWNLOAD_BYTES, cursor.getInt(
+                        cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)));
+                assertFalse(cursor.moveToNext());
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+
+            assertRemoveDownload(id, 0);
+        } finally {
+            mContext.unregisterReceiver(receiver);
+        }
+    }
+
     private class DownloadCompleteReceiver extends BroadcastReceiver {
 
-        private final CountDownLatch mReceiveLatch = new CountDownLatch(2);
+        private final CountDownLatch mReceiveLatch;
+
+        private final long waitTimeMs;
+
+        public DownloadCompleteReceiver(int numDownload, long waitTimeMs) {
+            this.mReceiveLatch = new CountDownLatch(numDownload);
+            this.waitTimeMs = waitTimeMs;
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -90,11 +138,11 @@ public class DownloadManagerTest extends AndroidTestCase {
 
         public void waitForDownloadComplete() throws InterruptedException {
             assertTrue("Make sure you have WiFi or some other connectivity for this test.",
-                    mReceiveLatch.await(3, TimeUnit.SECONDS));
+                    mReceiveLatch.await(waitTimeMs, TimeUnit.MILLISECONDS));
         }
     }
 
-    private void removeAllDownloads() {
+    private void clearDownloads() {
         if (getTotalNumberDownloads() > 0) {
             Cursor cursor = null;
             try {
@@ -116,11 +164,16 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     private Uri getGoodUrl() {
-        return Uri.parse(mWebServer.getTestDownloadUrl());
+        return Uri.parse(mWebServer.getTestDownloadUrl("cts-good-download", 0));
     }
 
     private Uri getBadUrl() {
         return Uri.parse(mWebServer.getBaseUri() + "/nosuchurl");
+    }
+
+    private Uri getMinimumDownloadUrl() {
+        return Uri.parse(mWebServer.getTestDownloadUrl("cts-minimum-download",
+                MINIMUM_DOWNLOAD_BYTES));
     }
 
     private int getTotalNumberDownloads() {
