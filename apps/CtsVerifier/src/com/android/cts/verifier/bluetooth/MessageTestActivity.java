@@ -18,11 +18,16 @@ package com.android.cts.verifier.bluetooth;
 
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
+import com.android.cts.verifier.TestResult;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,12 +48,17 @@ public class MessageTestActivity extends PassFailButtons.Activity {
     static final String EXTRA_DEVICE_ADDRESS = "deviceAddress";
     static final String EXTRA_SECURE = "secure";
 
+    /** Broadcast action that should only be fired when pairing for a secure connection. */
+    private static final String ACTION_PAIRING_REQUEST =
+            "android.bluetooth.device.action.PAIRING_REQUEST";
+
     private static final int ENABLE_BLUETOOTH_REQUEST = 1;
 
     private static final String MESSAGE_DELIMITER = "\n";
     private static final Pattern MESSAGE_PATTERN = Pattern.compile("Message (\\d+) to .*");
 
     private BluetoothAdapter mBluetoothAdapter;
+    private PairingActionReceiver mPairingActionReceiver;
     private BluetoothChatService mChatService;
 
     private ArrayAdapter<String> mReceivedMessagesAdapter;
@@ -111,6 +121,10 @@ public class MessageTestActivity extends PassFailButtons.Activity {
         });
 
         getPassButton().setEnabled(false);
+
+        mPairingActionReceiver = new PairingActionReceiver();
+        IntentFilter intentFilter = new IntentFilter(ACTION_PAIRING_REQUEST);
+        registerReceiver(mPairingActionReceiver, intentFilter);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter.isEnabled()) {
@@ -284,9 +298,41 @@ public class MessageTestActivity extends PassFailButtons.Activity {
         Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
     }
 
+    class PairingActionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!mSecure && ACTION_PAIRING_REQUEST.equals(intent.getAction())) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showPairingErrorDialog();
+                    }
+                });
+            }
+        }
+    }
+
+    private void showPairingErrorDialog() {
+        new AlertDialog.Builder(MessageTestActivity.this)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setTitle(R.string.bt_insecure_pairing_error_title)
+            .setMessage(R.string.bt_insecure_pairing_error_message)
+            .setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    TestResult.setFailedResult(MessageTestActivity.this);
+                    finish();
+                }
+            })
+            .setCancelable(false)
+            .show();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mChatService.stop();
+        unregisterReceiver(mPairingActionReceiver);
     }
 }
