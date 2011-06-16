@@ -53,6 +53,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsProviderTestCases \
 	CtsRenderscriptTestCases \
 	CtsSaxTestCases \
+	CtsSecurityTestCases \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \
 	CtsTestStubs \
