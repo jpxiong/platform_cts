@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.ClipboardManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -113,6 +114,10 @@ public class TestListActivity extends ListActivity {
                 handleClearItemSelected();
                 return true;
 
+            case R.id.copy:
+                handleCopyItemSelected();
+                return true;
+
             case R.id.share:
                 handleShareItemSelected();
                 return true;
@@ -126,6 +131,13 @@ public class TestListActivity extends ListActivity {
         ContentResolver resolver = getContentResolver();
         resolver.delete(TestResultsProvider.RESULTS_CONTENT_URI, "1", null);
         Toast.makeText(this, R.string.test_results_cleared, Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleCopyItemSelected() {
+        TestResultsReport report = new TestResultsReport(this, getListAdapter());
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        clipboardManager.setText(report.getBody());
+        Toast.makeText(this, R.string.test_results_copied, Toast.LENGTH_SHORT).show();
     }
 
     private void handleShareItemSelected() {

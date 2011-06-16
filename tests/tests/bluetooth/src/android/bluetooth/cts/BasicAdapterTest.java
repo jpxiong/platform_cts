@@ -105,7 +105,7 @@ public class BasicAdapterTest extends AndroidTestCase {
             "00:00:e0:00:00:00"));
         assertFalse(BluetoothAdapter.checkBluetoothAddress(
             "00:00:0f:00:00:00"));
-        
+
         assertTrue(BluetoothAdapter.checkBluetoothAddress(
             "00:00:00:00:00:00"));
         assertTrue(BluetoothAdapter.checkBluetoothAddress(
