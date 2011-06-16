@@ -84,7 +84,7 @@ public class AccessibilityEndToEndTest extends
      * Timeout required for pending Binder calls or event processing to
      * complete.
      */
-    private static final long MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING = 1000;
+    private static final long MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING = 2000;
 
     /**
      * The count of the polling attempts during {@link #MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING}

@@ -19,6 +19,7 @@ package android.hardware.cts;
 import java.util.List;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.test.AndroidTestCase;
@@ -75,16 +76,33 @@ public class SensorTest extends AndroidTestCase {
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         assertNotNull(sensors);
         Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        assertEquals(Sensor.TYPE_ACCELEROMETER, sensor.getType());
-        assertSensorValues(sensor);
+        boolean hasAccelerometer = getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_SENSOR_ACCELEROMETER);
+        // accelerometer sensor is optional
+        if (hasAccelerometer) {
+            assertEquals(Sensor.TYPE_ACCELEROMETER, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        assertEquals(Sensor.TYPE_MAGNETIC_FIELD, sensor.getType());
-        assertSensorValues(sensor);
+        boolean hasCompass = getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_SENSOR_COMPASS);
+        // compass sensor is optional
+        if (hasCompass) {
+            assertEquals(Sensor.TYPE_MAGNETIC_FIELD, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        assertEquals(Sensor.TYPE_ORIENTATION, sensor.getType());
-        assertSensorValues(sensor);
+        // orientation sensor is required if the device can physically implement it
+        if (hasCompass && hasAccelerometer) {
+            assertEquals(Sensor.TYPE_ORIENTATION, sensor.getType());
+            assertSensorValues(sensor);
+        }
 
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
         // temperature sensor is optional

@@ -17,11 +17,13 @@
 package com.android.cts.verifier.audioquality;
 
 import com.android.cts.verifier.audioquality.experiments.BiasExperiment;
+import com.android.cts.verifier.audioquality.experiments.ColdLatencyExperiment;
 import com.android.cts.verifier.audioquality.experiments.OverflowExperiment;
 import com.android.cts.verifier.audioquality.experiments.GainLinearityExperiment;
 import com.android.cts.verifier.audioquality.experiments.GlitchExperiment;
 import com.android.cts.verifier.audioquality.experiments.SoundLevelExperiment;
 import com.android.cts.verifier.audioquality.experiments.SpectrumShapeExperiment;
+import com.android.cts.verifier.audioquality.experiments.WarmLatencyExperiment;
 
 import android.content.Context;
 
@@ -47,7 +49,8 @@ public class VerifierExperiments {
             mExperiments.add(new SpectrumShapeExperiment());
             mExperiments.add(new GlitchExperiment(0));
             mExperiments.add(new GlitchExperiment(7));
-            // mExperiments.add(new VoiceRecognitionExperiment());
+            mExperiments.add(new ColdLatencyExperiment());
+            mExperiments.add(new WarmLatencyExperiment());
             for (Experiment exp : mExperiments) {
                 exp.init(context);
             }
