@@ -39,6 +39,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -4377,6 +4378,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         )
     })
     public void testHapticFeedback() {
+        // Expect true to be returned for a haptic feedback only if haptics are enabled.
+        boolean expectedHapticsReturnValue = Settings.System.getInt(mActivity.getContentResolver(),
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 0) != 0;
         final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
         final int LONG_PRESS = HapticFeedbackConstants.LONG_PRESS;
         final int FLAG_IGNORE_VIEW_SETTING = HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING;
@@ -4387,11 +4391,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(view.isHapticFeedbackEnabled());
         assertFalse(view.performHapticFeedback(LONG_PRESS));
         assertFalse(view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
-        assertTrue(view.performHapticFeedback(LONG_PRESS, ALWAYS));
+        assertEquals(expectedHapticsReturnValue, view.performHapticFeedback(LONG_PRESS, ALWAYS));
 
         view.setHapticFeedbackEnabled(true);
         assertTrue(view.isHapticFeedbackEnabled());
-        assertTrue(view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
+        assertEquals(expectedHapticsReturnValue, view.performHapticFeedback(
+                LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
     }
 
     @TestTargets({
