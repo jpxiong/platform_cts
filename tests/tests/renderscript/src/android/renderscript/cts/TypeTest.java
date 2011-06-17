@@ -169,11 +169,15 @@ public class TypeTest extends RSBaseCompute {
         assertEquals(Type.CubemapFace.NEGATIVE_X, Type.CubemapFace.valueOf("NEGATIVE_X"));
         assertEquals(Type.CubemapFace.NEGATIVE_Y, Type.CubemapFace.valueOf("NEGATIVE_Y"));
         assertEquals(Type.CubemapFace.NEGATIVE_Z, Type.CubemapFace.valueOf("NEGATIVE_Z"));
+        assertEquals(Type.CubemapFace.POSITIVE_X, Type.CubemapFace.valueOf("POSITIVE_X"));
+        assertEquals(Type.CubemapFace.POSITIVE_Y, Type.CubemapFace.valueOf("POSITIVE_Y"));
+        assertEquals(Type.CubemapFace.POSITIVE_Z, Type.CubemapFace.valueOf("POSITIVE_Z"));
+        // Legacy typo enums
         assertEquals(Type.CubemapFace.POSITVE_X, Type.CubemapFace.valueOf("POSITVE_X"));
         assertEquals(Type.CubemapFace.POSITVE_Y, Type.CubemapFace.valueOf("POSITVE_Y"));
         assertEquals(Type.CubemapFace.POSITVE_Z, Type.CubemapFace.valueOf("POSITVE_Z"));
         // Make sure no new enums are added
-        assertEquals(6, Type.CubemapFace.values().length);
+        assertEquals(9, Type.CubemapFace.values().length);
     }
 
     public void testEquals() {
