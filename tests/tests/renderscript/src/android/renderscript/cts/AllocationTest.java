@@ -285,83 +285,103 @@ public class AllocationTest extends RSBaseGraphics {
      * Test all copy from/to routines for byte/short/int/float
      */
 
-    void helperFloatCopy(int nElems) {
+    void helperFloatCopy(int nElems, int offset, int count, int copyMode) {
         Allocation A = Allocation.createSized(mRS, Element.F32(mRS), nElems);
 
         float src[], dst[];
         src = new float[nElems];
         dst = new float[nElems];
-        for (int i = 0; i < nElems; i++) {
+        for (int i = 0; i < count; i++) {
             src[i] = (float)i;
-            dst[i] = -1.0f;
+            dst[offset + i] = -1.0f;
         }
 
-        A.copyFrom(src);
+        switch (copyMode) {
+        case 0: A.copyFrom(src); break;
+        case 1: A.copyFromUnchecked(src); break;
+        case 2: A.copy1DRangeFrom(offset, count, src); break;
+        case 3: A.copy1DRangeFromUnchecked(offset, count, src); break;
+        }
         A.copyTo(dst);
 
-        for (int i = 0; i < nElems; i++) {
-            assertEquals(dst[i], src[i]);
+        for (int i = 0; i < count; i++) {
+            assertEquals(dst[offset + i], src[i]);
         }
     }
 
-    void helperByteCopy(int nElems) {
+    void helperByteCopy(int nElems, int offset, int count, int copyMode) {
         Allocation A = Allocation.createSized(mRS, Element.I8(mRS), nElems);
 
         byte src[], dst[];
         src = new byte[nElems];
         dst = new byte[nElems];
-        for (int i = 0; i < nElems; i++) {
+        for (int i = 0; i < count; i++) {
             src[i] = (byte)i;
-            dst[i] = -1;
+            dst[offset + i] = -1;
         }
 
-        A.copyFrom(src);
+        switch (copyMode) {
+        case 0: A.copyFrom(src); break;
+        case 1: A.copyFromUnchecked(src); break;
+        case 2: A.copy1DRangeFrom(offset, count, src); break;
+        case 3: A.copy1DRangeFromUnchecked(offset, count, src); break;
+        }
         A.copyTo(dst);
 
-        for (int i = 0; i < nElems; i++) {
-            assertEquals(dst[i], src[i]);
+        for (int i = 0; i < count; i++) {
+            assertEquals(dst[offset + i], src[i]);
         }
     }
 
-    void helperShortCopy(int nElems) {
+    void helperShortCopy(int nElems, int offset, int count, int copyMode) {
         Allocation A = Allocation.createSized(mRS, Element.I16(mRS), nElems);
 
         short src[], dst[];
         src = new short[nElems];
         dst = new short[nElems];
-        for (int i = 0; i < nElems; i++) {
+        for (int i = 0; i < count; i++) {
             src[i] = (short)i;
-            dst[i] = -1;
+            dst[offset + i] = -1;
         }
 
-        A.copyFrom(src);
+        switch (copyMode) {
+        case 0: A.copyFrom(src); break;
+        case 1: A.copyFromUnchecked(src); break;
+        case 2: A.copy1DRangeFrom(offset, count, src); break;
+        case 3: A.copy1DRangeFromUnchecked(offset, count, src); break;
+        }
         A.copyTo(dst);
 
-        for (int i = 0; i < nElems; i++) {
-            assertEquals(dst[i], src[i]);
+        for (int i = 0; i < count; i++) {
+            assertEquals(dst[offset + i], src[i]);
         }
     }
 
-    void helperIntCopy(int nElems) {
+    void helperIntCopy(int nElems, int offset, int count, int copyMode) {
         Allocation A = Allocation.createSized(mRS, Element.I32(mRS), nElems);
 
         int src[], dst[];
         src = new int[nElems];
         dst = new int[nElems];
-        for (int i = 0; i < nElems; i++) {
+        for (int i = 0; i < count; i++) {
             src[i] = i;
-            dst[i] = -1;
+            dst[offset + i] = -1;
         }
 
-        A.copyFrom(src);
+        switch (copyMode) {
+        case 0: A.copyFrom(src); break;
+        case 1: A.copyFromUnchecked(src); break;
+        case 2: A.copy1DRangeFrom(offset, count, src); break;
+        case 3: A.copy1DRangeFromUnchecked(offset, count, src); break;
+        }
         A.copyTo(dst);
 
-        for (int i = 0; i < nElems; i++) {
-            assertEquals(dst[i], src[i]);
+        for (int i = 0; i < count; i++) {
+            assertEquals(dst[offset + i], src[i]);
         }
     }
 
-    void helperBaseObjCopy(int nElems) {
+    void helperBaseObjCopy(int nElems, int offset, int count, int copyMode) {
         Allocation A =
             Allocation.createSized(mRS, Element.ELEMENT(mRS), nElems);
         Element E[] = new Element[nElems];
@@ -404,11 +424,26 @@ public class AllocationTest extends RSBaseGraphics {
 
     public void testCopyOperations() {
         for (int s = 8; s <= elemsToTest; s += 2) {
-            helperFloatCopy(s);
-            helperByteCopy(s);
-            helperShortCopy(s);
-            helperIntCopy(s);
-            helperBaseObjCopy(s);
+            for (int mode = 0; mode <= 1; mode ++) {
+                helperFloatCopy(s, 0, s, mode);
+                helperByteCopy(s, 0, s, mode);
+                helperShortCopy(s, 0, s, mode);
+                helperIntCopy(s, 0, s, mode);
+                helperBaseObjCopy(s, 0, s, mode);
+            }
+
+            // now test copy range
+            for (int mode = 2; mode <= 3; mode ++) {
+                for (int off = 0; off < s; off ++) {
+                    for (int count = 1; count <= s - off; count ++) {
+                        helperFloatCopy(s, off, count, mode);
+                        helperByteCopy(s, off, count, mode);
+                        helperShortCopy(s, off, count, mode);
+                        helperIntCopy(s, off, count, mode);
+                        helperBaseObjCopy(s, off, count, mode);
+                    }
+                }
+            }
         }
         helperBitmapCopy(bDimX, bDimY);
     }
