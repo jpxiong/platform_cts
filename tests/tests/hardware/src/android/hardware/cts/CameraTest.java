@@ -67,11 +67,17 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             "/test.jpg";
     private byte[] mJpegData;
 
-    private boolean mPreviewCallbackResult = false;
+    private static final int PREVIEW_CALLBACK_NOT_RECEIVED = 0;
+    private static final int PREVIEW_CALLBACK_RECEIVED = 1;
+    private static final int PREVIEW_CALLBACK_DATA_NULL = 2;
+    private static final int PREVIEW_CALLBACK_INVALID_FRAME_SIZE = 3;
+    private int mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
+
     private boolean mShutterCallbackResult = false;
     private boolean mRawPictureCallbackResult = false;
     private boolean mJpegPictureCallbackResult = false;
-    private boolean mErrorCallbackResult = false;
+    private static final int NO_ERROR = -1;
+    private int mCameraErrorCode = NO_ERROR;
     private boolean mAutoFocusSucceeded = false;
 
     private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1500;  // Milliseconds.
@@ -120,7 +126,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * Initializes the message looper so that the Camera object can
      * receive the callback messages.
      */
-    private void initializeMessageLooper(final int cameraId) {
+    private void initializeMessageLooper(final int cameraId) throws IOException {
         final ConditionVariable startDone = new ConditionVariable();
         new Thread() {
             @Override
@@ -131,8 +137,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // Save the looper so that we can terminate this thread
                 // after we are done with it.
                 mLooper = Looper.myLooper();
-                mCamera = Camera.open(cameraId);
-                mCamera.setErrorCallback(mErrorCallback);
+                try {
+                    mCamera = Camera.open(cameraId);
+                    mCamera.setErrorCallback(mErrorCallback);
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Fail to open camera." + e);
+                }
                 Log.v(TAG, "camera is opened");
                 startDone.open();
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
@@ -145,6 +155,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Log.v(TAG, "initializeMessageLooper: start timeout");
             fail("initializeMessageLooper: start timeout");
         }
+        assertNotNull("Fail to open camera.", mCamera);
+        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
     }
 
     /*
@@ -160,18 +172,29 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mLooper.getThread().join();
         mCamera.release();
         mCamera = null;
+        assertEquals("Got camera error callback.", NO_ERROR, mCameraErrorCode);
     }
 
     //Implement the previewCallback
     private final class PreviewCallback
             implements android.hardware.Camera.PreviewCallback {
         public void onPreviewFrame(byte [] data, Camera camera) {
-            assertNotNull(data);
+            if (data == null) {
+                mPreviewCallbackResult = PREVIEW_CALLBACK_DATA_NULL;
+                mPreviewDone.open();
+                return;
+            }
             Size size = camera.getParameters().getPreviewSize();
             int format = camera.getParameters().getPreviewFormat();
             int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
-            assertEquals(size.width * size.height * bitsPerPixel / 8, data.length);
-            mPreviewCallbackResult = true;
+            if (size.width * size.height * bitsPerPixel / 8 != data.length) {
+                Log.e(TAG, "Invalid frame size " + data.length + ". width=" + size.width
+                        + ". height=" + size.height + ". bitsPerPixel=" + bitsPerPixel);
+                mPreviewCallbackResult = PREVIEW_CALLBACK_INVALID_FRAME_SIZE;
+                mPreviewDone.open();
+                return;
+            }
+            mPreviewCallbackResult = PREVIEW_CALLBACK_RECEIVED;
             mCamera.stopPreview();
             if (LOGV) Log.v(TAG, "notify the preview callback");
             mPreviewDone.open();
@@ -230,8 +253,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     // Implement the ErrorCallback
     private final class TestErrorCallback implements ErrorCallback {
         public void onError(int error, Camera camera) {
-            mErrorCallbackResult = true;
-            fail("Got camera error from ErrorCallback: " + error);
+            Log.e(TAG, "Got camera error=" + error);
+            mCameraErrorCode = error;
         }
     }
 
@@ -272,7 +295,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void checkPreviewCallback() throws Exception {
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         if (LOGV) Log.v(TAG, "check preview callback");
         mCamera.startPreview();
         waitForPreviewDone();
@@ -329,7 +351,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testTakePictureByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         Size pictureSize = mCamera.getParameters().getPictureSize();
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
         assertTrue(waitForFocusDone());
@@ -398,25 +419,25 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setPreviewCallback(mPreviewCallback);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertTrue(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
 
-        mPreviewCallbackResult = false;
+        mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
         initializeMessageLooper(cameraId);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertFalse(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_NOT_RECEIVED, mPreviewCallbackResult);
 
         // Test all preview sizes.
         initializeMessageLooper(cameraId);
         Parameters parameters = mCamera.getParameters();
         for (Size size: parameters.getSupportedPreviewSizes()) {
-            mPreviewCallbackResult = false;
+            mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
             mCamera.setPreviewCallback(mPreviewCallback);
             parameters.setPreviewSize(size.width, size.height);
             mCamera.setParameters(parameters);
             assertEquals(size, mCamera.getParameters().getPreviewSize());
             checkPreviewCallback();
-            assertTrue(mPreviewCallbackResult);
+            assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
             try {
                 // Wait for a while to throw away the remaining preview frames.
                 Thread.sleep(1000);
@@ -447,13 +468,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setOneShotPreviewCallback(mPreviewCallback);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertTrue(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
 
-        mPreviewCallbackResult = false;
+        mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
         initializeMessageLooper(cameraId);
         checkPreviewCallback();
         terminateMessageLooper();
-        assertFalse(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_NOT_RECEIVED, mPreviewCallbackResult);
     }
 
     @TestTargetNew(
@@ -480,28 +501,28 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
-        assertTrue(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
 
         // Check the order: setPreviewDisplay->startPreview.
         initializeMessageLooper(cameraId);
-        mPreviewCallbackResult = false;
+        mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
         mCamera.setOneShotPreviewCallback(mPreviewCallback);
         mCamera.setPreviewDisplay(holder);
         mCamera.startPreview();
         waitForPreviewDone();
         mCamera.stopPreview();
-        assertTrue(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
 
         // Check the order: setting preview display to null->startPreview->
         // setPreviewDisplay.
-        mPreviewCallbackResult = false;
+        mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
         mCamera.setOneShotPreviewCallback(mPreviewCallback);
         mCamera.setPreviewDisplay(null);
         mCamera.startPreview();
         mCamera.setPreviewDisplay(holder);
         waitForPreviewDone();
         terminateMessageLooper();
-        assertTrue(mPreviewCallbackResult);
+        assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
     }
 
     @TestTargetNew(
@@ -536,7 +557,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
 
         // Start preview.
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
 
         // Check setting orientation during preview is not allowed.
@@ -807,7 +827,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(sizes.contains(mCamera.new Size(0, 0)));
 
         // Test if the thumbnail size matches the setting.
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
@@ -849,7 +868,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testJpegExifByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         Camera.Parameters parameters = mCamera.getParameters();
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         double focalLength = (double)parameters.getFocalLength();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
@@ -1060,6 +1078,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mCamera.setPreviewCallbackWithBuffer(callback);
             mCamera.startPreview();
             waitForPreviewDone();
+            assertFalse(callback.mPreviewDataNull);
+            assertFalse(callback.mInvalidData);
             assertEquals(1, callback.mNumCbWithBuffer1);
             assertEquals(1, callback.mNumCbWithBuffer2);
             assertEquals(0, callback.mNumCbWithBuffer3);
@@ -1067,6 +1087,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             // Test if preview callback with buffer still works during preview.
             mCamera.addCallbackBuffer(callback.mBuffer3);
             waitForPreviewDone();
+            assertFalse(callback.mPreviewDataNull);
+            assertFalse(callback.mInvalidData);
             assertEquals(1, callback.mNumCbWithBuffer1);
             assertEquals(1, callback.mNumCbWithBuffer2);
             assertEquals(1, callback.mNumCbWithBuffer3);
@@ -1080,8 +1102,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             implements android.hardware.Camera.PreviewCallback {
         public int mNumCbWithBuffer1, mNumCbWithBuffer2, mNumCbWithBuffer3;
         public byte[] mBuffer1, mBuffer2, mBuffer3;
+        public boolean mPreviewDataNull, mInvalidData;
         public void onPreviewFrame(byte[] data, Camera camera) {
-            assertNotNull(data);
+            if (data == null) {
+                Log.e(TAG, "Preview data is null!");
+                mPreviewDataNull = true;
+                mPreviewDone.open();
+                return;
+            }
             if (data == mBuffer1) {
                 mNumCbWithBuffer1++;
             } else if (data == mBuffer2) {
@@ -1089,7 +1117,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             } else if (data == mBuffer3) {
                 mNumCbWithBuffer3++;
             } else {
-                fail("Invalid byte array.");
+                Log.e(TAG, "Invalid byte array.");
+                mInvalidData = true;
+                mPreviewDone.open();
+                return;
             }
 
             if ((mNumCbWithBuffer1 == 1 && mNumCbWithBuffer2 == 1)
@@ -1099,40 +1130,20 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startSmoothZoom",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSmoothZoom",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setZoomChangeListener",
-            args = {android.hardware.Camera.OnZoomChangeListener.class}
-        )
-    })
     @UiThreadTest
-    public void testZoom() throws Exception {
+    public void testImmediateZoom() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
         for (int id = 0; id < nCameras; id++) {
             Log.v(TAG, "Camera id=" + id);
-            initializeMessageLooper(id);
-            testImmediateZoom();
-            testSmoothZoom();
-            terminateMessageLooper();
+            testImmediateZoomByCamera(id);
         }
     }
 
-    private void testImmediateZoom() throws Exception {
+    private void testImmediateZoomByCamera(int id) throws Exception {
+        initializeMessageLooper(id);
+
         Parameters parameters = mCamera.getParameters();
         if (!parameters.isZoomSupported()) return;
-
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
 
         // Test the zoom parameters.
         assertEquals(0, parameters.getZoom());  // default zoom should be 0.
@@ -1175,15 +1186,44 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                                 mJpegPictureCallback);
             waitForSnapshotDone();
         }
+
+        terminateMessageLooper();
     }
 
-    private void testSmoothZoom() throws Exception {
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "startSmoothZoom",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "stopSmoothZoom",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setZoomChangeListener",
+            args = {android.hardware.Camera.OnZoomChangeListener.class}
+        )
+    })
+    @UiThreadTest
+    public void testSmoothZoom() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testSmoothZoomByCamera(id);
+        }
+    }
+
+    private void testSmoothZoomByCamera(int id) throws Exception {
+        initializeMessageLooper(id);
+
         Parameters parameters = mCamera.getParameters();
         if (!parameters.isSmoothZoomSupported()) return;
         assertTrue(parameters.isZoomSupported());
 
         ZoomListener zoomListener = new ZoomListener();
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.setZoomChangeListener(zoomListener);
         mCamera.startPreview();
         waitForPreviewDone();
@@ -1212,24 +1252,31 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(maxZoom, mCamera.getParameters().getZoom());
         assertEquals(maxZoom, zoomListener.mValues.size());
         for(int i = 0; i < maxZoom; i++) {
-            // Make sure we get all the callbacks in order.
-            assertEquals(i + 1, zoomListener.mValues.get(i).intValue());
+            int value = zoomListener.mValues.get(i);
+            boolean stopped = zoomListener.mStopped.get(i);
+            // Make sure we get all the zoom values in order.
+            assertEquals(i + 1, value);
+            // All "stopped" except the last should be false.
+            assertEquals(i == maxZoom - 1, stopped);
         }
 
         // Test startSmoothZoom. Make sure we get all the callbacks.
         if (maxZoom > 1) {
-            zoomListener.mValues = new ArrayList<Integer>();
-            zoomListener.mStopped = false;
+            zoomListener.mValues.clear();
+            zoomListener.mStopped.clear();
             Log.e(TAG, "zoomListener.mStopped = " + zoomListener.mStopped);
             zoomListener.mZoomDone.close();
             mCamera.startSmoothZoom(maxZoom / 2);
             assertTrue(zoomListener.mZoomDone.block(5000));
             assertEquals(maxZoom / 2, mCamera.getParameters().getZoom());
             assertEquals(maxZoom - (maxZoom / 2), zoomListener.mValues.size());
-            int i = maxZoom - 1;
-            for(Integer value: zoomListener.mValues) {
-                assertEquals(i, value.intValue());
-                i--;
+            for(int i = 0; i < zoomListener.mValues.size(); i++) {
+                int value = zoomListener.mValues.get(i);
+                boolean stopped = zoomListener.mStopped.get(i);
+                // Make sure we get all the zoom values in order.
+                assertEquals(maxZoom - 1 - i, value);
+                // All "stopped" except the last should be false.
+                assertEquals(i == zoomListener.mValues.size() - 1, stopped);
             }
         }
 
@@ -1242,8 +1289,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
 
         // Test stopSmoothZoom.
-        zoomListener.mValues = new ArrayList<Integer>();
-        zoomListener.mStopped = false;
+        zoomListener.mValues.clear();
+        zoomListener.mStopped.clear();
         zoomListener.mZoomDone.close();
         parameters.setZoom(0);
         mCamera.setParameters(parameters);
@@ -1253,21 +1300,29 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(zoomListener.mZoomDone.block(5000));
         assertEquals(zoomListener.mValues.size(), mCamera.getParameters().getZoom());
         for(int i = 0; i < zoomListener.mValues.size() - 1; i++) {
+            int value = zoomListener.mValues.get(i);
+            boolean stopped = zoomListener.mStopped.get(i);
             // Make sure we get all the callbacks in order (except the last).
-            assertEquals(i + 1, zoomListener.mValues.get(i).intValue());
+            assertEquals(i + 1, value);
+            // All "stopped" except the last should be false. stopSmoothZoom has been called. So the
+            // last "stopped" can be true or false.
+            if (i != zoomListener.mValues.size() - 1) {
+                assertFalse(stopped);
+            }
         }
+
+        terminateMessageLooper();
     }
 
     private final class ZoomListener
             implements android.hardware.Camera.OnZoomChangeListener {
         public ArrayList<Integer> mValues = new ArrayList<Integer>();
-        public boolean mStopped;
+        public ArrayList<Boolean> mStopped = new ArrayList<Boolean>();
         public final ConditionVariable mZoomDone = new ConditionVariable();
 
         public void onZoomChange(int value, boolean stopped, Camera camera) {
             mValues.add(value);
-            assertFalse(mStopped);
-            mStopped = stopped;
+            mStopped.add(stopped);
             if (stopped) {
                 mZoomDone.open();
             }
@@ -1285,7 +1340,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testFocusDistancesByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         waitForPreviewDone();
         Parameters parameters = mCamera.getParameters();
@@ -1370,7 +1424,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testCancelAutofocusByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
 
         // No op if autofocus is not in progress.
@@ -1513,7 +1566,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testPreviewPictureSizesCombinationByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         Parameters parameters = mCamera.getParameters();
         PreviewCbForPreviewPictureSizesCombination callback =
             new PreviewCbForPreviewPictureSizesCombination();
@@ -1535,7 +1587,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 Log.v(TAG, "Test previewSize=(" + previewSize.width + "," +
                         previewSize.height + ") pictureSize=(" +
                         pictureSize.width + "," + pictureSize.height + ")");
-                mPreviewCallbackResult = false;
+                mPreviewCallbackResult = PREVIEW_CALLBACK_NOT_RECEIVED;
                 mCamera.setPreviewCallback(callback);
                 callback.expectedPreviewSize = previewSize;
                 parameters.setPreviewSize(previewSize.width, previewSize.height);
@@ -1547,7 +1599,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // Check if the preview size is the same as requested.
                 mCamera.startPreview();
                 waitForPreviewDone();
-                assertTrue(mPreviewCallbackResult);
+                assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
 
                 // Check if the picture size is the same as requested.
                 mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
@@ -1568,14 +1620,26 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             implements android.hardware.Camera.PreviewCallback {
         public Size expectedPreviewSize;
         public void onPreviewFrame(byte[] data, Camera camera) {
-            assertNotNull(data);
+            if (data == null) {
+                mPreviewCallbackResult = PREVIEW_CALLBACK_DATA_NULL;
+                mPreviewDone.open();
+                return;
+            }
             Size size = camera.getParameters().getPreviewSize();
-            assertEquals(expectedPreviewSize, size);
             int format = camera.getParameters().getPreviewFormat();
             int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
-            assertEquals(size.width * size.height * bitsPerPixel / 8, data.length);
+            if (!expectedPreviewSize.equals(size) ||
+                    size.width * size.height * bitsPerPixel / 8 != data.length) {
+                Log.e(TAG, "Expected preview width=" + expectedPreviewSize.width + ", height="
+                        + expectedPreviewSize.height + ". Actual width=" + size.width + ", height="
+                        + size.height);
+                Log.e(TAG, "Frame data length=" + data.length + ". bitsPerPixel=" + bitsPerPixel);
+                mPreviewCallbackResult = PREVIEW_CALLBACK_INVALID_FRAME_SIZE;
+                mPreviewDone.open();
+                return;
+            }
             camera.setPreviewCallback(null);
-            mPreviewCallbackResult = true;
+            mPreviewCallbackResult = PREVIEW_CALLBACK_RECEIVED;
             mPreviewDone.open();
         }
     }
@@ -1591,7 +1655,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testPreviewFpsRangeByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
 
         // Test if the parameters exists and minimum fps <= maximum fps.
         int[] defaultFps = new int[2];
@@ -1806,7 +1869,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
             // Make sure scene mode settings are consistent before preview and
             // after preview.
-            mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
             mCamera.startPreview();
             waitForPreviewDone();
             for (int i = 0; i < supportedSceneModes.size(); i++) {
@@ -1934,7 +1996,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testGetParameterDuringFocusByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
         Parameters parameters = mCamera.getParameters();
         for (String focusMode: parameters.getSupportedFocusModes()) {
@@ -1969,7 +2030,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testPreviewFormatsByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         Parameters parameters = mCamera.getParameters();
         for (int format: parameters.getSupportedPreviewFormats()) {
             Log.v(TAG, "Test preview format " + format);
@@ -1978,7 +2038,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mCamera.startPreview();
             waitForPreviewDone();
-            assertTrue(mPreviewCallbackResult);
+            assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
         }
         terminateMessageLooper();
     }
@@ -2010,7 +2070,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Start first camera
         if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 0");
         initializeMessageLooper(0);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         SimplePreviewStreamCb callback0 = new SimplePreviewStreamCb(0);
         mCamera.setPreviewCallback(callback0);
         if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 0");
@@ -2033,7 +2092,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // set mCamera and mLooper to new objects)
         if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 1");
         initializeMessageLooper(1);
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         SimplePreviewStreamCb callback1 = new SimplePreviewStreamCb(1);
         mCamera.setPreviewCallback(callback1);
         if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 1");
@@ -2107,7 +2165,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void testAreas(int type, int maxNumAreas) throws Exception {
-        mCamera.setPreviewDisplay(getActivity().getSurfaceView().getHolder());
         mCamera.startPreview();
 
         // Test various valid cases.
