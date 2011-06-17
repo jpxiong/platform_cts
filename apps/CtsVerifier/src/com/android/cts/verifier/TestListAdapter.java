@@ -17,13 +17,17 @@
 package com.android.cts.verifier;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,14 +63,21 @@ import java.util.Map;
  *             <meta-data android:name="test_category" android:value="@string/test_category_security" />
  *         </pre>
  *     </li>
+ *     <li>OPTIONAL: Add a meta data attribute to indicate whether this test has a parent test.
+ *         <pre>
+ *             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+ *         </pre>
+ *     </li>
  * </ol>
  */
-class TestListAdapter extends BaseAdapter {
+public class TestListAdapter extends BaseAdapter {
 
     /** Activities implementing {@link Intent#ACTION_MAIN} and this will appear in the list. */
     public static final String CATEGORY_MANUAL_TEST = "android.cts.intent.category.MANUAL_TEST";
 
     private static final String TEST_CATEGORY_META_DATA = "test_category";
+
+    private static final String TEST_PARENT_META_DATA = "test_parent";
 
     /** View type for a category of tests like "Sensors" or "Features" */
     private static final int CATEGORY_HEADER_VIEW_TYPE = 0;
@@ -79,8 +90,10 @@ class TestListAdapter extends BaseAdapter {
 
     private final Context mContext;
 
+    private final String mTestParent;
+
     /** Immutable data of tests like the test's title and launch intent. */
-    private final List<TestListItem> mRows;
+    private final List<TestListItem> mRows = new ArrayList<TestListAdapter.TestListItem>();
 
     /** Mutable test results that will change as each test activity finishes. */
     private final Map<String, Integer> mTestResults = new HashMap<String, Integer>();
@@ -88,7 +101,7 @@ class TestListAdapter extends BaseAdapter {
     private final LayoutInflater mLayoutInflater;
 
     /** {@link ListView} row that is either a test category header or a test. */
-    static class TestListItem {
+    public static class TestListItem {
 
         /** Title shown in the {@link ListView}. */
         final String title;
@@ -98,6 +111,9 @@ class TestListAdapter extends BaseAdapter {
 
         /** Intent used to launch the activity from the list. Null for categories. */
         final Intent intent;
+
+        /** Tests within this test. For instance, the Bluetooth test contains more tests. */
+        final List<TestListItem> subItems = new ArrayList<TestListItem>();
 
         static TestListItem newTest(String title, String className, Intent intent) {
             return new TestListItem(title, className, intent);
@@ -113,26 +129,81 @@ class TestListAdapter extends BaseAdapter {
             this.intent = intent;
         }
 
+        public Intent getIntent() {
+            return intent;
+        }
+
         boolean isTest() {
             return intent != null;
         }
+
+        void addTestListItem(TestListItem item) {
+            subItems.add(item);
+        }
     }
 
-    TestListAdapter(Context context) {
+    public TestListAdapter(Context context, String testParent) {
         this.mContext = context;
-        this.mRows = getRows(context);
+        this.mTestParent = testParent;
         this.mLayoutInflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        updateTestResults(mContext, mTestResults);
+
+        TestResultContentObserver observer = new TestResultContentObserver();
+        ContentResolver resolver = context.getContentResolver();
+        resolver.registerContentObserver(TestResultsProvider.RESULTS_CONTENT_URI, true, observer);
     }
 
-    static List<TestListItem> getRows(Context context) {
+    public void loadTestResults() {
+        new RefreshTestResultsTask().execute();
+    }
+
+    public void clearTestResults() {
+        new ClearTestResultsTask().execute();
+    }
+
+    public void setTestResult(TestResult testResult) {
+        new SetTestResultTask(testResult.getName(), testResult.getResult()).execute();
+    }
+
+    class RefreshTestResultsTask extends AsyncTask<Void, Void, RefreshResult> {
+        @Override
+        protected RefreshResult doInBackground(Void... params) {
+            List<TestListItem> rows = getRows();
+            Map<String, Integer> results = getTestResults();
+            return new RefreshResult(rows, results);
+        }
+
+        @Override
+        protected void onPostExecute(RefreshResult result) {
+            super.onPostExecute(result);
+            mRows.clear();
+            mRows.addAll(result.mItems);
+            mTestResults.clear();
+            mTestResults.putAll(result.mResults);
+            notifyDataSetChanged();
+        }
+    }
+
+    static class RefreshResult {
+        List<TestListItem> mItems;
+        Map<String, Integer> mResults;
+
+        RefreshResult(List<TestListItem> items, Map<String, Integer> results) {
+            mItems = items;
+            mResults = results;
+        }
+    }
+
+    List<TestListItem> getRows() {
+
         /*
-         * 1. Get all the tests keyed by their category.
-         * 2. Flatten the tests and categories into one giant list for the list view.
+         * 1. Get all the tests belonging to the test parent.
+         * 2. Get all the tests keyed by their category.
+         * 3. Flatten the tests and categories into one giant list for the list view.
          */
 
-        Map<String, List<TestListItem>> testsByCategory = getTestsByCategory(context);
+        List<ResolveInfo> infos = getResolveInfosForParent();
+        Map<String, List<TestListItem>> testsByCategory = getTestsByCategory(infos);
 
         List<String> testCategories = new ArrayList<String>(testsByCategory.keySet());
         Collections.sort(testCategories);
@@ -152,25 +223,41 @@ class TestListAdapter extends BaseAdapter {
         return allRows;
     }
 
-    static Map<String, List<TestListItem>> getTestsByCategory(Context context) {
-        Map<String, List<TestListItem>> testsByCategory =
-                new HashMap<String, List<TestListItem>>();
-
+    List<ResolveInfo> getResolveInfosForParent() {
         Intent mainIntent = new Intent(Intent.ACTION_MAIN);
         mainIntent.addCategory(CATEGORY_MANUAL_TEST);
 
-        PackageManager packageManager = context.getPackageManager();
+        PackageManager packageManager = mContext.getPackageManager();
         List<ResolveInfo> list = packageManager.queryIntentActivities(mainIntent,
                 PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
+        int size = list.size();
 
-        for (int i = 0; i < list.size(); i++) {
+        List<ResolveInfo> matchingList = new ArrayList<ResolveInfo>();
+        for (int i = 0; i < size; i++) {
             ResolveInfo info = list.get(i);
-            String testCategory = getTestCategory(context, info.activityInfo.metaData);
-            String title = getTitle(context, info.activityInfo);
+            String parent = getTestParent(mContext, info.activityInfo.metaData);
+            if ((mTestParent == null && parent == null)
+                    || (mTestParent != null && mTestParent.equals(parent))) {
+                matchingList.add(info);
+            }
+        }
+        return matchingList;
+    }
+
+    Map<String, List<TestListItem>> getTestsByCategory(List<ResolveInfo> list) {
+        Map<String, List<TestListItem>> testsByCategory =
+                new HashMap<String, List<TestListItem>>();
+
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            ResolveInfo info = list.get(i);
+            String title = getTitle(mContext, info.activityInfo);
             String className = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);
+            TestListItem item = TestListItem.newTest(title, className, intent);
 
-            addTestToCategory(testsByCategory, testCategory, title, className, intent);
+            String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
+            addTestToCategory(testsByCategory, testCategory, item);
         }
 
         return testsByCategory;
@@ -188,6 +275,10 @@ class TestListAdapter extends BaseAdapter {
         }
     }
 
+    static String getTestParent(Context context, Bundle metaData) {
+        return metaData != null ? metaData.getString(TEST_PARENT_META_DATA) : null;
+    }
+
     static String getTitle(Context context, ActivityInfo activityInfo) {
         if (activityInfo.labelRes != 0) {
             return context.getString(activityInfo.labelRes);
@@ -203,7 +294,7 @@ class TestListAdapter extends BaseAdapter {
     }
 
     static void addTestToCategory(Map<String, List<TestListItem>> testsByCategory,
-            String testCategory, String title, String className, Intent intent) {
+            String testCategory, TestListItem item) {
         List<TestListItem> tests;
         if (testsByCategory.containsKey(testCategory)) {
             tests = testsByCategory.get(testCategory);
@@ -211,12 +302,12 @@ class TestListAdapter extends BaseAdapter {
             tests = new ArrayList<TestListItem>();
         }
         testsByCategory.put(testCategory, tests);
-        tests.add(TestListItem.newTest(title, className, intent));
+        tests.add(item);
     }
 
-    static void updateTestResults(Context context, Map<String, Integer> testResults) {
-        testResults.clear();
-        ContentResolver resolver = context.getContentResolver();
+    Map<String, Integer> getTestResults() {
+        Map<String, Integer> results = new HashMap<String, Integer>();
+        ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
         try {
             cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI,
@@ -225,7 +316,7 @@ class TestListAdapter extends BaseAdapter {
                 do {
                     String className = cursor.getString(1);
                     int testResult = cursor.getInt(2);
-                    testResults.put(className, testResult);
+                    results.put(className, testResult);
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -233,11 +324,59 @@ class TestListAdapter extends BaseAdapter {
                 cursor.close();
             }
         }
+        return results;
     }
 
-    public void refreshTestResults() {
-        updateTestResults(mContext, mTestResults);
-        notifyDataSetChanged();
+    class ClearTestResultsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.delete(TestResultsProvider.RESULTS_CONTENT_URI, "1", null);
+            return null;
+        }
+    }
+
+    class SetTestResultTask extends AsyncTask<Void, Void, Void> {
+
+        private final String mTestName;
+
+        private final int mResult;
+
+        SetTestResultTask(String testName, int result) {
+            mTestName = testName;
+            mResult = result;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ContentValues values = new ContentValues(2);
+            values.put(TestResultsProvider.COLUMN_TEST_RESULT, mResult);
+            values.put(TestResultsProvider.COLUMN_TEST_NAME, mTestName);
+
+            ContentResolver resolver = mContext.getContentResolver();
+            int numUpdated = resolver.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
+                    TestResultsProvider.COLUMN_TEST_NAME + " = ?",
+                    new String[] {mTestName});
+
+            if (numUpdated == 0) {
+                resolver.insert(TestResultsProvider.RESULTS_CONTENT_URI, values);
+            }
+            return null;
+        }
+    }
+
+    class TestResultContentObserver extends ContentObserver {
+
+        public TestResultContentObserver() {
+            super(new Handler());
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            loadTestResults();
+        }
     }
 
     @Override
