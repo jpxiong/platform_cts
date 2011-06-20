@@ -23,9 +23,12 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.config.Option;
+import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.result.InputStreamSource;
+import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -64,35 +67,44 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
     private ITestDevice mDevice;
 
-    @Option(name = PLAN_OPTION, description = "the test plan to run")
+    @Option(name = PLAN_OPTION, description = "the test plan to run.",
+            importance = Importance.IF_UNSET)
     private String mPlanName = null;
 
-    @Option(name = PACKAGE_OPTION, description = "the test packages(s) to run")
+    @Option(name = PACKAGE_OPTION, description = "the test packages(s) to run.",
+            importance = Importance.IF_UNSET)
     private Collection<String> mPackageNames = new ArrayList<String>();
 
-    @Option(name = "exclude-package", description = "the test packages(s) to exclude from the run")
+    @Option(name = "exclude-package", description = "the test packages(s) to exclude from the run.")
     private Collection<String> mExcludedPackageNames = new ArrayList<String>();
 
-    @Option(name = CLASS_OPTION, shortName = 'c', description = "run a specific test class")
+    @Option(name = CLASS_OPTION, shortName = 'c', description = "run a specific test class.",
+            importance = Importance.IF_UNSET)
     private String mClassName = null;
 
     @Option(name = METHOD_OPTION, shortName = 'm',
-            description = "run a specific test method, from given --class")
+            description = "run a specific test method, from given --class.",
+            importance = Importance.IF_UNSET)
     private String mMethodName = null;
 
     @Option(name = "collect-device-info", description =
-        "flag to control whether to collect info from device. Default true")
+        "flag to control whether to collect info from device. Turning this off will speed up test" +
+        "execution for short test runs but will result in required data being omitted from the " +
+        "test report.")
     private boolean mCollectDeviceInfo = true;
 
     @Option(name = "resume", description =
-        "flag to attempt to automatically resume aborted test run on another connected device. " +
-        "Default false.")
+        "flag to attempt to automatically resume aborted test run on another connected device. ")
     private boolean mResume = false;
 
     @Option(name = "shards", description =
         "shard the tests to run into separately runnable chunks to execute on multiple devices " +
-        "concurrently")
+        "concurrently.")
     private int mShards = 1;
+
+    @Option(name = "screenshot", description =
+        "flag for taking a screenshot of the device when test execution is complete.")
+    private boolean mScreenshot = false;
 
     /** data structure for a {@link IRemoteTest} and its known tests */
     private class KnownTests {
@@ -246,6 +258,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             ResultFilter filter = new ResultFilter(listener, testPair.getKnownTests());
             test.run(filter);
             mRemainingTests.remove(0);
+        }
+
+        if (mScreenshot) {
+            InputStreamSource screenshotSource = getDevice().getScreenshot();
+            try {
+                listener.testLog("screenshot", LogDataType.PNG, screenshotSource);
+            } finally {
+                screenshotSource.cancel();
+            }
         }
     }
 

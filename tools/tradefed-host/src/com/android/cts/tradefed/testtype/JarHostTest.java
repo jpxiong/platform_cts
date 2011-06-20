@@ -196,7 +196,7 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver {
             deviceTest.setDevice(getDevice().getIDevice());
             deviceTest.setTestAppPath(mCtsBuild.getTestCasesDir().getAbsolutePath());
         }
-        CommandStatus status = RunUtil.getInstance().runTimed(mTimeoutMs, new IRunnableResult() {
+        CommandStatus status = RunUtil.getDefault().runTimed(mTimeoutMs, new IRunnableResult() {
 
             @Override
             public boolean run() throws Exception {
