@@ -56,13 +56,61 @@
         
         <activity android:name=".bluetooth.BluetoothToggleActivity"
                 android:label="@string/bt_toggle_bluetooth"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_control" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
 
+        <activity android:name=".bluetooth.SecureServerActivity"
+                android:label="@string/bt_secure_server"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+        
+        <activity android:name=".bluetooth.InsecureServerActivity"
+                android:label="@string/bt_insecure_server"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.SecureClientActivity"
+                android:label="@string/bt_secure_client"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+        
+        <activity android:name=".bluetooth.InsecureClientActivity"
+                android:label="@string/bt_insecure_client"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>       
+        
         <activity android:name=".bluetooth.DevicePickerActivity"
                 android:label="@string/bt_device_picker"
-                android:configChanges="keyboardHidden|orientation" />
-
-        <activity android:name=".bluetooth.MessageTestActivity"
                 android:configChanges="keyboardHidden|orientation" />
 
         <activity android:name=".suid.SuidFilesActivity" 
