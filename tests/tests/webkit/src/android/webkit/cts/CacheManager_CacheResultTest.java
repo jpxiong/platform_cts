@@ -27,6 +27,7 @@ import org.apache.http.impl.cookie.DateUtils;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.CacheManager.CacheResult;
 
@@ -49,6 +50,7 @@ public class CacheManager_CacheResultTest
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+        mWebView.setWebChromeClient(new WebChromeClient());
     }
 
     @Override
