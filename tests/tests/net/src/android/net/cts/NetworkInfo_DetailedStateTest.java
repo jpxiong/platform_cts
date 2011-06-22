@@ -64,7 +64,7 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
         assertEquals(DetailedState.DISCONNECTING, expected[7]);
         assertEquals(DetailedState.DISCONNECTED, expected[8]);
         assertEquals(DetailedState.FAILED, expected[9]);
-        assertEquals(DetailedState.FAILED, expected[10]);
+        assertEquals(DetailedState.BLOCKED, expected[10]);
     }
 
 }
