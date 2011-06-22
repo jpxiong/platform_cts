@@ -74,7 +74,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "44073",    // KDDI
                     "44074",    // KDDI
                     "44075",    // KDDI
-                    "44076"     // KDDI
+                    "44076",    // KDDI
+                    "311870"    // Boost Mobile
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
