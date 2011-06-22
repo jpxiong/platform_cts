@@ -83,7 +83,7 @@ public class ActivityManagerMemoryClassTest
 
             case DisplayMetrics.DENSITY_HIGH:
             case DisplayMetrics.DENSITY_XHIGH:
-                expectedMinimumMemory = isXLarge ? 48 : 24;
+                expectedMinimumMemory = isXLarge ? 48 : 48;
                 break;
 
             default:
