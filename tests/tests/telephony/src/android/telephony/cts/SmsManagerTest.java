@@ -31,6 +31,8 @@ import android.os.SystemClock;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
+import android.telephony.SmsMessage;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +56,7 @@ public class SmsManagerTest extends AndroidTestCase {
 
     private static final String SMS_SEND_ACTION = "CTS_SMS_SEND_ACTION";
     private static final String SMS_DELIVERY_ACTION = "CTS_SMS_DELIVERY_ACTION";
+    private static final String DATA_SMS_RECEIVED_ACTION = "android.intent.action.DATA_SMS_RECEIVED";
 
     // List of network operators that don't support SMS delivery report
     private static final List<String> NO_DELIVERY_REPORTS =
@@ -98,11 +101,14 @@ public class SmsManagerTest extends AndroidTestCase {
     private String mText;
     private SmsBroadcastReceiver mSendReceiver;
     private SmsBroadcastReceiver mDeliveryReceiver;
+    private SmsBroadcastReceiver mDataSmsReceiver;
     private PendingIntent mSentIntent;
     private PendingIntent mDeliveredIntent;
     private Intent mSendIntent;
     private Intent mDeliveryIntent;
     private boolean mDeliveryReportSupported;
+    private static boolean mReceivedDataSms;
+    private static String mReceivedText;
 
     private static final int TIME_OUT = 1000 * 60 * 5;
 
@@ -168,12 +174,17 @@ public class SmsManagerTest extends AndroidTestCase {
 
         IntentFilter sendIntentFilter = new IntentFilter(SMS_SEND_ACTION);
         IntentFilter deliveryIntentFilter = new IntentFilter(SMS_DELIVERY_ACTION);
+        IntentFilter dataSmsReceivedIntentFilter = new IntentFilter(DATA_SMS_RECEIVED_ACTION);
+        dataSmsReceivedIntentFilter.addDataScheme("sms");
+        dataSmsReceivedIntentFilter.addDataAuthority("localhost", "19989");
 
         mSendReceiver = new SmsBroadcastReceiver(SMS_SEND_ACTION);
         mDeliveryReceiver = new SmsBroadcastReceiver(SMS_DELIVERY_ACTION);
+        mDataSmsReceiver = new SmsBroadcastReceiver(DATA_SMS_RECEIVED_ACTION);
 
         getContext().registerReceiver(mSendReceiver, sendIntentFilter);
         getContext().registerReceiver(mDeliveryReceiver, deliveryIntentFilter);
+        getContext().registerReceiver(mDataSmsReceiver, dataSmsReceivedIntentFilter);
 
         // send single text sms
         init();
@@ -199,6 +210,9 @@ public class SmsManagerTest extends AndroidTestCase {
             if (mDeliveryReportSupported) {
                 assertTrue(mDeliveryReceiver.waitForCalls(1, TIME_OUT));
             }
+            mDataSmsReceiver.waitForCalls(1, TIME_OUT);
+            assertTrue(mReceivedDataSms);
+            assertEquals(mReceivedText, mText);
         } else {
             // This GSM network doesn't support Data(binary) SMS message.
             // Skip the test.
@@ -229,6 +243,8 @@ public class SmsManagerTest extends AndroidTestCase {
     private void init() {
         mSendReceiver.reset();
         mDeliveryReceiver.reset();
+        mDataSmsReceiver.reset();
+        mReceivedDataSms = false;
         mSentIntent = PendingIntent.getBroadcast(getContext(), 0, mSendIntent,
                 PendingIntent.FLAG_ONE_SHOT);
         mDeliveredIntent = PendingIntent.getBroadcast(getContext(), 0, mDeliveryIntent,
@@ -284,6 +300,25 @@ public class SmsManagerTest extends AndroidTestCase {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(mAction.equals(DATA_SMS_RECEIVED_ACTION)){
+                StringBuilder sb = new StringBuilder();
+                Bundle bundle = intent.getExtras();
+                if (bundle != null) {
+                    Object[] obj = (Object[]) bundle.get("pdus");
+                    SmsMessage[] message = new SmsMessage[obj.length];
+                    for (int i = 0; i < obj.length; i++) {
+                        message[i] = SmsMessage.createFromPdu((byte[]) obj[i]);
+                    }
+
+                    for (SmsMessage currentMessage : message) {
+                        byte[] binaryContent = currentMessage.getUserData();
+                        String readableContent = new String(binaryContent);
+                        sb.append(readableContent);
+                    }
+                }
+                mReceivedDataSms = true;
+                mReceivedText=sb.toString();
+            }
             if (intent.getAction().equals(mAction)) {
                 synchronized (mLock) {
                     mCalls += 1;
