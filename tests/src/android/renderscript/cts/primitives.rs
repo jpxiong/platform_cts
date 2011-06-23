@@ -1,3 +1,14 @@
+/*****************************************************************************
+ *****
+ *****
+ *****
+ ***** DANGER
+ ***** DO NOT ALTER THIS TEST WITHOUT VERIFYING ScriptTest.java STILL WORKS
+ ***** WE DEPEND ON VARIABLE ORDER FOR VERIFICATION
+ *****
+ *****
+ *****
+ *****************************************************************************/
 #include "shared.rsh"
 #include "structs.rsh"
 
@@ -9,6 +20,14 @@ short shortTest = -16;
 int intTest = -32;
 long longTest = 17179869184l; // 1 << 34
 long long longlongTest = 68719476736l; // 1 << 36
+bool boolTest = false;
+
+struct myStruct {
+    int i;
+} structTest;
+
+rs_allocation allocationTest;
+int *intPtrTest;
 
 uchar ucharTest = 8;
 ushort ushortTest = 16;
