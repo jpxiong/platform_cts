@@ -64,6 +64,10 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -377,11 +381,11 @@ public class CtsTestServer {
                 .toString();
     }
 
-    public String getLastRequestUrl() {
+    public synchronized String getLastRequestUrl() {
         return mLastQuery;
     }
 
-    public int getRequestCount() {
+    public synchronized int getRequestCount() {
         return mRequestCount;
     }
 
@@ -390,7 +394,7 @@ public class CtsTestServer {
      * value, the server will include a "Expires" header.
      * @param timeMillis The time, in milliseconds, for which any future response will be valid.
      */
-    public void setDocumentValidity(long timeMillis) {
+    public synchronized void setDocumentValidity(long timeMillis) {
         mDocValidity = timeMillis;
     }
 
@@ -399,7 +403,7 @@ public class CtsTestServer {
      * a "Last-Modified" header calculated from the value.
      * @param timeMillis The age, in milliseconds, of any document served in the future.
      */
-    public void setDocumentAge(long timeMillis) {
+    public synchronized void setDocumentAge(long timeMillis) {
         mDocAge = timeMillis;
     }
 
@@ -411,10 +415,14 @@ public class CtsTestServer {
     private HttpResponse getResponse(HttpRequest request) throws InterruptedException, IOException {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
-        mRequestCount += 1;
         Log.i(TAG, requestLine.getMethod() + ": " + requestLine.getUri());
         String uriString = requestLine.getUri();
-        mLastQuery = uriString;
+
+        synchronized (this) {
+            mRequestCount += 1;
+            mLastQuery = uriString;
+        }
+
         URI uri = URI.create(uriString);
         String path = uri.getPath();
         String query = uri.getQuery();
@@ -585,15 +593,17 @@ public class CtsTestServer {
 
     private void setDateHeaders(HttpResponse response) {
         long time = System.currentTimeMillis();
-        if (mDocValidity != 0) {
-            String expires =
-                    DateUtils.formatDate(new Date(time + mDocValidity), DateUtils.PATTERN_RFC1123);
-            response.addHeader("Expires", expires);
-        }
-        if (mDocAge != 0) {
-            String modified =
-                    DateUtils.formatDate(new Date(time - mDocAge), DateUtils.PATTERN_RFC1123);
-            response.addHeader("Last-Modified", modified);
+        synchronized (this) {
+            if (mDocValidity != 0) {
+                String expires = DateUtils.formatDate(new Date(time + mDocValidity),
+                        DateUtils.PATTERN_RFC1123);
+                response.addHeader("Expires", expires);
+            }
+            if (mDocAge != 0) {
+                String modified = DateUtils.formatDate(new Date(time - mDocAge),
+                        DateUtils.PATTERN_RFC1123);
+                response.addHeader("Last-Modified", modified);
+            }
         }
         response.addHeader("Date", DateUtils.formatDate(new Date(), DateUtils.PATTERN_RFC1123));
     }
@@ -601,7 +611,7 @@ public class CtsTestServer {
     /**
      * Create an empty response with the given status.
      */
-    private HttpResponse createResponse(int status) {
+    private static HttpResponse createResponse(int status) {
         HttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_0, status, null);
 
         // Fill in error reason. Avoid use of the ReasonPhraseCatalog, which is Locale-dependent.
@@ -620,7 +630,7 @@ public class CtsTestServer {
     /**
      * Create a string entity for the given content.
      */
-    private StringEntity createEntity(String content) {
+    private static StringEntity createEntity(String content) {
         try {
             StringEntity entity = new StringEntity(content);
             entity.setContentType("text/html");
@@ -631,7 +641,7 @@ public class CtsTestServer {
         return null;
     }
 
-    private HttpResponse createTestDownloadResponse(Uri uri) throws IOException {
+    private static HttpResponse createTestDownloadResponse(Uri uri) throws IOException {
         String downloadId = uri.getQueryParameter(DOWNLOAD_ID_PARAMETER);
         int numBytes = uri.getQueryParameter(NUM_BYTES_PARAMETER) != null
                 ? Integer.parseInt(uri.getQueryParameter(NUM_BYTES_PARAMETER))
@@ -642,7 +652,7 @@ public class CtsTestServer {
         return response;
     }
 
-    private FileEntity createFileEntity(String downloadId, int numBytes) throws IOException {
+    private static FileEntity createFileEntity(String downloadId, int numBytes) throws IOException {
         String storageState = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equalsIgnoreCase(storageState)) {
             File storageDir = Environment.getExternalStorageDirectory();
@@ -668,6 +678,7 @@ public class CtsTestServer {
         private boolean mIsSsl;
         private boolean mIsCancelled;
         private SSLContext mSslContext;
+        private ExecutorService mExecutorService = Executors.newFixedThreadPool(20);
 
         /**
          * Defines the keystore contents for the server, BKS version. Holds just a
@@ -749,12 +760,13 @@ public class CtsTestServer {
         }
 
         public void run() {
-            HttpParams params = new BasicHttpParams();
-            params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
             while (!mIsCancelled) {
                 try {
                     Socket socket = mSocket.accept();
+
                     DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
+                    HttpParams params = new BasicHttpParams();
+                    params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
                     conn.bind(socket, params);
 
                     // Determine whether we need to shutdown early before
@@ -764,18 +776,11 @@ public class CtsTestServer {
                     if (isShutdownRequest(request)) {
                         mIsCancelled = true;
                     }
-
-                    HttpResponse response = mServer.getResponse(request);
-                    conn.sendResponseHeader(response);
-                    conn.sendResponseEntity(response);
-                    conn.close();
-
+                    mExecutorService.submit(new HandleResponseTask(conn, request));
                 } catch (IOException e) {
                     // normal during shutdown, ignore
                     Log.w(TAG, e);
                 } catch (HttpException e) {
-                    Log.w(TAG, e);
-                } catch (InterruptedException e) {
                     Log.w(TAG, e);
                 } catch (UnsupportedOperationException e) {
                     // DefaultHttpServerConnection's close() throws an
@@ -784,18 +789,44 @@ public class CtsTestServer {
                 }
             }
             try {
+                mExecutorService.shutdown();
+                mExecutorService.awaitTermination(1L, TimeUnit.MINUTES);
                 mSocket.close();
             } catch (IOException ignored) {
                 // safe to ignore
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Shutting down threads", e);
             }
         }
 
-        private boolean isShutdownRequest(HttpRequest request) {
+        private static boolean isShutdownRequest(HttpRequest request) {
             RequestLine requestLine = request.getRequestLine();
             String uriString = requestLine.getUri();
             URI uri = URI.create(uriString);
             String path = uri.getPath();
             return path.equals(SHUTDOWN_PREFIX);
+        }
+
+        private class HandleResponseTask implements Callable<Void> {
+
+            private DefaultHttpServerConnection mConnection;
+
+            private HttpRequest mRequest;
+
+            public HandleResponseTask(DefaultHttpServerConnection connection,
+                    HttpRequest request) {
+                this.mConnection = connection;
+                this.mRequest = request;
+            }
+
+            @Override
+            public Void call() throws IOException, InterruptedException, HttpException {
+                HttpResponse response = mServer.getResponse(mRequest);
+                mConnection.sendResponseHeader(response);
+                mConnection.sendResponseEntity(response);
+                mConnection.close();
+                return null;
+            }
         }
     }
 }
