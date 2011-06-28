@@ -22,6 +22,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,10 +30,15 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 /** {@link ListActivity} that displays a  list of manual tests. */
 public class TestListActivity extends ListActivity {
 
+    private static final String TAG = TestListActivity.class.getSimpleName();
+
     private static final int LAUNCH_TEST_REQUEST_CODE = 1;
+
     private TestListAdapter mAdapter;
 
     @Override
@@ -109,19 +115,29 @@ public class TestListActivity extends ListActivity {
     }
 
     private void handleCopyItemSelected() {
-        TestResultsReport report = new TestResultsReport(this, mAdapter);
-        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        clipboardManager.setText(report.getBody());
-        Toast.makeText(this, R.string.test_results_copied, Toast.LENGTH_SHORT).show();
+        try {
+            TestResultsReport report = new TestResultsReport(this, mAdapter);
+            ClipboardManager clipboardManager = (ClipboardManager)
+                    getSystemService(CLIPBOARD_SERVICE);
+            clipboardManager.setText(report.getBody());
+            Toast.makeText(this, R.string.test_results_copied, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this, R.string.test_results_error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Coudn't copy test results report", e);
+        }
     }
 
     private void handleShareItemSelected() {
-        Intent target = new Intent(Intent.ACTION_SEND);
-        target.setType("text/plain");
-
-        TestResultsReport report = new TestResultsReport(this, mAdapter);
-        target.putExtra(Intent.EXTRA_SUBJECT, report.getSubject());
-        target.putExtra(Intent.EXTRA_TEXT, report.getBody());
-        startActivity(Intent.createChooser(target, getString(R.string.share_test_results)));
+        try {
+            Intent target = new Intent(Intent.ACTION_SEND);
+            TestResultsReport report = new TestResultsReport(this, mAdapter);
+            target.setType(report.getType());
+            target.putExtra(Intent.EXTRA_SUBJECT, report.getSubject());
+            target.putExtra(Intent.EXTRA_TEXT, report.getBody());
+            startActivity(Intent.createChooser(target, getString(R.string.share_test_results)));
+        } catch (IOException e) {
+            Toast.makeText(this, R.string.test_results_error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Coudn't share test results report", e);
+        }
     }
 }

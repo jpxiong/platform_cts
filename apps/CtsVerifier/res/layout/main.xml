@@ -26,12 +26,21 @@
         android:text="@string/continue_button_text"
         />
     <TextView
-        android:id="@+id/welcome_text"
+        android:id="@+id/version_text"
         android:gravity="center"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/continue_button"
-        android:padding="10dip"
+        android:paddingBottom="10dip"
+        style="@style/VersionFont"
+        />
+    <TextView
+        android:id="@+id/welcome_text"
+        android:gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/version_text"
+        android:paddingTop="10dip"
         android:text="@string/welcome_text"
         style="@style/WelcomeFont"
         />
