@@ -20,8 +20,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.TextView;
 
 /** {@link Activity} that displays an introduction to the verifier. */
 public class CtsVerifierActivity extends Activity {
@@ -39,6 +40,9 @@ public class CtsVerifierActivity extends Activity {
                 startActivity(new Intent(CtsVerifierActivity.this, TestListActivity.class));
             }
         };
+
+        TextView versionText = (TextView) findViewById(R.id.version_text);
+        versionText.setText(getString(R.string.version_text, Version.getVersionName(this)));
 
         findViewById(R.id.detective_logo).setOnClickListener(clickListener);
         findViewById(R.id.continue_button).setOnClickListener(clickListener);
