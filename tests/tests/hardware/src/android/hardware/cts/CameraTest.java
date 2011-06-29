@@ -213,11 +213,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     //Implement the RawPictureCallback
     private final class RawPictureCallback implements PictureCallback {
         public void onPictureTaken(byte [] rawData, Camera camera) {
-            if (rawData != null) {
-                mRawPictureCallbackResult = true;
-            } else {
-                mRawPictureCallbackResult = false;
-            }
+            mRawPictureCallbackResult = true;
             if (LOGV) Log.v(TAG, "RawPictureCallback callback");
         }
     }
@@ -358,8 +354,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         terminateMessageLooper();
-        assertTrue(mShutterCallbackResult);
-        assertTrue(mJpegPictureCallbackResult);
+        assertTrue("Shutter callback not received", mShutterCallbackResult);
+        assertTrue("Raw picture callback not received", mRawPictureCallbackResult);
+        assertTrue("Jpeg picture callback not recieved", mJpegPictureCallbackResult);
         assertNotNull(mJpegData);
         BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
         bmpOptions.inJustDecodeBounds = true;
