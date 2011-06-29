@@ -1023,6 +1023,39 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             recorder.setPreviewDisplay(holder.getSurface());
             recorder.prepare();
             recorder.start();
+
+            // Apps can use the camera after start since API level 13.
+            Parameters parameters = mCamera.getParameters();
+            if (parameters.isZoomSupported()) {
+               if (parameters.getMaxZoom() > 0) {
+                   parameters.setZoom(1);
+                   mCamera.setParameters(parameters);
+                   parameters.setZoom(0);
+                   mCamera.setParameters(parameters);
+               }
+            }
+            if (parameters.isSmoothZoomSupported()) {
+                if (parameters.getMaxZoom() > 0) {
+                    ZoomListener zoomListener = new ZoomListener();
+                    mCamera.setZoomChangeListener(zoomListener);
+                    mCamera.startSmoothZoom(1);
+                    assertTrue(zoomListener.mZoomDone.block(1000));
+                }
+            }
+
+            try {
+                mCamera.takePicture(null, null, null);
+                fail("takePicture should not succeed during recording.");
+            } catch(RuntimeException e) {
+                // expected
+            }
+            try {
+                mCamera.unlock();
+                fail("unlock should not succeed during recording.");
+            } catch(RuntimeException e) {
+                // expected
+            }
+
             Thread.sleep(2000);
             recorder.stop();
         } finally {
