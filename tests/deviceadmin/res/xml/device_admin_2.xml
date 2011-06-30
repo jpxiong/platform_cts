@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2009 The Android Open Source Project
+<!--
+ * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,19 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ -->
 
-package com.android.cts;
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <limit-password />
+        <reset-password />
+        <wipe-data />
+    </uses-policies>
+</device-admin>
 
-public class Version {
-    // The CTS version string
-    private static final String version = "3.1_r2";
-
-    private Version() {
-        // no instances allowed
-    }
-
-    public static String asString() {
-        return version;
-    }
-}

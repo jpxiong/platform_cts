@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.cts;
+package com.android.cts.verifier.bluetooth;
 
-public class Version {
-    // The CTS version string
-    private static final String version = "3.1_r2";
-
-    private Version() {
-        // no instances allowed
-    }
-
-    public static String asString() {
-        return version;
+public class SecureClientActivity extends MessageTestActivity {
+    public SecureClientActivity() {
+        super(true, false);
     }
 }

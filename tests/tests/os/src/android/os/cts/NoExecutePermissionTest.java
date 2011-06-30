@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.permission.cts;
+package android.os.cts;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +29,10 @@ import junit.framework.TestCase;
 public class NoExecutePermissionTest extends TestCase {
 
     public void testNoExecutePermission() throws FileNotFoundException {
+        if (!cpuHasNxSupport()) {
+            return;
+        }
+
         String heapPermissions = null;
         String stackPermissions = null;
 
@@ -61,5 +65,17 @@ public class NoExecutePermissionTest extends TestCase {
 
         assertEquals("NX (No Execute) not enabled for heap", "rw-p", heapPermissions);
         assertEquals("NX (No Execute) not enabled for stack", "rw-p", stackPermissions);
+    }
+
+    private static boolean cpuHasNxSupport() {
+        if (CpuFeatures.isArmCpu() && !CpuFeatures.isArm7Compatible()) {
+            // ARM processors before v7 do not have NX support.
+            // http://code.google.com/p/android/issues/detail?id=17328
+            return false;
+        }
+
+        // TODO: handle other processors.  For now, assume those processors
+        // have NX support.
+        return true;
     }
 }
