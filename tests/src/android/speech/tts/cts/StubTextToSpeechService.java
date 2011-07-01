@@ -27,9 +27,6 @@ import android.speech.tts.TextToSpeechService;
  */
 public class StubTextToSpeechService extends TextToSpeechService {
 
-    public static final String TEXT_STREAM = "stream";
-    public static final String TEXT_COMPLETE = "complete";
-
     @Override
     protected String[] onGetLanguage() {
         return new String[] { "eng", "USA", "" };
@@ -51,14 +48,6 @@ public class StubTextToSpeechService extends TextToSpeechService {
 
     @Override
     protected void onSynthesizeText(SynthesisRequest request, SynthesisCallback callback) {
-        if (TEXT_STREAM.equals(request.getText())) {
-            synthesizeStreaming(request, callback);
-        } else {
-            synthesizeComplete(request, callback);
-        }
-    }
-
-    private void synthesizeStreaming(SynthesisRequest request, SynthesisCallback callback) {
         if (callback.start(16000, AudioFormat.ENCODING_PCM_16BIT, 1) != TextToSpeech.SUCCESS) {
             return;
         }
@@ -67,14 +56,6 @@ public class StubTextToSpeechService extends TextToSpeechService {
             return;
         }
         if (callback.done() != TextToSpeech.SUCCESS) {
-            return;
-        }
-    }
-
-    private void synthesizeComplete(SynthesisRequest request, SynthesisCallback callback) {
-        byte[] data = { 0x01, 0x2 };
-        if (callback.completeAudioAvailable(16000, AudioFormat.ENCODING_PCM_16BIT, 1,
-                data, 0, data.length) != TextToSpeech.SUCCESS) {
             return;
         }
     }
