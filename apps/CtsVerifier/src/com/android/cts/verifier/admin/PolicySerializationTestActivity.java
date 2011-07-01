@@ -106,7 +106,7 @@ public class PolicySerializationTestActivity extends PassFailButtons.ListActivit
     private void loadPolicy() {
         mAdapter.clear();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        if (prefs.getBoolean(LOAD_EXPECTED_POLICY_PREFERENCE, true)) {
+        if (prefs.getBoolean(LOAD_EXPECTED_POLICY_PREFERENCE, false)) {
             for (PolicyItem<?> item : mPolicyItems) {
                 item.loadExpectedValue(prefs);
                 item.loadActualValue(mDevicePolicyManager, mAdmin);
