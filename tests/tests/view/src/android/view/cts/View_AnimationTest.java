@@ -127,9 +127,9 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
 
         assertSame(mAnimation, view.getAnimation());
 
-        view.clearAnimation();
         runTestOnUiThread(new Runnable() {
             public void run() {
+                view.clearAnimation();
                 view.invalidate();
             }
         });
