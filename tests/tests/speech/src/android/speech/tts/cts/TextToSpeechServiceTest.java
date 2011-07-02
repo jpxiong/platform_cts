@@ -29,6 +29,7 @@ import java.util.HashMap;
 public class TextToSpeechServiceTest extends AndroidTestCase {
 
     private static final String UTTERANCE_ID = "utterance";
+    private static final String UTTERANCE = "text to speech cts test";
     private static final String SAMPLE_FILE_NAME = "mytts.wav";
 
     private TextToSpeechWrapper mTts;
@@ -50,13 +51,12 @@ public class TextToSpeechServiceTest extends AndroidTestCase {
         return mTts.getTts();
     }
 
-    public void testSynthesizeToFileStreaming() throws Exception {
+    public void testSynthesizeToFile() throws Exception {
         File sampleFile = new File(Environment.getExternalStorageDirectory(), SAMPLE_FILE_NAME);
         try {
             assertFalse(sampleFile.exists());
 
-            int result = getTts().synthesizeToFile(StubTextToSpeechService.TEXT_STREAM,
-                    createParams(), sampleFile.getPath());
+            int result = getTts().synthesizeToFile(UTTERANCE, createParams(), sampleFile.getPath());
             assertEquals("synthesizeToFile() failed", TextToSpeech.SUCCESS, result);
 
             assertTrue("synthesizeToFile() completion timeout", mTts.waitForComplete(UTTERANCE_ID));
@@ -68,34 +68,8 @@ public class TextToSpeechServiceTest extends AndroidTestCase {
         }
     }
 
-    public void testSynthesizeToFileComplete() throws Exception {
-        File sampleFile = new File(Environment.getExternalStorageDirectory(), SAMPLE_FILE_NAME);
-        try {
-            assertFalse(sampleFile.exists());
-
-            int result = getTts().synthesizeToFile(StubTextToSpeechService.TEXT_COMPLETE,
-                    createParams(), sampleFile.getPath());
-            assertEquals("synthesizeToFile() failed", TextToSpeech.SUCCESS, result);
-
-            assertTrue("synthesizeToFile() completion timeout", waitForUtterance());
-            assertTrue("synthesizeToFile() didn't produce a file", sampleFile.exists());
-            assertTrue("synthesizeToFile() produced a non-sound file",
-                    TextToSpeechWrapper.isSoundFile(sampleFile.getPath()));
-        } finally {
-            sampleFile.delete();
-        }
-    }
-
-    public void testSpeakStreaming() throws Exception {
-        int result = getTts().speak(StubTextToSpeechService.TEXT_STREAM, TextToSpeech.QUEUE_FLUSH,
-                createParams());
-        assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
-        assertTrue("speak() completion timeout", waitForUtterance());
-    }
-
-    public void testSpeakComplete() throws Exception {
-        int result = getTts().speak(StubTextToSpeechService.TEXT_COMPLETE, TextToSpeech.QUEUE_FLUSH,
-                createParams());
+    public void testSpeak() throws Exception {
+        int result = getTts().speak(UTTERANCE, TextToSpeech.QUEUE_FLUSH, createParams());
         assertEquals("speak() failed", TextToSpeech.SUCCESS, result);
         assertTrue("speak() completion timeout", waitForUtterance());
     }
