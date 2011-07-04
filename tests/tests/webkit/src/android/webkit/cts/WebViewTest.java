@@ -683,17 +683,72 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "<body onload=\"document.title = typeof window.injectedObject;\"></body></html>";
 
         // Test that adding an object gives an object type.
-        final Object obj = new Object();
-        mWebView.addJavascriptInterface(obj, "injectedObject");
+        mWebView.addJavascriptInterface(new Object(), "injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
         waitForLoadComplete();
         assertEquals("object", mWebView.getTitle());
 
-        // Test that removing the object leaves the property undefined.
+        // Test that reloading the page after removing the object leaves the property undefined.
         mWebView.removeJavascriptInterface("injectedObject");
         mWebView.loadData(setTitleToPropertyTypeHtml, "text/html", "UTF-8");
         waitForLoadComplete();
         assertEquals("undefined", mWebView.getTitle());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "removeJavascriptInterface",
+        args = {String.class}
+    )
+    public void testUseRemovedJavascriptInterface() throws Throwable {
+        class RemovedObject {
+            @Override
+            public String toString() {
+                return "removedObject";
+            }
+            public void remove() throws Throwable {
+                runTestOnUiThread(new Runnable() {
+                    public void run() {
+                        mWebView.removeJavascriptInterface("removedObject");
+                        System.gc();
+                    }
+                });
+            }
+        }
+        class ResultObject {
+            private String mResult;
+            private boolean mIsResultAvailable;
+            public synchronized void setResult(String result) {
+                mResult = result;
+                mIsResultAvailable = true;
+                notify();
+            }
+            public synchronized String getResult() {
+                while (!mIsResultAvailable) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                return mResult;
+            }
+        }
+        final ResultObject resultObject = new ResultObject();
+
+        // Test that an object is still usable if removed while the page is in use, even if we have
+        // no external references to it.
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.getSettings().setJavaScriptEnabled(true);
+                mWebView.addJavascriptInterface(new RemovedObject(), "removedObject");
+                mWebView.addJavascriptInterface(resultObject, "resultObject");
+                mWebView.loadData("<html><head></head>" +
+                        "<body onload=\"window.removedObject.remove();" +
+                        "resultObject.setResult(removedObject.toString());\"></body></html>",
+                        "text/html", "UTF-8");
+            }
+        });
+        assertEquals("removedObject", resultObject.getResult());
     }
 
     @TestTargets({
