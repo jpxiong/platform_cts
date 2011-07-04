@@ -51,6 +51,7 @@ import android.view.View;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
+import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebBackForwardList;
@@ -1019,13 +1020,54 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
-    @UiThreadTest
-    public void testLoadData() throws Exception {
-        assertNull(mWebView.getTitle());
-        mWebView.loadData("<html><head><title>Hello,World!</title></head><body></body></html>",
-                "text/html", "UTF-8");
-        waitForLoadComplete();
-        assertEquals("Hello,World!", mWebView.getTitle());
+    public void testLoadData() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertNull(mWebView.getTitle());
+                mWebView.loadData("<html><head><title>Hello,World!</title></head><body></body>" +
+                        "</html>",
+                        "text/html", "UTF-8");
+                waitForLoadComplete();
+                assertEquals("Hello,World!", mWebView.getTitle());
+            }
+        });
+
+        // Test that JavaScript can't access cross-origin content.
+        class ConsoleMessageWebChromeClient extends WebChromeClient {
+            private boolean mIsMessageLevelAvailable;
+            private ConsoleMessage.MessageLevel mMessageLevel;
+            @Override
+            public synchronized boolean onConsoleMessage(ConsoleMessage message) {
+                mMessageLevel = message.messageLevel();
+                mIsMessageLevelAvailable = true;
+                notify();
+                return true;
+            }
+            public synchronized ConsoleMessage.MessageLevel getMessageLevel() {
+                while (!mIsMessageLevelAvailable) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                return mMessageLevel;
+            }
+        }
+        startWebServer(false);
+        final ConsoleMessageWebChromeClient webChromeClient = new ConsoleMessageWebChromeClient();
+        final String crossOriginUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.getSettings().setJavaScriptEnabled(true);
+                mWebView.setWebChromeClient(webChromeClient);
+                mWebView.loadData("<html><head></head><body onload=\"" +
+                        "document.title = " +
+                        "document.getElementById('frame').contentWindow.location.href;" +
+                        "\"><iframe id=\"frame\" src=\"" + crossOriginUrl + "\"></body></html>",
+                        "text/html", "UTF-8");
+            }
+        });
+        assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel());
     }
 
     @TestTargets({
@@ -1051,27 +1093,36 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNull(mWebView.getUrl());
         String imgUrl = TestHtmlConstants.SMALL_IMG_URL; // relative
 
+        // Check that we can access relative URLs and that reported URL is supplied history URL.
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
-        String failUrl = "random";
+        String historyUrl = "random";
         mWebView.loadDataWithBaseURL(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
-                "text/html", "UTF-8", failUrl);
+                "text/html", "UTF-8", historyUrl);
         waitForLoadComplete();
-        // check that image was retrieved from the server
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
-        // the fail URL is used for the history entry, even if the load succeeds
-        assertEquals(failUrl, mWebView.getUrl());
+        assertEquals(historyUrl, mWebView.getUrl());
 
+        // Check that reported URL is "about:blank" when supplied history URL
+        // is null.
         imgUrl = TestHtmlConstants.LARGE_IMG_URL;
         mWebView.loadDataWithBaseURL(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", null);
         waitForLoadComplete();
-        // check that image was retrieved from the server
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
-        // no history item saved, URL is still the last one
         assertEquals("about:blank", mWebView.getUrl());
+
+        // Test that JavaScript can access content from the same origin as the base URL.
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        final String crossOriginUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mWebView.loadDataWithBaseURL(baseUrl, "<html><head></head><body onload=\"" +
+                "document.title = document.getElementById('frame').contentWindow.location.href;" +
+                "\"><iframe id=\"frame\" src=\"" + crossOriginUrl + "\"></body></html>",
+                "text/html", "UTF-8", null);
+        waitForLoadComplete();
+        assertEquals(crossOriginUrl, mWebView.getTitle());
     }
 
     @TestTargetNew(
