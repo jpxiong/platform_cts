@@ -1178,6 +1178,14 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "text/html", "UTF-8", null);
         waitForLoadComplete();
         assertEquals(crossOriginUrl, mWebView.getTitle());
+
+        // Check that when the base URL uses the 'data' scheme, a 'data' scheme URL is used and the
+        // history URL is ignored.
+        mWebView.loadDataWithBaseURL("data:foo", "<html><body>bar</body></html>",
+                "text/html", "UTF-8", historyUrl);
+        waitForLoadComplete();
+        assertTrue(mWebView.getUrl().indexOf("data:text/html,") == 0);
+        assertTrue(mWebView.getUrl().indexOf("bar") > 0);
     }
 
     @TestTargetNew(
