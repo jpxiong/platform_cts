@@ -197,8 +197,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
             Bitmap b = BitmapFactory.decodeStream(is);
             assertNotNull(b);
             // Test the bitmap size
-            assertEquals(HEIGHTS[i], b.getHeight());
             assertEquals(WIDTHS[i], b.getWidth());
+            assertEquals(HEIGHTS[i], b.getHeight());
         }
     }
 
@@ -210,6 +210,7 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     public void testDecodeStream4() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Config.ARGB_8888;
+        final int kErrorTol = 16;
 
         // Decode the PNG & WebP test images. The WebP test image has been encoded from PNG test
         // image and should have same similar (within some error-tolerance) Bitmap data.
@@ -218,19 +219,19 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNotNull(bPng);
         assertEquals(bPng.getConfig(), Config.ARGB_8888);
 
-        InputStream iStreamWebp = obtainInputStream(R.drawable.webp_test);
-        Bitmap bWebp = BitmapFactory.decodeStream(iStreamWebp, null, options);
-        assertNotNull(bWebp);
-        compareBitmaps(bPng, bWebp, 16, true);
+        InputStream iStreamWebp1 = obtainInputStream(R.drawable.webp_test);
+        Bitmap bWebp1 = BitmapFactory.decodeStream(iStreamWebp1, null, options);
+        assertNotNull(bWebp1);
+        compareBitmaps(bPng, bWebp1, kErrorTol, true);
 
         // Compress the PNG image to WebP format (Quality=90) and decode it back.
         // This will test end-to-end WebP encoding and decoding.
         ByteArrayOutputStream oStreamWebp = new ByteArrayOutputStream();
         assertTrue(bPng.compress(CompressFormat.WEBP, 90, oStreamWebp));
-        iStreamWebp = new ByteArrayInputStream(oStreamWebp.toByteArray());
-        bWebp = BitmapFactory.decodeStream(iStreamWebp, null, options);
-        assertNotNull(bWebp);
-        compareBitmaps(bPng, bWebp, 16, true);
+        InputStream iStreamWebp2 = new ByteArrayInputStream(oStreamWebp.toByteArray());
+        Bitmap bWebp2 = BitmapFactory.decodeStream(iStreamWebp2, null, options);
+        assertNotNull(bWebp2);
+        compareBitmaps(bPng, bWebp2, kErrorTol, true);
     }
 
     @TestTargetNew(
@@ -338,20 +339,19 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     }
 
     // Compare expected to actual to see if their diff is less then mseMargin.
-    // lessThanMargin is to indicate whether we expect the diff to be
-    // "less than" or "no less than".
+    // lessThanMargin is to indicate whether we expect the mean square error
+    // to be "less than" or "no less than".
     private void compareBitmaps(Bitmap expected, Bitmap actual,
             int mseMargin, boolean lessThanMargin) {
-        assertEquals("mismatching widths", expected.getWidth(),
-                actual.getWidth());
-        assertEquals("mismatching heights", expected.getHeight(),
-                actual.getHeight());
+        final int width = expected.getWidth();
+        final int height = expected.getHeight();
+
+        assertEquals("mismatching widths", width, actual.getWidth());
+        assertEquals("mismatching heights", height, actual.getHeight());
         assertEquals("mismatching configs", expected.getConfig(),
                 actual.getConfig());
 
         double mse = 0;
-        int width = expected.getWidth();
-        int height = expected.getHeight();
         int[] expectedColors = new int [width * height];
         int[] actualColors = new int [width * height];
 
@@ -375,10 +375,10 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         }
     }
 
-    private double distance(int exp, int actual) {
-        int r = Color.red(actual) - Color.red(exp);
-        int g = Color.green(actual) - Color.green(exp);
-        int b = Color.blue(actual) - Color.blue(exp);
+    private double distance(int expect, int actual) {
+        final int r = Color.red(actual) - Color.red(expect);
+        final int g = Color.green(actual) - Color.green(expect);
+        final int b = Color.blue(actual) - Color.blue(expect);
         return r * r + g * g + b * b;
     }
 }
