@@ -79,21 +79,33 @@ public class SmsManagerTest extends AndroidTestCase {
                     "44075",    // KDDI
                     "44076",    // KDDI
                     "311870",   // Boost Mobile
-                    "311220"    // USCC
+                    "311220",   // USCC
+                    "302720",   // Rogers
+                    "30272",    // Rogers
+                    "302370",   // Fido
+                    "30237"     // Fido
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
     private static final List<String> UNSUPPORT_DATA_SMS_MESSAGES =
             Arrays.asList(
                     "44010",    // NTT DOCOMO
-                    "44020"     // SBM
+                    "44020",    // SBM
+                    "302720",   // Rogers
+                    "30272",    // Rogers
+                    "302370",   // Fido
+                    "30237"     // Fido
             );
 
     // List of network operators that doesn't support Maltipart SMS message
     private static final List<String> UNSUPPORT_MULTIPART_SMS_MESSAGES =
             Arrays.asList(
                     "44010",    // NTT DOCOMO
-                    "44020"     // SBM
+                    "44020",    // SBM
+                    "302720",   // Rogers
+                    "30272",    // Rogers
+                    "302370",   // Fido
+                    "30237"     // Fido
             );
 
     private TelephonyManager mTelephonyManager;
