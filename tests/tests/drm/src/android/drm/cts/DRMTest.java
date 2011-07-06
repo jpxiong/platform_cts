@@ -24,6 +24,7 @@ import android.content.ContentValues;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -82,6 +83,10 @@ public class DRMTest extends AndroidTestCase {
                                             config.getInfoOfRegistration(),
                                             config.getMimeType());
         executeProcessDrmInfo(drmInfo, config);
+    }
+
+    public void testIsDrmDirectoryExist() {
+        assertTrue("/data/drm/ does not exist", new File("/data/drm/").exists());
     }
 
     public void testRegisterAndDeregister() throws Exception {
