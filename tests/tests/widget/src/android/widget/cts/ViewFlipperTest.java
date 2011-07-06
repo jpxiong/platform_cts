@@ -23,6 +23,7 @@ import com.android.cts.stub.R;
 import android.app.Activity;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase;
+import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.View;
@@ -113,6 +114,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
             args = {}
         )
     })
+    @UiThreadTest
     public void testViewFlipper() {
         ViewFlipper viewFlipper = (ViewFlipper) mActivity.findViewById(R.id.viewflipper_test);
 
