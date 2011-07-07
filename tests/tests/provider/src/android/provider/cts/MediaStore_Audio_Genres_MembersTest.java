@@ -134,6 +134,7 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertEquals(Audio1.SIZE, c.getInt(c.getColumnIndex(Members.SIZE)));
             assertEquals(Audio1.TITLE, c.getString(c.getColumnIndex(Members.TITLE)));
             assertEquals(Audio1.ALBUM, c.getString(c.getColumnIndex(Members.ALBUM)));
+            assertEquals(Audio1.IS_DRM, c.getInt(c.getColumnIndex(Members.IS_DRM)));
             String albumKey = c.getString(c.getColumnIndex(Members.ALBUM_KEY));
             assertNotNull(albumKey);
             long albumId = c.getLong(c.getColumnIndex(Members.ALBUM_ID));
