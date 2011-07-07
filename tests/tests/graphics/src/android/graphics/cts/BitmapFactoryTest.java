@@ -25,18 +25,23 @@ import dalvik.annotation.TestTargetNew;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory.Options;
 import android.os.ParcelFileDescriptor;
 import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 @TestTargetClass(BitmapFactory.class)
 public class BitmapFactoryTest extends InstrumentationTestCase {
@@ -199,6 +204,37 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "decodeStream",
+        args = {java.io.InputStream.class}
+    )
+    public void testDecodeStream4() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Config.ARGB_8888;
+
+        // Decode the PNG & WebP test images. The WebP test image has been encoded from PNG test
+        // image and should have same similar (within some error-tolerance) Bitmap data.
+        InputStream iStreamPng = obtainInputStream(R.drawable.png_test);
+        Bitmap bPng = BitmapFactory.decodeStream(iStreamPng, null, options);
+        assertNotNull(bPng);
+        assertEquals(bPng.getConfig(), Config.ARGB_8888);
+
+        InputStream iStreamWebp = obtainInputStream(R.drawable.webp_test);
+        Bitmap bWebp = BitmapFactory.decodeStream(iStreamWebp, null, options);
+        assertNotNull(bWebp);
+        compareBitmaps(bPng, bWebp, 16, true);
+
+        // Compress the PNG image to WebP format (Quality=90) and decode it back.
+        // This will test end-to-end WebP encoding and decoding.
+        ByteArrayOutputStream oStreamWebp = new ByteArrayOutputStream();
+        assertTrue(bPng.compress(CompressFormat.WEBP, 90, oStreamWebp));
+        iStreamWebp = new ByteArrayInputStream(oStreamWebp.toByteArray());
+        bWebp = BitmapFactory.decodeStream(iStreamWebp, null, options);
+        assertNotNull(bWebp);
+        compareBitmaps(bPng, bWebp, 16, true);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "decodeFileDescriptor",
         args = {java.io.FileDescriptor.class, android.graphics.Rect.class,
                 android.graphics.BitmapFactory.Options.class}
@@ -299,5 +335,50 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         is.close();
         fOutput.close();
         return (file.getPath());
+    }
+
+    // Compare expected to actual to see if their diff is less then mseMargin.
+    // lessThanMargin is to indicate whether we expect the diff to be
+    // "less than" or "no less than".
+    private void compareBitmaps(Bitmap expected, Bitmap actual,
+            int mseMargin, boolean lessThanMargin) {
+        assertEquals("mismatching widths", expected.getWidth(),
+                actual.getWidth());
+        assertEquals("mismatching heights", expected.getHeight(),
+                actual.getHeight());
+        assertEquals("mismatching configs", expected.getConfig(),
+                actual.getConfig());
+
+        double mse = 0;
+        int width = expected.getWidth();
+        int height = expected.getHeight();
+        int[] expectedColors = new int [width * height];
+        int[] actualColors = new int [width * height];
+
+        expected.getPixels(expectedColors, 0, width, 0, 0, width, height);
+        actual.getPixels(actualColors, 0, width, 0, 0, width, height);
+
+        for (int row = 0; row < height; ++row) {
+            for (int col = 0; col < width; ++col) {
+                int idx = row * width + col;
+                mse += distance(expectedColors[idx], actualColors[idx]);
+            }
+        }
+        mse /= width * height;
+
+        if (lessThanMargin) {
+            assertTrue("MSE too large for normal case: " + mse,
+                    mse <= mseMargin);
+        } else {
+            assertFalse("MSE too small for abnormal case: " + mse,
+                    mse <= mseMargin);
+        }
+    }
+
+    private double distance(int exp, int actual) {
+        int r = Color.red(actual) - Color.red(exp);
+        int g = Color.green(actual) - Color.green(exp);
+        int b = Color.blue(actual) - Color.blue(exp);
+        return r * r + g * g + b * b;
     }
 }
