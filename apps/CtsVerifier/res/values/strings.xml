@@ -16,6 +16,7 @@
 <resources>
     <string name="app_name">CTS Verifier</string>
     <string name="welcome_text">Welcome to the CTS Verifier!</string>
+    <string name="version_text">%1$s</string>
     <string name="continue_button_text">Continue</string>
 
     <string name="pass_button_text">Pass</string>
@@ -23,15 +24,12 @@
     <string name="fail_button_text">Fail</string>
 
     <!-- Strings for TestResultsReport -->
-    <string name="subject_header">[CTS Verifier %1$s]</string>
-    <string name="body_header">CTS Verifier %1$s Test Results</string>
-    <string name="pass_result">PASS</string>
-    <string name="fail_result">FAIL</string>
-    <string name="not_executed_result">NOT_EXECUTED</string>
+    <string name="subject_header">CTS Verifier %1$s - %2$s</string>
 
     <!-- Strings for TestListActivity -->
     <string name="test_list_title">Manual Test List</string>
     <string name="test_category_audio">Audio</string>
+    <string name="test_category_device_admin">Device Administration</string>
     <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
     <string name="test_category_security">Security</string>
@@ -43,6 +41,44 @@
     <string name="test_results_copied">Test results copied to clipboard.</string>
     <string name="share">Share</string>
     <string name="share_test_results">Share Test Results</string>
+    <string name="test_results_error">Couldn\'t create test results report.</string>
+
+    <!-- Strings for Device Administration tests -->
+    <string name="da_policy_serialization_test">Policy Serialization Test</string>
+    <string name="da_policy_serialization_info">This test checks that a device policy is properly
+        saved and loaded across reboots.\n\nPress the \"Generate Policy\" button to create
+        a random policy. Then press the \"Apply Policy\" button to apply the policy. Reboot the
+        device and verify that all rows in the policy list are green. Red items indicate policy
+        settings that were not loaded properly.
+    </string>
+    <string name="da_no_policy">1. Press the \"Generate Policy\" to create a random device
+        policy\n\n2. Press \"Apply Policy\" to put the policy into effect.\n\n3. Reboot your
+        device and return to this test in the CTS Verifier.
+    </string>
+    <string name="da_generate_policy">Generate Policy</string>
+    <string name="da_apply_policy">Apply Policy</string>
+    <string name="da_random_policy">Random policy generated.</string>
+    <string name="da_policy_reboot">Reboot your device and return to this CTS Verifier test.</string>
+    <string name="da_password_quality">Password Quality</string>
+    <string name="da_password_quality_alphabetic">Alphabetic</string>
+    <string name="da_password_quality_alphanumeric">Alphanumeric</string>
+    <string name="da_password_quality_numeric">Numeric</string>
+    <string name="da_password_quality_something">Something</string>
+    <string name="da_password_quality_unspecified">Unspecified</string>
+    <string name="da_password_minimum_length">Minimum Password Length</string>
+    <string name="da_maximum_failed_passwords_for_wipe">Maximum Failed Passwords for Wipe</string>
+    <string name="da_maximum_time_to_lock">Maximum Time to Lock</string>
+    <string name="da_policy_info">Expected value: %1$s\nActual value: %2$s</string>
+
+    <string name="da_screen_lock_test">Screen Lock Test</string>
+    <string name="da_screen_lock_info">This test checks that the DevicePolicyManager\'s lockNow
+        method immediately locks the screen. It should lock the screen immediately despite any
+        settings that may specify a timeout.\n\nClick the \"Force Lock\" button to lock the screen. 
+        Your screen should be locked and require the password to be entered.
+    </string>
+    <string name="da_force_lock">Force Lock</string>
+    <string name="da_lock_success">It appears the screen was locked successfully!</string>
+    <string name="da_lock_error">It does not look like the screen was locked...</string>
 
     <!-- Strings for BluetoothActivity -->
     <string name="bluetooth_test">Bluetooth Test</string>

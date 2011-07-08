@@ -1,6 +1,10 @@
 [
 /* Framework problems. */
 {
+  name: "android.admin.cts.DevicePolicyManagerTest",
+  bug: 4993068
+},
+{
   name: "android.media.cts.MediaRecorderTest#testSetCamera",
   bug: 4464677
 },

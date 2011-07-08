@@ -139,6 +139,9 @@ public class AudioRecordTest extends AndroidTestCase {
         )
     })
     public void testAudioRecordProperties() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         assertEquals(AudioFormat.ENCODING_PCM_16BIT, mAudioRecord.getAudioFormat());
         assertEquals(MediaRecorder.AudioSource.DEFAULT, mAudioRecord.getAudioSource());
         assertEquals(1, mAudioRecord.getChannelCount());
@@ -226,6 +229,9 @@ public class AudioRecordTest extends AndroidTestCase {
         )
     })
     public void testAudioRecordOP() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         final int SLEEP_TIME = 10;
         final int RECORD_TIME = 10000;
         assertEquals(AudioRecord.STATE_INITIALIZED, mAudioRecord.getState());
@@ -329,5 +335,9 @@ public class AudioRecordTest extends AndroidTestCase {
 
         mAudioRecord.release();
         assertEquals(AudioRecord.STATE_UNINITIALIZED, mAudioRecord.getState());
+    }
+
+    private boolean hasMicrophone() {
+        return getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_MICROPHONE);
     }
 }
