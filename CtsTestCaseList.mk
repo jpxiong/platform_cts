@@ -31,6 +31,7 @@ CTS_SECURITY_APPS_LIST := \
 CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
+	CtsAdminTestCases \
 	CtsAppTestCases \
 	CtsBluetoothTestCases \
 	CtsContentTestCases \
@@ -72,6 +73,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 CTS_TEST_CASE_LIST := \
 	TestDeviceSetup \
 	CtsDelegatingAccessibilityService \
+	CtsDeviceAdmin \
 	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
