@@ -73,13 +73,10 @@
     <string name="da_screen_lock_test">Screen Lock Test</string>
     <string name="da_screen_lock_info">This test checks that the DevicePolicyManager\'s lockNow
         method immediately locks the screen. It should lock the screen immediately despite any
-        settings that may specify a timeout.\n\nClick the \"Force Lock\" button to change
-        your password to \"12345\" and lock the screen. Your screen should be locked and require
-        the password to be entered.
+        settings that may specify a timeout.\n\nClick the \"Force Lock\" button to lock the screen. 
+        Your screen should be locked and require the password to be entered.
     </string>
     <string name="da_force_lock">Force Lock</string>
-    <string name="da_lock_password_error">Couldn\'t change the password on the device.
-        Is there another active device administrator?</string>
     <string name="da_lock_success">It appears the screen was locked successfully!</string>
     <string name="da_lock_error">It does not look like the screen was locked...</string>
 

@@ -20,6 +20,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
@@ -150,6 +151,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testRecorderCamera() throws Exception {
+        if (!hasCamera()) {
+            return;
+        }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
@@ -262,6 +266,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testRecorderVideo() throws Exception {
+        if (!hasCamera()) {
+            return;
+        }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setOutputFile(OUTPUT_PATH2);
@@ -329,6 +336,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testRecorderAudio() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         assertEquals(0, mMediaRecorder.getMaxAmplitude());
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -385,6 +395,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testOnInfoListener() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setMaxDuration(MAX_DURATION_MSEC);
@@ -443,6 +456,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testOnErrorListener() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -463,5 +479,14 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         // We just make sure that the margin is not too big
         assertTrue(outFile.length() < 1.1 * maxFileSize);
         assertTrue(outFile.length() > 0);
+    }
+
+    private boolean hasCamera() {
+        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    private boolean hasMicrophone() {
+        return getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
     }
 }

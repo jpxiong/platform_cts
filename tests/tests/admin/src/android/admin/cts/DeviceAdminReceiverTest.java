@@ -60,14 +60,6 @@ public class DeviceAdminReceiverTest extends AndroidTestCase {
         mReceiver.reset();
         mReceiver.onReceive(mContext, new Intent(DeviceAdminReceiver.ACTION_DEVICE_ADMIN_DISABLED));
         assertTrue(mReceiver.hasFlags(DEVICE_ADMIN_DISABLED));
-
-        mReceiver.reset();
-        mReceiver.onReceive(mContext,
-                new Intent(DeviceAdminReceiver.ACTION_DEVICE_ADMIN_DISABLE_REQUESTED));
-        assertTrue(mReceiver.hasFlags(DEVICE_ADMIN_DISABLE_REQUESTED));
-        assertNotNull(mReceiver.getResultExtras(false));
-        assertEquals(DISABLE_WARNING, mReceiver.getResultExtras(false)
-                .getString(DeviceAdminReceiver.EXTRA_DISABLE_WARNING));
     }
 
     private class TestReceiver extends DeviceAdminReceiver {

@@ -33,8 +33,6 @@ import android.widget.Button;
 
 public class ScreenLockTestActivity extends PassFailButtons.Activity {
 
-    private static final String NEW_PASSWORD = "12345";
-
     private static final int ADD_DEVICE_ADMIN_REQUEST_CODE = 1;
 
     private ScreenOffReceiver mReceiver;
@@ -90,20 +88,7 @@ public class ScreenLockTestActivity extends PassFailButtons.Activity {
 
     private void handleAddDeviceAdminResult(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            mDevicePolicyManager.setPasswordMinimumLength(TestDeviceAdminReceiver
-                    .getComponent(this), NEW_PASSWORD.length());
-            mDevicePolicyManager.setPasswordQuality(TestDeviceAdminReceiver
-                    .getComponent(this), DevicePolicyManager.PASSWORD_QUALITY_NUMERIC);
-            if (mDevicePolicyManager.resetPassword(NEW_PASSWORD, 0)) {
-                mDevicePolicyManager.lockNow();
-            } else {
-                new AlertDialog.Builder(this)
-                    .setTitle(R.string.da_screen_lock_test)
-                    .setMessage(R.string.da_lock_password_error)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-            }
+            mDevicePolicyManager.lockNow();
         }
     }
 
