@@ -234,13 +234,7 @@ public class ProcessTest extends AndroidTestCase {
         }
 
         assertTrue(time > 0);
-
-        if(servicePid == Process.myPid()) {
-            assertFalse(Process.supportsProcesses());
-            return;
-        } else {
-            assertTrue(Process.supportsProcesses());
-        }
+        assertTrue(servicePid != Process.myPid());
 
         Process.killProcess(servicePid);
         synchronized (mSync) {
