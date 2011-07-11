@@ -1,5 +1,4 @@
 [
-/* Framework problems. */
 {
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578

@@ -219,13 +219,8 @@ public class AccessibilityEndToEndTest extends
         focusedEvent.setClassName(Button.class.getName());
         focusedEvent.setPackageName(getActivity().getPackageName());
         focusedEvent.getText().add(activity.getString(R.string.button_title));
-        if (hasActivityActionBar()) {
-            focusedEvent.setItemCount(4);
-            focusedEvent.setCurrentItemIndex(3);
-        } else {
-            focusedEvent.setItemCount(3);
-            focusedEvent.setCurrentItemIndex(2);
-        }
+        focusedEvent.setItemCount(3);
+        focusedEvent.setCurrentItemIndex(2);
         focusedEvent.setEnabled(true);
 
         // set expectations
@@ -411,14 +406,6 @@ public class AccessibilityEndToEndTest extends
         // failure - reset so it is not accept more events
         service.reset();
         throw lastVerifyThrowable;
-    }
-
-    /**
-     * @return Whether the activity has action bar.
-     */
-    private boolean hasActivityActionBar() {
-        return (getActivity().getApplicationInfo().targetSdkVersion
-                >= Build.VERSION_CODES.HONEYCOMB);
     }
 
     static class MockAccessibilityService extends AccessibilityService implements

@@ -2437,12 +2437,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
 
         View mockView = mActivity.findViewById(R.id.mock_view);
         mockView.getLocationOnScreen(location);
-        assertEquals(0, location[0]);
+        assertEquals(layoutLocation[0], location[0]);
         assertEquals(layoutLocation[1], location[1]);
 
         View scrollView = mActivity.findViewById(R.id.scroll_view);
         scrollView.getLocationOnScreen(location);
-        assertEquals(0, location[0]);
+        assertEquals(layoutLocation[0], location[0]);
         assertEquals(layoutLocation[1] + mockView.getHeight(), location[1]);
 
         try {

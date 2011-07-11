@@ -1015,7 +1015,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mWebView.loadUrl(url);
         new DelayedCheck(10000) {
             protected boolean check() {
-                return mWebView.getTitle().equals("Done");
+                return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
         }.run();
 
@@ -1023,7 +1023,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mWebView.loadUrl(url);
         new DelayedCheck(10000) {
             protected boolean check() {
-                return mWebView.getTitle().equals("Done");
+                return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
         }.run();
     }

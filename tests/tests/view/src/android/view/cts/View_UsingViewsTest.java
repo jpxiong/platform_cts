@@ -469,6 +469,8 @@ public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingV
     })
     @UiThreadTest
     public void testSetFocus() throws Throwable {
+        boolean focusWasOnEditText = mEditText.hasFocus();
+
         MockOnFocusChangeListener editListener = new MockOnFocusChangeListener();
         MockOnFocusChangeListener okListener = new MockOnFocusChangeListener();
         MockOnFocusChangeListener cancelListener = new MockOnFocusChangeListener();
@@ -491,7 +493,7 @@ public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingV
         assertFalse(mSymbolTextView.hasFocus());
         assertFalse(mWarningTextView.hasFocus());
 
-        assertTrue(editListener.hasFocus());
+        assertTrue(editListener.hasFocus() || focusWasOnEditText);
         assertFalse(okListener.hasFocus());
         assertFalse(cancelListener.hasFocus());
         assertFalse(symbolListener.hasFocus());

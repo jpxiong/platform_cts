@@ -315,6 +315,7 @@
         </activity>
 
         <activity android:name="android.view.cts.WindowStubActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
             android:label="WindowStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

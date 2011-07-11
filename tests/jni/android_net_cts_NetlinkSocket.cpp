@@ -21,6 +21,7 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <errno.h>
+#include <string.h>
 #include "JNIHelp.h"
 
 #include "android_net_cts_NetlinkSocket.h"
