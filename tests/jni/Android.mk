@@ -30,12 +30,8 @@ LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
 LOCAL_SHARED_LIBRARIES := libnativehelper liblog
 
-ifneq ($(TARGET_SIMULATOR),true)
 LOCAL_SRC_FILES += android_os_cts_CpuFeatures.cpp
 LOCAL_C_INCLUDES += ndk/sources/cpufeatures
 LOCAL_STATIC_LIBRARIES := cpufeatures
-else
-LOCAL_CFLAGS += -DCTS_TARGET_SIMULATOR
-endif
 
 include $(BUILD_SHARED_LIBRARY)
