@@ -1,0 +1,96 @@
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.security.cts;
+
+import android.test.AndroidTestCase;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class CertificateTest extends AndroidTestCase {
+
+    public void testCertificates() throws Exception {
+        Set<String> expectedCertificates = getExpectedCertificates();
+        Set<String> deviceCertificates = getDeviceCertificates();
+        expectedCertificates.removeAll(deviceCertificates);
+        assertTrue("Missing certificates: " + expectedCertificates, expectedCertificates.isEmpty());
+    }
+
+    private Set<String> getExpectedCertificates() {
+        Set<String> certificates = new HashSet<String>();
+        for (int i = 0; i < CertificateData.CERTIFICATE_DATA.length; i++) {
+            certificates.add(CertificateData.CERTIFICATE_DATA[i]);
+        }
+        return certificates;
+    }
+
+    private Set<String> getDeviceCertificates() throws KeyStoreException,
+            NoSuchAlgorithmException, CertificateException, IOException {
+        String trustStore = System.getProperty("javax.net.ssl.trustStore", null);
+        assertNotNull(trustStore);
+
+        KeyStore keyStore = KeyStore.getInstance("BKS");
+        InputStream inputStream = new FileInputStream(trustStore);
+        keyStore.load(inputStream, null);
+
+        List<String> aliases = Collections.list(keyStore.aliases());
+        assertFalse(aliases.isEmpty());
+
+        Set<String> certificates = new HashSet<String>();
+        for (String alias : aliases) {
+            assertTrue(keyStore.isCertificateEntry(alias));
+            X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+            assertEquals(certificate.getSubjectUniqueID(), certificate.getIssuerUniqueID());
+            assertNotNull(certificate.getSubjectDN());
+            assertNotNull(certificate.getIssuerDN());
+            String fingerprint = getFingerprint(certificate);
+            certificates.add(fingerprint);
+        }
+        return certificates;
+    }
+
+    private String getFingerprint(X509Certificate certificate) throws CertificateEncodingException,
+            NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+        messageDigest.update(certificate.getEncoded());
+        byte[] sha1 = messageDigest.digest();
+        return convertToHexFingerprint(sha1);
+    }
+
+    private String convertToHexFingerprint(byte[] sha1) {
+        StringBuilder fingerprint = new StringBuilder();
+        for (int i = 0; i < sha1.length; i++) {
+            fingerprint.append(String.format("%02X", sha1[i]));
+            if (i + 1 < sha1.length) {
+                fingerprint.append(":");
+            }
+        }
+        return fingerprint.toString();
+    }
+}
