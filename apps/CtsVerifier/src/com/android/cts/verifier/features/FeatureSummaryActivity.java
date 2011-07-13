@@ -162,6 +162,13 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.hardware.usb.accessory", false),
     };
 
+    public static final Feature[] ALL_HONEYCOMB_MR2_FEATURES = {
+            new Feature("android.hardware.faketouch.multitouch.distinct", false),
+            new Feature("android.hardware.faketouch.multitouch.jazzhand", false),
+            new Feature("android.hardware.screen.landscape", false),
+            new Feature("android.hardware.screen.portrait", false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,6 +199,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Collections.addAll(features, ALL_HONEYCOMB_MR2_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             Collections.addAll(features, ALL_HONEYCOMB_MR1_FEATURES);
         }
