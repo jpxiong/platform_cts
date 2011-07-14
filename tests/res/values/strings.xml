@@ -151,4 +151,13 @@
    <string name="version_v3">base</string>
    <string name="authenticator_label">Android CTS</string>
    <string name="search_label">Android CTS</string>
+
+
+   <string name="button">Button</string>
+   <string name="holo_test">Holo Test</string>
+   <string name="holo_generator">Holo Generator</string>
+   <string name="holo_light_test">Holo Light Test</string>
+   <string name="holo_light_generator">Holo Light Generator</string>
+   <string name="reference_image">Reference Image: </string>
+   <string name="generated_image">Generated Image: </string>
 </resources>
