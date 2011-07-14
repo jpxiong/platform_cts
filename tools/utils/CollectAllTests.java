@@ -85,6 +85,15 @@ public class CollectAllTests extends DescriptionGenerator {
         File manifestFile = new File(args[1]);
         String jarFileName = args[2];
         final String javaPackageFilter = args[3];
+        // Validate the javaPackageFilter value if non null.
+        if (javaPackageFilter.length() != 0) {
+            if (!isValidJavaPackage(javaPackageFilter)) {
+                System.err.println("Invalid " + ATTRIBUTE_JAVA_PACKAGE_FILTER + ": " +
+                        javaPackageFilter);
+                System.exit(1);
+                return;
+            }
+        }
         String libcoreExpectationDir = (args.length > 4) ? args[4] : null;
         String androidMakeFile = (args.length > 5) ? args[5] : null;
 
@@ -209,7 +218,8 @@ public class CollectAllTests extends DescriptionGenerator {
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
-                    System.out.println("problem with class " + className);
+                    System.out.println("Known bug (Working as intended): problem with class "
+                            + className);
                     e.printStackTrace();
                 }
                 try {
@@ -218,7 +228,8 @@ public class CollectAllTests extends DescriptionGenerator {
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
-                    System.out.println("problem with class " + className);
+                    System.out.println("Known bug (Working as intended): problem with class "
+                            + className);
                     e.printStackTrace();
                 }
             } catch (ClassNotFoundException e) {
@@ -428,5 +439,38 @@ public class CollectAllTests extends DescriptionGenerator {
         }
 
         testClass.mCases.add(new TestMethod(testName, "", "", knownFailure, false, false));
+    }
+
+    /**
+     * Determines if a given string is a valid java package name
+     * @param javaPackageName
+     * @return true if it is valid, false otherwise
+     */
+    private static boolean isValidJavaPackage(String javaPackageName) {
+        String[] strSections = javaPackageName.split(".");
+        for (String strSection : strSections) {
+          if (!isValidJavaIdentifier(strSection)) {
+              return false;
+          }
+        }
+        return true;
+    }
+
+    /**
+     * Determines if a given string is a valid java identifier.
+     * @param javaIdentifier
+     * @return true if it is a valid identifier, false otherwise
+     */
+    private static boolean isValidJavaIdentifier(String javaIdentifier) {
+        if (javaIdentifier.length() == 0 ||
+                !Character.isJavaIdentifierStart(javaIdentifier.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < javaIdentifier.length(); i++) {
+            if (!Character.isJavaIdentifierPart(javaIdentifier.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
