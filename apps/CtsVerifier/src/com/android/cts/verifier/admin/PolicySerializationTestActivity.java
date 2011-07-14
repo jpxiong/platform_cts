@@ -396,8 +396,7 @@ public class PolicySerializationTestActivity extends PassFailButtons.ListActivit
                     DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC,
                     DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC,
                     DevicePolicyManager.PASSWORD_QUALITY_NUMERIC,
-                    DevicePolicyManager.PASSWORD_QUALITY_SOMETHING,
-                    DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED
+                    DevicePolicyManager.PASSWORD_QUALITY_SOMETHING
             };
 
             int index = random.nextInt(passwordQualities.length);
@@ -426,8 +425,6 @@ public class PolicySerializationTestActivity extends PassFailButtons.ListActivit
                     return mContext.getString(R.string.da_password_quality_numeric);
                 case DevicePolicyManager.PASSWORD_QUALITY_SOMETHING:
                     return mContext.getString(R.string.da_password_quality_something);
-                case DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED:
-                    return mContext.getString(R.string.da_password_quality_unspecified);
                 default:
                     return Integer.toString(value);
             }
