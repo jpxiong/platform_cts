@@ -576,9 +576,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
         mManager.addProximityAlert(0, 0, 0, 5000, pi);
         mManager.removeProximityAlert(pi);
-
-        mManager.addProximityAlert(0, 0, 0, 5000, null);
-        mManager.removeProximityAlert(null);
     }
 
     @TestTargets({
