@@ -25,6 +25,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.test.AndroidTestCase;
 
 import java.util.List;
@@ -184,17 +186,62 @@ public class AvailableIntentsTest extends AndroidTestCase {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
                 || packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
-            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             assertCanBeHandled(intent);
 
-            intent.setAction(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
+            intent.setAction(MediaStore.ACTION_VIDEO_CAPTURE);
             assertCanBeHandled(intent);
 
-            intent.setAction(android.provider.MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+            intent.setAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
             assertCanBeHandled(intent);
 
-            intent.setAction(android.provider.MediaStore.INTENT_ACTION_VIDEO_CAMERA);
+            intent.setAction(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
             assertCanBeHandled(intent);
         }
+    }
+
+    public void testSettings() {
+        assertCanBeHandled(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_ADD_ACCOUNT));
+        assertCanBeHandled(new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_APN_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.parse("package:com.android.cts.stub")));
+
+        // TODO: Uncomment in HC. This appears to be broken in Froyo and Gingerbread...
+        // assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+
+        assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_DATE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_DEVICE_INFO_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_DISPLAY_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_LOCALE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS));
+
+        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
+        // assertCanBeHandled(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
+
+        assertCanBeHandled(new Intent(Settings.ACTION_PRIVACY_SETTINGS));
+
+        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
+        // assertCanBeHandled(new Intent(Settings.ACTION_QUICK_LAUNCH_SETTINGS));
+
+        assertCanBeHandled(new Intent(Settings.ACTION_SEARCH_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_SOUND_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_SYNC_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_SYSTEM_UPDATE_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_USER_DICTIONARY_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_WIFI_SETTINGS));
+        assertCanBeHandled(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 }
