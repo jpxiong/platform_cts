@@ -241,7 +241,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
                 android.graphics.BitmapFactory.Options.class}
     )
     public void testDecodeFileDescriptor1() throws IOException {
-        FileDescriptor input = obtainDescriptor(obtainPath());
+        ParcelFileDescriptor pfd = obtainParcelDescriptor(obtainPath());
+        FileDescriptor input = pfd.getFileDescriptor();
         Rect r = new Rect(1, 1, 1, 1);
         Bitmap b = BitmapFactory.decodeFileDescriptor(input, r, mOpt1);
         assertNotNull(b);
@@ -258,7 +259,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         args = {java.io.FileDescriptor.class}
     )
     public void testDecodeFileDescriptor2() throws IOException {
-        FileDescriptor input = obtainDescriptor(obtainPath());
+        ParcelFileDescriptor pfd = obtainParcelDescriptor(obtainPath());
+        FileDescriptor input = pfd.getFileDescriptor();
         Bitmap b = BitmapFactory.decodeFileDescriptor(input);
         assertNotNull(b);
         // Test the bitmap size
@@ -311,10 +313,11 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         return mRes.openRawResource(resId);
     }
 
-    private FileDescriptor obtainDescriptor(String path) throws IOException {
-      File file = new File(path);
-      return(ParcelFileDescriptor.open(file,
-              ParcelFileDescriptor.MODE_READ_ONLY).getFileDescriptor());
+    private ParcelFileDescriptor obtainParcelDescriptor(String path)
+            throws IOException {
+        File file = new File(path);
+        return(ParcelFileDescriptor.open(file,
+                ParcelFileDescriptor.MODE_READ_ONLY));
     }
 
     private String obtainPath() throws IOException {
