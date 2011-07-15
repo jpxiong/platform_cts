@@ -207,10 +207,7 @@ public class AvailableIntentsTest extends AndroidTestCase {
         assertCanBeHandled(new Intent(Settings.ACTION_APN_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 .setData(Uri.parse("package:com.android.cts.stub")));
-
-        // TODO: Uncomment in HC. This appears to be broken in Froyo and Gingerbread...
         assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
-
         assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS));
@@ -224,15 +221,9 @@ public class AvailableIntentsTest extends AndroidTestCase {
         assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS));
-
-        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
         assertCanBeHandled(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
-
         assertCanBeHandled(new Intent(Settings.ACTION_PRIVACY_SETTINGS));
-
-        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
         assertCanBeHandled(new Intent(Settings.ACTION_QUICK_LAUNCH_SETTINGS));
-
         assertCanBeHandled(new Intent(Settings.ACTION_SEARCH_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_SECURITY_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_SETTINGS));
