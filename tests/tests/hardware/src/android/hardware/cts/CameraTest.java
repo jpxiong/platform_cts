@@ -2312,4 +2312,34 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             assertEquals(originalAreas, parameters.getMeteringAreas());
         }
     }
+
+    // Apps should be able to call startPreview in jpeg callback.
+    @UiThreadTest
+    public void testJpegCallbackStartPreview() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testJpegCallbackStartPreviewByCamera(id);
+        }
+    }
+
+    private void testJpegCallbackStartPreviewByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        mCamera.startPreview();
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, new JpegStartPreviewCallback());
+        waitForSnapshotDone();
+        terminateMessageLooper();
+        assertTrue(mJpegPictureCallbackResult);
+    }
+
+    private final class JpegStartPreviewCallback implements PictureCallback {
+        public void onPictureTaken(byte[] rawData, Camera camera) {
+            try {
+                camera.startPreview();
+                mJpegPictureCallbackResult = true;
+            } catch (Exception e) {
+            }
+            mSnapshotDone.open();
+        }
+    }
 }
