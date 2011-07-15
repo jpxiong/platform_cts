@@ -338,10 +338,6 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         // TODO: Add tests for the other touchscreen features.
     }
 
-    public void testUsbFeatures() {
-        assertAvailable(PackageManager.FEATURE_USB_ACCESSORY);
-        assertAvailable(PackageManager.FEATURE_USB_HOST);
-    }
 
     public void testWifiFeature() throws Exception {
         boolean enabled = mWifiManager.isWifiEnabled();
