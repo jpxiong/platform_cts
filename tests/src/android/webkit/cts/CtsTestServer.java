@@ -656,10 +656,15 @@ public class CtsTestServer {
             File storageDir = Environment.getExternalStorageDirectory();
             File file = new File(storageDir, downloadId + ".bin");
             BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
+            byte data[] = new byte[1024];
+            for (int i = 0; i < data.length; i++) {
+                data[i] = 1;
+            }
             try {
-                for (int i = 0; i < numBytes; i++) {
-                    stream.write(1);
+                for (int i = 0; i < numBytes / data.length; i++) {
+                    stream.write(data);
                 }
+                stream.write(data, 0, numBytes % data.length);
                 stream.flush();
             } finally {
                 stream.close();
