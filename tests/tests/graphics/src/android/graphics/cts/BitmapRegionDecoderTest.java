@@ -157,7 +157,8 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
     public void testNewInstanceStringAndFileDescriptor() throws IOException {
         for (int i = 0; i < RES_IDS.length; ++i) {
             String filepath = obtainPath(i);
-            FileDescriptor fd = obtainDescriptor(filepath);
+            ParcelFileDescriptor pfd = obtainParcelDescriptor(filepath);
+            FileDescriptor fd = pfd.getFileDescriptor();
             try {
                 BitmapRegionDecoder decoder1 =
                         BitmapRegionDecoder.newInstance(filepath, false);
@@ -245,9 +246,11 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
                     Bitmap wholeImage = BitmapFactory.decodeFile(filepath, opts);
                     compareRegionByRegion(decoder, opts, wholeImage);
 
-                    FileDescriptor fd1 = obtainDescriptor(filepath);
+                    ParcelFileDescriptor pfd1 = obtainParcelDescriptor(filepath);
+                    FileDescriptor fd1 = pfd1.getFileDescriptor();
                     decoder = BitmapRegionDecoder.newInstance(fd1, false);
-                    FileDescriptor fd2 = obtainDescriptor(filepath);
+                    ParcelFileDescriptor pfd2 = obtainParcelDescriptor(filepath);
+                    FileDescriptor fd2 = pfd2.getFileDescriptor();
                     compareRegionByRegion(decoder, opts, wholeImage);
                     wholeImage.recycle();
                 }
@@ -357,11 +360,13 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         return (file.getPath());
     }
 
-    private FileDescriptor obtainDescriptor(String path) throws IOException {
+    private ParcelFileDescriptor obtainParcelDescriptor(String path)
+            throws IOException {
         File file = new File(path);
         return(ParcelFileDescriptor.open(file,
-                ParcelFileDescriptor.MODE_READ_ONLY).getFileDescriptor());
+                ParcelFileDescriptor.MODE_READ_ONLY));
     }
+
 
     // Compare expected to actual to see if their diff is less then mseMargin.
     // lessThanMargin is to indicate whether we expect the diff to be
