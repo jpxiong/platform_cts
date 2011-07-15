@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     /**
@@ -73,6 +75,23 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             this.name = name;
             this.required = required;
             this.present = false;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            } else if (o == null || !(o instanceof Feature)) {
+                return false;
+            } else {
+                Feature feature = (Feature) o;
+                return name.equals(feature.name);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
         }
     }
 
@@ -115,6 +134,15 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     };
 
     public static final Feature[] ALL_GINGERBREAD_FEATURES = {
+            // Required features in prior releases that became optional in GB
+            new Feature("android.hardware.bluetooth", false),
+            new Feature("android.hardware.camera", false),
+            new Feature("android.hardware.location.gps", false),
+            new Feature("android.hardware.microphone", false),
+            new Feature("android.hardware.sensor.accelerometer", false),
+            new Feature("android.hardware.sensor.compass", false),
+
+            // New features in GB
             new Feature("android.hardware.audio.low_latency", false),
             new Feature("android.hardware.camera.front", false),
             new Feature("android.hardware.nfc", false),
@@ -155,16 +183,18 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         // roll over all known features & check whether device reports them
         boolean present = false;
         int statusIcon;
-        ArrayList<Feature> features = new ArrayList<Feature>();
+        Set<Feature> features = new LinkedHashSet<Feature>();
+
+        // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
-        if (apiVersion >= Build.VERSION_CODES.ECLAIR_MR1) {
-            Collections.addAll(features, ALL_ECLAIR_FEATURES);
+        if (apiVersion >= Build.VERSION_CODES.GINGERBREAD) {
+            Collections.addAll(features, ALL_GINGERBREAD_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.FROYO) {
             Collections.addAll(features, ALL_FROYO_FEATURES);
         }
-        if (apiVersion >= Build.VERSION_CODES.GINGERBREAD) {
-            Collections.addAll(features, ALL_GINGERBREAD_FEATURES);
+        if (apiVersion >= Build.VERSION_CODES.ECLAIR_MR1) {
+            Collections.addAll(features, ALL_ECLAIR_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
             Collections.addAll(features, ALL_HONEYCOMB_FEATURES);
