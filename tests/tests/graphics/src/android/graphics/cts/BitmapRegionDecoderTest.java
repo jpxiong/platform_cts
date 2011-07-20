@@ -34,6 +34,7 @@ import com.android.cts.stub.R;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -258,15 +259,23 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
+    @TestTargets ({
+        @TestTargetNew(
+                level = TestLevel.COMPLETE,
+                method = "recycle",
+                args = {}
+        ),
+        @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "recycle",
+            method = "isRecycled",
             args = {}
-    )
+        )
+    })
     public void testRecycle() throws IOException {
         InputStream is = obtainInputStream(RES_IDS[0]);
         BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(is, false);
         decoder.recycle();
+        assertTrue(decoder.isRecycled());
         try {
             decoder.getWidth();
             fail("Should throw an exception!");

@@ -677,6 +677,30 @@ public class RectTest extends AndroidTestCase {
 
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "flattenToString",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "unflattenFromString",
+            args = {java.lang.String.class}
+        )
+    })
+    public void testFlattenToString() {
+        Rect mRect = new Rect(1, 2, 3, 4);
+        String flattenString = mRect.flattenToString();
+        assertNotNull(flattenString);
+        String unDefinedFormat = "TOPLEFT";
+        Rect rect = Rect.unflattenFromString(flattenString);
+        assertEquals(mRect, rect);
+        rect = null;
+        rect = Rect.unflattenFromString(unDefinedFormat);
+        assertNull(rect);
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "describeContents",

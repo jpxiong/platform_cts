@@ -207,6 +207,18 @@ public class NinePatchTest extends AndroidTestCase {
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "getDensity",
+        args = {}
+    )
+    public void testGetDensity() {
+        mBitmap.setDensity(11);
+        assertEquals(11, mNinePatch.getDensity());
+        mNinePatch = new NinePatch(mBitmap, mChunk, NAME);
+        assertEquals(mNinePatch.getDensity(), mBitmap.getDensity());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "getTransparentRegion",
         args = {android.graphics.Rect.class}
     )
