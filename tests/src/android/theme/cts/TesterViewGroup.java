@@ -78,7 +78,7 @@ public class TesterViewGroup extends ViewGroup {
     }
 
     private int getMeasureSpec(int val, int referenceSize) {
-        if (val == LayoutParams.MATCH_PARENT || val == LayoutParams.FILL_PARENT) {
+        if (val == LayoutParams.MATCH_PARENT) {
             return MeasureSpec.makeMeasureSpec(referenceSize, MeasureSpec.EXACTLY);
         } else if (val == LayoutParams.WRAP_CONTENT) {
             return MeasureSpec.makeMeasureSpec(referenceSize, MeasureSpec.AT_MOST);

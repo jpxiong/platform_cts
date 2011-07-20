@@ -160,4 +160,7 @@
    <string name="holo_light_generator">Holo Light Generator</string>
    <string name="reference_image">Reference Image: </string>
    <string name="generated_image">Generated Image: </string>
+   <string name="themes_prompt">Select a Theme:</string>
+   <string name="bacon_ipsum">Bacon ipsum dolor sit amet pork chop strip steak
+spare ribs short ribs jerky.</string>
 </resources>

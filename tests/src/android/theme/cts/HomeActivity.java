@@ -23,47 +23,38 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * This activity exists solely for debugging purposes.
  */
 public class HomeActivity extends Activity {
+    private ThemeInfo[] mThemes;
     /**
      * Called with the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_activity);
+        setContentView(R.layout.themetestlistactivity);
+
+        ListView lv = (ListView) findViewById(R.id.tests_list);
+
+        mThemes = ThemeTests.getThemes();
+        lv.setAdapter(new ThemesAdapter(this, mThemes));
+
+        lv.setOnItemClickListener(mTestClickedListener);
     }
 
-    public void onHoloTestClick(View view) {
-        Intent intent = new Intent(this, ThemeTestRunnerActivity.class);
-        intent.putExtra(ThemeTests.EXTRA_THEME_ID, android.R.style.Theme_Holo);
-        intent.putExtra(ThemeTests.EXTRA_THEME_NAME, "holo");
-        intent.putExtra(ThemeTests.EXTRA_RUN_TESTS, true);
-        startActivity(intent);
-    }
-
-    public void onHoloGenClick(View view) {
-        Intent intent = new Intent(this, ThemeTestGeneratorActivity.class);
-        intent.putExtra(ThemeTests.EXTRA_THEME_ID, android.R.style.Theme_Holo);
-        intent.putExtra(ThemeTests.EXTRA_THEME_NAME, "holo");
-        startActivity(intent);
-    }
-
-    public void onHoloLightTestClick(View view) {
-        Intent intent = new Intent(this, ThemeTestRunnerActivity.class);
-        intent.putExtra(ThemeTests.EXTRA_THEME_ID, android.R.style.Theme_Holo_Light);
-        intent.putExtra(ThemeTests.EXTRA_THEME_NAME, "holo_light");
-        intent.putExtra(ThemeTests.EXTRA_RUN_TESTS, true);
-        startActivity(intent);
-    }
-
-    public void onHoloLightGenClick(View view) {
-        Intent intent = new Intent(this, ThemeTestGeneratorActivity.class);
-        intent.putExtra(ThemeTests.EXTRA_THEME_ID, android.R.style.Theme_Holo_Light);
-        intent.putExtra(ThemeTests.EXTRA_THEME_NAME, "holo_light");
-        startActivity(intent);
-    }
+    private OnItemClickListener mTestClickedListener = new OnItemClickListener() {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Intent intent = new Intent(HomeActivity.this, TestListActivity.class);
+            ThemeInfo theme = mThemes[position];
+            intent.putExtra(ThemeTests.EXTRA_THEME_ID, theme.getResourceId());
+            intent.putExtra(ThemeTests.EXTRA_THEME_NAME, theme.getThemeName());
+            startActivity(intent);
+        }
+    };
 }

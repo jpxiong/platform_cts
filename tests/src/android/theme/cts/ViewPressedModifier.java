@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package android.theme.cts;
 
 import android.view.View;

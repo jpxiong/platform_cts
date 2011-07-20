@@ -37,12 +37,12 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
         mInstrumentation = getInstrumentation();
     }
 
-    public void testHoloTheme() {
-        runThemeTest(android.R.style.Theme_Holo, "holo");
-    }
+    public void testThemes() {
+        ThemeInfo[] themes = ThemeTests.getThemes();
 
-    public void testHoloLightTheme() {
-        runThemeTest(android.R.style.Theme_Holo_Light, "holo_light");
+        for (ThemeInfo theme : themes) {
+            runThemeTest(theme.getResourceId(), theme.getThemeName());
+        }
     }
 
     /**
@@ -69,5 +69,12 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
         });
 
         mInstrumentation.waitForIdleSync();
+
+        try {
+            tearDown();
+            setUp();
+        } catch (Exception e) {
+            fail("Failed at tearing down the activity so we can start a new one.");
+        }
     }
 }
