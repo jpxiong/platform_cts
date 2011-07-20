@@ -203,6 +203,56 @@ public class YuvImageTest extends AndroidTestCase {
 
     }
 
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getHeight",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getWidth",
+            args = {}
+        )
+    })
+    public void testGetHeight() {
+        generateTestBitmaps(WIDTH, HEIGHT);
+        YuvImage image = generateYuvImage(ImageFormat.YUY2, mTestBitmaps[0], 0);
+        assertEquals(mTestBitmaps[0].getHeight(), image.getHeight());
+        assertEquals(mTestBitmaps[0].getWidth(), image.getWidth());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getYuvData",
+        args = {}
+    )
+    public void testGetYuvData() {
+        generateTestBitmaps(WIDTH, HEIGHT);
+        int width = mTestBitmaps[0].getWidth();
+        int height = mTestBitmaps[0].getHeight();
+        int stride = width;
+        int[] argb = new int[stride * height];
+        mTestBitmaps[0].getPixels(argb, 0, stride, 0, 0, width, height);
+        byte[] yuv = convertArgbsToYuvs(argb, stride, height, ImageFormat.NV21);
+        int[] strides = new int[] {
+                stride, stride
+        };
+        YuvImage image = new YuvImage(yuv, ImageFormat.NV21, width, height, strides);
+        assertEquals(yuv, image.getYuvData());
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "getYuvFormat",
+        args = {}
+    )
+    public void testGetYuvFormat() {
+        generateTestBitmaps(WIDTH, HEIGHT);
+        YuvImage image = generateYuvImage(ImageFormat.YUY2, mTestBitmaps[0], 0);
+        assertEquals(ImageFormat.YUY2, image.getYuvFormat());
+    }
+
     private void generateTestBitmaps(int width, int height) {
         Bitmap dst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(dst);
@@ -220,7 +270,7 @@ public class YuvImageTest extends AndroidTestCase {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        int stride = width + paddings;;
+        int stride = width + paddings;
 
         YuvImage image = null;
         int[] argb = new int [stride * height];
@@ -251,7 +301,6 @@ public class YuvImageTest extends AndroidTestCase {
 
         Rect expectedRect = sameRect ? actualRect : rect1;
         expected = Bitmap.createBitmap(testBitmap, expectedRect.left, expectedRect.top, expectedRect.width(), expectedRect.height());
-        
         compareBitmaps(expected, actual, mMseMargin, sameRect);
     }
 

@@ -41,6 +41,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable.ConstantState;
 import android.test.InstrumentationTestCase;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 
 import java.io.ByteArrayInputStream;
@@ -67,7 +68,17 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "BitmapDrawable",
+            args = {android.content.res.Resources.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "BitmapDrawable",
             args = {android.graphics.Bitmap.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "BitmapDrawable",
+            args = {android.content.res.Resources.class, android.graphics.Bitmap.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -77,7 +88,17 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         @TestTargetNew(
             level = TestLevel.COMPLETE,
             method = "BitmapDrawable",
+            args = {android.content.res.Resources.class, java.lang.String.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "BitmapDrawable",
             args = {java.io.InputStream.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "BitmapDrawable",
+            args = {android.content.res.Resources.class, java.io.InputStream.class}
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -108,6 +129,10 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
                 bitmapDrawable.getPaint().getFlags());
         assertEquals(bitmap, bitmapDrawable.getBitmap());
 
+        new BitmapDrawable(mContext.getResources());
+
+        new BitmapDrawable(mContext.getResources(), bitmap);
+
         new BitmapDrawable(mContext.getFilesDir().getPath());
 
         new BitmapDrawable(new ByteArrayInputStream("test constructor".getBytes()));
@@ -115,7 +140,11 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         // exceptional test
         new BitmapDrawable((Bitmap) null);
 
+        new BitmapDrawable(mContext.getResources(), (String) null);
+
         new BitmapDrawable((String) null);
+
+        new BitmapDrawable(mContext.getResources(), (InputStream) null);
 
         new BitmapDrawable((InputStream) null);
     }
@@ -412,6 +441,38 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         InputStream source = mContext.getResources().openRawResource(R.drawable.size_48x48);
         bitmapDrawable = new BitmapDrawable(source);
         bitmapDrawable.setTargetDensity(mContext.getResources().getDisplayMetrics().densityDpi);
+        assertEquals(48, bitmapDrawable.getIntrinsicWidth());
+        assertEquals(48, bitmapDrawable.getIntrinsicHeight());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setTargetDensity",
+            args = {android.graphics.Canvas.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setTargetDensity",
+            args = {android.util.DisplayMetrics.class}
+        )
+    })
+    @SuppressWarnings("deprecation")
+    public void testSetTargetDensity() {
+        BitmapDrawable bitmapDrawable = new BitmapDrawable();
+
+        Bitmap bitmap = Bitmap.createBitmap(200, 300, Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        bitmapDrawable = new BitmapDrawable(bitmap);
+        bitmapDrawable.setTargetDensity(canvas.getDensity());
+        assertEquals(200, bitmapDrawable.getIntrinsicWidth());
+        assertEquals(300, bitmapDrawable.getIntrinsicHeight());
+
+        DisplayMetrics disMetrics = new DisplayMetrics();
+        disMetrics = getInstrumentation().getTargetContext().getResources().getDisplayMetrics();
+        InputStream source = mContext.getResources().openRawResource(R.drawable.size_48x48);
+        bitmapDrawable = new BitmapDrawable(source);
+        bitmapDrawable.setTargetDensity(disMetrics.densityDpi);
         assertEquals(48, bitmapDrawable.getIntrinsicWidth());
         assertEquals(48, bitmapDrawable.getIntrinsicHeight());
     }
