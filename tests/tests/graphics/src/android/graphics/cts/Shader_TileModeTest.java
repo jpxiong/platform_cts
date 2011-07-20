@@ -18,6 +18,7 @@ package android.graphics.cts;
 
 import junit.framework.TestCase;
 import android.graphics.Shader;
+import android.graphics.Shader.TileMode;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -26,18 +27,27 @@ import dalvik.annotation.TestTargets;
 @TestTargetClass(Shader.TileMode.class)
 public class Shader_TileModeTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "valueOf",
-            args = {java.lang.String.class}
-        )
-    })
-    public void testTileMode() {
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "valueOf",
+        args = {java.lang.String.class}
+    )
+    public void testValueOf() {
+        assertEquals(TileMode.CLAMP, TileMode.valueOf("CLAMP"));
+        assertEquals(TileMode.MIRROR, TileMode.valueOf("MIRROR"));
+        assertEquals(TileMode.REPEAT, TileMode.valueOf("REPEAT"));
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "values",
+        args = {}
+    )
+    public void testValues() {
+        TileMode[] tileMode = TileMode.values();
+        assertEquals(3, tileMode.length);
+        assertEquals(TileMode.CLAMP, tileMode[0]);
+        assertEquals(TileMode.REPEAT, tileMode[1]);
+        assertEquals(TileMode.MIRROR, tileMode[2]);
     }
 }

@@ -33,6 +33,7 @@ import android.graphics.BitmapFactory.Options;
 import android.os.ParcelFileDescriptor;
 import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -122,6 +123,24 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         // Test the bitmap size
         assertEquals(START_HEIGHT * mTargetDensity / mDefaultDensity, b.getHeight(), 1.1);
         assertEquals(START_WIDTH * mTargetDensity / mDefaultDensity, b.getWidth(), 1.1);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "decodeResourceStream",
+        args = {android.content.res.Resources.class, android.util.TypedValue.class,
+                java.io.InputStream.class, android.graphics.Rect.class,
+                android.graphics.BitmapFactory.Options.class}
+    )
+    public void testDecodeResourceStream() {
+        InputStream is = obtainInputStream();
+        Rect r = new Rect(1, 1, 1, 1);
+        TypedValue value = new TypedValue();
+        Bitmap b = BitmapFactory.decodeResourceStream(mRes, value, is, r, mOpt1);
+        assertNotNull(b);
+        // Test the bitmap size
+        assertEquals(START_HEIGHT, b.getHeight());
+        assertEquals(START_WIDTH, b.getWidth());
     }
 
     @TestTargetNew(
