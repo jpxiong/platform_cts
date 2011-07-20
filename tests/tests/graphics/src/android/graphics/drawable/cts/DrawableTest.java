@@ -31,6 +31,7 @@ import java.io.OutputStream;
 
 import android.content.ContentResolver;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
@@ -41,6 +42,7 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.util.Xml;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -212,6 +214,116 @@ public class DrawableTest extends AndroidTestCase {
 
             inputStream = new FileInputStream(imageFile);
             assertNotNull(Drawable.createFromStream(inputStream, "Sample"));
+        } finally {
+
+            if (null != outputEmptyStream) {
+                outputEmptyStream.close();
+            }
+            if (null != inputEmptyStream) {
+                inputEmptyStream.close();
+            }
+            if (null != inputStream) {
+                inputStream.close();
+            }
+            if (emptyFile.exists()) {
+                assertTrue(emptyFile.delete());
+            }
+            if (imageFile.exists()) {
+                assertTrue(imageFile.delete());
+            }
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "createFromResourceStream",
+        args = {android.content.res.Resources.class, android.util.TypedValue.class,
+                java.io.InputStream.class, java.lang.String.class}
+    )
+    public void testCreateFromResourceStream1() throws FileNotFoundException, IOException {
+        FileInputStream inputEmptyStream = null;
+        FileInputStream inputStream = null;
+        File imageFile = null;
+        OutputStream outputEmptyStream = null;
+
+        assertNull(Drawable.createFromResourceStream(null, null, inputStream, "test.bmp"));
+
+        File emptyFile = new File(mContext.getFilesDir(), "tempemptyimage.jpg");
+
+        // write some random data.
+        try {
+            outputEmptyStream = new FileOutputStream(emptyFile);
+            outputEmptyStream.write(10);
+
+            inputEmptyStream = new FileInputStream(emptyFile);
+            assertNull(Drawable.createFromResourceStream(mResources, null, inputEmptyStream,
+                    "Sample"));
+
+            imageFile = new File(mContext.getFilesDir(), "tempimage.jpg");
+
+            writeSampleImage(imageFile);
+
+            inputStream = new FileInputStream(imageFile);
+            final TypedValue value = new TypedValue();
+            assertNotNull(Drawable.createFromResourceStream(mResources, value, inputStream,
+                    "Sample"));
+        } finally {
+
+            if (null != outputEmptyStream) {
+                outputEmptyStream.close();
+            }
+            if (null != inputEmptyStream) {
+                inputEmptyStream.close();
+            }
+            if (null != inputStream) {
+                inputStream.close();
+            }
+            if (emptyFile.exists()) {
+                assertTrue(emptyFile.delete());
+            }
+            if (imageFile.exists()) {
+                assertTrue(imageFile.delete());
+            }
+        }
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "createFromResourceStream",
+        args = {android.content.res.Resources.class, android.util.TypedValue.class,
+                java.io.InputStream.class, java.lang.String.class,
+                android.graphics.BitmapFactory.Options.class}
+    )
+    public void testCreateFromResourceStream2() throws FileNotFoundException, IOException {
+        FileInputStream inputEmptyStream = null;
+        FileInputStream inputStream = null;
+        File imageFile = null;
+        OutputStream outputEmptyStream = null;
+
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inScaled = false;
+
+        assertNull(Drawable.createFromResourceStream(null, null, inputStream, "test.bmp", opt));
+
+        File emptyFile = new File(mContext.getFilesDir(), "tempemptyimage.jpg");
+
+        // write some random data.
+        try {
+            outputEmptyStream = new FileOutputStream(emptyFile);
+            outputEmptyStream.write(10);
+
+            inputEmptyStream = new FileInputStream(emptyFile);
+            assertNull(Drawable.createFromResourceStream(mResources, null, inputEmptyStream,
+                    "Sample", opt));
+
+            imageFile = new File(mContext.getFilesDir(), "tempimage.jpg");
+
+            writeSampleImage(imageFile);
+
+            inputStream = new FileInputStream(imageFile);
+            final TypedValue value = new TypedValue();
+            assertNotNull(Drawable.createFromResourceStream(mResources, value, inputStream,
+                    "Sample", opt));
         } finally {
 
             if (null != outputEmptyStream) {

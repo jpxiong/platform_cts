@@ -157,6 +157,9 @@ public class PathMeasureTest extends AndroidTestCase {
         mPath.addRect(1, 2, 3, 4, Path.Direction.CW);
         mPathMeasure.setPath(mPath, true);
         assertEquals(8f, mPathMeasure.getLength());
+        Path dst = new Path();
+        assertTrue(mPathMeasure.getSegment(0, mPathMeasure.getLength(), dst, true));
+        assertFalse(mPathMeasure.getSegment(mPathMeasure.getLength(), 0, dst, true));
     }
 
     @TestTargetNew(
