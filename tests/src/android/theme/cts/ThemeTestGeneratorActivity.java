@@ -25,6 +25,7 @@ import android.os.Bundle;
 import junit.framework.Assert;
 
 public class ThemeTestGeneratorActivity extends Activity {
+    private ThemeTester mTester;
 
     /**
      * Called with the activity is first created.
@@ -44,7 +45,10 @@ public class ThemeTestGeneratorActivity extends Activity {
         setTheme(themeId);
         setContentView(R.layout.testing_activity);
 
-        ThemeTester tester = new ThemeTester(this, themeName);
-        tester.generateTests();
+        mTester = new ThemeTester(this, themeName);
+    }
+
+    public void generateTests() {
+        mTester.generateTests();
     }
 }

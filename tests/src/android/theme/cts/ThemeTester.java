@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package android.theme.cts;
 
 import com.android.cts.stub.R;
@@ -22,6 +21,7 @@ import com.android.cts.stub.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -47,8 +47,8 @@ public class ThemeTester {
     private String mThemeName;
     private ImageView mReferenceImage;
     private ImageView mGeneratedImage;
-    private TextView mText;
     private TesterViewGroup mRoot;
+    private boolean mShouldAssert;
 
     /**
      * Creates a ThemeTester to run all of the tests.
@@ -59,11 +59,14 @@ public class ThemeTester {
         mActivity = activity;
         mThemeName = themeName;
         mRoot = (TesterViewGroup) mActivity.findViewById(R.id.test_group);
+        mShouldAssert = true;
 
-        // TODO - remove views that exist for debugging only
         mReferenceImage = (ImageView) mActivity.findViewById(R.id.reference_image);
         mGeneratedImage = (ImageView) mActivity.findViewById(R.id.generated_image);
-        mText = (TextView) mActivity.findViewById(R.id.text);
+    }
+
+    public void setShouldAssert(boolean shouldAssert) {
+        mShouldAssert = shouldAssert;
     }
 
     /**
@@ -72,12 +75,28 @@ public class ThemeTester {
     public void runTests() {
         ThemeTestInfo[] tests = ThemeTests.getTests();
         for (final ThemeTestInfo test : tests) {
-            mText.post(new Runnable() {
-                public void run() {
-                    testViewFromId(test);
-                }
-            });
+            runTest(test);
         }
+    }
+
+    /**
+     * Run an individual test based upon its position in the tests.
+     * @param position The position of the test that you wish to run.
+     */
+    public void runTest(int position) {
+        runTest(ThemeTests.getTests()[position]);
+    }
+
+    /**
+     * Run an individual test.
+     * @param test The {@link ThemeTestInfo} to use for this test.
+     */
+    private void runTest(final ThemeTestInfo test) {
+        mRoot.post(new Runnable() {
+            public void run() {
+                testViewFromId(test);
+            }
+        });
     }
 
     /**
@@ -86,9 +105,8 @@ public class ThemeTester {
     public void generateTests() {
         ThemeTestInfo[] tests = ThemeTests.getTests();
         for (final ThemeTestInfo test : tests) {
-            mText.post(new Runnable() {
+            mRoot.post(new Runnable() {
                 public void run() {
-                    mText.setText("Bitmaps saved");
                     generateViewFromId(test);
                 }
             });
@@ -97,7 +115,7 @@ public class ThemeTester {
 
     private void testViewFromId(ThemeTestInfo test) {
         processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
-                new BitmapComparer(mThemeName + "_" + test.getTestName()));
+                new BitmapComparer(mThemeName + "_" + test.getTestName(), mShouldAssert));
     }
 
     private void generateViewFromId(ThemeTestInfo test) {
@@ -118,11 +136,7 @@ public class ThemeTester {
                 view.draw(canvas);
                 mGeneratedImage.setImageBitmap(bitmap);
 
-                if (processor.processBitmap(bitmap)) {
-                    mText.setText(mText.getText() + "\nBitmaps identical");
-                } else {
-                    mText.setText(mText.getText() + "\nBitmaps differ");
-                }
+                processor.processBitmap(bitmap);
 
                 mRoot.removeView(view);
             }
@@ -141,7 +155,7 @@ public class ThemeTester {
         View view = inflater.inflate(resid, mRoot, false);
         mRoot.addView(view);
 
-        mRoot.measure(0, 0); // don't care about the first two values - we build our reference size
+        mRoot.measure(0, 0); // don't care about the input values - we build our reference size
         mRoot.layout(0, 0, mRoot.getMeasuredWidth(), mRoot.getMeasuredHeight());
 
         if (modifier != null) {
@@ -165,9 +179,11 @@ public class ThemeTester {
      */
     private class BitmapComparer implements BitmapProcessor {
         String mBitmapIdName;
+        boolean mShouldAssert;
 
-        public BitmapComparer(String filename) {
+        public BitmapComparer(String filename, boolean shouldAssert) {
             mBitmapIdName = filename;
+            mShouldAssert = shouldAssert;
         }
 
         @Override
@@ -175,11 +191,20 @@ public class ThemeTester {
             Resources r = mActivity.getResources();
             int resourceId = r.getIdentifier(mBitmapIdName, "drawable", mActivity.getPackageName());
 
-            BitmapDrawable drawable = (BitmapDrawable) r.getDrawable(resourceId);
+            BitmapDrawable drawable = null;
+
+            try {
+                drawable = (BitmapDrawable) r.getDrawable(resourceId);
+            } catch (NotFoundException e) {
+                Assert.fail("Test Failed: Resource not found - " + mBitmapIdName);
+            }
+
             Bitmap bmp2 = drawable.getBitmap();
             mReferenceImage.setImageBitmap(bmp2);
 
-            Assert.assertTrue("Test failed: " + mBitmapIdName, bmp2.sameAs(bitmap));
+            if (mShouldAssert) {
+                Assert.assertTrue("Test failed: " + mBitmapIdName, bmp2.sameAs(bitmap));
+            }
 
             return true;
         }

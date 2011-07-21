@@ -973,10 +973,17 @@
             </intent-filter>
         </activity>
         <activity android:name="android.theme.cts.HomeActivity"
-                  android:theme="@android:style/Theme.Holo">
+                  android:theme="@android:style/Theme.Holo"
+                  android:label="Theme Check">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="android.theme.cts.TestListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
     </application>

@@ -49,6 +49,12 @@ public class ThemeTestRunnerActivity extends Activity {
         if (intent.getBooleanExtra(ThemeTests.EXTRA_RUN_TESTS, false)) {
             mTester.runTests();
         }
+
+        int position = intent.getIntExtra(ThemeTests.EXTRA_RUN_INDIVIDUAL_TEST, -1);
+        if (position != -1) {
+            mTester.setShouldAssert(false);
+            mTester.runTest(position);
+        }
     }
 
     /**
