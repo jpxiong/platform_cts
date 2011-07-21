@@ -326,7 +326,7 @@ public class CheckedTextViewTest extends
 
         checkedTextView.setCheckMarkDrawable(0);
         assertEquals(basePaddingRight, checkedTextView.getPaddingRight());
-        assertTrue(checkedTextView.isLayoutRequested());
+        assertFalse(checkedTextView.isLayoutRequested());
     }
 
     @TestTargetNew(
