@@ -20,10 +20,15 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import junit.framework.Assert;
 
+/**
+ * Builds the bitmaps for all of the tests on the fly and
+ * compares them to the known master versions.
+ */
 public class ThemeTestRunnerActivity extends Activity {
     private ThemeTester mTester;
     /**
@@ -44,7 +49,19 @@ public class ThemeTestRunnerActivity extends Activity {
         setTheme(themeId);
         setContentView(R.layout.testing_activity);
 
-        mTester = new ThemeTester(this, themeName);
+        int orientation = intent.getIntExtra(ThemeTests.EXTRA_ORIENTATION,
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        setRequestedOrientation(orientation);
+
+        String oriented = "";
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            oriented = "land";
+        } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            oriented = "port";
+        }
+
+        mTester = new ThemeTester(this, themeName + "_" + oriented);
 
         if (intent.getBooleanExtra(ThemeTests.EXTRA_RUN_TESTS, false)) {
             mTester.runTests();

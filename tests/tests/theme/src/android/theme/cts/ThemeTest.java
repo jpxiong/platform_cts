@@ -18,6 +18,7 @@ package android.theme.cts;
 
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
@@ -41,7 +42,10 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
         ThemeInfo[] themes = ThemeTests.getThemes();
 
         for (ThemeInfo theme : themes) {
-            runThemeTest(theme.getResourceId(), theme.getThemeName());
+            runThemeTest(theme.getResourceId(), theme.getThemeName(),
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            runThemeTest(theme.getResourceId(), theme.getThemeName(),
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
 
@@ -50,7 +54,7 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
      * @param resourceId Resource ID of the theme being tested.
      * @param themeName Name of the theme being tested, e.g., "holo", "holo_light", etc
      */
-    private void runThemeTest(int resourceId, String themeName) {
+    private void runThemeTest(int resourceId, String themeName, int orientation) {
         if (mInstrumentation == null) {
             mInstrumentation = getInstrumentation();
         }
@@ -58,6 +62,7 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
         Intent intent = new Intent();
         intent.putExtra(ThemeTests.EXTRA_THEME_ID, resourceId);
         intent.putExtra(ThemeTests.EXTRA_THEME_NAME, themeName);
+        intent.putExtra(ThemeTests.EXTRA_ORIENTATION, orientation);
         setActivityIntent(intent);
 
         final ThemeTestRunnerActivity activity = getActivity();
