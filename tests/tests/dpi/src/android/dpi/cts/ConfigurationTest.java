@@ -48,10 +48,9 @@ public class ConfigurationTest extends AndroidTestCase {
 
         int max = Math.max(metrics.widthPixels, metrics.heightPixels);
         int min = Math.min(metrics.widthPixels, metrics.heightPixels);
-        boolean format16x9 = Math.floor(max * 9.0d / 16.0d) <= min;
-        boolean format4x3 = Math.ceil(max * 3.0d / 4.0d) >= min;
-        assertTrue("Aspect ratio must be between 4:3 and 16:9. It was " + max + ":" + min,
-                format4x3 && format16x9);
+        double aspectRatio = (double) max / min;
+        assertTrue("Aspect ratio must be between 1.333 and 1.86. It was " + aspectRatio,
+                aspectRatio >= 1.333 && aspectRatio <= 1.86);
 
         Set<Integer> allowedDensities = new HashSet<Integer>();
         allowedDensities.add(DisplayMetrics.DENSITY_LOW);
