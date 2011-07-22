@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 19;
+    private static final int NON_STATIC_FIELD_COUNT = 26;
 
     @MediumTest
     public void testMarshaling() throws Exception {
@@ -241,7 +241,7 @@ public class AccessibilityEventTest extends TestCase {
      * @param event The event to check.
      */
     public static void assertAccessibilityEventCleared(AccessibilityEvent event) {
-        TestCase.assertEquals("addedCount not properly recycled", 0, event.getAddedCount());
+        TestCase.assertEquals("addedCount not properly recycled", -1, event.getAddedCount());
         TestCase.assertNull("beforeText not properly recycled", event.getBeforeText());
         TestCase.assertNull("className not properly recycled", event.getClassName());
         TestCase.assertNull("contentDescription not properly recycled", event
@@ -250,11 +250,11 @@ public class AccessibilityEventTest extends TestCase {
                 .getCurrentItemIndex());
         TestCase.assertEquals("eventTime not properly recycled", 0, event.getEventTime());
         TestCase.assertEquals("eventType not properly recycled", 0, event.getEventType());
-        TestCase.assertEquals("fromIndex not properly recycled", 0, event.getFromIndex());
-        TestCase.assertEquals("itemCount not properly recycled", 0, event.getItemCount());
+        TestCase.assertEquals("fromIndex not properly recycled", -1, event.getFromIndex());
+        TestCase.assertEquals("itemCount not properly recycled", -1, event.getItemCount());
         TestCase.assertNull("packageName not properly recycled", event.getPackageName());
         TestCase.assertNull("parcelableData not properly recycled", event.getParcelableData());
-        TestCase.assertEquals("removedCount not properly recycled", 0, event.getRemovedCount());
+        TestCase.assertEquals("removedCount not properly recycled", -1, event.getRemovedCount());
         TestCase.assertTrue("text not properly recycled", event.getText().isEmpty());
     }
 }
