@@ -39,7 +39,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".TestListActivity" android:label="@string/test_list_title" />
+        <activity android:name=".TestListActivity" android:label="@string/app_name">
+            <!--
+                TestListActivity will have the USB accessory Test in its test list, but it
+                does not have any code to handle the USB accessory. The test has to be started
+                from TestListActivity or the pass/fail status won't be properly recorded. Also
+                this is to prevent the dialog saying there is no application able to support the
+                accessory from being shown.
+            -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                    android:resource="@xml/accessory_filter" />
+        </activity>
 
         <provider android:name=".TestResultsProvider" 
                 android:authorities="com.android.cts.verifier.testresultsprovider" />
@@ -185,6 +198,16 @@
                   android:label="@string/aq_view_results_name" />
 
         <service android:name=".audioquality.ExperimentService" />
+
+        <activity android:name=".usb.UsbAccessoryTestActivity"
+                android:label="@string/usb_accessory_test"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_hardware" />
+        </activity>
 
    </application>
 
