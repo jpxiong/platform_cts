@@ -584,6 +584,31 @@ public class TimeTest extends AndroidTestCase {
         assertTrue(Time.compare(a, a) == 0);
     }
 
+    public void testCompareNullFailure() throws Exception {
+        Time a = new Time(Time.TIMEZONE_UTC);
+
+        try {
+            Time.compare(a, null);
+            fail("Should throw NullPointerException on second argument");
+        } catch (NullPointerException e) {
+            // pass
+        }
+
+        try {
+            Time.compare(null, a);
+            fail("Should throw NullPointerException on first argument");
+        } catch (NullPointerException e) {
+            // pass
+        }
+
+        try {
+            Time.compare(null, null);
+            fail("Should throw NullPointerException because both args are null");
+        } catch (NullPointerException e) {
+            // pass
+        }
+    }
+
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "format",
