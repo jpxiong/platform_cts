@@ -131,7 +131,7 @@ public class ProgramFragmentTest extends RSBaseGraphics {
 
         String simpleUni = "void main() {\n"+
                            "  vec4 col = vec4(0.1, 0.2, 0.3, 0.4);\n"+
-                           "  col = UNI_MVP * col;\n"+
+                           "  col = UNI_MATRIX * col;\n"+
                            "  gl_FragColor = col;\n"+
                            "}";
 
@@ -139,13 +139,13 @@ public class ProgramFragmentTest extends RSBaseGraphics {
                               "  vec4 col = vec4(0.1, 0.2, 0.3, 0.4);"+
                               "  col += texture2D(UNI_Tex0, vec2(0.1, 0.1));\n"+
                               "  col += textureCube(UNI_Tex1, vec3(0.1, 0.2, 0.3));\n"+
-                              "  col = UNI_MVP * col;\n"+
+                              "  col = UNI_MATRIX * col;\n"+
                               "  gl_FragColor = col;\n"+
                               "}";
 
         String multiUni = "void main() {\n"+
                           "  vec4 col = vec4(0.1, 0.2, 0.3, 0.4);"+
-                          "  col = UNI_MVP * col;\n"+
+                          "  col = UNI_MATRIX * col;\n"+
                           "  col = UNI_EXTRA * col;\n"+
                           "  col += UNI_extra4;\n"+
                           "  col.xyz += UNI_extra3;\n "+
