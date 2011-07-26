@@ -111,8 +111,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
     @Override
     protected void tearDown() throws Exception {
         if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
+            terminateMessageLooper();
         }
         // Clean up static values in stub so it can be reused
         GLSurfaceViewStubActivity.resetRenderMode();
@@ -158,6 +157,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
      * Terminates the message looper thread.
      */
     private void terminateMessageLooper() throws Exception {
+        if (LOGV) Log.v(TAG, "Shutting down camera");
         mCamera.release();
         mLooper.quit();
         // Looper.quit() is asynchronous. The looper may still has some
@@ -168,6 +168,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         mLooper.getThread().join();
         mCamera = null;
         mSurfaceTexture = null;
+        if (LOGV) Log.v(TAG, "Shutdown of camera complete.");
     }
 
     /** The camera preview callback. Stops capture after the first callback */
@@ -325,6 +326,10 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             }
         } finally {
             wl.release();
+            // If an assert failed, camera might still be active. Clean up before next test.
+            if (mCamera != null) {
+                terminateMessageLooper();
+            }
         }
     }
 
@@ -344,7 +349,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mCamera.startPreview();
             mCamera.setPreviewTexture(mSurfaceTexture);
             noTimeout = waitForPreviewDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new preview callback!", noTimeout);
             terminateMessageLooper();
 
             // Check the order: setPreviewTexture->startPreview.
@@ -353,7 +358,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mCamera.setPreviewTexture(mSurfaceTexture);
             mCamera.startPreview();
             noTimeout = waitForPreviewDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new preview callback!", noTimeout);
 
             // Check the order: setting preview display to null->startPreview->
             // setPreviewTexture.
@@ -362,7 +367,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mCamera.startPreview();
             mCamera.setPreviewTexture(mSurfaceTexture);
             noTimeout = waitForPreviewDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new preview callback!", noTimeout);
             terminateMessageLooper();
         }
     };
@@ -388,9 +393,9 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mCamera.startPreview();
 
             noTimeout = waitForSurfaceTextureDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new frame from SurfaceTexture!", noTimeout);
             noTimeout = waitForPreviewDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new preview callback!",noTimeout);
 
             mGLView.requestRender();
             terminateMessageLooper();
@@ -405,9 +410,9 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mCamera.setPreviewTexture(mSurfaceTexture);
 
             noTimeout = waitForSurfaceTextureDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new frame from SurfaceTexture!", noTimeout);
             noTimeout = waitForPreviewDone();
-            assertTrue(noTimeout);
+            assertTrue("Timeout waiting for new preview callback!", noTimeout);
 
             mGLView.requestRender();
 
@@ -496,7 +501,15 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
     private RunPerCamera testCameraToSurfaceTextureMetadataByCamera = new RunPerCamera() {
         public void run(int cameraId) throws Exception {
-            int kLoopCount = 100; // Number of frames to test over
+            // Number of frames to test over
+            int kLoopCount = 100;
+            // Ignore timestamp issues before this frame
+            int kFirstTestedFrame = 10;
+            // Slop in timestamp testing, needed because timestamps are not
+            // currently being set by driver-level code so are subject to
+            // lots of variability
+            float kTestSlopMargin = 30; // ms
+
             boolean noTimeout;
             initializeMessageLooper(cameraId);
             Parameters parameters = mCamera.getParameters();
@@ -574,22 +587,27 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
                     float expectedMaxFrameDurationMs = 1000.f * 1000.f /
                             fps[Parameters.PREVIEW_FPS_MIN_INDEX];
+                    float slopMaxFrameDurationMs = expectedMaxFrameDurationMs +
+                            kTestSlopMargin;
                     float expectedMinFrameDurationMs = 1000.f * 1000.f /
                             fps[Parameters.PREVIEW_FPS_MAX_INDEX];
+                    float slopMinFrameDurationMs = expectedMinFrameDurationMs  -
+                            kTestSlopMargin;
 
-                    for (int i = 1; i < kLoopCount; i++) {
+                    for (int i = kFirstTestedFrame; i < kLoopCount; i++) {
                         float frameDurationMs = (timestamps[i] - timestamps[i - 1]) / 1000000.f;
                         if (LOGVV) {
                             Log.v(TAG, "Frame " + i + " duration: " + frameDurationMs +
                                   " ms, expecting [" + expectedMinFrameDurationMs + "," +
-                                  expectedMaxFrameDurationMs + "]");
+                                  expectedMaxFrameDurationMs + "], slop range [" +
+                                  slopMinFrameDurationMs + "," + slopMaxFrameDurationMs + "].");
                         }
                         assertTrue("Frame " + i + " duration out of bounds! ("+
                                    frameDurationMs + " ms, expecting [" +
-                                   expectedMinFrameDurationMs + "," +
-                                   expectedMaxFrameDurationMs + "] ms)",
-                                   (frameDurationMs > expectedMinFrameDurationMs) &&
-                                   (frameDurationMs < expectedMaxFrameDurationMs) );
+                                   slopMinFrameDurationMs + "," +
+                                   slopMaxFrameDurationMs + "] ms)",
+                                   (frameDurationMs > slopMinFrameDurationMs) &&
+                                   (frameDurationMs < slopMaxFrameDurationMs) );
                     }
                 }
             }
