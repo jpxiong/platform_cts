@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.util.DisplayMetrics;
 import android.graphics.DrawFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -1070,7 +1071,7 @@ public class CanvasTest extends InstrumentationTestCase {
         args = {float.class, float.class, float.class, float.class}
     )
     public void testClipRect6() {
-        assertTrue(mCanvas.clipRect(0, 0, 10, 31));
+        assertTrue(mCanvas.clipRect(0.5f, 0.5f, 10.5f, 31.5f));
     }
 
     @TestTargetNew(
@@ -2177,6 +2178,28 @@ public class CanvasTest extends InstrumentationTestCase {
 
         p.beginRecording(10, 30);
         mCanvas.drawPicture(p, dst);
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setDensity",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getDensity",
+            args = {android.util.DisplayMetrics.class}
+        )
+    })
+    public void testDensity() {
+        // set Density
+        mCanvas.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+        assertEquals(DisplayMetrics.DENSITY_DEFAULT, mCanvas.getDensity());
+
+        // set Density
+        mCanvas.setDensity(DisplayMetrics.DENSITY_HIGH);
+        assertEquals(DisplayMetrics.DENSITY_HIGH, mCanvas.getDensity());
     }
 
     private void preCompare() {
