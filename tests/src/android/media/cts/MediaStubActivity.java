@@ -26,6 +26,7 @@ public class MediaStubActivity extends Activity {
     public static final int WIDTH = 320;
     public static final int HEIGHT = 240;
     private SurfaceHolder mHolder;
+    private SurfaceHolder mHolder2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +41,28 @@ public class MediaStubActivity extends Activity {
         mHolder = surfaceV.getHolder();
         mHolder.setFixedSize(WIDTH, HEIGHT);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        SurfaceView surfaceV2 = (SurfaceView)findViewById(R.id.surface2);
+        ViewGroup.LayoutParams lp2 = surfaceV2.getLayoutParams();
+        lp2.width = WIDTH;
+        lp2.height = HEIGHT;
+        surfaceV2.setLayoutParams(lp2);
+        mHolder2 = surfaceV2.getHolder();
+        mHolder2.setFixedSize(WIDTH, HEIGHT);
+        mHolder2.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
     }
 
     public SurfaceHolder getSurfaceHolder() {
         return mHolder;
+    }
+
+    public SurfaceHolder getSurfaceHolder2() {
+        return mHolder2;
+    }
+
+    public SurfaceHolder generateSurfaceHolder() {
+        SurfaceView surface = (SurfaceView)findViewById(R.id.surface3);
+        return surface.getHolder();
     }
 }
