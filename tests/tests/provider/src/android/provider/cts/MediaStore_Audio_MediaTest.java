@@ -106,6 +106,7 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             assertEquals(expected, c.getString(c.getColumnIndex(Media.DATA)));
             assertTrue(c.getLong(c.getColumnIndex(Media.DATE_ADDED)) > 0);
             assertEquals(Audio1.DATE_MODIFIED, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
+            assertEquals(Audio1.IS_DRM, c.getInt(c.getColumnIndex(Media.IS_DRM)));
             assertEquals(Audio1.FILE_NAME, c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals(Audio1.MIME_TYPE, c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals(Audio1.SIZE, c.getInt(c.getColumnIndex(Media.SIZE)));
@@ -147,6 +148,7 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
             expected = isInternal ? Audio2.INTERNAL_DATA : Audio2.EXTERNAL_DATA;
             assertEquals(expected, c.getString(c.getColumnIndex(Media.DATA)));
             assertEquals(Audio2.DATE_MODIFIED, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
+            assertEquals(Audio2.IS_DRM, c.getInt(c.getColumnIndex(Media.IS_DRM)));
             assertEquals(Audio2.DISPLAY_NAME, c.getString(c.getColumnIndex(Media.DISPLAY_NAME)));
             assertEquals(Audio2.MIME_TYPE, c.getString(c.getColumnIndex(Media.MIME_TYPE)));
             assertEquals(Audio2.SIZE, c.getInt(c.getColumnIndex(Media.SIZE)));
