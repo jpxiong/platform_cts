@@ -153,8 +153,16 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.software.sip.voip", false),
     };
 
+    public static final Feature[] ALL_GINGERBREAD_MR1_FEATURES = {
+            new Feature("android.hardware.usb.accessory", false),
+    };
+
     public static final Feature[] ALL_HONEYCOMB_FEATURES = {
             new Feature("android.hardware.faketouch", true),
+    };
+
+    public static final Feature[] ALL_HONEYCOMB_MR1_FEATURES = {
+            new Feature("android.hardware.usb.host", false),
     };
 
     @Override
@@ -187,6 +195,15 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            Collections.addAll(features, ALL_HONEYCOMB_MR1_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
+            Collections.addAll(features, ALL_HONEYCOMB_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            Collections.addAll(features, ALL_GINGERBREAD_MR1_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.GINGERBREAD) {
             Collections.addAll(features, ALL_GINGERBREAD_FEATURES);
         }
@@ -195,9 +212,6 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         }
         if (apiVersion >= Build.VERSION_CODES.ECLAIR_MR1) {
             Collections.addAll(features, ALL_ECLAIR_FEATURES);
-        }
-        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
-            Collections.addAll(features, ALL_HONEYCOMB_FEATURES);
         }
         for (Feature f : features) {
             HashMap<String, Object> row = new HashMap<String, Object>();
