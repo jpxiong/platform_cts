@@ -563,9 +563,9 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
 
         // test Parcelable[]
-        Signature[] signatures = {new Signature("123"),
-                new Signature("ABC"),
-                new Signature("abc")};
+        Signature[] signatures = {new Signature("1234"),
+                new Signature("ABCD"),
+                new Signature("abcd")};
         Parcelable[] signatures2;
         p = Parcel.obtain();
         p.writeValue(signatures);
@@ -2449,13 +2449,13 @@ public class ParcelTest extends AndroidTestCase {
     public void testReadParcelableArray() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
-        Signature[] s = {new Signature("123"),
-                new Signature("ABC"),
-                new Signature("abc")};
+        Signature[] s = {new Signature("1234"),
+                new Signature("ABCD"),
+                new Signature("abcd")};
 
-        Signature[] s2 = {new Signature("123"),
+        Signature[] s2 = {new Signature("1234"),
                 null,
-                new Signature("abc")};
+                new Signature("abcd")};
         Parcelable[] s3;
 
         // test write null
@@ -2498,13 +2498,13 @@ public class ParcelTest extends AndroidTestCase {
     })
     public void testReadTypedArray() {
         Parcel p;
-        Signature[] s = {new Signature("123"),
-                new Signature("ABC"),
-                new Signature("abc")};
+        Signature[] s = {new Signature("1234"),
+                new Signature("ABCD"),
+                new Signature("abcd")};
 
-        Signature[] s2 = {new Signature("123"),
+        Signature[] s2 = {new Signature("1234"),
                 null,
-                new Signature("abc")};
+                new Signature("abcd")};
         Signature[] s3 = new Signature[3];
         Signature[] s4 = new Signature[4];
 
@@ -2575,11 +2575,11 @@ public class ParcelTest extends AndroidTestCase {
     public void testReadTypedArray2() {
         Parcel p;
         Signature[] s = {
-                new Signature("123"), new Signature("ABC"), new Signature("abc")
+                new Signature("1234"), new Signature("ABCD"), new Signature("abcd")
         };
 
         Signature[] s2 = {
-                new Signature("123"), null, new Signature("abc")
+                new Signature("1234"), null, new Signature("abcd")
         };
         Signature[] s3 = {
                 null, null, null
@@ -2625,13 +2625,13 @@ public class ParcelTest extends AndroidTestCase {
     })
     public void testCreateTypedArray() {
         Parcel p;
-        Signature[] s = {new Signature("123"),
-                new Signature("ABC"),
-                new Signature("abc")};
+        Signature[] s = {new Signature("1234"),
+                new Signature("ABCD"),
+                new Signature("abcd")};
 
-        Signature[] s2 = {new Signature("123"),
+        Signature[] s2 = {new Signature("1234"),
                 null,
-                new Signature("abc")};
+                new Signature("abcd")};
         Signature[] s3;
 
         // test write null
@@ -2676,12 +2676,12 @@ public class ParcelTest extends AndroidTestCase {
     public void testReadTypedList() {
         Parcel p;
         ArrayList<Signature> s = new ArrayList<Signature>();
-        s.add(new Signature("123"));
-        s.add(new Signature("ABC"));
-        s.add(new Signature("abc"));
+        s.add(new Signature("1234"));
+        s.add(new Signature("ABCD"));
+        s.add(new Signature("abcd"));
 
         ArrayList<Signature> s2 = new ArrayList<Signature>();
-        s2.add(new Signature("123"));
+        s2.add(new Signature("1234"));
         s2.add(null);
 
         ArrayList<Signature> s3 = new ArrayList<Signature>();
@@ -2728,7 +2728,7 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
 
         s2 = new ArrayList<Signature>();
-        s2.add(new Signature("123"));
+        s2.add(new Signature("1234"));
         s2.add(null);
         p = Parcel.obtain();
         p.writeTypedList(s2);
@@ -2756,12 +2756,12 @@ public class ParcelTest extends AndroidTestCase {
     public void testCreateTypedArrayList() {
         Parcel p;
         ArrayList<Signature> s = new ArrayList<Signature>();
-        s.add(new Signature("123"));
-        s.add(new Signature("ABC"));
-        s.add(new Signature("abc"));
+        s.add(new Signature("1234"));
+        s.add(new Signature("ABCD"));
+        s.add(new Signature("abcd"));
 
         ArrayList<Signature> s2 = new ArrayList<Signature>();
-        s2.add(new Signature("123"));
+        s2.add(new Signature("1234"));
         s2.add(null);
 
         ArrayList<Signature> s3;

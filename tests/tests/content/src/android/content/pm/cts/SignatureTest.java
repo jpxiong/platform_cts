@@ -30,110 +30,138 @@ import java.util.Arrays;
 @TestTargetClass(Signature.class)
 public class SignatureTest extends AndroidTestCase {
 
-    private static final String mSignatureString = "1234567890abcdef";
-    // mSignatureByteArray is the byte code of mSignatureString.
-    private static final byte[] mSignatureByteArray = { (byte) 0x12, (byte) 0x34, (byte) 0x56,
+    private static final String SIGNATURE_STRING = "1234567890abcdef";
+    // SIGNATURE_BYTE_ARRAY is the byte code of SIGNATURE_STRING.
+    private static final byte[] SIGNATURE_BYTE_ARRAY = { (byte) 0x12, (byte) 0x34, (byte) 0x56,
             (byte) 0x78, (byte) 0x90, (byte) 0xab, (byte) 0xcd, (byte) 0xef };
-    // mDiffByteArray has different content to mSignatureString.
-    private static final byte[] mDiffByteArray = { (byte) 0xfe, (byte) 0xdc, (byte) 0xba,
+    // DIFF_BYTE_ARRAY has different content to SIGNATURE_STRING.
+    private static final byte[] DIFF_BYTE_ARRAY = { (byte) 0xfe, (byte) 0xdc, (byte) 0xba,
             (byte) 0x09, (byte) 0x87, (byte) 0x65, (byte) 0x43, (byte) 0x21 };
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "Signature",
-            args = {byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "Signature",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toByteArray",
-            method = "toByteArray",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toCharsString",
-            method = "toCharsString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toChars",
-            method = "toChars",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toChars",
-            method = "toChars",
-            args = {char[].class, int[].class}
-        )
-    })
-    public void testSignature() {
-        Signature signature = new Signature(mSignatureString);
+    public void testSignatureStringConstructorValid() {
+        Signature signature = new Signature(SIGNATURE_STRING);
         byte[] actualByteArray = signature.toByteArray();
-        assertTrue(Arrays.equals(mSignatureByteArray, actualByteArray));
-
-        signature = new Signature(mSignatureByteArray);
-        String actualString = signature.toCharsString();
-        assertEquals(mSignatureString, actualString);
-
-        char[] charArray = signature.toChars();
-        actualString = new String(charArray);
-        assertEquals(mSignatureString, actualString);
-
-        char[] existingCharArray = new char[mSignatureString.length()];
-        int[] intArray = new int[1];
-        charArray = signature.toChars(existingCharArray, intArray);
-        actualString = new String(charArray);
-        assertEquals(mSignatureString, actualString);
-        // intArray[0] represents the length of array.
-        assertEquals(intArray[0], mSignatureByteArray.length);
+        assertTrue("Output byte array should match constructor byte array.",
+                Arrays.equals(SIGNATURE_BYTE_ARRAY, actualByteArray));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test equals",
-            method = "equals",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test hashCode",
-            method = "hashCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
+    public void testSignatureStringConstructorNull() {
+        String sig = null;
+
+        try {
+            Signature signature = new Signature(sig);
+            fail("Should throw NullPointerException on null input");
+        } catch (NullPointerException e) {
+            // pass
+        }
+    }
+
+    public void testSignatureStringConstructorInvalidLength() {
+        try {
+            Signature signature = new Signature("123");
+            fail("Should throw IllegalArgumentException on odd-sized input");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+    }
+
+    public void testSignatureByteArrayToCharsString() {
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+        String actualString = signature.toCharsString();
+        assertEquals(SIGNATURE_STRING, actualString);
+    }
+
+    public void testSignatureByteArrayConstructorNull() {
+        byte[] sig = null;
+
+        try {
+            Signature signature = new Signature(sig);
+            fail("Should throw NullPointerException on null input");
+        } catch (NullPointerException e) {
+            // pass
+        }
+    }
+
+    public void testSignatureToChars() {
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+        char[] charArray = signature.toChars();
+        String actualString = new String(charArray);
+        assertEquals(SIGNATURE_STRING, actualString);
+    }
+
+    public void testSignatureToCharsExistingArrayCorrectlySized() {
+        char[] existingCharArray = new char[SIGNATURE_STRING.length()];
+        int[] intArray = new int[1];
+
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+
+        char[] charArray = signature.toChars(existingCharArray, intArray);
+
+        assertTrue("Should return the same object since it's correctly sized.",
+                existingCharArray == charArray);
+
+        String actualString = new String(charArray);
+        assertEquals("The re-encoded Signature should match the constructor input",
+                SIGNATURE_STRING, actualString);
+
+        // intArray[0] represents the length of array.
+        assertEquals(intArray[0], SIGNATURE_BYTE_ARRAY.length);
+    }
+
+    public void testSignatureToCharsExistingArrayTooSmall() {
+        char[] existingCharArray = new char[0];
+        int[] intArray = new int[1];
+
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+        char[] charArray = signature.toChars(existingCharArray, intArray);
+
+        assertFalse("Should return a new array since the existing one is too small",
+                existingCharArray == charArray);
+
+        String actualString = new String(charArray);
+        assertEquals("The re-encoded Signature should match the constructor input",
+                SIGNATURE_STRING, actualString);
+
+        // intArray[0] represents the length of array.
+        assertEquals(intArray[0], SIGNATURE_BYTE_ARRAY.length);
+    }
+
+    public void testSignatureToCharsNullArrays() {
+        char[] existingCharArray = null;
+        int[] intArray = null;
+
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+        char[] charArray = signature.toChars(existingCharArray, intArray);
+
+        assertFalse("Should return a new array since the existing one is too small",
+                existingCharArray == charArray);
+
+        String actualString = new String(charArray);
+        assertEquals("The re-encoded Signature should match the constructor input",
+                SIGNATURE_STRING, actualString);
+    }
+
+    public void testSignatureStringToByteArray() {
+        Signature signature = new Signature(SIGNATURE_BYTE_ARRAY);
+        byte[] actualByteArray = signature.toByteArray();
+
+        assertFalse("Should return a different array to avoid modification",
+                SIGNATURE_BYTE_ARRAY == actualByteArray);
+
+        assertTrue("Output byte array should match constructor byte array.",
+                Arrays.equals(SIGNATURE_BYTE_ARRAY, actualByteArray));
+    }
+
     public void testTools() {
-        Signature byteSignature = new Signature(mSignatureByteArray);
-        Signature stringSignature = new Signature(mSignatureString);
+        Signature byteSignature = new Signature(SIGNATURE_BYTE_ARRAY);
+        Signature stringSignature = new Signature(SIGNATURE_STRING);
 
         // Test describeContents, equals
         assertEquals(0, byteSignature.describeContents());
         assertTrue(byteSignature.equals(stringSignature));
 
         // Test hashCode
-        byteSignature = new Signature(mDiffByteArray);
+        byteSignature = new Signature(DIFF_BYTE_ARRAY);
         assertNotSame(byteSignature.hashCode(), stringSignature.hashCode());
 
         // Test writeToParcel
