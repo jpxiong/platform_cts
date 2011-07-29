@@ -219,6 +219,7 @@ public class BasicAdapterTest extends AndroidTestCase {
         assertTrue(adapter.isEnabled());
         adapter.disable();
         for (int i=0; i<DISABLE_TIMEOUT/POLL_TIME; i++) {
+            sleep(POLL_TIME);
             switch (adapter.getState()) {
             case BluetoothAdapter.STATE_OFF:
                 assertFalse(adapter.isEnabled());
@@ -228,7 +229,6 @@ public class BasicAdapterTest extends AndroidTestCase {
                 assertFalse(adapter.isEnabled());
                 break;
             }
-            sleep(POLL_TIME);
         }
         fail("disable() timeout");
     }
@@ -247,6 +247,7 @@ public class BasicAdapterTest extends AndroidTestCase {
         assertFalse(adapter.isEnabled());
         adapter.enable();
         for (int i=0; i<ENABLE_TIMEOUT/POLL_TIME; i++) {
+            sleep(POLL_TIME);
             switch (adapter.getState()) {
             case BluetoothAdapter.STATE_ON:
                 assertTrue(adapter.isEnabled());
@@ -256,7 +257,6 @@ public class BasicAdapterTest extends AndroidTestCase {
                 assertFalse(adapter.isEnabled());
                 break;
             }
-            sleep(POLL_TIME);
         }
         fail("enable() timeout");
     }
