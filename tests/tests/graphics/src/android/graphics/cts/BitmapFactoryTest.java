@@ -71,6 +71,11 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     private static int WIDTHS[] = new int[] { 1280, 640, 320, 320, 640 };
     private static int HEIGHTS[] = new int[] { 960, 480, 240, 240, 480 };
 
+    // Configurations for BitmapFactory.Options
+    private static Config[] COLOR_CONFIGS = new Config[] {Config.ARGB_8888, Config.RGB_565,
+        Config.ARGB_4444};
+    private static int[] COLOR_TOLS = new int[] {16, 49, 576};
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -228,29 +233,30 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     )
     public void testDecodeStream4() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Config.ARGB_8888;
-        final int kErrorTol = 16;
+        for (int k = 0; k < COLOR_CONFIGS.length; ++k) {
+            options.inPreferredConfig = COLOR_CONFIGS[k];
 
-        // Decode the PNG & WebP test images. The WebP test image has been encoded from PNG test
-        // image and should have same similar (within some error-tolerance) Bitmap data.
-        InputStream iStreamPng = obtainInputStream(R.drawable.png_test);
-        Bitmap bPng = BitmapFactory.decodeStream(iStreamPng, null, options);
-        assertNotNull(bPng);
-        assertEquals(bPng.getConfig(), Config.ARGB_8888);
+            // Decode the PNG & WebP test images. The WebP test image has been encoded from PNG test
+            // image and should have same similar (within some error-tolerance) Bitmap data.
+            InputStream iStreamPng = obtainInputStream(R.drawable.png_test);
+            Bitmap bPng = BitmapFactory.decodeStream(iStreamPng, null, options);
+            assertNotNull(bPng);
+            assertEquals(bPng.getConfig(), COLOR_CONFIGS[k]);
 
-        InputStream iStreamWebp1 = obtainInputStream(R.drawable.webp_test);
-        Bitmap bWebp1 = BitmapFactory.decodeStream(iStreamWebp1, null, options);
-        assertNotNull(bWebp1);
-        compareBitmaps(bPng, bWebp1, kErrorTol, true);
+            InputStream iStreamWebp1 = obtainInputStream(R.drawable.webp_test);
+            Bitmap bWebp1 = BitmapFactory.decodeStream(iStreamWebp1, null, options);
+            assertNotNull(bWebp1);
+            compareBitmaps(bPng, bWebp1, COLOR_TOLS[k], true);
 
-        // Compress the PNG image to WebP format (Quality=90) and decode it back.
-        // This will test end-to-end WebP encoding and decoding.
-        ByteArrayOutputStream oStreamWebp = new ByteArrayOutputStream();
-        assertTrue(bPng.compress(CompressFormat.WEBP, 90, oStreamWebp));
-        InputStream iStreamWebp2 = new ByteArrayInputStream(oStreamWebp.toByteArray());
-        Bitmap bWebp2 = BitmapFactory.decodeStream(iStreamWebp2, null, options);
-        assertNotNull(bWebp2);
-        compareBitmaps(bPng, bWebp2, kErrorTol, true);
+            // Compress the PNG image to WebP format (Quality=90) and decode it back.
+            // This will test end-to-end WebP encoding and decoding.
+            ByteArrayOutputStream oStreamWebp = new ByteArrayOutputStream();
+            assertTrue(bPng.compress(CompressFormat.WEBP, 90, oStreamWebp));
+            InputStream iStreamWebp2 = new ByteArrayInputStream(oStreamWebp.toByteArray());
+            Bitmap bWebp2 = BitmapFactory.decodeStream(iStreamWebp2, null, options);
+            assertNotNull(bWebp2);
+            compareBitmaps(bPng, bWebp2, COLOR_TOLS[k], true);
+        }
     }
 
     @TestTargetNew(
