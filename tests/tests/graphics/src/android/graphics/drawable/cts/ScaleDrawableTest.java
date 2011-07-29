@@ -515,7 +515,8 @@ public class ScaleDrawableTest extends AndroidTestCase {
         XmlResourceParser parser = res.getXml(R.xml.scaledrawable);
         AttributeSet attrs = DrawableTestUtils.getAttributeSet(parser, "scale_allattrs");
         scaleDrawable.inflate(res, parser, attrs);
-        int bitmapSize = 48 * res.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT;
+        int bitmapSize = (int) Math.ceil(48.0 *
+                res.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         assertEquals(bitmapSize, scaleDrawable.getIntrinsicWidth());
         assertEquals(bitmapSize, scaleDrawable.getIntrinsicHeight());
 
