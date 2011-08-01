@@ -22,20 +22,16 @@ import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Make sure that the main launcher activity opens up properly, which will be
- * verified by {@link #testActivityTestCaseSetUpProperly}.
+ * This class runs the theme tests that takes snapshots of views (typically widgets
+ * such as buttons, etc).
  */
 public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerActivity> {
-    private Instrumentation mInstrumentation;
-
     /**
      * Creates an {@link ActivityInstrumentationTestCase2}
      * for the {@link ThemeTestRunnerActivity} activity.
      */
     public ThemeTest() {
         super(ThemeTestRunnerActivity.class);
-
-        mInstrumentation = getInstrumentation();
     }
 
     public void testThemes() {
@@ -55,9 +51,7 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
      * @param themeName Name of the theme being tested, e.g., "holo", "holo_light", etc
      */
     private void runThemeTest(int resourceId, String themeName, int orientation) {
-        if (mInstrumentation == null) {
-            mInstrumentation = getInstrumentation();
-        }
+        Instrumentation instrumentation = getInstrumentation();
 
         Intent intent = new Intent();
         intent.putExtra(ThemeTests.EXTRA_THEME_ID, resourceId);
@@ -73,7 +67,7 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
            }
         });
 
-        mInstrumentation.waitForIdleSync();
+        instrumentation.waitForIdleSync();
 
         try {
             tearDown();
