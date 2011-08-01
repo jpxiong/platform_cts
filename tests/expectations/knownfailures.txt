@@ -8,17 +8,26 @@
 {
   description: "Flaky tests that need to be rewritten or deleted.",
   names: [
-    "android.media.cts.MediaRecorderTest#testSetCamera",
     "android.webkit.cts.CacheManagerTest#testCacheFile",
     "android.widget.cts.AutoCompleteTextViewTest#testOnFilterComplete"
   ]
 },
-
+{
+  bug: 4464677,
+  name: "android.media.cts.MediaRecorderTest#testSetCamera"
+},
+{
+  bug: 5104153,
+  name: "android.media.cts.MediaRecorderTest#testSetMaxDuration"
+},
+{
+  bug: 5103805,
+  name: "android.media.cts.MediaRecorderTest#testSetMaxFileSize"
+},
 {
   description: "Broken test that is fixed in a future release.",
   name: "android.provider.cts.MediaStore_Audio_Playlists_MembersTest"
 },
-
 {
   description: "These tests pass when executed individually but fail when running CTS as a whole on GRH78.",
   bug: 3184701,
