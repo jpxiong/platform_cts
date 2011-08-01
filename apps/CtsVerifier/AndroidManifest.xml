@@ -19,7 +19,7 @@
       package="com.android.cts.verifier"
       android:versionCode="4"
       android:versionName="3.1_r3">
-      
+
     <uses-sdk android:minSdkVersion="5"></uses-sdk>
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
