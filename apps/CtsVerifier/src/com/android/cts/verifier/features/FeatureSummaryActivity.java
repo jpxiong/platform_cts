@@ -153,6 +153,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.software.sip.voip", false),
     };
 
+    public static final Feature[] ALL_GINGERBREAD_MR1_FEATURES = {
+            new Feature("android.hardware.usb.accessory", false),
+    };
+
     public static final Feature[] ALL_HONEYCOMB_FEATURES = {
             new Feature("android.hardware.faketouch", true),
     };
@@ -189,6 +193,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         int apiVersion = Build.VERSION.SDK_INT;
         if (apiVersion >= Build.VERSION_CODES.HONEYCOMB) {
             Collections.addAll(features, ALL_HONEYCOMB_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            Collections.addAll(features, ALL_GINGERBREAD_MR1_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.GINGERBREAD) {
             Collections.addAll(features, ALL_GINGERBREAD_FEATURES);

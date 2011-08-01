@@ -8,6 +8,14 @@
   bug: 4464677
 },
 {
+  name: "android.media.cts.MediaRecorderTest#testSetMaxDuration",
+  bug: 5104153
+},
+{
+  name: "android.media.cts.MediaRecorderTest#testSetMaxFileSize",
+  bug: 5103805
+},
+{
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
 },
