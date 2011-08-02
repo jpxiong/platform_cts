@@ -965,20 +965,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 CamcorderProfile.QUALITY_LOW);
 
         // Set the preview size.
-        if (parameters.getSupportedVideoSizes() == null) {
-            parameters.setPreviewSize(profile.videoFrameWidth,
-                    profile.videoFrameHeight);
-        } else {  // Driver supports separates outputs for preview and video.
-            List<Size> sizes = parameters.getSupportedPreviewSizes();
-            Size preferred = parameters.getPreferredPreviewSizeForVideo();
-            int product = preferred.width * preferred.height;
-            for (Size size: sizes) {
-                if (size.width * size.height <= product) {
-                    parameters.setPreviewSize(size.width, size.height);
-                    break;
-                }
-            }
-        }
+        setPreviewSizeByProfile(parameters, profile);
 
         mCamera.setParameters(parameters);
         mCamera.setPreviewDisplay(surfaceHolder);
@@ -1005,6 +992,23 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.lock();  // should not fail
         mCamera.setParameters(parameters);  // should not fail
         terminateMessageLooper();
+    }
+
+    private void setPreviewSizeByProfile(Parameters parameters, CamcorderProfile profile) {
+        if (parameters.getSupportedVideoSizes() == null) {
+            parameters.setPreviewSize(profile.videoFrameWidth,
+                    profile.videoFrameHeight);
+        } else {  // Driver supports separates outputs for preview and video.
+            List<Size> sizes = parameters.getSupportedPreviewSizes();
+            Size preferred = parameters.getPreferredPreviewSizeForVideo();
+            int product = preferred.width * preferred.height;
+            for (Size size: sizes) {
+                if (size.width * size.height <= product) {
+                    parameters.setPreviewSize(size.width, size.height);
+                    break;
+                }
+            }
+        }
     }
 
     private void recordVideo(CamcorderProfile profile,
@@ -2340,6 +2344,66 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             } catch (Exception e) {
             }
             mSnapshotDone.open();
+        }
+    }
+
+    @UiThreadTest
+    public void testRecordingHint() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testRecordingHintByCamera(id);
+        }
+    }
+
+    private void testRecordingHintByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        Parameters parameters = mCamera.getParameters();
+
+        SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
+        CamcorderProfile profile = CamcorderProfile.get(cameraId,
+                CamcorderProfile.QUALITY_LOW);
+
+        setPreviewSizeByProfile(parameters, profile);
+
+        // Test recording videos and taking pictures when the hint is off and on.
+        for (int i = 0; i < 2; i++) {
+            parameters.setRecordingHint(i == 0 ? false : true);
+            mCamera.setParameters(parameters);
+            mCamera.startPreview();
+            recordVideoSimple(profile, holder);
+            mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+            waitForSnapshotDone();
+            assertTrue(mJpegPictureCallbackResult);
+        }
+
+        // Can change recording hint when the preview is active.
+        mCamera.startPreview();
+        parameters.setRecordingHint(false);
+        mCamera.setParameters(parameters);
+        parameters.setRecordingHint(true);
+        mCamera.setParameters(parameters);
+        terminateMessageLooper();
+    }
+
+    private void recordVideoSimple(CamcorderProfile profile,
+            SurfaceHolder holder) throws Exception {
+        mCamera.unlock();
+        MediaRecorder recorder = new MediaRecorder();
+        try {
+            recorder.setCamera(mCamera);
+            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            recorder.setProfile(profile);
+            recorder.setOutputFile("/dev/null");
+            recorder.setPreviewDisplay(holder.getSurface());
+            recorder.prepare();
+            recorder.start();
+            Thread.sleep(2000);
+            recorder.stop();
+        } finally {
+            recorder.release();
+            mCamera.lock();
         }
     }
 }
