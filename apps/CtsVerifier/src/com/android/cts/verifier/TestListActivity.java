@@ -100,8 +100,8 @@ public class TestListActivity extends ListActivity {
                 handleCopyItemSelected();
                 return true;
 
-            case R.id.share:
-                handleShareItemSelected();
+            case R.id.export:
+                handleExportItemSelected();
                 return true;
 
             default:
@@ -119,25 +119,15 @@ public class TestListActivity extends ListActivity {
             TestResultsReport report = new TestResultsReport(this, mAdapter);
             ClipboardManager clipboardManager = (ClipboardManager)
                     getSystemService(CLIPBOARD_SERVICE);
-            clipboardManager.setText(report.getBody());
+            clipboardManager.setText(report.getContents());
             Toast.makeText(this, R.string.test_results_copied, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(this, R.string.test_results_error, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Coudn't copy test results report", e);
+            Log.e(TAG, "Couldn't copy test results report", e);
         }
     }
 
-    private void handleShareItemSelected() {
-        try {
-            Intent target = new Intent(Intent.ACTION_SEND);
-            TestResultsReport report = new TestResultsReport(this, mAdapter);
-            target.setType(report.getType());
-            target.putExtra(Intent.EXTRA_SUBJECT, report.getSubject());
-            target.putExtra(Intent.EXTRA_TEXT, report.getBody());
-            startActivity(Intent.createChooser(target, getString(R.string.share_test_results)));
-        } catch (IOException e) {
-            Toast.makeText(this, R.string.test_results_error, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Coudn't share test results report", e);
-        }
+    private void handleExportItemSelected() {
+        new ReportExporter(this, mAdapter).execute();
     }
 }

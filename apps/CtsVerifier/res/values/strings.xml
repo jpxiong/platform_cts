@@ -40,9 +40,10 @@
     <string name="test_results_cleared">Test results cleared.</string>
     <string name="copy">Copy</string>
     <string name="test_results_copied">Test results copied to clipboard.</string>
-    <string name="share">Share</string>
-    <string name="share_test_results">Share Test Results</string>
     <string name="test_results_error">Couldn\'t create test results report.</string>
+    <string name="export">Export</string>
+    <string name="no_storage">Cannot save report to external storage, see log for details.</string>
+    <string name="report_saved">Report saved to: %s</string>
 
     <!-- Strings for Device Administration tests -->
     <string name="da_policy_serialization_test">Policy Serialization Test</string>
