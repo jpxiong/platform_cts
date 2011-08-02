@@ -169,6 +169,15 @@
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
         </activity>
 
+        <activity android:name=".sensors.GyroscopeTestActivity" android:label="@string/snsr_gyro_test"
+                android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+        </activity>
+
         <activity android:name=".audioquality.AudioQualityVerifierActivity"
                 android:label="@string/aq_verifier">
             <intent-filter>
