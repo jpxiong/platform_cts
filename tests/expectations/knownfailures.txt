@@ -4,16 +4,24 @@
   bug: 4993068
 },
 {
+  name: "android.graphics.cts.TypefaceTest#testCreateFromAsset",
+  bug: 5092227
+},
+{
+  name: "android.graphics.cts.TypefaceTest#testCreateFromFile1",
+  bug: 5092227
+},
+{
+  name: "android.graphics.cts.TypefaceTest#testCreateFromFile2",
+  bug: 5092227
+},
+{
   name: "android.media.cts.MediaRecorderTest#testSetCamera",
   bug: 4464677
 },
 {
-  name: "android.media.cts.MediaRecorderTest#testSetMaxDuration",
-  bug: 5104153
-},
-{
-  name: "android.media.cts.MediaRecorderTest#testSetMaxFileSize",
-  bug: 5103805
+  name: "android.security.cts.BrowserTest",
+  description: "Fixed in HC MR2"
 },
 {
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
