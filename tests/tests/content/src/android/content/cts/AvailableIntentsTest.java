@@ -21,6 +21,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 
 import android.app.SearchManager;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -243,5 +244,71 @@ public class AvailableIntentsTest extends AndroidTestCase {
         assertCanBeHandled(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_WIFI_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+    }
+
+    /**
+     * Test add event in calendar
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "Intent",
+        args = {java.lang.String.class}
+    )
+    public void testCalendarAddAppointment() {
+        Intent addAppointmentIntent = new Intent(Intent.ACTION_EDIT);
+        addAppointmentIntent.setType("vnd.android.cursor.item/event");
+        assertCanBeHandled(addAppointmentIntent);
+    }
+
+    /**
+     * Test view call logs
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "Intent",
+        args = {java.lang.String.class}
+    )
+    public void testContactsCallLogs() {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setType("vnd.android.cursor.dir/calls");
+            assertCanBeHandled(intent);
+        }
+    }
+
+    /**
+     * Test view music playback
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "Intent",
+        args = {java.lang.String.class}
+    )
+    public void testMusicPlayback() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(ContentUris.withAppendedId(
+                MediaStore.Audio.Media.INTERNAL_CONTENT_URI, 1), "audio/*");
+        assertCanBeHandled(intent);
+    }
+
+    /**
+     * Test launch inbox view of Mms application
+     */
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "Intent",
+        args = {java.lang.String.class}
+    )
+    public void testViewMessageInbox() {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setType("vnd.android.cursor.dir/mms");
+            assertCanBeHandled(intent);
+
+            intent.setType("vnd.android-dir/mms-sms");
+            assertCanBeHandled(intent);
+        }
     }
 }
