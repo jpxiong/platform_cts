@@ -30,6 +30,12 @@ import java.util.Set;
  */
 public class ConfigurationTest extends AndroidTestCase {
 
+    /**
+     * Starting in HC MR2, this is in the public SDK and can be directly referenced instead
+     * of this constant.
+     */
+    private static final int DENSITY_TV = 213;
+
     public void testScreenConfiguration() {
         WindowManager windowManager =
             (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -57,6 +63,7 @@ public class ConfigurationTest extends AndroidTestCase {
         allowedDensities.add(DisplayMetrics.DENSITY_MEDIUM);
         allowedDensities.add(DisplayMetrics.DENSITY_TV);
         allowedDensities.add(DisplayMetrics.DENSITY_HIGH);
+        allowedDensities.add(DENSITY_TV);
         allowedDensities.add(DisplayMetrics.DENSITY_XHIGH);
         assertTrue("DisplayMetrics#densityDpi must be one of the DisplayMetrics.DENSITY_* values: "
                 + allowedDensities, allowedDensities.contains(metrics.densityDpi));

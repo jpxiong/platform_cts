@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -641,6 +642,9 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         )
     })
     public void testRecordAndPlay() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         recordMedia();
         MediaPlayer mp = new MediaPlayer();
         mp.setDataSource(mSourceMediaOnSdcard);
@@ -685,4 +689,8 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mr.release();
     }
 
+    private boolean hasMicrophone() {
+        return getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
+    }
 }

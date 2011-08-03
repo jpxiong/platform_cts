@@ -13,12 +13,12 @@
 // limitations under the License.
 
 typedef struct ConstMatrix {
-    rs_matrix4x4 MVP;
+    rs_matrix4x4 MATRIX;
 } ConstMatrix_s;
 ConstMatrix_s *c1;
 
 typedef struct ConstComplex {
-    rs_matrix4x4 MVP;
+    rs_matrix4x4 MATRIX;
     rs_matrix4x4 EXTRA;
     float extra1;
     float2 extra2;

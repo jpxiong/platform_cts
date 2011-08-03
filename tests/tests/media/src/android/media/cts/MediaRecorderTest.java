@@ -408,6 +408,40 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertTrue(mOnInfoCalled);
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setMaxDuration",
+        args = {int.class}
+    )
+    public void testSetMaxDuration() throws Exception {
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mMediaRecorder.setMaxDuration(0);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mMediaRecorder.prepare();
+        mMediaRecorder.start();
+        Thread.sleep(RECORD_TIME * 30);
+        mMediaRecorder.stop();
+        checkOutputExist();
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "setMaxFileSize",
+        args = {int.class}
+    )
+    public void testSetMaxFileSize() throws Exception {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mMediaRecorder.setMaxFileSize(0);
+            mMediaRecorder.prepare();
+            mMediaRecorder.start();
+            Thread.sleep(RECORD_TIME * 30);
+            mMediaRecorder.stop();
+            checkOutputExist();
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,

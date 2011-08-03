@@ -25,6 +25,7 @@ import dalvik.annotation.TestTargets;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -32,6 +33,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
+import android.util.DisplayMetrics;
 import android.widget.cts.WidgetTestUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -786,6 +788,98 @@ public class BitmapTest extends AndroidTestCase {
         mBitmap.writeToParcel(p, 0);
         p.setDataPosition(0);
         mBitmap.equals(Bitmap.CREATOR.createFromParcel(p));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledHeight",
+            args = {int.class}
+    )
+    public void testGetScaledHeight1() {
+        int dummyDensity = 5;
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        int scaledHeight = scaleFromDensity(ret.getHeight(), ret.getDensity(), dummyDensity);
+        assertNotNull(ret);
+        assertEquals(scaledHeight, ret.getScaledHeight(dummyDensity));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledHeight",
+            args = {android.util.DisplayMetrics.class}
+    )
+    public void testGetScaledHeight2() {
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        DisplayMetrics metrics = new DisplayMetrics();
+        metrics = getContext().getResources().getDisplayMetrics();
+        int scaledHeight = scaleFromDensity(ret.getHeight(), ret.getDensity(), metrics.densityDpi);
+        assertEquals(scaledHeight, ret.getScaledHeight(metrics));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledHeight",
+            args = {android.graphics.Canvas.class}
+    )
+    public void testGetScaledHeight3() {
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        Bitmap mMutableBitmap = Bitmap.createBitmap(100, 200, Config.ARGB_8888);
+        Canvas mCanvas = new Canvas(mMutableBitmap);
+        // set Density
+        mCanvas.setDensity(DisplayMetrics.DENSITY_HIGH);
+        int scaledHeight = scaleFromDensity(
+                ret.getHeight(), ret.getDensity(), mCanvas.getDensity());
+        assertEquals(scaledHeight, ret.getScaledHeight(mCanvas));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledWidth",
+            args = {android.graphics.Canvas.class}
+    )
+    public void testGetScaledWidth1() {
+        int dummyDensity = 5;
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        int scaledWidth = scaleFromDensity(ret.getWidth(), ret.getDensity(), dummyDensity);
+        assertNotNull(ret);
+        assertEquals(scaledWidth, ret.getScaledWidth(dummyDensity));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledWidth",
+            args = {android.util.DisplayMetrics.class}
+    )
+    public void testGetScaledWidth2() {
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        DisplayMetrics metrics = new DisplayMetrics();
+        metrics = getContext().getResources().getDisplayMetrics();
+        int scaledWidth = scaleFromDensity(ret.getWidth(), ret.getDensity(), metrics.densityDpi);
+        assertEquals(scaledWidth, ret.getScaledWidth(metrics));
+    }
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getScaledWidth",
+            args = {android.graphics.Canvas.class}
+    )
+    public void testGetScaledWidth3() {
+        Bitmap ret = Bitmap.createBitmap(100, 200, Config.RGB_565);
+        Bitmap mMutableBitmap = Bitmap.createBitmap(100, 200, Config.ARGB_8888);
+        Canvas mCanvas = new Canvas(mMutableBitmap);
+        // set Density
+        mCanvas.setDensity(DisplayMetrics.DENSITY_HIGH);
+        int scaledWidth = scaleFromDensity(ret.getWidth(), ret.getDensity(),  mCanvas.getDensity());
+        assertEquals(scaledWidth, ret.getScaledWidth(mCanvas));
+    }
+
+    private int scaleFromDensity(int size, int sdensity, int tdensity) {
+        if (sdensity == Bitmap.DENSITY_NONE || sdensity == tdensity) {
+            return size;
+        }
+
+        // Scale by tdensity / sdensity, rounding up.
+        return ((size * tdensity) + (sdensity >> 1)) / sdensity;
     }
 
     private int[] createColors(int size){
