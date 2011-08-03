@@ -18,7 +18,7 @@ package com.android.cts;
 
 public class Version {
     // The CTS version string
-    private static final String version = "3.2_r2";
+    private static final String version = "3.2_r3";
 
     private Version() {
         // no instances allowed

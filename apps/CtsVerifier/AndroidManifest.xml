@@ -17,9 +17,9 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.android.cts.verifier"
-      android:versionCode="5"
-      android:versionName="3.2_r2">
-
+      android:versionCode="6"
+      android:versionName="3.2_r3">
+      
     <uses-sdk android:minSdkVersion="5"></uses-sdk>
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
