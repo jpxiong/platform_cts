@@ -389,6 +389,37 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
             Thread.sleep(SLEEP_TIME);
         }
 
+        // Test for reseting a surface during video playback
+        // After reseting, the video should continue playing
+        // from the time setDisplay() was called
+        mp.start();
+        Thread.sleep(SLEEP_TIME);
+
+        int posBefore = mp.getCurrentPosition();
+        mp.setDisplay(getActivity().getSurfaceHolder2());
+        int posAfter = mp.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mp.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
+
+        posBefore = mp.getCurrentPosition();
+        mp.setDisplay(getActivity().generateSurfaceHolder());
+        posAfter = mp.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mp.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
+
+        posBefore = mp.getCurrentPosition();
+        mp.setDisplay(null);
+        posAfter = mp.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mp.isPlaying());
+
         mp.release();
     }
 
