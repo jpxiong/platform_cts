@@ -414,6 +414,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         args = {int.class}
     )
     public void testSetMaxDuration() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setMaxDuration(0);
@@ -431,15 +434,18 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         args = {int.class}
     )
     public void testSetMaxFileSize() throws Exception {
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mMediaRecorder.setMaxFileSize(0);
-            mMediaRecorder.prepare();
-            mMediaRecorder.start();
-            Thread.sleep(RECORD_TIME * 30);
-            mMediaRecorder.stop();
-            checkOutputExist();
+        if (!hasMicrophone()) {
+            return;
+        }
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mMediaRecorder.setMaxFileSize(0);
+        mMediaRecorder.prepare();
+        mMediaRecorder.start();
+        Thread.sleep(RECORD_TIME * 30);
+        mMediaRecorder.stop();
+        checkOutputExist();
     }
 
     @TestTargets({
