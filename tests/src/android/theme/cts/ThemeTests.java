@@ -18,6 +18,8 @@ package android.theme.cts;
 
 import com.android.cts.stub.R;
 
+import android.content.pm.ActivityInfo;
+
 public class ThemeTests {
     /**
      * Theme name to test.
@@ -29,6 +31,9 @@ public class ThemeTests {
      */
     public static final String EXTRA_THEME_ID = "android.intent.extra.THEME_ID";
 
+    /**
+     * Runs only the test supplied (by position number).
+     */
     public static final String EXTRA_RUN_INDIVIDUAL_TEST
             = "android.intent.extra.RUN_INDIVIDUAL_TEST";
 
@@ -36,6 +41,13 @@ public class ThemeTests {
      * Use solely for debugging. The actual intent that runs the tests will not have this flag.
      */
     public static final String EXTRA_RUN_TESTS = "android.intent.extra.RUN_TESTS";
+
+    /**
+     * Sets the orientation of the tests. Options are
+     * {@link ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} or
+     * {@link ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}.
+     */
+    public static final String EXTRA_ORIENTATION = "android.intent.extra.ORIENTATION";
 
     /**
      * The list of tests to run for each theme.
@@ -88,7 +100,51 @@ public class ThemeTests {
             new ThemeTestInfo(R.layout.purple, null, "purple"),
             new ThemeTestInfo(R.layout.orange_light, null, "orange_light"),
             new ThemeTestInfo(R.layout.orange_dark, null, "orange_dark"),
-            new ThemeTestInfo(R.layout.blue_bright, null, "blue_bright")};
+            new ThemeTestInfo(R.layout.blue_bright, null, "blue_bright"),
+            new ThemeTestInfo(R.layout.edittext, null, "edittext"),
+            new ThemeTestInfo(R.layout.calendarview, new CalendarViewModifier(), "calendarview"),
+            new ThemeTestInfo(R.layout.zoomcontrols, null, "zoomcontrols"),
+            new ThemeTestInfo(R.layout.tabhost, new TabHostModifier(), "tabhost"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.ONE_BUTTON)), "alertdialog_onebutton"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.TWO_BUTTONS)), "alertdialog_twobuttons"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.THREE_BUTTONS)), "alertdialog_threebuttons"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.LIST)), "alertdialog_list"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.SINGLE_CHOICE)), "alertdialog_singlechoice"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new AlertDialogBuilder(
+                                    AlertDialogBuilder.MULTI_CHOICE)), "alertdialog_multichoice"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new ProgressDialogBuilder(
+                                    ProgressDialogBuilder.SPINNER)), "progressdialog_spinner"),
+            new ThemeTestInfo(R.layout.empty_for_dialog,
+                    new DialogModifier(
+                            new ProgressDialogBuilder(
+                                    ProgressDialogBuilder.HORIZONTAL)),
+                                    "progressdialog_horizontal"),
+            new ThemeTestInfo(R.layout.searchview, null, "searchview"),
+            new ThemeTestInfo(R.layout.searchview,
+                    new SearchViewModifier(SearchViewModifier.QUERY_HINT),
+                    "searchview_queryhint"),
+            new ThemeTestInfo(R.layout.searchview,
+                    new SearchViewModifier(SearchViewModifier.QUERY),
+                    "searchview_query")};
 
     /**
      * Returns the list of tests to run on a particular theme.

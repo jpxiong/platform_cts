@@ -155,12 +155,14 @@ public class ThemeTester {
         View view = inflater.inflate(resid, mRoot, false);
         mRoot.addView(view);
 
+        if (modifier != null) {
+            view = modifier.modifyView(view);
+        }
+
         mRoot.measure(0, 0); // don't care about the input values - we build our reference size
         mRoot.layout(0, 0, mRoot.getMeasuredWidth(), mRoot.getMeasuredHeight());
 
-        if (modifier != null) {
-            modifier.modifyView(view);
-        }
+        view.setFocusable(false);
 
         return view;
     }
@@ -202,8 +204,14 @@ public class ThemeTester {
             Bitmap bmp2 = drawable.getBitmap();
             mReferenceImage.setImageBitmap(bmp2);
 
+            boolean identical = bmp2.sameAs(bitmap);
+
             if (mShouldAssert) {
-                Assert.assertTrue("Test failed: " + mBitmapIdName, bmp2.sameAs(bitmap));
+                Assert.assertTrue("Test failed: " + mBitmapIdName, identical);
+            } else if (identical) {
+                ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps identical");
+            } else {
+                ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps differ");
             }
 
             return true;

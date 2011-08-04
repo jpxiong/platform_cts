@@ -20,18 +20,25 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import junit.framework.Assert;
 
+/**
+ * Exists for debugging purposes. Allows the manual verifier
+ * to select which test to look at. Displays a list of all of the
+ * tests. Selecting one shows the reference and generated images
+ * for that specific test.
+ */
 public class TestListActivity extends Activity {
     private int mThemeId;
     private String mThemeName;
+    private int mOrientation;
 
     /**
      * Called with the activity is first created.
@@ -56,6 +63,9 @@ public class TestListActivity extends Activity {
         lv.setAdapter(new ThemeTestAdapter(this, ThemeTests.getTests()));
 
         lv.setOnItemClickListener(mTestClickedListener);
+
+        mOrientation = intent.getIntExtra(ThemeTests.EXTRA_ORIENTATION,
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     private OnItemClickListener mTestClickedListener = new OnItemClickListener() {
@@ -64,6 +74,7 @@ public class TestListActivity extends Activity {
             intent.putExtra(ThemeTests.EXTRA_THEME_ID, mThemeId);
             intent.putExtra(ThemeTests.EXTRA_THEME_NAME, mThemeName);
             intent.putExtra(ThemeTests.EXTRA_RUN_INDIVIDUAL_TEST, position);
+            intent.putExtra(ThemeTests.EXTRA_ORIENTATION, mOrientation);
             startActivity(intent);
         }
     };

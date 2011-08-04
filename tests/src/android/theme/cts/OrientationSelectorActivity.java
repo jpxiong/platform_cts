@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package android.theme.cts;
 
 import com.android.cts.stub.R;
@@ -24,14 +23,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 /**
- * This activity exists solely for debugging purposes.
+ * This activity exists solely for debugging purposes. It is
+ * the first activity seen when launching the manual viewer of tests.
+ * It allows the user to select whether they want to see the tests
+ * in portrait or landscape mode.
  */
-public class HomeActivity extends Activity {
-    private ThemeInfo[] mThemes;
+public class OrientationSelectorActivity extends Activity {
+    private static final String[] mOrientations = {"landscape", "portrait"};
     /**
      * Called with the activity is first created.
      */
@@ -42,18 +45,17 @@ public class HomeActivity extends Activity {
 
         ListView lv = (ListView) findViewById(R.id.tests_list);
 
-        mThemes = ThemeTests.getThemes();
-        lv.setAdapter(new ThemesAdapter(this, mThemes));
+        lv.setAdapter(
+                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mOrientations));
 
         lv.setOnItemClickListener(mTestClickedListener);
     }
 
     private OnItemClickListener mTestClickedListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(HomeActivity.this, TestListActivity.class);
-            ThemeInfo theme = mThemes[position];
-            intent.putExtra(ThemeTests.EXTRA_THEME_ID, theme.getResourceId());
-            intent.putExtra(ThemeTests.EXTRA_THEME_NAME, theme.getThemeName());
+            Intent intent =
+                new Intent(OrientationSelectorActivity.this, ThemeSelectorActivity.class);
+            intent.putExtra(ThemeTests.EXTRA_ORIENTATION, position);
             startActivity(intent);
         }
     };

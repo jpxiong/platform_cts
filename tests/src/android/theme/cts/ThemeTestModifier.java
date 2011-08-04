@@ -28,6 +28,9 @@ public interface ThemeTestModifier {
      * Define this function in order to modify the layout for your test.
      * The View that is passed in is the root of layout that is specified in the test.
      * @param view The root view of the layout.
+     * @return The view that will be saved as a bitmap. This view does not necessarily
+     * have to be the view that was passed into modifyView, however most implementations
+     * probably will return the original view.
      */
-    public void modifyView(View view);
+    public View modifyView(View view);
 }

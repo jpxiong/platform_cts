@@ -18,6 +18,7 @@ package android.theme.cts;
 
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.test.ActivityInstrumentationTestCase2;
 
 public class ThemeGenerator extends ActivityInstrumentationTestCase2<ThemeTestGeneratorActivity> {
@@ -42,11 +43,14 @@ public class ThemeGenerator extends ActivityInstrumentationTestCase2<ThemeTestGe
         ThemeInfo[] themes = ThemeTests.getThemes();
 
         for (ThemeInfo theme : themes) {
-            generateThemeTest(theme.getResourceId(), theme.getThemeName());
+            generateThemeTest(theme.getResourceId(), theme.getThemeName(),
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            generateThemeTest(theme.getResourceId(), theme.getThemeName(),
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
 
-    private void generateThemeTest(int resourceId, String themeName) {
+    private void generateThemeTest(int resourceId, String themeName, int orientation) {
         if (mInstrumentation == null) {
             mInstrumentation = getInstrumentation();
         }
@@ -54,6 +58,7 @@ public class ThemeGenerator extends ActivityInstrumentationTestCase2<ThemeTestGe
         Intent intent = new Intent();
         intent.putExtra(ThemeTests.EXTRA_THEME_ID, resourceId);
         intent.putExtra(ThemeTests.EXTRA_THEME_NAME, themeName);
+        intent.putExtra(ThemeTests.EXTRA_ORIENTATION, orientation);
         setActivityIntent(intent);
 
         final ThemeTestGeneratorActivity activity = getActivity();

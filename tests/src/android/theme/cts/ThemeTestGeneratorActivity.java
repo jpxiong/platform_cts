@@ -20,10 +20,15 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import junit.framework.Assert;
 
+/**
+ * Generates the master bitmaps for all of the tests for the specific
+ * theme and orientation requested via the intent.
+ */
 public class ThemeTestGeneratorActivity extends Activity {
     private ThemeTester mTester;
 
@@ -45,7 +50,19 @@ public class ThemeTestGeneratorActivity extends Activity {
         setTheme(themeId);
         setContentView(R.layout.testing_activity);
 
-        mTester = new ThemeTester(this, themeName);
+        int orientation = intent.getIntExtra(ThemeTests.EXTRA_ORIENTATION,
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        setRequestedOrientation(orientation);
+
+        String oriented = "";
+        if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            oriented = "land";
+        } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            oriented = "port";
+        }
+
+        mTester = new ThemeTester(this, themeName + "_" + oriented);
     }
 
     public void generateTests() {

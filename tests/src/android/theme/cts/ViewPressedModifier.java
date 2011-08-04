@@ -24,8 +24,8 @@ import android.view.View;
 public class ViewPressedModifier implements ThemeTestModifier {
 
     @Override
-    public void modifyView(View view) {
+    public View modifyView(View view) {
         view.setPressed(true);
+        return view;
     }
-
 }
