@@ -150,6 +150,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testRecorderCamera() throws Exception {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
@@ -262,6 +265,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         )
     })
     public void testRecorderVideo() throws Exception {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setOutputFile(OUTPUT_PATH2);
