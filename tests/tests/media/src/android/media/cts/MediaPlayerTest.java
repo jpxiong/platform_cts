@@ -405,7 +405,7 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         Thread.sleep(SLEEP_TIME);
 
         posBefore = mp.getCurrentPosition();
-        mp.setDisplay(getActivity().generateSurfaceHolder());
+        mp.setDisplay(null);
         posAfter = mp.getCurrentPosition();
 
         assertEquals(posAfter, posBefore);
@@ -414,11 +414,13 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         Thread.sleep(SLEEP_TIME);
 
         posBefore = mp.getCurrentPosition();
-        mp.setDisplay(null);
+        mp.setDisplay(getActivity().generateSurfaceHolder());
         posAfter = mp.getCurrentPosition();
 
         assertEquals(posAfter, posBefore);
         assertTrue(mp.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
 
         mp.release();
     }
