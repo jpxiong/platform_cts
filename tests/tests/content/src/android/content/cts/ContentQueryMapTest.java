@@ -263,9 +263,16 @@ public class ContentQueryMapTest extends AndroidTestCase {
             public void run() {
                 Looper.prepare();
                 mContentQueryMap.setKeepUpdated(true);
+                synchronized (ContentQueryMapTest.this) {
+                    //listener is ready, release the sender thread
+                    ContentQueryMapTest.this.notify();
+                }
                 Looper.loop();
             }
         }).start();
+        synchronized (this) {
+            wait(TEST_TIME_OUT);
+        }//wait the listener to be ready before launching onChange event
 
         // insert NAME3 and VALUE3
         values = new ContentValues();
@@ -285,9 +292,16 @@ public class ContentQueryMapTest extends AndroidTestCase {
             public void run() {
                 Looper.prepare();
                 mContentQueryMap.setKeepUpdated(false);
+                synchronized (ContentQueryMapTest.this) {
+                    //listener is ready, release the sender thread
+                    ContentQueryMapTest.this.notify();
+                }
                 Looper.loop();
             }
         }).start();
+        synchronized (this) {
+            wait(TEST_TIME_OUT);
+        }//wait the listener to be ready before launching onChange event
         // update NAME3 and VALUE3
         values = new ContentValues();
         values.put(DummyProvider.NAME, NAME0);
