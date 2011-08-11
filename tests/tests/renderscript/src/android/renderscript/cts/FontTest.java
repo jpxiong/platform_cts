@@ -64,7 +64,7 @@ public class FontTest extends RSBaseGraphics {
     }
 
     public void testCreateFromFile() {
-        String fontFile = "DroidSans.ttf";
+        String fontFile = "Roboto-Regular.ttf";
         String fontPath = Environment.getRootDirectory().getAbsolutePath();
         fontPath += "/fonts/" + fontFile;
         File fileDesc = new File(fontPath);
