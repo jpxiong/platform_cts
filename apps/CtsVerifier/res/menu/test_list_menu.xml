@@ -7,6 +7,6 @@
           android:icon="@android:drawable/ic_menu_upload"
           android:title="@string/copy" />
     <item android:id="@+id/export"
-          android:icon="@android:drawable/ic_menu_share"
+          android:icon="@android:drawable/ic_menu_save"
           android:title="@string/export" />
 </menu>
