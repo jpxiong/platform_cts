@@ -256,8 +256,8 @@
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
     <string name="usb_accessory_test_info">
-        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program from
-        the CTS tools directory.
+        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program 
+        included with the CTS Verifier bundle.
         \n\n2. If you have not started the CTS Verifier, press \'OK\' when asked to open the CTS
         Verifier when the accessory is connected. \n\nIf you are already in this test,
         then you can press \'Cancel\' but press \'OK\' in the next dialog asking whether to allow
