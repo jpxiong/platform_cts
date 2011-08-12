@@ -30,7 +30,13 @@
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <application android:label="@string/app_name" android:icon="@drawable/icon" android:debuggable="true">
+    <application android:label="@string/app_name" 
+            android:icon="@drawable/icon"
+            android:backupAgent="VerifierBackupAgent" 
+            android:debuggable="true">
+            
+        <meta-data android:name="com.google.android.backup.api_key"
+                android:value="AEdPqrEAAAAIbK6ldcOzoeRtQ1u1dFVJ1A7KetRhit-a1Xa82Q" />
 
         <activity android:name=".CtsVerifierActivity" android:label="@string/app_name">
             <intent-filter>
@@ -72,6 +78,13 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".backup.BackupTestActivity" android:label="@string/backup_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".bluetooth.BluetoothTestActivity"
                 android:label="@string/bluetooth_test"

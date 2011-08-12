@@ -350,18 +350,7 @@ public class TestListAdapter extends BaseAdapter {
 
         @Override
         protected Void doInBackground(Void... params) {
-            ContentValues values = new ContentValues(2);
-            values.put(TestResultsProvider.COLUMN_TEST_RESULT, mResult);
-            values.put(TestResultsProvider.COLUMN_TEST_NAME, mTestName);
-
-            ContentResolver resolver = mContext.getContentResolver();
-            int numUpdated = resolver.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
-                    TestResultsProvider.COLUMN_TEST_NAME + " = ?",
-                    new String[] {mTestName});
-
-            if (numUpdated == 0) {
-                resolver.insert(TestResultsProvider.RESULTS_CONTENT_URI, values);
-            }
+            TestResultsProvider.setTestResult(mContext, mTestName, mResult);
             return null;
         }
     }
