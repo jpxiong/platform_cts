@@ -22,11 +22,13 @@ import android.content.res.AssetFileDescriptor;
 import android.media.audiofx.AudioEffect;
 import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.audiofx.PresetReverb;
 import android.media.audiofx.EnvironmentalReverb;
 import android.media.audiofx.Equalizer;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 
 import android.os.Looper;
 import android.test.AndroidTestCase;
@@ -46,6 +48,8 @@ public class AudioEffectTest extends AndroidTestCase {
     private final static float DELAY_TOLERANCE = 1.05f;
     // allow +/- 5% tolerance between set and get ratios
     private final static float RATIO_TOLERANCE = 1.05f;
+    // AudioRecord sampling rate
+    private final static int SAMPLING_RATE = 44100;
 
     private AudioEffect mEffect = null;
     private AudioEffect mEffect2 = null;
@@ -115,6 +119,25 @@ public class AudioEffectTest extends AndroidTestCase {
     // 1 - constructor
     //----------------------------------
 
+    private AudioRecord getAudioRecord() {
+        AudioRecord ar = null;
+        try {
+            ar = new AudioRecord(MediaRecorder.AudioSource.DEFAULT,
+                    SAMPLING_RATE,
+                    AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    AudioRecord.getMinBufferSize(SAMPLING_RATE,
+                            AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT) * 10);
+            assertNotNull("Could not create AudioRecord", ar);
+            assertEquals("AudioRecord not initialized",
+                    AudioRecord.STATE_INITIALIZED, ar.getState());
+        } catch (IllegalArgumentException e) {
+            fail("AudioRecord invalid parameter");
+        }
+        return ar;
+    }
+
     //Test case 1.0: test constructor from effect type and get effect ID
     @TestTargets({
         @TestTargetNew(
@@ -139,10 +162,19 @@ public class AudioEffectTest extends AndroidTestCase {
         for (int i = 0; i < desc.length; i++) {
             if (!desc[i].type.equals(AudioEffect.EFFECT_TYPE_NULL)) {
                 try {
+                    int sessionId;
+                    AudioRecord ar = null;
+                    if (AudioEffect.EFFECT_PRE_PROCESSING.equals(desc[i].connectMode)) {
+                        ar = getAudioRecord();
+                        sessionId = ar.getAudioSessionId();
+                    } else {
+                        sessionId = 0;
+                    }
                     AudioEffect effect = new AudioEffect(desc[i].type,
                             AudioEffect.EFFECT_TYPE_NULL,
                             0,
-                            0);
+                            sessionId);
+
                     assertNotNull("could not create AudioEffect", effect);
                     try {
                         assertTrue("invalid effect ID", (effect.getId() != 0));
@@ -150,6 +182,9 @@ public class AudioEffectTest extends AndroidTestCase {
                         fail("AudioEffect not initialized");
                     } finally {
                         effect.release();
+                        if (ar != null) {
+                            ar.release();
+                        }
                     }
                 } catch (IllegalArgumentException e) {
                     fail("Effect not found: "+desc[i].name);
@@ -183,10 +218,18 @@ public class AudioEffectTest extends AndroidTestCase {
         assertTrue("no effects found", (desc.length != 0));
         for (int i = 0; i < desc.length; i++) {
             try {
+                int sessionId;
+                AudioRecord ar = null;
+                if (AudioEffect.EFFECT_PRE_PROCESSING.equals(desc[i].connectMode)) {
+                    ar =  getAudioRecord();
+                    sessionId = ar.getAudioSessionId();
+                } else {
+                    sessionId = 0;
+                }
                 AudioEffect effect = new AudioEffect(AudioEffect.EFFECT_TYPE_NULL,
                         desc[i].uuid,
                         0,
-                        0);
+                        sessionId);
                 assertNotNull("could not create AudioEffect", effect);
                 try {
                     assertTrue("invalid effect ID", (effect.getId() != 0));
@@ -194,6 +237,9 @@ public class AudioEffectTest extends AndroidTestCase {
                     fail("AudioEffect not initialized");
                 } finally {
                     effect.release();
+                    if (ar != null) {
+                        ar.release();
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 fail("Effect not found: "+desc[i].name);
