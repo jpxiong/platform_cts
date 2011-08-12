@@ -40,9 +40,10 @@
     <string name="test_results_cleared">Test results cleared.</string>
     <string name="copy">Copy</string>
     <string name="test_results_copied">Test results copied to clipboard.</string>
-    <string name="share">Share</string>
-    <string name="share_test_results">Share Test Results</string>
     <string name="test_results_error">Couldn\'t create test results report.</string>
+    <string name="export">Export</string>
+    <string name="no_storage">Cannot save report to external storage, see log for details.</string>
+    <string name="report_saved">Report saved to: %s</string>
 
     <!-- Strings for Device Administration tests -->
     <string name="da_policy_serialization_test">Policy Serialization Test</string>
@@ -140,11 +141,17 @@
 
     <string name="empty"></string>
 
-    <!-- Strings for AccelerometerTestActivity and MagnetometerTestActivity -->
+    <!-- Strings for AccelerometerTestActivity and GyroscopeTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
     <string name="snsr_accel_test_info">This test verifies that the accelerometer is working properly. As you move the device around through space, the triangle should always point down (i.e. in the direction of gravity.) If it does not, the accelerometer is improperly configured.</string>
-    <string name="snsr_mag_test">Magnetometer Test</string>
-    <string name="snsr_mag_test_info">This test verifies that the magnetometer (compass) is working properly. As you move the device around through space, the triangle should always point toward the north pole (which may point through the ground.) If it does not, the magnetometer is improperly configured. Be sure not to run this test with the device near any strong magnetic field generators.</string>
+
+    <string name="snsr_gyro_test">Gyroscope Test</string>
+    <string name="snsr_gyro_test_info">This test verifies that the gyroscope is working properly.\n\nRotate your device as shown by the 3D block. A green background or a check mark indicates that the gyroscope\'s value is correct. A red background or a X mark indicates that the gyroscope\'s value is not right.\n\nThere are 6 parts of the test corresponding to each rotation. Press Pass for all the stages to complete this test.</string>
+    <string name="snsr_gyro_test_progress">Test %1$d of %2$d</string>
+    <string name="snsr_gyro_test_no_gyro_title">No gyroscope?</string>
+    <string name="snsr_gyro_test_no_gyro_message">It doesn\'t seem like you have a gyroscope, so you don\'t need to run this test.</string>
+    <string name="snsr_gyro_test_degrees_title">Wrong units?</string>
+    <string name="snsr_gyro_test_degrees_message">These values looks like degrees per second. These should be radians per second!</string>
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>

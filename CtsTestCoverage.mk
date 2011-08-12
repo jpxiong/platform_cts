@@ -60,6 +60,8 @@ define generate-coverage-report
 	$(hide) echo $(1): file://$(ANDROID_BUILD_TOP)/$(COVERAGE_OUT)/$(4)
 endef
 
+# classes.dex is stripped from package.apk if dex-preopt is enabled,
+# so we use the copy that definitely includes classes.dex.
 define add-testcase-apk
-	TEST_APKS += $(call intermediates-dir-for,APPS,$(1))/package.apk
+	TEST_APKS += $(call intermediates-dir-for,APPS,$(1))/package.apk.unaligned
 endef
