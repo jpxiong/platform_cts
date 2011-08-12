@@ -77,17 +77,7 @@ class TestResultsReport {
         this.mAdapter = adapter;
     }
 
-    String getType() {
-        return "application/xml";
-    }
-
-    String getSubject() {
-        return mContext.getString(R.string.subject_header,
-                Version.getVersionName(mContext),
-                Build.FINGERPRINT);
-    }
-
-    String getBody() throws IllegalArgumentException, IllegalStateException, IOException {
+    String getContents() throws IllegalArgumentException, IllegalStateException, IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         XmlSerializer xml = Xml.newSerializer();
@@ -106,7 +96,16 @@ class TestResultsReport {
 
         xml.startTag(null, DEVICE_INFO_TAG);
         xml.startTag(null, BUILD_INFO_TAG);
+        xml.attribute(null, "board", Build.BOARD);
+        xml.attribute(null, "brand", Build.BRAND);
+        xml.attribute(null, "device", Build.DEVICE);
+        xml.attribute(null, "display", Build.DISPLAY);
         xml.attribute(null, "fingerprint", Build.FINGERPRINT);
+        xml.attribute(null, "id", Build.ID);
+        xml.attribute(null, "model", Build.MODEL);
+        xml.attribute(null, "product", Build.PRODUCT);
+        xml.attribute(null, "release", Build.VERSION.RELEASE);
+        xml.attribute(null, "sdk", Build.VERSION.SDK);
         xml.endTag(null, BUILD_INFO_TAG);
         xml.endTag(null, DEVICE_INFO_TAG);
 

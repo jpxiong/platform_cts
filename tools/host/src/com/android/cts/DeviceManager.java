@@ -215,28 +215,31 @@ public class DeviceManager implements IDeviceChangeListener {
 
         @Override
         public void run() {
-            try {
-               while (mDevice.getSyncService() == null || mDevice.getPropertyCount() == 0) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        Log.d("polling for device sync service interrupted");
+            while (true) {
+                try {
+                    if ((mDevice.getSyncService() != null) && (mDevice.getPropertyCount() != 0)) {
+                        break;
                     }
+                } catch (IOException e) {
+                    Log.e("Failed to connect to device", e);
+                } catch (TimeoutException e) {
+                    Log.e("Failed to connect to device", e);
+                } catch (AdbCommandRejectedException e) {
+                    Log.e("Failed to connect to device", e);
                 }
-                CUIOutputStream.println("Device(" + mDevice + ") connected");
-                if (!TestSession.isADBServerRestartedMode()) {
-                    CUIOutputStream.printPrompt();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Log.d("polling for device sync service interrupted");
                 }
-                appendDevice(mDevice);
-                // increment the counter semaphore to unblock threads waiting for devices
-                mSemaphore.release();
-            } catch (IOException e) {
-                // FIXME: handle failed connection to device.
-            } catch (TimeoutException e) {
-                // FIXME: handle failed connection to device.
-            } catch (AdbCommandRejectedException e) {
-                // FIXME: handle failed connection to device.
             }
+            CUIOutputStream.println("Device(" + mDevice + ") connected");
+            if (!TestSession.isADBServerRestartedMode()) {
+                CUIOutputStream.printPrompt();
+            }
+            appendDevice(mDevice);
+            // increment the counter semaphore to unblock threads waiting for devices
+            mSemaphore.release();
         }
     }
 
@@ -310,58 +313,62 @@ public class DeviceManager implements IDeviceChangeListener {
             // TODO: this is flaky, no guarantee device has actually rebooted, host should wait till
             // device goes offline
             Thread.sleep(REBOOT_DELAY);
+        } else {
+            executeCommand("killall emulator");
+            executeCommand("killall emulator-x86");
+            executeCommand("killall emulator-arm");
+        }
 
-            int attempts = 0;
-            boolean deviceConnected = false;
-            while (!deviceConnected && (attempts < MAX_ADB_RESTART_ATTEMPTS)) {
-                AndroidDebugBridge.disconnectBridge();
+        int attempts = 0;
+        boolean deviceConnected = false;
+        while (!deviceConnected && (attempts < MAX_ADB_RESTART_ATTEMPTS)) {
+            AndroidDebugBridge.disconnectBridge();
 
-                // kill the server while the device is rebooting
-                executeCommand("adb kill-server");
+            // kill the server while the device is rebooting
+            executeCommand("adb kill-server");
 
-                // Reset the device counter semaphore. We will wait below until at least one device
-                // has come online. This can happen any time during or after the call to
-                // createBridge(). The counter gets increased by the DeviceServiceMonitor when a
-                // device is added.
-                mSemaphore.drainPermits();
-                AndroidDebugBridge.createBridge(getAdbLocation(), true);
+            // Reset the device counter semaphore. We will wait below until at least one device
+            // has come online. This can happen any time during or after the call to
+            // createBridge(). The counter gets increased by the DeviceServiceMonitor when a
+            // device is added.
+            mSemaphore.drainPermits();
+            AndroidDebugBridge.createBridge(getAdbLocation(), true);
 
-                boolean deviceFound = false;
-                while (!deviceFound) {
-                    // wait until at least one device has been added
-                    mSemaphore.tryAcquire(LONG_DELAY, TimeUnit.MILLISECONDS);
-                    TestDevice device = searchTestDevice(deviceSerialNumber);
-                    if (device != null) {
-                        ts.setTestDevice(device);
-                        deviceFound = true;
-                        deviceConnected = device.waitForBootComplete();
-                        // After boot is complete, the ADB connection sometimes drops
-                        // for a short time. Wait for things to stabilize.
-                        try {
-                            Thread.sleep(POST_BOOT_DELAY);
-                        } catch (InterruptedException ignored) {
-                            // ignore
+            boolean deviceFound = false;
+            while (!deviceFound) {
+                // wait until at least one device has been added
+                mSemaphore.tryAcquire(LONG_DELAY, TimeUnit.MILLISECONDS);
+                TestDevice device = searchTestDevice(deviceSerialNumber);
+                if (device != null) {
+                    ts.setTestDevice(device);
+                    deviceFound = true;
+                    deviceConnected = device.waitForBootComplete();
+                    // After boot is complete, the ADB connection sometimes drops
+                    // for a short time. Wait for things to stabilize.
+                    try {
+                        Thread.sleep(POST_BOOT_DELAY);
+                    } catch (InterruptedException ignored) {
+                        // ignore
+                    }
+                    // If the connection dropped during the sleep above, the TestDevice
+                    // instance is no longer valid.
+                    TestDevice newDevice = searchTestDevice(deviceSerialNumber);
+                    if (newDevice != null) {
+                        ts.setTestDevice(newDevice);
+                        if (newDevice != device) {
+                            // the connection was dropped or a second reboot occurred
+                            // TODO: replace the hardcoded /sdcard
+                            String cmd = String.format("adb -s %s shell bugreport -o " +
+                                        "/sdcard/bugreports/doubleReboot", deviceSerialNumber);
+                            executeCommand(cmd);
                         }
-                        // If the connection dropped during the sleep above, the TestDevice
-                        // instance is no longer valid.
-                        TestDevice newDevice = searchTestDevice(deviceSerialNumber);
-                        if (newDevice != null) {
-                            ts.setTestDevice(newDevice);
-                            if (newDevice != device) {
-                                // the connection was dropped or a second reboot occurred
-                                // TODO: replace the hardcoded /sdcard
-                                String cmd = String.format("adb -s %s shell bugreport -o " +
-                                            "/sdcard/bugreports/doubleReboot", deviceSerialNumber);
-                                executeCommand(cmd);
-                            }
-                        } else {
-                            // connection dropped and has not come back up
-                            deviceFound = false; // go wait for next semaphore permit
-                        }
+                    } else {
+                        // connection dropped and has not come back up
+                        deviceFound = false; // go wait for next semaphore permit
                     }
                 }
-                attempts += 1;
             }
+            attempts += 1;
         }
     }
 
