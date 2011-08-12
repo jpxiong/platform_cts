@@ -152,7 +152,6 @@
    <string name="authenticator_label">Android CTS</string>
    <string name="search_label">Android CTS</string>
 
-
    <string name="button">Button</string>
    <string name="holo_test">Holo Test</string>
    <string name="holo_generator">Holo Generator</string>
@@ -161,6 +160,6 @@
    <string name="reference_image">Reference Image: </string>
    <string name="generated_image">Generated Image: </string>
    <string name="themes_prompt">Select a Theme:</string>
-   <string name="bacon_ipsum">Bacon ipsum dolor sit amet pork chop strip steak
-spare ribs short ribs jerky.</string>
+   <string name="sample_text">Sample text goes here. I wanted something creative and whimsical
+but then I just got bored...</string>
 </resources>

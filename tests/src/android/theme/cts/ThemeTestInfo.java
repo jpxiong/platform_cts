@@ -23,7 +23,7 @@ package android.theme.cts;
 public class ThemeTestInfo {
     private int mResourceId;
     private ThemeTestModifier mModifier;
-    private String mFilename;
+    private String mTestname;
 
     /**
      * Creates a new theme test.
@@ -35,7 +35,7 @@ public class ThemeTestInfo {
     public ThemeTestInfo(int layoutResourceId, ThemeTestModifier modifier, String testname) {
         mResourceId = layoutResourceId;
         mModifier = modifier;
-        mFilename = testname;
+        mTestname = testname;
     }
 
     public int getLayoutResourceId() {
@@ -47,6 +47,6 @@ public class ThemeTestInfo {
     }
 
     public String getTestName() {
-        return mFilename;
+        return mTestname;
     }
 }

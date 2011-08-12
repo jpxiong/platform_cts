@@ -50,7 +50,14 @@ public class ThemeTests {
     public static final String EXTRA_ORIENTATION = "android.intent.extra.ORIENTATION";
 
     /**
-     * The list of tests to run for each theme.
+     * The index of the current activity test that is being run so that it can be
+     * read on both sides of an intent.
+     */
+    public static final String EXTRA_ACTIVITY_TEST_INDEX
+            = "android.intent.extra.ACTIVITY_TEST_INDEX";
+
+    /**
+     * The list of tests to run for each theme.<p>
      * In order to create a new test, follow these steps.<p>
      * 1. Create a layout file for the test you wish to run.<br>
      * 2. (Optional) Create a class that derives from ThemeTestModifier
@@ -105,35 +112,35 @@ public class ThemeTests {
             new ThemeTestInfo(R.layout.calendarview, new CalendarViewModifier(), "calendarview"),
             new ThemeTestInfo(R.layout.zoomcontrols, null, "zoomcontrols"),
             new ThemeTestInfo(R.layout.tabhost, new TabHostModifier(), "tabhost"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.ONE_BUTTON)), "alertdialog_onebutton"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.TWO_BUTTONS)), "alertdialog_twobuttons"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.THREE_BUTTONS)), "alertdialog_threebuttons"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.LIST)), "alertdialog_list"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.SINGLE_CHOICE)), "alertdialog_singlechoice"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new AlertDialogBuilder(
                                     AlertDialogBuilder.MULTI_CHOICE)), "alertdialog_multichoice"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new ProgressDialogBuilder(
                                     ProgressDialogBuilder.SPINNER)), "progressdialog_spinner"),
-            new ThemeTestInfo(R.layout.empty_for_dialog,
+            new ThemeTestInfo(R.layout.empty,
                     new DialogModifier(
                             new ProgressDialogBuilder(
                                     ProgressDialogBuilder.HORIZONTAL)),
@@ -147,7 +154,7 @@ public class ThemeTests {
                     "searchview_query")};
 
     /**
-     * Returns the list of tests to run on a particular theme.
+     * Returns the list of tests to run on a particular theme. <p>
      *
      * In order to create a new test, follow these steps.<p>
      * 1. Create a layout file for the test you wish to run.<br>
@@ -171,7 +178,40 @@ public class ThemeTests {
      */
     private static final ThemeInfo[] THEMES = new ThemeInfo[] {
         new ThemeInfo(android.R.style.Theme_Holo, "holo"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light, "holo_light")};
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog, "holo_dialog"),
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog_MinWidth, "holo_dialog_minwidth"),
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog_NoActionBar,
+                "holo_dialog_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog_NoActionBar_MinWidth,
+                "holo_dialog_noactionbar_minwidth"),
+        new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge, "holo_dialogwhenlarge"),
+        new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge_NoActionBar,
+                "holo_dialogwhenlarge_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_InputMethod, "holo_inputmethod"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light, "holo_light"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_DarkActionBar, "holo_light_darkactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog, "holo_light_dialog"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                "holo_light_dialog_minwidth"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_NoActionBar,
+                "holo_light_dialog_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth,
+                "holo_light_dialog_noactionbar_minwidth"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_DialogWhenLarge,
+                "holo_light_dialogwhenlarge"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_DialogWhenLarge_NoActionBar,
+                "holo_light_dialogwhenlarge_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar, "holo_light_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen,
+                "holo_light_noactionbar_fullscreen"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Panel, "holo_light_panel"),
+        new ThemeInfo(android.R.style.Theme_Holo_NoActionBar, "holo_noactionbar"),
+        new ThemeInfo(android.R.style.Theme_Holo_NoActionBar_Fullscreen,
+                "holo_noactionbar_fullscreen"),
+        new ThemeInfo(android.R.style.Theme_Holo_Panel, "holo_panel"),
+        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper, "holo_wallpaper"),
+        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper_NoTitleBar, "holo_wallpaper_notitlebar")
+    };
 
     /**
      * Returns the list of themes to test. In order to add a new theme, follow these steps.<p>
@@ -183,5 +223,39 @@ public class ThemeTests {
      */
     public static ThemeInfo[] getThemes() {
         return THEMES;
+    }
+
+    /**
+     * The list of Activity snapshot tests.<p>
+     * In order to create a new test, follow these steps.<p>
+     * 1. Create a class that inherits from {@link ActivitytestInfo}.<br>
+     * 2. Add an initialization of that class to the array below.<br>
+     * 3. Done.
+     */
+    private static final ActivityTestInfo[] ACTIVITY_TESTS = new ActivityTestInfo[] {
+        new ActionBarModifier("actionbar", ActionBarModifier.BASIC),
+        new ActionBarModifier("actionbar_home_as_up", ActionBarModifier.DISPLAY_HOME_AS_UP),
+        new ActionBarModifier("actionbar_tabs", ActionBarModifier.TABS),
+        new ActionBarModifier("actionbar_list", ActionBarModifier.LIST),
+        new ActionBarModifier("actionbar_no_title", ActionBarModifier.NO_TITLE),
+        new ActionBarModifier("actionbar_no_icon", ActionBarModifier.NO_ICON),
+        new ActionBarModifier("actionbar_action_items", ActionBarModifier.ACTION_ITEMS),
+        new ActionBarModifier("actionbar_action_view", ActionBarModifier.ACTION_VIEW)//,
+        // TODO - fix this test - I think this one is particularly susceptible
+        // to the orientation bug so for now i'm just leaving it commented out
+        /*new ActionBarModifier(
+                "actionbar_collapsed_action_view", ActionBarModifier.COLLAPSED_ACTION_VIEW)*/
+    };
+
+    /**
+     * Returns the list of Activity snapshot tests.<p>
+     * In order to create a new test, follow these steps.<p>
+     * 1. Create a class that inherits from {@link ActivitytestInfo}.<br>
+     * 2. Add an initialization of that class to the array below.<br>
+     * 3. Done.
+     * @return The list of Activity snapshot tests.
+     */
+    public static ActivityTestInfo[] getActivityTests() {
+        return ACTIVITY_TESTS;
     }
 }

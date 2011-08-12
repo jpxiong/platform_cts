@@ -115,12 +115,13 @@ public class ThemeTester {
 
     private void testViewFromId(ThemeTestInfo test) {
         processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
-                new BitmapComparer(mThemeName + "_" + test.getTestName(), mShouldAssert));
+                new BitmapComparer(mActivity, mReferenceImage,
+                        mThemeName + "_" + test.getTestName(), mShouldAssert, false));
     }
 
     private void generateViewFromId(ThemeTestInfo test) {
         processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
-                new BitmapGenerator(mThemeName + "_" + test.getTestName()));
+                new BitmapSaver(mActivity, mThemeName + "_" + test.getTestName(), false));
     }
 
     private void processBitmapFromViewId(
@@ -167,82 +168,7 @@ public class ThemeTester {
         return view;
     }
 
-    /**
-     * Simple interface in order to share code between the bitmap comparison and bitmap generation
-     * steps.
-     */
-    private interface BitmapProcessor {
-        public boolean processBitmap(Bitmap bitmap);
-    }
 
-    /**
-     * Implementation of {@link BitmapProcessor} that compares the created bitmap
-     * to a known good version. Asserts if the bitmaps do not compare.
-     */
-    private class BitmapComparer implements BitmapProcessor {
-        String mBitmapIdName;
-        boolean mShouldAssert;
 
-        public BitmapComparer(String filename, boolean shouldAssert) {
-            mBitmapIdName = filename;
-            mShouldAssert = shouldAssert;
-        }
 
-        @Override
-        public boolean processBitmap(Bitmap bitmap) {
-            Resources r = mActivity.getResources();
-            int resourceId = r.getIdentifier(mBitmapIdName, "drawable", mActivity.getPackageName());
-
-            BitmapDrawable drawable = null;
-
-            try {
-                drawable = (BitmapDrawable) r.getDrawable(resourceId);
-            } catch (NotFoundException e) {
-                Assert.fail("Test Failed: Resource not found - " + mBitmapIdName);
-            }
-
-            Bitmap bmp2 = drawable.getBitmap();
-            mReferenceImage.setImageBitmap(bmp2);
-
-            boolean identical = bmp2.sameAs(bitmap);
-
-            if (mShouldAssert) {
-                Assert.assertTrue("Test failed: " + mBitmapIdName, identical);
-            } else if (identical) {
-                ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps identical");
-            } else {
-                ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps differ");
-            }
-
-            return true;
-        }
-    }
-
-    /**
-     * Implementation of {@link BitmapProcessor} that creates a known-good version of the
-     * bitmap and saves it to the applications data folder.
-     */
-    private class BitmapGenerator implements BitmapProcessor {
-        String mFilename;
-
-        public BitmapGenerator(String filename) {
-            mFilename = filename + ".png";
-        }
-
-        @Override
-        public boolean processBitmap(Bitmap bitmap) {
-            try {
-                FileOutputStream fos = mActivity.openFileOutput(mFilename, Context.MODE_PRIVATE);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                // TODO - break loudly
-            } catch (IOException e) {
-                // TODO - break loudly
-            }
-
-            return false;
-        }
-
-    }
 }
