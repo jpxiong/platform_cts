@@ -45,6 +45,32 @@
     <string name="no_storage">Cannot save report to external storage, see log for details.</string>
     <string name="report_saved">Report saved to: %s</string>
 
+    <!-- Strings for BackupTestActivity -->
+    <string name="backup_test">Data Backup Test</string>
+    <string name="backup_info">This test checks that data backup and automatic restore works 
+        properly. The test activity lists some preferences and files that are backed up and
+        restored by the CTS Verifier. If backup and restore is working properly, these values
+        should be restored after running the backup manager, uninstalling the app, and reinstalling
+        the CTS Verifier.
+        \n\nPress the \"Generate Test Data\" to populate these values
+        and then follow the on screen instructions to finish the test.
+    </string>
+    <string name="bu_preferences">Preferences</string>
+    <string name="bu_files">Files</string>
+    <string name="bu_loading">Loading...</string>
+    <string name="bu_generate">Generate Test Data</string>
+    <string name="bu_generate_error">Error occurred while generating test data...</string>
+    <string name="bu_instructions">Random values for the preferences and files have been saved.
+        \n\nFollow the instructions below to check that the data backup and restore works:
+        \n\n1. Make sure backup and automatic restore are enabled in settings. Depending on the 
+        backup transport supported by the device you may need to do additional steps. For instance 
+        you may need to set a Google account as the backup account for the device.
+        \n\n2. Run the backup manager: adb shell bmgr run
+        \n\n3. Uninstall the program: adb uninstall com.android.cts.verifier
+        \n\n4. Reinstall the CTS Verifier and verify that the values are still the same.
+    </string>
+    <string name="bu_settings">Settings</string>
+
     <!-- Strings for Device Administration tests -->
     <string name="da_policy_serialization_test">Policy Serialization Test</string>
     <string name="da_policy_serialization_info">This test checks that a device policy is properly
