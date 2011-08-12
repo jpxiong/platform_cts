@@ -17,36 +17,26 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
-import android.media.MediaPlayer.OnVideoSizeChangedListener;
+import android.media.cts.MediaPlayerTestHelpers.Monitor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.SurfaceHolder;
-import android.webkit.cts.CtsTestServer;
 import android.util.Log;
+import android.webkit.cts.CtsTestServer;
 
 import java.io.File;
-import java.io.FileDescriptor;
 
-@TestTargetClass(MediaPlayer.class)
+/**
+ * Tests for the MediaPlayer API and local video/audio playback.
+ */
 public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
 
     private static String TAG = "CtsMediaPlayerTest";
@@ -79,6 +69,7 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
     static MediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener =
         new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
                 synchronized (sVideoSizeChanged) {
                     Log.v(TAG, "sizechanged notification received ...");
@@ -87,27 +78,8 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
             }
         };
 
-    private static class Monitor {
-        private boolean signalled;
-
-        public synchronized void reset() {
-            signalled = false;
-        }
-
-        public synchronized void signal() {
-            signalled = true;
-            notifyAll();
-        }
-
-        public synchronized void waitForSignal() throws InterruptedException {
-            while (!signalled) {
-                wait();
-            }
-        }
-    }
-
     public MediaPlayerTest() {
-        super("com.android.cts.stub", MediaStubActivity.class);
+        super(MediaStubActivity.class);
         mSourceMediaOnSdcard = new File(Environment.getExternalStorageDirectory(),
                                         "record_and_play.3gp").getAbsolutePath();
     }
@@ -134,88 +106,15 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioStreamType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWakeMode",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isPlaying",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLooping",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isLooping",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "seekTo",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDuration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
+    public void testStreamNullSource() throws Exception {
+        try {
+            mMediaPlayer.setDataSource((String) null);
+            fail("Null URI was accepted");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
     public void testPlayAudio() throws Exception {
         final int mp3Duration = 34909;
         final int tolerance = 70;
@@ -267,44 +166,6 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
         mp.release();
     }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplay",
-            args = {SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setScreenOnWhilePlaying",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVideoHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVideoWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVolume",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class}
-        )
-    })
 
     /*
      * Initializes the message looper so that the mediaPlayer object can
@@ -392,39 +253,6 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mp.release();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnBufferingUpdateListener",
-            args = {OnBufferingUpdateListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplay",
-            args = {SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        )
-    })
-
     public void testPlayMp3Stream1() throws Throwable {
         streamTest("ringer.mp3", false, false);
     }
@@ -468,12 +296,13 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
         mOnBufferingUpdateCalled.reset();
         mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+            @Override
             public void onBufferingUpdate(MediaPlayer mp, int percent) {
                 mOnBufferingUpdateCalled.signal();
             }
         });
 
-        assertFalse(mOnBufferingUpdateCalled.signalled);
+        assertFalse(mOnBufferingUpdateCalled.isSignalled());
         mMediaPlayer.prepare();
 
         if (nolength) {
@@ -489,68 +318,6 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mMediaPlayer.reset();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnCompletionListener",
-            args = {OnCompletionListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnErrorListener",
-            args = {OnErrorListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnPreparedListener",
-            args = {OnPreparedListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnSeekCompleteListener",
-            args = {OnSeekCompleteListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnVideoSizeChangedListener",
-            args = {OnVideoSizeChangedListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnInfoListener",
-            args = {MediaPlayer.OnInfoListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isPlaying",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "seekTo",
-            args = {int.class}
-        )
-    })
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
@@ -566,18 +333,21 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mMediaPlayer.setScreenOnWhilePlaying(true);
 
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
                 mOnVideoSizeChangedCalled.signal();
             }
         });
 
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
             public void onPrepared(MediaPlayer mp) {
                 mOnPrepareCalled.signal();
             }
         });
 
         mMediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
             public void onSeekComplete(MediaPlayer mp) {
                 mOnSeekCompleteCalled.signal();
             }
@@ -585,12 +355,14 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
         mOnCompletionCalled.reset();
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
             public void onCompletion(MediaPlayer mp) {
                 mOnCompletionCalled.signal();
             }
         });
 
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 mOnErrorCalled.signal();
                 return false;
@@ -598,60 +370,34 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         });
 
         mMediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
                 mOnInfoCalled.signal();
                 return false;
             }
         });
 
-        assertFalse(mOnPrepareCalled.signalled);
-        assertFalse(mOnVideoSizeChangedCalled.signalled);
+        assertFalse(mOnPrepareCalled.isSignalled());
+        assertFalse(mOnVideoSizeChangedCalled.isSignalled());
         mMediaPlayer.prepare();
         mOnPrepareCalled.waitForSignal();
         mOnVideoSizeChangedCalled.waitForSignal();
-        mOnSeekCompleteCalled.signalled = false;
+        mOnSeekCompleteCalled.reset();
         mMediaPlayer.seekTo(mp4Duration >> 1);
         mOnSeekCompleteCalled.waitForSignal();
-        assertFalse(mOnCompletionCalled.signalled);
+        assertFalse(mOnCompletionCalled.isSignalled());
         mMediaPlayer.start();
         while(mMediaPlayer.isPlaying()) {
             Thread.sleep(SLEEP_TIME);
         }
         assertFalse(mMediaPlayer.isPlaying());
         mOnCompletionCalled.waitForSignal();
-        assertFalse(mOnErrorCalled.signalled);
+        assertFalse(mOnErrorCalled.isSignalled());
         mMediaPlayer.stop();
         mMediaPlayer.start();
         mOnErrorCalled.waitForSignal();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {Context.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, Uri.class, SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "prepareAsync",
-            args = {}
-        )
-    })
     public void testRecordAndPlay() throws Exception {
         recordMedia();
         MediaPlayer mp = new MediaPlayer();
