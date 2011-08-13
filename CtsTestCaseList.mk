@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CTS_APPS_LIST := \
-    CtsVerifier
-
 CTS_SECURITY_APPS_LIST := \
 	CtsAppAccessData \
 	CtsAppWithData \
@@ -78,6 +75,5 @@ CTS_TEST_CASE_LIST := \
 	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
-	$(CTS_APPS_LIST) \
 	$(CTS_COVERAGE_TEST_CASE_LIST) \
 	$(CTS_SECURITY_APPS_LIST)
