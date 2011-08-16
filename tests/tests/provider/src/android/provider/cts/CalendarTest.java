@@ -263,7 +263,7 @@ public class CalendarTest extends InstrumentationTestCase {
             values.put(Events.CALENDAR_ID, calendarId);
 
             values.put(Events.DESCRIPTION, "DESCRIPTION:" + seedString);
-            values.put(Events.STATUS, seed % 3);
+            values.put(Events.STATUS, seed % 2);    // avoid STATUS_CANCELED for general testing
 
             values.put(Events.DTSTART, seed);
             values.put(Events.DTEND, seed + DateUtils.HOUR_IN_MILLIS);
@@ -690,6 +690,9 @@ public class CalendarTest extends InstrumentationTestCase {
             assertEquals(newDescription, c.getString(0));
         }
         c.close();
+
+        // delete the calendar
+        removeAndVerifyCalendar(account, calendarId);
     }
 
     /**
@@ -1064,30 +1067,41 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
-     * Tests creation of a simple recurrence exception where the exception is created first.
-     * Simulates out-of-order delivery from the server.
+     * Tests insertion of event exceptions before and after a recurring event is created.
+     * <p>
+     * The server may send exceptions down before the event they refer to, so the provider
+     * fills in the originalId of previously-existing exceptions when a recurring event is
+     * inserted.  Make sure that works.
+     * <p>
+     * The _sync_id column is only unique with a given calendar.  We create events with
+     * identical originalSyncId values in two different calendars to verify that the provider
+     * doesn't update unrelated events.
      * <p>
      * We can't use the /exception URI, because that only works if the events are created
      * in order.
      */
     @MediumTest
     public void testOutOfOrderRecurrenceExceptions() {
-        String account = "reooo_account";
+        String account1 = "roid1_account";
+        String account2 = "roid2_account";
         String startWhen = "1987-08-09T12:00:00";
         int seed = 0;
 
         // Clean up just in case
-        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account1);
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account2);
 
-        // Create calendar
-        long calendarId = createAndVerifyCalendar(account, seed++, null);
+        // Create calendars
+        long calendarId1 = createAndVerifyCalendar(account1, seed++, null);
+        long calendarId2 = createAndVerifyCalendar(account2, seed++, null);
+
 
         // Generate base event.
-        ContentValues eventValues = EventHelper.getNewRecurringEventValues(account, seed,
-                calendarId, true, startWhen, "PT1H", "FREQ=DAILY;WKST=SU;COUNT=10");
+        ContentValues recurEventValues = EventHelper.getNewRecurringEventValues(account1, seed++,
+                calendarId1, true, startWhen, "PT1H", "FREQ=DAILY;WKST=SU;COUNT=10");
 
         // Select a period that gives us 3 instances.
-        String timeZone = eventValues.getAsString(Events.EVENT_TIMEZONE);
+        String timeZone = recurEventValues.getAsString(Events.EVENT_TIMEZONE);
         String testStart = "1987-08-09T00:00:00";
         String testEnd = "1987-08-11T23:59:59";
         String[] projection = { Instances.BEGIN, Instances.START_MINUTE, Instances.EVENT_ID };
@@ -1098,36 +1112,83 @@ public class CalendarTest extends InstrumentationTestCase {
          * range already covers the interesting set of dates, so we need to create and remove
          * an instance in the same time frame beforehand.
          */
-        expandInstanceRange(account, calendarId, testStart, testEnd, timeZone);
+        expandInstanceRange(account1, calendarId1, testStart, testEnd, timeZone);
 
         /*
          * Instances table should be expanded.  Do the test.
          */
 
-        // Generate exception from base.  We shift the start time by half an hour.
-        ContentValues excepValues = new ContentValues(eventValues);
-        excepValues.remove(Events._SYNC_ID);
-        excepValues.put(Events.ORIGINAL_SYNC_ID, eventValues.getAsString(Events._SYNC_ID));
+        final String MAGIC_SYNC_ID = "MagicSyncId";
+        recurEventValues.put(Events._SYNC_ID, MAGIC_SYNC_ID);
 
-        long dtstartMillis = excepValues.getAsLong(Events.DTSTART);
-        dtstartMillis += 24 * 60 * 60 * 1000;       // add one day -- use the second instance
-        excepValues.put(Events.ORIGINAL_INSTANCE_TIME, dtstartMillis);
-        dtstartMillis += 1800 * 1000;
-        excepValues.put(Events.DTSTART, dtstartMillis);
-        excepValues.put(Events.DTEND, dtstartMillis + 3600*1000);
-        excepValues.remove(Events.DURATION);
-        excepValues.remove(Events.RRULE);
+        // Generate exceptions from base, removing the generated _sync_id and setting the
+        // base event's _sync_id as originalSyncId.
+        ContentValues beforeExcepValues, afterExcepValues, unrelatedExcepValues;
+        beforeExcepValues = new ContentValues(recurEventValues);
+        afterExcepValues = new ContentValues(recurEventValues);
+        unrelatedExcepValues = new ContentValues(recurEventValues);
+        beforeExcepValues.remove(Events._SYNC_ID);
+        afterExcepValues.remove(Events._SYNC_ID);
+        unrelatedExcepValues.remove(Events._SYNC_ID);
+        beforeExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
+        afterExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
+        unrelatedExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
 
-        // Create exception event.
-        long excepId = createAndVerifyEvent(account, seed, calendarId, true, excepValues);
-        assertTrue(excepId >= 0);
+        // Disassociate the "unrelated" exception by moving it to the other calendar.
+        unrelatedExcepValues.put(Events.CALENDAR_ID, calendarId2);
+
+        // We shift the start time by half an hour, and use the same _sync_id.
+        final long ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
+        final long ONE_HOUR_MILLIS  = 60 * 60 * 1000;
+        final long HALF_HOUR_MILLIS  = 30 * 60 * 1000;
+        long dtstartMillis = recurEventValues.getAsLong(Events.DTSTART) + ONE_DAY_MILLIS;
+        beforeExcepValues.put(Events.ORIGINAL_INSTANCE_TIME, dtstartMillis);
+        beforeExcepValues.put(Events.DTSTART, dtstartMillis + HALF_HOUR_MILLIS);
+        beforeExcepValues.put(Events.DTEND, dtstartMillis + ONE_HOUR_MILLIS);
+        beforeExcepValues.remove(Events.DURATION);
+        beforeExcepValues.remove(Events.RRULE);
+        beforeExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
+        dtstartMillis += ONE_DAY_MILLIS;
+        afterExcepValues.put(Events.ORIGINAL_INSTANCE_TIME, dtstartMillis);
+        afterExcepValues.put(Events.DTSTART, dtstartMillis + HALF_HOUR_MILLIS);
+        afterExcepValues.put(Events.DTEND, dtstartMillis + ONE_HOUR_MILLIS);
+        afterExcepValues.remove(Events.DURATION);
+        afterExcepValues.remove(Events.RRULE);
+        afterExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
+        dtstartMillis += ONE_DAY_MILLIS;
+        unrelatedExcepValues.put(Events.ORIGINAL_INSTANCE_TIME, dtstartMillis);
+        unrelatedExcepValues.put(Events.DTSTART, dtstartMillis + HALF_HOUR_MILLIS);
+        unrelatedExcepValues.put(Events.DTEND, dtstartMillis + ONE_HOUR_MILLIS);
+        unrelatedExcepValues.remove(Events.DURATION);
+        unrelatedExcepValues.remove(Events.RRULE);
+        unrelatedExcepValues.put(Events.ORIGINAL_SYNC_ID, MAGIC_SYNC_ID);
+
+
+        // Create "before" and "unrelated" exceptions.
+        long beforeEventId = createAndVerifyEvent(account1, seed, calendarId1, true,
+                beforeExcepValues);
+        assertTrue(beforeEventId >= 0);
+        long unrelatedEventId = createAndVerifyEvent(account2, seed, calendarId2, true,
+                unrelatedExcepValues);
+        assertTrue(unrelatedEventId >= 0);
 
         // Create recurring event.
-        long eventId = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
-        assertTrue(eventId >= 0);
+        long recurEventId = createAndVerifyEvent(account1, seed, calendarId1, true,
+                recurEventValues);
+        assertTrue(recurEventId >= 0);
+
+        // Create "after" exception.
+        long afterEventId = createAndVerifyEvent(account1, seed, calendarId1, true,
+                afterExcepValues);
+        assertTrue(afterEventId >= 0);
+
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "before=" + beforeEventId + ", unrel=" + unrelatedEventId +
+                    ", recur=" + recurEventId + ", after=" + afterEventId);
+        }
 
         // Check to see how many instances we get.  If the recurrence and the exception don't
-        // get paired up correctly, we'll see one instance too many.
+        // get paired up correctly, we'll see too many instances.
         Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with exception");
@@ -1137,8 +1198,53 @@ public class CalendarTest extends InstrumentationTestCase {
 
         instances.close();
 
-        // delete the calendar
-        removeAndVerifyCalendar(account, calendarId);
+
+        /*
+         * Now we want to verify that:
+         * - "before" and "after" have an originalId equal to our recurEventId
+         * - "unrelated" has no originalId
+         */
+        Cursor c = null;
+        try {
+            final String[] PROJECTION = new String[] { Events.ORIGINAL_ID };
+            Uri eventUri;
+            Long originalId;
+
+            eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, beforeEventId);
+            c = mContentResolver.query(eventUri, PROJECTION, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToNext();
+            originalId = c.getLong(0);
+            assertNotNull(originalId);
+            assertEquals(recurEventId, (long) originalId);
+            c.close();
+
+            eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, afterEventId);
+            c = mContentResolver.query(eventUri, PROJECTION, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToNext();
+            originalId = c.getLong(0);
+            assertNotNull(originalId);
+            assertEquals(recurEventId, (long) originalId);
+            c.close();
+
+            eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, unrelatedEventId);
+            c = mContentResolver.query(eventUri, PROJECTION, null, null, null);
+            assertEquals(1, c.getCount());
+            c.moveToNext();
+            assertNull(c.getString(0));
+            c.close();
+
+            c = null;
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // delete the calendars
+        removeAndVerifyCalendar(account1, calendarId1);
+        removeAndVerifyCalendar(account2, calendarId2);
     }
 
     /**
