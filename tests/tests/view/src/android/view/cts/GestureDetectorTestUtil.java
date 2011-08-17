@@ -36,13 +36,13 @@ class GestureDetectorTestUtil {
         TouchUtils.longClickView(testcase, view);
         TouchUtils.scrollToBottom(testcase, activity, activity.getViewGroup());
         TouchUtils.touchAndCancelView(testcase, view);
-        
+
         Rect windowRect = new Rect();
         Window window = activity.getWindow();
         window.getDecorView().getWindowVisibleDisplayFrame(windowRect);
         int contentViewTop = window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
         int statusBarHeight = contentViewTop - windowRect.top;
-        
+
         int fromX = 1;
         int toX = 10;
         // Y has to be outside the status bar bounding box
