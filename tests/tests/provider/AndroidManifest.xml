@@ -26,5 +26,9 @@
                      android:targetPackage="com.android.cts.stub"
                      android:label="CTS tests of android.provider"/>
 
+    <instrumentation android:name="android.provider.cts.CalendarTest$CalendarEmmaTestRunner"
+                     android:targetPackage="com.android.cts.stub"
+                     android:label="Augmented CTS tests of Calendar provider"/>
+
 </manifest>
 
