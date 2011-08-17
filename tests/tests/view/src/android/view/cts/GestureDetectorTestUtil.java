@@ -16,9 +16,11 @@
 
 package android.view.cts;
 
+import android.graphics.Rect;
 import android.test.InstrumentationTestCase;
 import android.test.TouchUtils;
 import android.view.View;
+import android.view.Window;
 
 class GestureDetectorTestUtil {
 
@@ -34,11 +36,18 @@ class GestureDetectorTestUtil {
         TouchUtils.longClickView(testcase, view);
         TouchUtils.scrollToBottom(testcase, activity, activity.getViewGroup());
         TouchUtils.touchAndCancelView(testcase, view);
+        
+        Rect windowRect = new Rect();
+        Window window = activity.getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(windowRect);
+        int contentViewTop = window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+        int statusBarHeight = contentViewTop - windowRect.top;
+        
         int fromX = 1;
         int toX = 10;
         // Y has to be outside the status bar bounding box
-        int fromY = 50;
-        int toY = 100;
+        int fromY = statusBarHeight + 1;
+        int toY = statusBarHeight + 51;
         int stepCount = 20;
         TouchUtils.drag(testcase, fromX, toX, fromY, toY, stepCount);
         InstrumentationTestCase.assertTrue(activity.isDown);
