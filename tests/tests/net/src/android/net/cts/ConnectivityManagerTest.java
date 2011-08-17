@@ -35,6 +35,8 @@ import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -170,12 +172,20 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         args = {int.class, int.class}
     )
     public void testRequestRouteToHost() {
+        Set<Integer> exceptionFreeTypes = new HashSet<Integer>();
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_BLUETOOTH);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_ETHERNET);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_DUN);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_HIPRI);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_MMS);
+        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_SUPL);
 
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
         for (NetworkInfo n : ni) {
-            // make sure network is up (except WIFI due to always fail)
-            if (n.isConnected() && (n.getType() != TYPE_WIFI)) {
-                assertTrue(mCm.requestRouteToHost(n.getType(), HOST_ADDRESS));
+            if (n.isConnected() && exceptionFreeTypes.contains(n.getType())) {
+                assertTrue("Network type: " + n.getType(), mCm.requestRouteToHost(n.getType(),
+                        HOST_ADDRESS));
             }
         }
 
