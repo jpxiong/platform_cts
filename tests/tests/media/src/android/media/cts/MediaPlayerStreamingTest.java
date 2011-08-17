@@ -15,46 +15,91 @@
  */
 package android.media.cts;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.media.MediaPlayer;
-import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.cts.CtsTestServer;
+
 
 /**
  * Tests of MediaPlayer streaming capabilities.
  */
-public class MediaPlayerStreamingTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
+public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
+    private CtsTestServer mServer;
 
-    private static String TAG = "CtsMediaPlayerStreamingTest";
-
-    private Context mContext;
-    private Resources mResources;
-
-    /*
-     * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
-     * for the current thread. However, since we don't actually call loop() in the test,
-     * any messages queued with that looper will never be consumed. We instantiate the player
-     * in the constructor, before setUp(), so that its constructor does not see the
-     * nonfunctional Looper.
-     */
-    private MediaPlayer mMediaPlayer = new MediaPlayer();
-
-    public MediaPlayerStreamingTest() {
-        super(MediaStubActivity.class);
+    // Streaming audio from local HTTP server
+    public void testPlayMp3Stream1() throws Throwable {
+        localHttpAudioStreamTest("ringer.mp3", false, false);
+    }
+    public void testPlayMp3Stream2() throws Throwable {
+        localHttpAudioStreamTest("ringer.mp3", false, false);
+    }
+    public void testPlayMp3StreamRedirect() throws Throwable {
+        localHttpAudioStreamTest("ringer.mp3", true, false);
+    }
+    public void testPlayMp3StreamNoLength() throws Throwable {
+        localHttpAudioStreamTest("noiseandchirps.mp3", false, true);
+    }
+    public void testPlayOggStream() throws Throwable {
+        localHttpAudioStreamTest("noiseandchirps.ogg", false, false);
+    }
+    public void testPlayOggStreamRedirect() throws Throwable {
+        localHttpAudioStreamTest("noiseandchirps.ogg", true, false);
+    }
+    public void testPlayOggStreamNoLength() throws Throwable {
+        localHttpAudioStreamTest("noiseandchirps.ogg", false, true);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mContext = getInstrumentation().getTargetContext();
-        mResources = mContext.getResources();
-    }
+    private void localHttpAudioStreamTest(final String name, boolean redirect, boolean nolength)
+            throws Throwable {
+        mServer = new CtsTestServer(mContext);
+        try {
+            String stream_url = null;
+            if (redirect) {
+                // Stagefright doesn't have a limit, but we can't test support of infinite redirects
+                // Up to 4 redirects seems reasonable though.
+                stream_url = mServer.getRedirectingAssetUrl(name, 4);
+            } else {
+                stream_url = mServer.getAssetUrl(name);
+            }
+            if (nolength) {
+                stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
+            }
 
-    @Override
-    protected void tearDown() throws Exception {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
+            mMediaPlayer.setDataSource(stream_url);
+
+            mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+            mMediaPlayer.setScreenOnWhilePlaying(true);
+
+            mOnBufferingUpdateCalled.reset();
+            mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                @Override
+                public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                    mOnBufferingUpdateCalled.signal();
+                }
+            });
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    fail("Media player had error " + what + " playing " + name);
+                    return true;
+                }
+            });
+
+            assertFalse(mOnBufferingUpdateCalled.isSignalled());
+            mMediaPlayer.prepare();
+
+            if (nolength) {
+                mMediaPlayer.start();
+                Thread.sleep(LONG_SLEEP_TIME);
+                assertFalse(mMediaPlayer.isPlaying());
+            } else {
+                mOnBufferingUpdateCalled.waitForSignal();
+                mMediaPlayer.start();
+                Thread.sleep(SLEEP_TIME);
+            }
+            mMediaPlayer.stop();
+            mMediaPlayer.reset();
+        } finally {
+            mServer.shutdown();
         }
-        super.tearDown();
     }
 }
