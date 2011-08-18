@@ -16,13 +16,13 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestTargetClass;
-
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
@@ -30,12 +30,12 @@ import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.provider.CalendarContract.Reminders;
 import android.test.InstrumentationTestCase;
+import android.test.InstrumentationCtsTestRunner;
 import android.test.suitebuilder.annotation.*;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
 
-@TestTargetClass(android.provider.CalendarContract.class)
 public class CalendarTest extends InstrumentationTestCase {
 
     private static final String TAG = "CalCTS";
@@ -1758,5 +1758,36 @@ public class CalendarTest extends InstrumentationTestCase {
             assertEquals(key, values.getAsString(key), c.getString(index));
         }
         c.close();
+    }
+
+
+    /**
+     * Special version of the test runner that does some remote Emma coverage housekeeping.
+     */
+    public static class CalendarEmmaTestRunner extends InstrumentationCtsTestRunner {
+        private static final Uri EMMA_CONTENT_URI =
+            Uri.parse("content://" + CalendarContract.AUTHORITY + "/emma");
+        private ContentResolver mContentResolver;
+
+        @Override
+        public void onStart() {
+            mContentResolver = getTargetContext().getContentResolver();
+
+            ContentValues values = new ContentValues();
+            values.put("cmd", "start");
+            mContentResolver.insert(EMMA_CONTENT_URI, values);
+
+            super.onStart();
+        }
+
+        @Override
+        public void finish(int resultCode, Bundle results) {
+            ContentValues values = new ContentValues();
+            values.put("cmd", "stop");
+            values.put("outputFileName",
+                    Environment.getExternalStorageDirectory() + "/calendar-provider.ec");
+            mContentResolver.insert(EMMA_CONTENT_URI, values);
+            super.finish(resultCode, results);
+        }
     }
 }
