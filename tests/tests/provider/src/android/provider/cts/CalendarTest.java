@@ -19,14 +19,19 @@ package android.provider.cts;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Entity;
+import android.content.EntityIterator;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
+import android.provider.CalendarContract.CalendarEntity;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.EventsEntity;
+import android.provider.CalendarContract.ExtendedProperties;
 import android.provider.CalendarContract.Instances;
 import android.provider.CalendarContract.Reminders;
 import android.test.InstrumentationTestCase;
@@ -35,6 +40,8 @@ import android.test.suitebuilder.annotation.*;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 public class CalendarTest extends InstrumentationTestCase {
 
@@ -541,6 +548,169 @@ public class CalendarTest extends InstrumentationTestCase {
         c.close();
 
         removeAndVerifyCalendar(account, id);
+    }
+
+    @MediumTest
+    public void testEventsEntityQuery() {
+        String account = "eeq_account";
+        int seed = 0;
+
+        // Clean up just in case.
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create calendar.
+        long calendarId = createAndVerifyCalendar(account, seed++, null);
+
+        // Create three events.
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId1 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId2 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId2 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId3 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId3 >= 0);
+
+        /*
+         * Add some attendees, reminders, and extended properties.
+         */
+        Uri uri, syncUri;
+
+        syncUri = asSyncAdapter(Reminders.CONTENT_URI, account, CTS_TEST_TYPE);
+        ContentValues remValues = new ContentValues();
+        remValues.put(Reminders.EVENT_ID, eventId1);
+        remValues.put(Reminders.MINUTES, 10);
+        remValues.put(Reminders.METHOD, Reminders.METHOD_ALERT);
+        mContentResolver.insert(syncUri, remValues);
+        remValues.put(Reminders.MINUTES, 20);
+        mContentResolver.insert(syncUri, remValues);
+
+        syncUri = asSyncAdapter(ExtendedProperties.CONTENT_URI, account, CTS_TEST_TYPE);
+        ContentValues extended = new ContentValues();
+        extended.put(ExtendedProperties.NAME, "foo");
+        extended.put(ExtendedProperties.VALUE, "bar");
+        extended.put(ExtendedProperties.EVENT_ID, eventId2);
+        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+        extended.put(ExtendedProperties.EVENT_ID, eventId1);
+        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+        extended.put(ExtendedProperties.NAME, "foo2");
+        extended.put(ExtendedProperties.VALUE, "bar2");
+        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+
+        syncUri = asSyncAdapter(Attendees.CONTENT_URI, account, CTS_TEST_TYPE);
+
+        ContentValues attendee = new ContentValues();
+        attendee.put(Attendees.ATTENDEE_NAME, "Joe");
+        attendee.put(Attendees.ATTENDEE_EMAIL, CalendarHelper.generateCalendarOwnerEmail(account));
+        attendee.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_DECLINED);
+        attendee.put(Attendees.ATTENDEE_TYPE, Attendees.TYPE_REQUIRED);
+        attendee.put(Attendees.ATTENDEE_RELATIONSHIP, Attendees.RELATIONSHIP_PERFORMER);
+        attendee.put(Attendees.EVENT_ID, eventId3);
+        mContentResolver.insert(Attendees.CONTENT_URI, attendee);
+
+        /*
+         * Iterate over all events on our calendar.  Peek at a few values to see if they
+         * look reasonable.
+         */
+        EntityIterator ei = EventsEntity.newEntityIterator(
+                mContentResolver.query(EventsEntity.CONTENT_URI, null, Events.CALENDAR_ID + "=?",
+                        new String[] { String.valueOf(calendarId) }, null),
+                mContentResolver);
+        int count = 0;
+        try {
+            while (ei.hasNext()) {
+                Entity entity = ei.next();
+                ContentValues values = entity.getEntityValues();
+                ArrayList<Entity.NamedContentValues> subvalues = entity.getSubValues();
+                long eventId = values.getAsLong(Events._ID);
+                if (eventId == eventId1) {
+                    // 2 x reminder, 2 x extended properties
+                    assertEquals(4, subvalues.size());
+                } else if (eventId == eventId2) {
+                    // Extended properties
+                    assertEquals(1, subvalues.size());
+                    ContentValues subContentValues = subvalues.get(0).values;
+                    String name = subContentValues.getAsString(
+                            CalendarContract.ExtendedProperties.NAME);
+                    String value = subContentValues.getAsString(
+                            CalendarContract.ExtendedProperties.VALUE);
+                    assertEquals("foo", name);
+                    assertEquals("bar", value);
+                } else if (eventId == eventId3) {
+                    // Attendees
+                    assertEquals(1, subvalues.size());
+                } else {
+                    fail("should not be here");
+                }
+                count++;
+            }
+            assertEquals(3, count);
+        } finally {
+            ei.close();
+        }
+
+        // Confirm that querying for a single event yields a single event.
+        ei = EventsEntity.newEntityIterator(
+                mContentResolver.query(EventsEntity.CONTENT_URI, null, SQL_WHERE_ID,
+                        new String[] { String.valueOf(eventId3) }, null),
+                mContentResolver);
+        try {
+            count = 0;
+            while (ei.hasNext()) {
+                Entity entity = ei.next();
+                count++;
+            }
+            assertEquals(1, count);
+        } finally {
+            ei.close();
+        }
+
+
+        removeAndVerifyCalendar(account, calendarId);
+    }
+
+    @MediumTest
+    public void testCalendarEntityQuery() {
+        String account1 = "ceq1_account";
+        String account2 = "ceq2_account";
+        String account3 = "ceq3_account";
+        int seed = 0;
+
+        // Clean up just in case.
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account1);
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account2);
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account3);
+
+        // Create calendars.
+        long calendarId1 = createAndVerifyCalendar(account1, seed++, null);
+        long calendarId2 = createAndVerifyCalendar(account2, seed++, null);
+        long calendarId3 = createAndVerifyCalendar(account3, seed++, null);
+
+        EntityIterator ei = CalendarEntity.newEntityIterator(
+                mContentResolver.query(CalendarEntity.CONTENT_URI, null,
+                        Calendars._ID + "=? OR " + Calendars._ID + "=? OR " + Calendars._ID + "=?",
+                        new String[] { String.valueOf(calendarId1), String.valueOf(calendarId2),
+                                String.valueOf(calendarId3) },
+                        null));
+
+        try {
+            int count = 0;
+            while (ei.hasNext()) {
+                Entity entity = ei.next();
+                count++;
+            }
+            assertEquals(3, count);
+        } finally {
+            ei.close();
+        }
+
+        removeAndVerifyCalendar(account1, calendarId1);
+        removeAndVerifyCalendar(account2, calendarId2);
+        removeAndVerifyCalendar(account3, calendarId3);
     }
 
     @MediumTest
@@ -1392,6 +1562,7 @@ public class CalendarTest extends InstrumentationTestCase {
         while (instances.moveToNext()) {
             assertEquals("new location", newLocation, instances.getString(1));
         }
+        instances.close();
 
         // delete the calendar
         removeAndVerifyCalendar(account, calendarId);
