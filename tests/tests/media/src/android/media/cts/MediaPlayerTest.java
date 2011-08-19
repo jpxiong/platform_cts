@@ -102,6 +102,45 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         playVideoTest(R.raw.testvideo, 352, 288);
     }
 
+    /**
+     * Test for reseting a surface during video playback
+     * After reseting, the video should continue playing
+     * from the time setDisplay() was called
+     */
+    public void testVideoSurfaceResetting() throws Exception {
+        playVideoTest(R.raw.testvideo, 352, 288);
+
+        mMediaPlayer.start();
+        Thread.sleep(SLEEP_TIME);
+
+        int posBefore = mMediaPlayer.getCurrentPosition();
+        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder2());
+        int posAfter = mMediaPlayer.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mMediaPlayer.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
+
+        posBefore = mMediaPlayer.getCurrentPosition();
+        mMediaPlayer.setDisplay(null);
+        posAfter = mMediaPlayer.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mMediaPlayer.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
+
+        posBefore = mMediaPlayer.getCurrentPosition();
+        mMediaPlayer.setDisplay(getActivity().generateSurfaceHolder());
+        posAfter = mMediaPlayer.getCurrentPosition();
+
+        assertEquals(posAfter, posBefore);
+        assertTrue(mMediaPlayer.isPlaying());
+
+        Thread.sleep(SLEEP_TIME);
+    }
+
     public void testLocalVideo_MP4_H264_480x360_500kbps_25fps_AAC_Stereo_128kbps_44110Hz()
             throws Exception {
         playVideoTest(
