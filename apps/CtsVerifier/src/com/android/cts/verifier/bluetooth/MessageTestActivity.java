@@ -338,7 +338,7 @@ class MessageTestActivity extends PassFailButtons.Activity {
                     new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    TestResult.setFailedResult(MessageTestActivity.this);
+                    TestResult.setFailedResult(MessageTestActivity.this, getTestId());
                     finish();
                 }
             })
