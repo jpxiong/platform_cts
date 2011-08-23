@@ -100,11 +100,20 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         }
     }
 
-    protected void playVideoTest(int resid, final int width, final int height) throws Exception {
+    protected void playVideoTest(String path, int width, int height) throws Exception {
+        mMediaPlayer.setDataSource(path);
+        playLoadedVideo(width, height);
+    }
+
+    protected void playVideoTest(int resid, int width, int height) throws Exception {
+        loadResource(resid);
+        playLoadedVideo(width, height);
+    }
+
+    private void playLoadedVideo(final int width, final int height) throws Exception {
         final float leftVolume = 0.5f;
         final float rightVolume = 0.5f;
 
-        loadResource(resid);
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
