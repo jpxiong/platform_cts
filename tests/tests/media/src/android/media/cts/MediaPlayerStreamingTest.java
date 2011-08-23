@@ -26,8 +26,6 @@ public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
     private CtsTestServer mServer;
 
     // Streaming RTSP video from YouTube
-    // TODO: Enable RTSP tests once network issues are sorted out.
-    /*
     public void testRTSP_H263_AMR_Video1() throws Exception {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0x271de9756065677e"
                 + "&fmt=13&user=android-device-test", 176, 144);
@@ -54,7 +52,6 @@ public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0xc80658495af60617"
                 + "&fmt=18&user=android-device-test", 176, 144);
     }
-    */
 
     // Streaming HTTP video from YouTube
     public void testHTTP_H263_AMR_Video1() throws Exception {
