@@ -138,7 +138,7 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
 
         adapter.add(TestListItem.newCategory("RTSP"));
         for (Stream stream : RTSP_STREAMS) {
-            addStreamToTests(streams, stream);
+            addStreamToTests(adapter, stream);
         }
 
         adapter.add(TestListItem.newCategory("HTTP Progressive"));
