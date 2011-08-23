@@ -16,6 +16,7 @@
 
 package com.android.cts.verifier.streamquality;
 
+import com.android.cts.verifier.ArrayTestListAdapter;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListAdapter;
@@ -26,8 +27,6 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests for verifying the quality of streaming videos.  Plays streams of different formats over
@@ -130,42 +129,37 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
         setPassFailButtonClickListeners();
         setInfoResources(R.string.streaming_video, R.string.streaming_video_info, -1);
 
-        prepareTestListAdapter(getTestId());
         getPassButton().setEnabled(false);
+        setTestListAdapter(getStreamAdapter());
     }
 
-    @Override
-    protected void prepareTestListAdapter(String parent) {
-        mAdapter = new TestListAdapter(this, parent) {
-            @Override
-            protected List<TestListItem> getRows() {
-                List<TestListItem> streams = new ArrayList<TestListItem>();
-                // TODO: Enable RTSP streams
-                /*
-                streams.add(TestListItem.newCategory("RTSP"));
-                for (Stream stream : RTSP_STREAMS) {
-                    addStreamToTests(streams, stream);
-                }
-                */
+    private TestListAdapter getStreamAdapter() {
+        ArrayTestListAdapter adapter = new ArrayTestListAdapter(this);
 
-                streams.add(TestListItem.newCategory("HTTP Progressive"));
-                for (Stream stream : HTTP_STREAMS) {
-                    addStreamToTests(streams, stream);
-                }
-                return streams;
-            }
-        };
-        setListAdapter(mAdapter);
-        mAdapter.registerDataSetObserver(new DataSetObserver() {
+        // TODO: Enable RTSP streams
+        /*
+        adapter.add(TestListItem.newCategory("RTSP"));
+        for (Stream stream : RTSP_STREAMS) {
+            addStreamToTests(streams, stream);
+        }
+        */
+
+        adapter.add(TestListItem.newCategory("HTTP Progressive"));
+        for (Stream stream : HTTP_STREAMS) {
+            addStreamToTests(adapter, stream);
+        }
+
+        adapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
                 updatePassButton();
             }
         });
-        mAdapter.loadTestResults();
+
+        return adapter;
     }
 
-    private void addStreamToTests(List<TestListItem> streams, Stream stream) {
+    private void addStreamToTests(ArrayTestListAdapter streams, Stream stream) {
         Intent i = new Intent(StreamingVideoActivity.this, PlayVideoActivity.class);
         i.putExtra(PlayVideoActivity.EXTRA_STREAM, stream);
         streams.add(TestListItem.newTest(stream.name, PlayVideoActivity.getTestId(stream.code), i));

@@ -35,7 +35,7 @@ public class TestListActivity extends AbstractTestListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepareTestListAdapter(null);
+        setTestListAdapter(new ManifestTestListAdapter(this, null));
     }
 
     @Override
