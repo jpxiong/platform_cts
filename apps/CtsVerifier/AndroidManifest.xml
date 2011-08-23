@@ -165,6 +165,21 @@
             <meta-data android:name="test_category" android:value="@string/test_category_security" />
         </activity>
 
+        <activity android:name=".streamquality.StreamingVideoActivity"
+                android:label="@string/streaming_video"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_streaming" />
+        </activity>
+
+        <activity android:name=".streamquality.PlayVideoActivity"
+                android:label="@string/streaming_video"
+                android:configChanges="keyboardHidden|orientation"
+                android:screenOrientation="nosensor" />
+
         <activity android:name=".features.FeatureSummaryActivity" android:label="@string/feature_summary">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
