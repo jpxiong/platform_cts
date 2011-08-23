@@ -21,9 +21,9 @@ import android.content.Intent;
 
 /**
  * Object representing the result of a test activity like whether it succeeded or failed.
- * Use {@link #setPassedResult(Activity)} or {@link #setFailedResult(Activity)} from a test
- * activity like you would {@link Activity#setResult(int)} so that {@link TestListActivity} will
- * persist the test result and update its adapter and thus the list view.
+ * Use {@link #setPassedResult(Activity, String)} or {@link #setFailedResult(Activity, String)} from
+ * a test activity like you would {@link Activity#setResult(int)} so that {@link TestListActivity}
+ * will persist the test result and update its adapter and thus the list view.
  */
 public class TestResult {
 
@@ -39,18 +39,18 @@ public class TestResult {
     private final int mResult;
 
     /** Sets the test activity's result to pass. */
-    public static void setPassedResult(Activity activity) {
-        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_PASSED));
+    public static void setPassedResult(Activity activity, String testId) {
+        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_PASSED, testId));
     }
 
     /** Sets the test activity's result to failed. */
-    public static void setFailedResult(Activity activity) {
-        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_FAILED));
+    public static void setFailedResult(Activity activity, String testId) {
+        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_FAILED, testId));
     }
 
-    private static Intent createResult(Activity activity, int testResult) {
+    private static Intent createResult(Activity activity, int testResult, String testName) {
         Intent data = new Intent(activity, activity.getClass());
-        data.putExtra(TEST_NAME, activity.getClass().getName());
+        data.putExtra(TEST_NAME, testName);
         data.putExtra(TEST_RESULT, testResult);
         return data;
     }
