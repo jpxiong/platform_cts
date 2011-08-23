@@ -29,8 +29,8 @@ public abstract class AbstractTestListActivity extends ListActivity {
 
     protected TestListAdapter mAdapter;
 
-    protected void prepareTestListAdapter(String parent) {
-        mAdapter = new TestListAdapter(this, parent);
+    protected void setTestListAdapter(TestListAdapter adapter) {
+        mAdapter = adapter;
         setListAdapter(mAdapter);
         mAdapter.loadTestResults();
     }
