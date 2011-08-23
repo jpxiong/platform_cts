@@ -1015,7 +1015,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setAppCacheEnabled(true);
         mSettings.setJavaScriptEnabled(true);
 
-        mWebView.loadUrl(url);
+        loadUrl(url);
         new DelayedCheck(10000) {
             protected boolean check() {
                 return mWebView.getTitle().equals("Done");
@@ -1023,7 +1023,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         }.run();
 
         mSettings.setAppCachePath("/data/foo");
-        mWebView.loadUrl(url);
+        loadUrl(url);
         new DelayedCheck(10000) {
             protected boolean check() {
                 return mWebView.getTitle().equals("Done");
