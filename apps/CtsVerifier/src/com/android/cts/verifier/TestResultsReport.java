@@ -116,7 +116,7 @@ class TestResultsReport {
             if (item.isTest()) {
                 xml.startTag(null, TEST_TAG);
                 xml.attribute(null, "title", item.title);
-                xml.attribute(null, "class-name", item.className);
+                xml.attribute(null, "class-name", item.testName);
                 xml.attribute(null, "result", getTestResultString(mAdapter.getTestResult(i)));
                 xml.endTag(null, TEST_TAG);
             }
