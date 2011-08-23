@@ -16,70 +16,26 @@
 
 package com.android.cts.verifier;
 
-import com.android.cts.verifier.TestListAdapter.TestListItem;
-
 import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
 
-/** {@link ListActivity} that displays a  list of manual tests. */
-public class TestListActivity extends ListActivity {
+/** Top-level {@link ListActivity} for launching tests and managing results. */
+public class TestListActivity extends AbstractTestListActivity {
 
     private static final String TAG = TestListActivity.class.getSimpleName();
-
-    private static final int LAUNCH_TEST_REQUEST_CODE = 1;
-
-    private TestListAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new TestListAdapter(this, null);
-        setListAdapter(mAdapter);
-        mAdapter.loadTestResults();
-    }
-
-    /** Launch the activity when its {@link ListView} item is clicked. */
-    @Override
-    protected void onListItemClick(ListView listView, View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
-        Intent intent = getIntent(position);
-        startActivityForResult(intent, LAUNCH_TEST_REQUEST_CODE);
-    }
-
-    private Intent getIntent(int position) {
-        TestListItem item = mAdapter.getItem(position);
-        return item.intent;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case LAUNCH_TEST_REQUEST_CODE:
-                handleLaunchTestResult(resultCode, data);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown request code: " + requestCode);
-        }
-    }
-
-    private void handleLaunchTestResult(int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            TestResult testResult = TestResult.fromActivityResult(resultCode, data);
-            mAdapter.setTestResult(testResult);
-        }
+        prepareTestListAdapter(null);
     }
 
     @Override

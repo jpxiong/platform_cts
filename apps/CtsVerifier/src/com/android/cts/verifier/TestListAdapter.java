@@ -17,7 +17,6 @@
 package com.android.cts.verifier;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -106,8 +105,8 @@ public class TestListAdapter extends BaseAdapter {
         /** Title shown in the {@link ListView}. */
         final String title;
 
-        /** Class name with package to uniquely identify the test. Null for categories. */
-        final String className;
+        /** Test name with class and test ID to uniquely identify the test. Null for categories. */
+        final String testName;
 
         /** Intent used to launch the activity from the list. Null for categories. */
         final Intent intent;
@@ -115,17 +114,17 @@ public class TestListAdapter extends BaseAdapter {
         /** Tests within this test. For instance, the Bluetooth test contains more tests. */
         final List<TestListItem> subItems = new ArrayList<TestListItem>();
 
-        static TestListItem newTest(String title, String className, Intent intent) {
-            return new TestListItem(title, className, intent);
+        public static TestListItem newTest(String title, String testName, Intent intent) {
+            return new TestListItem(title, testName, intent);
         }
 
-        static TestListItem newCategory(String title) {
+        public static TestListItem newCategory(String title) {
             return new TestListItem(title, null, null);
         }
 
-        private TestListItem(String title, String className, Intent intent) {
+        private TestListItem(String title, String testName, Intent intent) {
             this.title = title;
-            this.className = className;
+            this.testName = testName;
             this.intent = intent;
         }
 
@@ -194,7 +193,7 @@ public class TestListAdapter extends BaseAdapter {
         }
     }
 
-    List<TestListItem> getRows() {
+    protected List<TestListItem> getRows() {
 
         /*
          * 1. Get all the tests belonging to the test parent.
@@ -214,6 +213,7 @@ public class TestListAdapter extends BaseAdapter {
 
             List<TestListItem> tests = testsByCategory.get(testCategory);
             Collections.sort(tests, new Comparator<TestListItem>() {
+                @Override
                 public int compare(TestListItem item, TestListItem otherItem) {
                     return item.title.compareTo(otherItem.title);
                 }
@@ -252,9 +252,9 @@ public class TestListAdapter extends BaseAdapter {
         for (int i = 0; i < size; i++) {
             ResolveInfo info = list.get(i);
             String title = getTitle(mContext, info.activityInfo);
-            String className = info.activityInfo.name;
+            String testName = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);
-            TestListItem item = TestListItem.newTest(title, className, intent);
+            TestListItem item = TestListItem.newTest(title, testName, intent);
 
             String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
             addTestToCategory(testsByCategory, testCategory, item);
@@ -314,9 +314,9 @@ public class TestListAdapter extends BaseAdapter {
                     TestResultsProvider.ALL_COLUMNS, null, null, null);
             if (cursor.moveToFirst()) {
                 do {
-                    String className = cursor.getString(1);
+                    String testName = cursor.getString(1);
                     int testResult = cursor.getInt(2);
-                    results.put(className, testResult);
+                    results.put(testName, testResult);
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -389,25 +389,39 @@ public class TestListAdapter extends BaseAdapter {
         return 2;
     }
 
+    @Override
     public int getCount() {
         return mRows.size();
     }
 
+    @Override
     public TestListItem getItem(int position) {
         return mRows.get(position);
     }
 
+    @Override
     public long getItemId(int position) {
         return position;
     }
 
     public int getTestResult(int position) {
         TestListItem item = getItem(position);
-        return mTestResults.containsKey(item.className)
-                ? mTestResults.get(item.className)
+        return mTestResults.containsKey(item.testName)
+                ? mTestResults.get(item.testName)
                 : TestResult.TEST_RESULT_NOT_EXECUTED;
     }
 
+    public boolean allTestsPassed() {
+        for (TestListItem item : mRows) {
+            if (item.isTest() && (!mTestResults.containsKey(item.testName)
+                    || (mTestResults.get(item.testName) != TestResult.TEST_RESULT_PASSED))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView textView;
         if (convertView == null) {
