@@ -16,6 +16,7 @@
 
 package com.android.cts.verifier.bluetooth;
 
+import com.android.cts.verifier.ManifestTestListAdapter;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
@@ -33,7 +34,7 @@ public class BluetoothTestActivity extends PassFailButtons.TestListActivity {
         setPassFailButtonClickListeners();
         setInfoResources(R.string.bluetooth_test, R.string.bluetooth_test_info, -1);
 
-        prepareTestListAdapter(getClass().getName());
+        setTestListAdapter(new ManifestTestListAdapter(this, getClass().getName()));
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             showNoBluetoothDialog();
