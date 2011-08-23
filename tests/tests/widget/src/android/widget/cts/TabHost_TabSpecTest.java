@@ -100,7 +100,7 @@ public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHos
 
         // normal value
         Drawable d = new ColorDrawable(Color.GRAY);
-        tabSpec.setIndicator(TAG_TAB2, d);
+        tabSpec.setIndicator("", d);
         tabSpec.setContent(new MockTabContentFactoryText());
         mTabHost.addTab(tabSpec);
         mTabHost.setCurrentTab(1);
@@ -109,7 +109,7 @@ public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHos
         int idIcon = com.android.internal.R.id.icon;
         TextView tvTitle = (TextView) currentTabView.findViewById(idTitle);
         ImageView ivIcon = ((ImageView) currentTabView.findViewById(idIcon));
-        assertEquals(TAG_TAB2, tvTitle.getText().toString());
+        assertEquals("", tvTitle.getText().toString());
         assertSame(d, ivIcon.getDrawable());
 
         // exceptional
@@ -133,6 +133,17 @@ public class TabHost_TabSpecTest extends ActivityInstrumentationTestCase2<TabHos
         tvTitle = (TextView) currentTabView.findViewById(idTitle);
         ivIcon = ((ImageView) currentTabView.findViewById(idIcon));
         assertEquals("", tvTitle.getText().toString());
+        assertNull(ivIcon.getDrawable());
+
+        tabSpec = mTabHost.newTabSpec("tab 5");
+        tabSpec.setIndicator("half cube", d);
+        tabSpec.setContent(new MockTabContentFactoryList());
+        mTabHost.addTab(tabSpec);
+        mTabHost.setCurrentTab(4);
+        currentTabView = mTabHost.getCurrentTabView();
+        tvTitle = (TextView) currentTabView.findViewById(idTitle);
+        ivIcon = ((ImageView) currentTabView.findViewById(idIcon));
+        assertEquals("half cube", tvTitle.getText().toString());
         assertNull(ivIcon.getDrawable());
     }
 
