@@ -74,7 +74,7 @@ public class CtsSetupTest extends TestCase {
         IFolderBuildInfo ctsBuild = EasyMock.createMock(IFolderBuildInfo.class);
         EasyMock.expect(ctsBuild.getRootDir()).andReturn(
                 new File("tmp")).anyTimes();
-        EasyMock.expect(ctsBuild.getBuildId()).andStubReturn(0);
+        EasyMock.expect(ctsBuild.getBuildId()).andStubReturn("0");
         EasyMock.expect(
                 mMockDevice.installPackage((File)EasyMock.anyObject(), EasyMock.anyBoolean()))
                 .andReturn(null)

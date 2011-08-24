@@ -82,7 +82,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         final String expectedSummaryOutput =
             "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" omitted=\"0\" pass=\"0\" total=\"0\" />";
         final String expectedEndTag = "</TestResult>";
-        mResultReporter.invocationStarted(new BuildInfo(1, "test", "test"));
+        mResultReporter.invocationStarted(new BuildInfo("1", "test", "test"));
         mResultReporter.invocationEnded(1);
         String actualOutput = getOutput();
         assertTrue(actualOutput.startsWith(expectedHeaderOutput));
