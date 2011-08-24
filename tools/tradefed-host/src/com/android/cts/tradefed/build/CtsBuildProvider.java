@@ -39,7 +39,7 @@ public class CtsBuildProvider implements IBuildProvider {
         if (mCtsRootDirPath == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
-        IFolderBuildInfo ctsBuild = new FolderBuildInfo(0, "cts", "cts");
+        IFolderBuildInfo ctsBuild = new FolderBuildInfo("0", "cts", "cts");
         ctsBuild.setRootDir(new File(mCtsRootDirPath));
         return ctsBuild;
     }
