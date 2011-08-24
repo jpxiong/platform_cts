@@ -16,10 +16,7 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
+import com.android.cts.stub.R;
 
 import android.content.ContentResolver;
 import android.content.IContentProvider;
@@ -29,11 +26,13 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(Photo.class)
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class ContactsContract_PhotoTest extends InstrumentationTestCase {
     private ContactsContract_TestDataBuilder mBuilder;
 
-    private static final byte[] TEST_PHOTO_DATA = "ABCDEFG".getBytes();
     private static final byte[] EMPTY_TEST_PHOTO_DATA = "".getBytes();
 
     @Override
@@ -51,40 +50,44 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
         mBuilder.cleanup();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Tests INSERT operation for photo"
-        )
-    })
-
     public void testAddPhoto() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact().insert();
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
-                .with(Photo.PHOTO, TEST_PHOTO_DATA)
+                .with(Photo.PHOTO, getTestPhotoData())
                 .insert();
 
         photoData.load();
         photoData.assertColumn(Photo.RAW_CONTACT_ID, rawContact.getId());
-        photoData.assertColumn(Photo.PHOTO, TEST_PHOTO_DATA);
+        photoData.assertBlobColumnNotNull(Photo.PHOTO);
     }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Tests INSERT operation for empty photo"
-        )
-    })
 
     public void testAddEmptyPhoto() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact().insert();
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
                 .with(Photo.PHOTO, EMPTY_TEST_PHOTO_DATA)
                 .insert();
+        assertNull(photoData.load());
+    }
 
-        photoData.load();
-        photoData.assertColumn(Photo.RAW_CONTACT_ID, rawContact.getId());
-        photoData.assertColumn(Photo.PHOTO, EMPTY_TEST_PHOTO_DATA);
+    private byte[] getTestPhotoData() {
+        InputStream input = getInstrumentation().getTargetContext().getResources()
+                .openRawResource(R.drawable.testimage);
+        return readInputStreamFully(input);
+    }
+
+    protected byte[] readInputStreamFully(InputStream is) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buffer = new byte[10000];
+        int count;
+        try {
+            while ((count = is.read(buffer)) != -1) {
+                os.write(buffer, 0, count);
+            }
+            is.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return os.toByteArray();
     }
 }
 

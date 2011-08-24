@@ -33,11 +33,10 @@ import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import java.util.Arrays;
 
 import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
@@ -155,9 +154,10 @@ public class ContactsContract_TestDataBuilder {
 
             mCursor = mProvider.query(getUri(), null, null, null, null);
             if (mCursor == null || !mCursor.moveToFirst()) {
-                fail("No data rows for URI: " + getUri());
+                return null;
+            } else {
+                return (T) this;
             }
-            return (T)this;
         }
 
         @SuppressWarnings("unchecked")
@@ -208,6 +208,14 @@ public class ContactsContract_TestDataBuilder {
 
         public void assertColumn(String columnName, byte[] value) {
             assertEquals(value, mCursor.getBlob(getColumnIndex(columnName)));
+        }
+
+        public void assertBlobColumnNotNull(String columnName) {
+            assertNotNull(mCursor.getBlob(getColumnIndex(columnName)));
+        }
+
+        public void assertBlobColumnNull(String columnName) {
+            assertNull(mCursor.getBlob(getColumnIndex(columnName)));
         }
 
         public void assertEquals(byte[] expected, byte[] actual) {
