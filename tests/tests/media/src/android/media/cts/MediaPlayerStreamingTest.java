@@ -46,11 +46,11 @@ public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
 
     public void testRTSP_H264Base_AAC_Video1() throws Exception {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0x271de9756065677e"
-                + "&fmt=18&user=android-device-test", 176, 144);
+                + "&fmt=18&user=android-device-test", 480, 270);
     }
     public void testRTSP_H264Base_AAC_Video2() throws Exception {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0xc80658495af60617"
-                + "&fmt=18&user=android-device-test", 176, 144);
+                + "&fmt=18&user=android-device-test", 480, 270);
     }
 
     // Streaming HTTP video from YouTube
