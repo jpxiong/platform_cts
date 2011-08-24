@@ -27,6 +27,8 @@ LOCAL_PACKAGE_NAME := CtsVerifier
 
 LOCAL_JNI_SHARED_LIBRARIES := libctsverifier_jni libaudioquality libcameraanalyzer
 
+LOCAL_PROGUARD_FLAG_FILES := proguard.flags
+
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
