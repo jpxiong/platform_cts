@@ -83,7 +83,9 @@ public class SmsManagerTest extends AndroidTestCase {
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
-                    "30237"     // Fido
+                    "30237",    // Fido
+                    "311490",   // Virgin Mobile
+                    "310000"    // Tracfone
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
@@ -94,7 +96,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
-                    "30237"     // Fido
+                    "30237",     // Fido
+                    "45008"     // KT
             );
 
     // List of network operators that doesn't support Maltipart SMS message

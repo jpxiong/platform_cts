@@ -202,48 +202,7 @@ public class AvailableIntentsTest extends AndroidTestCase {
     }
 
     public void testSettings() {
-        assertCanBeHandled(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_ADD_ACCOUNT));
-        assertCanBeHandled(new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_APN_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                .setData(Uri.parse("package:com.android.cts.stub")));
-
-        // TODO: Uncomment in HC. This appears to be broken in Froyo and Gingerbread...
-        // assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
-
-        assertCanBeHandled(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_DATE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_DEVICE_INFO_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_DISPLAY_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_LOCALE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_MEMORY_CARD_SETTINGS));
-
-        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
-        // assertCanBeHandled(new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
-
-        assertCanBeHandled(new Intent(Settings.ACTION_PRIVACY_SETTINGS));
-
-        // TODO: Seems to not work at on NS, Xoom, Xoom WiFi
-        // assertCanBeHandled(new Intent(Settings.ACTION_QUICK_LAUNCH_SETTINGS));
-
-        assertCanBeHandled(new Intent(Settings.ACTION_SEARCH_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_SECURITY_SETTINGS));
         assertCanBeHandled(new Intent(Settings.ACTION_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_SOUND_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_SYNC_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_SYSTEM_UPDATE_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_USER_DICTIONARY_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_WIFI_SETTINGS));
-        assertCanBeHandled(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
     /**
