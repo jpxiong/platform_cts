@@ -100,17 +100,30 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         }
     }
 
+    protected void playLiveVideoTest(String path, int playTime) throws Exception {
+        mMediaPlayer.setDataSource(path);
+        playLoadedVideo(null, null, playTime);
+    }
+
     protected void playVideoTest(String path, int width, int height) throws Exception {
         mMediaPlayer.setDataSource(path);
-        playLoadedVideo(width, height);
+        playLoadedVideo(width, height, 0);
     }
 
     protected void playVideoTest(int resid, int width, int height) throws Exception {
         loadResource(resid);
-        playLoadedVideo(width, height);
+        playLoadedVideo(width, height, 0);
     }
 
-    private void playLoadedVideo(final int width, final int height) throws Exception {
+    /**
+     * Play a video which has already been loaded with setDataSource().
+     *
+     * @param width width of the video to verify, or null to skip verification
+     * @param height height of the video to verify, or null to skip verification
+     * @param playTime length of time to play video, or 0 to play entire video
+     */
+    private void playLoadedVideo(final Integer width, final Integer height, int playTime)
+            throws Exception {
         final float leftVolume = 0.5f;
         final float rightVolume = 0.5f;
 
@@ -120,8 +133,12 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
             @Override
             public void onVideoSizeChanged(MediaPlayer mp, int w, int h) {
                 mOnVideoSizeChangedCalled.signal();
-                assertEquals(width, w);
-                assertEquals(height, h);
+                if (width != null) {
+                    assertEquals(width.intValue(), w);
+                }
+                if (height != null) {
+                    assertEquals(height.intValue(), h);
+                }
             }
         });
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -132,14 +149,18 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
             }
         });
         mMediaPlayer.prepare();
-        mOnVideoSizeChangedCalled.waitForSignal();
 
         mMediaPlayer.start();
+        mOnVideoSizeChangedCalled.waitForSignal();
         mMediaPlayer.setVolume(leftVolume, rightVolume);
 
         // waiting to complete
-        while (mMediaPlayer.isPlaying()) {
-            Thread.sleep(SLEEP_TIME);
+        if (playTime == 0) {
+            while (mMediaPlayer.isPlaying()) {
+                Thread.sleep(SLEEP_TIME);
+            }
+        } else {
+            Thread.sleep(playTime);
         }
     }
 }

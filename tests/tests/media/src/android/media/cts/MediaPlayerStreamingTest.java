@@ -105,6 +105,13 @@ public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
                 + "&key=test_key1&user=android-device-test", 480, 270);
     }
 
+    // Streaming HLS video from YouTube
+    public void testHLS() throws Exception {
+        // Play stream for 60 seconds
+        playLiveVideoTest("http://www.youtube.com/api/manifest/hls/ns/test/"
+                + "id/1?user=android-device-test&m3u8=1", 60 * 1000);
+    }
+
     // Streaming audio from local HTTP server
     public void testPlayMp3Stream1() throws Throwable {
         localHttpAudioStreamTest("ringer.mp3", false, false);
