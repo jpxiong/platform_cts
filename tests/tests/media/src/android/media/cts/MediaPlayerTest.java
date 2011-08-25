@@ -17,198 +17,34 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
-import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Looper;
 import android.os.PowerManager;
-import android.test.ActivityInstrumentationTestCase2;
-import android.view.SurfaceHolder;
-import android.webkit.cts.CtsTestServer;
-import android.util.Log;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-@TestTargetClass(MediaPlayer.class)
-public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
-
-    private static String TAG = "CtsMediaPlayerTest";
-    private static final int SLEEP_TIME = 1000;
-    private static final int LONG_SLEEP_TIME = 6000;
-    private final String mSourceMediaOnSdcard;
-    private Monitor mOnVideoSizeChangedCalled = new Monitor();
-    private Monitor mOnBufferingUpdateCalled = new Monitor();
-    private Monitor mOnPrepareCalled = new Monitor();
-    private Monitor mOnSeekCompleteCalled = new Monitor();
-    private Monitor mOnCompletionCalled = new Monitor();
-    private Monitor mOnInfoCalled = new Monitor();
-    private Monitor mOnErrorCalled = new Monitor();
-    private Context mContext;
-    private Resources mResources;
-    private CtsTestServer mServer;
-    private CountDownLatch mVideoSizeChanged = new CountDownLatch(1);
-    private CountDownLatch mLock = new CountDownLatch(1);
-    private static Looper sLooper = null;
-    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 60000;  //1 min max.
-
-    /*
-     * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
-     * for the current thread. However, since we don't actually call loop() in the test,
-     * any messages queued with that looper will never be consumed. We instantiate the player
-     * in the constructor, before setUp(), so that its constructor does not see the
-     * nonfunctional Looper.
-     */
-    private MediaPlayer mMediaPlayer = new MediaPlayer();
-
-    private static class Monitor {
-        private boolean signalled;
-
-        public synchronized void reset() {
-            signalled = false;
-        }
-
-        public synchronized void signal() {
-            signalled = true;
-            notifyAll();
-        }
-
-        public synchronized void waitForSignal() throws InterruptedException {
-            while (!signalled) {
-                wait();
-            }
+/**
+ * Tests for the MediaPlayer API and local video/audio playback.
+ *
+ * The files in res/raw used by testLocalVideo* are (c) copyright 2008,
+ * Blender Foundation / www.bigbuckbunny.org, and are licensed under the Creative Commons
+ * Attribution 3.0 License at http://creativecommons.org/licenses/by/3.0/us/.
+ */
+public class MediaPlayerTest extends MediaPlayerTestBase {
+    public void testPlayNullSource() throws Exception {
+        try {
+            mMediaPlayer.setDataSource((String) null);
+            fail("Null URI was accepted");
+        } catch (IllegalArgumentException e) {
+            // expected
         }
     }
 
-    public MediaPlayerTest() {
-        super("com.android.cts.stub", MediaStubActivity.class);
-        mSourceMediaOnSdcard = new File(Environment.getExternalStorageDirectory(),
-                                        "record_and_play.3gp").getAbsolutePath();
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mContext = getInstrumentation().getTargetContext();
-        mResources = mContext.getResources();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
-        }
-        File file = new File(mSourceMediaOnSdcard);
-        if (file.exists()) {
-            file.delete();
-        }
-        if (mServer != null) {
-            mServer.shutdown();
-        }
-        super.tearDown();
-    }
-
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioStreamType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWakeMode",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isPlaying",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLooping",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isLooping",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "seekTo",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDuration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void testPlayAudio() throws Exception {
         final int mp3Duration = 34909;
         final int tolerance = 70;
@@ -216,357 +52,266 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         final int resid = R.raw.testmp3_2;
 
         MediaPlayer mp = MediaPlayer.create(mContext, resid);
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+        try {
+            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
 
-        assertFalse(mp.isPlaying());
-        mp.start();
-        assertTrue(mp.isPlaying());
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
 
-        assertFalse(mp.isLooping());
-        mp.setLooping(true);
-        assertTrue(mp.isLooping());
+            assertFalse(mp.isLooping());
+            mp.setLooping(true);
+            assertTrue(mp.isLooping());
 
-        assertEquals(mp3Duration, mp.getDuration(), tolerance);
-        int pos = mp.getCurrentPosition();
-        assertTrue(pos >= 0);
-        assertTrue(pos < mp3Duration - seekDuration);
+            assertEquals(mp3Duration, mp.getDuration(), tolerance);
+            int pos = mp.getCurrentPosition();
+            assertTrue(pos >= 0);
+            assertTrue(pos < mp3Duration - seekDuration);
 
-        mp.seekTo(pos + seekDuration);
-        assertEquals(pos + seekDuration, mp.getCurrentPosition(), tolerance);
+            mp.seekTo(pos + seekDuration);
+            assertEquals(pos + seekDuration, mp.getCurrentPosition(), tolerance);
 
-        // test pause and restart
-        mp.pause();
-        Thread.sleep(SLEEP_TIME);
-        assertFalse(mp.isPlaying());
-        mp.start();
-        assertTrue(mp.isPlaying());
-
-        // test stop and restart
-        mp.stop();
-        mp.reset();
-        AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
-        mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        afd.close();
-        mp.prepare();
-        assertFalse(mp.isPlaying());
-        mp.start();
-        assertTrue(mp.isPlaying());
-
-        // waiting to complete
-        while(mp.isPlaying()) {
+            // test pause and restart
+            mp.pause();
             Thread.sleep(SLEEP_TIME);
-        }
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
 
-        mp.release();
-    }
+            // test stop and restart
+            mp.stop();
+            mp.reset();
+            AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
+            mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mp.prepare();
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplay",
-            args = {SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setScreenOnWhilePlaying",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVideoHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVideoWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVolume",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class}
-        )
-    })
-
-    /*
-     * Initializes the message looper so that the mediaPlayer object can
-     * receive the callback messages.
-     */
-    private void initializeMessageLooper() {
-        new Thread() {
-            @Override
-            public void run() {
-                // Set up a looper to be used by camera.
-                Looper.prepare();
-                // Save the looper so that we can terminate this thread
-                // after we are done with it.
-                sLooper = Looper.myLooper();
-                mLock.countDown();
-                Looper.loop();  // Blocks forever until Looper.quit() is called.
-                Log.v(TAG, "initializeMessageLooper: quit.");
+            // waiting to complete
+            while(mp.isPlaying()) {
+                Thread.sleep(SLEEP_TIME);
             }
-        }.start();
-    }
-
-    /*
-     * Terminates the message looper thread.
-     */
-    private static void terminateMessageLooper() {
-        sLooper.quit();
+        } finally {
+            mp.release();
+        }
     }
 
     public void testPlayVideo() throws Exception {
-        final int expectedVideoWidth = 352; // width of R.raw.testvideo
-        final int expectedVideoHeight = 288; // height of R.raw.testvideo
-        final float leftVolume = 0.5f;
-        final float rightVolume = 0.5f;
-        final int resid = R.raw.testvideo;
-
-        mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                mVideoSizeChanged.countDown();
-            }
-        });
-        AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
-        mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        afd.close();
-        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
-        mMediaPlayer.setScreenOnWhilePlaying(true);
-        mMediaPlayer.prepare();
-
-        int videoWidth = 0;
-        int videoHeight = 0;
-        initializeMessageLooper();
-        try {
-            mLock.await(WAIT_FOR_COMMAND_TO_COMPLETE, TimeUnit.MILLISECONDS);
-        } catch(Exception e) {
-            Log.v(TAG, "looper was interrupted.");
-            return;
-        }
-
-        try {
-             try {
-                 mVideoSizeChanged.await(WAIT_FOR_COMMAND_TO_COMPLETE, TimeUnit.MILLISECONDS);
-             } catch (InterruptedException e) {
-                 Log.v(TAG, "wait was interrupted");
-             }
-             videoWidth = mMediaPlayer.getVideoWidth();
-             videoHeight = mMediaPlayer.getVideoHeight();
-             terminateMessageLooper();
-        } catch (Exception e) {
-             Log.e(TAG, e.getMessage());
-        }
-        assertEquals(expectedVideoWidth, videoWidth);
-        assertEquals(expectedVideoHeight, videoHeight);
-
-        mMediaPlayer.start();
-        mMediaPlayer.setVolume(leftVolume, rightVolume);
-
-        // waiting to complete
-        while (mMediaPlayer.isPlaying()) {
-            Thread.sleep(SLEEP_TIME);
-        }
-
-        mMediaPlayer.release();
+        playVideoTest(R.raw.testvideo, 352, 288);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnBufferingUpdateListener",
-            args = {OnBufferingUpdateListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplay",
-            args = {SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        )
-    })
-
-    public void testPlayMp3Stream1() throws Throwable {
-        streamTest("ringer.mp3", false, false);
-    }
-    public void testPlayMp3Stream2() throws Throwable {
-        streamTest("ringer.mp3", false, false);
-    }
-    public void testPlayMp3StreamRedirect() throws Throwable {
-        streamTest("ringer.mp3", true, false);
-    }
-    public void testPlayMp3StreamNoLength() throws Throwable {
-        streamTest("noiseandchirps.mp3", false, true);
-    }
-    public void testPlayOggStream() throws Throwable {
-        streamTest("noiseandchirps.ogg", false, false);
-    }
-    public void testPlayOggStreamRedirect() throws Throwable {
-        streamTest("noiseandchirps.ogg", true, false);
-    }
-    public void testPlayOggStreamNoLength() throws Throwable {
-        streamTest("noiseandchirps.ogg", false, true);
+    public void testLocalVideo_MP4_H264_480x360_500kbps_25fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_500kbps_25fps_aac_stereo_128kbps_44100hz, 480, 360);
     }
 
-    private void streamTest(String name, boolean redirect, boolean nolength) throws Throwable {
-        mServer = new CtsTestServer(mContext);
-        String stream_url = null;
-        if (redirect) {
-            // Stagefright doesn't have a limit, but we can't test support of infinite redirects
-            // Up to 4 redirects seems reasonable though.
-            stream_url = mServer.getRedirectingAssetUrl(name, 4);
-        } else {
-            stream_url = mServer.getAssetUrl(name);
-        }
-        if (nolength) {
-            stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
-        }
-
-        mMediaPlayer.setDataSource(stream_url);
-
-        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
-        mMediaPlayer.setScreenOnWhilePlaying(true);
-
-        mOnBufferingUpdateCalled.reset();
-        mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-            public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                mOnBufferingUpdateCalled.signal();
-            }
-        });
-
-        assertFalse(mOnBufferingUpdateCalled.signalled);
-        mMediaPlayer.prepare();
-
-        if (nolength) {
-            mMediaPlayer.start();
-            Thread.sleep(LONG_SLEEP_TIME);
-            assertFalse(mMediaPlayer.isPlaying());
-        } else {
-            mOnBufferingUpdateCalled.waitForSignal();
-            mMediaPlayer.start();
-            Thread.sleep(SLEEP_TIME);
-        }
-        mMediaPlayer.stop();
-        mMediaPlayer.reset();
+    public void testLocalVideo_MP4_H264_480x360_500kbps_30fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz, 480, 360);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnCompletionListener",
-            args = {OnCompletionListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnErrorListener",
-            args = {OnErrorListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnPreparedListener",
-            args = {OnPreparedListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnSeekCompleteListener",
-            args = {OnSeekCompleteListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnVideoSizeChangedListener",
-            args = {OnVideoSizeChangedListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnInfoListener",
-            args = {MediaPlayer.OnInfoListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {FileDescriptor.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isPlaying",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "seekTo",
-            args = {int.class}
-        )
-    })
+    public void testLocalVideo_MP4_H264_480x360_1000kbps_25fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 480, 360);
+    }
+
+    public void testLocalVideo_MP4_H264_480x360_1000kbps_30fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1000kbps_30fps_aac_stereo_128kbps_44100hz, 480, 360);
+    }
+
+    public void testLocalVideo_MP4_H264_480x360_1350kbps_25fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1350kbps_25fps_aac_stereo_128kbps_44100hz, 480, 360);
+    }
+
+    public void testLocalVideo_MP4_H264_480x360_1350kbps_30fps_AAC_Stereo_128kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz, 480, 360);
+    }
+
+    public void testLocalVideo_MP4_H264_480x360_1350kbps_30fps_AAC_Stereo_192kbps_44110Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz, 480, 360);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Mono_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_mono_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Mono_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_mono_24kbps_22050hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Stereo_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Stereo_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Stereo_128kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_12fps_AAC_Stereo_128kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_12fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Mono_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_mono_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Mono_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_mono_24kbps_22050hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Stereo_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Stereo_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Stereo_128kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_56kbps_25fps_AAC_Stereo_128kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_56kbps_25fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Mono_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_mono_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Mono_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_mono_24kbps_22050hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Stereo_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Stereo_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Stereo_128kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_12fps_AAC_Stereo_128kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Mono_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_mono_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Mono_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_mono_24kbps_22050hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Stereo_24kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Stereo_24kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_24kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Stereo_128kbps_11025Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
+    public void testLocalVideo_3gp_H263_176x144_300kbps_25fps_AAC_Stereo_128kbps_22050Hz()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_128kbps_11025hz, 176, 144);
+    }
+
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
-        AssetFileDescriptor afd = mResources.openRawResourceFd(R.raw.testvideo);
-        try {
-            mMediaPlayer.setDataSource(
-                    afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        } finally {
-            afd.close();
-        }
-
+        loadResource(R.raw.testvideo);
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
 
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
                 mOnVideoSizeChangedCalled.signal();
             }
         });
 
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
             public void onPrepared(MediaPlayer mp) {
                 mOnPrepareCalled.signal();
             }
         });
 
         mMediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
             public void onSeekComplete(MediaPlayer mp) {
                 mOnSeekCompleteCalled.signal();
             }
@@ -574,12 +319,14 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
 
         mOnCompletionCalled.reset();
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
             public void onCompletion(MediaPlayer mp) {
                 mOnCompletionCalled.signal();
             }
         });
 
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 mOnErrorCalled.signal();
                 return false;
@@ -587,86 +334,84 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         });
 
         mMediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
                 mOnInfoCalled.signal();
                 return false;
             }
         });
 
-        assertFalse(mOnPrepareCalled.signalled);
-        assertFalse(mOnVideoSizeChangedCalled.signalled);
+        assertFalse(mOnPrepareCalled.isSignalled());
+        assertFalse(mOnVideoSizeChangedCalled.isSignalled());
         mMediaPlayer.prepare();
         mOnPrepareCalled.waitForSignal();
         mOnVideoSizeChangedCalled.waitForSignal();
-        mOnSeekCompleteCalled.signalled = false;
+        mOnSeekCompleteCalled.reset();
         mMediaPlayer.seekTo(mp4Duration >> 1);
         mOnSeekCompleteCalled.waitForSignal();
-        assertFalse(mOnCompletionCalled.signalled);
+        assertFalse(mOnCompletionCalled.isSignalled());
         mMediaPlayer.start();
         while(mMediaPlayer.isPlaying()) {
             Thread.sleep(SLEEP_TIME);
         }
         assertFalse(mMediaPlayer.isPlaying());
         mOnCompletionCalled.waitForSignal();
-        assertFalse(mOnErrorCalled.signalled);
+        assertFalse(mOnErrorCalled.isSignalled());
         mMediaPlayer.stop();
         mMediaPlayer.start();
         mOnErrorCalled.waitForSignal();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {Context.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSource",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "create",
-            args = {Context.class, Uri.class, SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "prepareAsync",
-            args = {}
-        )
-    })
     public void testRecordAndPlay() throws Exception {
         if (!hasMicrophone()) {
             return;
         }
-        recordMedia();
-        MediaPlayer mp = new MediaPlayer();
-        mp.setDataSource(mSourceMediaOnSdcard);
-        mp.prepareAsync();
-        Thread.sleep(SLEEP_TIME);
-        playAndStop(mp);
-        mp.reset();
-        Uri uri = Uri.parse(mSourceMediaOnSdcard);
-        mp = new MediaPlayer();
-        mp.setDataSource(mContext, uri);
-        mp.prepareAsync();
-        Thread.sleep(SLEEP_TIME);
-        playAndStop(mp);
-        mp.release();
+        File outputFile = new File(Environment.getExternalStorageDirectory(),
+                "record_and_play.3gp");
+        String outputFileLocation = outputFile.getAbsolutePath();
+        try {
+            recordMedia(outputFileLocation);
+            MediaPlayer mp = new MediaPlayer();
+            try {
+                mp.setDataSource(outputFileLocation);
+                mp.prepareAsync();
+                Thread.sleep(SLEEP_TIME);
+                playAndStop(mp);
+            } finally {
+                mp.release();
+            }
 
-        mp = MediaPlayer.create(mContext, uri);
-        playAndStop(mp);
-        mp.release();
+            Uri uri = Uri.parse(outputFileLocation);
+            mp = new MediaPlayer();
+            try {
+                mp.setDataSource(mContext, uri);
+                mp.prepareAsync();
+                Thread.sleep(SLEEP_TIME);
+                playAndStop(mp);
+            } finally {
+                mp.release();
+            }
 
-        mp = MediaPlayer.create(mContext, uri, getActivity().getSurfaceHolder());
-        playAndStop(mp);
-        mp.release();
+            try {
+                mp = MediaPlayer.create(mContext, uri);
+                playAndStop(mp);
+            } finally {
+                if (mp != null) {
+                    mp.release();
+                }
+            }
+
+            try {
+                mp = MediaPlayer.create(mContext, uri, getActivity().getSurfaceHolder());
+                playAndStop(mp);
+            } finally {
+                if (mp != null) {
+                    mp.release();
+                }
+            }
+        } finally {
+            outputFile.delete();
+        }
     }
 
     private void playAndStop(MediaPlayer mp) throws Exception {
@@ -675,18 +420,21 @@ public class MediaPlayerTest extends ActivityInstrumentationTestCase2<MediaStubA
         mp.stop();
     }
 
-    private void recordMedia() throws Exception {
+    private void recordMedia(String outputFile) throws Exception {
         MediaRecorder mr = new MediaRecorder();
-        mr.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mr.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mr.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        mr.setOutputFile(mSourceMediaOnSdcard);
+        try {
+            mr.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mr.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mr.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mr.setOutputFile(outputFile);
 
-        mr.prepare();
-        mr.start();
-        Thread.sleep(SLEEP_TIME);
-        mr.stop();
-        mr.release();
+            mr.prepare();
+            mr.start();
+            Thread.sleep(SLEEP_TIME);
+            mr.stop();
+        } finally {
+            mr.release();
+        }
     }
 
     private boolean hasMicrophone() {

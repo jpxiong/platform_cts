@@ -78,6 +78,11 @@ public class PassFailButtons {
 
         /* Added to the interface just to make sure it isn't forgotten in the implementations. */
         Dialog onCreateDialog(int id, Bundle args);
+
+        /**
+         * Returns a unique identifier for the test.  Usually, this is just the class name.
+         */
+        String getTestId();
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
@@ -100,6 +105,11 @@ public class PassFailButtons {
         @Override
         public Dialog onCreateDialog(int id, Bundle args) {
             return createDialog(this, id, args);
+        }
+
+        @Override
+        public String getTestId() {
+            return getClass().getName();
         }
     }
 
@@ -124,13 +134,48 @@ public class PassFailButtons {
         public Dialog onCreateDialog(int id, Bundle args) {
             return createDialog(this, id, args);
         }
+
+        @Override
+        public String getTestId() {
+            return getClass().getName();
+        }
     }
 
-    private static void setPassFailClickListeners(final android.app.Activity activity) {
+    public static class TestListActivity extends AbstractTestListActivity
+            implements PassFailActivity {
+
+        @Override
+        public void setPassFailButtonClickListeners() {
+            setPassFailClickListeners(this);
+        }
+
+        @Override
+        public void setInfoResources(int titleId, int messageId, int viewId) {
+            setInfo(this, titleId, messageId, viewId);
+        }
+
+        @Override
+        public Button getPassButton() {
+            return getPassButtonView(this);
+        }
+
+        @Override
+        public Dialog onCreateDialog(int id, Bundle args) {
+            return createDialog(this, id, args);
+        }
+
+        @Override
+        public String getTestId() {
+            return getClass().getName();
+        }
+    }
+
+    private static <T extends android.app.Activity & PassFailActivity>
+            void setPassFailClickListeners(final T activity) {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View target) {
-                setTestResultAndFinish(activity, target);
+                setTestResultAndFinish(activity, activity.getTestId(), target);
             }
         };
 
@@ -232,18 +277,29 @@ public class PassFailButtons {
     }
 
     /** Set the test result corresponding to the button clicked and finish the activity. */
-    private static void setTestResultAndFinish(android.app.Activity activity, View target) {
+    private static void setTestResultAndFinish(android.app.Activity activity, String testId,
+            View target) {
+        boolean passed;
         switch (target.getId()) {
             case R.id.pass_button:
-                TestResult.setPassedResult(activity);
+                passed = true;
                 break;
-
             case R.id.fail_button:
-                TestResult.setFailedResult(activity);
+                passed = false;
                 break;
-
             default:
                 throw new IllegalArgumentException("Unknown id: " + target.getId());
+        }
+        setTestResultAndFinish(activity, testId, passed);
+    }
+
+    /** Set the test result and finish the activity. */
+    public static void setTestResultAndFinish(android.app.Activity activity, String testId,
+            boolean passed) {
+        if (passed) {
+            TestResult.setPassedResult(activity, testId);
+        } else {
+            TestResult.setFailedResult(activity, testId);
         }
 
         activity.finish();

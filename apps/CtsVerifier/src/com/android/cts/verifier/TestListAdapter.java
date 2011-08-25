@@ -17,16 +17,11 @@
 package com.android.cts.verifier;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,48 +31,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * {@link BaseAdapter} that populates the {@link TestListActivity}'s {@link ListView}.
- * Making a new test activity to appear in the list requires the following steps:
- *
- * <ol>
- *     <li>REQUIRED: Add an activity to the AndroidManifest.xml with an intent filter with a
- *         main action and the MANUAL_TEST category.
- *         <pre>
- *             <intent-filter>
- *                <action android:name="android.intent.action.MAIN" />
- *                <category android:name="android.cts.intent.category.MANUAL_TEST" />
- *             </intent-filter>
- *         </pre>
- *     </li>
- *     <li>OPTIONAL: Add a meta data attribute to indicate what category of tests the activity
- *         should belong to. If you don't add this attribute, your test will show up in the
- *         "Other" tests category.
- *         <pre>
- *             <meta-data android:name="test_category" android:value="@string/test_category_security" />
- *         </pre>
- *     </li>
- *     <li>OPTIONAL: Add a meta data attribute to indicate whether this test has a parent test.
- *         <pre>
- *             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
- *         </pre>
- *     </li>
- * </ol>
+ * {@link BaseAdapter} that handles loading, refreshing, and setting test
+ * results. What tests are shown can be customized by overriding
+ * {@link #getRows()}. See {@link ArrayTestListAdapter} and
+ * {@link ManifestTestListAdapter} for examples.
  */
-public class TestListAdapter extends BaseAdapter {
+public abstract class TestListAdapter extends BaseAdapter {
 
     /** Activities implementing {@link Intent#ACTION_MAIN} and this will appear in the list. */
     public static final String CATEGORY_MANUAL_TEST = "android.cts.intent.category.MANUAL_TEST";
-
-    private static final String TEST_CATEGORY_META_DATA = "test_category";
-
-    private static final String TEST_PARENT_META_DATA = "test_parent";
 
     /** View type for a category of tests like "Sensors" or "Features" */
     private static final int CATEGORY_HEADER_VIEW_TYPE = 0;
@@ -90,10 +57,8 @@ public class TestListAdapter extends BaseAdapter {
 
     private final Context mContext;
 
-    private final String mTestParent;
-
     /** Immutable data of tests like the test's title and launch intent. */
-    private final List<TestListItem> mRows = new ArrayList<TestListAdapter.TestListItem>();
+    private final List<TestListItem> mRows = new ArrayList<TestListItem>();
 
     /** Mutable test results that will change as each test activity finishes. */
     private final Map<String, Integer> mTestResults = new HashMap<String, Integer>();
@@ -106,26 +71,23 @@ public class TestListAdapter extends BaseAdapter {
         /** Title shown in the {@link ListView}. */
         final String title;
 
-        /** Class name with package to uniquely identify the test. Null for categories. */
-        final String className;
+        /** Test name with class and test ID to uniquely identify the test. Null for categories. */
+        final String testName;
 
         /** Intent used to launch the activity from the list. Null for categories. */
         final Intent intent;
 
-        /** Tests within this test. For instance, the Bluetooth test contains more tests. */
-        final List<TestListItem> subItems = new ArrayList<TestListItem>();
-
-        static TestListItem newTest(String title, String className, Intent intent) {
-            return new TestListItem(title, className, intent);
+        public static TestListItem newTest(String title, String testName, Intent intent) {
+            return new TestListItem(title, testName, intent);
         }
 
-        static TestListItem newCategory(String title) {
+        public static TestListItem newCategory(String title) {
             return new TestListItem(title, null, null);
         }
 
-        private TestListItem(String title, String className, Intent intent) {
+        private TestListItem(String title, String testName, Intent intent) {
             this.title = title;
-            this.className = className;
+            this.testName = testName;
             this.intent = intent;
         }
 
@@ -136,15 +98,10 @@ public class TestListAdapter extends BaseAdapter {
         boolean isTest() {
             return intent != null;
         }
-
-        void addTestListItem(TestListItem item) {
-            subItems.add(item);
-        }
     }
 
-    public TestListAdapter(Context context, String testParent) {
+    public TestListAdapter(Context context) {
         this.mContext = context;
-        this.mTestParent = testParent;
         this.mLayoutInflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -194,116 +151,7 @@ public class TestListAdapter extends BaseAdapter {
         }
     }
 
-    List<TestListItem> getRows() {
-
-        /*
-         * 1. Get all the tests belonging to the test parent.
-         * 2. Get all the tests keyed by their category.
-         * 3. Flatten the tests and categories into one giant list for the list view.
-         */
-
-        List<ResolveInfo> infos = getResolveInfosForParent();
-        Map<String, List<TestListItem>> testsByCategory = getTestsByCategory(infos);
-
-        List<String> testCategories = new ArrayList<String>(testsByCategory.keySet());
-        Collections.sort(testCategories);
-
-        List<TestListItem> allRows = new ArrayList<TestListItem>();
-        for (String testCategory : testCategories) {
-            allRows.add(TestListItem.newCategory(testCategory));
-
-            List<TestListItem> tests = testsByCategory.get(testCategory);
-            Collections.sort(tests, new Comparator<TestListItem>() {
-                public int compare(TestListItem item, TestListItem otherItem) {
-                    return item.title.compareTo(otherItem.title);
-                }
-            });
-            allRows.addAll(tests);
-        }
-        return allRows;
-    }
-
-    List<ResolveInfo> getResolveInfosForParent() {
-        Intent mainIntent = new Intent(Intent.ACTION_MAIN);
-        mainIntent.addCategory(CATEGORY_MANUAL_TEST);
-
-        PackageManager packageManager = mContext.getPackageManager();
-        List<ResolveInfo> list = packageManager.queryIntentActivities(mainIntent,
-                PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA);
-        int size = list.size();
-
-        List<ResolveInfo> matchingList = new ArrayList<ResolveInfo>();
-        for (int i = 0; i < size; i++) {
-            ResolveInfo info = list.get(i);
-            String parent = getTestParent(mContext, info.activityInfo.metaData);
-            if ((mTestParent == null && parent == null)
-                    || (mTestParent != null && mTestParent.equals(parent))) {
-                matchingList.add(info);
-            }
-        }
-        return matchingList;
-    }
-
-    Map<String, List<TestListItem>> getTestsByCategory(List<ResolveInfo> list) {
-        Map<String, List<TestListItem>> testsByCategory =
-                new HashMap<String, List<TestListItem>>();
-
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            ResolveInfo info = list.get(i);
-            String title = getTitle(mContext, info.activityInfo);
-            String className = info.activityInfo.name;
-            Intent intent = getActivityIntent(info.activityInfo);
-            TestListItem item = TestListItem.newTest(title, className, intent);
-
-            String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
-            addTestToCategory(testsByCategory, testCategory, item);
-        }
-
-        return testsByCategory;
-    }
-
-    static String getTestCategory(Context context, Bundle metaData) {
-        String testCategory = null;
-        if (metaData != null) {
-            testCategory = metaData.getString(TEST_CATEGORY_META_DATA);
-        }
-        if (testCategory != null) {
-            return testCategory;
-        } else {
-            return context.getString(R.string.test_category_other);
-        }
-    }
-
-    static String getTestParent(Context context, Bundle metaData) {
-        return metaData != null ? metaData.getString(TEST_PARENT_META_DATA) : null;
-    }
-
-    static String getTitle(Context context, ActivityInfo activityInfo) {
-        if (activityInfo.labelRes != 0) {
-            return context.getString(activityInfo.labelRes);
-        } else {
-            return activityInfo.name;
-        }
-    }
-
-    static Intent getActivityIntent(ActivityInfo activityInfo) {
-        Intent intent = new Intent();
-        intent.setClassName(activityInfo.packageName, activityInfo.name);
-        return intent;
-    }
-
-    static void addTestToCategory(Map<String, List<TestListItem>> testsByCategory,
-            String testCategory, TestListItem item) {
-        List<TestListItem> tests;
-        if (testsByCategory.containsKey(testCategory)) {
-            tests = testsByCategory.get(testCategory);
-        } else {
-            tests = new ArrayList<TestListItem>();
-        }
-        testsByCategory.put(testCategory, tests);
-        tests.add(item);
-    }
+    protected abstract List<TestListItem> getRows();
 
     Map<String, Integer> getTestResults() {
         Map<String, Integer> results = new HashMap<String, Integer>();
@@ -314,9 +162,9 @@ public class TestListAdapter extends BaseAdapter {
                     TestResultsProvider.ALL_COLUMNS, null, null, null);
             if (cursor.moveToFirst()) {
                 do {
-                    String className = cursor.getString(1);
+                    String testName = cursor.getString(1);
                     int testResult = cursor.getInt(2);
-                    results.put(className, testResult);
+                    results.put(testName, testResult);
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -350,18 +198,7 @@ public class TestListAdapter extends BaseAdapter {
 
         @Override
         protected Void doInBackground(Void... params) {
-            ContentValues values = new ContentValues(2);
-            values.put(TestResultsProvider.COLUMN_TEST_RESULT, mResult);
-            values.put(TestResultsProvider.COLUMN_TEST_NAME, mTestName);
-
-            ContentResolver resolver = mContext.getContentResolver();
-            int numUpdated = resolver.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
-                    TestResultsProvider.COLUMN_TEST_NAME + " = ?",
-                    new String[] {mTestName});
-
-            if (numUpdated == 0) {
-                resolver.insert(TestResultsProvider.RESULTS_CONTENT_URI, values);
-            }
+            TestResultsProvider.setTestResult(mContext, mTestName, mResult);
             return null;
         }
     }
@@ -400,25 +237,39 @@ public class TestListAdapter extends BaseAdapter {
         return 2;
     }
 
+    @Override
     public int getCount() {
         return mRows.size();
     }
 
+    @Override
     public TestListItem getItem(int position) {
         return mRows.get(position);
     }
 
+    @Override
     public long getItemId(int position) {
         return position;
     }
 
     public int getTestResult(int position) {
         TestListItem item = getItem(position);
-        return mTestResults.containsKey(item.className)
-                ? mTestResults.get(item.className)
+        return mTestResults.containsKey(item.testName)
+                ? mTestResults.get(item.testName)
                 : TestResult.TEST_RESULT_NOT_EXECUTED;
     }
 
+    public boolean allTestsPassed() {
+        for (TestListItem item : mRows) {
+            if (item.isTest() && (!mTestResults.containsKey(item.testName)
+                    || (mTestResults.get(item.testName) != TestResult.TEST_RESULT_PASSED))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView textView;
         if (convertView == null) {

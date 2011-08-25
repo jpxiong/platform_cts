@@ -73,16 +73,19 @@ public class SuidFilesActivity extends ListActivity {
             .setTitle(R.string.suid_files)
             .setMessage(R.string.suid_files_info)
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     startScan();
                 }
             })
             .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     finish();
                 }
             })
             .setOnCancelListener(new OnCancelListener() {
+                @Override
                 public void onCancel(DialogInterface dialog) {
                     finish();
                 }
@@ -94,6 +97,7 @@ public class SuidFilesActivity extends ListActivity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle(getString(R.string.scanning_directory));
         mProgressDialog.setOnCancelListener(new OnCancelListener() {
+            @Override
             public void onCancel(DialogInterface dialog) {
                 // If the scanning dialog is cancelled, then stop the task and finish the activity
                 // to prevent the user from just seeing a blank listview.
@@ -205,6 +209,7 @@ public class SuidFilesActivity extends ListActivity {
 
             private final FileStatus status = new FileStatus();
 
+            @Override
             public boolean accept(File pathname) {
                 // Don't follow symlinks to avoid infinite looping.
                 if (FileUtils.getFileStatus(pathname.getPath(), status, true)) {
@@ -221,6 +226,7 @@ public class SuidFilesActivity extends ListActivity {
 
             private final FileStatus status = new FileStatus();
 
+            @Override
             public boolean accept(File pathname) {
                 if (FileUtils.getFileStatus(pathname.getPath(), status, true)) {
                     return !status.isDirectory()
@@ -250,18 +256,19 @@ public class SuidFilesActivity extends ListActivity {
 
                 // Alert the user that nothing was found rather than showing an empty list view.
                 if (passed) {
-                    TestResult.setPassedResult(SuidFilesActivity.this);
+                    TestResult.setPassedResult(SuidFilesActivity.this, getClass().getName());
                     new AlertDialog.Builder(SuidFilesActivity.this)
                             .setTitle(R.string.congratulations)
                             .setMessage(R.string.no_suid_files)
                             .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
                             })
                             .show();
                 } else {
-                    TestResult.setFailedResult(SuidFilesActivity.this);
+                    TestResult.setFailedResult(SuidFilesActivity.this, getClass().getName());
                 }
             }
         }
