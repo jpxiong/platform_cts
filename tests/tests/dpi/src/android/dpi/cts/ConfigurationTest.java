@@ -38,7 +38,7 @@ public class ConfigurationTest extends AndroidTestCase {
 
     public void testScreenConfiguration() {
         WindowManager windowManager =
-            (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+                (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
@@ -68,6 +68,7 @@ public class ConfigurationTest extends AndroidTestCase {
         assertTrue("DisplayMetrics#densityDpi must be one of the DisplayMetrics.DENSITY_* values: "
                 + allowedDensities, allowedDensities.contains(metrics.densityDpi));
 
-        assertEquals(metrics.density, (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        assertEquals(metrics.density, (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT,
+                0.001F);
     }
 }
