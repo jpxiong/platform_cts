@@ -24,11 +24,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
 import android.view.animation.cts.DelayedCheck;
 import android.webkit.cts.CtsTestServer;
 
+import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -115,6 +117,66 @@ public class DownloadManagerTest extends AndroidTestCase {
             }
 
             assertRemoveDownload(id, 0);
+        } finally {
+            mContext.unregisterReceiver(receiver);
+        }
+    }
+
+    /**
+     * Set download locations and verify that file is downloaded to correct location.
+     *
+     * Checks three different methods of setting location: directly via setDestinationUri, and
+     * indirectly through setDestinationInExternalFilesDir and setDestinationinExternalPublicDir.
+     */
+    public void testDownloadManagerDestination() throws Exception {
+        File uriLocation = new File(mContext.getExternalFilesDir(null), "uriFile.bin");
+        if (uriLocation.exists()) {
+            assertTrue(uriLocation.delete());
+        }
+
+        File extFileLocation = new File(mContext.getExternalFilesDir(null), "extFile.bin");
+        if (extFileLocation.exists()) {
+            assertTrue(extFileLocation.delete());
+        }
+
+        File publicLocation = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "publicFile.bin");
+        if (publicLocation.exists()) {
+            assertTrue(publicLocation.delete());
+        }
+
+        DownloadCompleteReceiver receiver =
+            new DownloadCompleteReceiver(3, TimeUnit.SECONDS.toMillis(5));
+        try {
+            IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+            mContext.registerReceiver(receiver, intentFilter);
+
+            Request requestUri = new Request(getGoodUrl());
+            requestUri.setDestinationUri(Uri.fromFile(uriLocation));
+            long uriId = mDownloadManager.enqueue(requestUri);
+
+            Request requestExtFile = new Request(getGoodUrl());
+            requestExtFile.setDestinationInExternalFilesDir(mContext, null, "extFile");
+            long extFileId = mDownloadManager.enqueue(requestExtFile);
+
+            Request requestPublic = new Request(getGoodUrl());
+            requestPublic.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                    "publicFile");
+            long publicId = mDownloadManager.enqueue(requestPublic);
+
+            int allDownloads = getTotalNumberDownloads();
+            assertEquals(3, allDownloads);
+
+            receiver.waitForDownloadComplete();
+
+            assertSuccessfulDownload(uriId, uriLocation);
+            assertSuccessfulDownload(extFileId, extFileLocation);
+            assertSuccessfulDownload(publicId, publicLocation);
+
+            assertRemoveDownload(uriId, allDownloads - 1);
+            assertRemoveDownload(extFileId, allDownloads - 2);
+            assertRemoveDownload(publicId, allDownloads - 3);
         } finally {
             mContext.unregisterReceiver(receiver);
         }
@@ -218,6 +280,23 @@ public class DownloadManagerTest extends AndroidTestCase {
                 }
             }
         }.run();
+    }
+
+    private void assertSuccessfulDownload(long id, File location) {
+        Cursor cursor = null;
+        try {
+            cursor = mDownloadManager.query(new Query().setFilterById(id));
+            assertTrue(cursor.moveToNext());
+            assertEquals(DownloadManager.STATUS_SUCCESSFUL, cursor.getInt(
+                    cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+            assertEquals(Uri.fromFile(location).toString(),
+                    cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
+            assertTrue(location.exists());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     private void assertRemoveDownload(long removeId, int expectedNumDownloads) {

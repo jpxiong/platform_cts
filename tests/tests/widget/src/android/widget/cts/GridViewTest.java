@@ -312,7 +312,7 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
         mGridView.setStretchMode(GridView.NO_STRETCH);
         // Number of columns should be big enough, otherwise the
         // horizontal spacing cannot be correctly verified.
-        mGridView.setNumColumns(20);
+        mGridView.setNumColumns(22);
 
         // this test case can not be ran in UI thread.
         mActivity.runOnUiThread(new Runnable() {
