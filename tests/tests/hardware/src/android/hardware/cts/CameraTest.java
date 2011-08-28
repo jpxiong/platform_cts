@@ -1177,7 +1177,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         initializeMessageLooper(id);
 
         Parameters parameters = mCamera.getParameters();
-        if (!parameters.isZoomSupported()) return;
+        if (!parameters.isZoomSupported()) {
+            terminateMessageLooper();
+            return;
+        }
 
         // Test the zoom parameters.
         assertEquals(0, parameters.getZoom());  // default zoom should be 0.
@@ -1254,7 +1257,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         initializeMessageLooper(id);
 
         Parameters parameters = mCamera.getParameters();
-        if (!parameters.isSmoothZoomSupported()) return;
+        if (!parameters.isSmoothZoomSupported()) {
+            terminateMessageLooper();
+            return;
+        }
         assertTrue(parameters.isZoomSupported());
 
         ZoomListener zoomListener = new ZoomListener();
