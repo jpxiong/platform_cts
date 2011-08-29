@@ -308,8 +308,8 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
                     mContentResolver, mPeopleRowsAdded.get(0));
             assertNotNull(photoStream);
             Bitmap bitmap = BitmapFactory.decodeStream(photoStream, null, null);
-            assertEquals(212, bitmap.getWidth());
-            assertEquals(142, bitmap.getHeight());
+            assertEquals(96, bitmap.getWidth());
+            assertEquals(64, bitmap.getHeight());
 
             photoStream = People.openContactPhotoInputStream(mContentResolver,
                     mPeopleRowsAdded.get(1));
@@ -317,8 +317,8 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
 
             bitmap = People.loadContactPhoto(context, mPeopleRowsAdded.get(0),
                     com.android.cts.stub.R.drawable.size_48x48, null);
-            assertEquals(212, bitmap.getWidth());
-            assertEquals(142, bitmap.getHeight());
+            assertEquals(96, bitmap.getWidth());
+            assertEquals(64, bitmap.getHeight());
 
             bitmap = People.loadContactPhoto(context, null,
                     com.android.cts.stub.R.drawable.size_48x48, null);
