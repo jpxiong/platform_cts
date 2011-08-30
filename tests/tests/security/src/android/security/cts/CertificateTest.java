@@ -42,6 +42,15 @@ public class CertificateTest extends AndroidTestCase {
         assertTrue("Missing certificates: " + expectedCertificates, expectedCertificates.isEmpty());
     }
 
+    public void testBlockCertificates() throws Exception {
+        Set<String> blockCertificates = new HashSet<String>();
+        blockCertificates.add("C0:60:ED:44:CB:D8:81:BD:0E:F8:6C:0B:A2:87:DD:CF:81:67:47:8C");
+
+        Set<String> deviceCertificates = getDeviceCertificates();
+        deviceCertificates.retainAll(blockCertificates);
+        assertTrue("Bad certificates: " + deviceCertificates, deviceCertificates.isEmpty());
+    }
+
     private Set<String> getExpectedCertificates() {
         Set<String> certificates = new HashSet<String>();
         for (int i = 0; i < CertificateData.CERTIFICATE_DATA.length; i++) {

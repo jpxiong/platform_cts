@@ -1,4 +1,5 @@
 [
+/* Framework problems. */
 {
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
@@ -12,6 +13,7 @@
   description: "Need investigation.",
   names: [
     "android.provider.cts.Contacts_PeopleTest#testAddToGroup",
+    "android.provider.cts.MediaStore_Audio_Playlists_MembersTest",
     "android.webkit.cts.WebViewTest#testRequestImageRef",
     "tests.api.java.util.CalendarTest#test_getInstance"
   ]

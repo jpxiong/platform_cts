@@ -95,9 +95,6 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
         }
     }
 
-    /**
-     * A list of all features added in Eclair (API=7).
-     */
     public static final Feature[] ALL_ECLAIR_FEATURES = {
             new Feature(PackageManager.FEATURE_CAMERA, true),
             new Feature(PackageManager.FEATURE_CAMERA_AUTOFOCUS, false),
@@ -110,15 +107,6 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_TELEPHONY_GSM, false),
     };
 
-    /**
-     * A list of all features added in FroYo (API=8) and Gingerbread (API=9).
-     * Because we want to run on Eclair devices,
-     * we can't use static references to constants added later
-     * than Eclair. We could use Reflection, but we'd still need a list of
-     * string literals (for constant names) anyway, and there's little point in
-     * using Reflection to to look up a constant String value for a constant
-     * String name.
-     */
     public static final Feature[] ALL_FROYO_FEATURES = {
             new Feature("android.hardware.bluetooth", true),
             new Feature("android.hardware.location", true),
@@ -158,11 +146,22 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
     };
 
     public static final Feature[] ALL_HONEYCOMB_FEATURES = {
+            // Required features in prior releases that became optional in HC
+            new Feature("android.hardware.touchscreen", false),
+
             new Feature("android.hardware.faketouch", true),
     };
 
     public static final Feature[] ALL_HONEYCOMB_MR1_FEATURES = {
             new Feature("android.hardware.usb.host", false),
+            new Feature("android.hardware.usb.accessory", true),
+    };
+
+    public static final Feature[] ALL_HONEYCOMB_MR2_FEATURES = {
+            new Feature("android.hardware.faketouch.multitouch.distinct", false),
+            new Feature("android.hardware.faketouch.multitouch.jazzhand", false),
+            new Feature("android.hardware.screen.landscape", false),
+            new Feature("android.hardware.screen.portrait", false),
     };
 
     @Override
@@ -195,6 +194,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Collections.addAll(features, ALL_HONEYCOMB_MR2_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             Collections.addAll(features, ALL_HONEYCOMB_MR1_FEATURES);
         }

@@ -80,6 +80,8 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         System.setProperty("user.home", cacheDir.getAbsolutePath());
         System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
         System.setProperty("user.dir", cacheDir.getAbsolutePath());
+        System.setProperty("javax.net.ssl.trustStore",
+                "/system/etc/security/cacerts.bks");
 
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 

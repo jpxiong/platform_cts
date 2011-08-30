@@ -77,3 +77,6 @@ CTS_TEST_CASE_LIST := \
 	ApiDemosReferenceTest \
 	$(CTS_COVERAGE_TEST_CASE_LIST) \
 	$(CTS_SECURITY_APPS_LIST)
+
+# The following files will be placed in the tools directory of the CTS distribution
+CTS_TOOLS_LIST :=
