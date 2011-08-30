@@ -182,6 +182,51 @@ public class DownloadManagerTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Set the download location and verify that the extension of the file name is left unchanged.
+     */
+    public void testDownloadManagerDestinationExtension() throws Exception {
+        String noExt = "noiseandchirps";
+        File noExtLocation = new File(mContext.getExternalFilesDir(null), noExt);
+        if (noExtLocation.exists()) {
+            assertTrue(noExtLocation.delete());
+        }
+
+        String wrongExt = "noiseandchirps.wrong";
+        File wrongExtLocation = new File(mContext.getExternalFilesDir(null), wrongExt);
+        if (wrongExtLocation.exists()) {
+            assertTrue(wrongExtLocation.delete());
+        }
+
+        DownloadCompleteReceiver receiver =
+            new DownloadCompleteReceiver(2, TimeUnit.SECONDS.toMillis(5));
+        try {
+            IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+            mContext.registerReceiver(receiver, intentFilter);
+
+            Request requestNoExt = new Request(getAssetUrl(noExt));
+            requestNoExt.setDestinationUri(Uri.fromFile(noExtLocation));
+            long noExtId = mDownloadManager.enqueue(requestNoExt);
+
+            Request requestWrongExt = new Request(getAssetUrl(wrongExt));
+            requestWrongExt.setDestinationUri(Uri.fromFile(wrongExtLocation));
+            long wrongExtId = mDownloadManager.enqueue(requestWrongExt);
+
+            int allDownloads = getTotalNumberDownloads();
+            assertEquals(2, allDownloads);
+
+            receiver.waitForDownloadComplete();
+
+            assertSuccessfulDownload(noExtId, noExtLocation);
+            assertSuccessfulDownload(wrongExtId, wrongExtLocation);
+
+            assertRemoveDownload(noExtId, allDownloads - 1);
+            assertRemoveDownload(wrongExtId, allDownloads - 2);
+        } finally {
+            mContext.unregisterReceiver(receiver);
+        }
+    }
+
     private class DownloadCompleteReceiver extends BroadcastReceiver {
 
         private final CountDownLatch mReceiveLatch;
@@ -236,6 +281,10 @@ public class DownloadManagerTest extends AndroidTestCase {
     private Uri getMinimumDownloadUrl() {
         return Uri.parse(mWebServer.getTestDownloadUrl("cts-minimum-download",
                 MINIMUM_DOWNLOAD_BYTES));
+    }
+
+    private Uri getAssetUrl(String asset) {
+        return Uri.parse(mWebServer.getAssetUrl(asset));
     }
 
     private int getTotalNumberDownloads() {
