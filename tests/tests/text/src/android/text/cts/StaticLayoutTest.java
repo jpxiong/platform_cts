@@ -19,6 +19,7 @@ package android.text.cts;
 import android.test.AndroidTestCase;
 import android.text.Editable;
 import android.text.StaticLayout;
+import android.text.TextDirectionHeuristics;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.Layout.Alignment;
@@ -42,6 +43,8 @@ public class StaticLayoutTest extends AndroidTestCase {
      */
     private static final CharSequence LAYOUT_TEXT = "CharSe\tq\nChar"
             + "Sequence\nCharSequence\nHelllo\n, world\nLongLongLong";
+
+    private static final CharSequence LAYOUT_TEXT_SINGLE_LINE = "CharSequence";
 
     private static final int VERTICAL_BELOW_TEXT = 1000;
 
@@ -73,6 +76,19 @@ public class StaticLayoutTest extends AndroidTestCase {
                 DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true,
                 TextUtils.TruncateAt.MIDDLE, ELLIPSIZE_WIDTH);
     }
+
+    private StaticLayout createEllipsizeStaticLayout(CharSequence text,
+            TextUtils.TruncateAt ellipsize, int maxLines) {
+        return new StaticLayout(text, 0, text.length(),
+                mDefaultPaint, DEFAULT_OUTER_WIDTH, DEFAULT_ALIGN,
+                TextDirectionHeuristics.FIRSTSTRONG_LTR,
+                SPACE_MULTI, SPACE_ADD, true /* include pad */,
+                ellipsize,
+                ELLIPSIZE_WIDTH,
+                maxLines);
+    }
+
+
 
     /**
      * Constructor test
@@ -362,9 +378,17 @@ public class StaticLayoutTest extends AndroidTestCase {
     @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
         + " of StaticLayout#getEllipsisCount(int) when line is out of bound")
     public void testGetEllipsisCount() {
-        mDefaultLayout = createEllipsizeStaticLayout();
-        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
-        assertTrue(mDefaultLayout.getEllipsisCount(1) > 0);
+        // Multilines (6 lines) and TruncateAt.START so no ellipsis at all
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT,
+                TextUtils.TruncateAt.MIDDLE,
+                Integer.MAX_VALUE /* maxLines */);
+
+        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(1) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(2) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(3) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(4) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(5) == 0);
 
         try {
             mDefaultLayout.getEllipsisCount(-1);
@@ -377,6 +401,66 @@ public class StaticLayoutTest extends AndroidTestCase {
             fail("should throw ArrayIndexOutOfBoundsException");
         } catch (ArrayIndexOutOfBoundsException e) {
         }
+
+        // Multilines (6 lines) and TruncateAt.MIDDLE so no ellipsis at all
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT,
+                TextUtils.TruncateAt.MIDDLE,
+                Integer.MAX_VALUE /* maxLines */);
+
+        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(1) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(2) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(3) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(4) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(5) == 0);
+
+        // Multilines (6 lines) and TruncateAt.END so ellipsis only on the last line
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT,
+                TextUtils.TruncateAt.END,
+                Integer.MAX_VALUE /* maxLines */);
+
+        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(1) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(2) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(3) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(4) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(5) > 0);
+
+        // Multilines (6 lines) and TruncateAt.MARQUEE so ellipsis only on the last line
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT,
+                TextUtils.TruncateAt.END,
+                Integer.MAX_VALUE /* maxLines */);
+
+        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(1) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(2) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(3) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(4) == 0);
+        assertTrue(mDefaultLayout.getEllipsisCount(5) > 0);
+
+        // Single line case and TruncateAt.END so that we have some ellipsis
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                TextUtils.TruncateAt.END,
+                1);
+        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
+
+        // Single line case and TruncateAt.MIDDLE so that we have some ellipsis
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                TextUtils.TruncateAt.MIDDLE,
+                1);
+        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
+
+        // Single line case and TruncateAt.END so that we have some ellipsis
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                TextUtils.TruncateAt.END,
+                1);
+        assertTrue(mDefaultLayout.getEllipsisCount(0) > 0);
+
+        // Single line case and TruncateAt.MARQUEE so that we have NO ellipsis
+        mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT_SINGLE_LINE,
+                TextUtils.TruncateAt.MARQUEE,
+                1);
+        assertTrue(mDefaultLayout.getEllipsisCount(0) == 0);
     }
 
     /*
