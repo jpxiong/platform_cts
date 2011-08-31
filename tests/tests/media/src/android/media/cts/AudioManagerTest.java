@@ -45,7 +45,6 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
-import android.app.cts.CTSResult;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -54,28 +53,11 @@ import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
 
 @TestTargetClass(AudioManager.class)
-public class AudioManagerTest extends AndroidTestCase implements CTSResult {
+public class AudioManagerTest extends AndroidTestCase {
 
     private final static int MP3_TO_PLAY = R.raw.testmp3;
     private final static long TIME_TO_PLAY = 2000;
     private AudioManager mAudioManager;
-    private int mResultCode;
-    private Sync mSync = new Sync();
-
-    private static class Sync {
-        private boolean notified;
-
-        synchronized void notifyResult() {
-            notified = true;
-            notify();
-        }
-
-        synchronized void waitForResult() throws Exception {
-            if (!notified) {
-                wait();
-            }
-        }
-    }
 
     @Override
     protected void setUp() throws Exception {
@@ -619,8 +601,12 @@ public class AudioManagerTest extends AndroidTestCase implements CTSResult {
                 FLAG_SHOW_UI | FLAG_ALLOW_RINGER_MODES);
     }
 
-    public void setResult(int resultCode) {
-        mSync.notifyResult();
-        mResultCode = resultCode;
+    public void testSetInvalidRingerMode() {
+        int ringerMode = mAudioManager.getRingerMode();
+        mAudioManager.setRingerMode(-1337);
+        assertEquals(ringerMode, mAudioManager.getRingerMode());
+
+        mAudioManager.setRingerMode(-3007);
+        assertEquals(ringerMode, mAudioManager.getRingerMode());
     }
 }
