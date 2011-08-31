@@ -942,6 +942,8 @@
             <meta-data android:name="android.preference" 
                     android:resource="@xml/preferences_from_intent" />
         </activity>
+                
+        <activity android:name="android.content.cts.ClipboardManagerListenerActivity"/>
 
         <activity android:name="android.app.cts.ActivityManagerMemoryClassLaunchActivity" />
 

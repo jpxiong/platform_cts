@@ -17,6 +17,7 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -401,6 +402,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testRecordAndPlay() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         File outputFile = new File(Environment.getExternalStorageDirectory(),
                 "record_and_play.3gp");
         String outputFileLocation = outputFile.getAbsolutePath();
@@ -470,5 +474,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         } finally {
             mr.release();
         }
+    }
+
+    private boolean hasMicrophone() {
+        return getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
     }
 }

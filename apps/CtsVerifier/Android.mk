@@ -55,10 +55,11 @@ verifier-zip-name := $(verifier-dir-name).zip
 verifier-zip := $(cts-dir)/$(verifier-zip-name)
 
 cts : $(verifier-zip)
-$(verifier-zip) : CtsVerifier $(ACP)
+$(verifier-zip) : CtsVerifier $(ACP) $(HOST_OUT)/bin/cts-usb-accessory
 		$(hide) mkdir -p $(verifier-dir)
 		$(hide) $(ACP) -fp $(call intermediates-dir-for,APPS,CtsVerifier)/package.apk \
 				$(verifier-dir)/CtsVerifier.apk
+		$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts-usb-accessory $(verifier-dir)/cts-usb-accessory
 		$(hide) cd $(cts-dir) && zip -rq $(verifier-dir-name) $(verifier-dir-name)
 
 ifneq ($(filter cts, $(MAKECMDGOALS)),)

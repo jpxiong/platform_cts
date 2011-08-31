@@ -230,9 +230,9 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertEquals(1.0f, parent.getWeightSum());
 
         int parentWidth = parent.getWidth();
-        assertEquals(parentWidth * 0.2, (float) weight02.getWidth(), 1.0);
-        assertEquals(parentWidth * 0.5, (float) weight05.getWidth(), 1.0);
-        assertEquals(parentWidth * 0.3, (float) weight03.getWidth(), 1.0);
+        assertEquals(Math.ceil(parentWidth * 0.2), weight02.getWidth(), 1.0);
+        assertEquals(Math.ceil(parentWidth * 0.5), weight05.getWidth(), 1.0);
+        assertEquals(Math.ceil(parentWidth * 0.3), weight03.getWidth(), 1.0);
     }
 
     @TestTargets({

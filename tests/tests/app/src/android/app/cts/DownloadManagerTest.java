@@ -129,19 +129,19 @@ public class DownloadManagerTest extends AndroidTestCase {
      * indirectly through setDestinationInExternalFilesDir and setDestinationinExternalPublicDir.
      */
     public void testDownloadManagerDestination() throws Exception {
-        File uriLocation = new File(mContext.getExternalFilesDir(null), "uriFile");
+        File uriLocation = new File(mContext.getExternalFilesDir(null), "uriFile.bin");
         if (uriLocation.exists()) {
             assertTrue(uriLocation.delete());
         }
 
-        File extFileLocation = new File(mContext.getExternalFilesDir(null), "extFile");
+        File extFileLocation = new File(mContext.getExternalFilesDir(null), "extFile.bin");
         if (extFileLocation.exists()) {
             assertTrue(extFileLocation.delete());
         }
 
         File publicLocation = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "publicFile");
+                "publicFile.bin");
         if (publicLocation.exists()) {
             assertTrue(publicLocation.delete());
         }

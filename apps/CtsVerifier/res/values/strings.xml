@@ -31,6 +31,7 @@
     <string name="test_category_audio">Audio</string>
     <string name="test_category_camera">Camera</string>
     <string name="test_category_device_admin">Device Administration</string>
+    <string name="test_category_hardware">Hardware</string>
     <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
     <string name="test_category_security">Security</string>
@@ -285,6 +286,29 @@
     <string name="camera_analyzer">Camera Analyzer</string>
     <string name="ca_run_label">Find color checker</string>
     <string name="ca_result_label">Patch values will be here</string>
+
+    <!-- Strings for USB accessory test activity -->
+    <string name="usb_accessory_test">USB Accessory Test</string>
+    <string name="usb_accessory_test_info">
+        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program 
+        included with the CTS Verifier bundle.
+        \n\n2. If you have not started the CTS Verifier, press \'OK\' when asked to open the CTS
+        Verifier when the accessory is connected. \n\nIf you are already in this test,
+        then you can press \'Cancel\' but press \'OK\' in the next dialog asking whether to allow
+        CTS Verifier to access the accessory.
+        \n\n3. You should see the accessory and the CTS Verifier display a series of messages
+        which indicates that the accessory support is working properly.
+    </string>
+    <string name="usb_not_available_title">USB accessory feature is not available?</string>
+    <string name="usb_not_available_message">If your device is supposed to support USB accessories, your API implementation is not behaving correctly!</string>
+    <string name="usb_received_messages">Received Messages</string>
+    <string name="usb_sent_messages">Sent Messages</string>
+    <string name="usb_no_messages">No messages</string>
+    <string name="usb_message_thread_started">Starting message processing...</string>
+    <string name="usb_message_thread_exception">Exception occurred while processing a message...</string>
+    <string name="usb_message_thread_ended">Stopping message processing...</string>
+    <string name="usb_test_passed">Received all expected messages. Pass button enabled!</string>
+    <string name="usb_file_descriptor_error">Could not open file descriptor for USB accessory... try reconnecting and restarting the accessory?</string>
 
     <!-- Strings for StreamingVideoActivity -->
     <string name="streaming_video">Streaming Video Quality Verifier</string>
