@@ -24,21 +24,29 @@ import dalvik.annotation.TestTargets;
 import android.graphics.ColorFilter;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.Cap;
+import android.graphics.Paint.Join;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rasterizer;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.Xfermode;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Cap;
-import android.graphics.Paint.Join;
-import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
 import android.text.SpannedString;
 
 @TestTargetClass(Paint.class)
 public class PaintTest extends AndroidTestCase {
+
+    private static final Typeface[] TYPEFACES = new Typeface[] {
+            Typeface.DEFAULT,
+            Typeface.DEFAULT_BOLD,
+            Typeface.MONOSPACE,
+            Typeface.SANS_SERIF,
+            Typeface.SERIF,
+    };
 
     @TestTargets({
         @TestTargetNew(
@@ -468,13 +476,17 @@ public class PaintTest extends AndroidTestCase {
     public void testGetFontSpacing() {
         Paint p = new Paint();
 
-        assertEquals(13.96875f, p.getFontSpacing());
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        p.setTextSize(24.0f);
-        assertEquals(27.9375f, p.getFontSpacing());
+            p.setTextSize(10);
+            float spacing10 = p.getFontSpacing();
+            assertTrue(spacing10 > 0);
 
-        p.setTypeface(Typeface.MONOSPACE);
-        assertEquals(27.9375f, p.getFontSpacing());
+            p.setTextSize(20);
+            float spacing20 = p.getFontSpacing();
+            assertTrue(spacing20 > spacing10);
+        }
     }
 
     @TestTargets({
@@ -618,25 +630,17 @@ public class PaintTest extends AndroidTestCase {
     public void testAscent() {
         Paint p = new Paint();
 
-        assertEquals(-11.138672f, p.ascent());
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        p.setTextSize(10.0f);
-        assertEquals(-9.282227f, p.ascent());
+            p.setTextSize(10);
+            float ascent10 = p.ascent();
+            assertTrue(ascent10 < 0);
 
-        p.setTypeface(Typeface.DEFAULT_BOLD);
-        assertEquals(-9.282227f, p.ascent());
-
-        p.setTextSize(20.0f);
-        assertEquals(-18.564453f, p.ascent());
-
-        p.setTypeface(Typeface.DEFAULT_BOLD);
-        assertEquals(-18.564453f, p.ascent());
-
-        p.setTypeface(Typeface.MONOSPACE);
-        assertEquals(-18.564453f, p.ascent());
-
-        p.setTypeface(Typeface.SANS_SERIF);
-        assertEquals(-18.564453f, p.ascent());
+            p.setTextSize(20);
+            float ascent20 = p.ascent();
+            assertTrue(ascent20 < ascent10);
+        }
     }
 
     @TestTargets({
@@ -908,36 +912,19 @@ public class PaintTest extends AndroidTestCase {
         Paint p = new Paint();
         Paint.FontMetrics fm = new Paint.FontMetrics();
 
-        assertEquals(13.96875f, p.getFontMetrics(fm));
-        assertEquals(-11.138672f, fm.ascent);
-        assertEquals(3.2519531f, fm.bottom);
-        assertEquals(2.8300781f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-12.574219f, fm.top);
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        assertEquals(13.96875f, p.getFontMetrics(null));
+            p.setTextSize(10);
+            float spacing10 = p.getFontMetrics(fm);
+            assertEquals(p.ascent(), fm.ascent);
+            assertEquals(p.descent(), fm.descent);
 
-        p.setTextSize(24.0f);
-
-        assertEquals(27.9375f, p.getFontMetrics(fm));
-        assertEquals(-22.277344f, fm.ascent);
-        assertEquals(6.5039062f, fm.bottom);
-        assertEquals(5.6601562f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-25.148438f, fm.top);
-
-        assertEquals(27.9375f, p.getFontMetrics(null));
-
-        p.setTypeface(Typeface.MONOSPACE);
-        assertEquals(27.9375f, p.getFontMetrics(fm));
-        assertEquals(-22.277344f, fm.ascent);
-        assertEquals(6.5039062f, fm.bottom);
-        assertEquals(5.6601562f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-25.347656f, fm.top);
-
-        assertEquals(27.9375f, p.getFontMetrics(null));
-
+            p.setTextSize(20);
+            float spacing20 = p.getFontMetrics(fm);
+            assertEquals(p.ascent(), fm.ascent);
+            assertEquals(p.descent(), fm.descent);
+        }
     }
 
     @TestTargetNew(
@@ -947,34 +934,22 @@ public class PaintTest extends AndroidTestCase {
     )
     public void testGetFontMetrics2() {
         Paint p = new Paint();
-        Paint.FontMetrics fm;
 
-        fm = p.getFontMetrics();
-        assertEquals(-11.138672f, fm.ascent);
-        assertEquals(3.2519531f, fm.bottom);
-        assertEquals(2.8300781f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-12.574219f, fm.top);
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        p.setTextSize(24.0f);
+            p.setTextSize(10);
+            Paint.FontMetrics fm = p.getFontMetrics();
+            assertEquals(p.ascent(), fm.ascent);
+            assertEquals(p.descent(), fm.descent);
 
-        fm = p.getFontMetrics();
-        assertEquals(-22.277344f, fm.ascent);
-        assertEquals(6.5039062f, fm.bottom);
-                assertEquals(5.6601562f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-25.148438f, fm.top);
-
-        p.setTypeface(Typeface.MONOSPACE);
-
-        fm = p.getFontMetrics();
-        assertEquals(-22.277344f, fm.ascent);
-        assertEquals(6.5039062f, fm.bottom);
-        assertEquals(5.6601562f, fm.descent);
-        assertEquals(0.0f, fm.leading);
-        assertEquals(-25.347656f, fm.top);
-
+            p.setTextSize(20);
+            fm = p.getFontMetrics();
+            assertEquals(p.ascent(), fm.ascent);
+            assertEquals(p.descent(), fm.descent);
+        }
     }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
@@ -1062,25 +1037,17 @@ public class PaintTest extends AndroidTestCase {
     public void testDescent() {
         Paint p = new Paint();
 
-        assertEquals(2.8300781f, p.descent());
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        p.setTextSize(10.0f);
-        assertEquals(2.3583984f, p.descent());
+            p.setTextSize(10);
+            float descent10 = p.descent();
+            assertTrue(descent10 > 0);
 
-        p.setTypeface(Typeface.DEFAULT_BOLD);
-        assertEquals(2.3583984f, p.descent());
-
-        p.setTextSize(20.0f);
-        assertEquals(4.716797f, p.descent());
-
-        p.setTypeface(Typeface.DEFAULT_BOLD);
-        assertEquals(4.716797f, p.descent());
-
-        p.setTypeface(Typeface.MONOSPACE);
-        assertEquals(4.716797f, p.descent());
-
-        p.setTypeface(Typeface.SANS_SERIF);
-        assertEquals(4.716797f, p.descent());
+            p.setTextSize(20);
+            float descent20 = p.descent();
+            assertTrue(descent20 > descent10);
+        }
     }
 
     @TestTargets({
@@ -1207,36 +1174,19 @@ public class PaintTest extends AndroidTestCase {
         Paint p = new Paint();
         Paint.FontMetricsInt fmi = new Paint.FontMetricsInt();
 
-        assertEquals(14, p.getFontMetricsInt(fmi));
-        assertEquals(-11, fmi.ascent);
-        assertEquals(4, fmi.bottom);
-        assertEquals(3, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-13, fmi.top);
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        assertEquals(14, p.getFontMetricsInt(null));
+            p.setTextSize(10);
+            p.getFontMetricsInt(fmi);
+            assertEquals(Math.round(p.ascent()), fmi.ascent);
+            assertEquals(Math.round(p.descent()), fmi.descent);
 
-        p.setTextSize(24);
-
-        assertEquals(28, p.getFontMetricsInt(fmi));
-        assertEquals(-22, fmi.ascent);
-        assertEquals(7, fmi.bottom);
-        assertEquals(6, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-26, fmi.top);
-
-        assertEquals(28, p.getFontMetricsInt(null));
-
-        p.setTypeface(Typeface.MONOSPACE);
-        assertEquals(28, p.getFontMetricsInt(fmi));
-        assertEquals(-22, fmi.ascent);
-        assertEquals(7, fmi.bottom);
-        assertEquals(6, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-26, fmi.top);
-
-        assertEquals(28, p.getFontMetricsInt(null));
-
+            p.setTextSize(20);
+            p.getFontMetricsInt(fmi);
+            assertEquals(Math.round(p.ascent()), fmi.ascent);
+            assertEquals(Math.round(p.descent()), fmi.descent);
+        }
     }
 
     @TestTargetNew(
@@ -1248,29 +1198,19 @@ public class PaintTest extends AndroidTestCase {
         Paint p = new Paint();
         Paint.FontMetricsInt fmi;
 
-        fmi = p.getFontMetricsInt();
-        assertEquals(-11, fmi.ascent);
-        assertEquals(4, fmi.bottom);
-        assertEquals(3, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-13, fmi.top);
+        for (Typeface typeface : TYPEFACES) {
+            p.setTypeface(typeface);
 
-        p.setTextSize(24);
+            p.setTextSize(10);
+            fmi = p.getFontMetricsInt();
+            assertEquals(Math.round(p.ascent()), fmi.ascent);
+            assertEquals(Math.round(p.descent()), fmi.descent);
 
-        fmi = p.getFontMetricsInt();
-        assertEquals(-22, fmi.ascent);
-        assertEquals(7, fmi.bottom);
-        assertEquals(6, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-26, fmi.top);
-
-        p.setTypeface(Typeface.MONOSPACE);
-        fmi = p.getFontMetricsInt();
-        assertEquals(-22, fmi.ascent);
-        assertEquals(7, fmi.bottom);
-        assertEquals(6, fmi.descent);
-        assertEquals(0, fmi.leading);
-        assertEquals(-26, fmi.top);
+            p.setTextSize(20);
+            fmi = p.getFontMetricsInt();
+            assertEquals(Math.round(p.ascent()), fmi.ascent);
+            assertEquals(Math.round(p.descent()), fmi.descent);
+        }
     }
 
     public void testMeasureText() {
