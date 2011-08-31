@@ -101,7 +101,7 @@ public class PaintTest extends AndroidTestCase {
                 3, widths[0] + widths[1] + widths[2]);
 
         // Measure substring from back: "MN"
-        assertBreakText(text, textChars, textSpan, 5, 7, false, totalWidth,
+        assertBreakText(text, textChars, textSpan, 5, 7, true, totalWidth,
                 2, widths[5] + widths[6]);
 
         // Reverse measure substring from back: "MN"
