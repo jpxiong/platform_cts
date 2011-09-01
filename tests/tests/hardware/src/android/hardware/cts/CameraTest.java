@@ -1045,12 +1045,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             }
 
             try {
-                mCamera.takePicture(null, null, null);
-                fail("takePicture should not succeed during recording.");
-            } catch(RuntimeException e) {
-                // expected
-            }
-            try {
                 mCamera.unlock();
                 fail("unlock should not succeed during recording.");
             } catch(RuntimeException e) {
