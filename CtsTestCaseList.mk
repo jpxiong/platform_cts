@@ -26,6 +26,8 @@ CTS_SECURITY_APPS_LIST := \
 
 # These test cases will be analyzed by the CTS API coverage tools. 
 CTS_COVERAGE_TEST_CASE_LIST := \
+	CtsAccelerationTestCases \
+	CtsAccelerationTestStubs \
 	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
 	CtsAdminTestCases \
