@@ -87,6 +87,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private static final int FOCUS_AREA = 0;
     private static final int METERING_AREA = 1;
 
+    private static final int AUTOEXPOSURE_LOCK = 0;
+    private static final int AUTOWHITEBALANCE_LOCK = 1;
+
     private PreviewCallback mPreviewCallback = new PreviewCallback();
     private TestShutterCallback mShutterCallback = new TestShutterCallback();
     private RawPictureCallback mRawPictureCallback = new RawPictureCallback();
@@ -2406,4 +2409,284 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mCamera.lock();
         }
     }
+
+    @UiThreadTest
+    public void testAutoExposureLock() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            initializeMessageLooper(id);
+            Parameters parameters = mCamera.getParameters();
+            boolean aeLockSupported = parameters.isAutoExposureLockSupported();
+            if (aeLockSupported) {
+                testLockCommon(AUTOEXPOSURE_LOCK);
+                testLockAdditionalAE();
+            }
+            terminateMessageLooper();
+        }
+    }
+
+    @UiThreadTest
+    public void testAutoWhiteBalanceLock() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            initializeMessageLooper(id);
+            Parameters parameters = mCamera.getParameters();
+            boolean awbLockSupported = parameters.isAutoWhiteBalanceLockSupported();
+            if (awbLockSupported) {
+                testLockCommon(AUTOWHITEBALANCE_LOCK);
+                testLockAdditionalAWB();
+            }
+            terminateMessageLooper();
+        }
+    }
+
+    @UiThreadTest
+    public void test3ALockInteraction() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            initializeMessageLooper(id);
+            Parameters parameters = mCamera.getParameters();
+            boolean locksSupported =
+                    parameters.isAutoWhiteBalanceLockSupported() &&
+                    parameters.isAutoExposureLockSupported();
+            if (locksSupported) {
+                testLockInteractions();
+            }
+            terminateMessageLooper();
+        }
+    }
+
+    private void testLockCommon(int type) {
+        // Verify lock is not set on open()
+        assert3ALockState("Lock not released after open()", type, false);
+
+        // Verify lock can be set, unset before preview
+        set3ALockState(true, type);
+        assert3ALockState("Lock could not be set before 1st preview!",
+                type, true);
+
+        set3ALockState(false, type);
+        assert3ALockState("Lock could not be unset before 1st preview!",
+                type, false);
+
+        // Verify preview start does not set lock
+        mCamera.startPreview();
+        assert3ALockState("Lock state changed by preview start!", type, false);
+
+        // Verify lock can be set, unset during preview
+        set3ALockState(true, type);
+        assert3ALockState("Lock could not be set during preview!", type, true);
+
+        set3ALockState(false, type);
+        assert3ALockState("Lock could not be unset during preview!",
+                type, false);
+
+        // Verify lock is cleared by stop preview
+        set3ALockState(true, type);
+        mCamera.stopPreview();
+        assert3ALockState("Lock was not cleared by stopPreview!", type, false);
+
+        // Verify that preview start does not clear lock
+        set3ALockState(true, type);
+        mCamera.startPreview();
+        assert3ALockState("Lock state changed by preview start!", type, true);
+
+        // Verify that taking a picture clears the lock
+        set3ALockState(true, type);
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback,
+                mJpegPictureCallback);
+        waitForSnapshotDone();
+        assert3ALockState("Lock state not cleared by takePicture!",
+                type, false);
+
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        for (String focusMode: parameters.getSupportedFocusModes()) {
+            // TODO: Test this for other focus modes as well, once agreement is
+            // reached on which ones it should apply to
+            if (!Parameters.FOCUS_MODE_AUTO.equals(focusMode) ) {
+                continue;
+            }
+
+            parameters.setFocusMode(focusMode);
+            mCamera.setParameters(parameters);
+
+            // Verify that autoFocus sets a (soft) lock
+            set3ALockState(false, type);
+            mCamera.autoFocus(mAutoFocusCallback);
+            assertTrue(waitForFocusDone());
+            assert3ALockState(
+                    "Lock not set by autoFocus in focus mode: " +
+                    focusMode + "!",
+                    type, true);
+
+            // Verify that cancelAutoFocus clears a (soft) lock
+            mCamera.cancelAutoFocus();
+            assert3ALockState("Soft lock not cleared by cancelAutoFocus!",
+                    type, false);
+
+            // Verify that autoFocus/cancelAutofocus preserves a user-set lock
+            set3ALockState(true, type);
+            mCamera.autoFocus(mAutoFocusCallback);
+            assertTrue(waitForFocusDone());
+            mCamera.cancelAutoFocus();
+            assert3ALockState(
+                    "Pre-AF lock state not restored by cancelAutoFocus!",
+                    type, true);
+
+            // Verify state preservation when not waiting for AF completion
+            set3ALockState(true, type);
+            mCamera.autoFocus(mAutoFocusCallback);
+            mCamera.cancelAutoFocus();
+            assert3ALockState(
+                    "Pre-AF lock state not restored by cancelAutoFocus!",
+                    type, true);
+
+            set3ALockState(false, type);
+            mCamera.autoFocus(mAutoFocusCallback);
+            mCamera.cancelAutoFocus();
+            assert3ALockState(
+                    "Pre-AF lock state not restored by cancelAutoFocus!",
+                    type, false);
+
+            // Verify soft lock->hard lock conversion with setParameters
+            set3ALockState(false, type);
+            mCamera.autoFocus(mAutoFocusCallback);
+            assertTrue(waitForFocusDone());
+            parameters = mCamera.getParameters();
+            mCamera.setParameters(parameters);
+            mCamera.cancelAutoFocus();
+            assert3ALockState(
+                    "AF-caused lock not made permanent by setParameters!",
+                    type, true);
+        }
+        mCamera.stopPreview();
+    }
+
+    private void testLockAdditionalAE() {
+        // Verify that exposure compensation can be used while
+        // AE lock is active
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        parameters.setAutoExposureLock(true);
+        mCamera.setParameters(parameters);
+        parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
+        mCamera.setParameters(parameters);
+        parameters = mCamera.getParameters();
+        assertTrue("Could not adjust exposure compensation with AE locked!",
+                parameters.getExposureCompensation() ==
+                parameters.getMaxExposureCompensation() );
+
+        parameters.setExposureCompensation(parameters.getMinExposureCompensation());
+        mCamera.setParameters(parameters);
+        parameters = mCamera.getParameters();
+        assertTrue("Could not adjust exposure compensation with AE locked!",
+                parameters.getExposureCompensation() ==
+                parameters.getMinExposureCompensation() );
+        mCamera.stopPreview();
+    }
+
+    private void testLockAdditionalAWB() {
+        // Verify that switching AWB modes clears AWB lock
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        String firstWb = null;
+        for ( String wbMode: parameters.getSupportedWhiteBalance() ) {
+            if (firstWb == null) {
+                firstWb = wbMode;
+            }
+            parameters.setWhiteBalance(firstWb);
+            mCamera.setParameters(parameters);
+            parameters.setAutoWhiteBalanceLock(true);
+            mCamera.setParameters(parameters);
+
+            parameters.setWhiteBalance(wbMode);
+            mCamera.setParameters(parameters);
+
+            assert3ALockState("Changing WB mode did not clear AWB lock!",
+                    AUTOWHITEBALANCE_LOCK, false);
+        }
+        mCamera.stopPreview();
+    }
+
+    private void testLockInteractions() {
+        // Verify that toggling AE does not change AWB lock state
+        set3ALockState(false, AUTOWHITEBALANCE_LOCK);
+        set3ALockState(false, AUTOEXPOSURE_LOCK);
+
+        set3ALockState(true, AUTOEXPOSURE_LOCK);
+        assert3ALockState("Changing AE lock affected AWB lock!",
+                AUTOWHITEBALANCE_LOCK, false);
+
+        set3ALockState(false, AUTOEXPOSURE_LOCK);
+        assert3ALockState("Changing AE lock affected AWB lock!",
+                AUTOWHITEBALANCE_LOCK, false);
+
+        set3ALockState(true, AUTOWHITEBALANCE_LOCK);
+
+        set3ALockState(true, AUTOEXPOSURE_LOCK);
+        assert3ALockState("Changing AE lock affected AWB lock!",
+                AUTOWHITEBALANCE_LOCK, true);
+
+        set3ALockState(false, AUTOEXPOSURE_LOCK);
+        assert3ALockState("Changing AE lock affected AWB lock!",
+                AUTOWHITEBALANCE_LOCK, true);
+
+        // Verify that toggling AWB does not change AE lock state
+        set3ALockState(false, AUTOWHITEBALANCE_LOCK);
+        set3ALockState(false, AUTOEXPOSURE_LOCK);
+
+        set3ALockState(true, AUTOWHITEBALANCE_LOCK);
+        assert3ALockState("Changing AWB lock affected AE lock!",
+                AUTOEXPOSURE_LOCK, false);
+
+        set3ALockState(false, AUTOWHITEBALANCE_LOCK);
+        assert3ALockState("Changing AWB lock affected AE lock!",
+                AUTOEXPOSURE_LOCK, false);
+
+        set3ALockState(true, AUTOEXPOSURE_LOCK);
+
+        set3ALockState(true, AUTOWHITEBALANCE_LOCK);
+        assert3ALockState("Changing AWB lock affected AE lock!",
+                AUTOEXPOSURE_LOCK, true);
+
+        set3ALockState(false, AUTOWHITEBALANCE_LOCK);
+        assert3ALockState("Changing AWB lock affected AE lock!",
+                AUTOEXPOSURE_LOCK, true);
+    }
+
+    private void assert3ALockState(String msg, int type, boolean state) {
+        Parameters parameters = mCamera.getParameters();
+        switch (type) {
+            case AUTOEXPOSURE_LOCK:
+                assertTrue(msg, state == parameters.getAutoExposureLock());
+                break;
+            case AUTOWHITEBALANCE_LOCK:
+                assertTrue(msg, state == parameters.getAutoWhiteBalanceLock());
+                break;
+            default:
+                assertTrue("Unknown lock type " + type, false);
+                break;
+        }
+    }
+
+    private void set3ALockState(boolean state, int type) {
+        Parameters parameters = mCamera.getParameters();
+        switch (type) {
+            case AUTOEXPOSURE_LOCK:
+                parameters.setAutoExposureLock(state);
+                break;
+            case AUTOWHITEBALANCE_LOCK:
+                parameters.setAutoWhiteBalanceLock(state);
+                break;
+            default:
+                assertTrue("Unknown lock type "+type, false);
+                break;
+        }
+        mCamera.setParameters(parameters);
+    }
+
 }
