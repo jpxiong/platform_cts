@@ -30,7 +30,7 @@ public class BluetoothTestActivity extends PassFailButtons.TestListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bt_main);
+        setContentView(R.layout.pass_fail_list);
         setPassFailButtonClickListeners();
         setInfoResources(R.string.bluetooth_test, R.string.bluetooth_test_info, -1);
 
