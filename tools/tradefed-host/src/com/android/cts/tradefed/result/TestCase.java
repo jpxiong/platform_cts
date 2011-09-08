@@ -73,6 +73,11 @@ class TestCase {
         serializer.startTag(CtsXmlResultReporter.ns, "Test");
         serializer.attribute(CtsXmlResultReporter.ns, "name", name);
         serializer.attribute(CtsXmlResultReporter.ns, "result", convertStatus(result.getStatus()));
+        serializer.attribute(CtsXmlResultReporter.ns, "starttime", TimeUtil.getTimestamp(
+                result.getStartTime()));
+        serializer.attribute(CtsXmlResultReporter.ns, "endtime", TimeUtil.getTimestamp(
+                result.getEndTime()));
+        serializer.attribute(CtsXmlResultReporter.ns, "result", convertStatus(result.getStatus()));
 
         if (result.getStackTrace() != null) {
             String sanitizedStack = sanitizeStackTrace(result.getStackTrace());
@@ -103,7 +108,7 @@ class TestCase {
                 return "pass";
             // TODO add notExecuted
         }
-        return "omitted";
+        return "fail";
     }
 
     /**

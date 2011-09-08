@@ -18,6 +18,7 @@ package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
+import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -33,6 +34,8 @@ import com.android.tradefed.util.FileUtil;
 
 import org.kxml2.io.KXmlSerializer;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -41,11 +44,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Writes results to an XML files in the CTS format.
@@ -59,8 +59,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     private static final String TEST_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.10";
-    private static final String CTS_VERSION = "99";
+    private static final String CTS_RESULT_FILE_VERSION = "1.11";
+    private static final String CTS_VERSION = "ICS_tradefed";
 
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
@@ -73,6 +73,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             "test results and associated logs. If not specified, results will be stored at " +
             "<cts root>/repository/results")
     protected File mReportDir = null;
+
+    // listen in on the plan option provided to CtsTest
+    @Option(name = CtsTest.PLAN_OPTION, description = "the test plan to run.")
+    private String mPlanName = "unknown";
 
     protected IBuildInfo mBuildInfo;
 
@@ -106,7 +110,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
         // create a unique directory for saving results, using old cts host convention
         // TODO: in future, consider using LogFileSaver to create build-specific directories
-        mReportDir = new File(mReportDir, getResultTimestamp());
+        mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
         mReportDir.mkdirs();
         mStartTime = getTimestamp();
         Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Using ctsbuild %s",
@@ -188,7 +192,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
                     getNumFailedTests(), getNumErrorTests());
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, msg);
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Time: %s",
-                    formatElapsedTime(elapsedTime)));
+                    TimeUtil.formatElapsedTime(elapsedTime)));
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to generate report data");
         } finally {
@@ -216,8 +220,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private void serializeResultsDoc(KXmlSerializer serializer, String startTime, String endTime)
             throws IOException {
         serializer.startTag(ns, "TestResult");
-        // TODO: output test plan and profile values
-        serializer.attribute(ns, "testPlan", "unknown");
+        serializer.attribute(ns, "testPlan", mPlanName);
         serializer.attribute(ns, "starttime", startTime);
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
@@ -246,18 +249,24 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         Map<String, String> metricsCopy = new HashMap<String, String>(
                 deviceInfoResult.getRunMetrics());
         serializer.startTag(ns, "Screen");
-        String screenWidth = metricsCopy.remove(DeviceInfoCollector.SCREEN_WIDTH);
-        String screenHeight = metricsCopy.remove(DeviceInfoCollector.SCREEN_HEIGHT);
+        String screenWidth = metricsCopy.remove(DeviceInfoConstants.SCREEN_WIDTH);
+        String screenHeight = metricsCopy.remove(DeviceInfoConstants.SCREEN_HEIGHT);
         serializer.attribute(ns, "resolution", String.format("%sx%s", screenWidth, screenHeight));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY,
+                metricsCopy.remove(DeviceInfoConstants.SCREEN_DENSITY));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY_BUCKET,
+                metricsCopy.remove(DeviceInfoConstants.SCREEN_DENSITY_BUCKET));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_SIZE,
+                metricsCopy.remove(DeviceInfoConstants.SCREEN_SIZE));
         serializer.endTag(ns, "Screen");
 
         serializer.startTag(ns, "PhoneSubInfo");
         serializer.attribute(ns, "subscriberId", metricsCopy.remove(
-                DeviceInfoCollector.PHONE_NUMBER));
+                DeviceInfoConstants.PHONE_NUMBER));
         serializer.endTag(ns, "PhoneSubInfo");
 
-        String featureData = metricsCopy.remove(DeviceInfoCollector.FEATURES);
-        String processData = metricsCopy.remove(DeviceInfoCollector.PROCESSES);
+        String featureData = metricsCopy.remove(DeviceInfoConstants.FEATURES);
+        String processData = metricsCopy.remove(DeviceInfoConstants.PROCESSES);
 
         // dump the remaining metrics without translation
         serializer.startTag(ns, "BuildInfo");
@@ -468,49 +477,6 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     }
 
     /**
-     * Return the current timestamp as a {@link String} suitable for displaying.
-     * <p/>
-     * Example: Fri Aug 20 15:13:03 PDT 2010
-     */
-    String getTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        return dateFormat.format(new Date());
-    }
-
-    /**
-     * Return the current timestamp in a compressed format, used to uniquely identify results.
-     * <p/>
-     * Example: 2010.08.16_11.42.12
-     */
-    private String getResultTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
-        return dateFormat.format(new Date());
-    }
-
-    /**
-     * Return a prettified version of the given elapsed time
-     * @return
-     */
-    private String formatElapsedTime(long elapsedTimeMs) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTimeMs) % 60;
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTimeMs) % 60;
-        long hours = TimeUnit.MILLISECONDS.toHours(elapsedTimeMs);
-        StringBuilder time = new StringBuilder();
-        if (hours > 0) {
-            time.append(hours);
-            time.append("h ");
-        }
-        if (minutes > 0) {
-            time.append(minutes);
-            time.append("m ");
-        }
-        time.append(seconds);
-        time.append("s");
-
-        return time.toString();
-    }
-
-    /**
      * Creates the output stream to use for test results. Exposed for mocking.
      * @param mReportPath
      */
@@ -552,5 +518,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     private void zipResults(File resultsDir) {
         // TODO: implement this
+    }
+
+    /**
+     * Get a String version of the current time.
+     * <p/>
+     * Exposed so unit tests can mock.
+     */
+    String getTimestamp() {
+        return TimeUtil.getTimestamp();
     }
 }

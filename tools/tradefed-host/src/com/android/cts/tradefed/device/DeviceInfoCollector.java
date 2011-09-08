@@ -36,14 +36,6 @@ public class DeviceInfoCollector {
     private static final String APK_NAME = "TestDeviceSetup";
     public static final String APP_PACKAGE_NAME = "android.tests.devicesetup";
     private static final String INSTRUMENTATION_NAME = "android.tests.getinfo.DeviceInfoInstrument";
-    // metric constants
-    // this values must exactly match those defined in
-    // cts/tools/device-setup/.../DeviceInfoInstrument.java
-    public static final String SCREEN_WIDTH = "screen_width";
-    public static final String SCREEN_HEIGHT = "screen_height";
-    public static final String PHONE_NUMBER = "phoneNumber";
-    public static final String FEATURES = "features";
-    public static final String PROCESSES = "processes";
 
     /**
      * Installs and runs the device info collector instrumentation, and forwards results

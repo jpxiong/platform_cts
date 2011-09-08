@@ -60,7 +60,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
     private static final String LOG_TAG = "CtsTest";
 
-    private static final String PLAN_OPTION = "plan";
+    public static final String PLAN_OPTION = "plan";
     private static final String PACKAGE_OPTION = "package";
     private static final String CLASS_OPTION = "class";
     private static final String METHOD_OPTION = "method";

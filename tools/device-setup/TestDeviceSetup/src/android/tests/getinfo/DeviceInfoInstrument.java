@@ -101,7 +101,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
                 Context.TELEPHONY_SERVICE);
         // network
         String network = tm.getNetworkOperatorName();
-        addResult(NETWORK, network);
+        addResult(NETWORK, network.trim());
 
         // imei
         String imei = tm.getDeviceId();
