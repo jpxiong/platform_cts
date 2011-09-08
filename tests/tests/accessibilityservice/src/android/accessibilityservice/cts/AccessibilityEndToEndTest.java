@@ -57,8 +57,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import junit.framework.TestCase;
-
 /**
  * This class performs end-to-end testing of the accessibility feature by
  * creating an {@link Activity} and poking around so {@link AccessibilityEvent}s
@@ -84,7 +82,7 @@ public class AccessibilityEndToEndTest extends
      * Timeout required for pending Binder calls or event processing to
      * complete.
      */
-    private static final long MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING = 1000;
+    private static final long MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING = 500;
 
     /**
      * The count of the polling attempts during {@link #MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING}
@@ -124,6 +122,10 @@ public class AccessibilityEndToEndTest extends
     public void testTypeViewSelectedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
 
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+
         // create and populate the expected event
         AccessibilityEvent selectedEvent = AccessibilityEvent.obtain();
         selectedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_SELECTED);
@@ -133,6 +135,9 @@ public class AccessibilityEndToEndTest extends
         selectedEvent.setItemCount(2);
         selectedEvent.setCurrentItemIndex(1);
         selectedEvent.setEnabled(true);
+        selectedEvent.setScrollable(true);
+        selectedEvent.setFromIndex(0);
+        selectedEvent.setToIndex(1);
 
         // set expectations
         MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
@@ -154,6 +159,10 @@ public class AccessibilityEndToEndTest extends
     @LargeTest
     public void testTypeViewClickedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
+
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent clickedEvent = AccessibilityEvent.obtain();
@@ -184,6 +193,10 @@ public class AccessibilityEndToEndTest extends
     public void testTypeViewLongClickedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
 
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+
         // create and populate the expected event
         AccessibilityEvent longClickedEvent = AccessibilityEvent.obtain();
         longClickedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
@@ -212,6 +225,10 @@ public class AccessibilityEndToEndTest extends
     @LargeTest
     public void testTypeViewFocusedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
+
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent focusedEvent = AccessibilityEvent.obtain();
@@ -253,7 +270,8 @@ public class AccessibilityEndToEndTest extends
         });
 
         // wait for the generated focus event to be dispatched
-        Thread.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+
 
         final String beforeText = activity.getString(R.string.text_input_blah);
         final String newText = activity.getString(R.string.text_input_blah_blah);
@@ -290,6 +308,11 @@ public class AccessibilityEndToEndTest extends
     @LargeTest
     public void testTypeWindowStateChangedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
+
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+
         String title = activity.getString(R.string.alert_title);
         String message = activity.getString(R.string.alert_message);
 
@@ -325,6 +348,11 @@ public class AccessibilityEndToEndTest extends
     @LargeTest
     public void testTypeNotificationStateChangedAccessibilityEvent() throws Throwable {
         Activity activity = getActivity();
+
+        // Wait for accessibility events to settle i.e. for all events generated
+        // while bringing the activity up to be delivered so they do not interfere.
+        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+
         String message = activity.getString(R.string.notification_message);
 
         // create the notification to send
@@ -676,6 +704,17 @@ public class AccessibilityEndToEndTest extends
                     receivedEvent.isPassword());
             TestCase.assertEquals("removedCount has incorrect value", expectedEvent
                     .getRemovedCount(), receivedEvent.getRemovedCount());
+            TestCase.assertEquals("scrollable has incorrect value", expectedEvent.isScrollable(),
+                    receivedEvent.isScrollable());
+            TestCase.assertEquals("toIndex has incorrect value", expectedEvent.getToIndex(),
+                    receivedEvent.getToIndex());
+            TestCase.assertEquals("recordCount has incorrect value", expectedEvent.getRecordCount(),
+                    receivedEvent.getRecordCount());
+            TestCase.assertEquals("scrollX has incorrect value", expectedEvent.getScrollX(),
+                    receivedEvent.getScrollX());
+            TestCase.assertEquals("scrollY has incorrect value", expectedEvent.getScrollY(),
+                    receivedEvent.getScrollY());
+
             assertEqualsText(expectedEvent, receivedEvent);
         }
 
