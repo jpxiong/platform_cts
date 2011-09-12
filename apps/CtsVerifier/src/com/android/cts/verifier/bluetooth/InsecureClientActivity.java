@@ -18,6 +18,6 @@ package com.android.cts.verifier.bluetooth;
 
 public class InsecureClientActivity extends MessageTestActivity {
     public InsecureClientActivity() {
-        super(false, false);
+        super(false, false, BluetoothChatService.INSECURE_UUID);
     }
 }
