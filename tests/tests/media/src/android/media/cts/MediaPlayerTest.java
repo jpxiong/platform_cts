@@ -109,6 +109,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
      * from the time setDisplay() was called
      */
     public void testVideoSurfaceResetting() throws Exception {
+        final int tolerance = 70;
+        final int seekPos = 1500;
+
         playVideoTest(R.raw.testvideo, 352, 288);
 
         mMediaPlayer.start();
@@ -123,11 +126,15 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         Thread.sleep(SLEEP_TIME);
 
+        mMediaPlayer.seekTo(seekPos);
+        Thread.sleep(SLEEP_TIME / 2);
+
         posBefore = mMediaPlayer.getCurrentPosition();
         mMediaPlayer.setDisplay(null);
         posAfter = mMediaPlayer.getCurrentPosition();
 
         assertEquals(posAfter, posBefore);
+        assertEquals(seekPos + SLEEP_TIME / 2, posBefore, tolerance);
         assertTrue(mMediaPlayer.isPlaying());
 
         Thread.sleep(SLEEP_TIME);
