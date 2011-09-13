@@ -25,6 +25,7 @@ import com.android.cts.verifier.TestListAdapter.TestListItem;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import java.io.Serializable;
 
@@ -125,9 +126,12 @@ public class StreamingVideoActivity extends PassFailButtons.TestListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sv_main);
+        setContentView(R.layout.pass_fail_list);
         setPassFailButtonClickListeners();
         setInfoResources(R.string.streaming_video, R.string.streaming_video_info, -1);
+
+        TextView empty = (TextView) findViewById(android.R.id.empty);
+        empty.setText(R.string.sv_no_data);
 
         getPassButton().setEnabled(false);
         setTestListAdapter(getStreamAdapter());

@@ -16,15 +16,19 @@
 
 package com.android.cts.verifier;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
-import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -60,12 +64,13 @@ class ReportExporter extends AsyncTask<Void, Void, String> {
         }
         File reportPath = new File(Environment.getExternalStorageDirectory(), "ctsVerifierReports");
         reportPath.mkdirs();
-        File reportFile = new File(reportPath,
-                "ctsVerifierReport-" + System.currentTimeMillis() + ".zip");
+
+        String baseName = getReportBaseName();
+        File reportFile = new File(reportPath, baseName + ".zip");
         ZipOutputStream out = null;
         try {
             out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(reportFile)));
-            ZipEntry entry = new ZipEntry("ctsVerifierReport.xml");
+            ZipEntry entry = new ZipEntry(baseName + ".xml");
             out.putNextEntry(entry);
             out.write(contents);
         } catch (IOException e) {
@@ -84,8 +89,22 @@ class ReportExporter extends AsyncTask<Void, Void, String> {
         return mContext.getString(R.string.report_saved, reportFile.getPath());
     }
 
+    private String getReportBaseName() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH.mm.ss", Locale.ENGLISH);
+        String date = dateFormat.format(new Date());
+        return "ctsVerifierReport"
+                + "-" + date
+                + "-" + Build.MANUFACTURER
+                + "-" + Build.PRODUCT
+                + "-" + Build.DEVICE
+                + "-" + Build.ID;
+    }
+
     @Override
     protected void onPostExecute(String result) {
-        Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
+        new AlertDialog.Builder(mContext)
+                .setMessage(result)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 }

@@ -48,7 +48,7 @@ public class CertificateTest extends AndroidTestCase {
 
         Set<String> deviceCertificates = getDeviceCertificates();
         deviceCertificates.retainAll(blockCertificates);
-        assertTrue("Bad certificates: " + deviceCertificates, deviceCertificates.isEmpty());
+        assertTrue("Blocked certificates: " + deviceCertificates, deviceCertificates.isEmpty());
     }
 
     private Set<String> getExpectedCertificates() {
