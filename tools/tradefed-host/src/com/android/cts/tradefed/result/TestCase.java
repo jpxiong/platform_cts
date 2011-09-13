@@ -77,7 +77,6 @@ class TestCase {
                 result.getStartTime()));
         serializer.attribute(CtsXmlResultReporter.ns, "endtime", TimeUtil.getTimestamp(
                 result.getEndTime()));
-        serializer.attribute(CtsXmlResultReporter.ns, "result", convertStatus(result.getStatus()));
 
         if (result.getStackTrace() != null) {
             String sanitizedStack = sanitizeStackTrace(result.getStackTrace());

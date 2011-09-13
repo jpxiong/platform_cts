@@ -30,7 +30,7 @@ import java.util.Collection;
 public interface ITestPackageDef {
 
     /**
-     * Get the unique URI of the test package.
+     * Get the unique URI, aka the appPackageName, of the test package.
      * @return the {@link String} uri
      */
     public String getUri();
@@ -68,5 +68,20 @@ public interface ITestPackageDef {
      * Get the collection of tests in this test package.
      */
     public Collection<TestIdentifier> getTests();
+
+    /**
+     * Return the sha1sum of the binary file for this test package.
+     * <p/>
+     * Will only return a valid value after {@link #createTest(File, String, String)} has been
+     * called.
+     *
+     * @return the sha1sum in {@link String} form
+     */
+    public String getDigest();
+
+    /**
+     * @return the name of this test package.
+     */
+    public String getName();
 
 }

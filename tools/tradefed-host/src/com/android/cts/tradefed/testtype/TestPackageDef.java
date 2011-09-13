@@ -17,10 +17,20 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.InstrumentationTest;
+import com.android.tradefed.util.StreamUtil;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -48,6 +58,7 @@ class TestPackageDef implements ITestPackageDef {
     private String mPackageToTest = null;
     private String mApkToTestName = null;
     private String mTestPackageName = null;
+    private String mDigest = null;
 
     // use a LinkedHashSet for predictable iteration insertion-order, and fast lookups
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
@@ -77,7 +88,11 @@ class TestPackageDef implements ITestPackageDef {
         mName = name;
     }
 
-    String getName() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
         return mName;
     }
 
@@ -149,16 +164,18 @@ class TestPackageDef implements ITestPackageDef {
         if (mIsHostSideTest) {
             Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
             JarHostTest hostTest = new JarHostTest();
-            hostTest.setRunName(mName);
+            hostTest.setRunName(getUri());
             hostTest.setJarFileName(mJarPath);
             hostTest.setTests(filterTests(mTests, className, methodName));
+            mDigest = generateDigest(testCaseDir, mJarPath);
             return hostTest;
         } else if (mIsVMHostTest) {
             Log.d(LOG_TAG, String.format("Creating vm host test for %s", mName));
             VMHostTest vmHostTest = new VMHostTest();
-            vmHostTest.setRunName(mName);
+            vmHostTest.setRunName(getUri());
             vmHostTest.setJarFileName(mJarPath);
             vmHostTest.setTests(filterTests(mTests, className, methodName));
+            mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml
@@ -174,18 +191,21 @@ class TestPackageDef implements ITestPackageDef {
             addTest(new TestIdentifier(SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD));
             // mName means 'apk file name' for instrumentation tests
             instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
+            mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
             return instrTest;
         } else if (mIsReferenceAppTest) {
             // a reference app test is just a InstrumentationTest with one extra apk to install
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
             instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
-            return setInstrumentationTest(className, methodName, instrTest);
+            return setInstrumentationTest(className, methodName, instrTest, testCaseDir);
         } else {
             Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
-            return setInstrumentationTest(className, methodName, instrTest);
+            return setInstrumentationTest(className, methodName, instrTest, testCaseDir);
         }
     }
+
+
 
     /**
      * Populates given {@link InstrumentationApkTest} with data from the package xml
@@ -196,8 +216,9 @@ class TestPackageDef implements ITestPackageDef {
      * @param instrTest
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
-    private InstrumentationApkTest setInstrumentationTest(String className,
-            String methodName, InstrumentationApkTest instrTest) {
+    private InstrumentationTest setInstrumentationTest(String className,
+            String methodName, InstrumentationApkTest instrTest, File testCaseDir) {
+        instrTest.setRunName(getUri());
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
         instrTest.setTestPackageName(mTestPackageName);
@@ -205,6 +226,7 @@ class TestPackageDef implements ITestPackageDef {
         instrTest.setMethodName(methodName);
         // mName means 'apk file name' for instrumentation tests
         instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
+        mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
         if (mTests.size() > 1000) {
             // TODO: hack, large test suites can take longer to collect tests, increase timeout
             instrTest.setCollectsTestsShellTimeout(10*60*1000);
@@ -263,5 +285,69 @@ class TestPackageDef implements ITestPackageDef {
     @Override
     public Collection<TestIdentifier> getTests() {
         return mTests;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDigest() {
+        return mDigest;
+    }
+
+    /**
+     * Generate a sha1sum digest for a file.
+     * <p/>
+     * Exposed for unit testing.
+     *
+     * @param fileDir the directory of the file
+     * @param fileName the name of the file
+     * @return a hex {@link String} of the digest
+     */
+     String generateDigest(File fileDir, String fileName) {
+        final String algorithm = "SHA-1";
+        InputStream fileStream = null;
+        DigestInputStream d  = null;
+        try {
+            fileStream = getFileStream(fileDir, fileName);
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            d = new DigestInputStream(fileStream, md);
+            byte[] buffer = new byte[8196];
+            while (d.read(buffer) != -1);
+            return toHexString(md.digest());
+        } catch (NoSuchAlgorithmException e) {
+            return algorithm + " not found";
+        } catch (IOException e) {
+            CLog.e(e);
+        } finally {
+            StreamUtil.closeStream(d);
+            StreamUtil.closeStream(fileStream);
+        }
+        return "failed to generate digest";
+    }
+
+    /**
+     * Retrieve an input stream for given file
+     * <p/>
+     * Exposed so unit tests can mock.
+     */
+    InputStream getFileStream(File fileDir, String fileName) throws FileNotFoundException {
+        InputStream fileStream;
+        fileStream = new BufferedInputStream(new FileInputStream(new File(fileDir, fileName)));
+        return fileStream;
+    }
+
+    /**
+     * Convert the given byte array into a lowercase hex string.
+     *
+     * @param arr The array to convert.
+     * @return The hex encoded string.
+     */
+    private String toHexString(byte[] arr) {
+        StringBuffer buf = new StringBuffer(arr.length * 2);
+        for (byte b : arr) {
+            buf.append(String.format("%02x", b & 0xFF));
+        }
+        return buf.toString();
     }
 }
