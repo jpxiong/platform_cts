@@ -16,23 +16,19 @@
 
 package android.content.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-
 import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.provider.AlarmClock;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
 
 import java.util.List;
 
-@TestTargetClass(Intent.class)
 public class AvailableIntentsTest extends AndroidTestCase {
     private static final String NORMAL_URL = "http://www.google.com/";
     private static final String SECURE_URL = "https://www.google.com/";
@@ -53,11 +49,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_VIEW when url is http://web_address,
      * it will open a browser window to the URL specified.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testViewNormalUrl() {
         Uri uri = Uri.parse(NORMAL_URL);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -68,11 +59,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_VIEW when url is https://web_address,
      * it will open a browser window to the URL specified.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testViewSecureUrl() {
         Uri uri = Uri.parse(SECURE_URL);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -83,11 +69,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_WEB_SEARCH when url is http://web_address,
      * it will open a browser window to the URL specified.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testWebSearchNormalUrl() {
         Uri uri = Uri.parse(NORMAL_URL);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -99,11 +80,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_WEB_SEARCH when url is https://web_address,
      * it will open a browser window to the URL specified.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testWebSearchSecureUrl() {
         Uri uri = Uri.parse(SECURE_URL);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -115,11 +91,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_WEB_SEARCH when url is empty string,
      * google search will be applied for the plain text.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testWebSearchPlainText() {
         String searchString = "where am I?";
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -130,11 +101,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test ACTION_CALL when uri is a phone number, it will call the entered phone number.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testCallPhoneNumber() {
         Uri uri = Uri.parse("tel:2125551212");
         Intent intent = new Intent(Intent.ACTION_CALL, uri);
@@ -144,11 +110,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test ACTION_DIAL when uri is a phone number, it will dial the entered phone number.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testDialPhoneNumber() {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
@@ -161,11 +122,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test ACTION_DIAL when uri is a phone number, it will dial the entered phone number.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class, android.net.Uri.class}
-    )
     public void testDialVoicemail() {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
@@ -178,11 +134,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test start camera by intent
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class}
-    )
     public void testCamera() {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
@@ -208,11 +159,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test add event in calendar
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class}
-    )
     public void testCalendarAddAppointment() {
         Intent addAppointmentIntent = new Intent(Intent.ACTION_EDIT);
         addAppointmentIntent.setType("vnd.android.cursor.item/event");
@@ -222,11 +168,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test view call logs
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class}
-    )
     public void testContactsCallLogs() {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
@@ -239,11 +180,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test view music playback
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class}
-    )
     public void testMusicPlayback() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(ContentUris.withAppendedId(
@@ -254,11 +190,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
     /**
      * Test launch inbox view of Mms application
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent",
-        args = {java.lang.String.class}
-    )
     public void testViewMessageInbox() {
         PackageManager packageManager = mContext.getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
@@ -269,5 +200,13 @@ public class AvailableIntentsTest extends AndroidTestCase {
             intent.setType("vnd.android-dir/mms-sms");
             assertCanBeHandled(intent);
         }
+    }
+
+    public void testAlarmClock() {
+        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
+        intent.putExtra(AlarmClock.EXTRA_MESSAGE, "Custom message");
+        intent.putExtra(AlarmClock.EXTRA_HOUR, 12);
+        intent.putExtra(AlarmClock.EXTRA_MINUTES, 0);
+        assertCanBeHandled(intent);
     }
 }

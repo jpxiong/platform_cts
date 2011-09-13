@@ -356,7 +356,8 @@ public class BaseInputConnectionTest extends
             mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_7));
         }
         else {
-            mConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
+            mInstrumentation.sendStringSync("q");
+            mInstrumentation.waitForIdleSync();
         }
         new DelayedCheck() {
             @Override

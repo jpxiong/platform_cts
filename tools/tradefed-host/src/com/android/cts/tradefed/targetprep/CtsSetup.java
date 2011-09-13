@@ -37,6 +37,7 @@ public class CtsSetup implements ITargetPreparer {
     private static final String RUNNER_APK_NAME = "android.core.tests.runner.apk";
     // TODO: read this from configuration file rather than hardcoding
     private static final String TEST_STUBS_APK = "CtsTestStubs.apk";
+    private static final String ACCELERATION_TEST_STUBS_APK = "CtsAccelerationTestStubs.apk";
 
     /**
      * Factory method to create a {@link CtsBuildHelper}.
@@ -93,6 +94,7 @@ public class CtsSetup implements ITargetPreparer {
     private void installCtsPrereqs(ITestDevice device, CtsBuildHelper ctsBuild)
             throws DeviceNotAvailableException, TargetSetupError, FileNotFoundException {
         installApk(device, ctsBuild.getTestApp(TEST_STUBS_APK));
+        installApk(device, ctsBuild.getTestApp(ACCELERATION_TEST_STUBS_APK));
         installApk(device, ctsBuild.getTestApp(RUNNER_APK_NAME));
     }
 }

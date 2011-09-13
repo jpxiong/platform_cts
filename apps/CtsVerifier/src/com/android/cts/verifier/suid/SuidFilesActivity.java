@@ -16,6 +16,7 @@
 
 package com.android.cts.verifier.suid;
 
+import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestResult;
 import com.android.cts.verifier.os.FileUtils;
@@ -23,7 +24,6 @@ import com.android.cts.verifier.os.FileUtils.FileStatus;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -45,7 +45,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** {@link Activity} that tries to find suid files. */
-public class SuidFilesActivity extends ListActivity {
+public class SuidFilesActivity extends PassFailButtons.ListActivity {
 
     private static final String TAG = SuidFilesActivity.class.getSimpleName();
 
@@ -63,7 +63,9 @@ public class SuidFilesActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setResult(RESULT_CANCELED);
+        setContentView(R.layout.pass_fail_list);
+        setPassFailButtonClickListeners();
+        getPassButton().setEnabled(false);
 
         mAdapter = new SuidFilesAdapter();
         setListAdapter(mAdapter);
@@ -256,7 +258,7 @@ public class SuidFilesActivity extends ListActivity {
 
                 // Alert the user that nothing was found rather than showing an empty list view.
                 if (passed) {
-                    TestResult.setPassedResult(SuidFilesActivity.this, getClass().getName());
+                    getPassButton().setEnabled(true);
                     new AlertDialog.Builder(SuidFilesActivity.this)
                             .setTitle(R.string.congratulations)
                             .setMessage(R.string.no_suid_files)
@@ -267,8 +269,6 @@ public class SuidFilesActivity extends ListActivity {
                                 }
                             })
                             .show();
-                } else {
-                    TestResult.setFailedResult(SuidFilesActivity.this, getClass().getName());
                 }
             }
         }
