@@ -1006,6 +1006,9 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <activity android:name="android.renderscript.cts.RenderscriptGLStubActivity"
+                  android:label="RenderscriptGLStub"/>
     </application>
 
     <!--Test for PackageManager, please put this at the very beginning-->
