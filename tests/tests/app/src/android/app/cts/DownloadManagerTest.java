@@ -157,12 +157,12 @@ public class DownloadManagerTest extends AndroidTestCase {
             long uriId = mDownloadManager.enqueue(requestUri);
 
             Request requestExtFile = new Request(getGoodUrl());
-            requestExtFile.setDestinationInExternalFilesDir(mContext, null, "extFile");
+            requestExtFile.setDestinationInExternalFilesDir(mContext, null, "extFile.bin");
             long extFileId = mDownloadManager.enqueue(requestExtFile);
 
             Request requestPublic = new Request(getGoodUrl());
             requestPublic.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                    "publicFile");
+                    "publicFile.bin");
             long publicId = mDownloadManager.enqueue(requestPublic);
 
             int allDownloads = getTotalNumberDownloads();
