@@ -40,6 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,15 +72,18 @@ class MessageTestActivity extends PassFailButtons.Activity {
     private AlertDialog mInstructionsDialog;
 
     private String mDeviceAddress;
-    private boolean mSecure;
-    private boolean mServer;
+
+    private final boolean mSecure;
+    private final boolean mServer;
+    private final UUID mUuid;
 
     private String mRemoteDeviceName = "";
     private StringBuilder mMessageBuffer = new StringBuilder();
 
-    MessageTestActivity(boolean secure, boolean server) {
+    MessageTestActivity(boolean secure, boolean server, UUID uuid) {
         mSecure = secure;
         mServer = server;
+        mUuid = uuid;
     }
 
     @Override
@@ -166,7 +170,7 @@ class MessageTestActivity extends PassFailButtons.Activity {
     }
 
     private void startChatService() {
-        mChatService = new BluetoothChatService(this, new ChatHandler());
+        mChatService = new BluetoothChatService(this, new ChatHandler(), mUuid);
         if (mServer) {
             mChatService.start(mSecure);
         } else {
