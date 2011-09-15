@@ -131,16 +131,43 @@
     <string name="bt_disabling">Disabling Bluetooth...</string>
     <string name="bt_disabling_error">Could not disable Bluetooth...</string>
 
+    <string name="bt_connection_access_server">Connection Access Server</string>
+    <string name="bt_connection_access_client">Connection Access Client</string>
+    <string name="bt_connection_access_server_info">
+        Start the CTS Verifier on another device, start the Bluetooth test, and choose
+        \"Connection Access Client\" to setup the test. 
+        \n\nFirst, unpair the devices via Bluetooth settings. Then connect the devices together 
+        using the \"Make Discoverable\" and \"Pick Server\" buttons.
+        \n\nA connection access request should appear on the server and enable the pass button.
+    </string>
+    <string name="bt_connection_access_client_info">
+        Start the CTS Verifier on another device, start the Bluetooth test, and choose
+        \"Connection Access Server\" to complete the test. 
+        \n\nMake the device acting as the server discoverable and connect to it via the 
+        \"Pick Server\" button. Check that the server displays the connection access request 
+        dialog. The client device does not need to do anything else.
+    </string>
+    <string name="bt_ca_dialog">Was the connection access request dialog shown?</string>
+    <string name="bt_ca_tips">
+        Tap the \"Bluetooth Settings\" button and check that both devices are not paired
+        before running the test.
+        \n\nUse the \"Make Discoverable\" and \"Pick Server\" buttons to connect the two Bluetooth
+        devices together and start the test.
+    </string>
+
     <string name="bt_secure_server">Secure Server</string>
     <string name="bt_secure_server_instructions">Start the CTS Verifier on another device, start the Bluetooth test, and choose \"Secure Client\" to complete the test.</string>
     <string name="bt_insecure_server">Insecure Server</string>
     <string name="bt_insecure_server_instructions">Start the CTS Verifier on another device, start the Bluetooth test, and choose \"Insecure Client\" to complete the test.</string>
     <string name="bt_waiting">Waiting for client...</string>
+    <string name="bt_listening">Listening...</string>
     <string name="bt_connecting">Connecting...</string>
+    <string name="bt_connected">Connected</string>
     <string name="bt_received_messages">Received Messages</string>
     <string name="bt_sent_messages">Sent Messages</string>
     <string name="bt_no_messages">No messages</string>
     <string name="bt_make_discoverable">Make Discoverable</string>
+    <string name="bt_pick_server">Pick Server</string>
     <string name="bt_insecure_pairing_error_title">Pairing dialog shown?</string>
     <string name="bt_insecure_pairing_error_message">Insecure connections should not show the pairing dialog!</string>
 
