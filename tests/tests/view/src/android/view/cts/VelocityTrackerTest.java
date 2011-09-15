@@ -118,8 +118,8 @@ public class VelocityTrackerTest extends AndroidTestCase {
         vt.clear();
         vt.addMovement(me);
         vt.computeCurrentVelocity(1);
-        XVelocity = 1.0277777f;
-        YVelocity = 1.0277777f;
+        XVelocity = 0.8242369f;
+        YVelocity = 0.8242369f;
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
@@ -127,8 +127,8 @@ public class VelocityTrackerTest extends AndroidTestCase {
         me.addBatch(100L, 100, 100, .0f, .0f, 0);
         vt.addMovement(me);
         vt.computeCurrentVelocity(1);
-        XVelocity = 1.0222223f;
-        YVelocity = 1.0222223f;
+        XVelocity = 0.8500008f;
+        YVelocity = 0.8500008f;
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
@@ -136,8 +136,8 @@ public class VelocityTrackerTest extends AndroidTestCase {
         me = MotionEvent.obtain(0L, 110L, MotionEvent.ACTION_UP, 100f, 100f, 0);
         vt.addMovement(me);
         vt.computeCurrentVelocity(1);
-        XVelocity = 1.0222223f;
-        YVelocity = 1.0222223f;
+        XVelocity = 0.8500008f;
+        YVelocity = 0.8500008f;
         assertEquals(XVelocity, vt.getXVelocity(), ERROR_TOLERANCE);
         assertEquals(YVelocity, vt.getYVelocity(), ERROR_TOLERANCE);
 
