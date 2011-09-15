@@ -77,22 +77,24 @@ public abstract class TestListAdapter extends BaseAdapter {
         /** Intent used to launch the activity from the list. Null for categories. */
         final Intent intent;
 
-        public static TestListItem newTest(String title, String testName, Intent intent) {
-            return new TestListItem(title, testName, intent);
+        /** Features necessary to run this test. */
+        final String[] requiredFeatures;
+
+        public static TestListItem newTest(String title, String testName, Intent intent,
+                String[] requiredFeatures) {
+            return new TestListItem(title, testName, intent, requiredFeatures);
         }
 
         public static TestListItem newCategory(String title) {
-            return new TestListItem(title, null, null);
+            return new TestListItem(title, null, null, null);
         }
 
-        private TestListItem(String title, String testName, Intent intent) {
+        private TestListItem(String title, String testName, Intent intent,
+                String[] requiredFeatures) {
             this.title = title;
             this.testName = testName;
             this.intent = intent;
-        }
-
-        public Intent getIntent() {
-            return intent;
+            this.requiredFeatures = requiredFeatures;
         }
 
         boolean isTest() {

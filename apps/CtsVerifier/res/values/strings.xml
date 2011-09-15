@@ -119,9 +119,6 @@
         \n\n1. a candidate device implementation running the software build to be tested
         \n\n2. a separate device implementation already known to be compatible</string>
 
-    <string name="bt_not_available_title">Bluetooth is not available?</string>
-    <string name="bt_not_available_message">If your device is supposed to have Bluetooth, your API implementation is not behaving correctly!</string>
-
     <string name="bt_control">Bluetooth Control</string>
     <string name="bt_device_communication">Device Communication</string>
 
