@@ -66,7 +66,7 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
                 .with(Photo.PHOTO, EMPTY_TEST_PHOTO_DATA)
                 .insert();
-        assertNull(photoData.load());
+        assertNotNull(photoData.load());
     }
 
     private byte[] getTestPhotoData() {
