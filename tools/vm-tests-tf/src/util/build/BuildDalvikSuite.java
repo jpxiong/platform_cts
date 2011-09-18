@@ -16,7 +16,7 @@
 
 package util.build;
 
-import com.android.dx.util.FileUtils;
+import com.android.dex.util.FileUtils;
 
 import dot.junit.AllTests;
 
