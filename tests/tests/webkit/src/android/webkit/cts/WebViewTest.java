@@ -424,21 +424,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
-    @UiThreadTest
-    public void testGetOriginalUrl() throws Exception {
-        assertNull(mWebView.getUrl());
-        assertNull(mWebView.getOriginalUrl());
-
+    public void testGetOriginalUrl() throws Throwable {
         startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        String redirect = mWebServer.getRedirectingAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        // set the web view client so that redirects are loaded in the WebView itself
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl(redirect);
+        final String finalUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        final String redirectUrl =
+                mWebServer.getRedirectingAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
 
-        waitForLoadComplete();
-        assertEquals(url, mWebView.getUrl());
-        assertEquals(redirect, mWebView.getOriginalUrl());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertNull(mWebView.getUrl());
+                assertNull(mWebView.getOriginalUrl());
+
+                // By default, WebView sends an intent to ask the system to
+                // handle loading a new URL. We set WebViewClient as
+                // WebViewClient.shouldOverrideUrlLoading() returns false, so
+                // the WebView will load the new URL.
+                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(redirectUrl);
+            }
+        });
+
+        // We need to yield the UI thread to allow the callback to
+        // WebViewClient.shouldOverrideUrlLoading() to be made.
+        waitForUiThreadDone();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(finalUrl, mWebView.getUrl());
+                assertEquals(redirectUrl, mWebView.getOriginalUrl());
+            }
+        });
     }
 
     @TestTargetNew(
@@ -2122,16 +2138,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
         }
 
-        final class LoadCompleteWebChromeClient extends WebChromeClient {
-            @Override
-            public void onProgressChanged(WebView webView, int progress) {
-                super.onProgressChanged(webView, progress);
-                if (progress == 100) {
-                    notifyUiThreadDone();
-                }
-            }
-        }
-
         startWebServer(true);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         runTestOnUiThread(new Runnable() {
@@ -2245,6 +2251,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
+                // By default, WebView sends an intent to ask the system to
+                // handle loading a new URL. We set WebViewClient as
+                // WebViewClient.shouldOverrideUrlLoading() returns false, so
+                // the WebView will load the new URL.
                 mWebView.setWebViewClient(new WebViewClient());
                 mWebView.setDownloadListener(listener);
                 mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
@@ -2641,6 +2651,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
             if (!mIsUiThreadDone) {
                 Assert.fail("Unexpected timeout");
+            }
+        }
+    }
+
+    final class LoadCompleteWebChromeClient extends WebChromeClient {
+        @Override
+        public void onProgressChanged(WebView webView, int progress) {
+            super.onProgressChanged(webView, progress);
+            if (progress == 100) {
+                notifyUiThreadDone();
             }
         }
     }
