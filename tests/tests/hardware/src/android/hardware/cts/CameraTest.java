@@ -2051,6 +2051,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 Thread.sleep(100);
                 // This should not crash or throw exception.
                 mCamera.getParameters();
+                waitForFocusDone();
             }
         }
         terminateMessageLooper();
