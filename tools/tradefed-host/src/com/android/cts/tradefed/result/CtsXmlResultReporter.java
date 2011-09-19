@@ -76,7 +76,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
     // listen in on the plan option provided to CtsTest
     @Option(name = CtsTest.PLAN_OPTION, description = "the test plan to run.")
-    private String mPlanName = "unknown";
+    private String mPlanName = "NA";
 
     protected IBuildInfo mBuildInfo;
 
@@ -273,6 +273,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
             serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
         }
+        serializer.attribute(ns, "deviceID", getBuildInfo().getDeviceSerial());
         serializer.endTag(ns, "BuildInfo");
 
         serializeFeatureInfo(serializer, featureData);
@@ -445,9 +446,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             return;
         }
         serializer.startTag(ns, "TestPackage");
-        serializer.attribute(ns, "name", runResult.getName());
+        serializer.attribute(ns, "name", getMetric(runResult, CtsTest.PACKAGE_NAME_METRIC));
         serializer.attribute(ns, "appPackageName", runResult.getName());
-        serializer.attribute(ns, "digest", getMetric(runResult, "digest"));
+        serializer.attribute(ns, "digest", getMetric(runResult, CtsTest.PACKAGE_DIGEST_METRIC));
 
         // Dump the results.
 

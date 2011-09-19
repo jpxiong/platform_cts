@@ -113,7 +113,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         // TODO: consider doing xml based compare
         assertTrue(output.contains(
                 "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"1\" />"));
-        assertTrue(output.contains("<TestPackage name=\"run\" appPackageName=\"run\" digest=\"\">"));
+        assertTrue(output.contains("<TestPackage name=\"\" appPackageName=\"run\" digest=\"\">"));
         assertTrue(output.contains("<TestCase name=\"FooTest\" priority=\"\">"));
 
         final String testCaseTag = String.format(

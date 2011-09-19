@@ -43,9 +43,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -57,7 +59,6 @@ import junit.framework.Test;
  * Supports running all the tests contained in a CTS plan, or individual test packages.
  */
 public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBuildReceiver {
-
     private static final String LOG_TAG = "CtsTest";
 
     public static final String PLAN_OPTION = "plan";
@@ -65,13 +66,16 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String CLASS_OPTION = "class";
     private static final String METHOD_OPTION = "method";
 
+    public static final String PACKAGE_NAME_METRIC = "packageName";
+    public static final String PACKAGE_DIGEST_METRIC = "packageDigest";
+
     private ITestDevice mDevice;
 
     @Option(name = PLAN_OPTION, description = "the test plan to run.",
             importance = Importance.IF_UNSET)
     private String mPlanName = null;
 
-    @Option(name = PACKAGE_OPTION, description = "the test packages(s) to run.",
+    @Option(name = PACKAGE_OPTION, shortName = 'p', description = "the test packages(s) to run.",
             importance = Importance.IF_UNSET)
     private Collection<String> mPackageNames = new ArrayList<String>();
 
@@ -110,8 +114,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private class KnownTests {
         private final IRemoteTest mTestForPackage;
         private final Collection<TestIdentifier> mKnownTests;
+        private final ITestPackageDef mPackageDef;
 
-        KnownTests(IRemoteTest testForPackage, Collection<TestIdentifier> knownTests) {
+        KnownTests(ITestPackageDef packageDef, IRemoteTest testForPackage,
+                Collection<TestIdentifier> knownTests) {
+            mPackageDef = packageDef;
             mTestForPackage = testForPackage;
             mKnownTests = knownTests;
         }
@@ -122,6 +129,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         Collection<TestIdentifier> getKnownTests() {
             return mKnownTests;
+        }
+
+        ITestPackageDef getPackageDef() {
+            return mPackageDef;
         }
     }
 
@@ -245,9 +256,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         collectDeviceInfo(getDevice(), mCtsBuild, listener);
 
         while (!mRemainingTests.isEmpty()) {
-            KnownTests testPair = mRemainingTests.get(0);
+            KnownTests knownTests = mRemainingTests.get(0);
 
-            IRemoteTest test = testPair.getTestForPackage();
+            IRemoteTest test = knownTests.getTestForPackage();
             if (test instanceof IDeviceTest) {
                 ((IDeviceTest)test).setDevice(getDevice());
             }
@@ -255,8 +266,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 ((IBuildReceiver)test).setBuild(mBuildInfo);
             }
 
-            ResultFilter filter = new ResultFilter(listener, testPair.getKnownTests());
+            ResultFilter filter = new ResultFilter(listener, knownTests.getKnownTests());
             test.run(filter);
+            forwardPackageDetails(knownTests.getPackageDef(), listener);
             mRemainingTests.remove(0);
         }
 
@@ -310,7 +322,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                     mClassName, mMethodName);
             if (testForPackage != null) {
                 Collection<TestIdentifier> knownTests = testPackage.getTests();
-                testList.add(new KnownTests(testForPackage, knownTests));
+                testList.add(new KnownTests(testPackage, testForPackage, knownTests));
             }
         } else {
             Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
@@ -470,5 +482,18 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             currentVal |= args[i];
         }
         return currentVal;
+    }
+
+    /**
+     * Forward the digest and package name to the listener as a metric
+     *
+     * @param listener
+     */
+    private void forwardPackageDetails(ITestPackageDef def, ITestInvocationListener listener) {
+        Map<String, String> metrics = new HashMap<String, String>(2);
+        metrics.put(PACKAGE_NAME_METRIC, def.getName());
+        metrics.put(PACKAGE_DIGEST_METRIC, def.getDigest());
+        listener.testRunStarted(def.getUri(), 0);
+        listener.testRunEnded(0, metrics);
     }
 }
