@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,14 @@ import java.util.Map;
  *             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
  *         </pre>
  *     </li>
+ *     <li>OPTIONAL: Add a meta data attribute to indicate what features are required to run the
+ *         test. If the device does not have all of the required features then it will not appear
+ *         in the test list. Use a colon (:) to specify multiple required features.
+ *         <pre>
+ *             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.accelerometer" />
+ *         </pre>
+ *     </li>
+ *
  * </ol>
  */
 public class ManifestTestListAdapter extends TestListAdapter {
@@ -66,6 +75,8 @@ public class ManifestTestListAdapter extends TestListAdapter {
     private static final String TEST_CATEGORY_META_DATA = "test_category";
 
     private static final String TEST_PARENT_META_DATA = "test_parent";
+
+    private static final String TEST_REQUIRED_FEATURES_META_DATA = "test_required_features";
 
     private Context mContext;
 
@@ -94,16 +105,17 @@ public class ManifestTestListAdapter extends TestListAdapter {
 
         List<TestListItem> allRows = new ArrayList<TestListItem>();
         for (String testCategory : testCategories) {
-            allRows.add(TestListItem.newCategory(testCategory));
-
-            List<TestListItem> tests = testsByCategory.get(testCategory);
-            Collections.sort(tests, new Comparator<TestListItem>() {
-                @Override
-                public int compare(TestListItem item, TestListItem otherItem) {
-                    return item.title.compareTo(otherItem.title);
-                }
-            });
-            allRows.addAll(tests);
+            List<TestListItem> tests = filterTests(testsByCategory.get(testCategory));
+            if (!tests.isEmpty()) {
+                allRows.add(TestListItem.newCategory(testCategory));
+                Collections.sort(tests, new Comparator<TestListItem>() {
+                    @Override
+                    public int compare(TestListItem item, TestListItem otherItem) {
+                        return item.title.compareTo(otherItem.title);
+                    }
+                });
+                allRows.addAll(tests);
+            }
         }
         return allRows;
     }
@@ -120,7 +132,7 @@ public class ManifestTestListAdapter extends TestListAdapter {
         List<ResolveInfo> matchingList = new ArrayList<ResolveInfo>();
         for (int i = 0; i < size; i++) {
             ResolveInfo info = list.get(i);
-            String parent = getTestParent(mContext, info.activityInfo.metaData);
+            String parent = getTestParent(info.activityInfo.metaData);
             if ((mTestParent == null && parent == null)
                     || (mTestParent != null && mTestParent.equals(parent))) {
                 matchingList.add(info);
@@ -139,7 +151,8 @@ public class ManifestTestListAdapter extends TestListAdapter {
             String title = getTitle(mContext, info.activityInfo);
             String testName = info.activityInfo.name;
             Intent intent = getActivityIntent(info.activityInfo);
-            TestListItem item = TestListItem.newTest(title, testName, intent);
+            String[] requiredFeatures = getRequiredFeatures(info.activityInfo.metaData);
+            TestListItem item = TestListItem.newTest(title, testName, intent, requiredFeatures);
 
             String testCategory = getTestCategory(mContext, info.activityInfo.metaData);
             addTestToCategory(testsByCategory, testCategory, item);
@@ -160,8 +173,21 @@ public class ManifestTestListAdapter extends TestListAdapter {
         }
     }
 
-    static String getTestParent(Context context, Bundle metaData) {
+    static String getTestParent(Bundle metaData) {
         return metaData != null ? metaData.getString(TEST_PARENT_META_DATA) : null;
+    }
+
+    static String[] getRequiredFeatures(Bundle metaData) {
+        if (metaData == null) {
+            return null;
+        } else {
+            String value = metaData.getString(TEST_REQUIRED_FEATURES_META_DATA);
+            if (value == null) {
+                return null;
+            } else {
+                return value.split(":");
+            }
+        }
     }
 
     static String getTitle(Context context, ActivityInfo activityInfo) {
@@ -188,5 +214,24 @@ public class ManifestTestListAdapter extends TestListAdapter {
         }
         testsByCategory.put(testCategory, tests);
         tests.add(item);
+    }
+
+    List<TestListItem> filterTests(List<TestListItem> tests) {
+        List<TestListItem> filteredTests = new ArrayList<TestListItem>(tests);
+        PackageManager packageManager = mContext.getPackageManager();
+        Iterator<TestListItem> iterator = filteredTests.iterator();
+        while (iterator.hasNext()) {
+            TestListItem item = iterator.next();
+            String[] requiredFeatures = item.requiredFeatures;
+            if (requiredFeatures != null) {
+                for (int i = 0; i < requiredFeatures.length; i++) {
+                    if (!packageManager.hasSystemFeature(requiredFeatures[i])) {
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+        return filteredTests;
     }
 }

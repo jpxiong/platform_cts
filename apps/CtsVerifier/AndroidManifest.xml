@@ -94,6 +94,7 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_networking" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.bluetooth" />
         </activity>
         
         <activity android:name=".bluetooth.BluetoothToggleActivity"
@@ -149,8 +150,30 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
-        </activity>       
+        </activity>
+
+        <activity android:name=".bluetooth.ConnectionAccessServerActivity"
+                android:label="@string/bt_connection_access_server"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
         
+        <activity android:name=".bluetooth.ConnectionAccessClientActivity"
+                android:label="@string/bt_connection_access_client"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+
         <activity android:name=".bluetooth.DevicePickerActivity"
                 android:label="@string/bt_device_picker"
                 android:configChanges="keyboardHidden|orientation" />
@@ -195,6 +218,7 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.sensor.accelerometer" />
         </activity>
 
         <activity android:name=".sensors.GyroscopeTestActivity" android:label="@string/snsr_gyro_test"
@@ -204,6 +228,7 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
         </activity>
 
         <activity android:name=".audioquality.AudioQualityVerifierActivity"
@@ -213,6 +238,7 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_audio" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.microphone" />
         </activity>
 
         <activity android:name=".audioquality.CalibrateVolumeActivity"
