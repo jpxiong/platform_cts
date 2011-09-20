@@ -2136,6 +2136,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Camera firstCamera = mCamera;
         Looper firstLooper = mLooper;
         //terminateMessageLooper(); // Intentionally not calling this
+        // Preview surface should be released though!
+        mCamera.setPreviewDisplay(null);
 
         // Start second camera without releasing the first one (will
         // set mCamera and mLooper to new objects)
