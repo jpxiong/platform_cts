@@ -16,14 +16,13 @@
 
 package android.jni.cts;
 
-import junit.framework.TestCase;
 
 /**
  * Basic native instance method tests. The "nonce" class being tested
  * by this class is a class defined in this package that declares the
  * bulk of its methods as native.
  */
-public class JniInstanceTest extends TestCase {
+public class JniInstanceTest extends JniTestCase {
     /** instance to use for all the tests */
     private InstanceNonce target;
 
@@ -165,7 +164,7 @@ public class JniInstanceTest extends TestCase {
     public void test_takeShort() {
         assertTrue(target.takeShort((short) 19991));
     }
-    
+
     /**
      * Test a simple value-taking method call, that returns whether it
      * got the expected value.
