@@ -139,9 +139,11 @@ public class DownloadManagerTest extends AndroidTestCase {
             assertTrue(extFileLocation.delete());
         }
 
-        File publicLocation = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "publicFile");
+        File publicDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        // Due to a Gingerbread bug, we need to make this directory if it doesn't exist
+        publicDir.mkdirs();
+        File publicLocation = new File(publicDir, "publicFile");
         if (publicLocation.exists()) {
             assertTrue(publicLocation.delete());
         }
