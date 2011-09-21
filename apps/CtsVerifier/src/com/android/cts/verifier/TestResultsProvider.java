@@ -53,12 +53,8 @@ public class TestResultsProvider extends ContentProvider {
     /** Boolean indicating whether the test info has been seen. */
     static final String COLUMN_TEST_INFO_SEEN = "testinfoseen";
 
-    static final String[] ALL_COLUMNS = {
-        _ID,
-        COLUMN_TEST_NAME,
-        COLUMN_TEST_RESULT,
-        COLUMN_TEST_INFO_SEEN,
-    };
+    /** String containing the test's details. */
+    static final String COLUMN_TEST_DETAILS = "testdetails";
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int RESULTS_ALL = 1;
@@ -87,7 +83,7 @@ public class TestResultsProvider extends ContentProvider {
 
         private static final String DATABASE_NAME = "results.db";
 
-        private static final int DATABASE_VERSION = 5;
+        private static final int DATABASE_VERSION = 6;
 
         TestResultsOpenHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -99,7 +95,8 @@ public class TestResultsProvider extends ContentProvider {
                     + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + COLUMN_TEST_NAME + " TEXT, "
                     + COLUMN_TEST_RESULT + " INTEGER,"
-                    + COLUMN_TEST_INFO_SEEN + " INTEGER DEFAULT 0);");
+                    + COLUMN_TEST_INFO_SEEN + " INTEGER DEFAULT 0,"
+                    + COLUMN_TEST_DETAILS + " TEXT);");
         }
 
         @Override
@@ -204,10 +201,12 @@ public class TestResultsProvider extends ContentProvider {
         return null;
     }
 
-    static void setTestResult(Context context, String testName, int testResult) {
+    static void setTestResult(Context context, String testName, int testResult,
+            String testDetails) {
         ContentValues values = new ContentValues(2);
         values.put(TestResultsProvider.COLUMN_TEST_RESULT, testResult);
         values.put(TestResultsProvider.COLUMN_TEST_NAME, testName);
+        values.put(TestResultsProvider.COLUMN_TEST_DETAILS, testDetails);
 
         ContentResolver resolver = context.getContentResolver();
         int numUpdated = resolver.update(TestResultsProvider.RESULTS_CONTENT_URI, values,
