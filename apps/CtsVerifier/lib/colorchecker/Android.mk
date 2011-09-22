@@ -30,9 +30,9 @@ LOCAL_SRC_FILES += testingimage.cpp \
                    imagetesthandler.cpp \
                    colorcheckertest.cpp \
                    autolocktest.cpp \
-                   #exposurecompensationtest.cpp \
-                   whitebalancetest.cpp \
-                   meteringtest.cpp
+                   meteringtest.cpp \
+                   #whitebalancetest.cpp \
+                   exposurecompensationtest.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker
 LOCAL_SHARED_LIBRARIES := libstlport \

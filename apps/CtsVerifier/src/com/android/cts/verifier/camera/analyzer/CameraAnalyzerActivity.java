@@ -210,7 +210,7 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         ColorCheckerTest.getSingletonTest().updateCamera();
         //WhiteBalanceTest.getSingletonTest().updateCamera();
         //ExposureCompensationTest.getSingletonTest().updateCamera();
-        //MeteringTest.getSingletonTest().updateCamera();
+        MeteringTest.getSingletonTest().updateCamera();
         AutoLockTest.getSingletonTest().updateCamera();
     }
 
@@ -358,14 +358,14 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         public void onClick(View v) {
             Log.v(TAG, "Running new metering tests!");
 
-            /*MeteringTest meteringTest = MeteringTest.getSingletonTest();
+            MeteringTest meteringTest = MeteringTest.getSingletonTest();
 
             mCurrentTest = meteringTest;
-            initializeAdapter();*/
+            initializeAdapter();
 
             // Loads the memory address of the checker centers and radius
             // from the this class and set the two values for the new test.
-            //MeteringTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
+            MeteringTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
         }
     };
 
