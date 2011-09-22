@@ -29,9 +29,9 @@ LOCAL_SRC_FILES += testingimage.cpp \
                    vec2.cpp \
                    imagetesthandler.cpp \
                    colorcheckertest.cpp \
-                   #whitebalancetest.cpp \
-                   exposurecompensationtest.cpp \
                    autolocktest.cpp \
+                   #exposurecompensationtest.cpp \
+                   whitebalancetest.cpp \
                    meteringtest.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker
