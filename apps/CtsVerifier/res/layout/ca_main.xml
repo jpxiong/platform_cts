@@ -19,25 +19,60 @@
   android:orientation="vertical" android:layout_width="fill_parent"
   android:layout_height="fill_parent">
 
-  <Button android:id="@+id/runbutton" android:layout_width="fill_parent"
-    android:layout_height="wrap_content" android:text="@string/ca_run_label" />
 
-  <TextView android:id="@+id/resulttext" android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/ca_result_label"
-            android:textSize="15sp" />
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <!--Button android:id="@+id/focusmodesbutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_focus_modes_label"
+      android:layout_weight="1" /-->
+    <Button android:id="@+id/findcheckerboardbutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_find_checkerboard_label"
+      android:layout_weight="1" />
+
+    <Button android:id="@+id/meteringbutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_metering_label"
+      android:layout_weight="1" />
+
+    <Button android:id="@+id/exposurecompensationbutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_exposure_test_label"
+      android:layout_weight="1"/>
+
+    <Button android:id="@+id/whitebalancebutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_wb_test_label"
+      android:layout_weight="1" />
+
+    <Button android:id="@+id/lockbutton" android:layout_width="0px"
+      android:layout_height="wrap_content" android:text="@string/ca_lock_test_label"
+      android:layout_weight="1" />
+  </LinearLayout>
 
   <LinearLayout android:orientation="horizontal"
-    android:layout_width="fill_parent" android:layout_height="wrap_content">
+    android:layout_width="fill_parent" android:layout_height="0px"
+    android:layout_weight="1">
 
-    <SurfaceView android:id="@+id/cameraview" android:layout_height="match_parent"
-      android:layout_width="match_parent"
-      android:layout_weight="1" />
+    <SurfaceView android:id="@+id/cameraview" android:layout_height="fill_parent"
+      android:layout_width="wrap_content"
+      android:layout_weight="0" />
 
-    <ImageView android:id="@+id/resultview" android:layout_height="match_parent"
-      android:layout_width="match_parent"
-      android:layout_weight="1" />
+    <LinearLayout android:orientation="vertical"
+      android:layout_width="fill_parent" android:layout_height="match_parent"
+      android:layout_weight="1">
+	       
+       <ListView android:id="@+id/ca_tests"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+	    android:layout_weight="1"
+            android:layout_marginLeft="10px"/>
+
+      <ImageView android:id="@+id/resultview" android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_weight="1" />
+    </LinearLayout>
 
   </LinearLayout>
+
+  <include layout="@layout/pass_fail_buttons" />
+
 </LinearLayout>
 

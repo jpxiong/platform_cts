@@ -24,7 +24,16 @@ include external/stlport/libstlport.mk
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libcolorchecker
 
-LOCAL_SRC_FILES += colorchecker.cpp
+LOCAL_SRC_FILES += #testingimage.cpp \
+                   vec3.cpp \
+                   vec2.cpp \
+                   imagetesthandler.cpp \
+                   whitebalancetest.cpp \
+                   colorcheckertest.cpp \
+                   exposurecompensationtest.cpp \
+                   autolocktest.cpp \
+                   meteringtest.cpp
+
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker
 LOCAL_SHARED_LIBRARIES := libstlport \
                           libcutils \
