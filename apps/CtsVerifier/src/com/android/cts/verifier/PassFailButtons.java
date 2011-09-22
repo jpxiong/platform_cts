@@ -83,6 +83,9 @@ public class PassFailButtons {
          * Returns a unique identifier for the test.  Usually, this is just the class name.
          */
         String getTestId();
+
+        /** @return null or details about the test run. */
+        String getTestDetails();
     }
 
     public static class Activity extends android.app.Activity implements PassFailActivity {
@@ -111,6 +114,11 @@ public class PassFailButtons {
         public String getTestId() {
             return getClass().getName();
         }
+
+        @Override
+        public String getTestDetails() {
+            return null;
+        }
     }
 
     public static class ListActivity extends android.app.ListActivity implements PassFailActivity {
@@ -138,6 +146,11 @@ public class PassFailButtons {
         @Override
         public String getTestId() {
             return getClass().getName();
+        }
+
+        @Override
+        public String getTestDetails() {
+            return null;
         }
     }
 
@@ -168,6 +181,11 @@ public class PassFailButtons {
         public String getTestId() {
             return getClass().getName();
         }
+
+        @Override
+        public String getTestDetails() {
+            return null;
+        }
     }
 
     private static <T extends android.app.Activity & PassFailActivity>
@@ -175,7 +193,8 @@ public class PassFailButtons {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View target) {
-                setTestResultAndFinish(activity, activity.getTestId(), target);
+                setTestResultAndFinish(activity, activity.getTestId(), activity.getTestDetails(),
+                        target);
             }
         };
 
@@ -278,7 +297,7 @@ public class PassFailButtons {
 
     /** Set the test result corresponding to the button clicked and finish the activity. */
     private static void setTestResultAndFinish(android.app.Activity activity, String testId,
-            View target) {
+            String testDetails, View target) {
         boolean passed;
         switch (target.getId()) {
             case R.id.pass_button:
@@ -290,16 +309,16 @@ public class PassFailButtons {
             default:
                 throw new IllegalArgumentException("Unknown id: " + target.getId());
         }
-        setTestResultAndFinish(activity, testId, passed);
+        setTestResultAndFinish(activity, testId, testDetails, passed);
     }
 
     /** Set the test result and finish the activity. */
     public static void setTestResultAndFinish(android.app.Activity activity, String testId,
-            boolean passed) {
+            String testDetails, boolean passed) {
         if (passed) {
-            TestResult.setPassedResult(activity, testId);
+            TestResult.setPassedResult(activity, testId, testDetails);
         } else {
-            TestResult.setFailedResult(activity, testId);
+            TestResult.setFailedResult(activity, testId, testDetails);
         }
 
         activity.finish();

@@ -121,7 +121,7 @@ public class PlayVideoActivity extends PassFailButtons.Activity
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 PassFailButtons.setTestResultAndFinish(PlayVideoActivity.this,
-                                        getTestId(), false);
+                                        getTestId(), null, false);
                             }
                         })
                         .show();
