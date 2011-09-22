@@ -21,12 +21,18 @@ import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.test.ActivityInstrumentationTestCase2;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+
 /**
  * Base class for tests which use MediaPlayer to play audio or video.
  */
 public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaStubActivity> {
+    private static final Logger LOG = Logger.getLogger(MediaPlayerTestBase.class.getName());
+
     protected static final int SLEEP_TIME = 1000;
     protected static final int LONG_SLEEP_TIME = 6000;
+    protected static final int STREAM_RETRIES = 5;
 
     public static class Monitor {
         private boolean signalled;
@@ -101,13 +107,28 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     }
 
     protected void playLiveVideoTest(String path, int playTime) throws Exception {
-        mMediaPlayer.setDataSource(path);
-        playLoadedVideo(null, null, playTime);
+        playVideoWithRetries(path, null, null, playTime);
     }
 
     protected void playVideoTest(String path, int width, int height) throws Exception {
-        mMediaPlayer.setDataSource(path);
-        playLoadedVideo(width, height, 0);
+        playVideoWithRetries(path, width, height, 0);
+    }
+
+    protected void playVideoWithRetries(String path, Integer width, Integer height, int playTime)
+            throws Exception {
+        boolean playedSuccessfully = false;
+        for (int i = 0; i < STREAM_RETRIES; i++) {
+          try {
+            mMediaPlayer.setDataSource(path);
+            playLoadedVideo(width, height, playTime);
+            playedSuccessfully = true;
+            break;
+          } catch (PrepareFailedException e) {
+            // prepare() can fail because of network issues, so try again
+            LOG.warning("prepare() failed on try " + i + ", trying playback again");
+          }
+        }
+        assertTrue("Stream did not play successfully after all attempts", playedSuccessfully);
     }
 
     protected void playVideoTest(int resid, int width, int height) throws Exception {
@@ -148,7 +169,12 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
                 return true;
             }
         });
-        mMediaPlayer.prepare();
+        try {
+          mMediaPlayer.prepare();
+        } catch (IOException e) {
+          mMediaPlayer.reset();
+          throw new PrepareFailedException();
+        }
 
         mMediaPlayer.start();
         mOnVideoSizeChangedCalled.waitForSignal();
@@ -163,4 +189,6 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
             Thread.sleep(playTime);
         }
     }
+
+    private static class PrepareFailedException extends Exception {}
 }
