@@ -63,6 +63,9 @@ public abstract class TestListAdapter extends BaseAdapter {
     /** Mutable test results that will change as each test activity finishes. */
     private final Map<String, Integer> mTestResults = new HashMap<String, Integer>();
 
+    /** Map from test name to test details. */
+    private final Map<String, String> mTestDetails = new HashMap<String, String>();
+
     private final LayoutInflater mLayoutInflater;
 
     /** {@link ListView} row that is either a test category header or a test. */
@@ -121,15 +124,15 @@ public abstract class TestListAdapter extends BaseAdapter {
     }
 
     public void setTestResult(TestResult testResult) {
-        new SetTestResultTask(testResult.getName(), testResult.getResult()).execute();
+        new SetTestResultTask(testResult.getName(), testResult.getResult(),
+                testResult.getDetails()).execute();
     }
 
     class RefreshTestResultsTask extends AsyncTask<Void, Void, RefreshResult> {
         @Override
         protected RefreshResult doInBackground(Void... params) {
             List<TestListItem> rows = getRows();
-            Map<String, Integer> results = getTestResults();
-            return new RefreshResult(rows, results);
+            return getRefreshResults(rows);
         }
 
         @Override
@@ -139,6 +142,8 @@ public abstract class TestListAdapter extends BaseAdapter {
             mRows.addAll(result.mItems);
             mTestResults.clear();
             mTestResults.putAll(result.mResults);
+            mTestDetails.clear();
+            mTestDetails.putAll(result.mDetails);
             notifyDataSetChanged();
         }
     }
@@ -146,27 +151,40 @@ public abstract class TestListAdapter extends BaseAdapter {
     static class RefreshResult {
         List<TestListItem> mItems;
         Map<String, Integer> mResults;
+        Map<String, String> mDetails;
 
-        RefreshResult(List<TestListItem> items, Map<String, Integer> results) {
+        RefreshResult(List<TestListItem> items, Map<String, Integer> results,
+                Map<String, String> details) {
             mItems = items;
             mResults = results;
+            mDetails = details;
         }
     }
 
     protected abstract List<TestListItem> getRows();
 
-    Map<String, Integer> getTestResults() {
+    static final String[] REFRESH_PROJECTION = {
+        TestResultsProvider._ID,
+        TestResultsProvider.COLUMN_TEST_NAME,
+        TestResultsProvider.COLUMN_TEST_RESULT,
+        TestResultsProvider.COLUMN_TEST_DETAILS,
+    };
+
+    RefreshResult getRefreshResults(List<TestListItem> items) {
         Map<String, Integer> results = new HashMap<String, Integer>();
+        Map<String, String> details = new HashMap<String, String>();
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
         try {
-            cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI,
-                    TestResultsProvider.ALL_COLUMNS, null, null, null);
+            cursor = resolver.query(TestResultsProvider.RESULTS_CONTENT_URI, REFRESH_PROJECTION,
+                    null, null, null);
             if (cursor.moveToFirst()) {
                 do {
                     String testName = cursor.getString(1);
                     int testResult = cursor.getInt(2);
+                    String testDetails = cursor.getString(3);
                     results.put(testName, testResult);
+                    details.put(testName, testDetails);
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -174,7 +192,7 @@ public abstract class TestListAdapter extends BaseAdapter {
                 cursor.close();
             }
         }
-        return results;
+        return new RefreshResult(items, results, details);
     }
 
     class ClearTestResultsTask extends AsyncTask<Void, Void, Void> {
@@ -193,14 +211,17 @@ public abstract class TestListAdapter extends BaseAdapter {
 
         private final int mResult;
 
-        SetTestResultTask(String testName, int result) {
+        private final String mDetails;
+
+        SetTestResultTask(String testName, int result, String details) {
             mTestName = testName;
             mResult = result;
+            mDetails = details;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            TestResultsProvider.setTestResult(mContext, mTestName, mResult);
+            TestResultsProvider.setTestResult(mContext, mTestName, mResult, mDetails);
             return null;
         }
     }
@@ -259,6 +280,13 @@ public abstract class TestListAdapter extends BaseAdapter {
         return mTestResults.containsKey(item.testName)
                 ? mTestResults.get(item.testName)
                 : TestResult.TEST_RESULT_NOT_EXECUTED;
+    }
+
+    public String getTestDetails(int position) {
+        TestListItem item = getItem(position);
+        return mTestDetails.containsKey(item.testName)
+                ? mTestDetails.get(item.testName)
+                : null;
     }
 
     public boolean allTestsPassed() {
