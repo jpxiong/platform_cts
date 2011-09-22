@@ -58,6 +58,7 @@ class TestResultsBackupHelper implements BackupHelper {
             int nameIndex = cursor.getColumnIndex(TestResultsProvider.COLUMN_TEST_NAME);
             int resultIndex = cursor.getColumnIndex(TestResultsProvider.COLUMN_TEST_RESULT);
             int infoSeenIndex = cursor.getColumnIndex(TestResultsProvider.COLUMN_TEST_INFO_SEEN);
+            int detailsIndex = cursor.getColumnIndex(TestResultsProvider.COLUMN_TEST_DETAILS);
 
             ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
             DataOutputStream dataOutput = new DataOutputStream(byteOutput);
@@ -67,10 +68,12 @@ class TestResultsBackupHelper implements BackupHelper {
                 String name = cursor.getString(nameIndex);
                 int result = cursor.getInt(resultIndex);
                 int infoSeen = cursor.getInt(infoSeenIndex);
+                String details = cursor.getString(detailsIndex);
 
                 dataOutput.writeUTF(name);
                 dataOutput.writeInt(result);
                 dataOutput.writeInt(infoSeen);
+                dataOutput.writeUTF(details != null ? details : "");
             }
 
             byte[] rawBytes = byteOutput.toByteArray();
@@ -102,17 +105,19 @@ class TestResultsBackupHelper implements BackupHelper {
                     String name = dataInput.readUTF();
                     int result = dataInput.readInt();
                     int infoSeen = dataInput.readInt();
+                    String details = dataInput.readUTF();
 
                     values[i] = new ContentValues();
                     values[i].put(TestResultsProvider.COLUMN_TEST_NAME, name);
                     values[i].put(TestResultsProvider.COLUMN_TEST_RESULT, result);
                     values[i].put(TestResultsProvider.COLUMN_TEST_INFO_SEEN, infoSeen);
+                    values[i].put(TestResultsProvider.COLUMN_TEST_DETAILS, details);
                 }
 
                 ContentResolver resolver = mContext.getContentResolver();
                 resolver.bulkInsert(TestResultsProvider.RESULTS_CONTENT_URI, values);
             } else {
-                failBackupTest();
+                Log.e(TAG, "Skipping key: " + data.getKey());
             }
         } catch (IOException e) {
             Log.e(TAG, "Couldn't restore test results...", e);
@@ -122,7 +127,7 @@ class TestResultsBackupHelper implements BackupHelper {
 
     private void failBackupTest() {
         TestResultsProvider.setTestResult(mContext, BackupTestActivity.class.getName(),
-                TestResult.TEST_RESULT_FAILED);
+                TestResult.TEST_RESULT_FAILED, null);
     }
 
     @Override
