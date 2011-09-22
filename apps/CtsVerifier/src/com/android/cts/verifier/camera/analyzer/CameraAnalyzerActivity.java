@@ -206,7 +206,8 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         }
         mCamera.startPreview();
         CameraTests.setCamera(mCamera);
-        //ColorCheckerTest.getSingletonTest().updateCamera();
+
+        ColorCheckerTest.getSingletonTest().updateCamera();
         //WhiteBalanceTest.getSingletonTest().updateCamera();
         //ExposureCompensationTest.getSingletonTest().updateCamera();
         //MeteringTest.getSingletonTest().updateCamera();
@@ -304,10 +305,10 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         @Override
         public void onClick(View v) {
             Log.v(TAG, "Running new color checker finding tests!");
-            /*ColorCheckerTest colorCheckerTest = ColorCheckerTest.getSingletonTest();
+            ColorCheckerTest colorCheckerTest = ColorCheckerTest.getSingletonTest();
 
             mCurrentTest = colorCheckerTest;
-            initializeAdapter();*/
+            initializeAdapter();
         }
     };
 

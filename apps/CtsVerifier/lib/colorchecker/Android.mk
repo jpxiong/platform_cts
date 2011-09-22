@@ -27,9 +27,9 @@ LOCAL_MODULE := libcolorchecker
 LOCAL_SRC_FILES += testingimage.cpp \
                    vec3.cpp \
                    vec2.cpp \
-                   #imagetesthandler.cpp \
-                   whitebalancetest.cpp \
+                   imagetesthandler.cpp \
                    colorcheckertest.cpp \
+                   #whitebalancetest.cpp \
                    exposurecompensationtest.cpp \
                    autolocktest.cpp \
                    meteringtest.cpp
