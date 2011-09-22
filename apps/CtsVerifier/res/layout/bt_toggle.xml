@@ -24,7 +24,7 @@
             android:layout_alignParentTop="true"
             android:gravity="center"
             android:text="@string/bt_toggle_instructions"
-            android:textSize="24dip"
+            style="@style/InstructionsFont"
             />
 
     <ToggleButton android:id="@+id/bt_toggle_button"

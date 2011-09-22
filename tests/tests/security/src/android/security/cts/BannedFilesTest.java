@@ -23,6 +23,18 @@ import junit.framework.TestCase;
 public class BannedFilesTest extends TestCase {
 
     /**
+     * setuid or setgid "ip" command can be used to modify the
+     * routing tables of a device, potentially allowing a malicious
+     * program to intercept all network traffic to and from
+     * the device.
+     */
+    public void testNoSetuidIp() {
+        assertNotSetugid("/system/bin/ip");
+        assertNotSetugid("/system/xbin/ip");
+        assertNotSetugid("/vendor/bin/ip");
+    }
+
+    /**
      * setuid or setgid tcpdump can be used maliciously to monitor
      * all traffic in and out of the device.
      */
@@ -31,6 +43,8 @@ public class BannedFilesTest extends TestCase {
         assertNotSetugid("/system/bin/tcpdump-arm");
         assertNotSetugid("/system/xbin/tcpdump");
         assertNotSetugid("/system/xbin/tcpdump-arm");
+        assertNotSetugid("/vendor/bin/tcpdump");
+        assertNotSetugid("/vendor/bin/tcpdump-arm");
     }
 
     private static void assertNotSetugid(String file) {

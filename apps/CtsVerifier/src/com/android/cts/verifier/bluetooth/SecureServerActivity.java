@@ -18,6 +18,6 @@ package com.android.cts.verifier.bluetooth;
 
 public class SecureServerActivity extends MessageTestActivity {
     public SecureServerActivity() {
-        super(true, true);
+        super(true, true, BluetoothChatService.SECURE_UUID);
     }
 }

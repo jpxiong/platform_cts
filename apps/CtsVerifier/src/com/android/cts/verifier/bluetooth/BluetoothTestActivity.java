@@ -20,9 +20,6 @@ import com.android.cts.verifier.ManifestTestListAdapter;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 public class BluetoothTestActivity extends PassFailButtons.TestListActivity {
@@ -35,24 +32,5 @@ public class BluetoothTestActivity extends PassFailButtons.TestListActivity {
         setInfoResources(R.string.bluetooth_test, R.string.bluetooth_test_info, -1);
 
         setTestListAdapter(new ManifestTestListAdapter(this, getClass().getName()));
-
-        if (BluetoothAdapter.getDefaultAdapter() == null) {
-            showNoBluetoothDialog();
-        }
-    }
-
-    private void showNoBluetoothDialog() {
-        new AlertDialog.Builder(this)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .setTitle(R.string.bt_not_available_title)
-            .setMessage(R.string.bt_not_available_message)
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            })
-            .show();
     }
 }

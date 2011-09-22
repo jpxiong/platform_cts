@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
-package com.android.cts.verifier.bluetooth;
+package android.jni.cts;
 
-public class InsecureServerActivity extends MessageTestActivity {
-    public InsecureServerActivity() {
-        super(false, true, BluetoothChatService.INSECURE_UUID);
+import android.os.Build;
+
+import junit.framework.TestCase;
+
+class JniTestCase extends TestCase {
+
+    static boolean isCpuAbiNone() {
+        return "none".equalsIgnoreCase(Build.CPU_ABI);
+    }
+
+    @Override
+    protected void runTest() throws Throwable {
+        // Skip the JNI tests if ABI is none...
+        if (!isCpuAbiNone()) {
+            super.runTest();
+        }
     }
 }
