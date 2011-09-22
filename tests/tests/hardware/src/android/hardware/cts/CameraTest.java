@@ -2485,23 +2485,22 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assert3ALockState("Lock could not be unset during preview!",
                 type, false);
 
-        // Verify lock is cleared by stop preview
+        // Verify lock is not cleared by stop preview
         set3ALockState(true, type);
         mCamera.stopPreview();
-        assert3ALockState("Lock was not cleared by stopPreview!", type, false);
+        assert3ALockState("Lock was cleared by stopPreview!", type, true);
 
         // Verify that preview start does not clear lock
         set3ALockState(true, type);
         mCamera.startPreview();
         assert3ALockState("Lock state changed by preview start!", type, true);
 
-        // Verify that taking a picture clears the lock
+        // Verify that taking a picture does not clear the lock
         set3ALockState(true, type);
         mCamera.takePicture(mShutterCallback, mRawPictureCallback,
                 mJpegPictureCallback);
         waitForSnapshotDone();
-        assert3ALockState("Lock state not cleared by takePicture!",
-                type, false);
+        assert3ALockState("Lock state was cleared by takePicture!", type, true);
 
         mCamera.startPreview();
         Parameters parameters = mCamera.getParameters();
@@ -2515,54 +2514,27 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             parameters.setFocusMode(focusMode);
             mCamera.setParameters(parameters);
 
-            // Verify that autoFocus sets a (soft) lock
+            // Verify that autoFocus does not change the lock
             set3ALockState(false, type);
             mCamera.autoFocus(mAutoFocusCallback);
+            assert3ALockState("Lock was set by autoFocus in mode: " + focusMode, type, false);
             assertTrue(waitForFocusDone());
-            assert3ALockState(
-                    "Lock not set by autoFocus in focus mode: " +
-                    focusMode + "!",
-                    type, true);
+            assert3ALockState("Lock was set by autoFocus in mode: " + focusMode, type, false);
 
-            // Verify that cancelAutoFocus clears a (soft) lock
+            // Verify that cancelAutoFocus does not change the lock
             mCamera.cancelAutoFocus();
-            assert3ALockState("Soft lock not cleared by cancelAutoFocus!",
-                    type, false);
+            assert3ALockState("Lock was set by cancelAutoFocus!", type, false);
 
-            // Verify that autoFocus/cancelAutofocus preserves a user-set lock
+            // Verify that autoFocus does not change the lock
             set3ALockState(true, type);
             mCamera.autoFocus(mAutoFocusCallback);
+            assert3ALockState("Lock was cleared by autoFocus in mode: " + focusMode, type, true);
             assertTrue(waitForFocusDone());
-            mCamera.cancelAutoFocus();
-            assert3ALockState(
-                    "Pre-AF lock state not restored by cancelAutoFocus!",
-                    type, true);
+            assert3ALockState("Lock was cleared by autoFocus in mode: " + focusMode, type, true);
 
-            // Verify state preservation when not waiting for AF completion
-            set3ALockState(true, type);
-            mCamera.autoFocus(mAutoFocusCallback);
+            // Verify that cancelAutoFocus does not change the lock
             mCamera.cancelAutoFocus();
-            assert3ALockState(
-                    "Pre-AF lock state not restored by cancelAutoFocus!",
-                    type, true);
-
-            set3ALockState(false, type);
-            mCamera.autoFocus(mAutoFocusCallback);
-            mCamera.cancelAutoFocus();
-            assert3ALockState(
-                    "Pre-AF lock state not restored by cancelAutoFocus!",
-                    type, false);
-
-            // Verify soft lock->hard lock conversion with setParameters
-            set3ALockState(false, type);
-            mCamera.autoFocus(mAutoFocusCallback);
-            assertTrue(waitForFocusDone());
-            parameters = mCamera.getParameters();
-            mCamera.setParameters(parameters);
-            mCamera.cancelAutoFocus();
-            assert3ALockState(
-                    "AF-caused lock not made permanent by setParameters!",
-                    type, true);
+            assert3ALockState("Lock was cleared by cancelAutoFocus!", type, true);
         }
         mCamera.stopPreview();
     }
