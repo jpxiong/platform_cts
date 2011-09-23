@@ -27,6 +27,7 @@
     <string name="test_list_title">Manual Test List</string>
     <string name="test_category_audio">Audio</string>
     <string name="test_category_device_admin">Device Administration</string>
+    <string name="test_category_hardware">Hardware</string>
     <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
     <string name="test_category_security">Security</string>
@@ -191,6 +192,67 @@
     <string name="fs_legend_error">required feature not reported, or forbidden feature reported</string>
 
     <string name="empty"></string>
+
+    <!-- Strings for NfcTestActivity -->
+    <string name="nfc_test">NFC Test</string>
+    <string name="nfc_test_info">The Peer-to-Peer Data Exchange tests require two devices with
+        NFC enabled to exchange messages. One device must be the candidate device running the
+        software build to be tested, while the other device must be an implementation already
+        known to be compatible.\n\nThe Tag Verification tests check that your
+        device can properly read and write to tags of different technologies. The MIFARE
+        Ultralight test is only applicable for devices that support it.
+    </string>
+
+    <string name="nfc_not_enabled">NFC is not enabled!</string>
+    <string name="nfc_not_enabled_message">These tests require NFC to be enabled. Click the 
+        button below to goto Settings and enable it.</string>
+    <string name="nfc_settings">NFC Settings</string>
+
+    <string name="nfc_pee_2_pee">Peer-to-Peer Data Exchange</string>
+    <string name="nfc_ndef_push_sender">NDEF Push Sender</string>
+    <string name="nfc_ndef_push_receiver">NDEF Push Receiver</string>
+
+    <string name="nfc_tag_verification">Tag Verification</string>
+    <string name="nfc_ndef">NDEF</string>
+    <string name="nfc_mifare_ultralight">MIFARE Ultralight</string>
+
+    <string name="nfc_ndef_push_sender_info">Start the \"CTS Verifier NDEF Receiver\" test on
+        another device and touch the devices back to back. The receiver should show a
+        dialog indicating it has successfully received the correct message!</string>
+    <string name="nfc_ndef_push_sender_instructions">Touch this device to the back of another
+        device running the \"CTS Verifier NDEF Receiver\"...</string>
+
+    <string name="nfc_ndef_push_receiver_info">Start the \"CTS Verifier NDEF Sender\" test on
+        another device and touch the devices back to back. The receiver should show a
+        dialog indicating it has successfully received the correct message!</string>
+    <string name="nfc_ndef_push_receiver_instructions">Touch this device to the back of another
+        device running the \"CTS Verifier NDEF Sender\"...</string>
+    <string name="nfc_ndef_push_receive_success">Successfully received the correct NDEF push
+        message.</string>
+    <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push 
+        message.</string>
+
+    <string name="nfc_tag_verifier">NFC Tag Verifier</string>
+    <string name="nfc_tag_verifier_info">Follow the on-screen instructions to write and read
+        a tag of the chosen technology.</string>
+
+    <string name="nfc_scan_tag">Place device on a writable %s tag...</string>
+    <string name="nfc_write_tag_title">Writable tag discovered!</string>
+    <string name="nfc_write_tag_message">Press OK to write to this tag...</string>
+    <string name="nfc_scan_tag_again">Tap the same %s tag again to confirm that its contents match...</string>
+    <string name="nfc_wrong_tag_title">Wrong type of tag scanned</string>
+    <string name="nfc_no_tech">No tag technologies detected...</string>
+
+    <string name="nfc_writing_tag">Writing NFC tag...</string>
+    <string name="nfc_writing_tag_error">Error writing NFC tag...</string>
+    <string name="nfc_reading_tag">Reading NFC tag...</string>
+    <string name="nfc_reading_tag_error">Error reading NFC tag...</string>
+
+    <string name="nfc_result_success">Test passed!</string>
+    <string name="nfc_result_failure">Test failed!</string>
+
+    <string name="nfc_result_message">Written data:\n%1$s\n\nRead data:\n%2$s</string>
+    <string name="nfc_ndef_content">Id: %1$s\nMime: %2$s\nPayload: %3$s</string>
 
     <!-- Strings for AccelerometerTestActivity and GyroscopeTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
