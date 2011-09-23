@@ -960,6 +960,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                     mWebView.draw(new Canvas(b));
                     assertBitmapFillWithColor(b, Color.WHITE);
 
+                    // restorePicture is only supported in software rendering
+                    mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                     assertTrue(mWebView.restorePicture(bundle, f));
                 }
             });
