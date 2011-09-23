@@ -22,6 +22,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Xml;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +56,7 @@ import java.util.Locale;
 class TestResultsReport {
 
     /** Version of the test report. Increment whenever adding new tags and attributes. */
-    private static final int REPORT_VERSION = 1;
+    private static final int REPORT_VERSION = 2;
 
     /** Format of the report's creation time. Maintain the same format at CTS. */
     private static DateFormat DATE_FORMAT =
@@ -67,6 +68,7 @@ class TestResultsReport {
     private static final String BUILD_INFO_TAG = "build-info";
     private static final String TEST_RESULTS_TAG = "test-results";
     private static final String TEST_TAG = "test";
+    private static final String TEST_DETAILS_TAG = "details";
 
     private final Context mContext;
 
@@ -105,7 +107,7 @@ class TestResultsReport {
         xml.attribute(null, "model", Build.MODEL);
         xml.attribute(null, "product", Build.PRODUCT);
         xml.attribute(null, "release", Build.VERSION.RELEASE);
-        xml.attribute(null, "sdk", Build.VERSION.SDK);
+        xml.attribute(null, "sdk", Integer.toString(Build.VERSION.SDK_INT));
         xml.endTag(null, BUILD_INFO_TAG);
         xml.endTag(null, DEVICE_INFO_TAG);
 
@@ -118,6 +120,14 @@ class TestResultsReport {
                 xml.attribute(null, "title", item.title);
                 xml.attribute(null, "class-name", item.testName);
                 xml.attribute(null, "result", getTestResultString(mAdapter.getTestResult(i)));
+
+                String details = mAdapter.getTestDetails(i);
+                if (!TextUtils.isEmpty(details)) {
+                    xml.startTag(null, TEST_DETAILS_TAG);
+                    xml.text(details);
+                    xml.endTag(null, TEST_DETAILS_TAG);
+                }
+
                 xml.endTag(null, TEST_TAG);
             }
         }
