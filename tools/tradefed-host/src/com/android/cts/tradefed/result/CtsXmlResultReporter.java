@@ -497,8 +497,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     private void copyFormattingFiles(File resultsDir) {
         for (String resultFileName : CTS_RESULT_RESOURCES) {
-            InputStream configStream = getClass().getResourceAsStream(
-                    String.format("%s", resultFileName));
+            InputStream configStream = getClass().getResourceAsStream(String.format("/%s",
+                    resultFileName));
             if (configStream != null) {
                 File resultFile = new File(resultsDir, resultFileName);
                 try {
@@ -518,7 +518,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @param resultsDir
      */
     private void zipResults(File resultsDir) {
-        // TODO: implement this
+        try {
+            // create a file in parent directory, with same name as resultsDir
+            File zipResultFile = new File(resultsDir.getParent(), String.format("%s.zip",
+                    resultsDir.getName()));
+            FileUtil.createZip(resultsDir, zipResultFile);
+        } catch (IOException e) {
+            Log.w(LOG_TAG, String.format("Failed to create zip for %s", resultsDir.getName()));
+        }
     }
 
     /**
