@@ -291,6 +291,12 @@ public class CalendarTest extends InstrumentationTestCase {
             values.put(Events.GUESTS_CAN_INVITE_OTHERS, seed % 2);
             values.put(Events.GUESTS_CAN_SEE_GUESTS, seed % 2);
 
+            // Default is STATUS_TENTATIVE (0).  We either set it to that explicitly, or leave
+            // it set to the default.
+            if (seed != Events.STATUS_TENTATIVE) {
+                values.put(Events.SELF_ATTENDEE_STATUS, Events.STATUS_TENTATIVE);
+            }
+
             if (asSyncAdapter) {
                 values.put(Events._SYNC_ID, "SYNC_ID:" + seedString);
                 values.put(Events.SYNC_DATA4, "SYNC_V:" + seedString);
@@ -550,6 +556,9 @@ public class CalendarTest extends InstrumentationTestCase {
         removeAndVerifyCalendar(account, id);
     }
 
+    /**
+     * Exercises the EventsEntity class.
+     */
     @MediumTest
     public void testEventsEntityQuery() {
         String account = "eeq_account";
@@ -561,17 +570,22 @@ public class CalendarTest extends InstrumentationTestCase {
         // Create calendar.
         long calendarId = createAndVerifyCalendar(account, seed++, null);
 
-        // Create three events.
+        // Create three events.  We need to make sure SELF_ATTENDEE_STATUS isn't set, because
+        // that causes the provider to generate an Attendees entry, and that'll throw off
+        // our expected count.
         ContentValues eventValues;
         eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.remove(Events.SELF_ATTENDEE_STATUS);
         long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
         assertTrue(eventId1 >= 0);
 
         eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.remove(Events.SELF_ATTENDEE_STATUS);
         long eventId2 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
         assertTrue(eventId2 >= 0);
 
         eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.remove(Events.SELF_ATTENDEE_STATUS);
         long eventId3 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
         assertTrue(eventId3 >= 0);
 
@@ -673,6 +687,9 @@ public class CalendarTest extends InstrumentationTestCase {
         removeAndVerifyCalendar(account, calendarId);
     }
 
+    /**
+     * Exercises the CalendarEntity class.
+     */
     @MediumTest
     public void testCalendarEntityQuery() {
         String account1 = "ceq1_account";
@@ -711,6 +728,107 @@ public class CalendarTest extends InstrumentationTestCase {
         removeAndVerifyCalendar(account1, calendarId1);
         removeAndVerifyCalendar(account2, calendarId2);
         removeAndVerifyCalendar(account3, calendarId3);
+    }
+
+    /**
+     * Test instance queries with search parameters.
+     */
+    @MediumTest
+    public void testInstanceSearch() {
+        String account = "cser_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create a calendar
+        ContentValues values = CalendarHelper.getNewCalendarValues(account, seed);
+        long calendarId = createAndVerifyCalendar(account, seed++, values);
+
+        String testStart = "2009-10-01T08:00:00";
+        String timeZone = TIME_ZONES[0];
+        Time startTime = new Time(timeZone);
+        startTime.parse3339(testStart);
+        long startMillis = startTime.toMillis(false);
+
+        // Create some events, with different descriptions.  (Could also create a single
+        // recurring event and some instance exceptions.)
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.DESCRIPTION, "testevent event-one fiddle");
+        eventValues.put(Events.DTSTART, startMillis);
+        eventValues.put(Events.DTEND, startMillis + DateUtils.HOUR_IN_MILLIS);
+        eventValues.put(Events.EVENT_TIMEZONE, timeZone);
+        long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId1 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.DESCRIPTION, "testevent event-two fuzzle");
+        eventValues.put(Events.DTSTART, startMillis + DateUtils.HOUR_IN_MILLIS);
+        eventValues.put(Events.DTEND, startMillis + DateUtils.HOUR_IN_MILLIS * 2);
+        eventValues.put(Events.EVENT_TIMEZONE, timeZone);
+        long eventId2 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId2 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.DESCRIPTION, "testevent event-three fiddle");
+        eventValues.put(Events.DTSTART, startMillis + DateUtils.HOUR_IN_MILLIS * 2);
+        eventValues.put(Events.DTEND, startMillis + DateUtils.HOUR_IN_MILLIS * 3);
+        eventValues.put(Events.EVENT_TIMEZONE, timeZone);
+        long eventId3 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId3 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.DESCRIPTION, "nontestevent");
+        eventValues.put(Events.DTSTART, startMillis + (long) (DateUtils.HOUR_IN_MILLIS * 1.5f));
+        eventValues.put(Events.DTEND, startMillis + DateUtils.HOUR_IN_MILLIS * 2);
+        eventValues.put(Events.EVENT_TIMEZONE, timeZone);
+        long eventId4 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId4 >= 0);
+
+        String rangeStart = "2009-10-01T00:00:00";
+        String rangeEnd = "2009-10-01T11:59:59";
+        String[] projection = new String[] { Instances.BEGIN };
+
+        if (false) {
+            Cursor instances = getInstances(timeZone, rangeStart, rangeEnd, projection);
+            dumpInstances(instances, timeZone, "all");
+            instances.close();
+        }
+
+        Cursor instances;
+        int count;
+
+        // Find all matching "testevent".  The search matches on partial strings, so this
+        // will also pick up "nontestevent".
+        instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
+                "testevent", false, projection);
+        count = instances.getCount();
+        instances.close();
+        assertEquals(4, count);
+
+        // Find all matching "fiddle" and "event".  Set the "by day" flag just to be different.
+        instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
+                "fiddle event", true, projection);
+        count = instances.getCount();
+        instances.close();
+        assertEquals(2, count);
+
+        // Find all matching "fiddle" and "baluchitherium".
+        instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
+                "baluchitherium fiddle", false, projection);
+        count = instances.getCount();
+        instances.close();
+        assertEquals(0, count);
+
+        // Find all matching "event-two".
+        instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
+                "event-two", false, projection);
+        count = instances.getCount();
+        instances.close();
+        assertEquals(1, count);
+
+        removeAndVerifyCalendar(account, calendarId);
     }
 
     @MediumTest
@@ -930,6 +1048,7 @@ public class CalendarTest extends InstrumentationTestCase {
             Cursor instances = getInstances(timeZone, "2003-08-05T00:00:00", "2003-08-31T11:59:59",
                     new String[] { Instances.BEGIN });
             dumpInstances(instances, timeZone, "initial");
+            instances.close();
         }
         assertEquals("recurrence instance count", 4, instanceCount);
 
@@ -1639,9 +1758,55 @@ public class CalendarTest extends InstrumentationTestCase {
         endTime.parse3339(endWhen);
         long endMillis = endTime.toMillis(false);
 
-        // We want a list of instances that occur between the specified dates.
+        // We want a list of instances that occur between the specified dates.  Use the
+        // "instances/when" URI.
         Uri uri = Uri.withAppendedPath(CalendarContract.Instances.CONTENT_URI,
                 startMillis + "/" + endMillis);
+
+        Cursor instances = mContentResolver.query(uri, projection, null, null,
+                projection[0] + " ASC");
+
+        return instances;
+    }
+
+    /**
+     * Acquires the set of instances that appear between the specified start and end points
+     * that match the search terms.
+     *
+     * @param timeZone Time zone to use when parsing startWhen and endWhen
+     * @param startWhen Start date/time, in RFC 3339 format
+     * @param endWhen End date/time, in RFC 3339 format
+     * @param search A collection of tokens to search for.  The columns searched are
+     *   hard-coded in the provider (currently title, description, location, attendee
+     *   name, attendee email).
+     * @param searchByDay If set, adjust start/end to calendar day boundaries.
+     * @param projection Array of desired column names
+     * @return Cursor with instances (caller should close when done)
+     */
+    private Cursor getInstancesSearch(String timeZone, String startWhen, String endWhen,
+            String search, boolean searchByDay, String[] projection) {
+        Time startTime = new Time(timeZone);
+        startTime.parse3339(startWhen);
+        long startMillis = startTime.toMillis(false);
+
+        Time endTime = new Time(timeZone);
+        endTime.parse3339(endWhen);
+        long endMillis = endTime.toMillis(false);
+
+        Uri uri;
+        if (searchByDay) {
+            // start/end are Julian day numbers rather than time in milliseconds
+            int julianStart = Time.getJulianDay(startMillis, startTime.gmtoff);
+            int julianEnd = Time.getJulianDay(endMillis, endTime.gmtoff);
+            uri = Uri.withAppendedPath(CalendarContract.Instances.CONTENT_SEARCH_BY_DAY_URI,
+                    julianStart + "/" + julianEnd + "/" + search);
+        } else {
+            uri = Uri.withAppendedPath(CalendarContract.Instances.CONTENT_SEARCH_URI,
+                    startMillis + "/" + endMillis + "/" + search);
+        }
+
+        // We want a list of instances that occur between the specified dates and that match
+        // the search terms.
 
         Cursor instances = mContentResolver.query(uri, projection, null, null,
                 projection[0] + " ASC");
