@@ -16,12 +16,6 @@
 
 package android.hardware.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -45,6 +39,11 @@ import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1461,6 +1460,20 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testCancelAutofocusByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
+        Parameters parameters = mCamera.getParameters();
+        List<String> focusModes = parameters.getSupportedFocusModes();
+
+        if (focusModes.contains(Parameters.FOCUS_MODE_AUTO)) {
+            parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
+        } else if (focusModes.contains(Parameters.FOCUS_MODE_MACRO)) {
+            parameters.setFocusMode(Parameters.FOCUS_MODE_MACRO);
+        } else {
+            terminateMessageLooper();
+            return;
+        }
+
+        mCamera.setParameters(parameters);
+
         mCamera.startPreview();
 
         // No op if autofocus is not in progress.
