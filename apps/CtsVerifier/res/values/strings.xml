@@ -23,9 +23,6 @@
     <string name="info_button_text">Info</string>
     <string name="fail_button_text">Fail</string>
 
-    <!-- Strings for TestResultsReport -->
-    <string name="subject_header">CTS Verifier %1$s - %2$s</string>
-
     <!-- Strings for TestListActivity -->
     <string name="test_list_title">Manual Test List</string>
     <string name="test_category_audio">Audio</string>
@@ -40,12 +37,14 @@
     <string name="test_category_other">Other</string>
     <string name="clear">Clear</string>
     <string name="test_results_cleared">Test results cleared.</string>
-    <string name="copy">Copy</string>
-    <string name="test_results_copied">Test results copied to clipboard.</string>
+    <string name="view">View</string>
     <string name="test_results_error">Couldn\'t create test results report.</string>
     <string name="export">Export</string>
     <string name="no_storage">Cannot save report to external storage, see log for details.</string>
     <string name="report_saved">Report saved to: %s</string>
+
+    <!-- Strings for ReportViewerActivity -->
+    <string name="report_viewer">Report Viewer</string>
 
     <!-- Strings for BackupTestActivity -->
     <string name="backup_test">Data Backup Test</string>
@@ -94,7 +93,6 @@
     <string name="da_password_quality_alphanumeric">Alphanumeric</string>
     <string name="da_password_quality_numeric">Numeric</string>
     <string name="da_password_quality_something">Something</string>
-    <string name="da_password_quality_unspecified">Unspecified</string>
     <string name="da_password_minimum_length">Minimum Password Length</string>
     <string name="da_maximum_failed_passwords_for_wipe">Maximum Failed Passwords for Wipe</string>
     <string name="da_maximum_time_to_lock">Maximum Time to Lock</string>
