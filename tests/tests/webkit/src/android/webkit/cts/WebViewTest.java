@@ -2376,6 +2376,74 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @TestTargets({
         @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "pauseTimers",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "resumeTimers",
+            args = {}
+        )
+    })
+    public void testPauseResumeTimers() throws Throwable {
+        class Monitor {
+            private boolean mIsUpdated;
+            public synchronized void update() {
+                mIsUpdated  = true;
+                notify();
+            }
+            public synchronized boolean waitForUpdate() {
+                while (!mIsUpdated) {
+                    try {
+                        // This is slightly flaky, as we can't guarantee that
+                        // this is a sufficient time limit, but there's no way
+                        // around this.
+                        wait(1000);
+                        if (!mIsUpdated) {
+                            return false;
+                        }
+                    } catch (InterruptedException e) {
+                    }
+                }
+                mIsUpdated = false;
+                return true;
+            }
+        };
+        final Monitor monitor = new Monitor();
+        final String updateMonitorHtml = "<html><head></head>" +
+                "<body onload=\"monitor.update();\"></body></html>";
+
+        // Test that JavaScript is executed even with timers paused.
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.getSettings().setJavaScriptEnabled(true);
+                mWebView.addJavascriptInterface(monitor, "monitor");
+                mWebView.pauseTimers();
+                mWebView.loadData(updateMonitorHtml, "text/html", null);
+            }
+        });
+        assertTrue(monitor.waitForUpdate());
+
+        // Start a timer and test that it does not fire.
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadUrl("javascript:setTimeout(function(){monitor.update();},100)");
+            }
+        });
+        assertFalse(monitor.waitForUpdate());
+
+        // Resume timers and test that the timer fires.
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.resumeTimers();
+            }
+        });
+        assertTrue(monitor.waitForUpdate());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
             level = TestLevel.NOT_NECESSARY,
             method = "dispatchKeyEvent",
             args = {KeyEvent.class}
