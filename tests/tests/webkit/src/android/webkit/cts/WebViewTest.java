@@ -67,6 +67,7 @@ import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Date;
 
 import junit.framework.Assert;
 
@@ -436,7 +437,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertNull(mWebView.getOriginalUrl());
 
                 // By default, WebView sends an intent to ask the system to
-                // handle loading a new URL. We set WebViewClient as
+                // handle loading a new URL. We set a WebViewClient as
                 // WebViewClient.shouldOverrideUrlLoading() returns false, so
                 // the WebView will load the new URL.
                 mWebView.setWebViewClient(new WebViewClient());
@@ -2132,7 +2133,65 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             args = {}
         )
     })
-    public void testAccessCertificate() throws Throwable {
+    @UiThreadTest
+    public void testSetAndGetCertificate() {
+        assertNull(mWebView.getCertificate());
+        SslCertificate certificate = new SslCertificate("foo", "bar", new Date(42), new Date(43));
+        mWebView.setCertificate(certificate);
+        assertEquals(certificate, mWebView.getCertificate());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setCertificate",
+            args = {SslCertificate.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCertificate",
+            args = {}
+        )
+    })
+    public void testInsecureSiteClearsCertificate() throws Throwable {
+        final SslCertificate certificate =
+                new SslCertificate("foo", "bar", new Date(42), new Date(43));
+        startWebServer(false);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.setCertificate(certificate);
+                mWebView.loadUrl(url);
+            }
+        });
+        waitForUiThreadDone();
+
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                new DelayedCheck(TEST_TIMEOUT) {
+                    @Override
+                    protected boolean check() {
+                        return mWebView.getCertificate() == null;
+                    }
+                }.run();
+            }
+        });
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setCertificate",
+            args = {SslCertificate.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getCertificate",
+            args = {}
+        )
+    })
+    public void testSecureSiteSetsCertificate() throws Throwable {
         final class MockWebViewClient extends WebViewClient {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -2144,11 +2203,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         runTestOnUiThread(new Runnable() {
             public void run() {
-                // need the client to handle error
                 mWebView.setWebViewClient(new MockWebViewClient());
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
                 mWebView.setCertificate(null);
-                // attempt to load the url.
                 mWebView.loadUrl(url);
             }
         });
@@ -2170,13 +2227,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "WebViewClient.onReceivedSslError() is hidden, cannot store SSL preferences.",
+        level = TestLevel.COMPLETE,
         method = "clearSslPreferences",
         args = {}
     )
     @UiThreadTest
     public void testClearSslPreferences() {
+        // FIXME: Implement this. See http://b/5378046.
         mWebView.clearSslPreferences();
     }
 
