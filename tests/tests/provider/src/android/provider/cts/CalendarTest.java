@@ -34,6 +34,7 @@ import android.provider.CalendarContract.EventsEntity;
 import android.provider.CalendarContract.ExtendedProperties;
 import android.provider.CalendarContract.Instances;
 import android.provider.CalendarContract.Reminders;
+import android.provider.CalendarContract.SyncState;
 import android.test.InstrumentationTestCase;
 import android.test.InstrumentationCtsTestRunner;
 import android.test.suitebuilder.annotation.*;
@@ -190,6 +191,77 @@ public class CalendarTest extends InstrumentationTestCase {
 
             return resolver.query(Calendars.CONTENT_URI, CALENDARS_SYNC_PROJECTION, selection,
                     selectionArgs, null);
+        }
+    }
+
+    /**
+     * Helper classes for manipulating entries in the _sync_state table.
+     */
+    private static class SyncStateHelper {
+        public static final String[] SYNCSTATE_PROJECTION = new String[] {
+            SyncState._ID,
+            SyncState.ACCOUNT_NAME,
+            SyncState.ACCOUNT_TYPE,
+            SyncState.DATA
+        };
+
+        private static final byte[] SAMPLE_SYNC_DATA = {
+            (byte) 'H', (byte) 'e', (byte) 'l', (byte) 'l', (byte) 'o'
+        };
+
+        private SyncStateHelper() {}      // do not instantiate
+
+        /**
+         * Creates a new set of values for creating a new _sync_state entry.
+         */
+        public static ContentValues getNewSyncStateValues(String account) {
+            ContentValues values = new ContentValues();
+            values.put(SyncState.DATA, SAMPLE_SYNC_DATA);
+            values.put(SyncState.ACCOUNT_NAME, account);
+            values.put(SyncState.ACCOUNT_TYPE, CTS_TEST_TYPE);
+            return values;
+        }
+
+        /**
+         * Retrieves the _sync_state entry with the specified ID.
+         */
+        public static Cursor getSyncStateById(ContentResolver resolver, long id) {
+            Uri uri = ContentUris.withAppendedId(SyncState.CONTENT_URI, id);
+            return resolver.query(uri, SYNCSTATE_PROJECTION, null, null, null);
+        }
+
+        /**
+         * Retrieves the _sync_state entry for the specified account.
+         */
+        public static Cursor getSyncStateByAccount(ContentResolver resolver, String account) {
+            assertNotNull(account);
+            String selection = SyncState.ACCOUNT_TYPE + "=? AND " + SyncState.ACCOUNT_NAME + "=?";
+            String[] selectionArgs = new String[] { CTS_TEST_TYPE, account };
+
+            return resolver.query(SyncState.CONTENT_URI, SYNCSTATE_PROJECTION, selection,
+                    selectionArgs, null);
+        }
+
+        /**
+         * Deletes the _sync_state entry with the specified ID.  Always done as app.
+         */
+        public static int deleteSyncStateById(ContentResolver resolver, long id) {
+            Uri uri = ContentUris.withAppendedId(SyncState.CONTENT_URI, id);
+            return resolver.delete(uri, null, null);
+        }
+
+        /**
+         * Deletes the _sync_state entry associated with the specified account.  Can be done
+         * as app or sync adapter.
+         */
+        public static int deleteSyncStateByAccount(ContentResolver resolver, String account,
+                boolean asSyncAdapter) {
+            Uri uri = SyncState.CONTENT_URI;
+            if (asSyncAdapter) {
+                uri = asSyncAdapter(uri, account, CTS_TEST_TYPE);
+            }
+            return resolver.delete(uri, SyncState.ACCOUNT_NAME + "=?",
+                    new String[] { account });
         }
     }
 
@@ -608,15 +680,14 @@ public class CalendarTest extends InstrumentationTestCase {
         extended.put(ExtendedProperties.NAME, "foo");
         extended.put(ExtendedProperties.VALUE, "bar");
         extended.put(ExtendedProperties.EVENT_ID, eventId2);
-        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+        mContentResolver.insert(syncUri, extended);
         extended.put(ExtendedProperties.EVENT_ID, eventId1);
-        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+        mContentResolver.insert(syncUri, extended);
         extended.put(ExtendedProperties.NAME, "foo2");
         extended.put(ExtendedProperties.VALUE, "bar2");
-        mContentResolver.insert(ExtendedProperties.CONTENT_URI, extended);
+        mContentResolver.insert(syncUri, extended);
 
         syncUri = asSyncAdapter(Attendees.CONTENT_URI, account, CTS_TEST_TYPE);
-
         ContentValues attendee = new ContentValues();
         attendee.put(Attendees.ATTENDEE_NAME, "Joe");
         attendee.put(Attendees.ATTENDEE_EMAIL, CalendarHelper.generateCalendarOwnerEmail(account));
@@ -624,7 +695,7 @@ public class CalendarTest extends InstrumentationTestCase {
         attendee.put(Attendees.ATTENDEE_TYPE, Attendees.TYPE_REQUIRED);
         attendee.put(Attendees.ATTENDEE_RELATIONSHIP, Attendees.RELATIONSHIP_PERFORMER);
         attendee.put(Attendees.EVENT_ID, eventId3);
-        mContentResolver.insert(Attendees.CONTENT_URI, attendee);
+        mContentResolver.insert(syncUri, attendee);
 
         /*
          * Iterate over all events on our calendar.  Peek at a few values to see if they
@@ -867,6 +938,42 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     // TODO test calendar updates as sync adapter
+
+    /**
+     * Test access to the "syncstate" table.
+     */
+    @MediumTest
+    public void testSyncState() {
+        String account = "ss_account";
+        int seed = 0;
+
+        // Clean up just in case
+        SyncStateHelper.deleteSyncStateByAccount(mContentResolver, account, true);
+
+        // Create a new sync state entry
+        ContentValues values = SyncStateHelper.getNewSyncStateValues(account);
+        long id = createAndVerifySyncState(account, values);
+
+        // Look it up with the by-ID URI
+//        [ URI not yet supported - b/5373449 ]
+//        Cursor c = SyncStateHelper.getSyncStateById(mContentResolver, id);
+//        assertNotNull(c);
+//        c.close();
+
+        // Try to remove it as non-sync-adapter; expected to fail.
+        boolean failed;
+        try {
+            SyncStateHelper.deleteSyncStateByAccount(mContentResolver, account, false);
+            failed = false;
+        } catch (IllegalArgumentException iae) {
+            failed = true;
+        }
+        assertTrue("deletion of sync state by app was allowed", failed);
+
+        // Remove it and verify that it's gone
+        removeAndVerifySyncState(account);
+    }
+
 
     private void verifyEvent(ContentValues values, long eventId) {
         Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
@@ -2094,6 +2201,60 @@ public class CalendarTest extends InstrumentationTestCase {
             assertEquals(key, values.getAsString(key), c.getString(index));
         }
         c.close();
+    }
+
+    /**
+     * Creates a new _sync_state entry and verifies the contents.
+     */
+    private long createAndVerifySyncState(String account, ContentValues values) {
+        assertNotNull(values);
+        Uri syncUri = asSyncAdapter(SyncState.CONTENT_URI, account, CTS_TEST_TYPE);
+        Uri uri = mContentResolver.insert(syncUri, values);
+        long syncStateId = ContentUris.parseId(uri);
+        assertTrue(syncStateId >= 0);
+
+        verifySyncState(account, values, syncStateId);
+        return syncStateId;
+
+    }
+
+    /**
+     * Removes the _sync_state entry with the specified id, then verifies that it's gone.
+     */
+    private void removeAndVerifySyncState(String account) {
+        assertEquals(1, SyncStateHelper.deleteSyncStateByAccount(mContentResolver, account, true));
+
+        // Verify
+        Cursor c = SyncStateHelper.getSyncStateByAccount(mContentResolver, account);
+        try {
+            assertEquals(0, c.getCount());
+        } finally {
+            c.close();
+        }
+    }
+
+    /**
+     * Check all the fields of a _sync_state entry contained in values + id. This assumes
+     * a single _sync_state has been created on the given account.
+     */
+    private void verifySyncState(String account, ContentValues values, long id) {
+        // Verify
+        Cursor c = SyncStateHelper.getSyncStateByAccount(mContentResolver, account);
+        try {
+            assertEquals(1, c.getCount());
+            assertTrue(c.moveToFirst());
+            assertEquals(id, c.getLong(0));
+            for (String key : values.keySet()) {
+                int index = c.getColumnIndex(key);
+                if (key.equals(SyncState.DATA)) {
+                    // TODO: can't compare as string, so compare as byte[]
+                } else {
+                    assertEquals(key, values.getAsString(key), c.getString(index));
+                }
+            }
+        } finally {
+            c.close();
+        }
     }
 
 
