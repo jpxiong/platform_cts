@@ -197,11 +197,11 @@ class TestPackageDef implements ITestPackageDef {
             // a reference app test is just a InstrumentationTest with one extra apk to install
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
             instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
-            return setInstrumentationTest(className, methodName, instrTest, testCaseDir);
+            return setInstrumentationTest(className, methodName, instrTest, testCaseDir, mTests);
         } else {
             Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
-            return setInstrumentationTest(className, methodName, instrTest, testCaseDir);
+            return setInstrumentationTest(className, methodName, instrTest, testCaseDir, mTests);
         }
     }
 
@@ -217,13 +217,15 @@ class TestPackageDef implements ITestPackageDef {
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
     private InstrumentationTest setInstrumentationTest(String className,
-            String methodName, InstrumentationApkTest instrTest, File testCaseDir) {
+            String methodName, InstrumentationApkTest instrTest, File testCaseDir,
+            Collection<TestIdentifier> testsToRun) {
         instrTest.setRunName(getUri());
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
         instrTest.setTestPackageName(mTestPackageName);
         instrTest.setClassName(className);
         instrTest.setMethodName(methodName);
+        instrTest.setTestsToRun(testsToRun, true /* force batch mode */);
         // mName means 'apk file name' for instrumentation tests
         instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
         mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));

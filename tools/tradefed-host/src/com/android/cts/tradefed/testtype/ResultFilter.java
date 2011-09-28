@@ -15,41 +15,60 @@
  */
 package com.android.cts.tradefed.testtype;
 
-import com.android.ddmlib.Log;
+import com.android.cts.tradefed.testtype.CtsTest.TestPackage;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.ResultForwarder;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
  * A {@link ITestInvocationListener} that filters test results based on the set of expected tests
  * in CTS test package xml files.
+ * <p/>
+ * It will only report test results for expected tests, and at end of invocation, will report the
+ * set of expected tests that were not executed.
  */
 class ResultFilter extends ResultForwarder {
 
-    private final Collection<TestIdentifier> mKnownTests;
+    private final Map<String, Collection<TestIdentifier>> mKnownTestsMap;
+    private final Map<String, Collection<TestIdentifier>> mRemainingTestsMap;
+    private String mCurrentTestRun = null;
 
     /**
      * Create a {@link ResultFilter}.
      *
      * @param listener the real {@link ITestInvocationListener} to forward results to
-     * @param expectedTests the full collection of known tests to expect
      */
-    ResultFilter(ITestInvocationListener listener, Collection<TestIdentifier> knownTests) {
+    ResultFilter(ITestInvocationListener listener, List<TestPackage> testPackages) {
         super(listener);
-        mKnownTests = knownTests;
+
+        mKnownTestsMap = new HashMap<String, Collection<TestIdentifier>>();
+        // use LinkedHashMap for predictable test order
+        mRemainingTestsMap = new LinkedHashMap<String, Collection<TestIdentifier>>();
+
+        for (TestPackage testPkg : testPackages) {
+            mKnownTestsMap.put(testPkg.getTestRunName(), new HashSet<TestIdentifier>(
+                    testPkg.getKnownTests()));
+            mRemainingTestsMap.put(testPkg.getTestRunName(), new LinkedHashSet<TestIdentifier>(
+                    testPkg.getKnownTests()));
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
-        super.testRunEnded(elapsedTime, runMetrics);
-        // TODO: report all remaining tests in mTestPackage as failed tests with
-        // notExecuted result
+    public void testRunStarted(String runName, int testCount) {
+        super.testRunStarted(runName, testCount);
+        mCurrentTestRun = runName;
     }
 
     /**
@@ -60,7 +79,7 @@ class ResultFilter extends ResultForwarder {
         if (isKnownTest(test)) {
             super.testStarted(test);
         } else {
-            Log.d("ResultFilter", String.format("Skipping reporting unknown test %s", test));
+            CLog.d("Skipping reporting unknown test %s", test);
         }
     }
 
@@ -81,6 +100,7 @@ class ResultFilter extends ResultForwarder {
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
         if (isKnownTest(test)) {
             super.testEnded(test, testMetrics);
+            removeExecutedTest(test);
         }
     }
 
@@ -89,6 +109,35 @@ class ResultFilter extends ResultForwarder {
      * @return
      */
     private boolean isKnownTest(TestIdentifier test) {
-        return mKnownTests.contains(test);
+        if (mCurrentTestRun != null && mKnownTestsMap.containsKey(mCurrentTestRun)) {
+            return mKnownTestsMap.get(mCurrentTestRun).contains(test);
+        }
+        return false;
+    }
+
+    /**
+     * Remove given test from the 'remaining tests' data structure.
+     * @param test
+     */
+    private void removeExecutedTest(TestIdentifier test) {
+        if (mCurrentTestRun != null && mRemainingTestsMap.containsKey(mCurrentTestRun)) {
+             mRemainingTestsMap.get(mCurrentTestRun).remove(test);
+        }
+    }
+
+    /**
+     * Report the set of expected tests that were not executed
+     */
+    public void reportUnexecutedTests() {
+        for (Map.Entry<String, Collection<TestIdentifier>> entry : mRemainingTestsMap.entrySet()) {
+            super.testRunStarted(entry.getKey(), entry.getValue().size());
+            for (TestIdentifier test : entry.getValue()) {
+                // an unexecuted test is currently reported as a 'testStarted' event without a
+                // 'testEnded'. TODO: consider adding an explict API for reporting an unexecuted
+                // test
+                super.testStarted(test);
+            }
+            super.testRunEnded(0, new HashMap<String,String>());
+        }
     }
 }

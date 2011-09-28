@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestResult.TestStatus;
 
@@ -105,8 +106,10 @@ class TestCase {
                 return "fail";
             case PASSED:
                 return "pass";
-            // TODO add notExecuted
+            case INCOMPLETE:
+                return "notExecuted";
         }
+        CLog.w("Unrecognized status %s", status);
         return "fail";
     }
 

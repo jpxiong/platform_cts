@@ -16,6 +16,8 @@
 
 package com.android.cts.tradefed.result;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
@@ -25,16 +27,16 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.TestResult;
 import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.util.FileUtil;
+import com.android.tradefed.util.StreamUtil;
 
 import org.kxml2.io.KXmlSerializer;
-
-import android.tests.getinfo.DeviceInfoConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -151,10 +153,11 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     @Override
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
         super.testRunEnded(elapsedTime, runMetrics);
-        Log.i(LOG_TAG, String.format("Test run %s complete. Tests passed %d, failed %d, error %d",
+        CLog.i("%s complete: Passed %d, Failed %d, Not Executed %d",
                 getCurrentRunResults().getName(), getCurrentRunResults().getNumPassedTests(),
-                getCurrentRunResults().getNumFailedTests(),
-                getCurrentRunResults().getNumErrorTests()));
+                getCurrentRunResults().getNumFailedTests() +
+                getCurrentRunResults().getNumErrorTests(),
+                getCurrentRunResults().getNumIncompleteTests());
     }
 
     /**
@@ -187,21 +190,16 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             serializeResultsDoc(serializer, startTimestamp, endTime);
             serializer.endDocument();
             // TODO: output not executed timeout omitted counts
-            String msg = String.format("XML test result file generated at %s. Total tests %d, " +
-                    "Failed %d, Error %d", getReportPath(), getNumTotalTests(),
-                    getNumFailedTests(), getNumErrorTests());
+            String msg = String.format("XML test result file generated at %s. Passed %d, " +
+                    "Failed %d, Not Executed %d", getReportPath(), getNumPassedTests(),
+                    getNumFailedTests() + getNumErrorTests(), getNumIncompleteTests());
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, msg);
             Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Time: %s",
                     TimeUtil.formatElapsedTime(elapsedTime)));
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to generate report data");
         } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ignored) {
-                }
-            }
+            StreamUtil.closeStream(stream);
         }
     }
 
@@ -414,7 +412,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.attribute(ns, "failed", Integer.toString(getNumErrorTests() +
                 getNumFailedTests()));
         // TODO: output notExecuted, timeout count
-        serializer.attribute(ns, "notExecuted", "0");
+        serializer.attribute(ns, "notExecuted",  Integer.toString(getNumIncompleteTests()));
+        // ignore timeouts - these are reported as errors
         serializer.attribute(ns, "timeout", "0");
         serializer.attribute(ns, "pass", Integer.toString(getNumPassedTests()));
         serializer.endTag(ns, "Summary");

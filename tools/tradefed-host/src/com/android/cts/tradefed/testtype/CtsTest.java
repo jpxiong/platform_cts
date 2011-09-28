@@ -43,6 +43,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -111,12 +112,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private boolean mScreenshot = false;
 
     /** data structure for a {@link IRemoteTest} and its known tests */
-    private class KnownTests {
+    class TestPackage {
         private final IRemoteTest mTestForPackage;
         private final Collection<TestIdentifier> mKnownTests;
         private final ITestPackageDef mPackageDef;
 
-        KnownTests(ITestPackageDef packageDef, IRemoteTest testForPackage,
+        TestPackage(ITestPackageDef packageDef, IRemoteTest testForPackage,
                 Collection<TestIdentifier> knownTests) {
             mPackageDef = packageDef;
             mTestForPackage = testForPackage;
@@ -134,10 +135,18 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         ITestPackageDef getPackageDef() {
             return mPackageDef;
         }
+
+        /**
+         * Return the test run name that should be used for the TestPackage
+         * @return
+         */
+        String getTestRunName() {
+            return mPackageDef.getUri();
+        }
     }
 
     /** list of remaining tests to execute */
-    private List<KnownTests> mRemainingTests = null;
+    private List<TestPackage> mRemainingTestPkgs = null;
 
     private CtsBuildHelper mCtsBuild = null;
     private IBuildInfo mBuildInfo = null;
@@ -247,38 +256,44 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             throw new IllegalArgumentException("missing device");
         }
 
-        if (mRemainingTests == null) {
+        if (mRemainingTestPkgs == null) {
             checkFields();
-            mRemainingTests = buildTestsToRun();
-        }
-        // always collect the device info, even for resumed runs, since test will likely be running
-        // on a different device
-        collectDeviceInfo(getDevice(), mCtsBuild, listener);
-
-        while (!mRemainingTests.isEmpty()) {
-            KnownTests knownTests = mRemainingTests.get(0);
-
-            IRemoteTest test = knownTests.getTestForPackage();
-            if (test instanceof IDeviceTest) {
-                ((IDeviceTest)test).setDevice(getDevice());
-            }
-            if (test instanceof IBuildReceiver) {
-                ((IBuildReceiver)test).setBuild(mBuildInfo);
-            }
-
-            ResultFilter filter = new ResultFilter(listener, knownTests.getKnownTests());
-            test.run(filter);
-            forwardPackageDetails(knownTests.getPackageDef(), listener);
-            mRemainingTests.remove(0);
+            mRemainingTestPkgs = buildTestsToRun();
         }
 
-        if (mScreenshot) {
-            InputStreamSource screenshotSource = getDevice().getScreenshot();
-            try {
-                listener.testLog("screenshot", LogDataType.PNG, screenshotSource);
-            } finally {
-                screenshotSource.cancel();
+        ResultFilter filter = new ResultFilter(listener, mRemainingTestPkgs);
+
+        try {
+            // always collect the device info, even for resumed runs, since test will likely be
+            // running on a different device
+            collectDeviceInfo(getDevice(), mCtsBuild, listener);
+
+            while (!mRemainingTestPkgs.isEmpty()) {
+                TestPackage knownTests = mRemainingTestPkgs.get(0);
+
+                IRemoteTest test = knownTests.getTestForPackage();
+                if (test instanceof IDeviceTest) {
+                    ((IDeviceTest)test).setDevice(getDevice());
+                }
+                if (test instanceof IBuildReceiver) {
+                    ((IBuildReceiver)test).setBuild(mBuildInfo);
+                }
+
+                forwardPackageDetails(knownTests.getPackageDef(), listener);
+                test.run(filter);
+                mRemainingTestPkgs.remove(0);
             }
+
+            if (mScreenshot) {
+                InputStreamSource screenshotSource = getDevice().getScreenshot();
+                try {
+                    listener.testLog("screenshot", LogDataType.PNG, screenshotSource);
+                } finally {
+                    screenshotSource.cancel();
+                }
+            }
+        } finally {
+            filter.reportUnexecutedTests();
         }
     }
 
@@ -287,8 +302,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      *
      * @return
      */
-    private List<KnownTests> buildTestsToRun() {
-        List<KnownTests> testList = new LinkedList<KnownTests>();
+    private List<TestPackage> buildTestsToRun() {
+        List<TestPackage> testList = new LinkedList<TestPackage>();
         try {
             ITestCaseRepo testRepo = createTestCaseRepo();
             Collection<String> testUris = getTestPackageUrisToRun(testRepo);
@@ -315,14 +330,14 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @param testUri
      * @param testPackage
      */
-    private void addTestPackage(List<KnownTests> testList, String testUri,
+    private void addTestPackage(List<TestPackage> testList, String testUri,
             ITestPackageDef testPackage) {
         if (testPackage != null) {
             IRemoteTest testForPackage = testPackage.createTest(mCtsBuild.getTestCasesDir(),
                     mClassName, mMethodName);
             if (testForPackage != null) {
                 Collection<TestIdentifier> knownTests = testPackage.getTests();
-                testList.add(new KnownTests(testPackage, testForPackage, knownTests));
+                testList.add(new TestPackage(testPackage, testForPackage, knownTests));
             }
         } else {
             Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
@@ -377,7 +392,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             return null;
         }
         checkFields();
-        List<KnownTests> allTests = buildTestsToRun();
+        List<TestPackage> allTests = buildTestsToRun();
 
         if (allTests.size() <= 1) {
             Log.w(LOG_TAG, "no tests to shard!");
@@ -389,13 +404,13 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         // don't create more shards than the number of tests we have!
         for (int i = 0; i < mShards && i < allTests.size(); i++) {
             CtsTest shard = new CtsTest();
-            shard.mRemainingTests = new LinkedList<KnownTests>();
+            shard.mRemainingTestPkgs = new LinkedList<TestPackage>();
             shardQueue.add(shard);
         }
         while (!allTests.isEmpty()) {
-            KnownTests testPair = allTests.remove(0);
+            TestPackage testPair = allTests.remove(0);
             CtsTest shard = (CtsTest)shardQueue.poll();
-            shard.mRemainingTests.add(testPair);
+            shard.mRemainingTestPkgs.add(testPair);
             shardQueue.add(shard);
         }
         return shardQueue;
