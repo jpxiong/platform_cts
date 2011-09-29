@@ -22,6 +22,7 @@ import android.content.ContentValues;
 import android.content.Entity;
 import android.content.EntityIterator;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -87,6 +88,7 @@ public class CalendarTest extends InstrumentationTestCase {
                 Calendars.CAN_ORGANIZER_RESPOND,
                 Calendars.CAN_MODIFY_TIME_ZONE,
                 Calendars.MAX_REMINDERS,
+                Calendars.ALLOWED_REMINDERS,
                 Calendars.DELETED,
                 Calendars.CAL_SYNC1,
                 Calendars.CAL_SYNC2,
@@ -99,6 +101,11 @@ public class CalendarTest extends InstrumentationTestCase {
 
         private CalendarHelper() {}     // do not instantiate this class
 
+        /**
+         * Generates the e-mail address for the Calendar owner.  Use this for
+         * Calendars.OWNER_ACCOUNT, Events.OWNER_ACCOUNT, and for Attendees.ATTENDEE_EMAIL
+         * when you want a "self" attendee entry.
+         */
         static String generateCalendarOwnerEmail(String account) {
             return "OWNER_" + account + "@example.com";
         }
@@ -136,7 +143,8 @@ public class CalendarTest extends InstrumentationTestCase {
             values.put(Calendars.CALENDAR_TIME_ZONE, TIME_ZONES[seed % TIME_ZONES.length]);
             values.put(Calendars.CAN_ORGANIZER_RESPOND, seed % 2);
             values.put(Calendars.CAN_MODIFY_TIME_ZONE, seed % 2);
-            values.put(Calendars.MAX_REMINDERS, seed);
+            values.put(Calendars.MAX_REMINDERS, 3);
+            values.put(Calendars.ALLOWED_REMINDERS, "0,1,2");   // does not include SMS (3)
             values.put(Calendars.CAL_SYNC1, "SYNC1:" + seedString);
             values.put(Calendars.CAL_SYNC2, "SYNC2:" + seedString);
             values.put(Calendars.CAL_SYNC3, "SYNC3:" + seedString);
@@ -195,7 +203,7 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
-     * Helper classes for manipulating entries in the _sync_state table.
+     * Helper class for manipulating entries in the _sync_state table.
      */
     private static class SyncStateHelper {
         public static final String[] SYNCSTATE_PROJECTION = new String[] {
@@ -540,6 +548,107 @@ public class CalendarTest extends InstrumentationTestCase {
         }
     }
 
+    /**
+     * Helper class for manipulating entries in the Attendees table.
+     */
+    private static class AttendeeHelper {
+        public static final String[] ATTENDEES_PROJECTION = new String[] {
+            Attendees._ID,
+            Attendees.EVENT_ID,
+            Attendees.ATTENDEE_NAME,
+            Attendees.ATTENDEE_EMAIL,
+            Attendees.ATTENDEE_STATUS,
+            Attendees.ATTENDEE_RELATIONSHIP,
+            Attendees.ATTENDEE_TYPE
+        };
+        // indexes into projection
+        public static final int ATTENDEES_ID_INDEX = 0;
+        public static final int ATTENDEES_EVENT_ID_INDEX = 1;
+
+        // do not instantiate
+        private AttendeeHelper() {}
+
+        /**
+         * Adds a new attendee to the specified event.
+         *
+         * @return the _id of the new attendee, or -1 on failure
+         */
+        public static long addAttendee(ContentResolver resolver, long eventId, String name,
+                String email, int status, int relationship, int type) {
+            Uri uri = Attendees.CONTENT_URI;
+
+            ContentValues attendee = new ContentValues();
+            attendee.put(Attendees.EVENT_ID, eventId);
+            attendee.put(Attendees.ATTENDEE_NAME, name);
+            attendee.put(Attendees.ATTENDEE_EMAIL, email);
+            attendee.put(Attendees.ATTENDEE_STATUS, status);
+            attendee.put(Attendees.ATTENDEE_RELATIONSHIP, relationship);
+            attendee.put(Attendees.ATTENDEE_TYPE, type);
+            Uri result = resolver.insert(uri, attendee);
+            return ContentUris.parseId(result);
+        }
+
+        /**
+         * Finds all Attendees rows for the specified event and email address.  The returned
+         * cursor will use {@link AttendeeHelper#ATTENDEES_PROJECTION}.
+         */
+        public static Cursor findAttendeesByEmail(ContentResolver resolver, long eventId,
+                String email) {
+            return resolver.query(Attendees.CONTENT_URI, ATTENDEES_PROJECTION,
+                    Attendees.EVENT_ID + "=? AND " + Attendees.ATTENDEE_EMAIL + "=?",
+                    new String[] { String.valueOf(eventId), email }, null);
+        }
+    }
+
+
+    /**
+     * Helper class for manipulating entries in the Attendees table.
+     */
+    private static class ReminderHelper {
+        public static final String[] REMINDERS_PROJECTION = new String[] {
+            Reminders._ID,
+            Reminders.EVENT_ID,
+            Reminders.MINUTES,
+            Reminders.METHOD
+        };
+        // indexes into projection
+        public static final int REMINDERS_ID_INDEX = 0;
+        public static final int REMINDERS_EVENT_ID_INDEX = 1;
+
+        // do not instantiate
+        private ReminderHelper() {}
+
+        /**
+         * Adds a new reminder to the specified event.
+         *
+         * @return the _id of the new reminder, or -1 on failure
+         */
+        public static long addReminder(ContentResolver resolver, long eventId, int minutes,
+                int method) {
+            Uri uri = Reminders.CONTENT_URI;
+
+            ContentValues reminder = new ContentValues();
+            reminder.put(Reminders.EVENT_ID, eventId);
+            reminder.put(Reminders.MINUTES, minutes);
+            reminder.put(Reminders.METHOD, method);
+            Uri result = resolver.insert(uri, reminder);
+            return ContentUris.parseId(result);
+        }
+
+        /**
+         * Finds all Reminders rows for the specified event.  The returned cursor will use
+         * {@link ReminderHelper#REMINDERS_PROJECTION}.
+         */
+        public static Cursor findRemindersByEventId(ContentResolver resolver, long eventId) {
+            return resolver.query(Reminders.CONTENT_URI, REMINDERS_PROJECTION,
+                    Reminders.EVENT_ID + "=?", new String[] { String.valueOf(eventId) }, null);
+        }
+   }
+
+    /**
+     * Creates an updated URI that includes query parameters that identify the source as a
+     * sync adapter.
+     */
     static Uri asSyncAdapter(Uri uri, String account, String accountType) {
         return uri.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER,
@@ -802,6 +911,142 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
+     * Tests creation and manipulation of Attendees.
+     */
+    @MediumTest
+    public void testAttendees() {
+        String account = "att_account";
+        int seed = 0;
+
+        // Clean up just in case.
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create calendar.
+        long calendarId = createAndVerifyCalendar(account, seed++, null);
+
+        // Create two events, one with a value set for SELF_ATTENDEE_STATUS, one without.
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.SELF_ATTENDEE_STATUS, Events.STATUS_TENTATIVE);
+        long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId1 >= 0);
+
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.remove(Events.SELF_ATTENDEE_STATUS);
+        long eventId2 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId2 >= 0);
+
+        /*
+         * Add some attendees.
+         */
+        long attId1 = AttendeeHelper.addAttendee(mContentResolver, eventId1,
+                "Alice",
+                "alice@example.com",
+                Attendees.ATTENDEE_STATUS_TENTATIVE,
+                Attendees.RELATIONSHIP_ATTENDEE,
+                Attendees.TYPE_REQUIRED);
+        long attId2 = AttendeeHelper.addAttendee(mContentResolver, eventId1,
+                "Betty",
+                "betty@example.com",
+                Attendees.ATTENDEE_STATUS_DECLINED,
+                Attendees.RELATIONSHIP_ATTENDEE,
+                Attendees.TYPE_NONE);
+        long attId3 = AttendeeHelper.addAttendee(mContentResolver, eventId1,
+                "Carol",
+                "carol@example.com",
+                Attendees.ATTENDEE_STATUS_DECLINED,
+                Attendees.RELATIONSHIP_ATTENDEE,
+                Attendees.TYPE_OPTIONAL);
+
+        /*
+         * Find the event1 "self" attendee entry.
+         */
+        Cursor cursor = AttendeeHelper.findAttendeesByEmail(mContentResolver, eventId1,
+                CalendarHelper.generateCalendarOwnerEmail(account));
+        try {
+            assertEquals(1, cursor.getCount());
+            //DatabaseUtils.dumpCursor(cursor);
+
+            cursor.moveToFirst();
+            long id = cursor.getLong(AttendeeHelper.ATTENDEES_ID_INDEX);
+
+            /*
+             * Update the status field.  The provider should automatically propagate the result.
+             */
+            ContentValues update = new ContentValues();
+            Uri uri = ContentUris.withAppendedId(Attendees.CONTENT_URI, id);
+
+            /* TODO: currently causes an NPE in provider
+            update.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_ACCEPTED);
+            int count = mContentResolver.update(uri, update, null, null);
+            */
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        // TODO: use new URI to change all "declined" to "invited"
+
+        // TODO: in second event, create a new "self" attendee
+
+        removeAndVerifyCalendar(account, calendarId);
+    }
+
+    /**
+     * Tests creation and manipulation of Reminders.
+     */
+    @MediumTest
+    public void testReminders() {
+        String account = "rem_account";
+        int seed = 0;
+
+        // Clean up just in case.
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create calendar.
+        long calendarId = createAndVerifyCalendar(account, seed++, null);
+
+        // Create events.
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId1 >= 0);
+
+        /*
+         * Add some reminders.
+         */
+        long remId1 = ReminderHelper.addReminder(mContentResolver, eventId1,
+                10, Reminders.METHOD_DEFAULT);
+        long remId2 = ReminderHelper.addReminder(mContentResolver, eventId1,
+                15, Reminders.METHOD_ALERT);
+        long remId3 = ReminderHelper.addReminder(mContentResolver, eventId1,
+                20, Reminders.METHOD_SMS);  // SMS isn't allowed for this calendar
+
+        /*
+         * Check the entries.
+         */
+        Cursor cursor = ReminderHelper.findRemindersByEventId(mContentResolver, eventId1);
+        try {
+            assertEquals(3, cursor.getCount());
+            //DatabaseUtils.dumpCursor(cursor);
+
+            // TODO: make sure METHOD_SMS worked even though not allowed
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        // TODO: change remId3 to METHOD_DEFAULT
+        // TODO: use new URI to change all METHOD_DEFAULT to METHOD_EMAIL, confirm 2 changes
+
+        removeAndVerifyCalendar(account, calendarId);
+    }
+
+    /**
      * Test instance queries with search parameters.
      */
     @MediumTest
@@ -955,10 +1200,10 @@ public class CalendarTest extends InstrumentationTestCase {
         long id = createAndVerifySyncState(account, values);
 
         // Look it up with the by-ID URI
-//        [ URI not yet supported - b/5373449 ]
-//        Cursor c = SyncStateHelper.getSyncStateById(mContentResolver, id);
-//        assertNotNull(c);
-//        c.close();
+        Cursor c = SyncStateHelper.getSyncStateById(mContentResolver, id);
+        assertNotNull(c);
+        assertEquals(1, c.getCount());
+        c.close();
 
         // Try to remove it as non-sync-adapter; expected to fail.
         boolean failed;
@@ -2060,45 +2305,31 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
-     * Add some attendees to an event.
+     * Add some sample attendees to an event.
      */
     private void addAttendees(String account, long eventId, int seed) {
-
         assertTrue(eventId >= 0);
-        Uri syncUri = asSyncAdapter(Attendees.CONTENT_URI, account, CTS_TEST_TYPE);
-
-        ContentValues values = new ContentValues();
-        values.put(Attendees.EVENT_ID, eventId);
-        values.put(Attendees.ATTENDEE_NAME, "Attender" + seed);
-        values.put(Attendees.ATTENDEE_EMAIL, CalendarHelper.generateCalendarOwnerEmail(account));
-        values.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_ACCEPTED);
-        values.put(Attendees.ATTENDEE_RELATIONSHIP, Attendees.RELATIONSHIP_ORGANIZER);
-        values.put(Attendees.ATTENDEE_TYPE, Attendees.TYPE_NONE);
-        Uri uri = mContentResolver.insert(syncUri, values);
+        AttendeeHelper.addAttendee(mContentResolver, eventId,
+                "Attender" + seed,
+                CalendarHelper.generateCalendarOwnerEmail(account),
+                Attendees.ATTENDEE_STATUS_ACCEPTED,
+                Attendees.RELATIONSHIP_ORGANIZER,
+                Attendees.TYPE_NONE);
         seed++;
 
-        values = new ContentValues();
-        values.put(Attendees.EVENT_ID, eventId);
-        values.put(Attendees.ATTENDEE_NAME, "Attender" + seed);
-        values.put(Attendees.ATTENDEE_EMAIL, "attender" + seed + "@example.com");
-        values.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_TENTATIVE);
-        values.put(Attendees.ATTENDEE_RELATIONSHIP, Attendees.RELATIONSHIP_NONE);
-        values.put(Attendees.ATTENDEE_TYPE, Attendees.TYPE_NONE);
-        uri = mContentResolver.insert(syncUri, values);
+        AttendeeHelper.addAttendee(mContentResolver, eventId,
+                "Attender" + seed,
+                "attender" + seed + "@example.com",
+                Attendees.ATTENDEE_STATUS_TENTATIVE,
+                Attendees.RELATIONSHIP_NONE,
+                Attendees.TYPE_NONE);
     }
 
     /**
-     * Add some reminders to an event.
+     * Add some sample reminders to an event.
      */
     private void addReminders(String account, long eventId, int seed) {
-        ContentValues values = new ContentValues();
-
-        values.put(Reminders.EVENT_ID, eventId);
-        values.put(Reminders.MINUTES, seed * 5);
-        values.put(Reminders.METHOD, Reminders.METHOD_ALERT);
-
-        Uri syncUri = asSyncAdapter(Reminders.CONTENT_URI, account, CTS_TEST_TYPE);
-        Uri uri = mContentResolver.insert(syncUri, values);
+        ReminderHelper.addReminder(mContentResolver, eventId, seed * 5, Reminders.METHOD_ALERT);
     }
 
     /**
@@ -2198,6 +2429,7 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals(id, c.getLong(0));
         for (String key : values.keySet()) {
             int index = c.getColumnIndex(key);
+            assertTrue("Key " + key + " not in projection", index >= 0);
             assertEquals(key, values.getAsString(key), c.getString(index));
         }
         c.close();
@@ -2229,7 +2461,9 @@ public class CalendarTest extends InstrumentationTestCase {
         try {
             assertEquals(0, c.getCount());
         } finally {
-            c.close();
+            if (c != null) {
+                c.close();
+            }
         }
     }
 
@@ -2253,7 +2487,9 @@ public class CalendarTest extends InstrumentationTestCase {
                 }
             }
         } finally {
-            c.close();
+            if (c != null) {
+                c.close();
+            }
         }
     }
 
