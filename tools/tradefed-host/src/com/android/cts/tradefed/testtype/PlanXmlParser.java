@@ -16,22 +16,28 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.util.xml.AbstractXmlParser;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Parses a test plan xml file.
  */
 class PlanXmlParser extends AbstractXmlParser implements IPlanXmlParser {
 
-    private Set<String> mUris;
+    /**
+     * Map of uri names found in plan, and their excluded tests
+     */
+    private Map<String, Collection<TestIdentifier>> mUriExcludedTestsMap;
 
     /**
      * SAX callback object. Handles parsing data from the xml tags.
@@ -45,21 +51,55 @@ class PlanXmlParser extends AbstractXmlParser implements IPlanXmlParser {
                 throws SAXException {
             if (ENTRY_TAG.equals(localName)) {
                 final String entryUriValue = attributes.getValue("uri");
-                mUris.add(entryUriValue);
+                Collection<TestIdentifier> excludedTests = parseExcludedTests(
+                        attributes.getValue("exclude"));
+                mUriExcludedTestsMap.put(entryUriValue, excludedTests);
             }
+        }
+
+        /**
+         * Parse the semi colon separated list of {@link TestIdentifier}s
+         *
+         * @param excludedString the excluded string list
+         * @return
+         */
+        private Collection<TestIdentifier> parseExcludedTests(String excludedString) {
+            Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+            if (excludedString != null) {
+                String[] testStrings = excludedString.split(";");
+                for (String testString : testStrings) {
+                    String[] classMethodPair = testString.split("#");
+                    if (classMethodPair.length == 2) {
+                        tests.add(new TestIdentifier(classMethodPair[0], classMethodPair[1]));
+                    } else {
+                        CLog.w("Unrecognized test name: %s. Expected format: class#method",
+                                testString);
+                    }
+                }
+            }
+            return tests;
         }
     }
 
     PlanXmlParser() {
-        // Uses a LinkedHashSet to have predictable iteration order
-        mUris = new LinkedHashSet<String>();
+        // Uses a LinkedHashMap to have predictable iteration order
+        mUriExcludedTestsMap = new LinkedHashMap<String, Collection<TestIdentifier>>();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<String> getTestUris() {
-        return mUris;
+        return mUriExcludedTestsMap.keySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<TestIdentifier> getExcludedTests(String uri) {
+        return mUriExcludedTestsMap.get(uri);
     }
 
     /**
