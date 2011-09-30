@@ -27,6 +27,7 @@
     <string name="explain">1. click start. \n2. if above image shaked, then press pass button,
          else press failed button.</string>
     <string name="text_view_hello">Hello! Text view!</string>
+    <string name="text_view_hello_two_lines">Hello! \nText view!</string>
     <string name="text_view_simple_hint">This is a hint.</string>
     <string name="text_view_hint">This is a string for testing hint of textview.</string>
     <string name="activity_forwarding">App/Forwarding</string>
