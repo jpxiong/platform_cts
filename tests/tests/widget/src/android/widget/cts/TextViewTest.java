@@ -19,6 +19,8 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.FastMath;
 
+import android.graphics.Path;
+import android.graphics.RectF;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -104,6 +106,7 @@ import java.io.IOException;
  */
 @TestTargetClass(TextView.class)
 public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubActivity> {
+
     private TextView mTextView;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
@@ -1863,6 +1866,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     public void testGetFocusedRect() {
         Rect rc = new Rect();
 
+        // Basic
         mTextView = new TextView(mActivity);
         mTextView.getFocusedRect(rc);
         assertEquals(mTextView.getScrollX(), rc.left);
@@ -1870,6 +1874,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(mTextView.getScrollY(), rc.top);
         assertEquals(mTextView.getScrollY() + mTextView.getHeight(), rc.bottom);
 
+        // Single line
         mTextView = findTextView(R.id.textview_text);
         mTextView.getFocusedRect(rc);
         assertEquals(mTextView.getScrollX(), rc.left);
@@ -1888,13 +1893,70 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
         mTextView.getFocusedRect(rc);
         assertNotNull(mTextView.getLayout());
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(13),
-                (float) rc.left, 0.4f);
-        // 'right' is one pixel larger than 'left'
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(13) + 1,
-                (float) rc.right, 0.4f);
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3), (float) rc.left);
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(13), (float) rc.right);
         assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
-        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom, 0.4f);
+        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setSelected(true);
+                SpannableString text = new SpannableString(mTextView.getText());
+                Selection.setSelection(text, 13, 3);
+                mTextView.setText(text);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        mTextView.getFocusedRect(rc);
+        assertNotNull(mTextView.getLayout());
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3) - 2, (float) rc.left);
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3) + 2, (float) rc.right);
+        assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
+        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
+
+        // Multi lines
+        mTextView = findTextView(R.id.textview_text_two_lines);
+        mTextView.getFocusedRect(rc);
+        assertEquals(mTextView.getScrollX(), rc.left);
+        assertEquals(mTextView.getScrollX() + mTextView.getWidth(), rc.right);
+        assertEquals(mTextView.getScrollY(), rc.top);
+        assertEquals(mTextView.getScrollY() + mTextView.getHeight(), rc.bottom);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setSelected(true);
+                SpannableString text = new SpannableString(mTextView.getText());
+                Selection.setSelection(text, 2, 4);
+                mTextView.setText(text);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        mTextView.getFocusedRect(rc);
+        assertNotNull(mTextView.getLayout());
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(2), (float) rc.left);
+        assertEquals(mTextView.getLayout().getPrimaryHorizontal(4), (float) rc.right);
+        assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
+        assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setSelected(true);
+                SpannableString text = new SpannableString(mTextView.getText());
+                Selection.setSelection(text, 2, 10); // cross the "\n" and two lines
+                mTextView.setText(text);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        mTextView.getFocusedRect(rc);
+        Path path = new Path();
+        mTextView.getLayout().getSelectionPath(2, 10, path);
+        RectF rcf = new RectF();
+        path.computeBounds(rcf, true);
+        assertNotNull(mTextView.getLayout());
+        assertEquals(rcf.left - 1, (float) rc.left);
+        assertEquals(rcf.right + 1, (float) rc.right);
+        assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
+        assertEquals(mTextView.getLayout().getLineBottom(1), rc.bottom);
 
         // Exception
         try {
