@@ -16,11 +16,11 @@
 package com.android.cts.tradefed.targetprep;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.targetprep.BuildError;
 import com.android.tradefed.targetprep.DeviceSetup;
 import com.android.tradefed.targetprep.ITargetPreparer;
@@ -42,11 +42,12 @@ import java.io.FileNotFoundException;
  */
 public class CtsRootDeviceSetup implements ITargetPreparer {
 
-    private static final String LOG_TAG = "CtsRootDeviceSetup";
-
     // TODO: read this from a configuration file rather than hard-coding
     private static final String ACCESSIBILITY_SERVICE_APK_FILE_NAME =
         "CtsDelegatingAccessibilityService.apk";
+
+    private static final String DEVICE_ADMIN_APK_FILE_NAME =
+        "CtsDeviceAdmin.apk";
 
     /**
      * {@inheritDoc}
@@ -57,7 +58,7 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
         if (!(buildInfo instanceof IFolderBuildInfo)) {
             throw new IllegalArgumentException("Provided buildInfo is not a IFolderBuildInfo");
         }
-        Log.i(LOG_TAG, String.format("Setting up %s to run CTS tests", device.getSerialNumber()));
+        CLog.i("Setting up %s to run CTS tests", device.getSerialNumber());
 
         IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
         try {
@@ -72,6 +73,7 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
 
             // TODO: turn on mock locations
             enableAccessibilityService(device, buildHelper);
+            enableDeviceAdmin(device, buildHelper);
 
             // end root setup steps
         } catch (FileNotFoundException e) {
@@ -92,5 +94,18 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
         }
         // TODO: enable Settings > Accessibility > Accessibility > Delegating Accessibility
         // Service
+    }
+
+    private void enableDeviceAdmin(ITestDevice device, CtsBuildHelper ctsBuild)
+            throws DeviceNotAvailableException, TargetSetupError, FileNotFoundException {
+        String errorCode = device.installPackage(ctsBuild.getTestApp(DEVICE_ADMIN_APK_FILE_NAME),
+                true);
+        if (errorCode != null) {
+            // TODO: retry ?
+            throw new TargetSetupError(String.format(
+                    "Failed to install %s on device %s. Reason: %s",
+                    DEVICE_ADMIN_APK_FILE_NAME, device.getSerialNumber(), errorCode));
+        }
+        // TODO: enable device admin Settings
     }
 }
