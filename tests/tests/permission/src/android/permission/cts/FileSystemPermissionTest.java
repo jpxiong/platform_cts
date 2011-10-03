@@ -157,7 +157,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that any publicly readable directories reachable from
-     * the root directory are not writable.
+     * the root directory are not writable.  World writable directories
+     * are a security hole and an application should only be able to
+     * write to it's own home directory.
      *
      * Note: Because not all directories are readable, this is a best-effort
      * test only.  Writable directories within unreadable subdirectories
@@ -184,11 +186,28 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/drm",
                     "/data/drm/rights",
                     "/data/data/.drm",
-                    "/data/data/.drm/.wmdrm"
+                    "/data/data/.drm/.wmdrm",
+                    "/data/wpstiles",
+                    "/data/wiper",
+                    "/data/shared",
+                    "/dbdata/databases",
+                    "/data/misc/bluetooth",
+                    "/data/misc/wifi",
+                    "/data/misc/wifi/sockets",
+                    "/data/wifi",
+                    "/data/misc/dhcp",
+                    "/data/log",
+                    "/data/anr",
+                    "/data/dump"
             )
     );
 
     /**
+     * Verify that directories not discoverable by
+     * testAllOtherDirectoriesNotWritable are not writable.  World
+     * writable directories are a security hole and an application
+     * should only be able to write to it's own home directory.
+     *
      * Because /data and /data/data are not readable, we blindly try to
      * poke around in there looking for bad directories.  There has to be
      * a better way...
