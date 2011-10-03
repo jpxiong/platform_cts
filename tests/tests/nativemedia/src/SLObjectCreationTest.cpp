@@ -335,15 +335,13 @@ TEST_F(SLObjectCreationTest, testAudioPlayerFromPcmBqCreation) {
     OutputMixCreation();
     AudioPlayerFromPcmBqCreation();
 }
-#if 0
-// taken out of the test until support for this type of player is fixed
+
 TEST_F(SLObjectCreationTest, testAudioPlayerFromTsAbqCreation) {
     LOGV("Test Fixture: AudioPlayerFromTsAbqCreation");
     // required for AudioPlayer creation
     OutputMixCreation();
     AudioPlayerFromTsAbqCreation();
 }
-#endif
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromUriToPcmBqCreation) {
     LOGV("Test Fixture: AudioPlayerFromUriToPcmBqCreation");
