@@ -4204,6 +4204,13 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     })
     public void testInitializeScrollbarsAndFadingEdge() {
         MockView view = (MockView) mActivity.findViewById(R.id.scroll_view);
+
+        assertTrue(view.isHorizontalScrollBarEnabled());
+        assertTrue(view.isVerticalScrollBarEnabled());
+        assertFalse(view.isHorizontalFadingEdgeEnabled());
+        assertFalse(view.isVerticalFadingEdgeEnabled());
+
+        view = (MockView) mActivity.findViewById(R.id.scroll_view_2);
         final int fadingEdgeLength = 20;
 
         assertTrue(view.isHorizontalScrollBarEnabled());
