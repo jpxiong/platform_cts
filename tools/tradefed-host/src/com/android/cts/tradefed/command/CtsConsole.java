@@ -119,8 +119,8 @@ public class CtsConsole extends Console {
         return mCtsBuild;
     }
 
-    public static void main(String[] args) {
-        CtsConsole console = new CtsConsole();
-        console.run(args);
+    public static void main(String[] args) throws InterruptedException {
+        Console console = new CtsConsole();
+        Console.startConsole(console, args);
     }
 }
