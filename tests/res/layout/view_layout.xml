@@ -36,6 +36,14 @@
         android:fadingEdge="horizontal|vertical"
         android:fadingEdgeLength="20px"/>
 
+    <android.view.cts.MockView
+        android:id="@+id/scroll_view_2"
+        android:layout_width="100px"
+        android:layout_height="200px"
+        android:scrollbars="horizontal|vertical"
+        android:requiresFadingEdge="horizontal|vertical"
+        android:fadingEdgeLength="20px"/>
+
     <View
         android:id="@+id/fit_windows"
         android:fitsSystemWindows="true"
