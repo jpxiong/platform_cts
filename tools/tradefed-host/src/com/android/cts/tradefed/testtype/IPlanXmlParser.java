@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.InputStream;
@@ -39,4 +40,11 @@ interface IPlanXmlParser {
      * Must be called after {@link IPlanXmlParser#parse(InputStream)}.
      */
     public Collection<String> getTestUris();
+
+    /**
+     * Gets the list of {@link TestIdentifier} that should be excluded from given package uri.
+     * <p/>
+     * Must be called after {@link IPlanXmlParser#parse(InputStream)}.
+     */
+    public Collection<TestIdentifier> getExcludedTests(String uri);
 }

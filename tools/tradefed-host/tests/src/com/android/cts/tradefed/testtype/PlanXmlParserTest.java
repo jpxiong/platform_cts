@@ -16,10 +16,12 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
@@ -31,11 +33,27 @@ public class PlanXmlParserTest extends TestCase {
 
     private static final String TEST_URI1 = "foo";
     private static final String TEST_URI2 = "foo2";
+    private static final String EXCLUDE_TEST_CLASS = "com.example.FooTest";
+    private static final String EXCLUDE_TEST_METHOD = "testFoo";
+    private static final String EXCLUDE_TEST_METHOD2 = "testFoo2";
 
     static final String TEST_DATA =
         "<TestPlan version=\"1.0\">" +
             String.format("<Entry uri=\"%s\" />", TEST_URI1) +
             String.format("<Entry uri=\"%s\" />", TEST_URI2) +
+        "</TestPlan>";
+
+    static final String TEST_EXCLUDED_DATA =
+        "<TestPlan version=\"1.0\">" +
+            String.format("<Entry uri=\"%s\" exclude=\"%s#%s\" />", TEST_URI1, EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD) +
+        "</TestPlan>";
+
+    static final String TEST_EXCLUDED2_DATA =
+        "<TestPlan version=\"1.0\">" +
+            String.format("<Entry uri=\"%s\" exclude=\"%s#%s;%s#%s\" />", TEST_URI1,
+                    EXCLUDE_TEST_CLASS, EXCLUDE_TEST_METHOD, EXCLUDE_TEST_CLASS,
+                    EXCLUDE_TEST_METHOD2) +
         "</TestPlan>";
 
     /**
@@ -49,6 +67,38 @@ public class PlanXmlParserTest extends TestCase {
         // assert uris in order
         assertEquals(TEST_URI1, iter.next());
         assertEquals(TEST_URI2, iter.next());
+        assertTrue(parser.getExcludedTests(TEST_URI1).isEmpty());
+        assertTrue(parser.getExcludedTests(TEST_URI2).isEmpty());
+    }
+
+    /**
+     * Test parsing a plan containing a single excluded test
+     */
+    public void testParse_exclude() throws ParseException  {
+        PlanXmlParser parser = new PlanXmlParser();
+        parser.parse(getStringAsStream(TEST_EXCLUDED_DATA));
+        assertEquals(1, parser.getTestUris().size());
+        Collection<TestIdentifier> excludedTests = parser.getExcludedTests(TEST_URI1);
+        TestIdentifier test = excludedTests.iterator().next();
+        assertEquals(EXCLUDE_TEST_CLASS, test.getClassName());
+        assertEquals(EXCLUDE_TEST_METHOD, test.getTestName());
+    }
+
+    /**
+     * Test parsing a plan containing multiple excluded tests
+     */
+    public void testParse_multiExclude() throws ParseException  {
+        PlanXmlParser parser = new PlanXmlParser();
+        parser.parse(getStringAsStream(TEST_EXCLUDED2_DATA));
+        assertEquals(1, parser.getTestUris().size());
+        Iterator<TestIdentifier> iter = parser.getExcludedTests(TEST_URI1).iterator();
+        TestIdentifier test = iter.next();
+        assertEquals(EXCLUDE_TEST_CLASS, test.getClassName());
+        assertEquals(EXCLUDE_TEST_METHOD, test.getTestName());
+        TestIdentifier test2 = iter.next();
+        assertEquals(EXCLUDE_TEST_CLASS, test2.getClassName());
+        assertEquals(EXCLUDE_TEST_METHOD2, test2.getTestName());
+
     }
 
     private InputStream getStringAsStream(String input) {
