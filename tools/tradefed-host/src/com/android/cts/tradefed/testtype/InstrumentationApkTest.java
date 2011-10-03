@@ -71,23 +71,20 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
         Assert.assertNotNull("missing device", getDevice());
         Assert.assertNotNull("missing build", mCtsBuild);
 
-        try {
-            for (String apkFileName : mInstallFileNames) {
-                Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
-                        getDevice().getSerialNumber()));
-                try {
-                    getDevice().installPackage(mCtsBuild.getTestApp(apkFileName), true);
-                } catch (FileNotFoundException e) {
-                    Log.e(LOG_TAG, e);
-                }
+        for (String apkFileName : mInstallFileNames) {
+            Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
+                    getDevice().getSerialNumber()));
+            try {
+                getDevice().installPackage(mCtsBuild.getTestApp(apkFileName), true);
+            } catch (FileNotFoundException e) {
+                Log.e(LOG_TAG, e);
             }
-            super.run(listener);
-        } finally {
-            for (String packageName : mUninstallPackages) {
-                Log.d(LOG_TAG, String.format("Uninstalling %s on %s", packageName,
-                        getDevice().getSerialNumber()));
-                getDevice().uninstallPackage(packageName);
-            }
+        }
+        super.run(listener);
+        for (String packageName : mUninstallPackages) {
+            Log.d(LOG_TAG, String.format("Uninstalling %s on %s", packageName,
+                    getDevice().getSerialNumber()));
+            getDevice().uninstallPackage(packageName);
         }
     }
 }
