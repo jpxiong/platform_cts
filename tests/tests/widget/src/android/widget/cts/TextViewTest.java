@@ -32,12 +32,10 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.app.Instrumentation.ActivityMonitor;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -3340,43 +3338,42 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         )
     })
     public void testGetFadingEdgeStrength() {
-        final MockTextView textView = new MockTextView(mActivity);
-        textView.setText(LONG_TEXT);
-        textView.setSingleLine();
-        // make the fading to be shown
-        textView.setHorizontalFadingEdgeEnabled(true);
-
+        final MockTextView textViewLeft = (MockTextView) mActivity.findViewById(
+                R.id.mock_textview_left);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mActivity.setContentView(textView);
-                textView.setGravity(Gravity.LEFT);
+                textViewLeft.setEllipsize(null);
             }
         });
         mInstrumentation.waitForIdleSync();
 
         // fading is shown on right side if the text aligns left
-        assertEquals(0.0f, textView.getLeftFadingEdgeStrength(), 0.01f);
-        assertEquals(1.0f, textView.getRightFadingEdgeStrength(), 0.01f);
+        assertEquals(0.0f, textViewLeft.getLeftFadingEdgeStrength(), 0.01f);
+        assertEquals(1.0f, textViewLeft.getRightFadingEdgeStrength(), 0.01f);
 
+        final MockTextView textViewRight = (MockTextView) mActivity.findViewById(
+                R.id.mock_textview_right);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                textView.setGravity(Gravity.RIGHT);
+                textViewRight.setEllipsize(null);
             }
         });
         mInstrumentation.waitForIdleSync();
         // fading is shown on left side if the text aligns right
-        assertEquals(1.0f, textView.getLeftFadingEdgeStrength(), 0.01f);
-        assertEquals(0.0f, textView.getRightFadingEdgeStrength(), 0.01f);
+        assertEquals(1.0f, textViewRight.getLeftFadingEdgeStrength(), 0.01f);
+        assertEquals(0.0f, textViewRight.getRightFadingEdgeStrength(), 0.01f);
 
+        final MockTextView textViewCenter = (MockTextView) mActivity.findViewById(
+                R.id.mock_textview_center);
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                textViewCenter.setEllipsize(null);
             }
         });
         mInstrumentation.waitForIdleSync();
         // fading is shown on both sides if the text aligns center
-        assertEquals(1.0f, textView.getLeftFadingEdgeStrength(), 0.01f);
-        assertEquals(1.0f, textView.getRightFadingEdgeStrength(), 0.01f);
+        assertEquals(1.0f, textViewCenter.getLeftFadingEdgeStrength(), 0.01f);
+        assertEquals(1.0f, textViewCenter.getRightFadingEdgeStrength(), 0.01f);
     }
 
     @TestTargets({
@@ -4482,208 +4479,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             if (!mIsMenuItemsBlank) {
                 menu.add("menu item");
             }
-        }
-    }
-
-    private static class MockTextView extends TextView {
-        private boolean mHasCalledOnCreateContextMenu;
-        private boolean mHasCalledOnFocusChanged;
-        private boolean mHasCalledOnMeasure;
-        private boolean mHasCalledOnTextChanged;
-        private boolean mHasCalledDrawableStateChanged;
-        private boolean mHasCalledOnWindowFocusChanged;
-        private boolean mHasCalledOnPrivateIMECommand;
-        private boolean mHasCalledOnKeyMultiple;
-
-        public boolean hasCalledOnWindowFocusChanged() {
-            return mHasCalledOnWindowFocusChanged;
-        }
-
-        public boolean hasCalledOnCreateContextMenu() {
-            return mHasCalledOnCreateContextMenu;
-        }
-
-        public boolean hasCalledDrawableStateChanged() {
-            return mHasCalledDrawableStateChanged;
-        }
-
-        public boolean hasCalledOnFocusChanged() {
-            return mHasCalledOnFocusChanged;
-        }
-
-        public boolean hasCalledOnMeasure() {
-            return mHasCalledOnMeasure;
-        }
-
-        public boolean hasCalledOnTextChanged() {
-            return mHasCalledOnTextChanged;
-        }
-
-        public boolean hasCalledOnPrivateIMECommand() {
-            return mHasCalledOnPrivateIMECommand;
-        }
-
-        public boolean hasCalledOnKeyMultiple(){
-            return mHasCalledOnKeyMultiple;
-        }
-
-        public MockTextView(Context context) {
-            super(context);
-        }
-
-        public void reset() {
-            mHasCalledOnWindowFocusChanged = false;
-            mHasCalledDrawableStateChanged = false;
-            mHasCalledOnCreateContextMenu = false;
-            mHasCalledOnFocusChanged = false;
-            mHasCalledOnMeasure = false;
-            mHasCalledOnTextChanged = false;
-            mHasCalledOnPrivateIMECommand = false;
-            mHasCalledOnKeyMultiple = false;
-        }
-
-        @Override
-        protected int computeHorizontalScrollRange() {
-            return super.computeHorizontalScrollRange();
-        }
-
-        @Override
-        protected int computeVerticalScrollRange() {
-            return super.computeVerticalScrollRange();
-        }
-
-        @Override
-        protected void drawableStateChanged() {
-            super.drawableStateChanged();
-            mHasCalledDrawableStateChanged = true;
-        }
-
-        @Override
-        protected boolean getDefaultEditable() {
-            return super.getDefaultEditable();
-        }
-
-        @Override
-        protected MovementMethod getDefaultMovementMethod() {
-            return super.getDefaultMovementMethod();
-        }
-
-        @Override
-        protected void onCreateContextMenu(ContextMenu menu) {
-            super.onCreateContextMenu(menu);
-            mHasCalledOnCreateContextMenu = true;
-        }
-
-        @Override
-        protected void onDetachedFromWindow() {
-            super.onDetachedFromWindow();
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-        }
-
-        @Override
-        protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
-            super.onFocusChanged(focused, direction, previouslyFocusedRect);
-            mHasCalledOnFocusChanged = true;
-        }
-
-        @Override
-        public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
-            mHasCalledOnKeyMultiple = true;
-            return super.onKeyMultiple(keyCode, repeatCount, event);
-        }
-
-        @Override
-        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            mHasCalledOnMeasure = true;
-        }
-
-        @Override
-        protected void onTextChanged(CharSequence text, int start, int before, int after) {
-            super.onTextChanged(text, start, before, after);
-            mHasCalledOnTextChanged = true;
-        }
-
-        @Override
-        protected boolean setFrame(int l, int t, int r, int b) {
-            return super.setFrame(l, t, r, b);
-        }
-
-        @Override
-        public void onWindowFocusChanged(boolean hasWindowFocus) {
-            super.onWindowFocusChanged(hasWindowFocus);
-            mHasCalledOnWindowFocusChanged = true;
-        }
-
-        @Override
-        protected float getLeftFadingEdgeStrength() {
-            return super.getLeftFadingEdgeStrength();
-        }
-
-        @Override
-        protected float getRightFadingEdgeStrength() {
-            return super.getRightFadingEdgeStrength();
-        }
-
-        @Override
-        public boolean onPrivateIMECommand(String action, Bundle data) {
-            mHasCalledOnPrivateIMECommand = true;
-            return super.onPrivateIMECommand(action, data);
-        }
-
-        public int getFrameLeft() {
-            return mLeft;
-        }
-
-        public int getFrameTop() {
-            return mTop;
-        }
-
-        public int getFrameRight() {
-            return mRight;
-        }
-
-        public int getFrameBottom() {
-            return mBottom;
-        }
-
-        @Override
-        protected int getBottomPaddingOffset() {
-            return super.getBottomPaddingOffset();
-        }
-
-        @Override
-        protected int getLeftPaddingOffset() {
-            return super.getLeftPaddingOffset();
-        }
-
-        @Override
-        protected int getRightPaddingOffset() {
-            return super.getRightPaddingOffset();
-        }
-
-        @Override
-        protected int getTopPaddingOffset() {
-            return super.getTopPaddingOffset();
-        }
-
-        @Override
-        protected boolean isPaddingOffsetRequired() {
-            return super.isPaddingOffsetRequired();
-        }
-
-        @Override
-        protected boolean verifyDrawable(Drawable who) {
-            return super.verifyDrawable(who);
-        }
-
-        @Override
-        protected int computeVerticalScrollExtent() {
-            return super.computeVerticalScrollExtent();
         }
     }
 }
