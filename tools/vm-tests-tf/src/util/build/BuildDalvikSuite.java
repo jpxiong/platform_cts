@@ -221,7 +221,7 @@ public class BuildDalvikSuite {
                                  " -classpath %s %s", TARGET_JAR_ROOT_PATH, classpath, mainclass);
       return "String res = getDevice().executeShellCommand(\""+ cmd + "\");\n" +
              "// A sucessful adb shell command returns an empty string.\n" +
-             "assertTrue(res.length() == 0);";
+             "assertEquals(\"" + cmd + "\", \"\", res);";
     }
 
     private String getWarningMessage() {
