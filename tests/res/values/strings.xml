@@ -163,4 +163,8 @@
    <string name="themes_prompt">Select a Theme:</string>
    <string name="sample_text">Sample text goes here. I wanted something creative and whimsical
 but then I just got bored...</string>
+    <string name="long_text">This is a really long string which exceeds the width of the view.
+New devices have a much larger screen which actually enables long strings to be displayed
+with no fading. I have made this string longer to fix this case. If you are correcting this
+text, I would love to see the kind of devices you guys now use!</string>
 </resources>

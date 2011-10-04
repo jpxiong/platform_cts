@@ -53,6 +53,36 @@
                     android:text="@string/text_view_hello_two_lines"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <android.widget.cts.MockTextView
+                    android:id="@+id/mock_textview_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:requiresFadingEdge="horizontal"
+                    android:singleLine="true"
+                    android:text="@string/long_text"
+                    android:gravity="left"
+                    />
+
+            <android.widget.cts.MockTextView
+                    android:id="@+id/mock_textview_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:requiresFadingEdge="horizontal"
+                    android:singleLine="true"
+                    android:text="@string/long_text"
+                    android:gravity="right"
+                    />
+
+            <android.widget.cts.MockTextView
+                    android:id="@+id/mock_textview_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:requiresFadingEdge="horizontal"
+                    android:singleLine="true"
+                    android:text="@string/long_text"
+                    android:gravity="center"
+                    />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
