@@ -16,6 +16,7 @@
 
 package android.media.cts;
 
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
@@ -42,6 +43,9 @@ public class AudioRecord_BufferSizeTest extends AndroidTestCase {
     private AudioRecord mAudioRecord;
 
     public void testGetMinBufferSize() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         List<Integer> failedSampleRates = new ArrayList<Integer>();
         for (int i = 0; i < SAMPLE_RATES_IN_HZ.length; i++) {
             try {
@@ -87,5 +91,10 @@ public class AudioRecord_BufferSizeTest extends AndroidTestCase {
                 return mAudioRecord.getRecordingState() == state;
             }
         }.run();
+    }
+
+    private boolean hasMicrophone() {
+        return getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_MICROPHONE);
     }
 }

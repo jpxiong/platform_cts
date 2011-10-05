@@ -16,14 +16,14 @@
 
 package android.jni.cts;
 
-import junit.framework.TestCase;
 
 /**
  * Basic static method tests. The "nonce" class being tested by this
  * class is a class defined in this package that declares the bulk of
  * its methods as native.
  */
-public class JniStaticTest extends TestCase {
+public class JniStaticTest extends JniTestCase {
+
     /**
      * Test a simple no-op and void-returning method call.
      */
@@ -166,7 +166,7 @@ public class JniStaticTest extends TestCase {
     public void test_takeShort() {
         assertTrue(StaticNonce.takeShort((short) 19991));
     }
-    
+
     /**
      * Test a simple value-taking method call, that returns whether it
      * got the expected value.

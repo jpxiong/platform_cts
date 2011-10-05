@@ -16,16 +16,17 @@
 
 package android.jni.cts;
 
-import junit.framework.TestCase;
 
 /**
  * Basic tests of calling the C functions that make up the JNI. This
  * class merely calls into native code and reports back if there was
  * a problem.
  */
-public class JniCTest extends TestCase {
+public class JniCTest extends JniTestCase {
     static {
-        System.loadLibrary("jnitest");
+        if (!JniTestCase.isCpuAbiNone()) {
+            System.loadLibrary("jnitest");
+        }
     }
 
     /**

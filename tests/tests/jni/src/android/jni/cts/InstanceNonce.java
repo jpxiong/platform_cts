@@ -22,7 +22,9 @@ package android.jni.cts;
  */
 public class InstanceNonce {
     static {
-        System.loadLibrary("jnitest");
+        if (!JniTestCase.isCpuAbiNone()) {
+            System.loadLibrary("jnitest");
+        }
     }
 
     /**
