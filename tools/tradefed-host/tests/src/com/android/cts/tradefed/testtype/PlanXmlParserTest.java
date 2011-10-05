@@ -19,12 +19,11 @@ package com.android.cts.tradefed.testtype;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
+import junit.framework.TestCase;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Iterator;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link PlanXmlParser}.
@@ -49,11 +48,17 @@ public class PlanXmlParserTest extends TestCase {
                     EXCLUDE_TEST_METHOD) +
         "</TestPlan>";
 
-    static final String TEST_EXCLUDED2_DATA =
+    static final String TEST_MULTI_EXCLUDED_DATA =
         "<TestPlan version=\"1.0\">" +
             String.format("<Entry uri=\"%s\" exclude=\"%s#%s;%s#%s\" />", TEST_URI1,
                     EXCLUDE_TEST_CLASS, EXCLUDE_TEST_METHOD, EXCLUDE_TEST_CLASS,
                     EXCLUDE_TEST_METHOD2) +
+        "</TestPlan>";
+
+    static final String TEST_CLASS_EXCLUDED_DATA =
+        "<TestPlan version=\"1.0\">" +
+            String.format("<Entry uri=\"%s\" exclude=\"%s\" />", TEST_URI1,
+                    EXCLUDE_TEST_CLASS) +
         "</TestPlan>";
 
     /**
@@ -67,8 +72,8 @@ public class PlanXmlParserTest extends TestCase {
         // assert uris in order
         assertEquals(TEST_URI1, iter.next());
         assertEquals(TEST_URI2, iter.next());
-        assertTrue(parser.getExcludedTests(TEST_URI1).isEmpty());
-        assertTrue(parser.getExcludedTests(TEST_URI2).isEmpty());
+        assertFalse(parser.getExcludedTestFilter(TEST_URI1).hasExclusion());
+        assertFalse(parser.getExcludedTestFilter(TEST_URI2).hasExclusion());
     }
 
     /**
@@ -78,10 +83,9 @@ public class PlanXmlParserTest extends TestCase {
         PlanXmlParser parser = new PlanXmlParser();
         parser.parse(getStringAsStream(TEST_EXCLUDED_DATA));
         assertEquals(1, parser.getTestUris().size());
-        Collection<TestIdentifier> excludedTests = parser.getExcludedTests(TEST_URI1);
-        TestIdentifier test = excludedTests.iterator().next();
-        assertEquals(EXCLUDE_TEST_CLASS, test.getClassName());
-        assertEquals(EXCLUDE_TEST_METHOD, test.getTestName());
+        TestFilter filter = parser.getExcludedTestFilter(TEST_URI1);
+        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                EXCLUDE_TEST_METHOD)));
     }
 
     /**
@@ -89,16 +93,24 @@ public class PlanXmlParserTest extends TestCase {
      */
     public void testParse_multiExclude() throws ParseException  {
         PlanXmlParser parser = new PlanXmlParser();
-        parser.parse(getStringAsStream(TEST_EXCLUDED2_DATA));
+        parser.parse(getStringAsStream(TEST_MULTI_EXCLUDED_DATA));
         assertEquals(1, parser.getTestUris().size());
-        Iterator<TestIdentifier> iter = parser.getExcludedTests(TEST_URI1).iterator();
-        TestIdentifier test = iter.next();
-        assertEquals(EXCLUDE_TEST_CLASS, test.getClassName());
-        assertEquals(EXCLUDE_TEST_METHOD, test.getTestName());
-        TestIdentifier test2 = iter.next();
-        assertEquals(EXCLUDE_TEST_CLASS, test2.getClassName());
-        assertEquals(EXCLUDE_TEST_METHOD2, test2.getTestName());
+        TestFilter filter = parser.getExcludedTestFilter(TEST_URI1);
+        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                EXCLUDE_TEST_METHOD)));
+        assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
+                EXCLUDE_TEST_METHOD2)));
+    }
 
+    /**
+     * Test parsing a plan containing an excluded class
+     */
+    public void testParse_classExclude() throws ParseException  {
+        PlanXmlParser parser = new PlanXmlParser();
+        parser.parse(getStringAsStream(TEST_CLASS_EXCLUDED_DATA));
+        assertEquals(1, parser.getTestUris().size());
+        TestFilter filter = parser.getExcludedTestFilter(TEST_URI1);
+        assertTrue(filter.getExcludedClasses().contains(EXCLUDE_TEST_CLASS));
     }
 
     private InputStream getStringAsStream(String input) {

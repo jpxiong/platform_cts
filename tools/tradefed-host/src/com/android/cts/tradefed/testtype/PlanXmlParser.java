@@ -17,14 +17,12 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.util.xml.AbstractXmlParser;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,7 +35,7 @@ class PlanXmlParser extends AbstractXmlParser implements IPlanXmlParser {
     /**
      * Map of uri names found in plan, and their excluded tests
      */
-    private Map<String, Collection<TestIdentifier>> mUriExcludedTestsMap;
+    private Map<String, TestFilter> mUriExcludedTestsMap;
 
     /**
      * SAX callback object. Handles parsing data from the xml tags.
@@ -51,39 +49,41 @@ class PlanXmlParser extends AbstractXmlParser implements IPlanXmlParser {
                 throws SAXException {
             if (ENTRY_TAG.equals(localName)) {
                 final String entryUriValue = attributes.getValue("uri");
-                Collection<TestIdentifier> excludedTests = parseExcludedTests(
-                        attributes.getValue("exclude"));
-                mUriExcludedTestsMap.put(entryUriValue, excludedTests);
+                TestFilter filter = parseExcludedTests(attributes.getValue("exclude"));
+                mUriExcludedTestsMap.put(entryUriValue, filter);
             }
         }
 
         /**
-         * Parse the semi colon separated list of {@link TestIdentifier}s
+         * Parse the semi colon separated list of tests to exclude.
+         * <p/>
+         * Expected format:
+         * testClassName[#testMethodName][;testClassName2...]
          *
          * @param excludedString the excluded string list
          * @return
          */
-        private Collection<TestIdentifier> parseExcludedTests(String excludedString) {
-            Collection<TestIdentifier> tests = new ArrayList<TestIdentifier>();
+        private TestFilter parseExcludedTests(String excludedString) {
+            TestFilter filter = new TestFilter();
             if (excludedString != null) {
                 String[] testStrings = excludedString.split(";");
                 for (String testString : testStrings) {
                     String[] classMethodPair = testString.split("#");
                     if (classMethodPair.length == 2) {
-                        tests.add(new TestIdentifier(classMethodPair[0], classMethodPair[1]));
+                        filter.addExcludedTest(new TestIdentifier(classMethodPair[0],
+                                classMethodPair[1]));
                     } else {
-                        CLog.w("Unrecognized test name: %s. Expected format: class#method",
-                                testString);
+                        filter.addExcludedClass(testString);
                     }
                 }
             }
-            return tests;
+            return filter;
         }
     }
 
     PlanXmlParser() {
         // Uses a LinkedHashMap to have predictable iteration order
-        mUriExcludedTestsMap = new LinkedHashMap<String, Collection<TestIdentifier>>();
+        mUriExcludedTestsMap = new LinkedHashMap<String, TestFilter>();
     }
 
     /**
@@ -98,7 +98,7 @@ class PlanXmlParser extends AbstractXmlParser implements IPlanXmlParser {
      * {@inheritDoc}
      */
     @Override
-    public Collection<TestIdentifier> getExcludedTests(String uri) {
+    public TestFilter getExcludedTestFilter(String uri) {
         return mUriExcludedTestsMap.get(uri);
     }
 

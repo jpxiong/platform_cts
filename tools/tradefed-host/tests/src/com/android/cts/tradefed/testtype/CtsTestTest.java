@@ -47,6 +47,8 @@ public class CtsTestTest extends TestCase {
     private ITestDevice mMockDevice;
     private ITestInvocationListener mMockListener;
     private StubCtsBuildHelper mStubBuildHelper;
+    private ITestPackageDef mMockPackageDef;
+    private IRemoteTest mMockTest;
 
     private static final String PLAN_NAME = "CTS";
 
@@ -61,6 +63,8 @@ public class CtsTestTest extends TestCase {
         mMockDevice = EasyMock.createMock(ITestDevice.class);
         mMockListener = EasyMock.createNiceMock(ITestInvocationListener.class);
         mStubBuildHelper = new StubCtsBuildHelper();
+        mMockPackageDef = EasyMock.createMock(ITestPackageDef.class);
+        mMockTest = EasyMock.createMock(IRemoteTest.class);
 
         mCtsTest = new CtsTest() {
             @Override
@@ -83,6 +87,8 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setBuildHelper(mStubBuildHelper);
         // turn off device collection for simplicity
         mCtsTest.setCollectDeviceInfo(false);
+
+
     }
 
     /**
@@ -92,17 +98,11 @@ public class CtsTestTest extends TestCase {
     public void testRun_plan() throws DeviceNotAvailableException, ParseException {
         setParsePlanExceptations();
 
-        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
-        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
-        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
-                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
-        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
-        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        setCreateAndRunTestExpectations();
 
-        replayMocks(mockTest, mockPackageDef);
+        replayMocks();
         mCtsTest.run(mMockListener);
-        verifyMocks(mockTest, mockPackageDef);
+        verifyMocks();
     }
 
     /**
@@ -111,17 +111,12 @@ public class CtsTestTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testRun_package() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
-        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
-        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
-        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
-                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
-        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
-        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
 
-        replayMocks(mockTest, mockPackageDef);
+        setCreateAndRunTestExpectations();
+
+        replayMocks();
         mCtsTest.run(mMockListener);
-        verifyMocks(mockTest, mockPackageDef);
+        verifyMocks();
     }
 
     /**
@@ -130,21 +125,17 @@ public class CtsTestTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testRun_resume() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
-        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
-        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
-        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
-                (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(mockTest);
-        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
 
-        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        setCreateAndRunTestExpectations();
         // abort the first run
         EasyMock.expectLastCall().andThrow(new DeviceNotAvailableException());
 
         // now expect test to be resumed
-        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        mMockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        EasyMock.expect(mMockPackageDef.getName()).andReturn(PACKAGE_NAME);
+        EasyMock.expect(mMockPackageDef.getDigest()).andReturn("digest");
 
-        replayMocks(mockTest, mockPackageDef);
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("Did not throw DeviceNotAvailableException");
@@ -153,7 +144,7 @@ public class CtsTestTest extends TestCase {
         }
         // now resume, and expect same test's run method to be called again
         mCtsTest.run(mMockListener);
-        verifyMocks(mockTest, mockPackageDef);
+        verifyMocks();
     }
 
     /**
@@ -166,26 +157,25 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setClassName(className);
         mCtsTest.setMethodName(methodName);
 
-
         EasyMock.expect(mMockRepo.findPackageForTest(className)).andReturn(PACKAGE_NAME);
-        ITestPackageDef mockPackageDef = EasyMock.createMock(ITestPackageDef.class);
-        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mockPackageDef);
-        IRemoteTest mockTest = EasyMock.createMock(IRemoteTest.class);
-        EasyMock.expect(mockPackageDef.createTest((File)EasyMock.anyObject(),
-                EasyMock.eq(className), EasyMock.eq(methodName))).andReturn(mockTest);
-        EasyMock.expect(mockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
-        mockTest.run((ITestInvocationListener)EasyMock.anyObject());
+        mMockPackageDef.setClassName(className, methodName);
 
-        replayMocks(mockTest, mockPackageDef);
+        setCreateAndRunTestExpectations();
+
+        replayMocks();
         mCtsTest.run(mMockListener);
-        verifyMocks(mockTest, mockPackageDef);
+        verifyMocks();
     }
 
     /**
      * Test {@link CtsTest#run(java.util.List)} when --excluded-package is specified
      */
     public void testRun_excludedPackage() throws DeviceNotAvailableException, ParseException {
-        setParsePlanExceptations();
+        mCtsTest.setPlanName(PLAN_NAME);
+        mMockPlanParser.parse((InputStream)EasyMock.anyObject());
+        Collection<String> uris = new ArrayList<String>(1);
+        uris.add(PACKAGE_NAME);
+        EasyMock.expect(mMockPlanParser.getTestUris()).andReturn(uris);
 
         mCtsTest.addExcludedPackageName(PACKAGE_NAME);
 
@@ -204,6 +194,25 @@ public class CtsTestTest extends TestCase {
         Collection<String> uris = new ArrayList<String>(1);
         uris.add(PACKAGE_NAME);
         EasyMock.expect(mMockPlanParser.getTestUris()).andReturn(uris);
+        TestFilter filter = new TestFilter();
+        EasyMock.expect(mMockPlanParser.getExcludedTestFilter(PACKAGE_NAME)).andReturn(
+                filter);
+        mMockPackageDef.setExcludedTestFilter(filter);
+    }
+
+    /**
+     * Set EasyMock expectations for creating and running a package with PACKAGE_NAME
+     */
+    private void setCreateAndRunTestExpectations() throws DeviceNotAvailableException {
+        EasyMock.expect(mMockRepo.getTestPackage(PACKAGE_NAME)).andReturn(mMockPackageDef);
+        EasyMock.expect(mMockPackageDef.createTest((File)EasyMock.anyObject())).andReturn(
+                mMockTest);
+        EasyMock.expect(mMockPackageDef.getTests()).andReturn(new ArrayList<TestIdentifier>());
+        EasyMock.expect(mMockPackageDef.getUri()).andStubReturn(PACKAGE_NAME);
+        EasyMock.expect(mMockPackageDef.getName()).andReturn(PACKAGE_NAME);
+        EasyMock.expect(mMockPackageDef.getDigest()).andReturn("digest");
+
+        mMockTest.run((ITestInvocationListener)EasyMock.anyObject());
     }
 
     /**
@@ -281,12 +290,14 @@ public class CtsTestTest extends TestCase {
     }
 
     private void replayMocks(Object... mocks) {
-        EasyMock.replay(mMockRepo, mMockPlanParser, mMockDevice, mMockListener);
+        EasyMock.replay(mMockRepo, mMockPlanParser, mMockDevice, mMockListener, mMockPackageDef,
+                mMockTest);
         EasyMock.replay(mocks);
     }
 
     private void verifyMocks(Object... mocks) {
-        EasyMock.verify(mMockRepo, mMockPlanParser, mMockDevice, mMockListener);
+        EasyMock.verify(mMockRepo, mMockPlanParser, mMockDevice, mMockListener, mMockPackageDef,
+                mMockTest);
         EasyMock.verify(mocks);
     }
 }
