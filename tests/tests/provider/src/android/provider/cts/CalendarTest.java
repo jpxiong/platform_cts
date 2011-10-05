@@ -546,6 +546,15 @@ public class CalendarTest extends InstrumentationTestCase {
         public static Cursor getEventByUri(ContentResolver resolver, Uri uri) {
             return resolver.query(uri, EVENTS_PROJECTION, null, null, null);
         }
+
+        /**
+         * Looks up the specified Event in the database and returns the "selfAttendeeStatus"
+         * value.
+         */
+        public static int getSelfAttendeeStatusFromDB(ContentResolver resolver, long eventId) {
+            return getIntFromDatabase(resolver, Events.CONTENT_URI, eventId,
+                    Events.SELF_ATTENDEE_STATUS);
+        }
     }
 
     /**
@@ -602,7 +611,7 @@ public class CalendarTest extends InstrumentationTestCase {
 
 
     /**
-     * Helper class for manipulating entries in the Attendees table.
+     * Helper class for manipulating entries in the Reminders table.
      */
     private static class ReminderHelper {
         public static final String[] REMINDERS_PROJECTION = new String[] {
@@ -614,6 +623,8 @@ public class CalendarTest extends InstrumentationTestCase {
         // indexes into projection
         public static final int REMINDERS_ID_INDEX = 0;
         public static final int REMINDERS_EVENT_ID_INDEX = 1;
+        public static final int REMINDERS_MINUTES_INDEX = 2;
+        public static final int REMINDERS_METHOD_INDEX = 3;
 
         // do not instantiate
         private ReminderHelper() {}
@@ -643,7 +654,88 @@ public class CalendarTest extends InstrumentationTestCase {
             return resolver.query(Reminders.CONTENT_URI, REMINDERS_PROJECTION,
                     Reminders.EVENT_ID + "=?", new String[] { String.valueOf(eventId) }, null);
         }
+
+        /**
+         * Looks up the specified Reminders row and returns the "method" value.
+         */
+        public static int lookupMethod(ContentResolver resolver, long remId) {
+            return getIntFromDatabase(resolver, Reminders.CONTENT_URI, remId,
+                    Reminders.METHOD);
+        }
    }
+
+    /**
+     * Helper class for manipulating entries in the ExtendedProperties table.
+     */
+    private static class ExtendedPropertiesHelper {
+        public static final String[] EXTENDED_PROPERTIES_PROJECTION = new String[] {
+            ExtendedProperties._ID,
+            ExtendedProperties.EVENT_ID,
+            ExtendedProperties.NAME,
+            ExtendedProperties.VALUE
+        };
+        // indexes into projection
+        public static final int EXTENDED_PROPERTIES_ID_INDEX = 0;
+        public static final int EXTENDED_PROPERTIES_EVENT_ID_INDEX = 1;
+        public static final int EXTENDED_PROPERTIES_NAME_INDEX = 2;
+        public static final int EXTENDED_PROPERTIES_VALUE_INDEX = 3;
+
+        // do not instantiate
+        private ExtendedPropertiesHelper() {}
+
+        /**
+         * Adds a new ExtendedProperty for the specified event.  Runs as sync adapter.
+         *
+         * @return the _id of the new ExtendedProperty, or -1 on failure
+         */
+        public static long addExtendedProperty(ContentResolver resolver, String account,
+                long eventId, String name, String value) {
+             Uri uri = asSyncAdapter(ExtendedProperties.CONTENT_URI, account, CTS_TEST_TYPE);
+
+            ContentValues ep = new ContentValues();
+            ep.put(ExtendedProperties.EVENT_ID, eventId);
+            ep.put(ExtendedProperties.NAME, name);
+            ep.put(ExtendedProperties.VALUE, value);
+            Uri result = resolver.insert(uri, ep);
+            return ContentUris.parseId(result);
+        }
+
+        /**
+         * Finds all ExtendedProperties rows for the specified event.  The returned cursor will
+         * use {@link ExtendedPropertiesHelper#EXTENDED_PROPERTIES_PROJECTION}.
+         */
+        public static Cursor findExtendedPropertiesByEventId(ContentResolver resolver,
+                long eventId) {
+            return resolver.query(ExtendedProperties.CONTENT_URI, EXTENDED_PROPERTIES_PROJECTION,
+                    ExtendedProperties.EVENT_ID + "=?",
+                    new String[] { String.valueOf(eventId) }, null);
+        }
+
+        /**
+         * Finds an ExtendedProperties entry with a matching name for the specified event, and
+         * returns the value.  Throws an exception if we don't find exactly one row.
+         */
+        public static String lookupValueByName(ContentResolver resolver, long eventId,
+                String name) {
+            Cursor cursor = resolver.query(ExtendedProperties.CONTENT_URI,
+                    EXTENDED_PROPERTIES_PROJECTION,
+                    ExtendedProperties.EVENT_ID + "=? AND " + ExtendedProperties.NAME + "=?",
+                    new String[] { String.valueOf(eventId), name }, null);
+
+            try {
+                if (cursor.getCount() != 1) {
+                    throw new RuntimeException("Got " + cursor.getCount() + " results, expected 1");
+                }
+
+                cursor.moveToFirst();
+                return cursor.getString(EXTENDED_PROPERTIES_VALUE_INDEX);
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
 
     /**
      * Creates an updated URI that includes query parameters that identify the source as a
@@ -655,6 +747,27 @@ public class CalendarTest extends InstrumentationTestCase {
                         "true")
                 .appendQueryParameter(Calendars.ACCOUNT_NAME, account)
                 .appendQueryParameter(Calendars.ACCOUNT_TYPE, accountType).build();
+    }
+
+    /**
+     * Returns the value of the specified row and column in the Events table, as an integer.
+     * Throws an exception if the specified row or column doesn't exist or doesn't contain
+     * an integer (e.g. null entry).
+     */
+    private static int getIntFromDatabase(ContentResolver resolver, Uri uri, long rowId,
+            String columnName) {
+        String[] projection = { columnName };
+        String selection = SQL_WHERE_ID;
+        String[] selectionArgs = { String.valueOf(rowId) };
+
+        Cursor c = resolver.query(uri, projection, selection, selectionArgs, null);
+        try {
+            assertEquals(1, c.getCount());
+            c.moveToFirst();
+            return c.getInt(0);
+        } finally {
+            c.close();
+        }
     }
 
     @Override
@@ -937,7 +1050,7 @@ public class CalendarTest extends InstrumentationTestCase {
         assertTrue(eventId2 >= 0);
 
         /*
-         * Add some attendees.
+         * Add some attendees to the first event.
          */
         long attId1 = AttendeeHelper.addAttendee(mContentResolver, eventId1,
                 "Alice",
@@ -976,10 +1089,12 @@ public class CalendarTest extends InstrumentationTestCase {
             ContentValues update = new ContentValues();
             Uri uri = ContentUris.withAppendedId(Attendees.CONTENT_URI, id);
 
-            /* TODO: currently causes an NPE in provider
             update.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_ACCEPTED);
             int count = mContentResolver.update(uri, update, null, null);
-            */
+            assertEquals(1, count);
+
+            int status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId1);
+            assertEquals(Attendees.ATTENDEE_STATUS_ACCEPTED, status);
 
         } finally {
             if (cursor != null) {
@@ -987,9 +1102,62 @@ public class CalendarTest extends InstrumentationTestCase {
             }
         }
 
-        // TODO: use new URI to change all "declined" to "invited"
+        /*
+         * Do a bulk update of all Attendees for this event, changing any Attendee with status
+         * "declined" to "invited".
+         */
+        ContentValues bulkUpdate = new ContentValues();
+        bulkUpdate.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_INVITED);
 
-        // TODO: in second event, create a new "self" attendee
+        int count = mContentResolver.update(Attendees.CONTENT_URI, bulkUpdate,
+                Attendees.EVENT_ID + "=? AND " + Attendees.ATTENDEE_STATUS + "=?",
+                new String[] {
+                    String.valueOf(eventId1), String.valueOf(Attendees.ATTENDEE_STATUS_DECLINED)
+                });
+        assertEquals(2, count);
+
+        /*
+         * Add a new, non-self attendee to the second event.
+         */
+        attId1 = AttendeeHelper.addAttendee(mContentResolver, eventId2,
+                "Diana",
+                "diana@example.com",
+                Attendees.ATTENDEE_STATUS_ACCEPTED,
+                Attendees.RELATIONSHIP_ATTENDEE,
+                Attendees.TYPE_REQUIRED);
+
+        /*
+         * Confirm that the selfAttendeeStatus on the second event has the default value.
+         */
+        int status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId2);
+        assertEquals(Attendees.ATTENDEE_STATUS_NONE, status);
+
+        /*
+         * Create a new "self" attendee in the second event by updating the email address to
+         * match that of the calendar owner.
+         */
+        ContentValues newSelf = new ContentValues();
+        newSelf.put(Attendees.ATTENDEE_EMAIL, CalendarHelper.generateCalendarOwnerEmail(account));
+        count = mContentResolver.update(ContentUris.withAppendedId(Attendees.CONTENT_URI, attId1),
+                newSelf, null, null);
+        assertEquals(1, count);
+
+        /*
+         * Confirm that the event's selfAttendeeStatus has been updated.
+         */
+        status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId2);
+        assertEquals(Attendees.ATTENDEE_STATUS_ACCEPTED, status);
+
+        /*
+         * TODO:  (these are unexpected usage patterns)
+         * - Update an Attendee's status and event_id to move it to a different event, and
+         *   confirm that the selfAttendeeStatus in the destination event is updated (rather
+         *   than that of the source event).
+         * - Create two Attendees with email addresses that match "self" but have different
+         *   values for "status".  Delete one and confirm that selfAttendeeStatus is changed
+         *   to that of the remaining Attendee.  (There is no defined behavior for
+         *   selfAttendeeStatus when there are multiple matching Attendees.)
+         */
 
         removeAndVerifyCalendar(account, calendarId);
     }
@@ -1032,16 +1200,128 @@ public class CalendarTest extends InstrumentationTestCase {
             assertEquals(3, cursor.getCount());
             //DatabaseUtils.dumpCursor(cursor);
 
-            // TODO: make sure METHOD_SMS worked even though not allowed
-
+            // Make sure METHOD_SMS appears exactly once.
+            while (cursor.moveToNext()) {
+                int minutes = cursor.getInt(ReminderHelper.REMINDERS_MINUTES_INDEX);
+                int method = cursor.getInt(ReminderHelper.REMINDERS_METHOD_INDEX);
+                switch (minutes) {
+                    case 10:
+                        assertEquals(Reminders.METHOD_DEFAULT, method);
+                        break;
+                    case 15:
+                        assertEquals(Reminders.METHOD_ALERT, method);
+                        break;
+                    case 20:
+                        assertEquals(Reminders.METHOD_SMS, method);
+                        break;
+                    default:
+                        fail("unexpected minutes " + minutes);
+                        break;
+                }
+            }
         } finally {
             if (cursor != null) {
                 cursor.close();
             }
         }
 
-        // TODO: change remId3 to METHOD_DEFAULT
-        // TODO: use new URI to change all METHOD_DEFAULT to METHOD_EMAIL, confirm 2 changes
+        /*
+         * Use the bulk update feature to change all METHOD_DEFAULT to METHOD_EMAIL.  To make
+         * this more interesting we first change remId3 to METHOD_DEFAULT.
+         */
+        int count;
+        ContentValues newValues = new ContentValues();
+        newValues.put(Reminders.METHOD, Reminders.METHOD_DEFAULT);
+        count = mContentResolver.update(ContentUris.withAppendedId(Reminders.CONTENT_URI, remId3),
+                newValues, null, null);
+        assertEquals(1, count);
+
+        newValues.put(Reminders.METHOD, Reminders.METHOD_EMAIL);
+        count = mContentResolver.update(Reminders.CONTENT_URI, newValues,
+                Reminders.EVENT_ID + "=? AND " + Reminders.METHOD + "=?",
+                new String[] {
+                    String.valueOf(eventId1), String.valueOf(Reminders.METHOD_DEFAULT)
+                });
+        assertEquals(2, count);
+
+        // check it
+        int method = ReminderHelper.lookupMethod(mContentResolver, remId3);
+        assertEquals(Reminders.METHOD_EMAIL, method);
+
+        removeAndVerifyCalendar(account, calendarId);
+    }
+
+    /**
+     * Tests creation and manipulation of ExtendedProperties.
+     */
+    @MediumTest
+    public void testExtendedProperties() {
+        String account = "ep_account";
+        int seed = 0;
+
+        // Clean up just in case.
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create calendar.
+        long calendarId = createAndVerifyCalendar(account, seed++, null);
+
+        // Create events.
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId1 >= 0);
+
+        /*
+         * Add some extended properties.
+         */
+        long epId1 = ExtendedPropertiesHelper.addExtendedProperty(mContentResolver, account,
+                eventId1, "first", "Jeffrey");
+        long epId2 = ExtendedPropertiesHelper.addExtendedProperty(mContentResolver, account,
+                eventId1, "last", "Lebowski");
+        long epId3 = ExtendedPropertiesHelper.addExtendedProperty(mContentResolver, account,
+                eventId1, "title", "Dude");
+
+        /*
+         * Spot-check a couple of entries.
+         */
+        Cursor cursor = ExtendedPropertiesHelper.findExtendedPropertiesByEventId(mContentResolver,
+                eventId1);
+        try {
+            assertEquals(3, cursor.getCount());
+            //DatabaseUtils.dumpCursor(cursor);
+
+            while (cursor.moveToNext()) {
+                String name =
+                    cursor.getString(ExtendedPropertiesHelper.EXTENDED_PROPERTIES_NAME_INDEX);
+                String value =
+                    cursor.getString(ExtendedPropertiesHelper.EXTENDED_PROPERTIES_VALUE_INDEX);
+
+                if (name.equals("last")) {
+                    assertEquals("Lebowski", value);
+                }
+            }
+
+            String title = ExtendedPropertiesHelper.lookupValueByName(mContentResolver, eventId1,
+                    "title");
+            assertEquals("Dude", title);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        // Update the title.  Must be done as a sync adapter.
+        ContentValues newValues = new ContentValues();
+        newValues.put(ExtendedProperties.VALUE, "Big");
+        Uri uri = ContentUris.withAppendedId(ExtendedProperties.CONTENT_URI, epId3);
+        uri = asSyncAdapter(uri, account, CTS_TEST_TYPE);
+        int count = mContentResolver.update(uri, newValues, null, null);
+        assertEquals(1, count);
+
+        // check it
+        String title = ExtendedPropertiesHelper.lookupValueByName(mContentResolver, eventId1,
+                "title");
+        assertEquals("Big", title);
 
         removeAndVerifyCalendar(account, calendarId);
     }
