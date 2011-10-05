@@ -45,19 +45,6 @@ public class Test_float_to_double extends DxTestCase {
         T_float_to_double_1 t = new T_float_to_double_1();
         assertEquals(-1d, t.run(-1), 0d);
     }
-    
-    /**
-     * @title Type of argument - int. Dalvik doens't distinguish 32-bits types internally,
-     * so this conversion of int to double makes no sense but shall not crash the VM.  
-     */
-
-    public void testN4() {
-        T_float_to_double_7 t = new T_float_to_double_7();
-        try {
-            t.run(1);
-        } catch (Throwable e) {
-        }
-    }  
 
     /**
      * @title Argument = Float.MAX_VALUE
@@ -171,6 +158,20 @@ public class Test_float_to_double extends DxTestCase {
     public void testVFE5() {
         try {
             Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - int. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE6() {
+        try {
+            Class.forName("dot.junit.opcodes.float_to_double.d.T_float_to_double_7");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

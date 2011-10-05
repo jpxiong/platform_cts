@@ -71,19 +71,6 @@ public class Test_add_int_2addr extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this sum of float and int makes no sense but shall not crash the VM.  
-     */
-
-    public void testN7() {
-        T_add_int_2addr_5 t = new T_add_int_2addr_5();
-        try {
-            t.run(1, 2f);
-        } catch (Throwable e) {
-        }
-    }
-    
-    /**
      * @title Arguments = 0, Integer.MAX_VALUE
      */
     public void testB1() {
@@ -180,6 +167,20 @@ public class Test_add_int_2addr extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.add_int_2addr.d.T_add_int_2addr_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.add_int_2addr.d.T_add_int_2addr_5");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

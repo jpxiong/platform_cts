@@ -67,19 +67,6 @@ public class Test_aput_object extends DxTestCase {
         assertEquals(3, t.run());
 
     }
-    
-    /**
-     * @title Type of index argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this array[float]=value makes no sense but shall not crash the VM.  
-     */
-    public void testN5() {
-        String[] arr = new String[2];
-        T_aput_object_12 t = new T_aput_object_12();
-        try {
-            t.run(arr, 3.14f, new String());
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title expected ArrayIndexOutOfBoundsException
@@ -242,4 +229,17 @@ public class Test_aput_object extends DxTestCase {
         }
     }
 
+    /**
+     * @constraint B1
+     * @title Type of index argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE9() {
+        try {
+            Class.forName("dot.junit.opcodes.aput_object.d.T_aput_object_12");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
 }

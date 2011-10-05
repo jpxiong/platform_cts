@@ -47,18 +47,6 @@ public class Test_cmp_long extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this comparison of long and double makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-         T_cmp_long_2 t = new T_cmp_long_2();
-        try {
-            t.run(123l, 3.145f);
-        } catch (Throwable e) {
-        }
-    }  
-    
-    /**
      * @title Arguments = Long.MAX_VALUE > Long.MIN_VALUE
      */
     public void testB1() {
@@ -159,4 +147,17 @@ public class Test_cmp_long extends DxTestCase {
         }
     }
 
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.cmp_long.d.T_cmp_long_2");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
 }

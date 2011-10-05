@@ -45,19 +45,6 @@ public class Test_int_to_long extends DxTestCase {
         T_int_to_long_1 t = new T_int_to_long_1();
         assertEquals(-1l, t.run(-1));
     }
-    
-    /**
-     * @title Type of argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this conversion of float to long makes no sense but shall not crash the VM.  
-     */
-
-    public void testN8() {
-        T_int_to_long_6 t = new T_int_to_long_6();
-        try {
-            t.run(1.333f);
-        } catch (Throwable e) {
-        }
-    } 
 
     /**
      * @title Argument = 0
@@ -145,6 +132,20 @@ public class Test_int_to_long extends DxTestCase {
     public void testVFE5() {
         try {
             Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_7");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE6() {
+        try {
+            Class.forName("dot.junit.opcodes.int_to_long.d.T_int_to_long_6");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

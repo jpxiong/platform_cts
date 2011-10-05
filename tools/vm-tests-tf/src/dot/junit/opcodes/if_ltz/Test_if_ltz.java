@@ -24,15 +24,6 @@ public class Test_if_ltz extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this operation of float makes no sense but shall not crash the VM.  
-     */
-    public void testN3() {
-        T_if_ltz_2 t = new T_if_ltz_2();
-        assertEquals(1234, t.run(1.123f));
-    }
-    
-    /**
      * @title Arguments = Integer.MAX_VALUE
      */
     public void testB1() {
@@ -147,4 +138,19 @@ public class Test_if_ltz extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE8() {
+        try {
+            Class.forName("dot.junit.opcodes.if_ltz.d.T_if_ltz_2");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
 }

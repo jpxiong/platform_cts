@@ -77,18 +77,6 @@ public class Test_iput extends DxTestCase {
         assertEquals(1000000, t.getProtectedField());
     }
 
-    /**
-     * @title Trying to put float into integer field. Dalvik doens't distinguish 32-bits types
-     * internally, so this operation makes no sense but shall not crash the VM.
-     */
-    public void testN6() {
-        T_iput_5 t = new  T_iput_5();
-        try {
-            t.run(3.14f);
-        } catch (Throwable e) {
-        }
-    }
-
 
     /**
      * @title expected NullPointerException
@@ -142,6 +130,20 @@ public class Test_iput extends DxTestCase {
             new T_iput_17().run();
             fail("expected NoSuchFieldError");
         } catch (NoSuchFieldError t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Trying to put float into integer field. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE6() {
+        try {
+            Class.forName("dot.junit.opcodes.iput.d.T_iput_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
         }
     }
@@ -340,4 +342,3 @@ public class Test_iput extends DxTestCase {
         }
     }
 }
-

@@ -47,18 +47,6 @@ public class Test_cmpg_float extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this comparison of int and float makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_cmpg_float_6 t = new T_cmpg_float_6();
-        try {
-            t.run(123, 3.145f);
-        } catch (Throwable e) {
-        }
-    }      
-    
-    /**
      * @title Arguments = Float.NaN, Float.MAX_VALUE
      */
     public void testB1() {
@@ -153,5 +141,19 @@ public class Test_cmpg_float extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.cmpg_float.d.T_cmpg_float_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
 }

@@ -47,18 +47,6 @@ public class Test_long_to_double extends DxTestCase {
     }
 
     /**
-     * @title Type of argument - double. Dalvik doens't distinguish 64-bits types internally,
-     * so this conversion of double to double makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_long_to_double_6 t = new T_long_to_double_6();
-        try {
-            t.run(12345);
-        } catch (Throwable e) {
-        }
-    }       
-    
-    /**
      * @title Argument = Long.MAX_VALUE
      */
     public void testB1() {
@@ -133,6 +121,20 @@ public class Test_long_to_double extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.long_to_double.d.T_long_to_double_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.long_to_double.d.T_long_to_double_6");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

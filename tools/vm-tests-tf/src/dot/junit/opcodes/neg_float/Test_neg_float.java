@@ -54,19 +54,6 @@ public class Test_neg_float extends DxTestCase {
         T_neg_float_1 t = new T_neg_float_1();
         assertEquals(2.7f, t.run(-2.7f));
     }
-    
-    /**
-     * @title Types of arguments - float, int. Dalvik doens't distinguish 32-bits types internally,
-     * so this operation of float and int makes no sense but shall not crash the VM.  
-     */
-
-    public void testN5() {
-        T_neg_float_6 t = new T_neg_float_6();
-        try {
-            t.run(5);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Argument = Float.NaN
@@ -159,6 +146,20 @@ public class Test_neg_float extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.neg_float.d.T_neg_float_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - float, int. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.neg_float.d.T_neg_float_6");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

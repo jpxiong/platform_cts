@@ -48,19 +48,6 @@ public class Test_float_to_int extends DxTestCase {
     }
 
     /**
-     * @title Type of argument - int. Dalvik doens't distinguish 32-bits types internally,
-     * so this conversion of int to int makes no sense but shall not crash the VM.  
-     */
-
-    public void testN4() {
-        T_float_to_int_5 t = new T_float_to_int_5();
-        try {
-            t.run(1);
-        } catch (Throwable e) {
-        }
-    }  
-    
-    /**
      * @title Argument = -0f
      */
     public void testB1() {
@@ -157,6 +144,20 @@ public class Test_float_to_int extends DxTestCase {
     public void testVFE5() {
         try {
             Class.forName("dot.junit.opcodes.float_to_int.d.T_float_to_int_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - int. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE6() {
+        try {
+            Class.forName("dot.junit.opcodes.float_to_int.d.T_float_to_int_5");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

@@ -47,18 +47,6 @@ public class Test_long_to_float extends DxTestCase {
     }
 
     /**
-     * @title Type of argument - double. Dalvik doens't distinguish 64-bits types internally,
-     * so this conversion of double to double makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_long_to_float_2 t = new T_long_to_float_2();
-        try {
-            t.run(12345);
-        } catch (Throwable e) {
-        }
-    }
-    
-    /**
      * @title Argument = Long.MAX_VALUE
      */
     public void testB1() {
@@ -84,6 +72,20 @@ public class Test_long_to_float extends DxTestCase {
 
 
 
+
+    /**
+     * @constraint B1
+     * @title Type of argument - double. The verifier checks that longs and
+     * doubles are not used interchangeably.
+     */
+    public void testVFE1() {
+        try {
+            Class.forName("dot.junit.opcodes.long_to_float.d.T_long_to_float_2");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
 
     /**
      * @constraint B1 

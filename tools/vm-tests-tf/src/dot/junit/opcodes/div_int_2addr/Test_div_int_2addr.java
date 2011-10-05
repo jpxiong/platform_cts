@@ -71,19 +71,6 @@ public class Test_div_int_2addr extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this division of float and int makes no sense but shall not crash the VM.  
-     */
-
-    public void testN7() {
-        T_div_int_2addr_5 t = new T_div_int_2addr_5();
-        try {
-            t.run(1, 3.14f);
-        } catch (Throwable e) {
-        }
-    }
-    
-    /**
      * @title Arguments = Integer.MIN_VALUE, -1
      */
     public void testB1() {
@@ -193,6 +180,20 @@ public class Test_div_int_2addr extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.div_int_2addr.d.T_div_int_2addr_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.div_int_2addr.d.T_div_int_2addr_5");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
