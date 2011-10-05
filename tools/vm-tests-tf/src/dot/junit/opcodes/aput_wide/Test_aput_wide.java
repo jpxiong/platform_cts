@@ -54,34 +54,7 @@ public class Test_aput_wide extends DxTestCase {
         t.run(arr, 0, 3.1415d);
         assertEquals(3.1415d, arr[0]);
     }
-    
-    /**
-     * @title Type of index argument - float. Dalvik doens't distinguish 64-bits types internally,
-     * so this array[float]=value makes no sense but shall not crash the VM.  
-     */
 
-    public void testN4() {
-        long[] arr = new long[2];
-        T_aput_wide_9 t = new T_aput_wide_9();
-        try {
-            t.run(arr, 3.14f, 111);
-        } catch (Throwable e) {
-        }
-    }
-    
-    /**
-     * @title Try to put long into double[]. Dalvik doens't distinguish 64-bits types internally,
-     * so this operation makes no sense but shall not crash the VM.
-     */
-    public void testN5() {
-        double[] arr = new double[2];
-        T_aput_wide_6 t = new T_aput_wide_6();
-        try {
-            t.run(arr, 0, 1234l);
-        } catch (Throwable e) {
-        }
-    }
-    
     /**
      * @title expected ArrayIndexOutOfBoundsException
      */
@@ -164,6 +137,20 @@ public class Test_aput_wide extends DxTestCase {
     }
 
     /**
+     * @constraint B1
+     * @title Type of index argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE4() {
+        try {
+            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_9");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
      * @constraint B1 
      * @title types of arguments - int[], int, long
      */
@@ -196,6 +183,20 @@ public class Test_aput_wide extends DxTestCase {
     public void testVFE7() {
         try {
             Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_10");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Try to put long into double[]. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE8() {
+        try {
+            Class.forName("dot.junit.opcodes.aput_wide.d.T_aput_wide_6");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

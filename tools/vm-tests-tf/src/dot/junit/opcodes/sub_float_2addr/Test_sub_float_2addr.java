@@ -47,18 +47,6 @@ public class Test_sub_float_2addr extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this subtraction of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_sub_float_2addr_5 t = new T_sub_float_2addr_5();
-        try {
-            t.run(1, 3.14f);
-        } catch (Throwable e) {
-        }
-    }
-    
-    /**
      * @title Arguments = Float.MAX_VALUE, Float.NaN
      */
     public void testB1() {
@@ -154,6 +142,20 @@ public class Test_sub_float_2addr extends DxTestCase {
 
 
     
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE1() {
+        try {
+            Class.forName("dot.junit.opcodes.sub_float_2addr.d.T_sub_float_2addr_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
 
     /**
      * @constraint B1 

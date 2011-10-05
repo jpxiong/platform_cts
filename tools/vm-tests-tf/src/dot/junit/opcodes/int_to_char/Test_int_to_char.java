@@ -56,19 +56,6 @@ public class Test_int_to_char extends DxTestCase {
     }
 
     /**
-     * @title Type of argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this conversion of float to char makes no sense but shall not crash the VM.  
-     */
-
-    public void testN5() {
-        T_int_to_char_5 t = new T_int_to_char_5();
-        try {
-            t.run(1.333f);
-        } catch (Throwable e) {
-        }
-    } 
-    
-    /**
      * @title Argument = 0
      */
     public void testB1() {
@@ -147,6 +134,20 @@ public class Test_int_to_char extends DxTestCase {
     public void testVFE5() {
         try {
             Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE6() {
+        try {
+            Class.forName("dot.junit.opcodes.int_to_char.d.T_int_to_char_5");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

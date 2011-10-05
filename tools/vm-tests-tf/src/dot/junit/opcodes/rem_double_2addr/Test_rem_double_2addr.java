@@ -46,18 +46,6 @@ public class Test_rem_double_2addr extends DxTestCase {
         T_rem_double_2addr_1 t = new T_rem_double_2addr_1();
         assertEquals(-0.43999999999999995d, t.run(-3.14d, 2.7d));
     }
-    
-    /**
-     * @title Types of arguments - double, long. Dalvik doens't distinguish 64-bits types internally,
-     * so this operation of double and long makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_rem_double_2addr_4 t = new T_rem_double_2addr_4();
-        try {
-            t.run(500000l, 1.05d);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = Double.MAX_VALUE, Double.NaN
@@ -182,6 +170,20 @@ public class Test_rem_double_2addr extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.rem_double_2addr.d.T_rem_double_2addr_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - double, long. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.rem_double_2addr.d.T_rem_double_2addr_4");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

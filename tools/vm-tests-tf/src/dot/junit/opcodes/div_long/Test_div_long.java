@@ -70,18 +70,6 @@ public class Test_div_long extends DxTestCase {
         T_div_long_1 t = new T_div_long_1();
         assertEquals(80l, t.run(-98765432123456l, -1234567891234l));
     }
-    
-    /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this division of long and double makes no sense but shall not crash the VM.  
-     */
-    public void testN7() {
-        T_div_long_2 t = new T_div_long_2();
-        try {
-            t.run(1234l, 3.1415d);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = Long.MIN_VALUE, -1
@@ -192,6 +180,20 @@ public class Test_div_long extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.div_long.d.T_div_long_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.div_long.d.T_div_long_2");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

@@ -46,19 +46,6 @@ public class Test_mul_long extends DxTestCase {
         T_mul_long_1 t = new T_mul_long_1();
         assertEquals(15241578750190521l, t.run(-123456789l, -123456789l));
     }
-    
-    /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this multiplication of long and long makes no sense but shall not crash the VM.  
-     */
-
-    public void testN4() {
-        T_mul_long_3 t = new T_mul_long_3();
-        try {
-            t.run(500000l, 2.7d);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = 0, Long.MAX_VALUE
@@ -166,6 +153,20 @@ public class Test_mul_long extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.mul_long.d.T_mul_long_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.mul_long.d.T_mul_long_3");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

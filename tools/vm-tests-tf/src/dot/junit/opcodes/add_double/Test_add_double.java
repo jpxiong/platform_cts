@@ -48,18 +48,6 @@ public class Test_add_double extends DxTestCase {
         T_add_double_1 t = new T_add_double_1();
         assertEquals(-5.84d, t.run(-3.14d, -2.7d));
     }
-    
-    /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this sum of long and double makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_add_double_3 t = new T_add_double_3();
-        try {
-            t.run();
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = Double.MAX_VALUE, Double.NaN
@@ -186,6 +174,20 @@ public class Test_add_double extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.add_double.d.T_add_double_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.add_double.d.T_add_double_3");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
