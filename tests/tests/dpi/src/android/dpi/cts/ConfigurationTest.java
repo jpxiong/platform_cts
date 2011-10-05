@@ -68,7 +68,8 @@ public class ConfigurationTest extends AndroidTestCase {
         assertTrue("DisplayMetrics#densityDpi must be one of the DisplayMetrics.DENSITY_* values: "
                 + allowedDensities, allowedDensities.contains(metrics.densityDpi));
 
-        assertEquals(metrics.density, (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT,
-                0.001F);
+        assertEquals(metrics.density,
+                (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT,
+                0.5f / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
