@@ -2278,6 +2278,147 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "WebViewClient.onReceivedSslError",
+        args = {}
+    )
+    public void testOnReceivedSslErrorProceed() throws Throwable {
+        final class MockWebViewClient extends WebViewClient {
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
+            }
+        }
+
+        startWebServer(true);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(new MockWebViewClient());
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(url);
+            }
+        });
+        waitForUiThreadDone();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(mWebView.getTitle(), TestHtmlConstants.HELLO_WORLD_TITLE);
+            }
+        });
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "WebViewClient.onReceivedSslError",
+        args = {}
+    )
+    public void testOnReceivedSslErrorCancel() throws Throwable {
+        final class MockWebViewClient extends WebViewClient {
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.cancel();
+            }
+        }
+
+        startWebServer(true);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(new MockWebViewClient());
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(url);
+            }
+        });
+        waitForUiThreadDone();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertFalse(TestHtmlConstants.HELLO_WORLD_TITLE.equals(mWebView.getTitle()));
+            }
+        });
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "WebViewClient.onReceivedSslError",
+        args = {}
+    )
+    public void testSslErrorProceedResponseReusedForSameHost() throws Throwable {
+        // Load the first page. We expect a call to
+        // WebViewClient.onReceivedSslError().
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        startWebServer(true);
+        final String firstUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(webViewClient);
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(firstUrl);
+            }
+        });
+        waitForUiThreadDone();
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+
+        // Load the second page. We don't expect a call to
+        // WebViewClient.onReceivedSslError(), but the page should load.
+        webViewClient.resetWasOnReceivedSslErrorCalled();
+        final String sameHostUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadUrl(sameHostUrl);
+            }
+        });
+        waitForUiThreadDone();
+        assertFalse(webViewClient.wasOnReceivedSslErrorCalled());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(mWebView.getTitle(), "Second page");
+            }
+        });
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "WebViewClient.onReceivedSslError",
+        args = {}
+    )
+    public void testSslErrorProceedResponseNotReusedForDifferentHost() throws Throwable {
+        // Load the first page. We expect a call to
+        // WebViewClient.onReceivedSslError().
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        startWebServer(true);
+        final String firstUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(webViewClient);
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(firstUrl);
+            }
+        });
+        waitForUiThreadDone();
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+
+        // Load the second page. We expect another call to
+        // WebViewClient.onReceivedSslError().
+        webViewClient.resetWasOnReceivedSslErrorCalled();
+        // The test server uses the host "localhost". "127.0.0.1" works as an
+        // alias, but will be considered unique by the WebView.
+        final String differentHostUrl = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2).replace(
+                "localhost", "127.0.0.1");
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.loadUrl(differentHostUrl);
+            }
+        });
+        waitForUiThreadDone();
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                assertEquals(mWebView.getTitle(), "Second page");
+            }
+        });
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "requestChildRectangleOnScreen",
         args = {View.class, Rect.class, boolean.class}
     )
@@ -2828,6 +2969,22 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             if (progress == 100) {
                 notifyUiThreadDone();
             }
+        }
+    }
+
+    // Note that this class is not thread-safe.
+    final class SslErrorWebViewClient extends WebViewClient {
+        private boolean mWasOnReceivedSslErrorCalled;
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            mWasOnReceivedSslErrorCalled = true;
+            handler.proceed();
+        }
+        public void resetWasOnReceivedSslErrorCalled() {
+            mWasOnReceivedSslErrorCalled = false;
+        }
+        public boolean wasOnReceivedSslErrorCalled() {
+            return mWasOnReceivedSslErrorCalled;
         }
     }
 }
