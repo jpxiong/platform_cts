@@ -118,13 +118,18 @@ public class ListeningPortsTest extends TestCase {
 
                 String localAddress = fields[1];
                 String state = fields[3];
+                String uid = fields[7];
 
                 assertTrue(procFilePath + " should have an IP address in the second column",
                         isAddress(localAddress));
 
+                String localIp = localAddress.split(":")[0];
+                int localPort = Integer.parseInt(localAddress.split(":")[1], 16);
+
                 if (!isException(localAddress) && isPortListening(state, isTcp)) {
                     throw new ListeningPortsAssertionError(
-                            "Found port listening on " + localAddress + " in " + procFilePath);
+                            "Found port listening on addr=" + localIp + ", port="
+                                + localPort + ", UID=" + uid + " in " + procFilePath);
                 }
             }
         } catch (FileNotFoundException notFound) {
