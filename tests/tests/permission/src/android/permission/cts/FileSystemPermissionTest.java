@@ -190,6 +190,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/app",
                     "/data/app-private",
                     "/data/backup",
+                    "/data/btips",
+                    "/data/btips/TI",
+                    "/data/btips/TI/opp",
                     "/data/dalvik-cache",
                     "/data/data/.drm",
                     "/data/data/.drm/.wmdrm",
@@ -198,6 +201,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/drm/rights",
                     "/data/dump",
                     "/data/local",
+                    "/data/local/tmp/com.nuance.android.vsuite.vsuiteapp",
                     "/data/log",
                     "/data/lost+found",
                     "/data/misc",
@@ -212,7 +216,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/wifi",
                     "/data/wiper",
                     "/data/wpstiles",
-                    "/dbdata/databases"
+                    "/dbdata/databases",
+                    "/mnt_ext",
+                    "/mnt_ext/badablk2",
+                    "/mnt_ext/badablk3",
+                    "/mnt_ext/cache",
+                    "/mnt_ext/data"
             )
     );
 
