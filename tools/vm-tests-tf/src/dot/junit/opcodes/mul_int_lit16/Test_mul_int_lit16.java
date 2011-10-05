@@ -58,19 +58,7 @@ public class Test_mul_int_lit16 extends DxTestCase {
         T_mul_int_lit16_2 t = new T_mul_int_lit16_2();
         assertEquals(32421, t.run(-101));
     }
-    
-    /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this multiplication of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN5() {
-        T_mul_int_lit16_3 t = new T_mul_int_lit16_3();
-        try {
-            t.run(3.14f);
-        } catch (Throwable e) {
-        }
-    }
-    
+
     /**
      * @title Arguments = 0, 0 
      */
@@ -159,6 +147,20 @@ public class Test_mul_int_lit16 extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.mul_int_lit16.d.T_mul_int_lit16_10");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.mul_int_lit16.d.T_mul_int_lit16_3");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

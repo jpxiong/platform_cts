@@ -58,15 +58,6 @@ public class Test_if_ne extends DxTestCase {
         String a = "a";
         assertEquals(1234, t.run(a, a));
     }
-    
-    /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this operation of int and float makes no sense but shall not crash the VM.  
-     */
-    public void testN7() {
-        T_if_ne_4 t = new T_if_ne_4();
-        assertEquals(1, t.run(1f, 1));
-    }  
 
     /**
      * @title Arguments = Integer.MAX_VALUE, Integer.MAX_VALUE
@@ -201,5 +192,19 @@ public class Test_if_ne extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE8() {
+        try {
+            Class.forName("dot.junit.opcodes.if_ne.d.T_if_ne_4");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
 }

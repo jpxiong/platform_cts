@@ -52,18 +52,6 @@ public class Test_rsub_int_lit8 extends DxTestCase {
         assertEquals("Subtest_3 is failed",-15, t.run2(15));
         assertEquals("Subtest_4 is failed",85, t.run2(-85));
     }
-    
-    /**
-     * @title Types of arguments - float, int. Dalvik doens't distinguish 32-bits types internally,
-     * so this operation of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN3() {
-        T_rsub_int_lit8_12 t = new T_rsub_int_lit8_12();
-        try {
-            t.run(3.14f);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title 
@@ -247,6 +235,20 @@ public class Test_rsub_int_lit8 extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.rsub_int_lit8.d.T_rsub_int_lit8_11");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - float, int. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.rsub_int_lit8.d.T_rsub_int_lit8_12");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

@@ -47,18 +47,6 @@ public class Test_sub_double_2addr extends DxTestCase {
     }
 
     /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this subtraction of double and long makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_sub_double_2addr_3 t = new T_sub_double_2addr_3();
-        try {
-            t.run(12345l, 3.14d);
-        } catch (Throwable e) {
-        }
-    }  
-    
-    /**
      * @title Arguments = Double.MAX_VALUE, Double.NaN
      */
     public void testB1() {
@@ -197,4 +185,19 @@ public class Test_sub_double_2addr extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.sub_double_2addr.d.T_sub_double_2addr_3");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
 }

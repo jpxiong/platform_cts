@@ -40,19 +40,7 @@ public class Test_xor_int_lit8 extends DxTestCase {
          T_xor_int_lit8_2 t = new T_xor_int_lit8_2();
          assertEquals(9, t.run());
      }
-    
-    /**
-     * @title Type of argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this (float ^ int) makes no sense but shall not crash the VM.  
-     */
-    public void testN3() {
-        T_xor_int_lit8_7 t = new T_xor_int_lit8_7();
-        try {
-            t.run(3.14f);
-        } catch (Throwable e) {
-        }
-    }
-    
+
     /**
      * @title Arguments = 0, -1
      */
@@ -104,6 +92,20 @@ public class Test_xor_int_lit8 extends DxTestCase {
     public void testVFE3() {
         try {
             Class.forName("dot.junit.opcodes.xor_int_lit8.d.T_xor_int_lit8_8");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE4() {
+        try {
+            Class.forName("dot.junit.opcodes.xor_int_lit8.d.T_xor_int_lit8_7");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

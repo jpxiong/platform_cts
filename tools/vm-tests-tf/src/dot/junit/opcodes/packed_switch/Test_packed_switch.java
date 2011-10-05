@@ -38,19 +38,6 @@ public class Test_packed_switch extends DxTestCase {
         assertEquals(20, t.run(3));
         assertEquals(-1, t.run(7));
     }
-    
-    /**
-     * @title Types of arguments - float, int. Dalvik doens't distinguish 32-bits types internally,
-     * so this operation of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN2() {
-        try {
-            T_packed_switch_2 t = new T_packed_switch_2();
-            t.run(-1.23f);
-        } catch(Throwable t) {
-            
-        }
-    }
 
     /**
      * @title Argument = Integer.MAX_VALUE
@@ -164,6 +151,20 @@ public class Test_packed_switch extends DxTestCase {
     public void testVFE7() {
         try {
             Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_9");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - float, int. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE8() {
+        try {
+            Class.forName("dot.junit.opcodes.packed_switch.d.T_packed_switch_2");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

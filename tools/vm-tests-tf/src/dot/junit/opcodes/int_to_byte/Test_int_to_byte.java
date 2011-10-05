@@ -71,19 +71,6 @@ public class Test_int_to_byte extends DxTestCase {
         T_int_to_byte_1 t = new T_int_to_byte_1();
         assertEquals(122, t.run(-134));
     }
-    
-    /**
-     * @title Type of argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this conversion of float to byte makes no sense but shall not crash the VM.  
-     */
-
-    public void testN7() {
-        T_int_to_byte_5 t = new T_int_to_byte_5();
-        try {
-            t.run(1.333f);
-        } catch (Throwable e) {
-        }
-    } 
 
     /**
      * @title Argument = 127
@@ -190,6 +177,20 @@ public class Test_int_to_byte extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.int_to_byte.d.T_int_to_byte_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Type of argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.int_to_byte.d.T_int_to_byte_5");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

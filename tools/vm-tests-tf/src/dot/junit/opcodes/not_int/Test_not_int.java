@@ -49,18 +49,6 @@ public class Test_not_int extends DxTestCase {
         assertEquals(-0xcaff, t.run(0xcafe));
         assertEquals(-0x12d, t.run(0x12c));
     }
-    
-    /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this multiplication of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_not_int_2 t = new T_not_int_2();
-        try {
-            t.run(3.14f);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Argument = Integer.MAX_VALUE
@@ -166,6 +154,20 @@ public class Test_not_int extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.not_int.d.T_not_int_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.not_int.d.T_not_int_2");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

@@ -54,18 +54,6 @@ public class Test_sub_int extends DxTestCase {
         T_sub_int_1 t = new T_sub_int_1();
         assertEquals(Integer.MAX_VALUE, t.run(0, -2147483647));
     }
-    
-    /**
-     * @title Types of arguments - int, float. Dalvik doens't distinguish 32-bits types internally,
-     * so this subtraction of float and int makes no sense but shall not crash the VM.  
-     */
-    public void testN5() {
-        T_sub_int_5 t = new  T_sub_int_5();
-        try {
-            t.run(1, 3.14f);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = 0, Integer.MAX_VALUE
@@ -140,6 +128,20 @@ public class Test_sub_int extends DxTestCase {
     }
 
     
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - int, float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE1() {
+        try {
+            Class.forName("dot.junit.opcodes.sub_int.d.T_sub_int_5");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
 
     /**
      * @constraint B1 

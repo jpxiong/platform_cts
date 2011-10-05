@@ -47,18 +47,6 @@ public class Test_or_long_2addr extends DxTestCase {
         T_or_long_2addr_1 t = new T_or_long_2addr_1();
         assertEquals(-1l, t.run(0xabcdefabcdefl, -1l));
     }
-    
-    /**
-     * @title Types of arguments - double, long. Dalvik doens't distinguish 64-bits types internally,
-     * so this operation of double and long makes no sense but shall not crash the VM.  
-     */
-    public void testN4() {
-        T_or_long_2addr_3 t = new T_or_long_2addr_3();
-        try {
-            t.run(500000l, 1.05d);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * @title Arguments = 0 & -1
@@ -124,6 +112,20 @@ public class Test_or_long_2addr extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.or_long_2addr.d.T_or_long_2addr_6");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - double, long. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.or_long_2addr.d.T_or_long_2addr_3");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

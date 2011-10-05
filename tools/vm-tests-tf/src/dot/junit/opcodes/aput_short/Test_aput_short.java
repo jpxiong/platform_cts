@@ -43,20 +43,6 @@ public class Test_aput_short extends DxTestCase {
     }
 
     /**
-     * @title Type of index argument - float. Dalvik doens't distinguish 32-bits types internally,
-     * so this array[float]=value makes no sense but shall not crash the VM.  
-     */
-
-    public void testN3() {
-        short[] arr = new short[2];
-        T_aput_short_8 t = new T_aput_short_8();
-        try {
-            t.run(arr, 3.14f, (short)111);
-        } catch (Throwable e) {
-        }
-    }    
-    
-    /**
      * @title expected ArrayIndexOutOfBoundsException
      */
     public void testE1() {
@@ -202,4 +188,19 @@ public class Test_aput_short extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
+
+    /**
+     * @constraint B1
+     * @title Type of index argument - float. The verifier checks that ints
+     * and floats are not used interchangeably.
+     */
+    public void testVFE9() {
+        try {
+            Class.forName("dot.junit.opcodes.aput_short.d.T_aput_short_8");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
 }

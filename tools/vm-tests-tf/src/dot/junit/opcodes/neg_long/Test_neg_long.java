@@ -55,19 +55,6 @@ public class Test_neg_long extends DxTestCase {
         T_neg_long_2 t = new T_neg_long_2();
         assertTrue(t.run(15l));
     }
-    
-    /**
-     * @title Types of arguments - long, double. Dalvik doens't distinguish 64-bits types internally,
-     * so this operation of long and double makes no sense but shall not crash the VM.  
-     */
-
-    public void testN5() {
-        T_neg_long_4 t = new T_neg_long_4();
-        try {
-            t.run(1.23d);
-        } catch (Throwable e) {
-        }
-    }
 
 
     /**
@@ -144,6 +131,20 @@ public class Test_neg_long extends DxTestCase {
     public void testVFE4() {
         try {
             Class.forName("dot.junit.opcodes.neg_long.d.T_neg_long_7");
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
+        }
+    }
+
+    /**
+     * @constraint B1
+     * @title Types of arguments - long, double. The verifier checks that longs
+     * and doubles are not used interchangeably.
+     */
+    public void testVFE5() {
+        try {
+            Class.forName("dot.junit.opcodes.neg_long.d.T_neg_long_4");
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);
