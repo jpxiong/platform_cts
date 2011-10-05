@@ -2239,6 +2239,45 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @TestTargetNew(
         level = TestLevel.COMPLETE,
+        method = "WebViewClient.onReceivedSslError",
+        args = {}
+    )
+    public void testOnReceivedSslError() throws Throwable {
+        final class MockWebViewClient extends WebViewClient {
+            private String mErrorUrl;
+            private WebView mWebView;
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                mWebView = view;
+                mErrorUrl = error.getUrl();
+                handler.proceed();
+            }
+            public String errorUrl() {
+                return mErrorUrl;
+            }
+            public WebView webView() {
+                return mWebView;
+            }
+        }
+
+        startWebServer(true);
+        final String errorUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        final MockWebViewClient webViewClient = new MockWebViewClient();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWebView.setWebViewClient(webViewClient);
+                mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.loadUrl(errorUrl);
+            }
+        });
+        waitForUiThreadDone();
+
+        assertEquals(webViewClient.webView(), mWebView);
+        assertEquals(webViewClient.errorUrl(), errorUrl);
+    }
+
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
         method = "requestChildRectangleOnScreen",
         args = {View.class, Rect.class, boolean.class}
     )
