@@ -41,6 +41,15 @@ if [ "${JAVA_VERSION}" == "" ]; then
     exit
 fi
 
+# check debug flag and set up remote debugging
+if [ -n "${TF_DEBUG}" ]; then
+  if [ -z "${TF_DEBUG_PORT}" ]; then
+    TF_DEBUG_PORT=10088
+  fi
+  RDBG_FLAG=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=${TF_DEBUG_PORT}
+fi
+
+
 # check if in Android build env
 if [ ! -z ${ANDROID_BUILD_TOP} ]; then
     HOST=`uname`
@@ -72,5 +81,6 @@ for JAR in $JARS; do
     JAR_PATH=${JAR_PATH}:${JAR_DIR}/${JAR}
 done
 
-java -cp ${JAR_PATH} -DCTS_ROOT=${CTS_ROOT} com.android.cts.tradefed.command.CtsConsole "$@"
+java $RDBG_FLAG \
+  -cp ${JAR_PATH} -DCTS_ROOT=${CTS_ROOT} com.android.cts.tradefed.command.CtsConsole "$@"
 
