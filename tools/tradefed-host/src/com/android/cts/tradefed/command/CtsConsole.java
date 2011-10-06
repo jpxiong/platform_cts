@@ -16,6 +16,9 @@
 package com.android.cts.tradefed.command;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.result.ITestSummary;
+import com.android.cts.tradefed.result.ITestResultRepo;
+import com.android.cts.tradefed.result.TestResultRepo;
 import com.android.cts.tradefed.testtype.ITestCaseRepo;
 import com.android.cts.tradefed.testtype.TestCaseRepo;
 import com.android.tradefed.command.Console;
@@ -34,7 +37,6 @@ import java.util.Map;
 public class CtsConsole extends Console {
 
     private CtsBuildHelper mCtsBuild = null;
-
 
     CtsConsole() {
         super();
@@ -64,6 +66,15 @@ public class CtsConsole extends Console {
                 }
             }
         }, LIST_PATTERN, "packages");
+        trie.put(new Runnable() {
+            @Override
+            public void run() {
+                CtsBuildHelper ctsBuild = getCtsBuild();
+                if (ctsBuild != null) {
+                    listResults(ctsBuild);
+                }
+            }
+        }, LIST_PATTERN, "r(?:esults)?");
 
         // find existing help for 'LIST_PATTERN' commands, and append these commands help
         String listHelp = commandHelp.get(LIST_PATTERN);
@@ -71,9 +82,10 @@ public class CtsConsole extends Console {
             // no help? Unexpected, but soldier on
             listHelp = new String();
         }
-        String combinedHelp = String.format("%s" + LINE_SEPARATOR +
-                "\tp[lans]  List all CTS test plans" + LINE_SEPARATOR +
-                "\tpackages  List all CTS packages" + LINE_SEPARATOR, listHelp);
+        String combinedHelp = listHelp +
+                "\tp[lans]\t\tList all CTS test plans" + LINE_SEPARATOR +
+                "\tpackages\tList all CTS packages" + LINE_SEPARATOR +
+                "\tr[esults]\tList all CTS results" + LINE_SEPARATOR;
         commandHelp.put(LIST_PATTERN, combinedHelp);
     }
 
@@ -98,6 +110,17 @@ public class CtsConsole extends Console {
         ITestCaseRepo testCaseRepo = new TestCaseRepo(ctsBuild.getTestCasesDir());
         for (String packageUri : testCaseRepo.getPackageNames()) {
             printLine(packageUri);
+        }
+    }
+
+    private void listResults(CtsBuildHelper ctsBuild) {
+        ITestResultRepo testResultRepo = new TestResultRepo(ctsBuild.getResultsDir());
+        printLine(ctsBuild.getResultsDir().getAbsolutePath());
+        printLine("Session\t\tPass\tFail\tNot Executed\tStart time");
+        for (ITestSummary result : testResultRepo.getResults()) {
+            printLine(String.format("%d\t\t%d\t%d\t%d\t\t%s", result.getId(),
+                    result.getNumPassed(), result.getNumFailed(),
+                    result.getNumIncomplete(), result.getTimestamp()));
         }
     }
 
