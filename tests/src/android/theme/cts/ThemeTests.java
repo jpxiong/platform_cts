@@ -177,6 +177,7 @@ public class ThemeTests {
      * 2. There is no step 2. You're done. Congrats.
      */
     private static final ThemeInfo[] THEMES = new ThemeInfo[] {
+        // The themes marked with asterisks seem to blow up when generating a 0x0 bitmap...
         new ThemeInfo(android.R.style.Theme_Holo, "holo"),
         new ThemeInfo(android.R.style.Theme_Holo_Dialog, "holo_dialog"),
         new ThemeInfo(android.R.style.Theme_Holo_Dialog_MinWidth, "holo_dialog_minwidth"),
@@ -187,7 +188,7 @@ public class ThemeTests {
         new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge, "holo_dialogwhenlarge"),
         new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge_NoActionBar,
                 "holo_dialogwhenlarge_noactionbar"),
-        new ThemeInfo(android.R.style.Theme_Holo_InputMethod, "holo_inputmethod"),
+        new ThemeInfo(android.R.style.Theme_Holo_InputMethod, "holo_inputmethod"), // *
         new ThemeInfo(android.R.style.Theme_Holo_Light, "holo_light"),
         new ThemeInfo(android.R.style.Theme_Holo_Light_DarkActionBar, "holo_light_darkactionbar"),
         new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog, "holo_light_dialog"),
@@ -204,11 +205,11 @@ public class ThemeTests {
         new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar, "holo_light_noactionbar"),
         new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen,
                 "holo_light_noactionbar_fullscreen"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light_Panel, "holo_light_panel"),
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Panel, "holo_light_panel"), // *
         new ThemeInfo(android.R.style.Theme_Holo_NoActionBar, "holo_noactionbar"),
         new ThemeInfo(android.R.style.Theme_Holo_NoActionBar_Fullscreen,
                 "holo_noactionbar_fullscreen"),
-        new ThemeInfo(android.R.style.Theme_Holo_Panel, "holo_panel"),
+        new ThemeInfo(android.R.style.Theme_Holo_Panel, "holo_panel"), // *
         new ThemeInfo(android.R.style.Theme_Holo_Wallpaper, "holo_wallpaper"),
         new ThemeInfo(android.R.style.Theme_Holo_Wallpaper_NoTitleBar, "holo_wallpaper_notitlebar")
     };

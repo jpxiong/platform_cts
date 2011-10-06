@@ -16,14 +16,11 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
-
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
@@ -183,22 +180,6 @@ public class ActivitySnapshotTester {
                     break;
             }
 
-            Resources resources = activity.getResources();
-            int realWidth = resources.getDimensionPixelSize(R.dimen.reference_width);
-            int realHeight = resources.getDimensionPixelSize(R.dimen.reference_height);
-            View decorView = activity.getWindow().getDecorView();
-            int width = decorView.getWidth();
-            int height = decorView.getHeight();
-            int windowHeight = activity.getWindow().getAttributes().height;
-            int windowWidth = activity.getWindow().getAttributes().width;
-
-            if (mOrientation != realOrientation ||
-                    width != realWidth || height != realHeight ||
-                    width != windowWidth || height != windowHeight) {
-                mShouldRetryTest = true;
-                return;
-            }
-
             // seems more stable if we make sure to request the layout again
             // can't hurt if it's just one more time
             if (mShouldRequestLayout) {
@@ -217,6 +198,7 @@ public class ActivitySnapshotTester {
 
             Bitmap bmp = activity.getBitmapOfWindow();
             processor.processBitmap(bmp);
+            bmp.recycle();
         }
 
         /**
