@@ -146,8 +146,7 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
                 WindowManager.LayoutParams.TYPE_BASE_APPLICATION,
                 WindowManager.LayoutParams.FLAG_DITHER);
         assertEquals(WindowManager.LayoutParams.TYPE_CHANGED
-                | WindowManager.LayoutParams.FLAGS_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+                | WindowManager.LayoutParams.FLAGS_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(WindowManager.LayoutParams.TYPE_BASE_APPLICATION, mLayoutParams.type);
         assertEquals(WindowManager.LayoutParams.FLAG_DITHER, mLayoutParams.flags);
@@ -158,7 +157,6 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
                 WindowManager.LayoutParams.FLAG_DITHER, PixelFormat.JPEG);
         assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
                 | WindowManager.LayoutParams.FLAGS_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED
                 | WindowManager.LayoutParams.FORMAT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(WINDOW_WIDTH, mLayoutParams.width);
@@ -184,40 +182,35 @@ public class WindowManager_LayoutParamsTest extends AndroidTestCase {
         params = new WindowManager.LayoutParams();
         params.gravity = Gravity.TOP;
         mLayoutParams = new WindowManager.LayoutParams();
-        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.gravity, mLayoutParams.gravity);
 
         params = new WindowManager.LayoutParams();
         params.horizontalMargin = HORIZONTAL_MARGIN;
         mLayoutParams = new WindowManager.LayoutParams();
-        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.horizontalMargin, mLayoutParams.horizontalMargin);
 
         params = new WindowManager.LayoutParams();
         params.horizontalWeight = HORIZONTAL_WEIGHT;
         mLayoutParams = new WindowManager.LayoutParams();
-        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.horizontalWeight, mLayoutParams.horizontalWeight);
 
         params = new WindowManager.LayoutParams();
         params.verticalMargin = MARGIN;
         mLayoutParams = new WindowManager.LayoutParams();
-        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.verticalMargin, mLayoutParams.verticalMargin);
 
         params = new WindowManager.LayoutParams();
         params.verticalWeight = VERTICAL_WEIGHT;
         mLayoutParams = new WindowManager.LayoutParams();
-        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED
-                | WindowManager.LayoutParams.BUFFER_CHANGED,
+        assertEquals(WindowManager.LayoutParams.LAYOUT_CHANGED,
                 mLayoutParams.copyFrom(params));
         assertEquals(params.verticalWeight, mLayoutParams.verticalWeight);
     }
