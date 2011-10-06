@@ -27,7 +27,6 @@
 .method public run(J)J
 .limit regs 8
 
-       const-wide v6, 32380293
        double-to-long v0, v6
        const-wide v2, 123
        return-wide v2

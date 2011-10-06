@@ -18,7 +18,7 @@ package dot.junit.opcodes.add_long_2addr.d;
 
 public class T_add_long_2addr_6 {
 
-    public long run() {
+    public long run(double a) {
         return 0;
     }
 }
