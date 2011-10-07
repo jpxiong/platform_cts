@@ -138,6 +138,7 @@ public class ThemeTester {
                 mGeneratedImage.setImageBitmap(bitmap);
 
                 processor.processBitmap(bitmap);
+                bitmap.recycle();
 
                 mRoot.removeView(view);
             }
