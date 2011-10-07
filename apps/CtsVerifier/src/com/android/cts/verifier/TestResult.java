@@ -21,8 +21,9 @@ import android.content.Intent;
 
 /**
  * Object representing the result of a test activity like whether it succeeded or failed.
- * Use {@link #setPassedResult(Activity, String)} or {@link #setFailedResult(Activity, String)} from
- * a test activity like you would {@link Activity#setResult(int)} so that {@link TestListActivity}
+ * Use {@link #setPassedResult(Activity, String, String)} or
+ * {@link #setFailedResult(Activity, String, String)} from a test activity like you would
+ * {@link Activity#setResult(int)} so that {@link TestListActivity}
  * will persist the test result and update its adapter and thus the list view.
  */
 public class TestResult {
@@ -33,25 +34,30 @@ public class TestResult {
 
     private static final String TEST_NAME = "name";
     private static final String TEST_RESULT = "result";
+    private static final String TEST_DETAILS = "details";
 
     private final String mName;
-
     private final int mResult;
+    private final String mDetails;
 
     /** Sets the test activity's result to pass. */
-    public static void setPassedResult(Activity activity, String testId) {
-        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_PASSED, testId));
+    public static void setPassedResult(Activity activity, String testId, String testDetails) {
+        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_PASSED, testId,
+                testDetails));
     }
 
     /** Sets the test activity's result to failed. */
-    public static void setFailedResult(Activity activity, String testId) {
-        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_FAILED, testId));
+    public static void setFailedResult(Activity activity, String testId, String testDetails) {
+        activity.setResult(Activity.RESULT_OK, createResult(activity, TEST_RESULT_FAILED, testId,
+                testDetails));
     }
 
-    private static Intent createResult(Activity activity, int testResult, String testName) {
+    private static Intent createResult(Activity activity, int testResult, String testName,
+            String testDetails) {
         Intent data = new Intent(activity, activity.getClass());
         data.putExtra(TEST_NAME, testName);
         data.putExtra(TEST_RESULT, testResult);
+        data.putExtra(TEST_DETAILS, testDetails);
         return data;
     }
 
@@ -59,15 +65,17 @@ public class TestResult {
      * Convert the test activity's result into a {@link TestResult}. Only meant to be used by
      * {@link TestListActivity}.
      */
-    public static TestResult fromActivityResult(int resultCode, Intent data) {
+    static TestResult fromActivityResult(int resultCode, Intent data) {
         String name = data.getStringExtra(TEST_NAME);
         int result = data.getIntExtra(TEST_RESULT, TEST_RESULT_NOT_EXECUTED);
-        return new TestResult(name, result);
+        String details = data.getStringExtra(TEST_DETAILS);
+        return new TestResult(name, result, details);
     }
 
-    private TestResult(String name, int result) {
+    private TestResult(String name, int result, String details) {
         this.mName = name;
         this.mResult = result;
+        this.mDetails = details;
     }
 
     /** Return the name of the test like "com.android.cts.verifier.foo.FooTest" */
@@ -78,5 +86,10 @@ public class TestResult {
     /** Return integer test result. See test result constants. */
     public int getResult() {
         return mResult;
+    }
+
+    /** Return null or string containing test output. */
+    public String getDetails() {
+        return mDetails;
     }
 }

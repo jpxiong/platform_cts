@@ -17,8 +17,8 @@
 package com.android.cts.verifier;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,8 +52,8 @@ public class TestListActivity extends AbstractTestListActivity {
                 handleClearItemSelected();
                 return true;
 
-            case R.id.copy:
-                handleCopyItemSelected();
+            case R.id.view:
+                handleViewItemSelected();
                 return true;
 
             case R.id.export:
@@ -70,13 +70,12 @@ public class TestListActivity extends AbstractTestListActivity {
         Toast.makeText(this, R.string.test_results_cleared, Toast.LENGTH_SHORT).show();
     }
 
-    private void handleCopyItemSelected() {
+    private void handleViewItemSelected() {
         try {
             TestResultsReport report = new TestResultsReport(this, mAdapter);
-            ClipboardManager clipboardManager = (ClipboardManager)
-                    getSystemService(CLIPBOARD_SERVICE);
-            clipboardManager.setText(report.getContents());
-            Toast.makeText(this, R.string.test_results_copied, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ReportViewerActivity.class);
+            intent.putExtra(ReportViewerActivity.EXTRA_REPORT_CONTENTS, report.getContents());
+            startActivity(intent);
         } catch (IOException e) {
             Toast.makeText(this, R.string.test_results_error, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Couldn't copy test results report", e);

@@ -280,6 +280,11 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity
     }
 
     @Override
+    public String getTestDetails() {
+        return genReport();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
