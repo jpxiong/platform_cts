@@ -47,6 +47,10 @@
 
         <activity android:name=".TestListActivity" android:label="@string/test_list_title" />
 
+        <activity android:name=".ReportViewerActivity"
+                android:configChanges="keyboardHidden|orientation"
+                android:label="@string/report_viewer" />
+
         <provider android:name=".TestResultsProvider" 
                 android:authorities="com.android.cts.verifier.testresultsprovider" />
                 

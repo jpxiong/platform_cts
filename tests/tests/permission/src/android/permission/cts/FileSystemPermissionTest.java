@@ -157,7 +157,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that any publicly readable directories reachable from
-     * the root directory are not writable.
+     * the root directory are not writable.  World writable directories
+     * are a security hole and an application should only be able to
+     * write to it's own home directory.
      *
      * Note: Because not all directories are readable, this is a best-effort
      * test only.  Writable directories within unreadable subdirectories
@@ -170,25 +172,51 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     private static final Set<String> OTHER_RANDOM_DIRECTORIES = new HashSet<String>(
             Arrays.asList(
-                    "/data/backup",
-                    "/data/secure",
-                    "/data/system",
-                    "/data/dalvik-cache",
-                    "/data/property",
+                    "/data/anr",
                     "/data/app",
                     "/data/app-private",
-                    "/data/local",
-                    "/data/misc",
+                    "/data/backup",
+                    "/data/btips",
+                    "/data/btips/TI",
+                    "/data/btips/TI/opp",
+                    "/data/dalvik-cache",
+                    "/data/data/.drm",
+                    "/data/data/.drm/.wmdrm",
                     "/data/dontpanic",
-                    "/data/lost+found",
                     "/data/drm",
                     "/data/drm/rights",
-                    "/data/data/.drm",
-                    "/data/data/.drm/.wmdrm"
+                    "/data/dump",
+                    "/data/local",
+                    "/data/local/tmp/com.nuance.android.vsuite.vsuiteapp",
+                    "/data/log",
+                    "/data/lost+found",
+                    "/data/misc",
+                    "/data/misc/bluetooth",
+                    "/data/misc/dhcp",
+                    "/data/misc/wifi",
+                    "/data/misc/wifi/sockets",
+                    "/data/property",
+                    "/data/secure",
+                    "/data/shared",
+                    "/data/system",
+                    "/data/wifi",
+                    "/data/wiper",
+                    "/data/wpstiles",
+                    "/dbdata/databases",
+                    "/mnt_ext",
+                    "/mnt_ext/badablk2",
+                    "/mnt_ext/badablk3",
+                    "/mnt_ext/cache",
+                    "/mnt_ext/data"
             )
     );
 
     /**
+     * Verify that directories not discoverable by
+     * testAllOtherDirectoriesNotWritable are not writable.  World
+     * writable directories are a security hole and an application
+     * should only be able to write to it's own home directory.
+     *
      * Because /data and /data/data are not readable, we blindly try to
      * poke around in there looking for bad directories.  There has to be
      * a better way...
