@@ -21,10 +21,6 @@
   bug: 4464677
 },
 {
-  name: "android.security.cts.BrowserTest",
-  description: "Fixed in HC MR2"
-},
-{
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
 },
