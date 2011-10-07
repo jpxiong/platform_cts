@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -64,6 +63,11 @@ class TestPackageDef implements ITestPackageDef {
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
     // also maintain an index of known test classes
     private Collection<String> mTestClasses = new LinkedHashSet<String>();
+
+    // dynamic options, not parsed from package xml
+    private String mClassName;
+    private String mMethodName;
+    private TestFilter mExcludedTestFilter = new TestFilter();
 
     void setUri(String uri) {
         mUri = uri;
@@ -160,13 +164,34 @@ class TestPackageDef implements ITestPackageDef {
     /**
      * {@inheritDoc}
      */
-    public IRemoteTest createTest(File testCaseDir, String className, String methodName) {
+    @Override
+    public void setExcludedTestFilter(TestFilter excludeFilter) {
+        mExcludedTestFilter = excludeFilter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClassName(String className, String methodName) {
+        mClassName = className;
+        mMethodName = methodName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IRemoteTest createTest(File testCaseDir) {
+        mExcludedTestFilter.setTestInclusion(mClassName, mMethodName);
+        mTests = filterTests();
+
         if (mIsHostSideTest) {
             Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(getUri());
             hostTest.setJarFileName(mJarPath);
-            hostTest.setTests(filterTests(mTests, className, methodName));
+            hostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return hostTest;
         } else if (mIsVMHostTest) {
@@ -174,7 +199,7 @@ class TestPackageDef implements ITestPackageDef {
             VMHostTest vmHostTest = new VMHostTest();
             vmHostTest.setRunName(getUri());
             vmHostTest.setJarFileName(mJarPath);
-            vmHostTest.setTests(filterTests(mTests, className, methodName));
+            vmHostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (mIsSignatureTest) {
@@ -197,15 +222,13 @@ class TestPackageDef implements ITestPackageDef {
             // a reference app test is just a InstrumentationTest with one extra apk to install
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
             instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
-            return setInstrumentationTest(className, methodName, instrTest, testCaseDir, mTests);
+            return setInstrumentationTest(instrTest, testCaseDir);
         } else {
             Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
-            return setInstrumentationTest(className, methodName, instrTest, testCaseDir, mTests);
+            return setInstrumentationTest(instrTest, testCaseDir);
         }
     }
-
-
 
     /**
      * Populates given {@link InstrumentationApkTest} with data from the package xml
@@ -216,16 +239,17 @@ class TestPackageDef implements ITestPackageDef {
      * @param instrTest
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
-    private InstrumentationTest setInstrumentationTest(String className,
-            String methodName, InstrumentationApkTest instrTest, File testCaseDir,
-            Collection<TestIdentifier> testsToRun) {
+    private InstrumentationTest setInstrumentationTest(InstrumentationApkTest instrTest,
+            File testCaseDir) {
         instrTest.setRunName(getUri());
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
         instrTest.setTestPackageName(mTestPackageName);
-        instrTest.setClassName(className);
-        instrTest.setMethodName(methodName);
-        instrTest.setTestsToRun(testsToRun, true /* force batch mode */);
+        instrTest.setClassName(mClassName);
+        instrTest.setMethodName(mMethodName);
+        instrTest.setTestsToRun(mTests,
+                !mExcludedTestFilter.hasExclusion()
+                /* only force batch mode if no tests are excluded */);
         // mName means 'apk file name' for instrumentation tests
         instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
         mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
@@ -237,24 +261,13 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
-     * Filter the tests to run based on class and method name
+     * Filter the tests to run based on list of excluded tests, class and method name
      *
-     * @param tests the full set of tests in package
-     * @param className the test class name filter. <code>null</code> to run all test classes
-     * @param methodName the test method name. <code>null</code> to run all test methods
      * @return the filtered collection of tests
      */
-    private Collection<TestIdentifier> filterTests(Collection<TestIdentifier> tests,
-            String className, String methodName) {
-        Collection<TestIdentifier> filteredTests = new ArrayList<TestIdentifier>(tests.size());
-        for (TestIdentifier test : tests) {
-            if (className == null || test.getClassName().equals(className)) {
-                if (methodName == null || test.getTestName().equals(methodName)) {
-                    filteredTests.add(test);
-                }
-            }
-        }
-        return filteredTests;
+    private Collection<TestIdentifier> filterTests() {
+        mExcludedTestFilter.setTestInclusion(mClassName, mMethodName);
+        return mExcludedTestFilter.filter(mTests);
     }
 
     /**

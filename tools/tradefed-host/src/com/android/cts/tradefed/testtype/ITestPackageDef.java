@@ -46,7 +46,7 @@ public interface ITestPackageDef {
      * @return a {@link IRemoteTest} with all necessary data populated to run the test or
      *         <code>null</code> if test could not be created
      */
-    public IRemoteTest createTest(File testCaseDir, String className, String methodName);
+    public IRemoteTest createTest(File testCaseDir);
 
     /**
      * Determine if given test is defined in this package.
@@ -83,5 +83,21 @@ public interface ITestPackageDef {
      * @return the name of this test package.
      */
     public String getName();
+
+    /**
+     * Set the filter to use to exclude tests
+     *
+     * @param excludedTestFilter
+     */
+    public void setExcludedTestFilter(TestFilter excludedTestFilter);
+
+    /**
+     * Restrict this test package to run a specific class and method name
+     *
+     * @param className the test class to restrict this run to
+     * @param methodName the optional test method to restrict this run to, or <code>null</code> to
+     *            run all tests in class
+     */
+    public void setClassName(String className, String methodName);
 
 }

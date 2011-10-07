@@ -36,6 +36,8 @@ import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
+import junit.framework.Test;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,8 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
-import junit.framework.Test;
 
 /**
  * A {@link Test} for running CTS tests.
@@ -302,16 +302,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @return
      */
     private List<TestPackage> buildTestsToRun() {
-        List<TestPackage> testList = new LinkedList<TestPackage>();
+        List<TestPackage> testPkgList = new LinkedList<TestPackage>();
         try {
             ITestCaseRepo testRepo = createTestCaseRepo();
-            Collection<String> testUris = getTestPackageUrisToRun(testRepo);
+            Collection<ITestPackageDef> testPkgDefs = getTestPackagesToRun(testRepo);
 
-            for (String testUri : testUris) {
-                ITestPackageDef testPackage = testRepo.getTestPackage(testUri);
-                addTestPackage(testList, testUri, testPackage);
+            for (ITestPackageDef testPkgDef : testPkgDefs) {
+                addTestPackage(testPkgList, testPkgDef);
             }
-            if (testList.isEmpty()) {
+            if (testPkgList.isEmpty()) {
                 Log.logAndDisplay(LogLevel.WARN, LOG_TAG, "No tests to run");
             }
         } catch (FileNotFoundException e) {
@@ -319,57 +318,67 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         } catch (ParseException e) {
             throw new IllegalArgumentException("failed to parse CTS plan file", e);
         }
-        return testList;
+        return testPkgList;
     }
 
     /**
      * Adds a test package to the list of packages to test
      *
      * @param testList
-     * @param testUri
-     * @param testPackage
+     * @param testPkgDef
      */
-    private void addTestPackage(List<TestPackage> testList, String testUri,
-            ITestPackageDef testPackage) {
-        if (testPackage != null) {
-            IRemoteTest testForPackage = testPackage.createTest(mCtsBuild.getTestCasesDir(),
-                    mClassName, mMethodName);
-            if (testForPackage != null) {
-                Collection<TestIdentifier> knownTests = testPackage.getTests();
-                testList.add(new TestPackage(testPackage, testForPackage, knownTests));
-            }
-        } else {
-            Log.e(LOG_TAG, String.format("Could not find test package uri %s", testUri));
+    private void addTestPackage(List<TestPackage> testList, ITestPackageDef testPkgDef) {
+        IRemoteTest testForPackage = testPkgDef.createTest(mCtsBuild.getTestCasesDir());
+        if (testForPackage != null) {
+            Collection<TestIdentifier> knownTests = testPkgDef.getTests();
+            testList.add(new TestPackage(testPkgDef, testForPackage, knownTests));
         }
     }
 
     /**
-     * Return the list of test package uris to run
+     * Return the list of test package defs to run
      *
-     * @return the list of test package uris to run
+     * @return the list of test package defs to run
      * @throws ParseException
      * @throws FileNotFoundException
      */
-    private Collection<String> getTestPackageUrisToRun(ITestCaseRepo testRepo)
+    private Collection<ITestPackageDef> getTestPackagesToRun(ITestCaseRepo testRepo)
             throws ParseException, FileNotFoundException {
         // use LinkedHashSet to have predictable iteration order
-        Set<String> testUris = new LinkedHashSet<String>();
+        Set<ITestPackageDef> testPkgDefs = new LinkedHashSet<ITestPackageDef>();
         if (mPlanName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
             String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
             File ctsPlanFile = new File(mCtsBuild.getTestPlansDir(), ctsPlanRelativePath);
             IPlanXmlParser parser = createXmlParser();
             parser.parse(createXmlStream(ctsPlanFile));
-            testUris.addAll(parser.getTestUris());
+            for (String uri : parser.getTestUris()) {
+                if (!mExcludedPackageNames.contains(uri)) {
+                    ITestPackageDef testPackage = testRepo.getTestPackage(uri);
+                    testPackage.setExcludedTestFilter(parser.getExcludedTestFilter(uri));
+                    testPkgDefs.add(testPackage);
+                }
+            }
         } else if (mPackageNames.size() > 0){
             Log.i(LOG_TAG, String.format("Executing CTS test packages %s", mPackageNames));
-            testUris.addAll(mPackageNames);
+            for (String uri : mPackageNames) {
+                ITestPackageDef testPackage = testRepo.getTestPackage(uri);
+                if (testPackage != null) {
+                    testPkgDefs.add(testPackage);
+                } else {
+                    throw new IllegalArgumentException(String.format(
+                            "Could not find test package %s. " +
+                            "Use 'list packages' to see available packages." , uri));
+                }
+            }
         } else if (mClassName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test class %s", mClassName));
             // try to find package to run from class name
             String packageUri = testRepo.findPackageForTest(mClassName);
             if (packageUri != null) {
-                testUris.add(packageUri);
+                ITestPackageDef testPackageDef = testRepo.getTestPackage(packageUri);
+                testPackageDef.setClassName(mClassName, mMethodName);
+                testPkgDefs.add(testPackageDef);
             } else {
                 Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
                         "Could not find package for test class %s", mClassName));
@@ -378,8 +387,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             // should never get here - was checkFields() not called?
             throw new IllegalStateException("nothing to run?");
         }
-        testUris.removeAll(mExcludedPackageNames);
-        return testUris;
+        return testPkgDefs;
     }
 
     /**
