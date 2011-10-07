@@ -558,13 +558,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Start preview.
         mCamera.startPreview();
 
-        // Check setting orientation during preview is not allowed.
-        try {
-            mCamera.setDisplayOrientation(90);
-            fail("Should throw exception for setting orientation during preview.");
-        } catch (RuntimeException ex) {
-            // expected
-        }
+        // Check setting orientation during preview is allowed.
+        mCamera.setDisplayOrientation(90);
+        mCamera.setDisplayOrientation(180);
+        mCamera.setDisplayOrientation(270);
+        mCamera.setDisplayOrientation(00);
 
         terminateMessageLooper();
     }
