@@ -60,6 +60,10 @@
                     android:resource="@xml/accessory_filter" />
         </activity>
 
+        <activity android:name=".ReportViewerActivity"
+                android:configChanges="keyboardHidden|orientation"
+                android:label="@string/report_viewer" />
+
         <provider android:name=".TestResultsProvider" 
                 android:authorities="com.android.cts.verifier.testresultsprovider" />
                 
@@ -156,28 +160,6 @@
         
         <activity android:name=".bluetooth.InsecureClientActivity"
                 android:label="@string/bt_insecure_client"
-                android:configChanges="keyboardHidden|orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
-        </activity>
-
-        <activity android:name=".bluetooth.ConnectionAccessServerActivity"
-                android:label="@string/bt_connection_access_server"
-                android:configChanges="keyboardHidden|orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
-        </activity>
-        
-        <activity android:name=".bluetooth.ConnectionAccessClientActivity"
-                android:label="@string/bt_connection_access_client"
                 android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
