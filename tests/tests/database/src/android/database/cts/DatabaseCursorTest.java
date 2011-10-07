@@ -313,53 +313,6 @@ public class DatabaseCursorTest extends AndroidTestCase implements PerformanceTe
     }
 
     @LargeTest
-    public void testLoadingThreadClose() throws Exception {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-
-        final int count = 1000;
-        String sql = "INSERT INTO test (data) VALUES (?);";
-        SQLiteStatement s = mDatabase.compileStatement(sql);
-        for (int i = 0; i < count; i++) {
-            s.bindLong(1, i);
-            s.execute();
-        }
-
-        int maxRead = 11;
-        int initialRead = 5;
-        SQLiteCursor testCursor = (SQLiteCursor) mDatabase.rawQuery("select * from test;", null,
-                initialRead, maxRead);
-
-        TestObserver observer = new TestObserver(count, testCursor);
-        testCursor.registerDataSetObserver(observer);
-        testCursor.getCount();
-        testCursor.close();
-    }
-
-    @LargeTest
-    public void testLoadingThreadDeactivate() throws Exception {
-        mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data INT);");
-
-        final int count = 1000;
-        String sql = "INSERT INTO test (data) VALUES (?);";
-        SQLiteStatement s = mDatabase.compileStatement(sql);
-        for (int i = 0; i < count; i++) {
-            s.bindLong(1, i);
-            s.execute();
-        }
-
-        int maxRead = 11;
-        int initialRead = 5;
-        SQLiteCursor testCursor = (SQLiteCursor) mDatabase.rawQuery("select * from test;", null,
-                initialRead, maxRead);
-
-        TestObserver observer = new TestObserver(count, testCursor);
-        testCursor.registerDataSetObserver(observer);
-        testCursor.getCount();
-        testCursor.deactivate();
-        testCursor.close();
-    }
-
-    @LargeTest
     public void testManyRowsLong() throws Exception {
         mDatabase.beginTransaction();
         final int count = 9000;
