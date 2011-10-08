@@ -172,6 +172,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     private static final Set<String> OTHER_RANDOM_DIRECTORIES = new HashSet<String>(
             Arrays.asList(
+                    "/app-cache/ciq/socket",
                     "/data/anr",
                     "/data/app",
                     "/data/app-private",
