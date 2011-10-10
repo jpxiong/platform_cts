@@ -34,6 +34,10 @@ public class WordIteratorTest extends TestCase {
         }
     }
 
+    private void setCharSequence(String string) {
+        wi.setCharSequence(string, 0, string.length());
+    }
+
     private void checkIsWord(int beginning, int end) {
         checkIsWordWithSurrogate(beginning, end, -1);
     }
@@ -46,7 +50,7 @@ public class WordIteratorTest extends TestCase {
     }
 
     public void testEmptyString() {
-        wi.setCharSequence("");
+        setCharSequence("");
         assertEquals(BreakIterator.DONE, wi.following(0));
         assertEquals(BreakIterator.DONE, wi.preceding(0));
 
@@ -55,29 +59,29 @@ public class WordIteratorTest extends TestCase {
     }
 
     public void testOneWord() {
-        wi.setCharSequence("I");
+        setCharSequence("I");
         checkIsWord(0, 1);
 
-        wi.setCharSequence("am");
+        setCharSequence("am");
         checkIsWord(0, 2);
 
-        wi.setCharSequence("zen");
+        setCharSequence("zen");
         checkIsWord(0, 3);
     }
 
     public void testSpacesOnly() {
-        wi.setCharSequence(" ");
+        setCharSequence(" ");
         checkIsNotWord(0, 1);
 
-        wi.setCharSequence(", ");
+        setCharSequence(", ");
         checkIsNotWord(0, 2);
 
-        wi.setCharSequence(":-)");
+        setCharSequence(":-)");
         checkIsNotWord(0, 3);
     }
 
     public void testBeginningEnd() {
-        wi.setCharSequence("Well hello,   there! ");
+        setCharSequence("Well hello,   there! ");
         //                  0123456789012345678901
         checkIsWord(0, 4);
         checkIsWord(5, 10);
@@ -85,14 +89,14 @@ public class WordIteratorTest extends TestCase {
         checkIsWord(14, 19);
         checkIsNotWord(20, 21);
 
-        wi.setCharSequence("  Another - sentence");
+        setCharSequence("  Another - sentence");
         //                  012345678901234567890
         checkIsNotWord(0, 1);
         checkIsWord(2, 9);
         checkIsNotWord(10, 11);
         checkIsWord(12, 20);
 
-        wi.setCharSequence("This is \u0644\u0627 tested"); // Lama-aleph
+        setCharSequence("This is \u0644\u0627 tested"); // Lama-aleph
         //                  012345678     9     01234567
         checkIsWord(0, 4);
         checkIsWord(5, 7);
@@ -103,7 +107,7 @@ public class WordIteratorTest extends TestCase {
     public void testSurrogate() {
         final String BAIRKAN = "\uD800\uDF31";
 
-        wi.setCharSequence("one we" + BAIRKAN + "ird word");
+        setCharSequence("one we" + BAIRKAN + "ird word");
         //                  012345    67         890123456
 
         checkIsWord(0, 3);
@@ -111,14 +115,14 @@ public class WordIteratorTest extends TestCase {
         checkIsWordWithSurrogate(4, 11, 7);
         checkIsWord(12, 16);
 
-        wi.setCharSequence("one " + BAIRKAN + "xxx word");
+        setCharSequence("one " + BAIRKAN + "xxx word");
         //                  0123    45         678901234
 
         checkIsWord(0, 3);
         checkIsWordWithSurrogate(4, 9, 5);
         checkIsWord(10, 14);
 
-        wi.setCharSequence("one xxx" + BAIRKAN + " word");
+        setCharSequence("one xxx" + BAIRKAN + " word");
         //                  0123456    78         901234
 
         checkIsWord(0, 3);
