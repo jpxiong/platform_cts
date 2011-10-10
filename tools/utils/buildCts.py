@@ -108,6 +108,7 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
+
     plan.Exclude(r'android\.tests\.sigtest')
     plan.Exclude(r'android\.core.*')
     self.__WritePlan(plan, 'Android')
@@ -127,10 +128,6 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.apidemos\.cts')
     self.__WritePlan(plan, 'RefApp')
-
-    plan = tools.TestPlan(packages)
-    plan.Include(r'android\.performance.*')
-    self.__WritePlan(plan, 'Performance')
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.tests\.appsecurity')
