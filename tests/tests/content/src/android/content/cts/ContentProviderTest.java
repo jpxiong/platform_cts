@@ -330,12 +330,6 @@ public class ContentProviderTest extends AndroidTestCase {
         assertSame(mockContentProvider, ContentProvider.coerceToLocalContentProvider(transport));
 
         IContentProvider iContentProvider = new IContentProvider() {
-            public IBulkCursor bulkQuery(Uri url, String[] projection, String selection,
-                    String[] selectionArgs, String sortOrder, IContentObserver observer,
-                    CursorWindow window) throws RemoteException {
-                return null;
-            }
-
             public int bulkInsert(Uri url, ContentValues[] initialValues) {
                 return 0;
             }
