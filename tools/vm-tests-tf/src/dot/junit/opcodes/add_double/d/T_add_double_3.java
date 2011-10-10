@@ -18,7 +18,7 @@ package dot.junit.opcodes.add_double.d;
 
 public class T_add_double_3 {
 
-    public double run() {
+    public double run(long a, double b) {
         return 1;
     }
 }

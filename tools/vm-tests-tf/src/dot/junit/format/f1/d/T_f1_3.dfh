@@ -1,10 +1,10 @@
 // Processing 'out/classes_dasm/dot/junit/format/f1/d/T_f1_3.dex'...
-// Opened 'out/classes_dasm/dot/junit/format/f1/d/T_f1_3.dex', DEX version '035'
+// Opened 'out/classes_dasm/dot/junit/format/f1/d/T_f1_3.dex', DEX version '999'
 // DEX file header:
 // parsed: offset 0, len 8: magic               : 'dex
-// 035'
-//@mod    64 65 78 0A 30 33 35 00 
-    64 65 78 0A 30 33 36 00 
+// 999'
+//@mod    64 65 78 0A 39 39 39 00
+    64 65 78 0A 39 39 39 00
 // parsed: offset 8, len 4: checksum            : df0f35a3
     A3 35 0F DF 
 // parsed: offset 12, len 20: signature           : b564...1b93

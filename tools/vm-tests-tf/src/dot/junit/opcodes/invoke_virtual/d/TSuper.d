@@ -33,7 +33,7 @@
     
 .method public toInt(F)I 
 .limit regs 3
-    int-to-float v0, v2
+    float-to-int v0, v2
     return v0
 .end method
 

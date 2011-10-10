@@ -46,23 +46,7 @@ public class Test_if_eqz extends DxTestCase {
         T_if_eqz_1 t = new T_if_eqz_1();
         assertEquals(1234, t.run(Integer.MIN_VALUE));
     }
-    
-    /**
-     * @title Arguments = Float.MAX_VALUE
-     */
-    public void testB3() {
-        T_if_eqz_3 t = new T_if_eqz_3();
-        assertEquals(1234, t.run(Float.MAX_VALUE));
-    }
-    
-    /**
-     * @title Arguments = Float.MIN_VALUE
-     */
-    public void testB4() {
-        T_if_eqz_3 t = new T_if_eqz_3();
-        assertEquals(1234, t.run(Float.MIN_VALUE));
-    }
-    
+
     /**
      * @title Arguments = 0
      */
