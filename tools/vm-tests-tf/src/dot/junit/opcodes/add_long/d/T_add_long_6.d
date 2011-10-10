@@ -23,12 +23,10 @@
        return-void
 .end method
 
-.method public run()J
+.method public run(JD)J
 .limit regs 7
 
-       const-wide v2, 31415
-       const-wide v4, 3.1415
-       add-long v0, v2, v4
+       add-long v0, v3, v5
        return-wide v0
 .end method
 

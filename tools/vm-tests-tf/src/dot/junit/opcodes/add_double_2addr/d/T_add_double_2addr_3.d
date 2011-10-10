@@ -23,13 +23,12 @@
        return-void
 .end method
 
-.method public run()D
+.method public run(J)D
 .limit regs 7
 
-       const-wide v2, 31415
-       const-wide v4, 3.1415
-       add-double/2addr v4, v2
-       return-wide v4
+       const-wide v2, 3.1415
+       add-double/2addr v2, v5
+       return-wide v2
 .end method
 
 
