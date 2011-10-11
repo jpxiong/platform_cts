@@ -141,10 +141,6 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'RefApp')
 
     plan = tools.TestPlan(packages)
-    plan.Include(r'android\.performance.*')
-    self.__WritePlan(plan, 'Performance')
-
-    plan = tools.TestPlan(packages)
     plan.Include(r'android\.tests\.appsecurity')
     self.__WritePlan(plan, 'AppSecurity')
 
