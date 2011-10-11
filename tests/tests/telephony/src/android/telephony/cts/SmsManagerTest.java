@@ -96,8 +96,10 @@ public class SmsManagerTest extends AndroidTestCase {
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
-                    "30237",     // Fido
-                    "45008"     // KT
+                    "30237",    // Fido
+                    "45008",    // KT
+                    "45005",    // SKT Mobility
+                    "45002"     // SKT Mobility
             );
 
     // List of network operators that doesn't support Maltipart SMS message
