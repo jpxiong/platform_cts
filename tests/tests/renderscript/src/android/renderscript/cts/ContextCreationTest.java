@@ -50,6 +50,12 @@ public class ContextCreationTest extends
         super.setUp();
         mActivity = getActivity();
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        mActivity.destroyAll();
+        super.tearDown();
+    }
 
     /**
      * Test repeated recreation of the renderscript context with a
@@ -74,7 +80,7 @@ public class ContextCreationTest extends
     public void testCreationWithoutDelay() {
         for (int i = 0; i < NUM_RECREATE_ITERATIONS_WITHOUT_DELAY; i++) {
             if (LOG_RECREATE) {
-                Log.w(TAG, "Recreate (no delay) step " + i + " - pause");
+                Log.w(TAG, "Recreate (no delay) step " + i);
             }
             mActivity.recreateView();
         }
