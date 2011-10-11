@@ -31,6 +31,13 @@ class GestureDetectorTestUtil {
      */
     public static void testGestureDetector(InstrumentationTestCase testcase,
             GestureDetectorStubActivity activity) {
+        // wait for launching view complete
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         View view = activity.getView();
         TouchUtils.clickView(testcase, view);
         TouchUtils.longClickView(testcase, view);
