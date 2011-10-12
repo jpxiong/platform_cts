@@ -23,6 +23,8 @@ import android.hardware.Camera;
 import android.hardware.Camera.Area;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.ErrorCallback;
+import android.hardware.Camera.Face;
+import android.hardware.Camera.FaceDetectionListener;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
@@ -2675,4 +2677,117 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setParameters(parameters);
     }
 
+    @UiThreadTest
+    public void testFaceDetection() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testFaceDetectionByCamera(id);
+        }
+    }
+
+    private void testFaceDetectionByCamera(int cameraId) throws Exception {
+        final int FACE_DETECTION_TEST_DURATION = 3000;
+        initializeMessageLooper(cameraId);
+        mCamera.startPreview();
+        Parameters parameters = mCamera.getParameters();
+        int maxNumOfFaces = parameters.getMaxNumDetectedFaces();
+        assertTrue(maxNumOfFaces >= 0);
+        if (maxNumOfFaces == 0) {
+            try {
+                mCamera.startFaceDetection();
+                fail("Should throw an exception if face detection is not supported.");
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+            terminateMessageLooper();
+            return;
+        }
+
+        mCamera.startFaceDetection();
+        try {
+            mCamera.startFaceDetection();
+            fail("Starting face detection twice should throw an exception");
+        } catch (RuntimeException e) {
+            // expected
+        }
+        FaceListener listener = new FaceListener();
+        mCamera.setFaceDetectionListener(listener);
+        // Sleep some time so the camera has chances to detect faces.
+        Thread.sleep(FACE_DETECTION_TEST_DURATION);
+        // The face callback runs in another thread. Release the camera and stop
+        // the looper. So we do not access the face array from two threads at
+        // the same time.
+        terminateMessageLooper();
+
+        // Check if the optional fields are supported.
+        boolean optionalFieldSupported = false;
+        Face firstFace = null;
+        for (Face[] faces: listener.mFacesArray) {
+            for (Face face: faces) {
+                if (face != null) firstFace = face;
+            }
+        }
+        if (firstFace != null) {
+            if (firstFace.id != -1 || firstFace.leftEye != null
+                    || firstFace.rightEye != null || firstFace.mouth != null) {
+                optionalFieldSupported = true;
+            }
+        }
+
+        // Verify the faces array.
+        for (Face[] faces: listener.mFacesArray) {
+            testFaces(faces, maxNumOfFaces, optionalFieldSupported);
+        }
+    }
+
+    private class FaceListener implements FaceDetectionListener {
+        public ArrayList<Face[]> mFacesArray = new ArrayList<Face[]>();
+
+        @Override
+        public void onFaceDetection(Face[] faces, Camera camera) {
+            mFacesArray.add(faces);
+        }
+    }
+
+    private void testFaces(Face[] faces, int maxNumOfFaces,
+            boolean optionalFieldSupported) {
+        Rect bounds = new Rect(-1000, -1000, 1000, 1000);
+        assertNotNull(faces);
+        assertTrue(faces.length <= maxNumOfFaces);
+        for (int i = 0; i < faces.length; i++) {
+            Face face = faces[i];
+            Rect rect = face.rect;
+            // Check the bounds.
+            assertNotNull(rect);
+            assertTrue(rect.width() > 0);
+            assertTrue(rect.height() > 0);
+            assertTrue("Coordinates out of bounds. rect=" + rect,
+                    bounds.contains(rect) || Rect.intersects(bounds, rect));
+
+            // Check the score.
+            assertTrue(face.score >= 1 && face.score <= 100);
+
+            // Check id, left eye, right eye, and the mouth.
+            // Optional fields should be all valid or none of them.
+            if (!optionalFieldSupported) {
+                assertEquals(-1, face.id);
+                assertNull(face.leftEye);
+                assertNull(face.rightEye);
+                assertNull(face.mouth);
+            } else {
+                assertTrue(face.id != -1);
+                assertNotNull(face.leftEye);
+                assertNotNull(face.rightEye);
+                assertNotNull(face.mouth);
+                assertTrue(bounds.contains(face.leftEye.x, face.leftEye.y));
+                assertTrue(bounds.contains(face.rightEye.x, face.rightEye.y));
+                assertTrue(bounds.contains(face.mouth.x, face.mouth.y));
+                // ID should be unique.
+                if (i != faces.length - 1) {
+                    assertTrue(face.id != faces[i + 1].id);
+                }
+            }
+        }
+    }
 }
