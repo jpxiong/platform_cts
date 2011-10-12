@@ -128,7 +128,8 @@
         </activity>
 
         <activity android:name="android.media.cts.MediaStubActivity"
-            android:label="MediaStubActivity">
+            android:label="MediaStubActivity"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
