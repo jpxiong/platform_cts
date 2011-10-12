@@ -364,7 +364,6 @@ public class CalendarTest extends InstrumentationTestCase {
             }
             values.put(Events.ACCESS_LEVEL, seed % 4);
             values.put(Events.AVAILABILITY, seed % 2);
-            values.put(Events.HAS_ALARM, seed % 2);
             values.put(Events.HAS_EXTENDED_PROPERTIES, seed % 2);
             values.put(Events.HAS_ATTENDEE_DATA, seed % 2);
             values.put(Events.GUESTS_CAN_MODIFY, seed % 2);
@@ -468,7 +467,6 @@ public class CalendarTest extends InstrumentationTestCase {
             // TIME_ZONES.length]);
             values.put(Events.ACCESS_LEVEL, seed % 4);
             values.put(Events.AVAILABILITY, seed % 2);
-            values.put(Events.HAS_ALARM, seed % 2);
             values.put(Events.HAS_EXTENDED_PROPERTIES, seed % 2);
             values.put(Events.HAS_ATTENDEE_DATA, seed % 2);
             values.put(Events.GUESTS_CAN_MODIFY, seed % 2);
@@ -551,9 +549,18 @@ public class CalendarTest extends InstrumentationTestCase {
          * Looks up the specified Event in the database and returns the "selfAttendeeStatus"
          * value.
          */
-        public static int getSelfAttendeeStatusFromDB(ContentResolver resolver, long eventId) {
+        public static int lookupSelfAttendeeStatus(ContentResolver resolver, long eventId) {
             return getIntFromDatabase(resolver, Events.CONTENT_URI, eventId,
                     Events.SELF_ATTENDEE_STATUS);
+        }
+
+        /**
+         * Looks up the specified Event in the database and returns the "hasAlarm"
+         * value.
+         */
+        public static int lookupHasAlarm(ContentResolver resolver, long eventId) {
+            return getIntFromDatabase(resolver, Events.CONTENT_URI, eventId,
+                    Events.HAS_ALARM);
         }
     }
 
@@ -1093,7 +1100,7 @@ public class CalendarTest extends InstrumentationTestCase {
             int count = mContentResolver.update(uri, update, null, null);
             assertEquals(1, count);
 
-            int status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId1);
+            int status = EventHelper.lookupSelfAttendeeStatus(mContentResolver, eventId1);
             assertEquals(Attendees.ATTENDEE_STATUS_ACCEPTED, status);
 
         } finally {
@@ -1119,7 +1126,7 @@ public class CalendarTest extends InstrumentationTestCase {
         /*
          * Add a new, non-self attendee to the second event.
          */
-        attId1 = AttendeeHelper.addAttendee(mContentResolver, eventId2,
+        long attId4 = AttendeeHelper.addAttendee(mContentResolver, eventId2,
                 "Diana",
                 "diana@example.com",
                 Attendees.ATTENDEE_STATUS_ACCEPTED,
@@ -1129,7 +1136,7 @@ public class CalendarTest extends InstrumentationTestCase {
         /*
          * Confirm that the selfAttendeeStatus on the second event has the default value.
          */
-        int status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId2);
+        int status = EventHelper.lookupSelfAttendeeStatus(mContentResolver, eventId2);
         assertEquals(Attendees.ATTENDEE_STATUS_NONE, status);
 
         /*
@@ -1138,14 +1145,14 @@ public class CalendarTest extends InstrumentationTestCase {
          */
         ContentValues newSelf = new ContentValues();
         newSelf.put(Attendees.ATTENDEE_EMAIL, CalendarHelper.generateCalendarOwnerEmail(account));
-        count = mContentResolver.update(ContentUris.withAppendedId(Attendees.CONTENT_URI, attId1),
+        count = mContentResolver.update(ContentUris.withAppendedId(Attendees.CONTENT_URI, attId4),
                 newSelf, null, null);
         assertEquals(1, count);
 
         /*
          * Confirm that the event's selfAttendeeStatus has been updated.
          */
-        status = EventHelper.getSelfAttendeeStatusFromDB(mContentResolver, eventId2);
+        status = EventHelper.lookupSelfAttendeeStatus(mContentResolver, eventId2);
         assertEquals(Attendees.ATTENDEE_STATUS_ACCEPTED, status);
 
         /*
@@ -1158,6 +1165,17 @@ public class CalendarTest extends InstrumentationTestCase {
          *   to that of the remaining Attendee.  (There is no defined behavior for
          *   selfAttendeeStatus when there are multiple matching Attendees.)
          */
+
+        /*
+         * Test deletion, singly by ID and in bulk.
+         */
+        count = mContentResolver.delete(ContentUris.withAppendedId(Attendees.CONTENT_URI, attId4),
+                null, null);
+        assertEquals(1, count);
+
+        count = mContentResolver.delete(Attendees.CONTENT_URI, Attendees.EVENT_ID + "=?",
+                new String[] { String.valueOf(eventId1) });
+        assertEquals(4, count);     // 3 we created + 1 auto-added by the provider
 
         removeAndVerifyCalendar(account, calendarId);
     }
@@ -1181,6 +1199,15 @@ public class CalendarTest extends InstrumentationTestCase {
         eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
         long eventId1 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
         assertTrue(eventId1 >= 0);
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        long eventId2 = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId2 >= 0);
+
+        // No reminders, hasAlarm should be zero.
+        int hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId1);
+        assertEquals(0, hasAlarm);
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId2);
+        assertEquals(0, hasAlarm);
 
         /*
          * Add some reminders.
@@ -1192,6 +1219,17 @@ public class CalendarTest extends InstrumentationTestCase {
         long remId3 = ReminderHelper.addReminder(mContentResolver, eventId1,
                 20, Reminders.METHOD_SMS);  // SMS isn't allowed for this calendar
 
+        // Should have been set to 1 by provider.
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId1);
+        assertEquals(1, hasAlarm);
+
+        // Add a reminder to event2.
+        ReminderHelper.addReminder(mContentResolver, eventId2,
+                20, Reminders.METHOD_DEFAULT);
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId2);
+        assertEquals(1, hasAlarm);
+
+
         /*
          * Check the entries.
          */
@@ -1200,7 +1238,6 @@ public class CalendarTest extends InstrumentationTestCase {
             assertEquals(3, cursor.getCount());
             //DatabaseUtils.dumpCursor(cursor);
 
-            // Make sure METHOD_SMS appears exactly once.
             while (cursor.moveToNext()) {
                 int minutes = cursor.getInt(ReminderHelper.REMINDERS_MINUTES_INDEX);
                 int method = cursor.getInt(ReminderHelper.REMINDERS_METHOD_INDEX);
@@ -1247,6 +1284,40 @@ public class CalendarTest extends InstrumentationTestCase {
         // check it
         int method = ReminderHelper.lookupMethod(mContentResolver, remId3);
         assertEquals(Reminders.METHOD_EMAIL, method);
+
+        /*
+         * Delete some / all reminders and confirm that hasAlarm tracks it.
+         *
+         * You can also remove reminders from an event by updating the event_id column, but
+         * that's defined as producing undefined behavior, so we don't do it here.
+         */
+        count = mContentResolver.delete(Reminders.CONTENT_URI,
+                Reminders.EVENT_ID + "=? AND " + Reminders.MINUTES + ">=?",
+                new String[] { String.valueOf(eventId1), "15" });
+        assertEquals(2, count);
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId1);
+        assertEquals(1, hasAlarm);
+
+        // Delete all reminders from both events.
+        count = mContentResolver.delete(Reminders.CONTENT_URI,
+                Reminders.EVENT_ID + "=? OR " + Reminders.EVENT_ID + "=?",
+                new String[] { String.valueOf(eventId1), String.valueOf(eventId2) });
+        assertEquals(2, count);
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId1);
+        assertEquals(0, hasAlarm);
+        hasAlarm = EventHelper.lookupHasAlarm(mContentResolver, eventId2);
+        assertEquals(0, hasAlarm);
+
+        /*
+         * Add a couple of reminders and then delete one with the by-ID URI.
+         */
+        long remId4 = ReminderHelper.addReminder(mContentResolver, eventId1,
+                10, Reminders.METHOD_EMAIL);
+        long remId5 = ReminderHelper.addReminder(mContentResolver, eventId1,
+                15, Reminders.METHOD_EMAIL);
+        count = mContentResolver.delete(ContentUris.withAppendedId(Reminders.CONTENT_URI, remId4),
+                null, null);
+        assertEquals(1, count);
 
         removeAndVerifyCalendar(account, calendarId);
     }
