@@ -1386,11 +1386,42 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             assertEquals(focusMode, parameters.getFocusMode());
             checkFocusDistances(parameters);
             if (Parameters.FOCUS_MODE_AUTO.equals(focusMode)
-                    || Parameters.FOCUS_MODE_MACRO.equals(focusMode)) {
+                    || Parameters.FOCUS_MODE_MACRO.equals(focusMode)
+                    || Parameters.FOCUS_MODE_CONTINUOUS_VIDEO.equals(focusMode)
+                    || Parameters.FOCUS_MODE_CONTINUOUS_PICTURE.equals(focusMode)) {
+                Log.v(TAG, "Focus mode=" + focusMode);
                 mCamera.autoFocus(mAutoFocusCallback);
                 assertTrue(waitForFocusDone());
                 parameters = mCamera.getParameters();
                 checkFocusDistances(parameters);
+                float[] initialFocusDistances = new float[3];
+                parameters.getFocusDistances(initialFocusDistances);
+
+                // Focus position should not change after autoFocus call.
+                // Continuous autofocus should have stopped. Sleep some time and
+                // check. Make sure continuous autofocus is not working. If the
+                // focus mode is auto or macro, it is no harm to do the extra
+                // test.
+                Thread.sleep(500);
+                parameters = mCamera.getParameters();
+                float[] currentFocusDistances = new float[3];
+                parameters.getFocusDistances(currentFocusDistances);
+                assertEquals(initialFocusDistances, currentFocusDistances);
+
+                // Focus position should not change after stopping preview.
+                mCamera.stopPreview();
+                parameters = mCamera.getParameters();
+                parameters.getFocusDistances(currentFocusDistances);
+                assertEquals(initialFocusDistances, currentFocusDistances);
+
+                // Focus position should not change after taking a picture.
+                mCamera.startPreview();
+                mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+                waitForSnapshotDone();
+                parameters = mCamera.getParameters();
+                parameters.getFocusDistances(currentFocusDistances);
+                assertEquals(initialFocusDistances, currentFocusDistances);
+                mCamera.startPreview();
             }
         }
 
@@ -1863,6 +1894,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void assertEquals(Size expected, Size actual) {
         assertEquals(expected.width, actual.width);
         assertEquals(expected.height, actual.height);
+    }
+
+    private void assertEquals(float[] expected, float[] actual) {
+        assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i], 0.000001f);
+        }
     }
 
     private void assertNoLetters(String value, String key) {
