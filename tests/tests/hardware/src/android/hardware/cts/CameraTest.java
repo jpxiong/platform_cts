@@ -344,20 +344,20 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int nCameras = Camera.getNumberOfCameras();
         for (int id = 0; id < nCameras; id++) {
             Log.v(TAG, "Camera id=" + id);
-            testTakePictureByCamera(id);
+            initializeMessageLooper(id);
+            mCamera.startPreview();
+            testTakePictureByCamera();
+            terminateMessageLooper();
         }
     }
 
-    private void testTakePictureByCamera(int cameraId) throws Exception {
-        initializeMessageLooper(cameraId);
+    private void testTakePictureByCamera() throws Exception {
         Size pictureSize = mCamera.getParameters().getPictureSize();
-        mCamera.startPreview();
         mCamera.autoFocus(mAutoFocusCallback);
         assertTrue(waitForFocusDone());
         mJpegData = null;
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
-        terminateMessageLooper();
         assertTrue("Shutter callback not received", mShutterCallbackResult);
         assertTrue("Raw picture callback not received", mRawPictureCallbackResult);
         assertTrue("Jpeg picture callback not recieved", mJpegPictureCallbackResult);
@@ -810,12 +810,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int nCameras = Camera.getNumberOfCameras();
         for (int id = 0; id < nCameras; id++) {
             Log.v(TAG, "Camera id=" + id);
-            testJpegThumbnailSizeByCamera(id);
+            initializeMessageLooper(id);
+            testJpegThumbnailSizeByCamera(false);
+            terminateMessageLooper();
         }
     }
 
-    private void testJpegThumbnailSizeByCamera(int cameraId) throws Exception {
-        initializeMessageLooper(cameraId);
+    private void testJpegThumbnailSizeByCamera(boolean recording) throws Exception {
         // Thumbnail size parameters should have valid values.
         Parameters p = mCamera.getParameters();
         Size size = p.getJpegThumbnailSize();
@@ -826,7 +827,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(sizes.contains(mCamera.new Size(0, 0)));
 
         // Test if the thumbnail size matches the setting.
-        mCamera.startPreview();
+        if (!recording) mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         assertTrue(mJpegPictureCallbackResult);
@@ -845,14 +846,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Size actual = mCamera.getParameters().getJpegThumbnailSize();
         assertEquals(0, actual.width);
         assertEquals(0, actual.height);
-        mCamera.startPreview();
+        if (!recording) mCamera.startPreview();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         assertTrue(mJpegPictureCallbackResult);
         exif = new ExifInterface(JPEG_PATH);
         assertFalse(exif.hasThumbnail());
-
-        terminateMessageLooper();
     }
 
     @UiThreadTest
@@ -860,15 +859,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         int nCameras = Camera.getNumberOfCameras();
         for (int id = 0; id < nCameras; id++) {
             Log.v(TAG, "Camera id=" + id);
-            testJpegExifByCamera(id);
+            initializeMessageLooper(id);
+            testJpegExifByCamera(false);
+            terminateMessageLooper();
         }
     }
 
-    private void testJpegExifByCamera(int cameraId) throws Exception {
-        initializeMessageLooper(cameraId);
+    private void testJpegExifByCamera(boolean recording) throws Exception {
         Camera.Parameters parameters = mCamera.getParameters();
-        mCamera.startPreview();
-        double focalLength = (double)parameters.getFocalLength();
+        if (!recording) mCamera.startPreview();
+        double focalLength = parameters.getFocalLength();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         ExifInterface exif = new ExifInterface(JPEG_PATH);
@@ -878,8 +878,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
         checkGpsDataNull(exif);
-        double exifFocalLength = (double)exif.getAttributeDouble(
-                ExifInterface.TAG_FOCAL_LENGTH, -1);
+        double exifFocalLength = exif.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, -1);
         assertEquals(focalLength, exifFocalLength, 0.001);
 
         // Test gps exif tags.
@@ -889,14 +888,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         testGpsExifValues(parameters, -89.736071, -179.441983, 100000, 1199145602, "NETWORK");
 
         // Test gps tags do not exist after calling removeGpsData.
-        mCamera.startPreview();
+        if (!recording) mCamera.startPreview();
         parameters.removeGpsData();
         mCamera.setParameters(parameters);
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
-        terminateMessageLooper();
     }
 
     private void testGpsExifValues(Parameters parameters, double latitude,
@@ -2789,5 +2787,59 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 }
             }
         }
+    }
+
+    @UiThreadTest
+    public void testVideoSnapshot() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testVideoSnapshotByCamera(id);
+        }
+    }
+
+    private void testVideoSnapshotByCamera(int cameraId) throws Exception {
+        initializeMessageLooper(cameraId);
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (!parameters.isVideoSnapshotSupported()) return;
+
+        SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
+
+        // Set the preview size.
+        CamcorderProfile profile = CamcorderProfile.get(cameraId,
+                CamcorderProfile.QUALITY_LOW);
+        setPreviewSizeByProfile(parameters, profile);
+
+        // Set the biggest picture size.
+        Size biggestSize = mCamera.new Size(-1, -1);
+        for (Size size: parameters.getSupportedPictureSizes()) {
+            if (biggestSize.width < size.width) {
+                biggestSize = size;
+            }
+        }
+        parameters.setPictureSize(biggestSize.width, biggestSize.height);
+
+        mCamera.setParameters(parameters);
+        mCamera.startPreview();
+        mCamera.unlock();
+        MediaRecorder recorder = new MediaRecorder();
+        try {
+            recorder.setCamera(mCamera);
+            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            recorder.setProfile(profile);
+            recorder.setOutputFile("/dev/null");
+            recorder.setPreviewDisplay(holder.getSurface());
+            recorder.prepare();
+            recorder.start();
+            testTakePictureByCamera();
+            testJpegExifByCamera(true);
+            testJpegThumbnailSizeByCamera(true);
+            recorder.stop();
+        } finally {
+            recorder.release();
+            mCamera.lock();
+        }
+        terminateMessageLooper();
     }
 }
