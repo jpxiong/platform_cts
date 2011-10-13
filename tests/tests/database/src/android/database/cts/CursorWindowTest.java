@@ -16,7 +16,6 @@
 
 package android.database.cts;
 
-import com.android.common.ArrayListCursor;
 import com.google.android.collect.Lists;
 
 import dalvik.annotation.TestLevel;
@@ -28,6 +27,7 @@ import dalvik.annotation.ToBeFixed;
 import android.database.AbstractCursor;
 import android.database.CharArrayBuffer;
 import android.database.CursorWindow;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -81,10 +81,13 @@ public class CursorWindowTest extends AndroidTestCase {
     })
     public void testWriteCursorToWindow() throws Exception {
         // create cursor
-        String[] colNames = new String[]{"name", "number", "profit"};
+        String[] colNames = new String[]{"_id", "name", "number", "profit"};
         int colsize = colNames.length;
         ArrayList<ArrayList> list = createTestList(10, colsize);
-        AbstractCursor cursor = new ArrayListCursor(colNames, list);
+        MatrixCursor cursor = new MatrixCursor(colNames, list.size());
+        for (ArrayList row : list) {
+            cursor.addRow(row);
+        }
 
         // fill window
         CursorWindow window = new CursorWindow(false);
@@ -674,8 +677,7 @@ public class CursorWindowTest extends AndroidTestCase {
             list.add(col);
             for (int j = 0; j < cols; j++) {
                 // generate random number
-                Integer r = generator.nextInt();
-                col.add(r);
+                col.add(j == 0 ? i : generator.nextInt());
             }
         }
         return list;

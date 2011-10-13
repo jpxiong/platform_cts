@@ -17,7 +17,6 @@
 package android.widget.cts;
 
 import com.android.cts.stub.R;
-import com.android.common.ArrayListCursor;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -27,6 +26,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.test.InstrumentationTestCase;
@@ -43,7 +43,6 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 /**
  * Test {@link SimpleCursorAdapter}.
@@ -470,21 +469,22 @@ public class SimpleCursorAdapterTest extends InstrumentationTestCase {
      */
     @SuppressWarnings("unchecked")
     private Cursor createTestCursor(int colCount, int rowCount) {
-        ArrayList<ArrayList> list = new ArrayList<ArrayList>();
-        String[] columns = new String[colCount];
+        String[] columns = new String[colCount + 1];
         for (int i = 0; i < colCount; i++) {
             columns[i] = "column" + i;
         }
+        columns[colCount] = "_id";
 
+        MatrixCursor cursor = new MatrixCursor(columns, rowCount);
+        Object[] row = new Object[colCount + 1];
         for (int i = 0; i < rowCount; i++) {
-            ArrayList<String> row = new ArrayList<String>();
             for (int j = 0; j < colCount; j++) {
-                row.add("" + i + "" + j);
+                row[j] = "" + i + "" + j;
             }
-            list.add(row);
+            row[colCount] = i;
+            cursor.addRow(row);
         }
-
-        return new ArrayListCursor(columns, list);
+        return cursor;
     }
 
     private static class MockViewBinder implements ViewBinder {

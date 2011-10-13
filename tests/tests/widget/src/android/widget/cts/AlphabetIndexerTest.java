@@ -16,18 +16,15 @@
 
 package android.widget.cts;
 
-import com.android.common.ArrayListCursor;
-
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.test.AndroidTestCase;
 import android.widget.AlphabetIndexer;
-
-import java.util.ArrayList;
 
 @TestTargetClass(AlphabetIndexer.class)
 public class AlphabetIndexerTest extends AndroidTestCase {
@@ -36,7 +33,7 @@ public class AlphabetIndexerTest extends AndroidTestCase {
     private static final String[] NAMES_LIST = new String[]
         {"Andy", "Bergkamp", "David", "Jacky", "Kevin", "Messi", "Michael", "Steven"};
     private static final String ALPHABET = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final int SORTED_COLUMN_INDEX = 0;
+    private static final int SORTED_COLUMN_INDEX = 1;
 
     private static final int INDEX_OF_ARGENTINA = 0;
     private static final int INDEX_OF_CHINA = 2;
@@ -151,16 +148,13 @@ public class AlphabetIndexerTest extends AndroidTestCase {
 
     @SuppressWarnings("unchecked")
     private Cursor createCursor(String listName, String[] listData) {
-        String[] columns = { listName };
+        String[] columns = { "_id", listName };
 
-        ArrayList<ArrayList> list = new ArrayList<ArrayList>();
-        for (String cell : listData) {
-            ArrayList<String> row = new ArrayList<String>();
-            row.add(cell);
-            list.add(row);
+        MatrixCursor cursor = new MatrixCursor(columns, listData.length);
+        for (int i = 0; i < listData.length; i++) {
+            cursor.addRow(new Object[] { i, listData[i] });
         }
-
-        return new ArrayListCursor(columns, list);
+        return cursor;
     }
 
     /**

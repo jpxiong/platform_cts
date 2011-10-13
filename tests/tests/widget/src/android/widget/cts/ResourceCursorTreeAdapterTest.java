@@ -17,7 +17,6 @@
 package android.widget.cts;
 
 import com.android.cts.stub.R;
-import com.android.common.ArrayListCursor;
 
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.TestLevel;
@@ -26,13 +25,12 @@ import dalvik.annotation.TestTargetClass;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.test.InstrumentationTestCase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ResourceCursorTreeAdapter;
-
-import java.util.ArrayList;
 
 /**
  * Test {@link ResourceCursorTreeAdapter}.
@@ -186,21 +184,22 @@ public class ResourceCursorTreeAdapterTest extends InstrumentationTestCase {
      */
     @SuppressWarnings("unchecked")
     private Cursor createTestCursor(int colCount, int rowCount) {
-        ArrayList<ArrayList> list = new ArrayList<ArrayList>();
-        String[] columns = new String[colCount];
+        String[] columns = new String[colCount + 1];
         for (int i = 0; i < colCount; i++) {
             columns[i] = "column" + i;
         }
+        columns[colCount] = "_id";
 
+        MatrixCursor cursor = new MatrixCursor(columns, rowCount);
+        Object[] row = new Object[colCount + 1];
         for (int i = 0; i < rowCount; i++) {
-            ArrayList<String> row = new ArrayList<String>();
             for (int j = 0; j < colCount; j++) {
-                row.add("" + rowCount + "" + colCount);
+                row[j] = "" + rowCount + "" + colCount;
             }
-            list.add(row);
+            row[colCount] = i;
+            cursor.addRow(row);
         }
-
-        return new ArrayListCursor(columns, list);
+        return cursor;
     }
 
     private class MockResourceCursorTreeAdapter extends ResourceCursorTreeAdapter {
