@@ -83,9 +83,18 @@ public abstract class TestListAdapter extends BaseAdapter {
         /** Features necessary to run this test. */
         final String[] requiredFeatures;
 
+        public static TestListItem newTest(Context context, int titleResId, String testName,
+                Intent intent, String[] requiredFeatures) {
+            return newTest(context.getString(titleResId), testName, intent, requiredFeatures);
+        }
+
         public static TestListItem newTest(String title, String testName, Intent intent,
                 String[] requiredFeatures) {
             return new TestListItem(title, testName, intent, requiredFeatures);
+        }
+
+        public static TestListItem newCategory(Context context, int titleResId) {
+            return newCategory(context.getString(titleResId));
         }
 
         public static TestListItem newCategory(String title) {
