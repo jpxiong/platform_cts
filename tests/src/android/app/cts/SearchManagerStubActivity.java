@@ -49,11 +49,6 @@ public class SearchManagerStubActivity extends Activity {
         super.onCreate(icicle);
         mSearchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         mComponentName = getComponentName();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         String action = getIntent().getAction();
         if (action.equals(TEST_STOP_SEARCH)) {
             testStopSearch();
