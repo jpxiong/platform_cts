@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,22 +63,12 @@ public class InstrumentationTest extends InstrumentationTestCase {
     private Intent mIntent;
     private boolean mRunOnMainSyncResult;
     private Context mContext;
-    private MotionEvent mMotionEvent;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mInstrumentation = getInstrumentation();
         mContext = mInstrumentation.getTargetContext();
-        final long downTime = SystemClock.uptimeMillis();
-        final long eventTime = SystemClock.uptimeMillis();
-        // use coordinates for MotionEvent that do not include the status bar
-        // TODO: is there a more deterministic way to get these values
-        final long x = 100;
-        final long y = 100;
-        final int metaState = 0;
-        mMotionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y,
-                metaState);
         mIntent = new Intent(mContext, InstrumentationTestActivity.class);
         mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mActivity = (InstrumentationTestActivity) mInstrumentation.startActivitySync(mIntent);
@@ -269,13 +260,16 @@ public class InstrumentationTest extends InstrumentationTestCase {
         args = {MotionEvent.class}
     )
     public void testSendTrackballEventSync() throws Exception {
-        mInstrumentation.sendTrackballEventSync(mMotionEvent);
+        long now = SystemClock.uptimeMillis();
+        MotionEvent orig = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN,
+                100, 100, 0);
+        mInstrumentation.sendTrackballEventSync(orig);
         mInstrumentation.waitForIdleSync();
 
         MotionEvent motionEvent = mActivity.getMotionEvent();
-        assertEquals(mMotionEvent.getMetaState(), motionEvent.getMetaState());
-        assertEquals(mMotionEvent.getEventTime(), motionEvent.getEventTime());
-        assertEquals(mMotionEvent.getDownTime(), motionEvent.getDownTime());
+        assertEquals(orig.getMetaState(), motionEvent.getMetaState());
+        assertEquals(orig.getEventTime(), motionEvent.getEventTime());
+        assertEquals(orig.getDownTime(), motionEvent.getDownTime());
     }
 
     @TestTargetNew(
@@ -538,7 +532,20 @@ public class InstrumentationTest extends InstrumentationTestCase {
     public void testSendPointerSync() throws Exception {
         mInstrumentation.waitForIdleSync();
         mInstrumentation.setInTouchMode(true);
-        mInstrumentation.sendPointerSync(mMotionEvent);
+
+        // Send a touch event to the middle of the activity.
+        // We assume that the Activity is empty so there won't be anything in the middle
+        // to handle the touch.  Consequently the Activity should receive onTouchEvent
+        // because nothing else handled it.
+        Point size = new Point();
+        mActivity.getWindowManager().getDefaultDisplay().getSize(size);
+        final int x = size.x / 2;
+        final int y = size.y / 2;
+        long now = SystemClock.uptimeMillis();
+        MotionEvent orig = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN,
+                x, y, 0);
+        mInstrumentation.sendPointerSync(orig);
+
         mInstrumentation.waitForIdleSync();
         assertTrue(mActivity.isOnTouchEventCalled());
         mActivity.setOnTouchEventCalled(false);
