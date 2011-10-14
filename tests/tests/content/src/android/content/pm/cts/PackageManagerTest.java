@@ -785,4 +785,19 @@ public class PackageManagerTest extends AndroidTestCase {
         assertEquals(xmlName, mPackageManager.getResourcesForApplication(PACKAGE_NAME)
                 .getResourceName(resourceId));
     }
+
+    public void testGetPackageArchiveInfo() throws Exception {
+        final String apkPath = getContext().getPackageCodePath();
+        final String apkName = getContext().getPackageName();
+
+        final int flags = PackageManager.GET_SIGNATURES;
+
+        final PackageInfo pkgInfo = mPackageManager.getPackageArchiveInfo(apkPath, flags);
+
+        assertEquals("getPackageArchiveInfo should return the correct package name",
+                apkName, pkgInfo.packageName);
+
+        assertNotNull("Signatures should have been collected when GET_SIGNATURES flag specified",
+                pkgInfo.signatures);
+    }
 }
