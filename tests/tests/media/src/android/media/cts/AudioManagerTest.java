@@ -49,8 +49,10 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
+
 
 @TestTargetClass(AudioManager.class)
 public class AudioManagerTest extends AndroidTestCase {
@@ -491,6 +493,11 @@ public class AudioManagerTest extends AndroidTestCase {
                           AudioManager.STREAM_VOICE_CALL,
                           AudioManager.STREAM_RING };
 
+        TelephonyManager tm =
+            (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        //FIXME: use TelephonyManager.isVoiceCapable() when public
+        boolean voiceCapable = tm.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
+
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
         mAudioManager.adjustSuggestedStreamVolume(
                 ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, FLAG_SHOW_UI);
@@ -510,9 +517,18 @@ public class AudioManagerTest extends AndroidTestCase {
 
             // volume lower
             mAudioManager.setStreamVolume(streams[i], maxVolume, FLAG_SHOW_UI);
-            for (int k = maxVolume; k > 0; k--) {
+            for (int k = maxVolume; k > 1; k--) {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
                 assertEquals(k - 1, mAudioManager.getStreamVolume(streams[i]));
+            }
+            // on voice capable devices, ring and notification volumes cannot be set to 0
+            // by continous press on volume minus key
+            mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
+            if(!voiceCapable || (streams[i] != AudioManager.STREAM_RING &&
+                    streams[i] != AudioManager.STREAM_NOTIFICATION)) {
+                assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
+            } else {
+                assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
             }
 
             // test ringer modes changes
@@ -533,7 +549,14 @@ public class AudioManagerTest extends AndroidTestCase {
 
             // increasing the volume from 0 should change back to normal
             adjustStreamVolumeAndRingerMode(streams[i], ADJUST_RAISE);
-            assertEquals("Stream: " + i, 1, mAudioManager.getStreamVolume(streams[i]));
+            // on voice capable devices, ring and notification volumes will return to 1 when
+            // exiting silent mode. Otherwise, volume will stay at 0.
+            if(!voiceCapable || (streams[i] != AudioManager.STREAM_RING &&
+                    streams[i] != AudioManager.STREAM_NOTIFICATION)) {
+                assertEquals("Stream: " + i, 0, mAudioManager.getStreamVolume(streams[i]));
+            } else {
+                assertEquals("Stream: " + i, 1, mAudioManager.getStreamVolume(streams[i]));
+            }
             assertTrue("Stream: " + i, mAudioManager.getRingerMode() == RINGER_MODE_NORMAL);
 
             // volume raise
