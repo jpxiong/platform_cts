@@ -68,6 +68,18 @@ class VideoSurfaceView extends GLSurfaceView {
         Thread.sleep(SLEEP_TIME * 5);
         mMediaPlayer.setSurface(null);
 
+        Thread.sleep(SLEEP_TIME * 1);
+        SurfaceTexture surfaceTexture = new SurfaceTexture(0);
+        Surface surface = new Surface(surfaceTexture);
+        surface.release();
+        try {
+            mMediaPlayer.setSurface(surface);
+            throw new RuntimeException("setSurface with released Surface object didn't throw " +
+                    "IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
         while (mMediaPlayer.isPlaying()) {
             Thread.sleep(SLEEP_TIME);
         }
