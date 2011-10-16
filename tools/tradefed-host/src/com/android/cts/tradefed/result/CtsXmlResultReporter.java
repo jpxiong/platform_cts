@@ -63,9 +63,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private static final String TEST_RESULT_FILE_NAME = "testResult.xml";
     private static final String CTS_RESULT_FILE_VERSION = "1.11";
     private static final String CTS_VERSION = "ICS_tradefed";
-
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
+    private static final String SIGNATURE_TEST_PKG = "android.tests.sigtest";
 
     /** the XML namespace */
     static final String ns = null;
@@ -189,7 +189,6 @@ public class CtsXmlResultReporter extends CollectingTestListener {
                     "href=\"cts_result.xsl\"");
             serializeResultsDoc(serializer, startTimestamp, endTime);
             serializer.endDocument();
-            // TODO: output not executed timeout omitted counts
             String msg = String.format("XML test result file generated at %s. Passed %d, " +
                     "Failed %d, Not Executed %d", getReportPath(), getNumPassedTests(),
                     getNumFailedTests() + getNumErrorTests(), getNumIncompleteTests());
@@ -395,7 +394,13 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
         serializer.startTag(ns, "Cts");
         serializer.attribute(ns, "version", CTS_VERSION);
-        // TODO: consider outputting tradefed options here
+        // TODO: consider outputting other tradefed options here
+        serializer.startTag(ns, "IntValue");
+        serializer.attribute(ns, "name", "testStatusTimeoutMs");
+        // TODO: create a constant variable for testStatusTimeoutMs value. Currently it cannot be
+        // changed
+        serializer.attribute(ns, "value", "600000");
+        serializer.endTag(ns, "IntValue");
         serializer.endTag(ns, "Cts");
 
         serializer.endTag(ns, "HostInfo");
@@ -448,6 +453,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.attribute(ns, "name", getMetric(runResult, CtsTest.PACKAGE_NAME_METRIC));
         serializer.attribute(ns, "appPackageName", runResult.getName());
         serializer.attribute(ns, "digest", getMetric(runResult, CtsTest.PACKAGE_DIGEST_METRIC));
+        if (runResult.getName().equals(SIGNATURE_TEST_PKG)) {
+            serializer.attribute(ns, "signatureCheck", "true");
+        }
 
         // Dump the results.
 
