@@ -87,10 +87,15 @@ public class RenderscriptGLStubActivity extends Activity {
                 destroyRenderScriptGL();
             }
         }
+        
+        public void forceDestroy() {
+            onDetachedFromWindow();
+        }
     }
 
     // Custom view to use with RenderScript
     private HelloWorldView mView;
+    private HelloWorldView mView2;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -102,16 +107,28 @@ public class RenderscriptGLStubActivity extends Activity {
     }
 
     public void recreateView() {
+        HelloWorldView oldView = mView;
         mView = new HelloWorldView(this);
         setContentView(mView);
+        oldView.forceDestroy();
+    }
+    
+    public void destroyAll() {
+        if (mView != null) {
+            mView.forceDestroy();
+        }
+        if (mView2 != null) {
+            mView2.forceDestroy();
+        }
     }
 
     public void recreateMultiView() {
-        HelloWorldView view1 = new HelloWorldView(this);
-        HelloWorldView view2 = new HelloWorldView(this);
-        setContentView(view1);
-        setContentView(view2);
-        mView = view2;
+        HelloWorldView oldView = mView;
+        mView = new HelloWorldView(this);
+        mView2 = new HelloWorldView(this);
+        setContentView(mView);
+        setContentView(mView2);
+        oldView.forceDestroy();
     }
 
     @Override
