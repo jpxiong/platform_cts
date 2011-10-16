@@ -87,7 +87,7 @@ public class RenderscriptGLStubActivity extends Activity {
                 destroyRenderScriptGL();
             }
         }
-        
+
         public void forceDestroy() {
             onDetachedFromWindow();
         }
