@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 26;
+    private static final int NON_STATIC_FIELD_COUNT = 28;
 
     @MediumTest
     public void testMarshaling() throws Exception {
@@ -128,6 +128,8 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.setPassword(true);
         sentEvent.setRemovedCount(1);
         sentEvent.getText().add("Foo");
+        sentEvent.setMaxScrollX(1);
+        sentEvent.setMaxScrollY(1);
 
         AccessibilityRecord record = AccessibilityRecord.obtain();
         record.setAddedCount(1);
@@ -183,6 +185,10 @@ public class AccessibilityEventTest extends TestCase {
         assertEqualsText(expectedEvent.getText(), receivedEvent.getText());
         assertEquals("must have one record", expectedEvent.getRecordCount(),
                 receivedEvent.getRecordCount());
+        assertSame("maxScrollX has incorect value", expectedEvent.getMaxScrollX(),
+                receivedEvent.getMaxScrollX());
+        assertSame("maxScrollY has incorect value", expectedEvent.getMaxScrollY(),
+                receivedEvent.getMaxScrollY());
 
         AccessibilityRecord expectedRecord = expectedEvent.getRecord(0);
         AccessibilityRecord receivedRecord = receivedEvent.getRecord(0);
