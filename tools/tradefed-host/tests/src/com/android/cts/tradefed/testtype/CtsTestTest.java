@@ -43,7 +43,7 @@ public class CtsTestTest extends TestCase {
     /** the test fixture under test, with all external dependencies mocked out */
     private CtsTest mCtsTest;
     private ITestCaseRepo mMockRepo;
-    private IPlanXmlParser mMockPlanParser;
+    private ITestPlan mMockPlan;
     private ITestDevice mMockDevice;
     private ITestInvocationListener mMockListener;
     private StubCtsBuildHelper mStubBuildHelper;
@@ -59,7 +59,7 @@ public class CtsTestTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mMockRepo = EasyMock.createMock(ITestCaseRepo.class);
-        mMockPlanParser = EasyMock.createMock(IPlanXmlParser.class);
+        mMockPlan = EasyMock.createMock(ITestPlan.class);
         mMockDevice = EasyMock.createMock(ITestDevice.class);
         mMockListener = EasyMock.createNiceMock(ITestInvocationListener.class);
         mStubBuildHelper = new StubCtsBuildHelper();
@@ -73,8 +73,8 @@ public class CtsTestTest extends TestCase {
             }
 
             @Override
-            IPlanXmlParser createXmlParser() {
-                return mMockPlanParser;
+            ITestPlan createPlan() {
+                return mMockPlan;
             }
 
             @Override
@@ -172,10 +172,10 @@ public class CtsTestTest extends TestCase {
      */
     public void testRun_excludedPackage() throws DeviceNotAvailableException, ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
-        mMockPlanParser.parse((InputStream)EasyMock.anyObject());
+        mMockPlan.parse((InputStream)EasyMock.anyObject());
         Collection<String> uris = new ArrayList<String>(1);
         uris.add(PACKAGE_NAME);
-        EasyMock.expect(mMockPlanParser.getTestUris()).andReturn(uris);
+        EasyMock.expect(mMockPlan.getTestUris()).andReturn(uris);
 
         mCtsTest.addExcludedPackageName(PACKAGE_NAME);
 
@@ -190,12 +190,12 @@ public class CtsTestTest extends TestCase {
      */
     private void setParsePlanExceptations() throws ParseException {
         mCtsTest.setPlanName(PLAN_NAME);
-        mMockPlanParser.parse((InputStream)EasyMock.anyObject());
+        mMockPlan.parse((InputStream)EasyMock.anyObject());
         Collection<String> uris = new ArrayList<String>(1);
         uris.add(PACKAGE_NAME);
-        EasyMock.expect(mMockPlanParser.getTestUris()).andReturn(uris);
+        EasyMock.expect(mMockPlan.getTestUris()).andReturn(uris);
         TestFilter filter = new TestFilter();
-        EasyMock.expect(mMockPlanParser.getExcludedTestFilter(PACKAGE_NAME)).andReturn(
+        EasyMock.expect(mMockPlan.getExcludedTestFilter(PACKAGE_NAME)).andReturn(
                 filter);
         mMockPackageDef.setExcludedTestFilter(filter);
     }
@@ -290,13 +290,13 @@ public class CtsTestTest extends TestCase {
     }
 
     private void replayMocks(Object... mocks) {
-        EasyMock.replay(mMockRepo, mMockPlanParser, mMockDevice, mMockListener, mMockPackageDef,
+        EasyMock.replay(mMockRepo, mMockPlan, mMockDevice, mMockListener, mMockPackageDef,
                 mMockTest);
         EasyMock.replay(mocks);
     }
 
     private void verifyMocks(Object... mocks) {
-        EasyMock.verify(mMockRepo, mMockPlanParser, mMockDevice, mMockListener, mMockPackageDef,
+        EasyMock.verify(mMockRepo, mMockPlan, mMockDevice, mMockListener, mMockPackageDef,
                 mMockTest);
         EasyMock.verify(mocks);
     }

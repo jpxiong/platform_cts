@@ -19,9 +19,9 @@ import com.android.cts.tradefed.result.CtsXmlResultReporterTest;
 import com.android.cts.tradefed.targetprep.CtsSetupTest;
 import com.android.cts.tradefed.testtype.CtsTestTest;
 import com.android.cts.tradefed.testtype.JarHostTestTest;
-import com.android.cts.tradefed.testtype.PlanXmlParserTest;
 import com.android.cts.tradefed.testtype.TestPackageDefTest;
 import com.android.cts.tradefed.testtype.TestPackageXmlParserTest;
+import com.android.cts.tradefed.testtype.TestPlanTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -40,7 +40,7 @@ public class UnitTests extends TestSuite {
         addTestSuite(CtsSetupTest.class);
         addTestSuite(JarHostTestTest.class);
         addTestSuite(CtsTestTest.class);
-        addTestSuite(PlanXmlParserTest.class);
+        addTestSuite(TestPlanTest.class);
         addTestSuite(TestPackageXmlParserTest.class);
         addTestSuite(TestPackageDefTest.class);
     }

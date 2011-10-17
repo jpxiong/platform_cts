@@ -16,34 +16,55 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 
 /**
  * Interface for accessing test plan data.
  */
-interface IPlanXmlParser {
+public interface ITestPlan {
 
     /**
-     * Parse the test plan data from given stream.
+     * Populates the test plan data from given XML stream.
      *
      * @param xmlStream the {@link InputStream} that contains the test plan xml.
      */
     public void parse(InputStream xmlStream) throws ParseException;
 
     /**
-     * Gets the list of test uris parsed from the plan.
-     * <p/>
-     * Must be called after {@link IPlanXmlParser#parse(InputStream)}.
+     * Gets the list of test uris contained in this plan.
      */
     public Collection<String> getTestUris();
 
     /**
      * Gets the {@link TestFilter} that should be used to exclude tests from given package.
-     * <p/>
-     * Must be called after {@link IPlanXmlParser#parse(InputStream)}.
      */
     public TestFilter getExcludedTestFilter(String uri);
+
+    /**
+     * Add a package to this test plan
+     * @param uri
+     */
+    public void addPackage(String uri);
+
+    /**
+     * Add a excluded test to this test plan
+     *
+     * @param uri the package uri
+     * @param testToExclude the test to exclude for given package
+     */
+    public void addExcludedTest(String uri, TestIdentifier testToExclude);
+
+    /**
+     * Serialize the contents of this test plan.
+     *
+     * @param xmlOutStream the {@link OutputStream} to serialize test plan contents to
+     * @throws IOException
+     */
+    public void serialize(OutputStream xmlOutStream) throws IOException;
 }
