@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.cts.tradefed.testtype;
 
-import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -41,7 +41,6 @@ import java.util.LinkedHashSet;
  */
 class TestPackageDef implements ITestPackageDef {
 
-    private static final String LOG_TAG = "TestPackageDef";
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
 
@@ -59,7 +58,8 @@ class TestPackageDef implements ITestPackageDef {
     private String mTestPackageName = null;
     private String mDigest = null;
 
-    // use a LinkedHashSet for predictable iteration insertion-order, and fast lookups
+    // use a LinkedHashSet for predictable iteration insertion-order, and fast
+    // lookups
     private Collection<TestIdentifier> mTests = new LinkedHashSet<TestIdentifier>();
     // also maintain an index of known test classes
     private Collection<String> mTestClasses = new LinkedHashSet<String>();
@@ -125,6 +125,7 @@ class TestPackageDef implements ITestPackageDef {
     boolean isVMHostTest() {
         return mIsVMHostTest;
     }
+
     void setJarPath(String jarPath) {
         mJarPath = jarPath;
     }
@@ -187,7 +188,7 @@ class TestPackageDef implements ITestPackageDef {
         mTests = filterTests();
 
         if (mIsHostSideTest) {
-            Log.d(LOG_TAG, String.format("Creating host test for %s", mName));
+            CLog.d("Creating host test for %s", mName);
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(getUri());
             hostTest.setJarFileName(mJarPath);
@@ -195,7 +196,7 @@ class TestPackageDef implements ITestPackageDef {
             mDigest = generateDigest(testCaseDir, mJarPath);
             return hostTest;
         } else if (mIsVMHostTest) {
-            Log.d(LOG_TAG, String.format("Creating vm host test for %s", mName));
+            CLog.d("Creating vm host test for %s", mName);
             VMHostTest vmHostTest = new VMHostTest();
             vmHostTest.setRunName(getUri());
             vmHostTest.setJarFileName(mJarPath);
@@ -203,17 +204,19 @@ class TestPackageDef implements ITestPackageDef {
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
         } else if (mIsSignatureTest) {
-            // TODO: hardcode the runner/class/method for now, since current package xml
-            // points to specialized instrumentation. Eventually this special case for signatureTest
-            // can be removed, and it can be treated just like a normal InstrumentationTest
-            Log.d(LOG_TAG, String.format("Creating signature test %s", mName));
+            // TODO: hardcode the runner/class/method for now, since current package xml points to
+            // specialized instrumentation. Eventually this special case for signatureTest can be
+            // removed, and it can be treated just like a normal InstrumentationTest
+            CLog.d("Creating signature test %s", mName);
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
             instrTest.setPackageName(mAppNameSpace);
             instrTest.setRunnerName("android.test.InstrumentationTestRunner");
             instrTest.setClassName(SIGNATURE_TEST_CLASS);
             instrTest.setMethodName(SIGNATURE_TEST_METHOD);
-            // add signature test to list of known tests
-            addTest(new TestIdentifier(SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD));
+            // set expected tests to the single signature test
+            TestIdentifier t = new TestIdentifier(SIGNATURE_TEST_CLASS, SIGNATURE_TEST_METHOD);
+            mTests.clear();
+            mTests.add(t);
             // mName means 'apk file name' for instrumentation tests
             instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
             mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
@@ -224,14 +227,14 @@ class TestPackageDef implements ITestPackageDef {
             instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
             return setInstrumentationTest(instrTest, testCaseDir);
         } else {
-            Log.d(LOG_TAG, String.format("Creating instrumentation test for %s", mName));
+            CLog.d("Creating instrumentation test for %s", mName);
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
             return setInstrumentationTest(instrTest, testCaseDir);
         }
     }
 
     /**
-     * Populates given {@link InstrumentationApkTest} with data from the package xml
+     * Populates given {@link InstrumentationApkTest} with data from the package xml.
      *
      * @param testCaseDir
      * @param className
@@ -255,13 +258,13 @@ class TestPackageDef implements ITestPackageDef {
         mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
         if (mTests.size() > 1000) {
             // TODO: hack, large test suites can take longer to collect tests, increase timeout
-            instrTest.setCollectsTestsShellTimeout(10*60*1000);
+            instrTest.setCollectsTestsShellTimeout(10 * 60 * 1000);
         }
         return instrTest;
     }
 
     /**
-     * Filter the tests to run based on list of excluded tests, class and method name
+     * Filter the tests to run based on list of excluded tests, class and method name.
      *
      * @return the filtered collection of tests
      */
@@ -319,10 +322,10 @@ class TestPackageDef implements ITestPackageDef {
      * @param fileName the name of the file
      * @return a hex {@link String} of the digest
      */
-     String generateDigest(File fileDir, String fileName) {
+    String generateDigest(File fileDir, String fileName) {
         final String algorithm = "SHA-1";
         InputStream fileStream = null;
-        DigestInputStream d  = null;
+        DigestInputStream d = null;
         try {
             fileStream = getFileStream(fileDir, fileName);
             MessageDigest md = MessageDigest.getInstance(algorithm);
