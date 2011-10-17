@@ -16,8 +16,6 @@
 
 package com.android.cts.tradefed.result;
 
-import android.tests.getinfo.DeviceInfoConstants;
-
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
@@ -37,6 +35,8 @@ import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.StreamUtil;
 
 import org.kxml2.io.KXmlSerializer;
+
+import android.tests.getinfo.DeviceInfoConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -145,6 +145,16 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         super.testFailed(status, test, trace);
         Log.i(LOG_TAG, String.format("Test %s#%s: %s\n%s", test.getClassName(), test.getTestName(),
                 status.toString(), trace));
+    }
+
+    @Override
+    public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
+        super.testEnded(test, testMetrics);
+        TestRunResult results = getCurrentRunResults();
+        TestResult result = results.getTestResults().get(test);
+        Log.logAndDisplay(LogLevel.INFO, LOG_TAG,
+                String.format("%s#%s %s", test.getClassName(), test.getTestName(),
+                        result.getStatus()));
     }
 
     /**
