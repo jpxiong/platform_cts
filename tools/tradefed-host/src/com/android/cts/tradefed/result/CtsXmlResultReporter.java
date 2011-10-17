@@ -60,15 +60,21 @@ public class CtsXmlResultReporter extends CollectingTestListener {
 
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
-    private static final String TEST_RESULT_FILE_NAME = "testResult.xml";
+    static final String TEST_RESULT_FILE_NAME = "testResult.xml";
     private static final String CTS_RESULT_FILE_VERSION = "1.11";
     private static final String CTS_VERSION = "ICS_tradefed";
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
-    private static final String SIGNATURE_TEST_PKG = "android.tests.sigtest";
 
     /** the XML namespace */
     static final String ns = null;
+
+    // XML constants
+    static final String SUMMARY_TAG = "Summary";
+    static final String PASS_ATTR = "pass";
+    static final String TIMEOUT_ATTR = "timeout";
+    static final String NOT_EXECUTED_ATTR = "notExecuted";
+    static final String FAILED_ATTR = "failed";
 
     private static final String REPORT_DIR_NAME = "output-file-path";
     @Option(name=REPORT_DIR_NAME, description="root file system path to directory to store xml " +
@@ -423,15 +429,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      * @throws IOException
      */
     private void serializeTestSummary(KXmlSerializer serializer) throws IOException {
-        serializer.startTag(ns, "Summary");
-        serializer.attribute(ns, "failed", Integer.toString(getNumErrorTests() +
+        serializer.startTag(ns, SUMMARY_TAG);
+        serializer.attribute(ns, FAILED_ATTR, Integer.toString(getNumErrorTests() +
                 getNumFailedTests()));
-        // TODO: output notExecuted, timeout count
-        serializer.attribute(ns, "notExecuted",  Integer.toString(getNumIncompleteTests()));
+        serializer.attribute(ns, NOT_EXECUTED_ATTR,  Integer.toString(getNumIncompleteTests()));
         // ignore timeouts - these are reported as errors
-        serializer.attribute(ns, "timeout", "0");
-        serializer.attribute(ns, "pass", Integer.toString(getNumPassedTests()));
-        serializer.endTag(ns, "Summary");
+        serializer.attribute(ns, TIMEOUT_ATTR, "0");
+        serializer.attribute(ns, PASS_ATTR, Integer.toString(getNumPassedTests()));
+        serializer.endTag(ns, SUMMARY_TAG);
     }
 
     /**
@@ -459,24 +464,17 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             // ignore run results for the info collecting packages
             return;
         }
-        serializer.startTag(ns, "TestPackage");
-        serializer.attribute(ns, "name", getMetric(runResult, CtsTest.PACKAGE_NAME_METRIC));
-        serializer.attribute(ns, "appPackageName", runResult.getName());
-        serializer.attribute(ns, "digest", getMetric(runResult, CtsTest.PACKAGE_DIGEST_METRIC));
-        if (runResult.getName().equals(SIGNATURE_TEST_PKG)) {
-            serializer.attribute(ns, "signatureCheck", "true");
-        }
-
-        // Dump the results.
-
+        TestPackageResult packageResult = new TestPackageResult();
+        packageResult.setName(getMetric(runResult, CtsTest.PACKAGE_NAME_METRIC));
+        packageResult.setAppPackageName(runResult.getName());
+        packageResult.setDigest(getMetric(runResult, CtsTest.PACKAGE_DIGEST_METRIC));
         // organize the tests into data structures that mirror the expected xml output.
-        TestSuiteRoot suiteRoot = new TestSuiteRoot();
         for (Map.Entry<TestIdentifier, TestResult> testEntry : runResult.getTestResults()
                 .entrySet()) {
-            suiteRoot.insertTest(testEntry.getKey(), testEntry.getValue());
+            packageResult.insertTest(testEntry.getKey(), testEntry.getValue());
         }
-        suiteRoot.serialize(serializer);
-        serializer.endTag(ns, "TestPackage");
+        // dump the results
+        packageResult.serialize(serializer);
     }
 
     /**

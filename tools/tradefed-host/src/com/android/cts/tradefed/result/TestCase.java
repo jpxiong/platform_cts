@@ -15,9 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
-import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestResult.TestStatus;
 
 import org.kxml2.io.KXmlSerializer;
 
@@ -30,16 +28,29 @@ import java.util.Map;
  */
 class TestCase {
 
-    private final String mName;
+    static final String TAG = "TestCase";
 
-    Map<String, TestResult> mChildTestMap = new LinkedHashMap<String, TestResult>();
+    private String mName;
+
+    Map<String, Test> mChildTestMap = new LinkedHashMap<String, Test>();
 
     /**
      * Create a {@link TestCase}
      * @param testCaseName
      */
     public TestCase(String testCaseName) {
-        mName = testCaseName;
+        setName(testCaseName);
+    }
+
+    public TestCase() {
+    }
+
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public String getName() {
+        return mName;
     }
 
     /**
@@ -49,7 +60,18 @@ class TestCase {
      * @param testResult
      */
     public void insertTest(String testName, TestResult testResult) {
-        mChildTestMap.put(testName, testResult);
+        Test t = new Test(testName, testResult);
+        insertTest(t);
+    }
+
+    /**
+     * Inserts given test result
+     *
+     * @param testName
+     * @param testResult
+     */
+    private void insertTest(Test test) {
+        mChildTestMap.put(test.getName(), test);
     }
 
     /**
@@ -59,79 +81,13 @@ class TestCase {
      * @throws IOException
      */
     public void serialize(KXmlSerializer serializer) throws IOException {
-        serializer.startTag(CtsXmlResultReporter.ns, "TestCase");
-        serializer.attribute(CtsXmlResultReporter.ns, "name", mName);
+        serializer.startTag(CtsXmlResultReporter.ns, TAG);
+        serializer.attribute(CtsXmlResultReporter.ns, "name", getName());
         // unused
         serializer.attribute(CtsXmlResultReporter.ns, "priority", "");
-        for (Map.Entry<String, TestResult> resultEntry: mChildTestMap.entrySet()) {
-            serializeTestResult(serializer, resultEntry.getKey(), resultEntry.getValue());
+        for (Test t : mChildTestMap.values()) {
+            t.serialize(serializer);
         }
-       serializer.endTag(CtsXmlResultReporter.ns, "TestCase");
-    }
-
-    private void serializeTestResult(KXmlSerializer serializer, String name, TestResult result)
-            throws IOException {
-        serializer.startTag(CtsXmlResultReporter.ns, "Test");
-        serializer.attribute(CtsXmlResultReporter.ns, "name", name);
-        serializer.attribute(CtsXmlResultReporter.ns, "result", convertStatus(result.getStatus()));
-        serializer.attribute(CtsXmlResultReporter.ns, "starttime", TimeUtil.getTimestamp(
-                result.getStartTime()));
-        serializer.attribute(CtsXmlResultReporter.ns, "endtime", TimeUtil.getTimestamp(
-                result.getEndTime()));
-
-        if (result.getStackTrace() != null) {
-            String sanitizedStack = sanitizeStackTrace(result.getStackTrace());
-            serializer.startTag(CtsXmlResultReporter.ns, "FailedScene");
-            serializer.attribute(CtsXmlResultReporter.ns, "message",
-                    getFailureMessageFromStackTrace(sanitizedStack));
-            serializer.text(sanitizedStack);
-            serializer.endTag(CtsXmlResultReporter.ns, "FailedScene");
-        }
-
-        serializer.endTag(CtsXmlResultReporter.ns, "Test");
-
-    }
-
-    /**
-     * Convert a {@link TestStatus} to the result text to output in XML
-     *
-     * @param status the {@link TestStatus}
-     * @return
-     */
-    private String convertStatus(TestStatus status) {
-        switch (status) {
-            case ERROR:
-                return "fail";
-            case FAILURE:
-                return "fail";
-            case PASSED:
-                return "pass";
-            case INCOMPLETE:
-                return "notExecuted";
-        }
-        CLog.w("Unrecognized status %s", status);
-        return "fail";
-    }
-
-    /**
-     * Strip out any invalid XML characters that might cause the report to be unviewable.
-     * http://www.w3.org/TR/REC-xml/#dt-character
-     */
-    private static String sanitizeStackTrace(String trace) {
-        if (trace != null) {
-            return trace.replaceAll("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD]", "");
-        } else {
-            return null;
-        }
-    }
-
-    private static String getFailureMessageFromStackTrace(String stack) {
-        // This is probably too simplistic to work in all cases, but for now, just return first
-        // line of stack as failure message
-        int firstNewLine = stack.indexOf('\n');
-        if (firstNewLine != -1) {
-            return stack.substring(0, firstNewLine);
-        }
-        return stack;
+       serializer.endTag(CtsXmlResultReporter.ns, TAG);
     }
 }

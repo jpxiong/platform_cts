@@ -109,10 +109,12 @@ public class TestSummaryXml implements ITestSummary  {
     private void parseSummary(XmlPullParser parser) throws XmlPullParserException, IOException {
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.getName().equals("Summary")) {
-                mNumFailed = parseIntAttr(parser, "failed") + parseIntAttr(parser, "timeout");
-                mNumNotExecuted = parseIntAttr(parser, "notExecuted");
-                mNumPassed = parseIntAttr(parser, "pass");
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
+                    CtsXmlResultReporter.SUMMARY_TAG)) {
+                mNumFailed = parseIntAttr(parser, CtsXmlResultReporter.FAILED_ATTR) +
+                        parseIntAttr(parser, CtsXmlResultReporter.TIMEOUT_ATTR);
+                mNumNotExecuted = parseIntAttr(parser, CtsXmlResultReporter.NOT_EXECUTED_ATTR);
+                mNumPassed = parseIntAttr(parser, CtsXmlResultReporter.PASS_ATTR);
                 return;
               }
             eventType = parser.nextTag();
