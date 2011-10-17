@@ -350,7 +350,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
             String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
             File ctsPlanFile = new File(mCtsBuild.getTestPlansDir(), ctsPlanRelativePath);
-            IPlanXmlParser parser = createXmlParser();
+            ITestPlan parser = createPlan();
             parser.parse(createXmlStream(ctsPlanFile));
             for (String uri : parser.getTestUris()) {
                 if (!mExcludedPackageNames.contains(uri)) {
@@ -450,12 +450,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
-     * Factory method for creating a {@link PlanXmlParser}.
+     * Factory method for creating a {@link TestPlan}.
      * <p/>
      * Exposed for unit testing
      */
-    IPlanXmlParser createXmlParser() {
-        return new PlanXmlParser();
+    ITestPlan createPlan() {
+        return new TestPlan();
     }
 
     /**
