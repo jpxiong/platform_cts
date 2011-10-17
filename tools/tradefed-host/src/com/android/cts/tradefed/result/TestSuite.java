@@ -29,7 +29,9 @@ import java.util.Map;
  */
 class TestSuite {
 
-    private final String mName;
+    static final String TAG = "TestSuite";
+
+    private String mName;
 
     // use linked hash map for predictable iteration order
     Map<String, TestSuite> mChildSuiteMap = new LinkedHashMap<String, TestSuite>();
@@ -40,6 +42,23 @@ class TestSuite {
      */
     public TestSuite(String suiteName) {
         mName = suiteName;
+    }
+
+    public TestSuite() {
+    }
+
+    /**
+     * @return the name of this suite
+     */
+    public String getName() {
+        return mName;
+    }
+
+    /**
+     * Set the name of this suite
+     */
+    public void setName(String name) {
+        mName = name;
     }
 
     /**
@@ -100,7 +119,7 @@ class TestSuite {
      */
     public void serialize(KXmlSerializer serializer) throws IOException {
         if (mName != null) {
-            serializer.startTag(CtsXmlResultReporter.ns, "TestSuite");
+            serializer.startTag(CtsXmlResultReporter.ns, TAG);
             serializer.attribute(CtsXmlResultReporter.ns, "name", mName);
         }
         for (TestSuite childSuite : mChildSuiteMap.values()) {
@@ -110,7 +129,7 @@ class TestSuite {
             childCase.serialize(serializer);
         }
         if (mName != null) {
-            serializer.endTag(CtsXmlResultReporter.ns, "TestSuite");
+            serializer.endTag(CtsXmlResultReporter.ns, TAG);
         }
     }
 }
