@@ -324,6 +324,18 @@ public class ComputeTest extends RSBaseCompute {
         assertEquals(result, RS_MSG_TEST_PASSED);
     }
 
+    /**
+     * Test utility functions.
+     */
+    public void testUtilityFunctions() {
+        ScriptC_primitives t = new ScriptC_primitives(mRS,
+                                                      mRes,
+                                                      R.raw.utils);
+        t.invoke_test();
+        waitForMessage();
+        assertEquals(result, RS_MSG_TEST_PASSED);
+    }
+
     void setUpAllocation(Allocation a, int val) {
         Type t = a.getType();
         int x = t.getX();
