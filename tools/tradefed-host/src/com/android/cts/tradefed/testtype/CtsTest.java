@@ -26,6 +26,7 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
@@ -485,6 +486,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
         if (mCtsBuild == null) {
             throw new IllegalArgumentException("missing CTS build");
+        }
+        if ("CTS".equals(mPlanName)) {
+            CLog.i("Switching to CTS-TF plan instead of CTS plan for faster execution of vm-tests");
+            mPlanName = "CTS-TF";
         }
     }
 
