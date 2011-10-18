@@ -360,8 +360,8 @@
                         <xsl:for-each select="TestResult/TestPackage">
                             <TR>
                                 <TD>
-                                    <xsl:variable name="href"><xsl:value-of select="@name"/></xsl:variable>
-                                    <a href="#{$href}"><xsl:value-of select="@name"/></a>
+                                    <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
+                                    <a href="#{$href}"><xsl:value-of select="@appPackageName"/></a>
                                 </TD>
                                 <TD>
                                     <xsl:value-of select="count(TestSuite//Test[@result = 'pass'])"/>
@@ -419,8 +419,8 @@
                         <TABLE>
                             <TR>
                                 <TD class="none" align="left">
-                                    <xsl:variable name="href"><xsl:value-of select="@name"/></xsl:variable>
-                                    <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@name"/></a>
+                                    <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
+                                    <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/></a>
                                 </TD>
                             </TR>
                         </TABLE>
