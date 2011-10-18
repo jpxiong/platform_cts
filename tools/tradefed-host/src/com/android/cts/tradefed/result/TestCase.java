@@ -18,15 +18,18 @@ package com.android.cts.tradefed.result;
 import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Data structure that represents a "TestCase" XML element and its children.
  */
-class TestCase {
+class TestCase extends AbstractXmlPullParser {
 
     static final String TAG = "TestCase";
 
@@ -51,6 +54,13 @@ class TestCase {
 
     public String getName() {
         return mName;
+    }
+
+    /**
+     * Gets the child tests
+     */
+    public Collection<Test> getTests() {
+        return mChildTestMap.values();
     }
 
     /**
@@ -89,5 +99,31 @@ class TestCase {
             t.serialize(serializer);
         }
        serializer.endTag(CtsXmlResultReporter.ns, TAG);
+    }
+
+    /**
+     * Populates this class with test case result data parsed from XML.
+     *
+     * @param parser the {@link XmlPullParser}. Expected to be pointing at start
+     *            of a TestCase tag
+     */
+    @Override
+    void parse(XmlPullParser parser) throws XmlPullParserException, IOException {
+        if (!parser.getName().equals(TAG)) {
+            throw new XmlPullParserException(String.format(
+                    "invalid XML: Expected %s tag but received %s", TAG, parser.getName()));
+        }
+        setName(getAttribute(parser, "name"));
+        int eventType = parser.next();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(Test.TAG)) {
+                Test test = new Test();
+                test.parse(parser);
+                insertTest(test);
+            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
+                return;
+            }
+            eventType = parser.next();
+        }
     }
 }

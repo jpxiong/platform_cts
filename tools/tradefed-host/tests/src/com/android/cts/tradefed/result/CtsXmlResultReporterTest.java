@@ -141,7 +141,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         assertTrue(output.contains(
                 "<Summary failed=\"1\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />"));
         final String failureTag =
-                "<FailedScene message=\"this is a trace\">this is a tracemore trace";
+                "<FailedScene message=\"this is a trace\">      <StackTrace>this is a tracemore trace";
         assertTrue(output.contains(failureTag));
     }
 
