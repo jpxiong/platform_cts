@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Filter for {@link TestIdentifier}s.
  */
-class TestFilter {
+public class TestFilter {
 
     private final Set<String> mExcludedClasses;
     private final Set<TestIdentifier> mExcludedTests;

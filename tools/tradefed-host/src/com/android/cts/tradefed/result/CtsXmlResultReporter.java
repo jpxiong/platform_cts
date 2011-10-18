@@ -86,11 +86,14 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     @Option(name = CtsTest.PLAN_OPTION, description = "the test plan to run.")
     private String mPlanName = "NA";
 
+    @Option(name = "quiet-output", description = "Mute display of test results.")
+    private boolean mQuietOutput = false;
+
     protected IBuildInfo mBuildInfo;
 
     private String mStartTime;
 
-    private String mReportPath = "";
+    private String mDeviceSerial;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -121,8 +124,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
         mReportDir.mkdirs();
         mStartTime = getTimestamp();
-        Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Using ctsbuild %s",
-                mReportDir.getAbsolutePath()));
+        mDeviceSerial = buildInfo.getDeviceSerial();
+        logResult("Created result dir %s", mReportDir.getName());
     }
 
     /**
@@ -143,14 +146,21 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-        super.testFailed(status, test, trace);
-        Log.i(LOG_TAG, String.format("Test %s#%s: %s\n%s", test.getClassName(), test.getTestName(),
-                status.toString(), trace));
+    public void testRunStarted(String name, int numTests) {
+        if (name.equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+            logResult("Collecting device info");
+        } else if (!name.equals(getCurrentRunResults().getName())) {
+            // this is a new run
+            if (getCurrentRunResults().isRunComplete()) {
+                // display results from previous run
+                logCompleteRun(getCurrentRunResults());
+            }
+            logResult("-----------------------------------------");
+            logResult("Test package %s started", name);
+            logResult("-----------------------------------------");
+        }
+        super.testRunStarted(name, numTests);
     }
 
     @Override
@@ -158,22 +168,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         super.testEnded(test, testMetrics);
         TestRunResult results = getCurrentRunResults();
         TestResult result = results.getTestResults().get(test);
-        Log.logAndDisplay(LogLevel.INFO, LOG_TAG,
-                String.format("%s#%s %s", test.getClassName(), test.getTestName(),
-                        result.getStatus()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
-        super.testRunEnded(elapsedTime, runMetrics);
-        CLog.i("%s complete: Passed %d, Failed %d, Not Executed %d",
-                getCurrentRunResults().getName(), getCurrentRunResults().getNumPassedTests(),
-                getCurrentRunResults().getNumFailedTests() +
-                getCurrentRunResults().getNumErrorTests(),
-                getCurrentRunResults().getNumIncompleteTests());
+        String stack = result.getStackTrace() == null ? "" : "\n" + result.getStackTrace();
+        logResult("%s#%s %s %s", test.getClassName(), test.getTestName(), result.getStatus(),
+                stack);
     }
 
     /**
@@ -181,10 +178,32 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     @Override
     public void invocationEnded(long elapsedTime) {
+        // display the results of the last completed run
+        logCompleteRun(getCurrentRunResults());
         super.invocationEnded(elapsedTime);
         createXmlResult(mReportDir, mStartTime, elapsedTime);
         copyFormattingFiles(mReportDir);
         zipResults(mReportDir);
+    }
+
+    private void logResult(String format, Object... args) {
+        if (mQuietOutput) {
+            CLog.i(format, args);
+        } else {
+            Log.logAndDisplay(LogLevel.INFO, mDeviceSerial, String.format(format, args));
+        }
+    }
+
+    private void logCompleteRun(TestRunResult runResults) {
+        if (runResults.getName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+            logResult("Device info collection complete");
+            return;
+        }
+        logResult("%s package complete: Passed %d, Failed %d, Not Executed %d",
+                runResults.getName(), runResults.getNumPassedTests(),
+                runResults.getNumFailedTests() +
+                runResults.getNumErrorTests(),
+                runResults.getNumIncompleteTests());
     }
 
     /**
@@ -206,20 +225,15 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             serializeResultsDoc(serializer, startTimestamp, endTime);
             serializer.endDocument();
             String msg = String.format("XML test result file generated at %s. Passed %d, " +
-                    "Failed %d, Not Executed %d", getReportPath(), getNumPassedTests(),
+                    "Failed %d, Not Executed %d", mReportDir.getName(), getNumPassedTests(),
                     getNumFailedTests() + getNumErrorTests(), getNumIncompleteTests());
-            Log.logAndDisplay(LogLevel.INFO, LOG_TAG, msg);
-            Log.logAndDisplay(LogLevel.INFO, LOG_TAG, String.format("Time: %s",
-                    TimeUtil.formatElapsedTime(elapsedTime)));
+            logResult(msg);
+            logResult("Time: %s", TimeUtil.formatElapsedTime(elapsedTime));
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to generate report data");
         } finally {
             StreamUtil.closeStream(stream);
         }
-    }
-
-    private String getReportPath() {
-        return mReportPath;
     }
 
     /**
@@ -500,8 +514,6 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         File reportFile = new File(reportDir, TEST_RESULT_FILE_NAME);
         Log.i(LOG_TAG, String.format("Created xml report file at %s",
                 reportFile.getAbsolutePath()));
-        // TODO: convert to path relative to cts root
-        mReportPath = reportFile.getAbsolutePath();
         return new FileOutputStream(reportFile);
     }
 
