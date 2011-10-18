@@ -18,8 +18,11 @@ package com.android.cts.tradefed.result;
 import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ import java.util.Map;
 /**
  * Data structure that represents a "TestSuite" XML element and its children.
  */
-class TestSuite {
+class TestSuite extends AbstractXmlPullParser {
 
     static final String TAG = "TestSuite";
 
@@ -83,6 +86,20 @@ class TestSuite {
     }
 
     /**
+     * Gets all the child {@link TestSuite}s
+     */
+    public Collection<TestSuite> getTestSuites() {
+        return mChildSuiteMap.values();
+    }
+
+    /**
+     * Gets all the child {@link TestCase}s
+     */
+    public Collection<TestCase> getTestCases() {
+        return mChildTestCaseMap.values();
+    }
+
+    /**
      * Get the child {@link TestSuite} with given name, creating if necessary.
      *
      * @param suiteName
@@ -131,5 +148,50 @@ class TestSuite {
         if (mName != null) {
             serializer.endTag(CtsXmlResultReporter.ns, TAG);
         }
+    }
+
+    /**
+     * Populates this class with suite result data parsed from XML.
+     *
+     * @param parser the {@link XmlPullParser}. Expected to be pointing at start
+     *            of a TestSuite tag
+     */
+    @Override
+    void parse(XmlPullParser parser) throws XmlPullParserException, IOException {
+        if (!parser.getName().equals(TAG)) {
+            throw new XmlPullParserException(String.format(
+                    "invalid XML: Expected %s tag but received %s", TAG, parser.getName()));
+        }
+        setName(getAttribute(parser, "name"));
+        int eventType = parser.next();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(TestSuite.TAG)) {
+                TestSuite suite = new TestSuite();
+                suite.parse(parser);
+                insertSuite(suite);
+            } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
+                    TestCase.TAG)) {
+                TestCase testCase = new TestCase();
+                testCase.parse(parser);
+                insertTestCase(testCase);
+            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
+                return;
+            }
+            eventType = parser.next();
+        }
+    }
+
+    /**
+     * Adds a child {@link TestCase}.
+     */
+    public void insertTestCase(TestCase testCase) {
+        mChildTestCaseMap.put(testCase.getName(), testCase);
+    }
+
+    /**
+     * Adds a child {@link TestSuite}.
+     */
+    public void insertSuite(TestSuite suite) {
+        mChildSuiteMap.put(suite.getName(), suite);
     }
 }
