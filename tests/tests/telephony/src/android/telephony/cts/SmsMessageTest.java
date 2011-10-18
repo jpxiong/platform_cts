@@ -30,7 +30,6 @@ import android.test.AndroidTestCase;
 public class SmsMessageTest extends AndroidTestCase{
 
     private TelephonyManager mTelephonyManager;
-
     private static final String DISPLAY_MESSAGE_BODY = "test subject /test body";
     private static final String DMB = "{ testBody[^~\\] }";
     private static final String EMAIL_ADD = "foo@example.com";
@@ -184,7 +183,7 @@ public class SmsMessageTest extends AndroidTestCase{
         int[] result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER1, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(SmsMessage.MAX_USER_DATA_SEPTETS - sms.getMessageBody().length(), result[2]);
+        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
         assertEquals(pdu, toHexString(sms.getPdu()));
 
@@ -216,7 +215,7 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(msgBody, false);
         assertEquals(SMS_NUMBER2, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(SmsMessage.MAX_USER_DATA_SEPTETS - sms.getMessageBody().length(), result[2]);
+        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
 
         // Test createFromPdu Ucs to Sms
@@ -227,8 +226,18 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER3, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(SmsMessage.MAX_USER_DATA_SEPTETS - sms.getMessageBody().length(), result[2]);
+        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
+    }
+
+    private int getNumSeptets() {
+        if (TelephonyUtils.isSkt(mTelephonyManager)) {
+            return 80;
+        } else if (TelephonyUtils.isKt(mTelephonyManager)) {
+            return 90;
+        } else {
+            return SmsMessage.MAX_USER_DATA_SEPTETS;
+        }
     }
 
     @TestTargets({
