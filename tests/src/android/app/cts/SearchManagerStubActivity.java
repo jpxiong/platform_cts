@@ -62,6 +62,7 @@ public class SearchManagerStubActivity extends Activity {
     private void testOnCancelListener() {
         mCancelCalled = false;
         mSearchManager.setOnCancelListener(new SearchManager.OnCancelListener() {
+            @Override
             public void onCancel() {
                mCancelCalled = true;
             }
@@ -80,6 +81,7 @@ public class SearchManagerStubActivity extends Activity {
                         return false;
                     case 3:
                         assertTrue("cancel not called", mCancelCalled);
+                        pass();
                         return true;
                     default:
                         throw new IllegalArgumentException("Bad step " + step);
@@ -204,9 +206,7 @@ public class SearchManagerStubActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             try {
-                if (doStep(msg.what)) {
-                    pass();
-                } else {
+                if (!doStep(msg.what)) {
                     sendEmptyMessage(msg.what + 1);
                 }
             } catch (FailException ex) {
@@ -231,16 +231,8 @@ public class SearchManagerStubActivity extends Activity {
             super();
         }
 
-        public FailException(String detailMessage, Throwable throwable) {
-            super(detailMessage, throwable);
-        }
-
         public FailException(String detailMessage) {
             super(detailMessage);
-        }
-
-        public FailException(Throwable throwable) {
-            super(throwable);
         }
     }
 }
