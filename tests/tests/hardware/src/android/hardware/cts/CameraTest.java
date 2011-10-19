@@ -1875,7 +1875,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                         interval > mMinFrameInterval - intervalMargin);
 
                 // Check if the fps is within range.
-                double fpsMargin = 0.03;
+                double fpsMargin = 0.05;
                 double avgInterval = (double)(arrivalTime - mFrames.get(0))
                         / mFrames.size();
                 double fps = 1000.0 / avgInterval;
