@@ -61,10 +61,24 @@ public interface ITestPlan {
     public void addExcludedTest(String uri, TestIdentifier testToExclude);
 
     /**
+     * Adds the list of excluded tests for given package
+     *
+     * @param pkgUri
+     * @param excludedTests
+     */
+    public void addExcludedTests(String uri, Collection<TestIdentifier> excludedTests);
+
+    /**
      * Serialize the contents of this test plan.
      *
      * @param xmlOutStream the {@link OutputStream} to serialize test plan contents to
      * @throws IOException
      */
     public void serialize(OutputStream xmlOutStream) throws IOException;
+
+    /**
+     * @return the test plan name
+     */
+    public String getName();
+
 }

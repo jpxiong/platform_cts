@@ -42,7 +42,7 @@ public class CtsTestTest extends TestCase {
     private static final String PACKAGE_NAME = "test-uri";
     /** the test fixture under test, with all external dependencies mocked out */
     private CtsTest mCtsTest;
-    private ITestCaseRepo mMockRepo;
+    private ITestPackageRepo mMockRepo;
     private ITestPlan mMockPlan;
     private ITestDevice mMockDevice;
     private ITestInvocationListener mMockListener;
@@ -58,7 +58,7 @@ public class CtsTestTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mMockRepo = EasyMock.createMock(ITestCaseRepo.class);
+        mMockRepo = EasyMock.createMock(ITestPackageRepo.class);
         mMockPlan = EasyMock.createMock(ITestPlan.class);
         mMockDevice = EasyMock.createMock(ITestDevice.class);
         mMockListener = EasyMock.createNiceMock(ITestInvocationListener.class);
@@ -68,12 +68,12 @@ public class CtsTestTest extends TestCase {
 
         mCtsTest = new CtsTest() {
             @Override
-            ITestCaseRepo createTestCaseRepo() {
+            ITestPackageRepo createTestCaseRepo() {
                 return mMockRepo;
             }
 
             @Override
-            ITestPlan createPlan() {
+            ITestPlan createPlan(String planName) {
                 return mMockPlan;
             }
 
