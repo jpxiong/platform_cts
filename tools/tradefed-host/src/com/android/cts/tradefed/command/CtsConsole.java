@@ -16,18 +16,22 @@
 package com.android.cts.tradefed.command;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.result.ITestSummary;
 import com.android.cts.tradefed.result.ITestResultRepo;
+import com.android.cts.tradefed.result.ITestSummary;
+import com.android.cts.tradefed.result.PlanCreator;
 import com.android.cts.tradefed.result.TestResultRepo;
-import com.android.cts.tradefed.testtype.ITestCaseRepo;
-import com.android.cts.tradefed.testtype.TestCaseRepo;
+import com.android.cts.tradefed.testtype.ITestPackageRepo;
+import com.android.cts.tradefed.testtype.TestPackageRepo;
 import com.android.tradefed.command.Console;
+import com.android.tradefed.config.ArgsOptionParser;
+import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.RegexTrie;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +40,10 @@ import java.util.Map;
  */
 public class CtsConsole extends Console {
 
+    protected static final String ADD_PATTERN = "a(?:dd)?";
+
     private CtsBuildHelper mCtsBuild = null;
+
 
     CtsConsole() {
         super();
@@ -87,6 +94,28 @@ public class CtsConsole extends Console {
                 "\tpackages\tList all CTS packages" + LINE_SEPARATOR +
                 "\tr[esults]\tList all CTS results" + LINE_SEPARATOR;
         commandHelp.put(LIST_PATTERN, combinedHelp);
+
+        ArgRunnable<CaptureList> addDerivedCommand = new ArgRunnable<CaptureList>() {
+            @Override
+            public void run(CaptureList args) {
+                // Skip 2 tokens to get past addPattern and "derivedplan"
+                String[] flatArgs = new String[args.size() - 2];
+                for (int i = 2; i < args.size(); i++) {
+                    flatArgs[i - 2] = args.get(i).get(0);
+                }
+                CtsBuildHelper ctsBuild = getCtsBuild();
+                if (ctsBuild != null) {
+                    addDerivedPlan(ctsBuild, flatArgs);
+                }
+            }
+        };
+        trie.put(addDerivedCommand, ADD_PATTERN, "d(?:erivedplan?)", null);
+        commandHelp.put(ADD_PATTERN, String.format(
+                "%s help:" + LINE_SEPARATOR +
+                "\tderivedplan      Add a derived plan" + LINE_SEPARATOR,
+                ADD_PATTERN));
+
+
     }
 
     private void listPlans(CtsBuildHelper ctsBuild) {
@@ -107,20 +136,31 @@ public class CtsConsole extends Console {
     }
 
     private void listPackages(CtsBuildHelper ctsBuild) {
-        ITestCaseRepo testCaseRepo = new TestCaseRepo(ctsBuild.getTestCasesDir());
+        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir());
         for (String packageUri : testCaseRepo.getPackageNames()) {
             printLine(packageUri);
         }
     }
 
     private void listResults(CtsBuildHelper ctsBuild) {
+        printLine("Session\t\tPass\tFail\tNot Executed\tStart time\t\tPlan name");
         ITestResultRepo testResultRepo = new TestResultRepo(ctsBuild.getResultsDir());
-        printLine(ctsBuild.getResultsDir().getAbsolutePath());
-        printLine("Session\t\tPass\tFail\tNot Executed\tStart time");
-        for (ITestSummary result : testResultRepo.getResults()) {
-            printLine(String.format("%d\t\t%d\t%d\t%d\t\t%s", result.getId(),
+        for (ITestSummary result : testResultRepo.getSummaries()) {
+            printLine(String.format("%d\t\t%d\t%d\t%d\t\t%s\t%s", result.getId(),
                     result.getNumPassed(), result.getNumFailed(),
-                    result.getNumIncomplete(), result.getTimestamp()));
+                    result.getNumIncomplete(), result.getTimestamp(), result.getTestPlan()));
+        }
+    }
+
+    private void addDerivedPlan(CtsBuildHelper ctsBuild, String[] flatArgs) {
+        PlanCreator creator = new PlanCreator();
+        try {
+            ArgsOptionParser optionParser = new ArgsOptionParser(creator);
+            optionParser.parse(Arrays.asList(flatArgs));
+            creator.createAndSerializeDerivedPlan(ctsBuild);
+        } catch (ConfigurationException e) {
+            printLine("Error: " + e.getMessage());
+            printLine(ArgsOptionParser.getOptionHelp(false, creator));
         }
     }
 

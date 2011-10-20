@@ -24,49 +24,47 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * An implementation of {@link ITestResultRepo}.
+ * An implementation of {@link ITestResultsRepo}.
  */
 public class TestResultRepo implements ITestResultRepo {
 
-    private Map<Integer, ITestSummary> mResultMap;
+    /**
+     * ordered list of result directories. the index of each file is its session id.
+     */
+    private List<File> mResultDirs;
 
     /**
-     * Create a TestResultRepo from a testResultsDir
-     * @param testCasesDir
+     * Create a {@link TestResultRepo} from a directory of results
+     *
+     * @param testResultsDir the parent directory of results
      */
     public TestResultRepo(File testResultsDir) {
-        mResultMap = new LinkedHashMap<Integer, ITestSummary>();
-        File[] resultArray = testResultsDir.listFiles(new DirFilter());
+        mResultDirs = new ArrayList<File>();
+        File[] resultArray = testResultsDir.listFiles(new ResultDirFilter());
         if (resultArray != null) {
             List<File> resultList = new ArrayList<File>();
             Collections.addAll(resultList, resultArray);
             Collections.sort(resultList, new FileComparator());
             for (int i=0; i < resultList.size(); i++) {
-                ITestSummary result = parseResult(i, resultList.get(i));
-                if (result != null) {
-                    mResultMap.put(i, result);
+                File resultFile = new File(resultList.get(i),
+                        CtsXmlResultReporter.TEST_RESULT_FILE_NAME);
+                if (resultFile.exists()) {
+                    mResultDirs.add(i, resultList.get(i));
                 }
             }
         }
     }
 
-    private ITestSummary parseResult(int id, File resultDir) {
-        File resultFile = new File(resultDir, "testResult.xml");
-        if (!resultFile.exists()) {
-            CLog.e("Failed to find result xml in %s", resultDir.getName());
-            return null;
-        }
+    private ITestSummary parseSummary(int id, File resultDir) {
+        TestSummaryXml result = new TestSummaryXml(id, resultDir.getName());
         try {
-            TestSummaryXml result = new TestSummaryXml(id, resultDir.getName());
-            result.parse(new BufferedReader(new FileReader(resultFile)));
+            result.parse(new BufferedReader(new FileReader(new File(resultDir,
+                    CtsXmlResultReporter.TEST_RESULT_FILE_NAME))));
             return result;
         } catch (ParseException e) {
             CLog.e(e);
@@ -74,26 +72,48 @@ public class TestResultRepo implements ITestResultRepo {
             // should never happen, since we check for file existence above. Barf the stack trace
             CLog.e(e);
         }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ITestSummary> getSummaries() {
+        // parsing the summary data should be relatively quick, so just parse it every time
+        // rather than caching it
+        List<ITestSummary> summaries = new ArrayList<ITestSummary>(mResultDirs.size());
+        for (int i = 0; i < mResultDirs.size(); i++) {
+            summaries.add(parseSummary(i, mResultDirs.get(i)));
+        }
+        return summaries;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TestResults getResult(int sessionId) {
+        // TODO: consider caching the results in future
+        if (mResultDirs.size() <= sessionId) {
+            CLog.e("Session id %d does not exist", sessionId);
+            return null;
+        }
+        try {
+            TestResults results = new TestResults();
+            File resultFile = new File(mResultDirs.get(sessionId),
+                    CtsXmlResultReporter.TEST_RESULT_FILE_NAME);
+            results.parse(new BufferedReader(new FileReader(resultFile)));
+            return results;
+        } catch (FileNotFoundException e) {
+            CLog.e("Could not find result file for session %d", sessionId);
+        } catch (ParseException e) {
+            CLog.e("Failed to parse result file for session %d", sessionId);
+        }
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<ITestSummary> getResults() {
-        return mResultMap.values();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ITestSummary getResult(int sessionId) {
-        return mResultMap.get(sessionId);
-    }
-
-    private class DirFilter implements FileFilter {
+    private class ResultDirFilter implements FileFilter {
 
         /**
          * {@inheritDoc}
