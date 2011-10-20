@@ -22,7 +22,7 @@ import java.util.Collection;
 /**
  * Interface for accessing tests from the CTS repository.
  */
-public interface ITestCaseRepo {
+public interface ITestPackageRepo {
 
     /**
      * Get a {@link TestPackageDef} given a uri

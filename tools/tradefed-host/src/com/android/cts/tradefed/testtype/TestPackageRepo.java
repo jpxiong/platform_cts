@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Retrieves CTS test case definitions from the repository.
+ * Retrieves CTS test package definitions from the repository.
  */
-public class TestCaseRepo implements ITestCaseRepo {
+public class TestPackageRepo implements ITestPackageRepo {
 
     private static final String LOG_TAG = "TestCaseRepo";
 
@@ -44,11 +44,11 @@ public class TestCaseRepo implements ITestCaseRepo {
     private Map<String, TestPackageDef> mTestMap;
 
     /**
-     * Creates a {@link TestCaseRepo}, initialized from provided repo files
+     * Creates a {@link TestPackageRepo}, initialized from provided repo files
      *
      * @param testCaseDir directory containing all test case definition xml and build files
      */
-    public TestCaseRepo(File testCaseDir) {
+    public TestPackageRepo(File testCaseDir) {
         mTestCaseDir = testCaseDir;
         mTestMap = new Hashtable<String, TestPackageDef>();
         parse(mTestCaseDir);
