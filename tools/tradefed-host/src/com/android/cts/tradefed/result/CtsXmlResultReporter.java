@@ -17,6 +17,7 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.build.CtsBuildProvider;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.Log;
@@ -58,11 +59,12 @@ import java.util.Map;
  */
 public class CtsXmlResultReporter extends CollectingTestListener {
 
+
+
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
     private static final String CTS_RESULT_FILE_VERSION = "1.11";
-    private static final String CTS_VERSION = "ICS_tradefed";
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
 
@@ -75,6 +77,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     static final String TIMEOUT_ATTR = "timeout";
     static final String NOT_EXECUTED_ATTR = "notExecuted";
     static final String FAILED_ATTR = "failed";
+    static final String RESULT_TAG = "TestResult";
+    static final String PLAN_ATTR = "testPlan";
 
     private static final String REPORT_DIR_NAME = "output-file-path";
     @Option(name=REPORT_DIR_NAME, description="root file system path to directory to store xml " +
@@ -179,7 +183,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     @Override
     public void invocationEnded(long elapsedTime) {
         // display the results of the last completed run
-        logCompleteRun(getCurrentRunResults());
+        if (getCurrentRunResults().isRunComplete()) {
+            logCompleteRun(getCurrentRunResults());
+        }
         super.invocationEnded(elapsedTime);
         createXmlResult(mReportDir, mStartTime, elapsedTime);
         copyFormattingFiles(mReportDir);
@@ -246,8 +252,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     private void serializeResultsDoc(KXmlSerializer serializer, String startTime, String endTime)
             throws IOException {
-        serializer.startTag(ns, "TestResult");
-        serializer.attribute(ns, "testPlan", mPlanName);
+        serializer.startTag(ns, RESULT_TAG);
+        serializer.attribute(ns, PLAN_ATTR, mPlanName);
         serializer.attribute(ns, "starttime", startTime);
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
@@ -256,6 +262,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializeHostInfo(serializer);
         serializeTestSummary(serializer);
         serializeTestResults(serializer);
+        serializer.endTag(ns, RESULT_TAG);
     }
 
     /**
@@ -423,7 +430,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializer.endTag(ns, "Java");
 
         serializer.startTag(ns, "Cts");
-        serializer.attribute(ns, "version", CTS_VERSION);
+        serializer.attribute(ns, "version", CtsBuildProvider.CTS_BUILD_VERSION);
         // TODO: consider outputting other tradefed options here
         serializer.startTag(ns, "IntValue");
         serializer.attribute(ns, "name", "testStatusTimeoutMs");

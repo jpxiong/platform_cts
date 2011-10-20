@@ -32,6 +32,8 @@ public class CtsBuildProvider implements IBuildProvider {
     @Option(name="cts-install-path", description="the path to the cts installation to use")
     private String mCtsRootDirPath = System.getProperty("CTS_ROOT");
 
+    public static final String CTS_BUILD_VERSION = "ICS_tradefed";
+
     /**
      * {@inheritDoc}
      */
@@ -39,7 +41,7 @@ public class CtsBuildProvider implements IBuildProvider {
         if (mCtsRootDirPath == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
-        IFolderBuildInfo ctsBuild = new FolderBuildInfo("0", "cts", "cts");
+        IFolderBuildInfo ctsBuild = new FolderBuildInfo(CTS_BUILD_VERSION, "cts", "cts");
         ctsBuild.setRootDir(new File(mCtsRootDirPath));
         return ctsBuild;
     }
