@@ -15,7 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Repository for CTS results.
@@ -23,17 +23,18 @@ import java.util.Collection;
 public interface ITestResultRepo {
 
     /**
-     * @return the list of {@link ITestSummary}s
+     * @return the list of {@link ITestSummary}s. The index of the {@link ITestSummary} in the
+     * list is its session id
      */
-    Collection<ITestSummary> getResults();
+    public List<ITestSummary> getSummaries();
 
     /**
-     * Get the {@link ITestSummary} for given session id.
+     * Get the {@link TestResults} for given session id.
      *
      * @param sessionId the session id
-     * @return the {@link ITestSummary} or <code>null</null> if that session id
-     * does not exist
+     * @return the {@link TestResults} or <code>null</null> if the result with that session id
+     * cannot be retrieved
      */
-    ITestSummary getResult(int sessionId);
+    public TestResults getResult(int sessionId);
 
 }
