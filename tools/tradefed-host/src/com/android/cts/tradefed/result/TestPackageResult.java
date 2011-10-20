@@ -26,6 +26,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -144,5 +145,18 @@ class TestPackageResult  extends AbstractXmlPullParser {
             }
             eventType = parser.next();
         }
+    }
+
+    /**
+     * Return a list of {@link TestIdentifer}s contained in this result with the given status
+     *
+     * @param resultFilter the {@link CtsTestStatus} to filter by
+     * @return a collection of {@link TestIdentifer}s
+     */
+    public Collection<TestIdentifier> getTestsWithStatus(CtsTestStatus resultFilter) {
+        Collection<TestIdentifier> tests = new LinkedList<TestIdentifier>();
+        Deque<String> suiteNames = new LinkedList<String>();
+        mSuiteRoot.addTestsWithStatus(tests, suiteNames, resultFilter);
+        return tests;
     }
 }
