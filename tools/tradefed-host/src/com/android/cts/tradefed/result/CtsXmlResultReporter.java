@@ -59,8 +59,6 @@ import java.util.Map;
  */
 public class CtsXmlResultReporter extends CollectingTestListener {
 
-
-
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
@@ -262,7 +260,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializeHostInfo(serializer);
         serializeTestSummary(serializer);
         serializeTestResults(serializer);
-        serializer.endTag(ns, RESULT_TAG);
+        // TODO: not sure why, but the serializer doesn't like this statement
+        //serializer.endTag(ns, RESULT_TAG);
     }
 
     /**
