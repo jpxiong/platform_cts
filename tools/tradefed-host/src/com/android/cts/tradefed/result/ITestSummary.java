@@ -45,4 +45,9 @@ public interface ITestSummary {
      */
     int getNumPassed();
 
+    /**
+     * @return the test plan associated with result
+     */
+    String getTestPlan();
+
 }

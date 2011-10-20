@@ -19,22 +19,21 @@ import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 
 /**
  * A {@link ITestSummary} that parses summary data from the CTS result XML.
  */
-public class TestSummaryXml implements ITestSummary  {
+public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummary  {
 
     private final int mId;
     private final String mTimestamp;
     private int mNumFailed = 0;
     private int mNumNotExecuted = 0;
     private int mNumPassed = 0;
+    private String mPlan = "NA";
 
     /**
      * @param id
@@ -88,57 +87,32 @@ public class TestSummaryXml implements ITestSummary  {
     }
 
     /**
-     * Parse the summary data from the given input data.
-     *
-     * @param xmlReader the input XML
-     * @throws ParseException if failed to parse the summary data.
+     * {@inheritDoc}
      */
-    public void parse(Reader xmlReader) throws ParseException {
-        try {
-            XmlPullParserFactory fact = org.xmlpull.v1.XmlPullParserFactory.newInstance();
-            XmlPullParser parser = fact.newPullParser();
-            parser.setInput (xmlReader);
-            parseSummary(parser);
-        } catch (XmlPullParserException e) {
-           throw new ParseException(e);
-        } catch (IOException e) {
-            throw new ParseException(e);
-        }
+    @Override
+    public String getTestPlan() {
+        return mPlan ;
     }
 
-    private void parseSummary(XmlPullParser parser) throws XmlPullParserException, IOException {
+
+    @Override
+    void parse(XmlPullParser parser) throws XmlPullParserException, IOException {
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
+                    CtsXmlResultReporter.RESULT_TAG)) {
+                mPlan = getAttribute(parser, CtsXmlResultReporter.PLAN_ATTR);
+            } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
                     CtsXmlResultReporter.SUMMARY_TAG)) {
                 mNumFailed = parseIntAttr(parser, CtsXmlResultReporter.FAILED_ATTR) +
-                        parseIntAttr(parser, CtsXmlResultReporter.TIMEOUT_ATTR);
+                    parseIntAttr(parser, CtsXmlResultReporter.TIMEOUT_ATTR);
                 mNumNotExecuted = parseIntAttr(parser, CtsXmlResultReporter.NOT_EXECUTED_ATTR);
                 mNumPassed = parseIntAttr(parser, CtsXmlResultReporter.PASS_ATTR);
                 return;
               }
-            eventType = parser.nextTag();
+            eventType = parser.next();
         }
         throw new XmlPullParserException("Could not find Summary tag");
-    }
-
-    /**
-     * Parse an integer value from an XML attribute
-     *
-     * @param parser the {@link XmlPullParser}
-     * @param name the attribute name
-     * @return the parsed value or 0 if it could not be parsed
-     */
-    private int parseIntAttr(XmlPullParser parser, String name) {
-        try {
-            String value = parser.getAttributeValue(null, name);
-            if (value != null) {
-                return Integer.parseInt(value);
-            }
-        } catch (NumberFormatException e) {
-            // ignore
-        }
-        return 0;
     }
 }
 
