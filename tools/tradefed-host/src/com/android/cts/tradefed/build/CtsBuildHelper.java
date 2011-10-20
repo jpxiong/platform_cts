@@ -133,6 +133,16 @@ public class CtsBuildHelper {
     }
 
     /**
+     * @return a {@link File} representing the test plan with given name. note: no attempt will be
+     * made to ensure the plan actually exists
+     * @throws FileNotFoundException if plans directory does not exist
+     */
+    public File getTestPlanFile(String planName) throws FileNotFoundException {
+        String ctsPlanRelativePath = String.format("%s.xml", planName);
+        return new File(getTestPlansDir(), ctsPlanRelativePath);
+    }
+
+    /**
      * Check the validity of the CTS build file system structure.
      * @throws FileNotFoundException if any major directories are missing
      */
