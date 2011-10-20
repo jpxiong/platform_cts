@@ -305,7 +305,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private List<TestPackage> buildTestsToRun() {
         List<TestPackage> testPkgList = new LinkedList<TestPackage>();
         try {
-            ITestCaseRepo testRepo = createTestCaseRepo();
+            ITestPackageRepo testRepo = createTestCaseRepo();
             Collection<ITestPackageDef> testPkgDefs = getTestPackagesToRun(testRepo);
 
             for (ITestPackageDef testPkgDef : testPkgDefs) {
@@ -343,15 +343,14 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @throws ParseException
      * @throws FileNotFoundException
      */
-    private Collection<ITestPackageDef> getTestPackagesToRun(ITestCaseRepo testRepo)
+    private Collection<ITestPackageDef> getTestPackagesToRun(ITestPackageRepo testRepo)
             throws ParseException, FileNotFoundException {
         // use LinkedHashSet to have predictable iteration order
         Set<ITestPackageDef> testPkgDefs = new LinkedHashSet<ITestPackageDef>();
         if (mPlanName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
-            String ctsPlanRelativePath = String.format("%s.xml", mPlanName);
-            File ctsPlanFile = new File(mCtsBuild.getTestPlansDir(), ctsPlanRelativePath);
-            ITestPlan parser = createPlan();
+            File ctsPlanFile = mCtsBuild.getTestPlanFile(mPlanName);
+            ITestPlan parser = createPlan(mPlanName);
             parser.parse(createXmlStream(ctsPlanFile));
             for (String uri : parser.getTestUris()) {
                 if (!mExcludedPackageNames.contains(uri)) {
@@ -442,12 +441,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
-     * Factory method for creating a {@link ITestCaseRepo}.
+     * Factory method for creating a {@link ITestPackageRepo}.
      * <p/>
      * Exposed for unit testing
      */
-    ITestCaseRepo createTestCaseRepo() {
-        return new TestCaseRepo(mCtsBuild.getTestCasesDir());
+    ITestPackageRepo createTestCaseRepo() {
+        return new TestPackageRepo(mCtsBuild.getTestCasesDir());
     }
 
     /**
@@ -455,8 +454,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * <p/>
      * Exposed for unit testing
      */
-    ITestPlan createPlan() {
-        return new TestPlan();
+    ITestPlan createPlan(String planName) {
+        return new TestPlan(planName);
     }
 
     /**
