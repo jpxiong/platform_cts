@@ -126,7 +126,8 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
         mReportDir.mkdirs();
         mStartTime = getTimestamp();
-        mDeviceSerial = buildInfo.getDeviceSerial();
+        mDeviceSerial = buildInfo.getDeviceSerial() == null ? "unknown_device" :
+                buildInfo.getDeviceSerial();
         logResult("Created result dir %s", mReportDir.getName());
     }
 
@@ -306,7 +307,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
             serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
         }
-        serializer.attribute(ns, "deviceID", getBuildInfo().getDeviceSerial());
+        serializer.attribute(ns, "deviceID", mDeviceSerial);
         serializer.endTag(ns, "BuildInfo");
 
         serializeFeatureInfo(serializer, featureData);
