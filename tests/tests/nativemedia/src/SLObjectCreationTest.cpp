@@ -79,7 +79,7 @@ protected:
 
     /* Test setup*/
     virtual void SetUp() {
-        LOGV("Test Setup()");
+        ALOGV("Test Setup()");
         res = SL_RESULT_UNKNOWN_ERROR;
         engineItf = NULL;
         engineObj = NULL;
@@ -96,7 +96,7 @@ protected:
     }
 
     virtual void TearDown() {
-        LOGV("Test TearDown()");
+        ALOGV("Test TearDown()");
         if (audioPlayerObj) {
             (*audioPlayerObj)->Destroy(audioPlayerObj);
             audioPlayerObj = NULL;
@@ -306,60 +306,60 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 TEST_F(SLObjectCreationTest, testEngineCreation) {
-    LOGV("Test Fixture: EngineCreation");
+    ALOGV("Test Fixture: EngineCreation");
     // nothing to do here that isn't done in SetUp()
 }
 
 TEST_F(SLObjectCreationTest, testOutputMixCreation) {
-    LOGV("Test Fixture: OutputMixCreation");
+    ALOGV("Test Fixture: OutputMixCreation");
     OutputMixCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromUriCreation) {
-    LOGV("Test Fixture: AudioPlayerFromUriCreation");
+    ALOGV("Test Fixture: AudioPlayerFromUriCreation");
     // required for AudioPlayer creation
     OutputMixCreation();
     AudioPlayerFromUriCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation) {
-    LOGV("Test Fixture: AudioPlayerFromFdCreation");
+    ALOGV("Test Fixture: AudioPlayerFromFdCreation");
     // required for AudioPlayer creation
     OutputMixCreation();
     AudioPlayerFromFdCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromPcmBqCreation) {
-    LOGV("Test Fixture: AudioPlayerFromPcmBqCreation");
+    ALOGV("Test Fixture: AudioPlayerFromPcmBqCreation");
     // required for AudioPlayer creation
     OutputMixCreation();
     AudioPlayerFromPcmBqCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromTsAbqCreation) {
-    LOGV("Test Fixture: AudioPlayerFromTsAbqCreation");
+    ALOGV("Test Fixture: AudioPlayerFromTsAbqCreation");
     // required for AudioPlayer creation
     OutputMixCreation();
     AudioPlayerFromTsAbqCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromUriToPcmBqCreation) {
-    LOGV("Test Fixture: AudioPlayerFromUriToPcmBqCreation");
+    ALOGV("Test Fixture: AudioPlayerFromUriToPcmBqCreation");
     AudioPlayerFromUriToPcmBqCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromFdToPcmBqCreation) {
-    LOGV("Test Fixture: AudioPlayerFromFdToPcmBqCreation");
+    ALOGV("Test Fixture: AudioPlayerFromFdToPcmBqCreation");
     AudioPlayerFromFdToPcmBqCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioPlayerFromAdtsAbqToPcmBqCreation) {
-    LOGV("Test Fixture: AudioPlayerFromAdtsAbqToPcmBqCreation");
+    ALOGV("Test Fixture: AudioPlayerFromAdtsAbqToPcmBqCreation");
     AudioPlayerFromAdtsAbqToPcmBqCreation();
 }
 
 TEST_F(SLObjectCreationTest, testAudioRecorderCreation) {
-    LOGV("Test Fixture: AudioRecorderCreation");
+    ALOGV("Test Fixture: AudioRecorderCreation");
     AudioRecorderCreation();
 }
 

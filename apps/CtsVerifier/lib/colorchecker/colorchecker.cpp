@@ -363,7 +363,7 @@ bool findColorChecker(const unsigned char *image,
     const int outScale = width / outTargetWidth;
     const int outWidth = width / outScale;
     const int outHeight = height / outScale;
-    LOGV("Debug image dimensions: %d, %d", outWidth, outHeight);
+    ALOGV("Debug image dimensions: %d, %d", outWidth, outHeight);
 
     unsigned char *output = new unsigned char[outWidth * outHeight * totalChannels];
 
@@ -441,21 +441,21 @@ bool findColorChecker(const unsigned char *image,
         // Find the bottom-left and top-right corners
         if ( (bl = tl->getDNeighbor(3)) == NULL ||
              (tr = tl->getRNeighbor(5)) == NULL ) continue;
-        LOGV("Candidate at %d, %d", dex, dey);
-        LOGV("  Got BL and TR");
+        ALOGV("Candidate at %d, %d", dex, dey);
+        ALOGV("  Got BL and TR");
 
         // Find the bottom-right corner
         if ( tr->getDNeighbor(3) == NULL ) {
-            LOGV("  No BR from TR");
+            ALOGV("  No BR from TR");
             continue;
         }
         br = tr->getDNeighbor(3);
         if ( br != bl->getRNeighbor(5) ) {
-            LOGV("  BR from TR and from BL don't agree");
+            ALOGV("  BR from TR and from BL don't agree");
             continue;
         }
         br->getApproxCenter(&dex, &dey);
-        LOGV("  Got BR corner at %d, %d", dex, dey);
+        ALOGV("  Got BR corner at %d, %d", dex, dey);
 
         // Check that matching grid edge lengths are about the same
         float gridTopWidth = tl->distanceTo(tr);
@@ -463,14 +463,14 @@ bool findColorChecker(const unsigned char *image,
 
         if (gridTopWidth / gridBotWidth < minAspectRatio ||
             gridTopWidth / gridBotWidth > maxAspectRatio) continue;
-        LOGV("  Got reasonable widths: %f %f", gridTopWidth, gridBotWidth);
+        ALOGV("  Got reasonable widths: %f %f", gridTopWidth, gridBotWidth);
 
         float gridLeftWidth = tl->distanceTo(bl);
         float gridRightWidth = tr->distanceTo(br);
 
         if (gridLeftWidth / gridRightWidth < minAspectRatio ||
             gridLeftWidth / gridRightWidth > maxAspectRatio) continue;
-        LOGV("  Got reasonable heights: %f %f", gridLeftWidth, gridRightWidth);
+        ALOGV("  Got reasonable heights: %f %f", gridLeftWidth, gridRightWidth);
 
         // Calculate average grid spacing
         float gridAvgXGap = (gridTopWidth + gridBotWidth) / 2 / 5;
@@ -502,13 +502,13 @@ bool findColorChecker(const unsigned char *image,
             bestError > error) {
             bestGrid = grid;
             bestError = error;
-            LOGV("  Best candidate, error %f", error);
+            ALOGV("  Best candidate, error %f", error);
         }
     }
 
     // Check if a grid wasn't found
     if (bestError == -1) {
-        LOGV("No color checker found!");
+        ALOGV("No color checker found!");
     }
 
     // Make sure black square is in bottom-right corner
@@ -525,7 +525,7 @@ bool findColorChecker(const unsigned char *image,
         int brSum = brValues[0] + brValues[1] + brValues[2];
         if (brSum > tlSum) {
             // Grid is upside down, need to flip!
-            LOGV("Flipping grid to put grayscale ramp at bottom");
+            ALOGV("Flipping grid to put grayscale ramp at bottom");
             bestGrid = std::vector<int>(bestGrid.rbegin(), bestGrid.rend());
         }
     }
@@ -579,7 +579,7 @@ bool findColorChecker(const unsigned char *image,
             }
         }
         // Print out patch colors
-        IF_LOGV() {
+        IF_ALOGV() {
             for (int y = 0; y < 4; y++) {
                 char tmpMsg[256];
                 int cnt = 0;
@@ -595,7 +595,7 @@ bool findColorChecker(const unsigned char *image,
                                         "\t(xxx,xxx,xxx)");
                     }
                 }
-                LOGV("%s", tmpMsg);
+                ALOGV("%s", tmpMsg);
             }
         }
     }
@@ -705,7 +705,7 @@ bool findColorChecker(const unsigned char *image,
     }
 
     int64_t endTime = systemTime();
-    LOGV("Process time: %f ms",
+    ALOGV("Process time: %f ms",
          (endTime - startTime) / 1000000.);
 
     if (bestError == -1) return false;
