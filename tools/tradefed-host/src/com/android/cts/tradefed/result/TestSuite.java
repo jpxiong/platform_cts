@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
@@ -23,6 +24,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,5 +195,30 @@ class TestSuite extends AbstractXmlPullParser {
      */
     public void insertSuite(TestSuite suite) {
         mChildSuiteMap.put(suite.getName(), suite);
+    }
+
+
+    /**
+     * Adds tests contained in this result that have the given <var>resultFilter</var>
+     *
+     * @param tests the {@link Collection} of {@link TestIdentifier}s to add to
+     * @param parentSuiteNames a {@link Deque} of parent suite names. Used to construct the full
+     * class name of the test
+     * @param resultFilter the {@link CtsTestStatus} to filter by
+     */
+    void addTestsWithStatus(Collection<TestIdentifier> tests, Deque<String> parentSuiteNames,
+            CtsTestStatus resultFilter) {
+        if (getName() != null) {
+            parentSuiteNames.addLast(getName());
+        }
+        for (TestSuite suite : mChildSuiteMap.values()) {
+            suite.addTestsWithStatus(tests, parentSuiteNames, resultFilter);
+        }
+        for (TestCase testCase : mChildTestCaseMap.values()) {
+            testCase.addTestsWithStatus(tests, parentSuiteNames, resultFilter);
+        }
+        if (getName() != null) {
+            parentSuiteNames.removeLast();
+        }
     }
 }
