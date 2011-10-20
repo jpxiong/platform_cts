@@ -49,6 +49,8 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
     private static final String EXCLUDE_ATTR = "exclude";
     private static final String URI_ATTR = "uri";
 
+    private final String mName;
+
     /**
      * SAX callback object. Handles parsing data from the xml tags.
      */
@@ -91,9 +93,18 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
         }
     }
 
-    TestPlan() {
+    public TestPlan(String name) {
+        mName = name;
         // Uses a LinkedHashMap to have predictable iteration order
         mUriExcludedTestsMap = new LinkedHashMap<String, TestFilter>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
+        return mName;
     }
 
     /**
@@ -136,6 +147,19 @@ public class TestPlan extends AbstractXmlParser implements ITestPlan {
         TestFilter filter = mUriExcludedTestsMap.get(uri);
         if (filter != null) {
             filter.addExcludedTest(testToExclude);
+        } else {
+            throw new IllegalArgumentException(String.format("Could not find package %s", uri));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addExcludedTests(String uri, Collection<TestIdentifier> excludedTests) {
+        TestFilter filter = mUriExcludedTestsMap.get(uri);
+        if (filter != null) {
+            filter.getExcludedTests().addAll(excludedTests);
         } else {
             throw new IllegalArgumentException(String.format("Could not find package %s", uri));
         }

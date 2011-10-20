@@ -65,13 +65,20 @@ public class TestPlanTest extends TestCase {
                     EXCLUDE_TEST_CLASS) +
         "</TestPlan>";
 
+    private TestPlan mPlan;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mPlan = new TestPlan("plan");
+    }
+
     /**
      * Simple test for parsing a plan containing two uris
      */
     public void testParse() throws ParseException  {
-        TestPlan plan = new TestPlan();
-        plan.parse(getStringAsStream(TEST_DATA));
-        assertTestData(plan);
+        mPlan.parse(getStringAsStream(TEST_DATA));
+        assertTestData(mPlan);
     }
 
     /**
@@ -92,10 +99,9 @@ public class TestPlanTest extends TestCase {
      * Test parsing a plan containing a single excluded test
      */
     public void testParse_exclude() throws ParseException  {
-        TestPlan plan = new TestPlan();
-        plan.parse(getStringAsStream(TEST_EXCLUDED_DATA));
-        assertEquals(1, plan.getTestUris().size());
-        TestFilter filter = plan.getExcludedTestFilter(TEST_URI1);
+        mPlan.parse(getStringAsStream(TEST_EXCLUDED_DATA));
+        assertEquals(1, mPlan.getTestUris().size());
+        TestFilter filter = mPlan.getExcludedTestFilter(TEST_URI1);
         assertTrue(filter.getExcludedTests().contains(new TestIdentifier(EXCLUDE_TEST_CLASS,
                 EXCLUDE_TEST_METHOD)));
     }
@@ -104,9 +110,8 @@ public class TestPlanTest extends TestCase {
      * Test parsing a plan containing multiple excluded tests
      */
     public void testParse_multiExclude() throws ParseException  {
-        TestPlan plan = new TestPlan();
-        plan.parse(getStringAsStream(TEST_MULTI_EXCLUDED_DATA));
-        assertMultiExcluded(plan);
+        mPlan.parse(getStringAsStream(TEST_MULTI_EXCLUDED_DATA));
+        assertMultiExcluded(mPlan);
     }
 
     /**
@@ -126,10 +131,9 @@ public class TestPlanTest extends TestCase {
      * Test parsing a plan containing an excluded class
      */
     public void testParse_classExclude() throws ParseException  {
-        TestPlan plan = new TestPlan();
-        plan.parse(getStringAsStream(TEST_CLASS_EXCLUDED_DATA));
-        assertEquals(1, plan.getTestUris().size());
-        TestFilter filter = plan.getExcludedTestFilter(TEST_URI1);
+        mPlan.parse(getStringAsStream(TEST_CLASS_EXCLUDED_DATA));
+        assertEquals(1, mPlan.getTestUris().size());
+        TestFilter filter = mPlan.getExcludedTestFilter(TEST_URI1);
         assertTrue(filter.getExcludedClasses().contains(EXCLUDE_TEST_CLASS));
     }
 
@@ -138,9 +142,8 @@ public class TestPlanTest extends TestCase {
      * @throws IOException
      */
     public void testSerialize_empty() throws ParseException, IOException  {
-        TestPlan plan = new TestPlan();
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        plan.serialize(outStream);
+        mPlan.serialize(outStream);
         assertTrue(outStream.toString().contains(EMPTY_DATA));
     }
 
@@ -149,12 +152,11 @@ public class TestPlanTest extends TestCase {
      * @throws IOException
      */
     public void testSerialize_packages() throws ParseException, IOException  {
-        TestPlan plan = new TestPlan();
-        plan.addPackage(TEST_URI1);
-        plan.addPackage(TEST_URI2);
+        mPlan.addPackage(TEST_URI1);
+        mPlan.addPackage(TEST_URI2);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        plan.serialize(outStream);
-        TestPlan parsedPlan = new TestPlan();
+        mPlan.serialize(outStream);
+        TestPlan parsedPlan = new TestPlan("parsed");
         parsedPlan.parse(getStringAsStream(outStream.toString()));
         // parsedPlan should contain same contents as TEST_DATA
         assertTestData(parsedPlan);
@@ -164,15 +166,14 @@ public class TestPlanTest extends TestCase {
      * Test serializing and deserializing plan with multiple excluded tests
      */
     public void testSerialize_multiExclude() throws ParseException, IOException  {
-        TestPlan plan = new TestPlan();
-        plan.addPackage(TEST_URI1);
-        plan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
+        mPlan.addPackage(TEST_URI1);
+        mPlan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
                 EXCLUDE_TEST_METHOD));
-        plan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
+        mPlan.addExcludedTest(TEST_URI1, new TestIdentifier(EXCLUDE_TEST_CLASS,
                 EXCLUDE_TEST_METHOD2));
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        plan.serialize(outStream);
-        TestPlan parsedPlan = new TestPlan();
+        mPlan.serialize(outStream);
+        TestPlan parsedPlan = new TestPlan("parsed");
         parsedPlan.parse(getStringAsStream(outStream.toString()));
         // parsedPlan should contain same contents as TEST_DATA
         assertMultiExcluded(parsedPlan);
