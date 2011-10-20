@@ -130,14 +130,16 @@ class ResultFilter extends ResultForwarder {
      */
     public void reportUnexecutedTests() {
         for (Map.Entry<String, Collection<TestIdentifier>> entry : mRemainingTestsMap.entrySet()) {
-            super.testRunStarted(entry.getKey(), entry.getValue().size());
-            for (TestIdentifier test : entry.getValue()) {
-                // an unexecuted test is currently reported as a 'testStarted' event without a
-                // 'testEnded'. TODO: consider adding an explict API for reporting an unexecuted
-                // test
-                super.testStarted(test);
+            if (!entry.getValue().isEmpty()) {
+                super.testRunStarted(entry.getKey(), entry.getValue().size());
+                for (TestIdentifier test : entry.getValue()) {
+                    // an unexecuted test is currently reported as a 'testStarted' event without a
+                    // 'testEnded'. TODO: consider adding an explict API for reporting an unexecuted
+                    // test
+                    super.testStarted(test);
+                }
+                super.testRunEnded(0, new HashMap<String,String>());
             }
-            super.testRunEnded(0, new HashMap<String,String>());
         }
     }
 }

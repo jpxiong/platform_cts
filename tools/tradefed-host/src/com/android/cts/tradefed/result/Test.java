@@ -15,9 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
-import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestResult.TestStatus;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
@@ -40,7 +38,7 @@ class Test extends AbstractXmlPullParser {
     private static final String STACK_TAG = "StackTrace";
 
     private String mName;
-    private String mResult;
+    private CtsTestStatus mResult;
     private String mStartTime;
     private String mEndTime;
     private String mMessage;
@@ -56,18 +54,12 @@ class Test extends AbstractXmlPullParser {
      * Create a {@link Test} from a {@link TestResult}.
      *
      * @param name
-     * @param result
      */
-    public Test(String name, TestResult result) {
+    public Test(String name) {
         mName = name;
-        mResult = convertStatus(result.getStatus());
-        mStartTime = TimeUtil.getTimestamp(result.getStartTime());
-        mEndTime = TimeUtil.getTimestamp(result.getEndTime());
-        if (result.getStackTrace() != null) {
-            String sanitizedStack = sanitizeStackTrace(result.getStackTrace());
-            mMessage = getFailureMessageFromStackTrace(sanitizedStack);
-            mStackTrace = sanitizedStack;
-        }
+        mResult = CtsTestStatus.NOT_EXECUTED;
+        mStartTime = TimeUtil.getTimestamp();
+        updateEndTime();
     }
 
     /**
@@ -84,7 +76,7 @@ class Test extends AbstractXmlPullParser {
         return mName;
     }
 
-    public String getResult() {
+    public CtsTestStatus getResult() {
         return mResult;
     }
 
@@ -104,6 +96,20 @@ class Test extends AbstractXmlPullParser {
         return mStackTrace;
     }
 
+    public void setStackTrace(String stackTrace) {
+
+        mStackTrace = sanitizeStackTrace(stackTrace);
+        mMessage = getFailureMessageFromStackTrace(mStackTrace);
+    }
+
+    public void updateEndTime() {
+        mEndTime = TimeUtil.getTimestamp();
+    }
+
+    public void setResultStatus(CtsTestStatus status) {
+        mResult = status;
+    }
+
     /**
      * Serialize this object and all its contents to XML.
      *
@@ -114,7 +120,7 @@ class Test extends AbstractXmlPullParser {
             throws IOException {
         serializer.startTag(CtsXmlResultReporter.ns, TAG);
         serializer.attribute(CtsXmlResultReporter.ns, NAME_ATTR, getName());
-        serializer.attribute(CtsXmlResultReporter.ns, RESULT_ATTR, mResult);
+        serializer.attribute(CtsXmlResultReporter.ns, RESULT_ATTR, mResult.getValue());
         serializer.attribute(CtsXmlResultReporter.ns, STARTTIME_ATTR, mStartTime);
         serializer.attribute(CtsXmlResultReporter.ns, ENDTIME_ATTR, mEndTime);
 
@@ -129,27 +135,6 @@ class Test extends AbstractXmlPullParser {
             serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
         }
         serializer.endTag(CtsXmlResultReporter.ns, TAG);
-    }
-
-    /**
-     * Convert a {@link TestStatus} to the result text to output in XML
-     *
-     * @param status the {@link TestStatus}
-     * @return
-     */
-    private String convertStatus(TestStatus status) {
-        switch (status) {
-            case ERROR:
-                return CtsTestStatus.FAIL.getValue();
-            case FAILURE:
-                return CtsTestStatus.FAIL.getValue();
-            case PASSED:
-                return CtsTestStatus.PASS.getValue();
-            case INCOMPLETE:
-                return CtsTestStatus.NOT_EXECUTED.getValue();
-        }
-        CLog.w("Unrecognized status %s", status);
-        return CtsTestStatus.FAIL.getValue();
     }
 
     /**
@@ -187,7 +172,7 @@ class Test extends AbstractXmlPullParser {
                     "invalid XML: Expected %s tag but received %s", TAG, parser.getName()));
         }
         setName(getAttribute(parser, NAME_ATTR));
-        mResult = getAttribute(parser, RESULT_ATTR);
+        mResult = CtsTestStatus.getStatus(getAttribute(parser, RESULT_ATTR));
         mStartTime = getAttribute(parser, STARTTIME_ATTR);
         mEndTime = getAttribute(parser, ENDTIME_ATTR);
 
