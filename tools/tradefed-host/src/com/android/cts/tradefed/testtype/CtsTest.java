@@ -18,10 +18,13 @@ package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
+import com.android.cts.tradefed.result.CtsTestStatus;
+import com.android.cts.tradefed.result.PlanCreator;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
@@ -66,6 +69,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String PACKAGE_OPTION = "package";
     private static final String CLASS_OPTION = "class";
     private static final String METHOD_OPTION = "method";
+    public static final String CONTINUE_OPTION = "continue-session";
 
     public static final String PACKAGE_NAME_METRIC = "packageName";
     public static final String PACKAGE_DIGEST_METRIC = "packageDigest";
@@ -91,6 +95,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             description = "run a specific test method, from given --class.",
             importance = Importance.IF_UNSET)
     private String mMethodName = null;
+
+    @Option(name = CONTINUE_OPTION,
+            description = "continue a previous test session.",
+            importance = Importance.IF_UNSET)
+    private Integer mContinueSessionId = null;
 
     @Option(name = "collect-device-info", description =
         "flag to control whether to collect info from device. Turning this off will speed up test" +
@@ -220,6 +229,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
+     * Sets the test session id to continue.
+     * <p/>
+     * Exposed for unit testing
+     */
+     void setContinueSessionId(int sessionId) {
+        mContinueSessionId = sessionId;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -318,6 +336,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             throw new IllegalArgumentException("failed to find CTS plan file", e);
         } catch (ParseException e) {
             throw new IllegalArgumentException("failed to parse CTS plan file", e);
+        } catch (ConfigurationException e) {
+            throw new IllegalArgumentException("failed to process arguments", e);
         }
         return testPkgList;
     }
@@ -342,20 +362,21 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * @return the list of test package defs to run
      * @throws ParseException
      * @throws FileNotFoundException
+     * @throws ConfigurationException
      */
     private Collection<ITestPackageDef> getTestPackagesToRun(ITestPackageRepo testRepo)
-            throws ParseException, FileNotFoundException {
+            throws ParseException, FileNotFoundException, ConfigurationException {
         // use LinkedHashSet to have predictable iteration order
         Set<ITestPackageDef> testPkgDefs = new LinkedHashSet<ITestPackageDef>();
         if (mPlanName != null) {
             Log.i(LOG_TAG, String.format("Executing CTS test plan %s", mPlanName));
             File ctsPlanFile = mCtsBuild.getTestPlanFile(mPlanName);
-            ITestPlan parser = createPlan(mPlanName);
-            parser.parse(createXmlStream(ctsPlanFile));
-            for (String uri : parser.getTestUris()) {
+            ITestPlan plan = createPlan(mPlanName);
+            plan.parse(createXmlStream(ctsPlanFile));
+            for (String uri : plan.getTestUris()) {
                 if (!mExcludedPackageNames.contains(uri)) {
                     ITestPackageDef testPackage = testRepo.getTestPackage(uri);
-                    testPackage.setExcludedTestFilter(parser.getExcludedTestFilter(uri));
+                    testPackage.setExcludedTestFilter(plan.getExcludedTestFilter(uri));
                     testPkgDefs.add(testPackage);
                 }
             }
@@ -382,6 +403,21 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             } else {
                 Log.logAndDisplay(LogLevel.WARN, LOG_TAG, String.format(
                         "Could not find package for test class %s", mClassName));
+            }
+        } else if (mContinueSessionId != null) {
+            // create an in-memory derived plan that contains the notExecuted tests from previous
+            // session
+            // use timestamp as plan name so it will hopefully be unique
+            String uniquePlanName = Long.toString(System.currentTimeMillis());
+            PlanCreator planCreator = new PlanCreator(uniquePlanName, mContinueSessionId,
+                    CtsTestStatus.NOT_EXECUTED);
+            ITestPlan plan = createPlan(planCreator);
+            for (String uri : plan.getTestUris()) {
+                if (!mExcludedPackageNames.contains(uri)) {
+                    ITestPackageDef testPackage = testRepo.getTestPackage(uri);
+                    testPackage.setExcludedTestFilter(plan.getExcludedTestFilter(uri));
+                    testPkgDefs.add(testPackage);
+                }
             }
         } else {
             // should never get here - was checkFields() not called?
@@ -459,6 +495,16 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
+     * Factory method for creating a {@link TestPlan} from a {@link PlanCreator}.
+     * <p/>
+     * Exposed for unit testing
+     * @throws ConfigurationException
+     */
+    ITestPlan createPlan(PlanCreator planCreator) throws ConfigurationException {
+        return planCreator.createDerivedPlan(mCtsBuild);
+    }
+
+    /**
      * Factory method for creating a {@link InputStream} from a plan xml file.
      * <p/>
      * Exposed for unit testing
@@ -471,13 +517,13 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         // for simplicity of command line usage, make --plan, --package, and --class mutually
         // exclusive
         boolean mutualExclusiveArgs = xor(mPlanName != null, mPackageNames.size() > 0,
-                mClassName != null);
+                mClassName != null, mContinueSessionId != null);
 
         if (!mutualExclusiveArgs) {
             throw new IllegalArgumentException(String.format(
                     "Ambiguous or missing arguments. " +
-                    "One and only of --%s --%s(s) or --%s to run can be specified",
-                    PLAN_OPTION, PACKAGE_OPTION, CLASS_OPTION));
+                    "One and only of --%s --%s(s), --%s or %s to run can be specified",
+                    PLAN_OPTION, PACKAGE_OPTION, CLASS_OPTION, CONTINUE_OPTION));
         }
         if (mMethodName != null && mClassName == null) {
             throw new IllegalArgumentException(String.format(

@@ -61,6 +61,23 @@ public class PlanCreator {
     private File mPlanFile;
 
     /**
+     * Create an empty {@link PlanCreator}.
+     * <p/>
+     * All {@link Option} fields must be populated via {@link ArgsOptionParser}
+     */
+    public PlanCreator() {
+    }
+
+    /**
+     * Create a {@link PlanCreator} using the specified option values.
+     */
+    public PlanCreator(String planName, int session, CtsTestStatus result) {
+        mPlanName = planName;
+        mSessionId = session;
+        mResultFilterString = result.getValue();
+    }
+
+    /**
      * Create and serialize a test plan derived from a result.
      * <p/>
      * {@link Option} values must all be set before this is called.
