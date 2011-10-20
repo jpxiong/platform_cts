@@ -16,12 +16,15 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.StubCtsBuildHelper;
+import com.android.cts.tradefed.result.PlanCreator;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
+
+import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 
@@ -31,8 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link CtsTest}.
@@ -74,6 +75,11 @@ public class CtsTestTest extends TestCase {
 
             @Override
             ITestPlan createPlan(String planName) {
+                return mMockPlan;
+            }
+
+            @Override
+            ITestPlan createPlan(PlanCreator planCreator) {
                 return mMockPlan;
             }
 
@@ -186,6 +192,26 @@ public class CtsTestTest extends TestCase {
     }
 
     /**
+     * Test {@link CtsTest#run(ITestInvocationListener))} when --continue-session is specified
+     */
+    public void testRun_continueSession() throws DeviceNotAvailableException, ParseException {
+        mCtsTest.setContinueSessionId(1);
+        Collection<String> uris = new ArrayList<String>(1);
+        uris.add(PACKAGE_NAME);
+        EasyMock.expect(mMockPlan.getTestUris()).andReturn(uris);
+        TestFilter filter = new TestFilter();
+        EasyMock.expect(mMockPlan.getExcludedTestFilter(PACKAGE_NAME)).andReturn(
+                filter);
+        mMockPackageDef.setExcludedTestFilter(filter);
+
+        setCreateAndRunTestExpectations();
+
+        replayMocks();
+        mCtsTest.run(mMockListener);
+        verifyMocks();
+    }
+
+    /**
      * Set EasyMock expectations for parsing {@link #PLAN_NAME}
      */
     private void setParsePlanExceptations() throws ParseException {
@@ -281,6 +307,21 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.addPackageName(PACKAGE_NAME);
         mCtsTest.setClassName("class");
+        try {
+            mCtsTest.run(mMockListener);
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test {@link CtsTest#run(java.util.List)} when --plan, --continue-option options have been
+     * specified
+     */
+    public void testRun_planContinue() throws DeviceNotAvailableException {
+        mCtsTest.setPlanName(PLAN_NAME);
+        mCtsTest.setContinueSessionId(1);
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");

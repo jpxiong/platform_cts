@@ -18,7 +18,7 @@ package com.android.cts.tradefed.result;
 /**
  * An enum of possible test statuses.
  */
-enum CtsTestStatus {
+public enum CtsTestStatus {
     PASS("pass"),
     FAIL("fail"),
     NOT_EXECUTED("notExecuted");
