@@ -74,16 +74,16 @@ class TestSuite extends AbstractXmlPullParser {
      * @param testName the test method name
      * @param testResult the {@link TestResult}
      */
-    public void insertTest(List<String> suiteNames, String testClassName, String testName,
-            TestResult testResult) {
+    public Test findTest(List<String> suiteNames, String testClassName, String testName,
+            boolean insertIfMissing) {
         if (suiteNames.size() <= 0) {
             // no more package segments
             TestCase testCase = getTestCase(testClassName);
-            testCase.insertTest(testName, testResult);
+            return testCase.findTest(testName, insertIfMissing);
         } else {
             String rootName = suiteNames.remove(0);
             TestSuite suite = getTestSuite(rootName);
-            suite.insertTest(suiteNames, testClassName, testName, testResult);
+            return suite.findTest(suiteNames, testClassName, testName, insertIfMissing);
         }
     }
 
@@ -220,5 +220,22 @@ class TestSuite extends AbstractXmlPullParser {
         if (getName() != null) {
             parentSuiteNames.removeLast();
         }
+    }
+
+    /**
+     * Count the number of tests in this {@link TestSuite} with given status.
+     *
+     * @param status
+     * @return the test count
+     */
+    public int countTests(CtsTestStatus status) {
+        int total = 0;
+        for (TestSuite suite : mChildSuiteMap.values()) {
+            total += suite.countTests(status);
+        }
+        for (TestCase testCase : mChildTestCaseMap.values()) {
+            total += testCase.countTests(status);
+        }
+        return total;
     }
 }

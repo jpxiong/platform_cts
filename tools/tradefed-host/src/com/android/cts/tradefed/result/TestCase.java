@@ -16,7 +16,6 @@
 package com.android.cts.tradefed.result;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.result.TestResult;
 import com.android.tradefed.util.ArrayUtil;
 
 import org.kxml2.io.KXmlSerializer;
@@ -67,24 +66,17 @@ class TestCase extends AbstractXmlPullParser {
     }
 
     /**
-     * Inserts given test result
-     *
      * @param testName
-     * @param testResult
+     * @param insertIfMissing
+     * @return
      */
-    public void insertTest(String testName, TestResult testResult) {
-        Test t = new Test(testName, testResult);
-        insertTest(t);
-    }
-
-    /**
-     * Inserts given test result
-     *
-     * @param testName
-     * @param testResult
-     */
-    private void insertTest(Test test) {
-        mChildTestMap.put(test.getName(), test);
+    public Test findTest(String testName, boolean insertIfMissing) {
+        Test t = mChildTestMap.get(testName);
+        if (t == null && insertIfMissing) {
+            t = new Test(testName);
+            mChildTestMap.put(t.getName(), t);
+        }
+        return t;
     }
 
     /**
@@ -122,7 +114,7 @@ class TestCase extends AbstractXmlPullParser {
             if (eventType == XmlPullParser.START_TAG && parser.getName().equals(Test.TAG)) {
                 Test test = new Test();
                 test.parse(parser);
-                insertTest(test);
+                mChildTestMap.put(test.getName(), test);
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
             }
@@ -145,12 +137,28 @@ class TestCase extends AbstractXmlPullParser {
         }
         String fullClassName = ArrayUtil.join(".", parentSuiteNames);
         for (Test test : mChildTestMap.values()) {
-            if (resultFilter.getValue().equals(test.getResult())) {
+            if (resultFilter.equals(test.getResult())) {
                 tests.add(new TestIdentifier(fullClassName, test.getName()));
             }
         }
         if (getName() != null) {
             parentSuiteNames.removeLast();
         }
+    }
+
+    /**
+     * Count the number of tests in this {@link TestCase} with given status.
+     *
+     * @param status
+     * @return the test count
+     */
+    public int countTests(CtsTestStatus status) {
+        int total = 0;
+        for (Test test : mChildTestMap.values()) {
+            if (test.getResult().equals(status)) {
+                total++;
+            }
+        }
+        return total;
     }
 }
