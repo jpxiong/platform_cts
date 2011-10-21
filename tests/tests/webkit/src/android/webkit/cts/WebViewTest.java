@@ -2267,13 +2267,14 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             public void run() {
                 mWebView.setWebViewClient(webViewClient);
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.clearSslPreferences();
                 mWebView.loadUrl(errorUrl);
             }
         });
         waitForUiThreadDone();
 
-        assertEquals(webViewClient.webView(), mWebView);
-        assertEquals(webViewClient.errorUrl(), errorUrl);
+        assertEquals(mWebView, webViewClient.webView());
+        assertEquals(errorUrl, webViewClient.errorUrl());
     }
 
     @TestTargetNew(
@@ -2301,7 +2302,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         waitForUiThreadDone();
         runTestOnUiThread(new Runnable() {
             public void run() {
-                assertEquals(mWebView.getTitle(), TestHtmlConstants.HELLO_WORLD_TITLE);
+                assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
             }
         });
     }
@@ -2325,6 +2326,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             public void run() {
                 mWebView.setWebViewClient(new MockWebViewClient());
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.clearSslPreferences();
                 mWebView.loadUrl(url);
             }
         });
@@ -2351,6 +2353,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             public void run() {
                 mWebView.setWebViewClient(webViewClient);
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.clearSslPreferences();
                 mWebView.loadUrl(firstUrl);
             }
         });
@@ -2370,7 +2373,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertFalse(webViewClient.wasOnReceivedSslErrorCalled());
         runTestOnUiThread(new Runnable() {
             public void run() {
-                assertEquals(mWebView.getTitle(), "Second page");
+                assertEquals("Second page", mWebView.getTitle());
             }
         });
     }
@@ -2390,6 +2393,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             public void run() {
                 mWebView.setWebViewClient(webViewClient);
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
+                mWebView.clearSslPreferences();
                 mWebView.loadUrl(firstUrl);
             }
         });
@@ -2412,7 +2416,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
         runTestOnUiThread(new Runnable() {
             public void run() {
-                assertEquals(mWebView.getTitle(), "Second page");
+                assertEquals("Second page", mWebView.getTitle());
             }
         });
     }
