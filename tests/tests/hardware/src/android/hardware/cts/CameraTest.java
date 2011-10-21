@@ -1986,30 +1986,26 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             for (int i = 0; i < settings.length; i++) {
                 if (Parameters.SCENE_MODE_AUTO.equals(settings[i].mScene)) continue;
 
-                // If the scene mode overrides the flash mode, it should also override
-                // the supported flash modes.
+                // Both the setting and the supported settings may change. It is
+                // allowed to have more than one supported settings in scene
+                // modes. For example, in night scene mode, supported flash
+                // modes can have on and off.
                 if (autoSceneMode.mSupportedFlash != null) {
-                    if (!autoSceneMode.mFlash.equals(settings[i].mFlash)) {
-                        assertEquals(1, settings[i].mSupportedFlash.size());
-                        assertTrue(settings[i].mSupportedFlash.contains(settings[i].mFlash));
+                    assertTrue(settings[i].mSupportedFlash.contains(settings[i].mFlash));
+                    for (String mode: settings[i].mSupportedFlash) {
+                        assertTrue(autoSceneMode.mSupportedFlash.contains(mode));
                     }
                 }
-
-                // If the scene mode overrides the focus mode, it should also override
-                // the supported focus modes.
                 if (autoSceneMode.mSupportedFocus != null) {
-                    if (!autoSceneMode.mFocus.equals(settings[i].mFocus)) {
-                        assertEquals(1, settings[i].mSupportedFocus.size());
-                        assertTrue(settings[i].mSupportedFocus.contains(settings[i].mFocus));
+                    assertTrue(settings[i].mSupportedFocus.contains(settings[i].mFocus));
+                    for (String mode: settings[i].mSupportedFocus) {
+                        assertTrue(autoSceneMode.mSupportedFocus.contains(mode));
                     }
                 }
-
-                // If the scene mode overrides the white balance, it should also override
-                // the supported white balance.
                 if (autoSceneMode.mSupportedWhiteBalance != null) {
-                    if (!autoSceneMode.mWhiteBalance.equals(settings[i].mWhiteBalance)) {
-                        assertEquals(1, settings[i].mSupportedWhiteBalance.size());
-                        assertTrue(settings[i].mSupportedWhiteBalance.contains(settings[i].mWhiteBalance));
+                    assertTrue(settings[i].mSupportedWhiteBalance.contains(settings[i].mWhiteBalance));
+                    for (String mode: settings[i].mSupportedWhiteBalance) {
+                        assertTrue(autoSceneMode.mSupportedWhiteBalance.contains(mode));
                     }
                 }
             }
