@@ -110,8 +110,8 @@ public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
         // Play stream for 60 seconds
         playLiveVideoTest("http://www.youtube.com/api/manifest/hls/ns/yt-live/id/UeHRu5LFHaU"
                 + "?ip=0.0.0.0&ipbits=0&expire=19000000000&sparams=ip,ipbits,expire&signature"
-                + "=313BE90526F2D815EB207156E1460C7E8EEC2503.799EE7B8B7CE3F2957060DB27C2160770303EBD2"
-                + "&key=test_key1&user=android-device-test&m3u8=1", 60 * 1000);
+                + "=313BE90526F2D815EB207156E1460C7E8EEC2503.799EE7B8B7CE3F2957060DB27C216077"
+                + "0303EBD2&key=test_key1&user=android-device-test&m3u8=1", 60 * 1000);
     }
 
     // Streaming audio from local HTTP server
