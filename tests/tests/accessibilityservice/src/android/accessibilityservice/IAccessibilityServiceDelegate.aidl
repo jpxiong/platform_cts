@@ -20,7 +20,7 @@ import android.view.accessibility.AccessibilityEvent;
 /**
  * Interface for interacting with the accessibility service mock.
  */
-interface IAccessibilityServiceDelegate {
+oneway interface IAccessibilityServiceDelegate {
 
     /**
      * Delegate an {@link android.view.accessibility.AccessibilityEvent}.

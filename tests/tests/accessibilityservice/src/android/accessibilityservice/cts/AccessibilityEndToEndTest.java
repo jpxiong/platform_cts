@@ -16,39 +16,24 @@
 
 package android.accessibilityservice.cts;
 
-import com.android.cts.accessibilityservice.R;
-
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.IAccessibilityServiceDelegate;
-import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.android.cts.accessibilityservice.R;
 
 import junit.framework.TestCase;
 
@@ -62,18 +47,22 @@ import java.util.Queue;
  * creating an {@link Activity} and poking around so {@link AccessibilityEvent}s
  * are generated and their correct dispatch verified.
  * <p>
- * Note: The end-to-end test is composed of two APKs, one with a mock accessibility
- * service, another with the instrumented activity and test cases. The motivation for
- * two APKs design is that CTS tests cannot access the secure settings which is
- * required for enabling accessibility and accessibility services. Therefore, manual
- * installation of the <strong>CtsAccessibilityServiceTestMockService.apk</strong>
+ * Note: The accessibility CTS tests are composed of two APKs, one with delegating
+ * accessibility service and another with the instrumented activity and test cases.
+ * The motivation for two APKs design is that CTS tests cannot access the secure
+ * settings which is required for enabling accessibility services, hence there is
+ * no way to manipulate accessibility settings programmaticaly. Further, manually
+ * enabling an accessibility service in the tests APK will not work either because
+ * the instrumentation restarts the process under test which would break the binding
+ * between the accessibility service and the system.
+ * <p>
+ * Therefore, manual installation of the
+ * <strong>CtsAccessibilityServiceTestMockService.apk</strong>
  * whose source is located at <strong>cts/tests/accessibility</strong> is required.
- * Once the former package has been installed accessibility must be enabled (Settings ->
- * Accessibility), the mock service must be enabled (Settings -> Accessibility
- * -> Mock Accessibility Service), and then the CTS tests in this package can be
- * successfully run. Further, the mock and tests run in separate processes since
- * the instrumentation restarts the process in which it is running and this
- * breaks the binding between the mock accessibility service and the system.
+ * Once the former package has been installed the service must be enabled
+ * (Settings -> Accessibility -> Delegating Accessibility Service), and then the CTS tests
+ * in this package can be successfully run.
+ * </p>
  */
 public class AccessibilityEndToEndTest extends
         ActivityInstrumentationTestCase2<AccessibilityEndToEndTestActivity> {
@@ -82,35 +71,10 @@ public class AccessibilityEndToEndTest extends
      * Timeout required for pending Binder calls or event processing to
      * complete.
      */
-    private static final long MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING = 500;
+    private static final long TIMEOUT_ASYNC_PROCESSING = 500;
 
     /**
-     * The count of the polling attempts during {@link #MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING}
-     */
-    private static final long COUNT_POLLING_ATTEMPTS = 10;
-
-    /**
-     * The package of the accessibility service mock interface.
-     */
-    private static final String DELEGATING_SERVICE_PACKAGE =
-        "android.accessibilityservice.delegate";
-
-    /**
-     * The package of the delegating accessibility service interface.
-     */
-    private static final String DELEGATING_SERVICE_CLASS_NAME =
-        "android.accessibilityservice.delegate.DelegatingAccessibilityService";
-
-    /**
-     * The package of the delegating accessibility service connection interface.
-     */
-    private static final String DELEGATING_SERVICE_CONNECTION_CLASS_NAME =
-        "android.accessibilityservice.delegate."
-            + "DelegatingAccessibilityService$DelegatingConnectionService";
-
-    /**
-     * Creates a new instance for testing
-     * {@link AccessibilityEndToEndTestActivity}.
+     * Creates a new instance for testing {@link AccessibilityEndToEndTestActivity}.
      *
      * @throws Exception If any error occurs.
      */
@@ -124,7 +88,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent selectedEvent = AccessibilityEvent.obtain();
@@ -135,7 +99,7 @@ public class AccessibilityEndToEndTest extends
         selectedEvent.setItemCount(2);
         selectedEvent.setCurrentItemIndex(1);
         selectedEvent.setEnabled(true);
-        selectedEvent.setScrollable(true);
+        selectedEvent.setScrollable(false);
         selectedEvent.setFromIndex(0);
         selectedEvent.setToIndex(1);
 
@@ -153,7 +117,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -162,7 +126,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent clickedEvent = AccessibilityEvent.obtain();
@@ -186,7 +150,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -195,7 +159,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent longClickedEvent = AccessibilityEvent.obtain();
@@ -219,7 +183,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -228,7 +192,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         // create and populate the expected event
         AccessibilityEvent focusedEvent = AccessibilityEvent.obtain();
@@ -254,7 +218,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -270,7 +234,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // wait for the generated focus event to be dispatched
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
 
         final String beforeText = activity.getString(R.string.text_input_blah);
@@ -302,7 +266,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -311,7 +275,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         String title = activity.getString(R.string.alert_title);
         String message = activity.getString(R.string.alert_message);
@@ -342,7 +306,7 @@ public class AccessibilityEndToEndTest extends
         });
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
     }
 
     @LargeTest
@@ -351,7 +315,7 @@ public class AccessibilityEndToEndTest extends
 
         // Wait for accessibility events to settle i.e. for all events generated
         // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING);
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
         String message = activity.getString(R.string.notification_message);
 
@@ -383,61 +347,18 @@ public class AccessibilityEndToEndTest extends
         notificationManager.notify(notificationId, notification);
 
         // verify if all expected methods have been called
-        assertMockServiceVerifiedWithinTimeout(service);
+        service.verify();
 
         // remove the notification
         notificationManager.cancel(notificationId);
     }
 
-    /**
-     * Asserts the the mock accessibility service has been successfully verified
-     * (which is it has received the expected method calls with expected
-     * arguments) within the {@link #MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING}. The
-     * verified state is checked by polling upon small intervals.
-     *
-     * @param service The service to verify.
-     * @throws Exception If the verification has failed with exception after the
-     *             {@link #MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING}.
-     */
-    private void assertMockServiceVerifiedWithinTimeout(MockAccessibilityService service)
-            throws Throwable {
-        Throwable lastVerifyThrowable = null;
-        long beginTime = SystemClock.uptimeMillis();
-        long pollTmeout = MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING / COUNT_POLLING_ATTEMPTS;
+    static class MockAccessibilityService extends AccessibilityService {
 
-        // poll until the timeout has elapsed
-        while (SystemClock.uptimeMillis() - beginTime < MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING) {
-            // sleep first since immediate call will always fail
-            try {
-                Thread.sleep(pollTmeout);
-            } catch (InterruptedException ie) {
-                /* ignore */
-            }
-
-            try {
-                service.verify();
-                // success - reset so it is not accept more events
-                service.reset();
-                return;
-            } catch (IllegalStateException ise) {
-                // this exception is thrown if the expected event is not
-                // received yet, so we will keep trying within the timeout
-                lastVerifyThrowable = ise;
-                continue;
-            } catch (Throwable t) {
-                // we have just failed
-                lastVerifyThrowable = t;
-                break;
-            }
-        }
-
-        // failure - reset so it is not accept more events
-        service.reset();
-        throw lastVerifyThrowable;
-    }
-
-    static class MockAccessibilityService extends AccessibilityService implements
-            ServiceConnection {
+        /**
+         * Helper for connecting to the delegating accessibility service.
+         */
+        private final AccessibilityDelegateHelper mAccessibilityDelegateHelper;
 
         /**
          * The singleton instance.
@@ -451,6 +372,11 @@ public class AccessibilityEndToEndTest extends
             new LinkedList<AccessibilityEvent>();
 
         /**
+         * Reusable temporary builder.
+         */
+        private final StringBuilder mTempBuilder = new StringBuilder();
+
+        /**
          * Interruption call this service expects to receive.
          */
         private boolean mExpectedInterrupt;
@@ -461,14 +387,9 @@ public class AccessibilityEndToEndTest extends
         private boolean mReplaying;
 
         /**
-         * Flag indicating if this mock is initialized.
+         * Lock for synchronization.
          */
-        private boolean mInitialized;
-
-        /**
-         * The {@link Context} whose services to utilize.
-         */
-        private Context mContext;
+        private final Object mLock = new Object();
 
         /**
          * Gets the {@link MockAccessibilityService} singleton.
@@ -491,100 +412,57 @@ public class AccessibilityEndToEndTest extends
          * Creates a new instance.
          */
         private MockAccessibilityService(Context context) {
-            mContext = context;
-            ensureSetupAndBoundToDelegatingAccessibilityService();
-        }
-
-        /**
-         * Ensures the required setup for the test performed and that it is bound to the
-         * DelegatingAccessibilityService which runs in another process. The setup is
-         * enabling accessibility and installing and enabling the delegating accessibility
-         * service this test binds to.
-         * </p>
-         * Note: Please look at the class description for information why such an
-         *       approach is taken.
-         */
-        public void ensureSetupAndBoundToDelegatingAccessibilityService() {
-            // check if accessibility is enabled
-            AccessibilityManager accessibilityManager = (AccessibilityManager) mContext
-                    .getSystemService(Service.ACCESSIBILITY_SERVICE);
-
-            if (!accessibilityManager.isEnabled()) {
-                throw new IllegalStateException("Accessibility not enabled. "
-                        + "(Settings -> Accessibility)");
-            }
-
-            // check if the delegating service is running
-            ComponentName delegatingServiceName = new ComponentName(
-                    DELEGATING_SERVICE_PACKAGE, DELEGATING_SERVICE_CLASS_NAME);
-            ActivityManager activityManager = (ActivityManager) mContext
-                    .getSystemService(Service.ACTIVITY_SERVICE);
-            boolean delegatingServiceRunning = false;
-
-            for (RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(100)) {
-                if (delegatingServiceName.equals(runningServiceInfo.service)) {
-                    delegatingServiceRunning = true;
-                    break;
-                }
-            }
-
-            if (!delegatingServiceRunning) {
-                // delegating service not running, so check if it is installed at all
-                try {
-                    PackageManager packageManager = mContext.getPackageManager();
-                    packageManager.getServiceInfo(delegatingServiceName, 0);
-                } catch (NameNotFoundException nnfe) {
-                    throw new IllegalStateException("CtsDelegatingAccessibilityService.apk" +
-                            " not installed.");
-                }
-
-                throw new IllegalStateException("Delegating Accessibility Service not running."
-                         + "(Settings -> Accessibility -> Delegating Accessibility Service)");
-            }
-
-            Intent intent = new Intent().setClassName(DELEGATING_SERVICE_PACKAGE,
-                    DELEGATING_SERVICE_CONNECTION_CLASS_NAME);
-            mContext.bindService(intent, this, Context.BIND_AUTO_CREATE);
-
-            long beginTime = SystemClock.uptimeMillis();
-            long pollTmeout = MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING / COUNT_POLLING_ATTEMPTS;
-
-            // bind to the delegating service which runs in another process by
-            // polling until the binder connection is established
-            while (SystemClock.uptimeMillis() - beginTime < MAX_TIMEOUT_ASYNCHRONOUS_PROCESSING) {
-                if (mInitialized) {
-                    // success
-                    return;
-                }
-                try {
-                    Thread.sleep(pollTmeout);
-                } catch (InterruptedException ie) {
-                    /* ignore */
-                }
-            }
+            mAccessibilityDelegateHelper = new AccessibilityDelegateHelper(this);
+            mAccessibilityDelegateHelper.bindToDelegatingAccessibilityService(
+                    context);
         }
 
         /**
          * Starts replaying the mock.
          */
-        private void replay() {
+        public void replay() {
             mReplaying = true;
         }
 
         /**
-         * Verifies if all expected service methods have been called.
+         * Verifies the mock service.
+         *
+         * @throws IllegalStateException If the verification has failed.
          */
-        private void verify() {
-            synchronized (this) {
-                if (!mReplaying) {
-                    throw new IllegalStateException("Did you forget to call replay()");
-                }
-                if (mExpectedInterrupt) {
-                    throw new IllegalStateException("Expected call to #interrupt() not received");
-                }
-                if (!mExpectedEvents.isEmpty()) {
-                    throw new IllegalStateException("Expected a call to onAccessibilityEvent() for "
-                            + "events \"" + mExpectedEvents + "\" not received");
+        public void verify() throws IllegalStateException {
+            StringBuilder problems = mTempBuilder;
+            final long startTime = SystemClock.uptimeMillis();
+            synchronized (mLock) {
+                while (true) {
+                    if (!mReplaying) {
+                        throw new IllegalStateException("Did you forget to call replay()?");
+                    }
+                    if (!mExpectedInterrupt && mExpectedEvents.isEmpty()) {
+                        reset();
+                        return; // success
+                    }
+                    problems.setLength(0);
+                    if (mExpectedInterrupt) {
+                        problems.append("Expected call to #interrupt() not received.");
+                    }
+                    if (!mExpectedEvents.isEmpty()) {
+                        problems.append("Expected a call to onAccessibilityEvent() for events \""
+                                + mExpectedEvents + "\" not received.");
+                    }
+                    final long elapsedTime = SystemClock.uptimeMillis() - startTime;
+                    final long remainingTime = TIMEOUT_ASYNC_PROCESSING - elapsedTime;
+                    if (remainingTime <= 0) {
+                        reset();
+                        if (problems.length() > 0) {
+                            throw new IllegalStateException(problems.toString());
+                        }
+                        return;
+                    }
+                    try {
+                        mLock.wait(remainingTime);
+                    } catch (InterruptedException ie) {
+                        /* ignore */
+                    }
                 }
             }
         }
@@ -593,10 +471,11 @@ public class AccessibilityEndToEndTest extends
          * Resets this instance so it can be reused.
          */
         private void reset() {
-            synchronized (this) {
+            synchronized (mLock) {
                 mExpectedEvents.clear();
                 mExpectedInterrupt = false;
                 mReplaying = false;
+                mLock.notifyAll();
             }
         }
 
@@ -620,7 +499,7 @@ public class AccessibilityEndToEndTest extends
 
         @Override
         public void onAccessibilityEvent(AccessibilityEvent receivedEvent) {
-            synchronized (this) {
+            synchronized (mLock) {
                 if (!mReplaying) {
                     return;
                 }
@@ -629,45 +508,22 @@ public class AccessibilityEndToEndTest extends
                 }
                 AccessibilityEvent expectedEvent = mExpectedEvents.poll();
                 assertEqualsAccessiblityEvent(expectedEvent, receivedEvent);
+                mLock.notifyAll();
             }
         }
 
         @Override
         public void onInterrupt() {
-            synchronized (this) {
+            synchronized (mLock) {
                 if (!mReplaying) {
                     return;
                 }
-
                 if (!mExpectedInterrupt) {
                     throw new IllegalStateException("Unexpected call to onInterrupt()");
                 }
-
                 mExpectedInterrupt = false;
+                mLock.notifyAll();
             }
-        }
-
-        /**
-         * {@inheritDoc ServiceConnection#onServiceConnected(ComponentName,IBinder)}
-         */
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            IAccessibilityServiceDelegateConnection connection =
-                IAccessibilityServiceDelegateConnection.Stub
-                    .asInterface(service);
-            try {
-                connection.setAccessibilityServiceDelegate(new AccessibilityServiceDelegate(this));
-                mInitialized = true;
-            } catch (RemoteException re) {
-                fail("Could not set delegate to the delegating service.");
-            }
-        }
-
-        /**
-         * {@inheritDoc ServiceConnection#onServiceDisconnected(ComponentName)}
-         */
-        public void onServiceDisconnected(ComponentName name) {
-            mInitialized = false;
-            /* do nothing */
         }
 
         /**
@@ -762,85 +618,6 @@ public class AccessibilityEndToEndTest extends
                 // compare the string representation
                 TestCase.assertEquals(message, expectedTextIterator.next().toString(),
                         receivedTextIterator.next().toString());
-            }
-        }
-
-        /**
-         * This class is the delegate called by the DelegatingAccessibilityService.
-         */
-        private class AccessibilityServiceDelegate extends
-                IAccessibilityServiceDelegate.Stub implements Handler.Callback {
-
-            /**
-             * Tag for logging.
-             */
-            private static final String LOG_TAG = "AccessibilityServiceDelegate";
-
-            /**
-             * Message type for calling {@link #onInterrupt()}
-             */
-            private static final int DO_ON_INTERRUPT = 10;
-
-            /**
-             * Message type for calling {@link #onAccessibilityEvent(AccessibilityEvent)}
-             */
-            private static final int DO_ON_ACCESSIBILITY_EVENT = 20;
-
-            /**
-             * Caller for handling {@link Message}s
-             */
-            private final Handler mHandler;
-
-            /**
-             * The {@link MockAccessibilityService} to which to delegate;
-             */
-            private MockAccessibilityService mMockAccessibilityService;
-
-            /**
-             * Creates a new instance.
-             *
-             * @param mockAccessibilityService The service to whcih to delegate.
-             */
-            public AccessibilityServiceDelegate(MockAccessibilityService mockAccessibilityService) {
-                mMockAccessibilityService = mockAccessibilityService;
-                mHandler = new Handler(this);
-            }
-
-            /**
-             * {@inheritDoc IAccessibilityServiceDelegate#onAccessibilityEvent(AccessibilityEvent)}
-             */
-            public void onAccessibilityEvent(AccessibilityEvent event) {
-                Message message = Message.obtain(mHandler, DO_ON_ACCESSIBILITY_EVENT, event);
-                mHandler.sendMessage(message);
-            }
-
-            /**
-             * {@inheritDoc IAccessibilityServiceDelegate#onInterrupt()}
-             */
-            public void onInterrupt() {
-                Message message = mHandler.obtainMessage(DO_ON_INTERRUPT);
-                mHandler.sendMessage(message);
-            }
-
-            /**
-             * {@inheritDoc Handler.Callback#handleMessage(Message)}
-             */
-            public boolean handleMessage(Message message) {
-                switch (message.what) {
-                    case DO_ON_ACCESSIBILITY_EVENT:
-                        AccessibilityEvent event = (AccessibilityEvent) message.obj;
-                        if (event != null) {
-                            mMockAccessibilityService.onAccessibilityEvent(event);
-                            event.recycle();
-                        }
-                        return true;
-                    case DO_ON_INTERRUPT:
-                        mMockAccessibilityService.onInterrupt();
-                        return true;
-                    default:
-                        Log.w(LOG_TAG, "Unknown message type " + message.what);
-                        return false;
-                }
             }
         }
     }
