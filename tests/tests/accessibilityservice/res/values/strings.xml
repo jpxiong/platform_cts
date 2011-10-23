@@ -44,4 +44,38 @@
     <!-- String notification message -->
     <string name="notification_message">Notification message</string>
 
+
+    <!-- String title of the accessibility query window test activity -->
+    <string name="accessibility_query_window_test_activity">Query window test</string>
+
+    <!-- String Button1 text -->
+    <string name="button1">Button1</string>
+
+    <!-- String Button2 text -->
+    <string name="button2">Button2</string>
+
+    <!-- String Button3 text -->
+    <string name="button3">Button3</string>
+
+    <!-- String Button4 text -->
+    <string name="button4">Button4</string>
+
+    <!-- String Button5 text -->
+    <string name="button5">Button5</string>
+
+    <!-- String Button6 text -->
+    <string name="button6">Button6</string>
+
+    <!-- String with content description for Button6 -->
+    <string name="contentDescription">contentDescription</string>
+
+    <!-- String Button7 text -->
+    <string name="button7">Button7</string>
+
+    <!-- String Button8 text -->
+    <string name="button8">Button8</string>
+
+    <!-- String Button9 text -->
+    <string name="button9">Button9</string>
+
 </resources>
