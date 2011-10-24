@@ -17,7 +17,6 @@
 package android.accessibilityservice.delegate;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accessibilityservice.IAccessibilityServiceDelegate;
 import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
 import android.app.Service;
@@ -64,14 +63,6 @@ public class DelegatingAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
-        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
-        info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
-        info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-        info.packageNames = new String[] {
-            "com.android.cts.accessibilityservice"
-        };
-        setServiceInfo(info);
-
         // the service is ready to be used only
         // after the system has bound to it
         sServiceDelegate = this;
