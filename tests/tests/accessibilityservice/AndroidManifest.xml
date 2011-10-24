@@ -26,6 +26,9 @@
       <activity android:label="@string/accessibility_end_to_end_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityEndToEndTestActivity"/>
 
+      <activity android:label="@string/accessibility_query_window_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityWindowQueryActivity"/>
+
   </application>
 
   <instrumentation android:name="android.test.InstrumentationTestRunner"
