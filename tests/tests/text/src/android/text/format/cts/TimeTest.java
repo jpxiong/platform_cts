@@ -627,10 +627,10 @@ public class TimeTest extends AndroidTestCase {
     )
     public void testSetToNow0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
-        t.setToNow();
         long currentTime = System.currentTimeMillis();
+        t.setToNow();
         long time = t.toMillis(false);
-        assertEquals(currentTime, time, 500);
+        assertEquals(currentTime, time, 999);
     }
 
     @TestTargetNew(
