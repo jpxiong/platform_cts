@@ -16,9 +16,9 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.Log;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
+import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.util.FileUtil;
 
@@ -32,7 +32,6 @@ import java.util.zip.ZipFile;
  */
 public class VMHostTest extends JarHostTest {
 
-    private static final String LOG_TAG = "VMHostTest";
     private static final String VM_TEST_TEMP_DIR = "/data/local/tmp/vm-tests";
 
     /**
@@ -60,36 +59,38 @@ public class VMHostTest extends JarHostTest {
     private boolean installVmPrereqs(ITestDevice device, CtsBuildHelper ctsBuild)
             throws DeviceNotAvailableException {
         if (device.doesFileExist(VM_TEST_TEMP_DIR)) {
-            Log.d(LOG_TAG, String.format("Removing device's temp dir %s from previous runs.",
-                    VM_TEST_TEMP_DIR));
+            CLog.d("Removing device's temp dir %s from previous runs.", VM_TEST_TEMP_DIR);
             device.executeShellCommand(String.format("rm -r %s", VM_TEST_TEMP_DIR));
         }
         // Creates temp directory recursively. We also need to create the dalvik-cache directory
         // which is used by the dalvikvm to optimize things. Without the dalvik-cache, there will be
         // a sigsev thrown by the vm.
-        Log.d(LOG_TAG, "Creating device temp directory, including dalvik-cache.");
+        CLog.d("Creating device temp directory, including dalvik-cache.");
         createRemoteDir(device, VM_TEST_TEMP_DIR + "/dalvik-cache" );
         try {
             File localTmpDir = FileUtil.createTempDir("cts-vm", new File("/tmp/"));
-            Log.d(LOG_TAG, String.format("Creating host temp dir %s", localTmpDir.getPath()));
+            CLog.d("Creating host temp dir %s", localTmpDir.getPath());
             File jarFile = new File(ctsBuild.getTestCasesDir(), getJarFileName());
             if (!jarFile.exists()) {
-                Log.e(LOG_TAG, String.format("Missing jar file %s", jarFile.getPath()));
+                CLog.e("Missing jar file %s", jarFile.getPath());
                 return false;
             }
-            Log.d(LOG_TAG, String.format("Extracting jar file %s to host temp directory %s.",
-                    jarFile.getPath(), localTmpDir.getPath()));
+            CLog.d("Extracting jar file %s to host temp directory %s.",
+                    jarFile.getPath(), localTmpDir.getPath());
             ZipFile zipFile = new ZipFile(jarFile);
             FileUtil.extractZip(zipFile, localTmpDir);
-            File localTestTmpDir = new File(localTmpDir, "tests/dot");
-            Log.d(LOG_TAG, String.format("Syncing host dir %s to device dir %s",
-                    localTestTmpDir.getPath(), VM_TEST_TEMP_DIR));
-            device.syncFiles(localTestTmpDir, VM_TEST_TEMP_DIR);
-            Log.d(LOG_TAG, String.format("Cleaning up host temp dir %s", localTmpDir.getPath()));
+            File localTestTmpDir = new File(localTmpDir, "tests");
+            CLog.d("Syncing host dir %s to device dir %s",
+                    localTestTmpDir.getPath(), VM_TEST_TEMP_DIR);
+            if (!device.pushDir(localTestTmpDir, VM_TEST_TEMP_DIR)) {
+                CLog.e("Failed to push vm test files");
+                return false;
+            }
+            CLog.d("Cleaning up host temp dir %s", localTmpDir.getPath());
             FileUtil.recursiveDelete(localTmpDir);
         } catch (IOException e) {
-            Log.e(LOG_TAG, String.format("Failed to extract jar file %s and sync it to device %s.",
-                    getJarFileName(), device.getSerialNumber()));
+            CLog.e("Failed to extract jar file %s and sync it to device %s.",
+                    getJarFileName(), device.getSerialNumber());
             return false;
         }
         return true;
