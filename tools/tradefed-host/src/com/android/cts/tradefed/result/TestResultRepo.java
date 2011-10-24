@@ -54,10 +54,15 @@ public class TestResultRepo implements ITestResultRepo {
                 File resultFile = new File(resultList.get(i),
                         CtsXmlResultReporter.TEST_RESULT_FILE_NAME);
                 if (resultFile.exists()) {
-                    mResultDirs.add(i, resultList.get(i));
+                    mResultDirs.add(resultList.get(i));
                 }
             }
         }
+    }
+
+    @Override
+    public File getReportDir(int sessionId) {
+        return mResultDirs.get(sessionId);
     }
 
     private ITestSummary parseSummary(int id, File resultDir) {

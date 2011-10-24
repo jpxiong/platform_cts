@@ -16,8 +16,6 @@
 package com.android.cts.tradefed.result;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestResult.TestStatus;
 
 import junit.framework.TestCase;
 
@@ -34,14 +32,11 @@ public class TestPackageResultTest extends TestCase {
     public void testGetTestsWithStatus() {
         TestPackageResult pkgResult = new TestPackageResult();
         TestIdentifier excludedTest = new TestIdentifier("com.example.ExampleTest", "testPass");
-        TestResult passed = new TestResult();
-        passed.setStatus(TestStatus.PASSED);
-        pkgResult.insertTest(excludedTest, passed);
+        pkgResult.insertTest(excludedTest);
+        pkgResult.reportTestEnded(excludedTest);
         TestIdentifier includedTest = new TestIdentifier("com.example.ExampleTest",
                 "testNotExecuted");
-        TestResult notExecuted = new TestResult();
-        notExecuted.setStatus(TestStatus.INCOMPLETE);
-        pkgResult.insertTest(includedTest, notExecuted);
+        pkgResult.insertTest(includedTest);
         Collection<TestIdentifier> tests =  pkgResult.getTestsWithStatus(
                 CtsTestStatus.NOT_EXECUTED);
         assertEquals(1, tests.size());

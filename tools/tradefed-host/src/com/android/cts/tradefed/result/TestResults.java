@@ -15,12 +15,21 @@
  */
 package com.android.cts.tradefed.result;
 
+import com.android.cts.tradefed.device.DeviceInfoCollector;
+import com.android.tradefed.log.LogUtil.CLog;
+
+import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure for the detailed CTS test results.
@@ -29,7 +38,8 @@ import java.util.List;
  */
 class TestResults extends AbstractXmlPullParser {
 
-    private List<TestPackageResult> mPackages = new ArrayList<TestPackageResult>();
+    private Map<String, TestPackageResult> mPackageMap = new LinkedHashMap<String, TestPackageResult>();
+    private TestPackageResult mDeviceInfoPkg = new TestPackageResult();
 
     /**
      * {@inheritDoc}
@@ -42,16 +52,91 @@ class TestResults extends AbstractXmlPullParser {
                     TestPackageResult.TAG)) {
                 TestPackageResult pkg = new TestPackageResult();
                 pkg.parse(parser);
-                mPackages.add(pkg);
+                if (pkg.getAppPackageName() != null) {
+                    mPackageMap.put(pkg.getAppPackageName(), pkg);
+                } else {
+                    CLog.w("Found package with no app package name");
+                }
             }
             eventType = parser.next();
         }
     }
 
     /**
-     * @return the list of parsed {@link TestPackageResult}.
+     * @return the list of {@link TestPackageResult}.
      */
-    public List<TestPackageResult> getPackages() {
-        return mPackages;
+    public Collection<TestPackageResult> getPackages() {
+        return mPackageMap.values();
+    }
+
+    /**
+     * Count the number of tests with given status
+     * @param pass
+     * @return
+     */
+    public int countTests(CtsTestStatus status) {
+        int total = 0;
+        for (TestPackageResult result : mPackageMap.values()) {
+            total += result.countTests(status);
+        }
+        return total;
+    }
+
+    /**
+     * @return
+     */
+    public Map<String, String> getDeviceInfoMetrics() {
+        return mDeviceInfoPkg.getMetrics();
+    }
+
+    /**
+     * @param mCurrentPkgResult
+     */
+    public void addPackageResult(TestPackageResult pkgResult) {
+        mPackageMap.put(pkgResult.getName(), pkgResult);
+    }
+
+    /**
+     * @param serializer
+     * @throws IOException
+     */
+    public void serialize(KXmlSerializer serializer) throws IOException {
+        // sort before serializing
+        List<TestPackageResult> pkgs = new ArrayList<TestPackageResult>(mPackageMap.values());
+        Collections.sort(pkgs, new PkgComparator());
+        for (TestPackageResult r : pkgs) {
+            r.serialize(serializer);
+        }
+    }
+
+    private static class PkgComparator implements Comparator<TestPackageResult> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int compare(TestPackageResult o1, TestPackageResult o2) {
+            return o1.getAppPackageName().compareTo(o2.getAppPackageName());
+        }
+
+    }
+
+    /**
+     * Return existing package with given app package name. If not found, create a new one.
+     * @param name
+     * @return
+     */
+    public TestPackageResult getOrCreatePackage(String appPackageName) {
+        if (appPackageName.equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+            mDeviceInfoPkg.setAppPackageName(DeviceInfoCollector.APP_PACKAGE_NAME);
+            return mDeviceInfoPkg ;
+        }
+        TestPackageResult pkgResult = mPackageMap.get(appPackageName);
+        if (pkgResult == null) {
+            pkgResult = new TestPackageResult();
+            pkgResult.setAppPackageName(appPackageName);
+            mPackageMap.put(appPackageName, pkgResult);
+        }
+        return pkgResult;
     }
 }
