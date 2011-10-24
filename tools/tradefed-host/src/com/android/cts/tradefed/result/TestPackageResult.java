@@ -15,9 +15,9 @@
  */
 package com.android.cts.tradefed.result;
 
+import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
-import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure for a CTS test package result.
@@ -47,6 +49,8 @@ class TestPackageResult  extends AbstractXmlPullParser {
     private String mAppPackageName;
     private String mName;
     private String mDigest;
+
+    private Map<String, String> mMetrics = new HashMap<String, String>();
 
     private TestSuite mSuiteRoot = new TestSuite(null);
 
@@ -87,17 +91,31 @@ class TestPackageResult  extends AbstractXmlPullParser {
      * @param testId
      * @param testResult
      */
-    public void insertTest(TestIdentifier testId, TestResult testResult) {
+    public Test insertTest(TestIdentifier testId) {
+        return findTest(testId, true);
+    }
+
+    private Test findTest(TestIdentifier testId, boolean insertIfMissing) {
         List<String> classNameSegments = new LinkedList<String>();
         Collections.addAll(classNameSegments, testId.getClassName().split("\\."));
         if (classNameSegments.size() <= 0) {
             CLog.e("Unrecognized package name format for test class '%s'",
                     testId.getClassName());
-        } else {
-            String testCaseName = classNameSegments.remove(classNameSegments.size()-1);
-            mSuiteRoot.insertTest(classNameSegments, testCaseName, testId.getTestName(),
-                    testResult);
+            // should never happen
+            classNameSegments.add("UnknownTestClass");
         }
+            String testCaseName = classNameSegments.remove(classNameSegments.size()-1);
+            return mSuiteRoot.findTest(classNameSegments, testCaseName, testId.getTestName(), insertIfMissing);
+    }
+
+
+    /**
+     * Find the test result for given {@link TestIdentifier}.
+     * @param testId
+     * @return the {@link Test} or <code>null</code>
+     */
+    public Test findTest(TestIdentifier testId) {
+        return findTest(testId, false);
     }
 
     /**
@@ -108,14 +126,29 @@ class TestPackageResult  extends AbstractXmlPullParser {
      */
     public void serialize(KXmlSerializer serializer) throws IOException {
         serializer.startTag(ns, TAG);
-        serializer.attribute(ns, NAME_ATTR, mName);
-        serializer.attribute(ns, APP_PACKAGE_NAME_ATTR, mAppPackageName);
-        serializer.attribute(ns, DIGEST_ATTR, getDigest());
-        if (mName.equals(SIGNATURE_TEST_PKG)) {
+        serializeAttribute(serializer, NAME_ATTR, mName);
+        serializeAttribute(serializer, APP_PACKAGE_NAME_ATTR, mAppPackageName);
+        serializeAttribute(serializer, DIGEST_ATTR, getDigest());
+        if (SIGNATURE_TEST_PKG.equals(mName)) {
             serializer.attribute(ns, "signatureCheck", "true");
         }
         mSuiteRoot.serialize(serializer);
         serializer.endTag(ns, TAG);
+    }
+
+    /**
+     * Helper method to serialize attributes.
+     * Can handle null values. Useful for cases where test package has not been fully populated
+     * such as when unit testing.
+     *
+     * @param attrName
+     * @param attrValue
+     * @throws IOException
+     */
+    private void serializeAttribute(KXmlSerializer serializer, String attrName, String attrValue)
+            throws IOException {
+        attrValue = attrValue == null ? "" : attrValue;
+        serializer.attribute(ns, attrName, attrValue);
     }
 
     /**
@@ -158,5 +191,64 @@ class TestPackageResult  extends AbstractXmlPullParser {
         Deque<String> suiteNames = new LinkedList<String>();
         mSuiteRoot.addTestsWithStatus(tests, suiteNames, resultFilter);
         return tests;
+    }
+
+    /**
+     * Populate values in this package result from run metrics
+     * @param runResult
+     */
+    public void populateMetrics(Map<String, String> metrics) {
+        String name = metrics.get(CtsTest.PACKAGE_NAME_METRIC);
+        if (name != null) {
+            setName(name);
+        }
+        String digest = metrics.get(CtsTest.PACKAGE_DIGEST_METRIC);
+        if (digest != null) {
+            setDigest(digest);
+        }
+        mMetrics.putAll(metrics);
+    }
+
+    /**
+     * Report the given test as a failure.
+     *
+     * @param test
+     * @param status
+     * @param trace
+     */
+    public void reportTestFailure(TestIdentifier test, CtsTestStatus status, String trace) {
+        Test result = findTest(test);
+        result.setResultStatus(status);
+        result.setStackTrace(trace);
+    }
+
+    /**
+     * Report that the given test has completed.
+     *
+     * @param test
+     */
+    public void reportTestEnded(TestIdentifier test) {
+        Test result = findTest(test);
+        if (!result.getResult().equals(CtsTestStatus.FAIL)) {
+            result.setResultStatus(CtsTestStatus.PASS);
+        }
+        result.updateEndTime();
+    }
+
+    /**
+     * Return the number of tests with given status
+     *
+     * @param status
+     * @return the total number of tests with given status
+     */
+    public int countTests(CtsTestStatus status) {
+        return mSuiteRoot.countTests(status);
+    }
+
+    /**
+     * @return
+     */
+    public Map<String, String> getMetrics() {
+        return mMetrics;
     }
 }

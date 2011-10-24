@@ -64,7 +64,7 @@ public class TestResultsTest extends junit.framework.TestCase {
         TestResults parser = new TestResults();
         parser.parse(new StringReader(TEST_PACKAGE_FULL));
         assertEquals(1, parser.getPackages().size());
-        TestPackageResult pkg = parser.getPackages().get(0);
+        TestPackageResult pkg = parser.getPackages().iterator().next();
         assertEquals("pkgName", pkg.getName());
         assertEquals("appPkgName", pkg.getAppPackageName());
         assertEquals("digValue", pkg.getDigest());
@@ -91,7 +91,7 @@ public class TestResultsTest extends junit.framework.TestCase {
         TestResults parser = new TestResults();
         parser.parse(new StringReader(TEST_FULL));
         assertEquals(1, parser.getPackages().size());
-        TestPackageResult pkg = parser.getPackages().get(0);
+        TestPackageResult pkg = parser.getPackages().iterator().next();
         TestSuite comSuite = pkg.getTestSuites().iterator().next();
         assertEquals("com", comSuite.getName());
         TestSuite exampleSuite = comSuite.getTestSuites().iterator().next();

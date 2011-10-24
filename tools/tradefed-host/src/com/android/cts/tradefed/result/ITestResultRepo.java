@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -36,5 +37,12 @@ public interface ITestResultRepo {
      * cannot be retrieved
      */
     public TestResults getResult(int sessionId);
+
+    /**
+     * Get the report directory for given result
+     * @param sessionId
+     * @return
+     */
+    public File getReportDir(int sessionId);
 
 }
