@@ -16,20 +16,15 @@
 
 package android.os.cts;
 
+import android.os.FileObserver;
+import android.test.AndroidTestCase;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import android.os.FileObserver;
-import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
-@TestTargetClass(FileObserver.class)
 public class FileObserverTest extends AndroidTestCase {
 
     private File mTestFile;
@@ -73,18 +68,6 @@ public class FileObserverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FileObserver",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FileObserver",
-            args = {java.lang.String.class, int.class}
-        )
-    })
     public void testConstructor() {
         // new the instance
         new MockFileObserver(PATH);
@@ -104,31 +87,6 @@ public class FileObserverTest extends AndroidTestCase {
      * moved from dir observer should get moved-from event,
      * moved to dir observer should get moved-to event.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startWatching",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onEvent",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "stopWatching",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finalize",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1725406", explanation =
-        "android.os.FileObserver#onEvent(int event, String path) still got event "
-        + "after called FileObserver#stopWatching()")
     public void testFileObserver() throws Exception {
         MockFileObserver fileObserver = null;
         int[] expected = null;
@@ -172,7 +130,7 @@ public class FileObserverTest extends AndroidTestCase {
             mTestDir.delete();
 
             expected = new int[] {FileObserver.CREATE,
-                    FileObserver.OPEN, FileObserver.CLOSE_NOWRITE,
+                    FileObserver.OPEN, FileObserver.CLOSE_WRITE,
                     FileObserver.DELETE, FileObserver.DELETE_SELF, UNDEFINED};
             moveEvents = waitForEvent(fileObserver);
             assertEventsEquals(expected, moveEvents);
@@ -217,9 +175,15 @@ public class FileObserverTest extends AndroidTestCase {
     }
 
     private void assertEventsEquals(final int[] expected, final FileEvent[] moveEvents) {
-        assertEquals(expected.length, moveEvents.length);
+        List<Integer> expectedEvents = new ArrayList<Integer>();
         for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], moveEvents[i].event);
+            expectedEvents.add(expected[i]);
+        }
+        List<FileEvent> actualEvents = Arrays.asList(moveEvents);
+        String message = "Expected: " + expectedEvents + " Actual: " + actualEvents;
+        assertEquals(message, expected.length, moveEvents.length);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(message, expected[i], moveEvents[i].event);
         }
     }
 
@@ -238,6 +202,11 @@ public class FileObserverTest extends AndroidTestCase {
         public FileEvent(final int event, final String path) {
             this.event = event;
             this.path = path;
+        }
+
+        @Override
+        public String toString() {
+            return Integer.toString(event);
         }
     }
 
