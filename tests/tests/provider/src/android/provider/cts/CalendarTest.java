@@ -1824,10 +1824,13 @@ public class CalendarTest extends InstrumentationTestCase {
         addAttendees(account, eventId, seed);
         addReminders(account, eventId, seed);
 
-        // Select a period that gives us 5 instances.
+        // Select a period that gives us 5 instances.  We don't want this to straddle a DST
+        // transition, because we expect the startMinute field to be the same for all
+        // instances, and it's stored as minutes since midnight in the device's time zone.
+        // Things won't be consistent if the event and the device have different ideas about DST.
         String timeZone = eventValues.getAsString(Events.EVENT_TIMEZONE);
-        String testStart = "1999-03-28T00:00:00";
-        String testEnd = "1999-04-25T23:59:59";
+        String testStart = "1999-04-18T00:00:00";
+        String testEnd = "1999-05-16T23:59:59";
         String[] projection = { Instances.BEGIN, Instances.START_MINUTE, Instances.END_MINUTE };
 
         Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
