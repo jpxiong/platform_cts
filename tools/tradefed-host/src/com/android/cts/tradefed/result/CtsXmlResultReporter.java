@@ -16,6 +16,8 @@
 
 package com.android.cts.tradefed.result;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.build.CtsBuildProvider;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
@@ -27,17 +29,14 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.log.LogUtil.CLog;
-import com.android.tradefed.result.CollectingTestListener;
+import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
-import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestRunResult;
+import com.android.tradefed.result.TestSummary;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.StreamUtil;
 
 import org.kxml2.io.KXmlSerializer;
-
-import android.tests.getinfo.DeviceInfoConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +56,7 @@ import java.util.Map;
  * <p/>
  * Outputs xml in format governed by the cts_result.xsd
  */
-public class CtsXmlResultReporter extends CollectingTestListener {
+public class CtsXmlResultReporter implements ITestInvocationListener {
 
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
@@ -88,14 +87,18 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     @Option(name = CtsTest.PLAN_OPTION, description = "the test plan to run.")
     private String mPlanName = "NA";
 
+    // listen in on the continue-session option provided to CtsTest
+    @Option(name = CtsTest.CONTINUE_OPTION, description = "the test result session to continue.")
+    private Integer mContinueSessionId = null;
+
     @Option(name = "quiet-output", description = "Mute display of test results.")
     private boolean mQuietOutput = false;
 
     protected IBuildInfo mBuildInfo;
-
     private String mStartTime;
-
     private String mDeviceSerial;
+    private TestResults mResults = new TestResults();
+    private TestPackageResult mCurrentPkgResult = null;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -106,29 +109,51 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     @Override
     public void invocationStarted(IBuildInfo buildInfo) {
-        super.invocationStarted(buildInfo);
-        if (mReportDir == null) {
-            if (!(buildInfo instanceof IFolderBuildInfo)) {
-                throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
-            }
-
-            IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
-            try {
-                CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
-                buildHelper.validateStructure();
-                mReportDir = buildHelper.getResultsDir();
-            } catch (FileNotFoundException e) {
-                throw new IllegalArgumentException("Invalid CTS build", e);
-            }
+        mBuildInfo = buildInfo;
+        if (!(buildInfo instanceof IFolderBuildInfo)) {
+            throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
         }
-        // create a unique directory for saving results, using old cts host convention
-        // TODO: in future, consider using LogFileSaver to create build-specific directories
-        mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
-        mReportDir.mkdirs();
-        mStartTime = getTimestamp();
+        IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
         mDeviceSerial = buildInfo.getDeviceSerial() == null ? "unknown_device" :
-                buildInfo.getDeviceSerial();
-        logResult("Created result dir %s", mReportDir.getName());
+            buildInfo.getDeviceSerial();
+        if (mContinueSessionId != null) {
+            CLog.d("Continuing session %d", mContinueSessionId);
+            // reuse existing directory
+            TestResultRepo resultRepo = new TestResultRepo(getBuildHelper(ctsBuild).getResultsDir());
+            mResults = resultRepo.getResult(mContinueSessionId);
+            if (mResults == null) {
+                throw new IllegalArgumentException(String.format("Could not find session %d",
+                        mContinueSessionId));
+            }
+            mPlanName = resultRepo.getSummaries().get(mContinueSessionId).getTestPlan();
+            mStartTime = resultRepo.getSummaries().get(mContinueSessionId).getTimestamp();
+            mReportDir = resultRepo.getReportDir(mContinueSessionId);
+        } else {
+            if (mReportDir == null) {
+                mReportDir = getBuildHelper(ctsBuild).getResultsDir();
+            }
+            // create a unique directory for saving results, using old cts host convention
+            // TODO: in future, consider using LogFileSaver to create build-specific directories
+            mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
+            mReportDir.mkdirs();
+            mStartTime = getTimestamp();
+            logResult("Created result dir %s", mReportDir.getName());
+        }
+    }
+
+    /**
+     * Helper method to retrieve the {@link CtsBuildHelper}.
+     * @param ctsBuild
+     * @return
+     */
+    CtsBuildHelper getBuildHelper(IFolderBuildInfo ctsBuild) {
+        CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
+        try {
+            buildHelper.validateStructure();
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("Invalid CTS build", e);
+        }
+        return buildHelper;
     }
 
     /**
@@ -149,31 +174,60 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void testRunStarted(String name, int numTests) {
+        if (mCurrentPkgResult != null && !name.equals(mCurrentPkgResult.getAppPackageName())) {
+            // display results from previous run
+            logCompleteRun(mCurrentPkgResult);
+        }
         if (name.equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
             logResult("Collecting device info");
-        } else if (!name.equals(getCurrentRunResults().getName())) {
-            // this is a new run
-            if (getCurrentRunResults().isRunComplete()) {
-                // display results from previous run
-                logCompleteRun(getCurrentRunResults());
-            }
+        } else  if (mCurrentPkgResult == null || !name.equals(
+                mCurrentPkgResult.getAppPackageName())) {
             logResult("-----------------------------------------");
             logResult("Test package %s started", name);
             logResult("-----------------------------------------");
         }
-        super.testRunStarted(name, numTests);
+        mCurrentPkgResult = mResults.getOrCreatePackage(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testStarted(TestIdentifier test) {
+        mCurrentPkgResult.insertTest(test);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        super.testEnded(test, testMetrics);
-        TestRunResult results = getCurrentRunResults();
-        TestResult result = results.getTestResults().get(test);
+        mCurrentPkgResult.reportTestEnded(test);
+        Test result = mCurrentPkgResult.findTest(test);
         String stack = result.getStackTrace() == null ? "" : "\n" + result.getStackTrace();
-        logResult("%s#%s %s %s", test.getClassName(), test.getTestName(), result.getStatus(),
+        logResult("%s#%s %s %s", test.getClassName(), test.getTestName(), result.getResult(),
                 stack);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
+        mCurrentPkgResult.populateMetrics(runMetrics);
     }
 
     /**
@@ -182,10 +236,9 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     @Override
     public void invocationEnded(long elapsedTime) {
         // display the results of the last completed run
-        if (getCurrentRunResults().isRunComplete()) {
-            logCompleteRun(getCurrentRunResults());
+        if (mCurrentPkgResult != null) {
+            logCompleteRun(mCurrentPkgResult);
         }
-        super.invocationEnded(elapsedTime);
         createXmlResult(mReportDir, mStartTime, elapsedTime);
         copyFormattingFiles(mReportDir);
         zipResults(mReportDir);
@@ -199,16 +252,15 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         }
     }
 
-    private void logCompleteRun(TestRunResult runResults) {
-        if (runResults.getName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+    private void logCompleteRun(TestPackageResult pkgResult) {
+        if (pkgResult.getAppPackageName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
             logResult("Device info collection complete");
             return;
         }
         logResult("%s package complete: Passed %d, Failed %d, Not Executed %d",
-                runResults.getName(), runResults.getNumPassedTests(),
-                runResults.getNumFailedTests() +
-                runResults.getNumErrorTests(),
-                runResults.getNumIncompleteTests());
+                pkgResult.getAppPackageName(), pkgResult.countTests(CtsTestStatus.PASS),
+                pkgResult.countTests(CtsTestStatus.FAIL),
+                pkgResult.countTests(CtsTestStatus.NOT_EXECUTED));
     }
 
     /**
@@ -230,8 +282,10 @@ public class CtsXmlResultReporter extends CollectingTestListener {
             serializeResultsDoc(serializer, startTimestamp, endTime);
             serializer.endDocument();
             String msg = String.format("XML test result file generated at %s. Passed %d, " +
-                    "Failed %d, Not Executed %d", mReportDir.getName(), getNumPassedTests(),
-                    getNumFailedTests() + getNumErrorTests(), getNumIncompleteTests());
+                    "Failed %d, Not Executed %d", mReportDir.getName(),
+                    mResults.countTests(CtsTestStatus.PASS),
+                    mResults.countTests(CtsTestStatus.FAIL),
+                    mResults.countTests(CtsTestStatus.NOT_EXECUTED));
             logResult(msg);
             logResult("Time: %s", TimeUtil.formatElapsedTime(elapsedTime));
         } catch (IOException e) {
@@ -260,7 +314,7 @@ public class CtsXmlResultReporter extends CollectingTestListener {
         serializeDeviceInfo(serializer);
         serializeHostInfo(serializer);
         serializeTestSummary(serializer);
-        serializeTestResults(serializer);
+        mResults.serialize(serializer);
         // TODO: not sure why, but the serializer doesn't like this statement
         //serializer.endTag(ns, RESULT_TAG);
     }
@@ -273,15 +327,16 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     private void serializeDeviceInfo(KXmlSerializer serializer) throws IOException {
         serializer.startTag(ns, "DeviceInfo");
 
-        TestRunResult deviceInfoResult = findRunResult(DeviceInfoCollector.APP_PACKAGE_NAME);
-        if (deviceInfoResult == null) {
-            Log.w(LOG_TAG, String.format("Could not find device info run %s",
-                    DeviceInfoCollector.APP_PACKAGE_NAME));
+        Map<String, String> deviceInfoMetrics = mResults.getDeviceInfoMetrics();
+        if (deviceInfoMetrics == null || deviceInfoMetrics.isEmpty()) {
+            // this might be expected, if device info collection was turned off
+            CLog.d("Could not find device info");
             return;
         }
+
         // Extract metrics that need extra handling, and then dump the remainder into BuildInfo
         Map<String, String> metricsCopy = new HashMap<String, String>(
-                deviceInfoResult.getRunMetrics());
+                deviceInfoMetrics);
         serializer.startTag(ns, "Screen");
         String screenWidth = metricsCopy.remove(DeviceInfoConstants.SCREEN_WIDTH);
         String screenHeight = metricsCopy.remove(DeviceInfoConstants.SCREEN_HEIGHT);
@@ -390,21 +445,6 @@ public class CtsXmlResultReporter extends CollectingTestListener {
     }
 
     /**
-     * Finds the {@link TestRunResult} with the given name.
-     *
-     * @param runName
-     * @return the {@link TestRunResult}
-     */
-    private TestRunResult findRunResult(String runName) {
-        for (TestRunResult runResult : getRunResults()) {
-            if (runResult.getName().equals(runName)) {
-                return runResult;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Output the host info XML.
      *
      * @param serializer
@@ -451,66 +491,15 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     private void serializeTestSummary(KXmlSerializer serializer) throws IOException {
         serializer.startTag(ns, SUMMARY_TAG);
-        serializer.attribute(ns, FAILED_ATTR, Integer.toString(getNumErrorTests() +
-                getNumFailedTests()));
-        serializer.attribute(ns, NOT_EXECUTED_ATTR,  Integer.toString(getNumIncompleteTests()));
+        serializer.attribute(ns, FAILED_ATTR, Integer.toString(mResults.countTests(
+                CtsTestStatus.FAIL)));
+        serializer.attribute(ns, NOT_EXECUTED_ATTR,  Integer.toString(mResults.countTests(
+                CtsTestStatus.NOT_EXECUTED)));
         // ignore timeouts - these are reported as errors
         serializer.attribute(ns, TIMEOUT_ATTR, "0");
-        serializer.attribute(ns, PASS_ATTR, Integer.toString(getNumPassedTests()));
+        serializer.attribute(ns, PASS_ATTR, Integer.toString(mResults.countTests(
+                CtsTestStatus.PASS)));
         serializer.endTag(ns, SUMMARY_TAG);
-    }
-
-    /**
-     * Output the detailed test results XML.
-     *
-     * @param serializer
-     * @throws IOException
-     */
-    private void serializeTestResults(KXmlSerializer serializer) throws IOException {
-        for (TestRunResult runResult : getRunResults()) {
-            serializeTestRunResult(serializer, runResult);
-        }
-    }
-
-    /**
-     * Output the XML for one test run aka test package.
-     *
-     * @param serializer
-     * @param runResult the {@link TestRunResult}
-     * @throws IOException
-     */
-    private void serializeTestRunResult(KXmlSerializer serializer, TestRunResult runResult)
-            throws IOException {
-        if (runResult.getName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
-            // ignore run results for the info collecting packages
-            return;
-        }
-        TestPackageResult packageResult = new TestPackageResult();
-        packageResult.setName(getMetric(runResult, CtsTest.PACKAGE_NAME_METRIC));
-        packageResult.setAppPackageName(runResult.getName());
-        packageResult.setDigest(getMetric(runResult, CtsTest.PACKAGE_DIGEST_METRIC));
-        // organize the tests into data structures that mirror the expected xml output.
-        for (Map.Entry<TestIdentifier, TestResult> testEntry : runResult.getTestResults()
-                .entrySet()) {
-            packageResult.insertTest(testEntry.getKey(), testEntry.getValue());
-        }
-        // dump the results
-        packageResult.serialize(serializer);
-    }
-
-    /**
-     * Helper method to retrieve the metric value with given name, or blank if not found
-     *
-     * @param runResult
-     * @param string
-     * @return
-     */
-    private String getMetric(TestRunResult runResult, String keyName) {
-        String value = runResult.getRunMetrics().get(keyName);
-        if (value == null) {
-            return "";
-        }
-        return value;
     }
 
     /**
@@ -569,5 +558,37 @@ public class CtsXmlResultReporter extends CollectingTestListener {
      */
     String getTimestamp() {
         return TimeUtil.getTimestamp();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testRunFailed(String errorMessage) {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testRunStopped(long elapsedTime) {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invocationFailed(Throwable cause) {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TestSummary getSummary() {
+        return null;
     }
 }

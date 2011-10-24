@@ -15,12 +15,16 @@
  */
 package com.android.cts.tradefed.result;
 
-import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.ITestRunListener.TestFailure;
-import com.android.tradefed.build.BuildInfo;
+import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.XmlResultReporter;
 import com.android.tradefed.util.FileUtil;
+
+import junit.framework.TestCase;
+
+import org.easymock.EasyMock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,8 +32,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link XmlResultReporter}.
@@ -39,6 +41,7 @@ public class CtsXmlResultReporterTest extends TestCase {
     private CtsXmlResultReporter mResultReporter;
     private ByteArrayOutputStream mOutputStream;
     private File mReportDir;
+    private IFolderBuildInfo mMockBuild;
 
     /**
      * {@inheritDoc}
@@ -62,6 +65,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         // TODO: use mock file dir instead
         mReportDir = FileUtil.createTempDir("foo");
         mResultReporter.setReportDir(mReportDir);
+        mMockBuild = EasyMock.createNiceMock(IFolderBuildInfo.class);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         final String expectedSummaryOutput =
             "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />";
         final String expectedEndTag = "</TestResult>";
-        mResultReporter.invocationStarted(new BuildInfo("1", "test", "test"));
+        mResultReporter.invocationStarted(mMockBuild);
         mResultReporter.invocationEnded(1);
         String actualOutput = getOutput();
         assertTrue(actualOutput.startsWith(expectedHeaderOutput));
@@ -101,7 +105,7 @@ public class CtsXmlResultReporterTest extends TestCase {
     public void testSinglePass() {
         Map<String, String> emptyMap = Collections.emptyMap();
         final TestIdentifier testId = new TestIdentifier("com.foo.FooTest", "testFoo");
-        mResultReporter.invocationStarted(new BuildInfo());
+        mResultReporter.invocationStarted(mMockBuild);
         mResultReporter.testRunStarted("run", 1);
         mResultReporter.testStarted(testId);
         mResultReporter.testEnded(testId, emptyMap);
@@ -128,7 +132,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         Map<String, String> emptyMap = Collections.emptyMap();
         final TestIdentifier testId = new TestIdentifier("FooTest", "testFoo");
         final String trace = "this is a trace\nmore trace";
-        mResultReporter.invocationStarted(new BuildInfo());
+        mResultReporter.invocationStarted(mMockBuild);
         mResultReporter.testRunStarted("run", 1);
         mResultReporter.testStarted(testId);
         mResultReporter.testFailed(TestFailure.FAILURE, testId, trace);
