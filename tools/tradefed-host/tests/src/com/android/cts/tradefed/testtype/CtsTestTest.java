@@ -93,6 +93,8 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setBuildHelper(mStubBuildHelper);
         // turn off device collection for simplicity
         mCtsTest.setCollectDeviceInfo(false);
+        EasyMock.expect(mMockPackageDef.getTargetApkName()).andStubReturn(null);
+        EasyMock.expect(mMockPackageDef.getTargetPackageName()).andStubReturn(null);
 
 
     }

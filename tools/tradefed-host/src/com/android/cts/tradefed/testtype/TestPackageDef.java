@@ -68,6 +68,8 @@ class TestPackageDef implements ITestPackageDef {
     private String mClassName;
     private String mMethodName;
     private TestFilter mExcludedTestFilter = new TestFilter();
+    private String mTargetBinaryName;
+    private String mTargetNameSpace;
 
     void setUri(String uri) {
         mUri = uri;
@@ -160,6 +162,30 @@ class TestPackageDef implements ITestPackageDef {
 
     void setApkToTest(String apkName) {
         mApkToTestName = apkName;
+    }
+
+    void setTargetBinaryName(String targetBinaryName) {
+        mTargetBinaryName = targetBinaryName;
+    }
+
+    void setTargetNameSpace(String targetNameSpace) {
+        mTargetNameSpace = targetNameSpace;
+    }
+
+    @Override
+    public String getTargetApkName() {
+       if (mTargetBinaryName != null && !mTargetBinaryName.isEmpty()) {
+           return String.format("%s.apk", mTargetBinaryName);
+       }
+       return null;
+    }
+
+    @Override
+    public String getTargetPackageName() {
+        if (mTargetNameSpace != null && mTargetNameSpace.isEmpty()) {
+            return null;
+        }
+        return mTargetNameSpace;
     }
 
     /**

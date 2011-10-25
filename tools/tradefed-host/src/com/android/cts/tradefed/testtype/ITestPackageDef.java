@@ -100,4 +100,17 @@ public interface ITestPackageDef {
      */
     public void setClassName(String className, String methodName);
 
+    /**
+     * Return the file name of this package's instrumentation target apk.
+     *
+     * @return the file name or <code>null</code> if not applicable.
+     */
+    public String getTargetApkName();
+
+    /**
+     * Return the Android package name of this package's instrumentation target, or
+     * <code>null</code> if not applicable.
+     */
+    public String getTargetPackageName();
+
 }
