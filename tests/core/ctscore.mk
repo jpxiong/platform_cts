@@ -56,8 +56,8 @@ $(LOCAL_BUILT_MODULE): $(cts_no-core-tests-res_BUILT_MODULE) $(CORETESTS_INTERME
 	$(hide) rm -rf $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses
 	# javalib.jar should only contain .dex files, but the harmony tests also include
 	# some .class files, so get rid of them
-	$(call unzip-jar-files,$(PRIVATE_CORETESTS_INTERMEDIATES_COMMON)/javalib.jar,\
-		$(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses)
+	$(hide) unzip -qo $(PRIVATE_CORETESTS_INTERMEDIATES_COMMON)/javalib.jar \
+		-d $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses
 	$(hide) find $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses -type f -name "*.class" -delete
 	$(hide) rm -f $(PRIVATE_INTERMEDIATES_COMMON)/ctsclasses/classes.dex
 	$(hide) cp $< $@
