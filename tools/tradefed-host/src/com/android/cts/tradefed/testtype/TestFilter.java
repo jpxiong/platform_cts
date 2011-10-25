@@ -20,7 +20,10 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -91,10 +94,10 @@ public class TestFilter {
      * Filter the list of tests based on rules in this filter
      *
      * @param tests the list of tests to filter
-     * @return a new list of tests that passed the filter
+     * @return a new sorted list of tests that passed the filter
      */
     public Collection<TestIdentifier> filter(Collection<TestIdentifier > tests) {
-        Collection<TestIdentifier> filteredTests = new ArrayList<TestIdentifier>(tests.size());
+        List<TestIdentifier> filteredTests = new ArrayList<TestIdentifier>(tests.size());
         for (TestIdentifier test : tests) {
             if (mIncludedClass != null && !test.getClassName().equals(mIncludedClass)) {
                 // skip
@@ -114,6 +117,7 @@ public class TestFilter {
             }
             filteredTests.add(test);
         }
+        Collections.sort(filteredTests, new TestIdComparator());
         return filteredTests;
     }
 
@@ -122,5 +126,17 @@ public class TestFilter {
      */
     public boolean hasExclusion() {
         return !mExcludedClasses.isEmpty() || !mExcludedTests.isEmpty();
+    }
+
+    /**
+     * A {@link Comparator} for {@link TestIdentifier} that compares using
+     * {@link TestIdentifier#toString()}
+     */
+    private class TestIdComparator implements Comparator<TestIdentifier> {
+
+        @Override
+        public int compare(TestIdentifier o1, TestIdentifier o2) {
+            return o1.toString().compareTo(o2.toString());
+        }
     }
 }
