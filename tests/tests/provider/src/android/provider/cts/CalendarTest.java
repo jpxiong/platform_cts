@@ -23,6 +23,7 @@ import android.content.Entity;
 import android.content.EntityIterator;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +31,7 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.CalendarEntity;
 import android.provider.CalendarContract.Calendars;
+import android.provider.CalendarContract.Colors;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.EventsEntity;
 import android.provider.CalendarContract.ExtendedProperties;
@@ -39,6 +41,7 @@ import android.provider.CalendarContract.SyncState;
 import android.test.InstrumentationTestCase;
 import android.test.InstrumentationCtsTestRunner;
 import android.test.suitebuilder.annotation.*;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -79,6 +82,7 @@ public class CalendarTest extends InstrumentationTestCase {
                 Calendars.NAME,
                 Calendars.CALENDAR_DISPLAY_NAME,
                 Calendars.CALENDAR_COLOR,
+                Calendars.CALENDAR_COLOR_INDEX,
                 Calendars.CALENDAR_ACCESS_LEVEL,
                 Calendars.VISIBLE,
                 Calendars.SYNC_EVENTS,
@@ -89,6 +93,8 @@ public class CalendarTest extends InstrumentationTestCase {
                 Calendars.CAN_MODIFY_TIME_ZONE,
                 Calendars.MAX_REMINDERS,
                 Calendars.ALLOWED_REMINDERS,
+                Calendars.ALLOWED_AVAILABILITY,
+                Calendars.ALLOWED_ATTENDEE_TYPES,
                 Calendars.DELETED,
                 Calendars.CAL_SYNC1,
                 Calendars.CAL_SYNC2,
@@ -145,6 +151,8 @@ public class CalendarTest extends InstrumentationTestCase {
             values.put(Calendars.CAN_MODIFY_TIME_ZONE, seed % 2);
             values.put(Calendars.MAX_REMINDERS, 3);
             values.put(Calendars.ALLOWED_REMINDERS, "0,1,2");   // does not include SMS (3)
+            values.put(Calendars.ALLOWED_ATTENDEE_TYPES, "0,1,2,3");
+            values.put(Calendars.ALLOWED_AVAILABILITY, "0,1,2,3");
             values.put(Calendars.CAL_SYNC1, "SYNC1:" + seedString);
             values.put(Calendars.CAL_SYNC2, "SYNC2:" + seedString);
             values.put(Calendars.CAL_SYNC3, "SYNC3:" + seedString);
@@ -299,6 +307,8 @@ public class CalendarTest extends InstrumentationTestCase {
             Events.DTEND,
             Events.EVENT_TIMEZONE,
             Events.EVENT_END_TIMEZONE,
+            Events.EVENT_COLOR,
+            Events.EVENT_COLOR_INDEX,
             Events.DURATION,
             Events.ALL_DAY,
             Events.ACCESS_LEVEL,
@@ -325,10 +335,11 @@ public class CalendarTest extends InstrumentationTestCase {
             Events.SYNC_DATA5,
             Events.DIRTY,
             Events.SYNC_DATA8,
-            Events.SYNC_DATA2, // Events.SYNC_DATA1
-            // Events.SYNC_DATA2
-            // Events.SYNC_DATA3
-            // Events.SYNC_DATA4
+            Events.SYNC_DATA2,
+            Events.SYNC_DATA1,
+            Events.SYNC_DATA2,
+            Events.SYNC_DATA3,
+            Events.SYNC_DATA4,
         };
         // @formatter:on
 
@@ -355,6 +366,7 @@ public class CalendarTest extends InstrumentationTestCase {
             values.put(Events.DTSTART, seed);
             values.put(Events.DTEND, seed + DateUtils.HOUR_IN_MILLIS);
             values.put(Events.EVENT_TIMEZONE, TIME_ZONES[seed % TIME_ZONES.length]);
+            values.put(Events.EVENT_COLOR, seed);
             // values.put(Events.EVENT_TIMEZONE2, TIME_ZONES[(seed +1) %
             // TIME_ZONES.length]);
             if ((seed % 2) == 0) {
@@ -613,6 +625,115 @@ public class CalendarTest extends InstrumentationTestCase {
             return resolver.query(Attendees.CONTENT_URI, ATTENDEES_PROJECTION,
                     Attendees.EVENT_ID + "=? AND " + Attendees.ATTENDEE_EMAIL + "=?",
                     new String[] { String.valueOf(eventId), email }, null);
+        }
+    }
+
+    /**
+     * Helper class for manipulating entries in the Colors table.
+     */
+    private static class ColorHelper {
+        public static final String WHERE_COLOR_ACCOUNT = Colors.ACCOUNT_NAME + "=? AND "
+                + Colors.ACCOUNT_TYPE + "=?";
+        public static final String WHERE_COLOR_ACCOUNT_AND_INDEX = WHERE_COLOR_ACCOUNT + " AND "
+                + Colors.COLOR_INDEX + "=?";
+
+        public static final String[] COLORS_PROJECTION = new String[] {
+                Colors._ID, // 0
+                Colors.ACCOUNT_NAME, // 1
+                Colors.ACCOUNT_TYPE, // 2
+                Colors.DATA, // 3
+                Colors.COLOR_TYPE, // 4
+                Colors.COLOR_INDEX, // 5
+                Colors.COLOR, // 6
+        };
+        // indexes into projection
+        public static final int COLORS_ID_INDEX = 0;
+        public static final int COLORS_INDEX_INDEX = 5;
+        public static final int COLORS_COLOR_INDEX = 6;
+
+        public static final int[] DEFAULT_TYPES = new int[] {
+                Colors.TYPE_CALENDAR, Colors.TYPE_CALENDAR, Colors.TYPE_CALENDAR,
+                Colors.TYPE_CALENDAR, Colors.TYPE_EVENT, Colors.TYPE_EVENT, Colors.TYPE_EVENT,
+                Colors.TYPE_EVENT,
+        };
+        public static final int[] DEFAULT_COLORS = new int[] {
+                0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFAA00AA, 0xFF00AAAA, 0xFF333333, 0xFFAAAA00,
+                0xFFAAAAAA,
+        };
+        public static final String[] DEFAULT_INDICES = new String[] {
+                "000", "001", "010", "011", "100", "101", "110", "111",
+        };
+
+        public static final int C_COLOR_0 = 0;
+        public static final int C_COLOR_1 = 1;
+        public static final int C_COLOR_2 = 2;
+        public static final int C_COLOR_3 = 3;
+        public static final int E_COLOR_0 = 4;
+        public static final int E_COLOR_1 = 5;
+        public static final int E_COLOR_2 = 6;
+        public static final int E_COLOR_3 = 7;
+
+        // do not instantiate
+        private ColorHelper() {
+        }
+
+        /**
+         * Adds a new color to the colors table.
+         *
+         * @return the _id of the new color, or -1 on failure
+         */
+        public static long addColor(ContentResolver resolver, String accountName,
+                String accountType, String data, String index, int type, int color) {
+            Uri uri = asSyncAdapter(Colors.CONTENT_URI, accountName, accountType);
+
+            ContentValues colorValues = new ContentValues();
+            colorValues.put(Colors.DATA, data);
+            colorValues.put(Colors.COLOR_INDEX, index);
+            colorValues.put(Colors.COLOR_TYPE, type);
+            colorValues.put(Colors.COLOR, color);
+            Uri result = resolver.insert(uri, colorValues);
+            return ContentUris.parseId(result);
+        }
+
+        /**
+         * Finds the color specified by an account name/type and a color index.
+         * The returned cursor will use {@link ColorHelper#COLORS_PROJECTION}.
+         */
+        public static Cursor findColorByIndex(ContentResolver resolver, String accountName,
+                String accountType, String index) {
+            return resolver.query(Colors.CONTENT_URI, COLORS_PROJECTION,
+                    WHERE_COLOR_ACCOUNT_AND_INDEX,
+                    new String[] {accountName, accountType, index}, null);
+        }
+
+        public static Cursor findColorsByAccount(ContentResolver resolver, String accountName,
+                String accountType) {
+            return resolver.query(Colors.CONTENT_URI, COLORS_PROJECTION, WHERE_COLOR_ACCOUNT,
+                    new String[] { accountName, accountType }, null);
+        }
+
+        /**
+         * Adds a default set of test colors to the Colors table under the given
+         * account.
+         *
+         * @return true if the default colors were added successfully
+         */
+        public static boolean addDefaultColorsToAccount(ContentResolver resolver,
+                String accountName, String accountType) {
+            for (int i = 0; i < DEFAULT_INDICES.length; i++) {
+                long id = addColor(resolver, accountName, accountType, null, DEFAULT_INDICES[i],
+                        DEFAULT_TYPES[i], DEFAULT_COLORS[i]);
+                if (id == -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static void deleteColorsByAccount(ContentResolver resolver, String accountName,
+                String accountType) {
+            Uri uri = asSyncAdapter(Colors.CONTENT_URI, accountName, accountType);
+            resolver.delete(uri, WHERE_COLOR_ACCOUNT, new String[] { accountName, accountType });
         }
     }
 
@@ -1322,6 +1443,339 @@ public class CalendarTest extends InstrumentationTestCase {
         removeAndVerifyCalendar(account, calendarId);
     }
 
+    @MediumTest
+    public void testColorWriteRequirements() {
+        String account = "colw_account";
+        String account2 = "colw2_account";
+        int seed = 0;
+        Uri uri = asSyncAdapter(Colors.CONTENT_URI, account, CTS_TEST_TYPE);
+        Uri uri2 = asSyncAdapter(Colors.CONTENT_URI, account2, CTS_TEST_TYPE);
+
+        // Clean up just in case
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account2, CTS_TEST_TYPE);
+
+        ContentValues colorValues = new ContentValues();
+        // Account name/type must be in the query params, so may be left
+        // out here
+        colorValues.put(Colors.DATA, "0");
+        colorValues.put(Colors.COLOR_INDEX, "1");
+        colorValues.put(Colors.COLOR_TYPE, 0);
+        colorValues.put(Colors.COLOR, 0xff000000);
+
+        // Verify only a sync adapter can write to Colors
+        try {
+            mContentResolver.insert(Colors.CONTENT_URI, colorValues);
+            fail("Should not allow non-sync adapter to insert colors");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Verify everything except DATA is required
+        ContentValues testVals = new ContentValues(colorValues);
+        for (String key : colorValues.keySet()) {
+
+            testVals.remove(key);
+            try {
+                Uri colUri = mContentResolver.insert(uri, testVals);
+                if (!TextUtils.equals(key, Colors.DATA)) {
+                    // The DATA field is allowed to be empty.
+                    fail("Should not allow color creation without " + key);
+                }
+                ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+            } catch (IllegalArgumentException e) {
+                if (TextUtils.equals(key, Colors.DATA)) {
+                    // The DATA field is allowed to be empty.
+                    fail("Should allow color creation without " + key);
+                }
+            }
+            testVals.put(key, colorValues.getAsString(key));
+        }
+
+        // Verify writing a color works
+        Uri col1 = mContentResolver.insert(uri, colorValues);
+
+        // Verify adding the same color fails
+        try {
+            mContentResolver.insert(uri, colorValues);
+            fail("Should not allow adding the same color twice");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Verify specifying a different account than the query params doesn't work
+        colorValues.put(Colors.ACCOUNT_NAME, account2);
+        try {
+            mContentResolver.insert(uri, colorValues);
+            fail("Should use the account from the query params, not the values.");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Verify adding a color to a different account works
+        Uri col2 = mContentResolver.insert(uri2, colorValues);
+
+        // And a different index on the same account
+        colorValues.put(Colors.COLOR_INDEX, "2");
+        Uri col3 = mContentResolver.insert(uri2, colorValues);
+
+        // Verify that all three colors are in the table
+        Cursor c = ColorHelper.findColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+        assertEquals(1, c.getCount());
+        c.close();
+        c = ColorHelper.findColorsByAccount(mContentResolver, account2, CTS_TEST_TYPE);
+        assertEquals(2, c.getCount());
+        c.close();
+
+        // Verify deleting them works
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account2, CTS_TEST_TYPE);
+
+        c = ColorHelper.findColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+        assertEquals(0, c.getCount());
+        c.close();
+        c = ColorHelper.findColorsByAccount(mContentResolver, account2, CTS_TEST_TYPE);
+        assertEquals(0, c.getCount());
+        c.close();
+    }
+
+    /**
+     * Tests Colors interaction with the Calendars table.
+     */
+    @MediumTest
+    public void testCalendarColors() {
+        String account = "cc_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+
+        // Test inserting a calendar with an invalid color index
+        ContentValues cv = CalendarHelper.getNewCalendarValues(account, seed++);
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, "badIndex");
+        Uri calSyncUri = asSyncAdapter(Calendars.CONTENT_URI, account, CTS_TEST_TYPE);
+        Uri colSyncUri = asSyncAdapter(Colors.CONTENT_URI, account, CTS_TEST_TYPE);
+
+        try {
+            Uri uri = mContentResolver.insert(calSyncUri, cv);
+            fail("Should not allow insertion of invalid color index into Calendars");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Test updating a calendar with an invalid color index
+        long calendarId = createAndVerifyCalendar(account, seed++, null);
+        cv.clear();
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, "badIndex2");
+        Uri calendarUri = ContentUris.withAppendedId(Calendars.CONTENT_URI, calendarId);
+        try {
+            mContentResolver.update(calendarUri, cv, null, null);
+            fail("Should not allow update of invalid color index into Calendars");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        assertTrue(ColorHelper.addDefaultColorsToAccount(mContentResolver, account, CTS_TEST_TYPE));
+
+        // Test that inserting a valid color index works
+        cv = CalendarHelper.getNewCalendarValues(account, seed++);
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
+
+        Uri uri = mContentResolver.insert(calSyncUri, cv);
+        long calendarId2 = ContentUris.parseId(uri);
+        assertTrue(calendarId2 >= 0);
+        // And updates the calendar's color to the one in the table
+        cv.put(Calendars.CALENDAR_COLOR, ColorHelper.DEFAULT_COLORS[ColorHelper.C_COLOR_0]);
+        verifyCalendar(account, cv, calendarId2, 2);
+
+        // Test that updating a valid color index also updates the color in a
+        // calendar
+        cv.clear();
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
+        mContentResolver.update(calendarUri, cv, null, null);
+        Cursor c = mContentResolver.query(calendarUri,
+                new String[] { Calendars.CALENDAR_COLOR_INDEX, Calendars.CALENDAR_COLOR },
+                null, null, null);
+        try {
+            c.moveToFirst();
+            String index = c.getString(0);
+            int color = c.getInt(1);
+            assertEquals(index, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
+            assertEquals(color, ColorHelper.DEFAULT_COLORS[ColorHelper.C_COLOR_0]);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // And clearing it doesn't change the color
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, (String) null);
+        mContentResolver.update(calendarUri, cv, null, null);
+        c = mContentResolver.query(calendarUri,
+                new String[] { Calendars.CALENDAR_COLOR_INDEX, Calendars.CALENDAR_COLOR },
+                null, null, null);
+        try {
+            c.moveToFirst();
+            String index = c.getString(0);
+            int color = c.getInt(1);
+            assertEquals(index, null);
+            assertEquals(ColorHelper.DEFAULT_COLORS[ColorHelper.C_COLOR_0], color);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // Test that setting a calendar color to an event color fails
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
+        try {
+            mContentResolver.update(calendarUri, cv, null, null);
+            fail("Should not allow a calendar to use an event color");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Test that you can't remove a color that is referenced by a calendar
+        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_3]);
+        mContentResolver.update(calendarUri, cv, null, null);
+
+        try {
+            mContentResolver.delete(colSyncUri, ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX,
+                    new String[] {
+                            account, CTS_TEST_TYPE,
+                            ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_3]
+                    });
+            fail("Should not allow deleting referenced color");
+        } catch (UnsupportedOperationException e) {
+            // WAI
+        }
+
+        // Clean up
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+    }
+
+    /**
+     * Tests Colors interaction with the Events table.
+     */
+    @MediumTest
+    public void testEventColors() {
+        String account = "ec_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+
+        // Test inserting an event with an invalid color index
+        long cal_id = createAndVerifyCalendar(account, seed++, null);
+
+        Uri colSyncUri = asSyncAdapter(Colors.CONTENT_URI, account, CTS_TEST_TYPE);
+
+        ContentValues ev = EventHelper.getNewEventValues(account, seed++, cal_id, false);
+        ev.put(Events.EVENT_COLOR_INDEX, "badIndex");
+
+        try {
+            Uri uri = mContentResolver.insert(Events.CONTENT_URI, ev);
+            fail("Should not allow insertion of invalid color index into Events");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Test updating an event with an invalid color index fails
+        long event_id = createAndVerifyEvent(account, seed++, cal_id, false, null);
+        ev.clear();
+        ev.put(Events.EVENT_COLOR_INDEX, "badIndex2");
+        Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, event_id);
+        try {
+            mContentResolver.update(eventUri, ev, null, null);
+            fail("Should not allow update of invalid color index into Events");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        assertTrue(ColorHelper.addDefaultColorsToAccount(mContentResolver, account, CTS_TEST_TYPE));
+
+        // Test that inserting a valid color index works
+        ev = EventHelper.getNewEventValues(account, seed++, cal_id, false);
+        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
+
+        Uri uri = mContentResolver.insert(Events.CONTENT_URI, ev);
+        long eventId2 = ContentUris.parseId(uri);
+        assertTrue(eventId2 >= 0);
+        // And updates the event's color to the one in the table
+        ev.put(Events.EVENT_COLOR, ColorHelper.DEFAULT_COLORS[ColorHelper.E_COLOR_0]);
+        verifyEvent(ev, eventId2);
+
+        // Test that updating a valid color index also updates the color in an
+        // event
+        ev.clear();
+        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+        mContentResolver.update(eventUri, ev, null, null);
+        Cursor c = mContentResolver.query(eventUri, new String[] {
+                Events.EVENT_COLOR_INDEX, Events.EVENT_COLOR
+        }, null, null, null);
+        try {
+            c.moveToFirst();
+            String index = c.getString(0);
+            int color = c.getInt(1);
+            assertEquals(index, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+            assertEquals(color, ColorHelper.DEFAULT_COLORS[ColorHelper.E_COLOR_1]);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // And clearing it doesn't change the color
+        ev.put(Events.EVENT_COLOR_INDEX, (String) null);
+        mContentResolver.update(eventUri, ev, null, null);
+        c = mContentResolver.query(eventUri, new String[] {
+                Events.EVENT_COLOR_INDEX, Events.EVENT_COLOR
+        }, null, null, null);
+        try {
+            c.moveToFirst();
+            String index = c.getString(0);
+            int color = c.getInt(1);
+            assertEquals(index, null);
+            assertEquals(ColorHelper.DEFAULT_COLORS[ColorHelper.E_COLOR_1], color);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        // Test that setting an event color to a calendar color fails
+        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_2]);
+        try {
+            mContentResolver.update(eventUri, ev, null, null);
+            fail("Should not allow an event to use a calendar color");
+        } catch (IllegalArgumentException e) {
+            // WAI
+        }
+
+        // Test that you can't remove a color that is referenced by an event
+        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+        mContentResolver.update(eventUri, ev, null, null);
+        try {
+            mContentResolver.delete(colSyncUri, ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX,
+                    new String[] {
+                            account, CTS_TEST_TYPE,
+                            ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]
+                    });
+            fail("Should not allow deleting referenced color");
+        } catch (UnsupportedOperationException e) {
+            // WAI
+        }
+
+        // TODO test colors with exceptions
+
+        // Clean up
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+        ColorHelper.deleteColorsByAccount(mContentResolver, account, CTS_TEST_TYPE);
+    }
+
     /**
      * Tests creation and manipulation of ExtendedProperties.
      */
@@ -1517,7 +1971,7 @@ public class CalendarTest extends InstrumentationTestCase {
                 values, seed++);
         assertEquals(1, mContentResolver.update(uri, updateValues, null, null));
 
-        verifyCalendar(account, values, id);
+        verifyCalendar(account, values, id, 1);
 
         // Update the calendar using selection + args
         String selection = Calendars._ID + "=?";
@@ -1528,7 +1982,7 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals(1, mContentResolver.update(
                 Calendars.CONTENT_URI, updateValues, selection, selectionArgs));
 
-        verifyCalendar(account, values, id);
+        verifyCalendar(account, values, id, 1);
 
         removeAndVerifyCalendar(account, id);
     }
@@ -2744,7 +3198,7 @@ public class CalendarTest extends InstrumentationTestCase {
         long calendarId = ContentUris.parseId(uri);
         assertTrue(calendarId >= 0);
 
-        verifyCalendar(account, values, calendarId);
+        verifyCalendar(account, values, calendarId, 1);
         return calendarId;
     }
 
@@ -2768,19 +3222,21 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
-     * Check all the fields of a calendar contained in values + id. This assumes
-     * a single calendar has been created on the given account.
+     * Check all the fields of a calendar contained in values + id.
      *
      * @param account the account of the calendar
      * @param values the values to check against the db
      * @param id the _id of the calendar
+     * @param expectedCount the number of calendars expected on this account
      */
-    private void verifyCalendar(String account, ContentValues values, long id) {
+    private void verifyCalendar(String account, ContentValues values, long id, int expectedCount) {
         // Verify
         Cursor c = CalendarHelper.getCalendarsByAccount(mContentResolver, account);
-        assertEquals(1, c.getCount());
+        assertEquals(expectedCount, c.getCount());
         assertTrue(c.moveToFirst());
-        assertEquals(id, c.getLong(0));
+        while (c.getLong(0) != id) {
+            assertTrue(c.moveToNext());
+        }
         for (String key : values.keySet()) {
             int index = c.getColumnIndex(key);
             assertTrue("Key " + key + " not in projection", index >= 0);
