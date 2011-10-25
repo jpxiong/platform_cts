@@ -210,12 +210,16 @@ public class CamcorderProfileTest extends AndroidTestCase {
         checkProfile(highTimeLapseProfile, null);
 
         int[] specificProfileQualities = {CamcorderProfile.QUALITY_QCIF,
+                                          // replace this with CamcorderProfile.QUALITY_QVGA
+                                          7,
                                           CamcorderProfile.QUALITY_CIF,
                                           CamcorderProfile.QUALITY_480P,
                                           CamcorderProfile.QUALITY_720P,
                                           CamcorderProfile.QUALITY_1080P};
 
         int[] specificTimeLapseProfileQualities = {CamcorderProfile.QUALITY_TIME_LAPSE_QCIF,
+                                                   // replace this with CamcorderProfile.QUALITY_TIME_LAPSE_QVGA
+                                                   1007,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_CIF,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_480P,
                                                    CamcorderProfile.QUALITY_TIME_LAPSE_720P,
