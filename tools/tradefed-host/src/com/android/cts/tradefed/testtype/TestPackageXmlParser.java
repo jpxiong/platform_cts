@@ -74,6 +74,8 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String apkToTest = attributes.getValue("apkToTestName");
                 final String packageToTest = attributes.getValue("packageToTest");
                 final String javaPackageFilter = attributes.getValue("javaPackageFilter");
+                final String targetBinaryName = attributes.getValue("targetBinaryName");
+                final String targetNameSpace = attributes.getValue("targetNameSpace");
 
                 mPackageDef = new TestPackageDef();
                 mPackageDef.setUri(entryUriValue);
@@ -88,6 +90,8 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setApkToTest(apkToTest);
                 mPackageDef.setPackageToTest(packageToTest);
                 mPackageDef.setTestPackageName(javaPackageFilter);
+                mPackageDef.setTargetBinaryName(targetBinaryName);
+                mPackageDef.setTargetNameSpace(targetNameSpace);
 
                 // reset the class name
                 mClassNameStack = new Stack<String>();
