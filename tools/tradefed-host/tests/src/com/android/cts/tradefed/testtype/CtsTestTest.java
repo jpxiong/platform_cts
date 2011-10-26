@@ -26,7 +26,7 @@ import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import junit.framework.TestCase;
 
-import org.easymock.EasyMock;
+// import org.easymock.EasyMock;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -93,8 +93,8 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setBuildHelper(mStubBuildHelper);
         // turn off device collection for simplicity
         mCtsTest.setSkipDeviceInfo(true);
-        EasyMock.expect(mMockPackageDef.getTargetApkName()).andStubReturn(null);
-        EasyMock.expect(mMockPackageDef.getTargetPackageName()).andStubReturn(null);
+//        EasyMock.expect(mMockPackageDef.getTargetApkName()).andStubReturn(null);
+//        EasyMock.expect(mMockPackageDef.getTargetPackageName()).andStubReturn(null);
     }
 
     /**
