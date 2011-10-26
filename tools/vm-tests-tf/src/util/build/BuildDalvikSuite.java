@@ -217,8 +217,9 @@ public class BuildDalvikSuite {
     }
 
     private String getShellExecJavaLine(String classpath, String mainclass) {
-      String cmd = String.format("dalvikvm -Xint:portable -Xmx512M -Xss32K -Djava.io.tmpdir=%s" +
-                                 " -classpath %s %s", TARGET_JAR_ROOT_PATH, classpath, mainclass);
+      String cmd = String.format("ANDROID_DATA=%s dalvikvm -Xint:portable -Xmx512M -Xss32K " +
+              ""-Djava.io.tmpdir=%s" -classpath %s %s", TARGET_JAR_ROOT_PATH, TARGET_JAR_ROOT_PATH,
+              classpath, mainclass);
       return "String res = getDevice().executeShellCommand(\""+ cmd + "\");\n" +
              "// A sucessful adb shell command returns an empty string.\n" +
              "assertEquals(\"" + cmd + "\", \"\", res);";
