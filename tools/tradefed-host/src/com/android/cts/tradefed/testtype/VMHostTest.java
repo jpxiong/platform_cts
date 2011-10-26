@@ -46,6 +46,7 @@ public class VMHostTest extends JarHostTest {
                     getDevice().getSerialNumber()));
         }
         super.run(listener);
+        cleanupDeviceFiles(getDevice());
     }
 
     /**
@@ -58,10 +59,7 @@ public class VMHostTest extends JarHostTest {
      */
     private boolean installVmPrereqs(ITestDevice device, CtsBuildHelper ctsBuild)
             throws DeviceNotAvailableException {
-        if (device.doesFileExist(VM_TEST_TEMP_DIR)) {
-            CLog.d("Removing device's temp dir %s from previous runs.", VM_TEST_TEMP_DIR);
-            device.executeShellCommand(String.format("rm -r %s", VM_TEST_TEMP_DIR));
-        }
+        cleanupDeviceFiles(device);
         // Creates temp directory recursively. We also need to create the dalvik-cache directory
         // which is used by the dalvikvm to optimize things. Without the dalvik-cache, there will be
         // a sigsev thrown by the vm.
@@ -94,6 +92,19 @@ public class VMHostTest extends JarHostTest {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Removes temporary file directory from device
+     *
+     * @param device
+     * @throws DeviceNotAvailableException
+     */
+    private void cleanupDeviceFiles(ITestDevice device) throws DeviceNotAvailableException {
+        if (device.doesFileExist(VM_TEST_TEMP_DIR)) {
+            CLog.d("Removing device's temp dir %s from previous runs.", VM_TEST_TEMP_DIR);
+            device.executeShellCommand(String.format("rm -r %s", VM_TEST_TEMP_DIR));
+        }
     }
 
     /**
