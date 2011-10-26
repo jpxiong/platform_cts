@@ -20,7 +20,6 @@
     <option name="disable-keyguard" value="false" />
     <build_provider class="com.android.cts.tradefed.build.CtsBuildProvider" />
     <device_recovery class="com.android.tradefed.device.WaitDeviceRecovery" />
-    <target_preparer class="com.android.cts.tradefed.targetprep.CtsSetup" />
     <test class="com.android.cts.tradefed.testtype.CtsTest" />
     <logger class="com.android.tradefed.log.FileLogger" />
     <result_reporter class="com.android.cts.tradefed.result.CtsXmlResultReporter" />
