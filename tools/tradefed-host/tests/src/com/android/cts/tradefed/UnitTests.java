@@ -16,7 +16,6 @@
 package com.android.cts.tradefed;
 
 import com.android.cts.tradefed.result.CtsXmlResultReporterTest;
-import com.android.cts.tradefed.targetprep.CtsSetupTest;
 import com.android.cts.tradefed.testtype.CtsTestTest;
 import com.android.cts.tradefed.testtype.JarHostTestTest;
 import com.android.cts.tradefed.testtype.TestPackageDefTest;
@@ -37,7 +36,6 @@ public class UnitTests extends TestSuite {
     public UnitTests() {
         super();
         addTestSuite(CtsXmlResultReporterTest.class);
-        addTestSuite(CtsSetupTest.class);
         addTestSuite(JarHostTestTest.class);
         addTestSuite(CtsTestTest.class);
         addTestSuite(TestPlanTest.class);
