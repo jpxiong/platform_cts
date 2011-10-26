@@ -164,6 +164,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.hardware.screen.portrait", false),
     };
 
+    public static final Feature[] ALL_ICE_CREAM_SANDWICH_FEATURES = {
+            new Feature(PackageManager.FEATURE_WIFI_DIRECT, false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +198,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            Collections.addAll(features, ALL_ICE_CREAM_SANDWICH_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             Collections.addAll(features, ALL_HONEYCOMB_MR2_FEATURES);
         }
