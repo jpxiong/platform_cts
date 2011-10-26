@@ -26,7 +26,7 @@ import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import junit.framework.TestCase;
 
-// import org.easymock.EasyMock;
+import org.easymock.EasyMock;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
