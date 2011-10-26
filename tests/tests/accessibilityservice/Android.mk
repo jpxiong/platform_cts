@@ -22,7 +22,9 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+# TODO: include the core runner source as a library instead
+LOCAL_SRC_FILES := $(call all-java-files-under, src)\
+              $(call all-java-files-under, ../../core/runner/src)
 
 LOCAL_SRC_FILES += \
   src/android/accessibilityservice/IAccessibilityServiceDelegate.aidl \
@@ -30,6 +32,6 @@ LOCAL_SRC_FILES += \
 
 LOCAL_PACKAGE_NAME := CtsAccessibilityServiceTestCases
 
-LOCAL_SDK_VERSION := current
+#LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
