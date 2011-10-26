@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -279,9 +280,15 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             mRemainingTestPkgs = buildTestsToRun();
         }
 
+        // collect and install the prerequisiteApks first, to save time when multiple test
+        // packages are using the same prerequisite apk (I'm looking at you, CtsTestStubs!)
+        Collection<String> prerequisiteApks = getPrerequisiteApks(mRemainingTestPkgs);
+        Collection<String> uninstallPackages = getPrerequisitePackageNames(mRemainingTestPkgs);
         ResultFilter filter = new ResultFilter(listener, mRemainingTestPkgs);
 
         try {
+            installPrerequisiteApks(prerequisiteApks);
+
             // always collect the device info, even for resumed runs, since test will likely be
             // running on a different device
             collectDeviceInfo(getDevice(), mCtsBuild, listener);
@@ -310,6 +317,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                     screenshotSource.cancel();
                 }
             }
+
+            uninstallPrequisiteApks(uninstallPackages);
+
         } finally {
             filter.reportUnexecutedTests();
         }
@@ -424,6 +434,71 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             throw new IllegalStateException("nothing to run?");
         }
         return testPkgDefs;
+    }
+
+    /**
+     * Return the list of unique prerequisite Android package names
+     * @param testPackages
+     * @return
+     */
+    private Collection<String> getPrerequisitePackageNames(List<TestPackage> testPackages) {
+        Set<String> pkgNames = new HashSet<String>();
+        for (TestPackage testPkg : testPackages) {
+            String pkgName = testPkg.mPackageDef.getTargetPackageName();
+            if (pkgName != null) {
+                pkgNames.add(pkgName);
+            }
+        }
+        return pkgNames;
+    }
+
+    /**
+     * Return the list of unique prerequisite apks to install
+     * @param testPackages
+     * @return
+     */
+    private Collection<String> getPrerequisiteApks(List<TestPackage> testPackages) {
+        Set<String> apkNames = new HashSet<String>();
+        for (TestPackage testPkg : testPackages) {
+            String apkName = testPkg.mPackageDef.getTargetApkName();
+            if (apkName != null) {
+                apkNames.add(apkName);
+            }
+        }
+        return apkNames;
+    }
+
+    /**
+     * Install the collection of test apk file names
+     *
+     * @param prerequisiteApks
+     * @throws DeviceNotAvailableException
+     */
+    private void installPrerequisiteApks(Collection<String> prerequisiteApks)
+            throws DeviceNotAvailableException {
+        for (String apkName : prerequisiteApks) {
+            try {
+                File apkFile = mCtsBuild.getTestApp(apkName);
+                String errorCode = getDevice().installPackage(apkFile, true);
+                if (errorCode != null) {
+                    CLog.e("Failed to install %s. Reason: %s", apkName, errorCode);
+                }
+            } catch (FileNotFoundException e) {
+                CLog.e("Could not find test apk %s", apkName);
+            }
+        }
+    }
+
+    /**
+     * Uninstalls the collection of android package names from device.
+     *
+     * @param uninstallPackages
+     */
+    private void uninstallPrequisiteApks(Collection<String> uninstallPackages)
+            throws DeviceNotAvailableException {
+        for (String pkgName : uninstallPackages) {
+            getDevice().uninstallPackage(pkgName);
+        }
     }
 
     /**
