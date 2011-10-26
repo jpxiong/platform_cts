@@ -597,7 +597,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         if (!mutualExclusiveArgs) {
             throw new IllegalArgumentException(String.format(
                     "Ambiguous or missing arguments. " +
-                    "One and only of --%s --%s(s), --%s or %s to run can be specified",
+                    "One and only of --%s --%s(s), --%s or --%s to run can be specified",
                     PLAN_OPTION, PACKAGE_OPTION, CLASS_OPTION, CONTINUE_OPTION));
         }
         if (mMethodName != null && mClassName == null) {
