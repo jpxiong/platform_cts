@@ -101,11 +101,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             importance = Importance.IF_UNSET)
     private Integer mContinueSessionId = null;
 
-    @Option(name = "collect-device-info", description =
-        "flag to control whether to collect info from device. Turning this off will speed up test" +
-        "execution for short test runs but will result in required data being omitted from the " +
-        "test report.")
-    private boolean mCollectDeviceInfo = true;
+    @Option(name = "skip-device-info", shortName = 'd', description =
+        "flag to control whether to collect info from device. Providing this flag will speed up " +
+        "test execution for short test runs but will result in required data being omitted from " +
+        "the test report.")
+    private boolean mSkipDeviceInfo = false;
 
     @Option(name = "resume", description =
         "flag to attempt to automatically resume aborted test run on another connected device. ")
@@ -184,12 +184,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     /**
-     * Set the collect device info flag.
+     * Set the skip collect device info flag.
      * <p/>
      * Exposed for unit testing
      */
-    void setCollectDeviceInfo(boolean collectDeviceInfo) {
-        mCollectDeviceInfo = collectDeviceInfo;
+    void setSkipDeviceInfo(boolean skipDeviceInfo) {
+        mSkipDeviceInfo = skipDeviceInfo;
     }
 
     /**
@@ -471,7 +471,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      */
     void collectDeviceInfo(ITestDevice device, CtsBuildHelper ctsBuild,
             ITestInvocationListener listener) throws DeviceNotAvailableException {
-        if (mCollectDeviceInfo) {
+        if (!mSkipDeviceInfo) {
             DeviceInfoCollector.collectDeviceInfo(device, ctsBuild.getTestCasesDir(), listener);
         }
     }
