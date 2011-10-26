@@ -2059,6 +2059,26 @@ public class CalendarTest extends InstrumentationTestCase {
 
         removeAndVerifyEvent(eventUri, eventValues, account);
 
+        // Attempt to create an event without a calendar ID.
+        ContentValues badValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        badValues.remove(Events.CALENDAR_ID);
+        try {
+            createAndVerifyEvent(account, seed, calendarId, true, badValues);
+            fail("was allowed to create an event without CALENDAR_ID");
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
+
+        // Validation may be relaxed for content providers, so test missing timezone as app.
+        badValues = EventHelper.getNewEventValues(account, seed++, calendarId, false);
+        badValues.remove(Events.EVENT_TIMEZONE);
+        try {
+            createAndVerifyEvent(account, seed, calendarId, false, badValues);
+            fail("was allowed to create an event without EVENT_TIMEZONE");
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
+
         removeAndVerifyCalendar(account, calendarId);
     }
 
@@ -2086,6 +2106,17 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals(1, mContentResolver.update(eventUri, updateValues, null, null));
         updateValues.put(Events.DIRTY, 1);      // provider should have marked as dirty
         verifyEvent(updateValues, eventId);
+
+        // Try nulling out a required value.
+        ContentValues badValues = new ContentValues(updateValues);
+        badValues.putNull(Events.EVENT_TIMEZONE);
+        badValues.remove(Events.DIRTY);
+        try {
+            mContentResolver.update(eventUri, badValues, null, null);
+            fail("was allowed to null out EVENT_TIMEZONE");
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
 
         removeAndVerifyEvent(eventUri, eventValues, account);
 
@@ -3050,6 +3081,7 @@ public class CalendarTest extends InstrumentationTestCase {
             insertUri = asSyncAdapter(insertUri, account, CTS_TEST_TYPE);
         }
         Uri uri = mContentResolver.insert(insertUri, values);
+        assertNotNull(uri);
 
         // Verify
         EventHelper.addDefaultReadOnlyValues(values, account, asSyncAdapter);
