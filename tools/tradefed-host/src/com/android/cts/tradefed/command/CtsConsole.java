@@ -16,6 +16,7 @@
 package com.android.cts.tradefed.command;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.build.CtsBuildProvider;
 import com.android.cts.tradefed.result.ITestResultRepo;
 import com.android.cts.tradefed.result.ITestSummary;
 import com.android.cts.tradefed.result.PlanCreator;
@@ -43,7 +44,6 @@ public class CtsConsole extends Console {
     protected static final String ADD_PATTERN = "a(?:dd)?";
 
     private CtsBuildHelper mCtsBuild = null;
-
 
     CtsConsole() {
         super();
@@ -114,8 +114,60 @@ public class CtsConsole extends Console {
                 "%s help:" + LINE_SEPARATOR +
                 "\tderivedplan      Add a derived plan" + LINE_SEPARATOR,
                 ADD_PATTERN));
+    }
 
+    /**
+     * @return
+     */
+    @Override
+    protected String getConsolePrompt() {
+        return "cts-tf > ";
+    }
 
+    @Override
+    protected String getGenericHelpString(List<String> genericHelp) {
+        StringBuilder helpBuilder = new StringBuilder();
+        helpBuilder.append("CTS-tradefed host version ");
+        helpBuilder.append(CtsBuildProvider.CTS_BUILD_VERSION);
+        helpBuilder.append("\n\n");
+        helpBuilder.append("CTS-tradefed is the test harness for running the Android ");
+        helpBuilder.append("Compatibility Suite, built on top of the tradefed framework.\n\n");
+        helpBuilder.append("Available commands and options\n");
+        helpBuilder.append("Host:\n");
+        helpBuilder.append("  help: show this message\n");
+        helpBuilder.append("  help all: show the complete tradefed help\n");
+        helpBuilder.append("  exit: gracefully exit the cts console, waiting till all ");
+        helpBuilder.append("invocations are complete\n");
+        helpBuilder.append("Run:\n");
+        helpBuilder.append("  run cts --plan test_plan_name: run a test plan\n");
+        helpBuilder.append("  run cts --package/-p : run a CTS test package\n");
+        helpBuilder.append("  run cts --class/-c [--method/-m] : run a specific test class and/or");
+        helpBuilder.append("method\n");
+        helpBuilder.append("  run cts --continue-session-id session_ID: run all not executed ");
+        helpBuilder.append("tests from a previous CTS session\n");
+        helpBuilder.append("  run cts [options] --serial/s device_ID: run CTS on specified ");
+        helpBuilder.append("device\n");
+        helpBuilder.append("  run cts [options] --shards number_of_shards: shard a CTS run into ");
+        helpBuilder.append("given number of independent chunks, to run on multiple devices in");
+        helpBuilder.append("parallel\n");
+        helpBuilder.append("  run cts --help/--help-all: get more help on running CTS\n");
+        helpBuilder.append("List:\n");
+        helpBuilder.append("  l/list d/devices: list connected devices and their state\n");
+        helpBuilder.append("  l/list p/packages: list CTS test packages\n");
+        helpBuilder.append("  l/list plans: list CTS test plans\n");
+        helpBuilder.append("  l/list i/invocations: list invocations aka CTS test runs currently");
+        helpBuilder.append("in progress\n");
+        helpBuilder.append("  l/list c/commands: list commands: aka CTS test run commands ");
+        helpBuilder.append("currently in the queue waiting to be allocated devices\n");
+        helpBuilder.append("  l/list r/results: list CTS results currently present in the ");
+        helpBuilder.append("repository\n");
+        helpBuilder.append("Add:\n");
+        helpBuilder.append("  add derivedplan --plan plane_name --session/-s session_id -r ");
+        helpBuilder.append("[pass/fail/notExecuted/timeout]: derive a plan from the given ");
+        helpBuilder.append("session\n");
+        helpBuilder.append("Dump:\n");
+        helpBuilder.append("  d/dump l/logs: dump the tradefed logs for all running invocations\n");
+        return helpBuilder.toString();
     }
 
     private void listPlans(CtsBuildHelper ctsBuild) {
