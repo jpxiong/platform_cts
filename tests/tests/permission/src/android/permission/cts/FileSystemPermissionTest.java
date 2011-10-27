@@ -170,9 +170,14 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that any publicly readable directories reachable from
-     * the root directory are not writable.  World writable directories
-     * are a security hole and an application should only be able to
-     * write to it's own home directory.
+     * the root directory are not writable.  An application should only be
+     * able to write to it's own home directory. World writable directories
+     * are a security hole because they enable a number of different attacks.
+     * <ul>
+     *   <li><a href="http://en.wikipedia.org/wiki/Symlink_race">Symlink Races</a></li>
+     *   <li>Data destruction by deleting or renaming files you don't own</li>
+     *   <li>Data substitution by replacing trusted files with untrusted files</li>
+     * </ul>
      *
      * Note: Because not all directories are readable, this is a best-effort
      * test only.  Writable directories within unreadable subdirectories
@@ -228,9 +233,15 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that directories not discoverable by
-     * testAllOtherDirectoriesNotWritable are not writable.  World
-     * writable directories are a security hole and an application
-     * should only be able to write to it's own home directory.
+     * testAllOtherDirectoriesNotWritable are not writable.  An application
+     * should only be able to write to it's own home directory. World
+     * writable directories are a security hole because they enable a
+     * number of different attacks.
+     * <ul>
+     *   <li><a href="http://en.wikipedia.org/wiki/Symlink_race">Symlink Races</a></li>
+     *   <li>Data destruction by deleting or renaming files you don't own</li>
+     *   <li>Data substitution by replacing trusted files with untrusted files</li>
+     * </ul>
      *
      * Because /data and /data/data are not readable, we blindly try to
      * poke around in there looking for bad directories.  There has to be
