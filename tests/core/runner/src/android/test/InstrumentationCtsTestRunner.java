@@ -34,6 +34,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import junit.framework.AssertionFailedError;
@@ -54,12 +55,7 @@ import junit.framework.TestListener;
  */
 public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
 
-    /**
-     * Convenience definition of our log tag.
-     */
     private static final String TAG = "InstrumentationCtsTestRunner";
-
-    private static final String REPORT_VALUE_ID = "InstrumentationCtsTestRunner";
 
     /**
      * True if (and only if) we are running in single-test mode (as opposed to
@@ -124,6 +120,9 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
              */
             private long startTime;
 
+            private Locale defaultLocale;
+
+            @Override
             public void startTest(Test test) {
                 if (test.getClass() != lastClass) {
                     lastClass = test.getClass();
@@ -133,10 +132,15 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 Thread.currentThread().setContextClassLoader(
                         test.getClass().getClassLoader());
 
+                defaultLocale = Locale.getDefault();
+
                 startTime = System.currentTimeMillis();
             }
 
+            @Override
             public void endTest(Test test) {
+                Locale.setDefault(defaultLocale);
+
                 if (test instanceof TestCase) {
                     cleanup((TestCase)test);
 
@@ -158,10 +162,12 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 }
             }
 
+            @Override
             public void addError(Test test, Throwable t) {
                 // This space intentionally left blank.
             }
 
+            @Override
             public void addFailure(Test test, AssertionFailedError t) {
                 // This space intentionally left blank.
             }
