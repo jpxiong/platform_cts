@@ -1,38 +1,90 @@
 [
-/* Framework problems. */
+{
+  name: "android.graphics.drawable.cts.AnimationDrawableTest#testStart",
+  bug: 5513533
+},
+{
+  name: "android.hardware.cts.CameraTest#testFocusDistances",
+  bug: 5473673
+},
+{
+  name: "android.hardware.cts.CameraTest#testVideoSnapshot",
+  bug: 5492725
+},
+{
+  name: "android.media.cts.MediaPlayerTest#testVideoSurfaceResetting",
+  bug: 5382086
+},
+{
+  names: [
+    "android.media.cts.VisualizerTest#test2_0PollingCapture",
+    "android.media.cts.VisualizerTest#test2_1ListenerCapture"
+  ],
+  bug: 5519606
+},
+{
+  names: [
+    "android.net.cts.ListeningPortsTest#testNoListeningTcp6Ports",
+    "android.net.cts.ListeningPortsTest#testNoListeningUdp6Ports"
+  ],
+  bug: 5477538
+},
 {
   name: "android.telephony.cts.PhoneNumberFormattingTextWatcherTest#testPhoneNumberFormattingTextWatcher",
   bug: 3198578
 },
 {
+  name: "android.text.cts.AndroidCharacterTest#testMirror",
+  bug: 4371654
+},
+{
+  names: [
+    "android.theme.cts.ActivitySnapshotTests",
+    "android.theme.cts.SplitActivitySnapshotTests",
+    "android.theme.cts.ThemeTest"
+  ],
+  bug: 5404694
+},
+{
   name: "android.webkit.cts.WebViewTest#testRequestFocusNodeHref",
   bug: 3241968
 },
-
 {
-  description: "Need investigation.",
+  name: "android.webkit.cts.WebViewTest#testGetHitTestResult",
+  bug: 5361502
+},
+{
+  name: "android.widget.cts.ViewFlipperTest#testViewFlipper",
+  bug: 5051682
+},
+{
   names: [
+    "libcore.java.net.OldCookieHandlerTest#test_CookieHandler",
+    "libcore.java.net.ConcurrentCloseTest#test_read",
+    "libcore.java.security.ProviderTest#test_Provider_getServices",
+    "libcore.java.text.DecimalFormatTest#testBigDecimalBug1897917",
+    "libcore.java.text.DecimalFormatTest#testBigDecimalTestBigIntWithMultiplier",
+    "libcore.java.text.OldDecimalFormatTest",
+    "libcore.java.text.OldDecimalFormatTestICU",
+    "libcore.java.util.logging.OldFormatterTest",
+    "libcore.java.net.URLConnectionTest#testServerClosesSocket"
+  ],
+  bug: 5498103
+},
+{
+  name: "libcore.java.security.KeyPairGeneratorTest",
+  bug: 5513723
+},
+{
+  description: "Reevaluate these tests for the next release",
+  names: [
+    "android.content.cts.ContextWrapperTest#testAccessTheme",
     "android.provider.cts.Contacts_PeopleTest#testAddToGroup",
-    "android.provider.cts.MediaStore_Audio_Playlists_MembersTest",
-    "android.webkit.cts.WebViewTest#testRequestImageRef",
-    "tests.api.java.util.CalendarTest#test_getInstance"
-  ]
-},
-
-{
-  description: "Test should be made independent from theme.",
-  name: "android.content.cts.ContextWrapperTest#testAccessTheme"
-},
-  
-{
-  description: "Flakey",
-  names: [
-    "android.hardware.cts.CameraTest#testSetPreviewDisplay",
     "android.view.cts.GestureDetectorTest#testOnTouchEvent",
     "android.view.cts.ViewTest#testWindowVisibilityChanged",
+    "android.widget.cts.AbsListViewTest#testGetContextMenuInfo",
     "android.webkit.cts.WebChromeClientTest#testOnReceivedIcon",
-    "android.widget.cts.AbsListViewTest#testGetContextMenuInfo"
+    "android.webkit.cts.WebViewTest#testRequestImageRef"
   ]
 }
-
 ]
