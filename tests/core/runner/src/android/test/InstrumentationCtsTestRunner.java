@@ -121,6 +121,7 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
             private long startTime;
 
             private Locale defaultLocale;
+            private String userHome;
             private String javaIoTmpDir;
 
             @Override
@@ -140,11 +141,13 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
 
             private void save() {
                 defaultLocale = Locale.getDefault();
+                userHome = System.getProperty("user.home");
                 javaIoTmpDir = System.getProperty("java.io.tmpdir");
             }
 
             private void restore() {
                 Locale.setDefault(defaultLocale);
+                System.setProperty("user.home", userHome);
                 System.setProperty("java.io.tmpdir", javaIoTmpDir);
             }
 
