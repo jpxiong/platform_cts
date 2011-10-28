@@ -33,9 +33,15 @@ import android.util.Log;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.Authenticator;
+import java.net.CookieHandler;
+import java.net.ResponseCache;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
@@ -63,6 +69,8 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
      */
     private boolean mSingleTest = false;
 
+    private TestEnvironment mEnvironment;
+
     @Override
     public void onCreate(Bundle arguments) {
         // We might want to move this to /sdcard, if is is mounted/writable.
@@ -78,6 +86,8 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         System.setProperty("user.dir", cacheDir.getAbsolutePath());
 
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+
+        mEnvironment = new TestEnvironment();
 
         if (arguments != null) {
             String classArg = arguments.getString(ARGUMENT_TEST_CLASS);
@@ -120,10 +130,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
              */
             private long startTime;
 
-            private Locale defaultLocale;
-            private String userHome;
-            private String javaIoTmpDir;
-
             @Override
             public void startTest(Test test) {
                 if (test.getClass() != lastClass) {
@@ -134,26 +140,13 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                 Thread.currentThread().setContextClassLoader(
                         test.getClass().getClassLoader());
 
-                save();
+                mEnvironment.reset();
 
                 startTime = System.currentTimeMillis();
             }
 
-            private void save() {
-                defaultLocale = Locale.getDefault();
-                userHome = System.getProperty("user.home");
-                javaIoTmpDir = System.getProperty("java.io.tmpdir");
-            }
-
-            private void restore() {
-                Locale.setDefault(defaultLocale);
-                System.setProperty("user.home", userHome);
-                System.setProperty("java.io.tmpdir", javaIoTmpDir);
-            }
-
             @Override
             public void endTest(Test test) {
-                restore();
                 if (test instanceof TestCase) {
                     cleanup((TestCase)test);
 
@@ -233,6 +226,34 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         });
 
         return runner;
+    }
+
+    // http://code.google.com/p/vogar/source/browse/trunk/src/vogar/target/TestEnvironment.java
+    static class TestEnvironment {
+        private Locale mDefaultLocale;
+        private String mUserHome;
+        private String mJavaIoTmpDir;
+        private HostnameVerifier mHostnameVerifier;
+        private SSLSocketFactory mSslSocketFactory;
+
+        TestEnvironment() {
+            mDefaultLocale = Locale.getDefault();
+            mUserHome = System.getProperty("user.home");
+            mJavaIoTmpDir = System.getProperty("java.io.tmpdir");
+            mHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+            mSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+        }
+
+        void reset() {
+            Locale.setDefault(mDefaultLocale);
+            System.setProperty("user.home", mUserHome);
+            System.setProperty("java.io.tmpdir", mJavaIoTmpDir);
+            Authenticator.setDefault(null);
+            CookieHandler.setDefault(null);
+            ResponseCache.setDefault(null);
+            HttpsURLConnection.setDefaultHostnameVerifier(mHostnameVerifier);
+            HttpsURLConnection.setDefaultSSLSocketFactory(mSslSocketFactory);
+        }
     }
 
     @Override
