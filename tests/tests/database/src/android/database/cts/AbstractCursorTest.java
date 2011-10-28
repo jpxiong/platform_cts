@@ -546,6 +546,19 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertEquals(COLUMN_NAMES1.length, mDatabaseCursor.getColumnCount());
     }
 
+    @TestTargetNew(
+        level = TestLevel.COMPLETE,
+        method = "deactivateInternal",
+        args = {}
+    )
+    public void testDeactivateInternal() {
+        MockDataSetObserver mock = new MockDataSetObserver();
+        mDatabaseCursor.registerDataSetObserver(mock);
+        assertFalse(mock.hadCalledOnInvalid());
+        mDatabaseCursor.deactivateInternal();
+        assertTrue(mock.hadCalledOnInvalid());
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
