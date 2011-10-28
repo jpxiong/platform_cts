@@ -75,9 +75,13 @@ public class InstrumentationApkTest extends InstrumentationTest implements IBuil
             Log.d(LOG_TAG, String.format("Installing %s on %s", apkFileName,
                     getDevice().getSerialNumber()));
             try {
-                getDevice().installPackage(mCtsBuild.getTestApp(apkFileName), true);
+                String installCode = getDevice().installPackage(mCtsBuild.getTestApp(apkFileName),
+                        true);
+                Assert.assertNull(String.format("Failed to install %s on %s. Reason: %s",
+                        apkFileName, getDevice().getSerialNumber(), installCode), installCode);
+
             } catch (FileNotFoundException e) {
-                Log.e(LOG_TAG, e);
+                Assert.fail(String.format("Could not find file %s", apkFileName));
             }
         }
         super.run(listener);
