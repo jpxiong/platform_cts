@@ -29,9 +29,11 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.log.LogUtil.CLog;
+import com.android.tradefed.result.ILogFileSaver;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
+import com.android.tradefed.result.LogFileSaver;
 import com.android.tradefed.result.TestSummary;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.StreamUtil;
@@ -160,17 +162,22 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testLog(String dataName, LogDataType dataType, InputStreamSource dataStream) {
-        // save as zip file in report dir
-        // TODO: ensure uniqueness of file name
-        // TODO: use dataType.getFileExt() when its made public
-        String fileName = String.format("%s.%s", dataName, dataType.name().toLowerCase());
-        // TODO: consider compressing large files
-        File logFile = new File(mReportDir, fileName);
         try {
-            FileUtil.writeToFile(dataStream.createInputStream(), logFile);
+            File logFile = getLogFileSaver().saveAndZipLogData(dataName, dataType,
+                    dataStream.createInputStream());
+            logResult(String.format("Saved log %s", logFile.getName()));
         } catch (IOException e) {
-            Log.e(LOG_TAG, String.format("Failed to write log %s", logFile.getAbsolutePath()));
+            CLog.e("Failed to write log for %s", dataName);
         }
+    }
+
+    /**
+     * Return the {@link ILogFileSaver} to use.
+     * <p/>
+     * Exposed for unit testing.
+     */
+    ILogFileSaver getLogFileSaver() {
+        return new LogFileSaver(mReportDir);
     }
 
     /**

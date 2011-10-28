@@ -33,6 +33,7 @@ import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
+import com.android.tradefed.result.ResultForwarder;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -121,6 +122,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         "flag for taking a screenshot of the device when test execution is complete.")
     private boolean mScreenshot = false;
 
+    @Option(name = "bugreport", shortName = 'b', description =
+        "take a bugreport after each failed test. " +
+        "Warning: can potentially use a lot of disk space.")
+    private boolean mBugreport = false;
+
     /** data structure for a {@link IRemoteTest} and its known tests */
     class TestPackage {
         private final IRemoteTest mTestForPackage;
@@ -152,6 +158,27 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
          */
         String getTestRunName() {
             return mPackageDef.getUri();
+        }
+    }
+
+    /**
+     * A {@link ResultForwarder} that will forward a bugreport on each failed test.
+     */
+    private static class FailedTestBugreportGenerator extends ResultForwarder {
+        private ITestDevice mDevice;
+
+        public FailedTestBugreportGenerator(ITestInvocationListener listener, ITestDevice device) {
+            super(listener);
+            mDevice = device;
+        }
+
+        @Override
+        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+            super.testFailed(status, test, trace);
+            InputStreamSource bugSource = mDevice.getBugreport();
+            super.testLog(String.format("bug-%s", test.toString()), LogDataType.TEXT,
+                    bugSource);
+            bugSource.cancel();
         }
     }
 
@@ -278,6 +305,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         if (mRemainingTestPkgs == null) {
             checkFields();
             mRemainingTestPkgs = buildTestsToRun();
+        }
+        if (mBugreport) {
+            FailedTestBugreportGenerator bugListener = new FailedTestBugreportGenerator(listener,
+                    getDevice());
+            listener = bugListener;
         }
 
         // collect and install the prerequisiteApks first, to save time when multiple test
@@ -597,7 +629,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         if (!mutualExclusiveArgs) {
             throw new IllegalArgumentException(String.format(
                     "Ambiguous or missing arguments. " +
-                    "One and only of --%s --%s(s), --%s or --%s to run can be specified",
+                    "One and only one of --%s --%s(s), --%s or --%s to run can be specified",
                     PLAN_OPTION, PACKAGE_OPTION, CLASS_OPTION, CONTINUE_OPTION));
         }
         if (mMethodName != null && mClassName == null) {
