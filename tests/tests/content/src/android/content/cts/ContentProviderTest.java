@@ -28,12 +28,16 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.IContentProvider;
+import android.content.EntityIterator;
 import android.content.ContentProviderResult;
 import android.content.ContentProviderOperation;
 import android.content.OperationApplicationException;
 import android.content.pm.ProviderInfo;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.database.CursorWindow;
+import android.database.IBulkCursor;
+import android.database.IContentObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -326,71 +330,69 @@ public class ContentProviderTest extends AndroidTestCase {
         assertSame(mockContentProvider, ContentProvider.coerceToLocalContentProvider(transport));
 
         IContentProvider iContentProvider = new IContentProvider() {
-            @Override
             public int bulkInsert(Uri url, ContentValues[] initialValues) {
                 return 0;
             }
 
-            @Override
             public int delete(Uri url, String selection, String[] selectionArgs) {
                 return 0;
             }
 
-            @Override
             public String getType(Uri url) {
                 return null;
             }
 
-            @Override
             public Uri insert(Uri url, ContentValues initialValues) {
                 return null;
             }
 
-            @Override
             public ParcelFileDescriptor openFile(Uri url, String mode) {
                 return null;
             }
 
-            @Override
             public AssetFileDescriptor openAssetFile(Uri url, String mode) {
                 return null;
             }
 
-            @Override
             public ContentProviderResult[] applyBatch(
                     ArrayList<ContentProviderOperation> operations)
                     throws RemoteException, OperationApplicationException {
                 return null;
             }
 
-            @Override
             public Cursor query(Uri url, String[] projection, String selection,
                     String[] selectionArgs, String sortOrder) {
                 return null;
             }
 
-            @Override
+            /**
+             * @hide
+             */
+            public EntityIterator queryEntities(Uri url, String selection, String[] selectionArgs,
+                    String sortOrder) throws RemoteException {
+                return null;
+            }
+
             public int update(Uri url, ContentValues values, String selection,
                     String[] selectionArgs) {
                 return 0;
             }
 
-            @Override
             public IBinder asBinder() {
                 return null;
             }
 
-            @Override
+            /**
+             * @hide
+             */
             public Bundle call(String method, String request, Bundle args) {
                 return null;
             }
-
-            @Override
+            
             public String[] getStreamTypes(Uri url, String mimeTypeFilter) throws RemoteException {
                 return null;
             }
 
-            @Override
             public AssetFileDescriptor openTypedAssetFile(Uri url, String mimeType, Bundle opts)
                     throws RemoteException, FileNotFoundException {
                 return null;

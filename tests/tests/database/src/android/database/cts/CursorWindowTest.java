@@ -212,7 +212,7 @@ public class CursorWindowTest extends AndroidTestCase {
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "createFromParcel",
+            method = "newFromParcel",
             args = {android.os.Parcel.class}
         ),
         @TestTargetNew(
@@ -221,6 +221,7 @@ public class CursorWindowTest extends AndroidTestCase {
             args = {android.os.Parcel.class, int.class}
         )
     })
+    @ToBeFixed(bug = " ", explanation = "Can't create a remote binder for newFromParcel here.")
     public void testConstructors() {
         int TEST_NUMBER = 5;
         CursorWindow cursorWindow;
@@ -235,17 +236,19 @@ public class CursorWindowTest extends AndroidTestCase {
 
         // Test newFromParcel
         Parcel parcel = Parcel.obtain();
+        try {
+            cursorWindow = CursorWindow.newFromParcel(parcel);
+            fail("Can't accept a local binder.");
+        } catch (IllegalStateException e) {
+            // expected
+        }
+
         cursorWindow = new CursorWindow(true);
         cursorWindow.setStartPosition(TEST_NUMBER);
-        cursorWindow.setNumColumns(1);
-        cursorWindow.allocRow();
-        cursorWindow.putString(TEST_STRING, TEST_NUMBER, 0);
         cursorWindow.writeToParcel(parcel, 0);
-
         parcel.setDataPosition(0);
-        cursorWindow = CursorWindow.CREATOR.createFromParcel(parcel);
-        assertEquals(TEST_NUMBER, cursorWindow.getStartPosition());
-        assertEquals(TEST_STRING, cursorWindow.getString(TEST_NUMBER, 0));
+        assertNotNull(parcel.readStrongBinder());
+        assertEquals(TEST_NUMBER, parcel.readInt());
     }
 
     @TestTargets({
