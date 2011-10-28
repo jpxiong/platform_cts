@@ -355,6 +355,7 @@
                             <TH>Passed</TH>
                             <TH>Failed</TH>
                             <TH>Timed Out</TH>
+                            <TH>Not Executed</TH>
                             <TH>Total Tests</TH>
                         </TR>
                         <xsl:for-each select="TestResult/TestPackage">
@@ -371,6 +372,9 @@
                                 </TD>
                                 <TD>
                                     <xsl:value-of select="count(TestSuite//Test[@result = 'timeout'])"/>
+                                </TD>
+                                <TD>
+                                    <xsl:value-of select="count(TestSuite//Test[@result = 'notExecuted'])"/>
                                 </TD>
                                 <TD>
                                     <xsl:value-of select="count(TestSuite//Test)"/>
