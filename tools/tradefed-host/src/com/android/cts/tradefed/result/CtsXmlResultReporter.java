@@ -144,7 +144,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     /**
      * Helper method to retrieve the {@link CtsBuildHelper}.
      * @param ctsBuild
-     * @return
      */
     CtsBuildHelper getBuildHelper(IFolderBuildInfo ctsBuild) {
         CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
@@ -418,10 +417,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      *     ...
      *   </ProcessInfo>
      * </pre>
-     *
-     * @param document
-     * @param parentNode
-     * @param deviceInfo
      */
     private void serializeProcessInfo(KXmlSerializer serializer, String rootProcesses)
             throws IOException {
@@ -504,12 +499,10 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
 
     /**
      * Creates the output stream to use for test results. Exposed for mocking.
-     * @param mReportPath
      */
     OutputStream createOutputResultStream(File reportDir) throws IOException {
         File reportFile = new File(reportDir, TEST_RESULT_FILE_NAME);
-        Log.i(LOG_TAG, String.format("Created xml report file at %s",
-                reportFile.getAbsolutePath()));
+        logResult("Created xml report file at file://%s", reportFile.getAbsolutePath());
         return new FileOutputStream(reportFile);
     }
 
