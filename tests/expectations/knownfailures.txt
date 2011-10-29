@@ -4,8 +4,12 @@
   bug: 5513533
 },
 {
-  name: "android.hardware.cts.CameraTest#testFocusDistances",
-  bug: 5473673
+  name: "android.hardware.cts.CameraGLTest#testSetPreviewTextureBothCallbacks",
+  bug: 5534460
+},
+{
+  name: "android.hardware.cts.CameraGLTest#testSetPreviewTexturePreviewCallback",
+  bug: 5534170
 },
 {
   name: "android.hardware.cts.CameraTest#testVideoSnapshot",
@@ -58,20 +62,15 @@
   bug: 5051682
 },
 {
-  names: [
-    "libcore.java.net.OldCookieHandlerTest#test_CookieHandler",
-    "libcore.java.net.ConcurrentCloseTest#test_read",
-    "libcore.java.security.ProviderTest#test_Provider_getServices",
-    "libcore.java.text.DecimalFormatTest#testBigDecimalBug1897917",
-    "libcore.java.text.DecimalFormatTest#testBigDecimalTestBigIntWithMultiplier",
-    "libcore.java.text.OldDecimalFormatTest",
-    "libcore.java.text.OldDecimalFormatTestICU",
-    "libcore.java.util.logging.OldFormatterTest",
-    "libcore.java.net.URLConnectionTest#testServerClosesSocket"
-  ],
-  bug: 5498103
+  name: "libcore.java.net.URLConnectionTest#testServerClosesSocket",
+  bug: 5534202
 },
 {
+  name: "dalvik.system.DexClassLoaderTest#test_twoJar_callInstanceMethod",
+  bug: 5534165
+},
+{
+  description: "Test exceeds Tradefed's 10 minute timeout",
   name: "libcore.java.security.KeyPairGeneratorTest",
   bug: 5513723
 },
