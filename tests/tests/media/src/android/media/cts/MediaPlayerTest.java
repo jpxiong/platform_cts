@@ -109,7 +109,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
      * from the time setDisplay() was called
      */
     public void testVideoSurfaceResetting() throws Exception {
-        final int tolerance = 70;
+        final int tolerance = 150;
         final int seekPos = 1500;
 
         playVideoTest(R.raw.testvideo, 352, 288);
