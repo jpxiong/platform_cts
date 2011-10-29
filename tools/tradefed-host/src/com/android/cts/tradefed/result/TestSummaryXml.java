@@ -103,11 +103,11 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
                     CtsXmlResultReporter.RESULT_TAG)) {
                 mPlan = getAttribute(parser, CtsXmlResultReporter.PLAN_ATTR);
             } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
-                    CtsXmlResultReporter.SUMMARY_TAG)) {
-                mNumFailed = parseIntAttr(parser, CtsXmlResultReporter.FAILED_ATTR) +
-                    parseIntAttr(parser, CtsXmlResultReporter.TIMEOUT_ATTR);
-                mNumNotExecuted = parseIntAttr(parser, CtsXmlResultReporter.NOT_EXECUTED_ATTR);
-                mNumPassed = parseIntAttr(parser, CtsXmlResultReporter.PASS_ATTR);
+                    TestResults.SUMMARY_TAG)) {
+                mNumFailed = parseIntAttr(parser, TestResults.FAILED_ATTR) +
+                    parseIntAttr(parser, TestResults.TIMEOUT_ATTR);
+                mNumNotExecuted = parseIntAttr(parser, TestResults.NOT_EXECUTED_ATTR);
+                mNumPassed = parseIntAttr(parser, TestResults.PASS_ATTR);
                 return;
               }
             eventType = parser.next();

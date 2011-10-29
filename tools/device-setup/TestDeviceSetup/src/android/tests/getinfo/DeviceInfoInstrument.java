@@ -68,6 +68,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         addResult(BUILD_FINGERPRINT, Build.FINGERPRINT);
         addResult(BUILD_ABI, Build.CPU_ABI);
         addResult(BUILD_ABI2, Build.CPU_ABI2);
+        addResult(SERIAL_NUMBER, Build.SERIAL);
 
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
         addResult(VERSION_SDK, Build.VERSION.SDK);
@@ -77,8 +78,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
                 Context.WINDOW_SERVICE);
         Display d = wm.getDefaultDisplay();
         d.getMetrics(metrics);
-        addResult(SCREEN_WIDTH, metrics.widthPixels);
-        addResult(SCREEN_HEIGHT, metrics.heightPixels);
+        addResult(RESOLUTION, String.format("%sx%s", metrics.widthPixels, metrics.heightPixels));
         addResult(SCREEN_DENSITY, metrics.density);
         addResult(SCREEN_X_DENSITY, metrics.xdpi);
         addResult(SCREEN_Y_DENSITY, metrics.ydpi);
