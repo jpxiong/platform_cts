@@ -15,7 +15,6 @@
  */
 package com.android.cts.tradefed.build;
 
-import com.android.tradefed.build.BuildRetrievalError;
 import com.android.tradefed.build.FolderBuildInfo;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IBuildProvider;
@@ -32,12 +31,13 @@ public class CtsBuildProvider implements IBuildProvider {
     @Option(name="cts-install-path", description="the path to the cts installation to use")
     private String mCtsRootDirPath = System.getProperty("CTS_ROOT");
 
-    public static final String CTS_BUILD_VERSION = "ICS_tradefed";
+    public static final String CTS_BUILD_VERSION = "4.0_r1";
 
     /**
      * {@inheritDoc}
      */
-    public IBuildInfo getBuild() throws BuildRetrievalError {
+    @Override
+    public IBuildInfo getBuild() {
         if (mCtsRootDirPath == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
@@ -49,6 +49,7 @@ public class CtsBuildProvider implements IBuildProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void buildNotTested(IBuildInfo info) {
         // ignore
     }
@@ -56,6 +57,7 @@ public class CtsBuildProvider implements IBuildProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void cleanUp(IBuildInfo info) {
         // ignore
     }

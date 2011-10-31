@@ -49,6 +49,12 @@ public class CtsConsole extends Console {
         super();
     }
 
+    @Override
+    public void run() {
+        printLine(String.format("Android CTS %s", CtsBuildProvider.CTS_BUILD_VERSION));
+        super.run();
+    }
+
     /**
      * Adds the 'list packages' and 'list plans' commands
      */
@@ -116,9 +122,6 @@ public class CtsConsole extends Console {
                 ADD_PATTERN));
     }
 
-    /**
-     * @return
-     */
     @Override
     protected String getConsolePrompt() {
         return "cts-tf > ";
