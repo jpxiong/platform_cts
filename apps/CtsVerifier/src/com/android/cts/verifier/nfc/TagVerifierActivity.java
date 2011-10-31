@@ -104,10 +104,6 @@ public class TagVerifierActivity<T> extends PassFailButtons.ListActivity {
             mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
                     .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-            if (!mNfcAdapter.isEnabled()) {
-                showDialog(NFC_NOT_ENABLED_DIALOG_ID);
-            }
-
             goToWriteStep();
         } else {
             finish();
@@ -128,6 +124,10 @@ public class TagVerifierActivity<T> extends PassFailButtons.ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!mNfcAdapter.isEnabled()) {
+            showDialog(NFC_NOT_ENABLED_DIALOG_ID);
+        }
+
         mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
     }
 

@@ -206,6 +206,11 @@
         button below to goto Settings and enable it.</string>
     <string name="nfc_settings">NFC Settings</string>
 
+    <string name="ndef_push_not_enabled">NDEF Push is not enabled!</string>
+    <string name="ndef_push_not_enabled_message">These tests require Android Beam to be enabled.
+        Click the button below to goto NFC Sharing Settings and enable it.</string>
+    <string name="ndef_push_settings">NFC Sharing Settings</string>
+
     <string name="nfc_pee_2_pee">Peer-to-Peer Data Exchange</string>
     <string name="nfc_ndef_push_sender">NDEF Push Sender</string>
     <string name="nfc_ndef_push_receiver">NDEF Push Receiver</string>

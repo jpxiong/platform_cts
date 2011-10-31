@@ -37,6 +37,7 @@ public class NdefPushSenderActivity extends PassFailButtons.Activity {
     static final NdefMessage TEST_MESSAGE = getTestMessage();
 
     private static final int NFC_NOT_ENABLED_DIALOG_ID = 1;
+    private static final int NDEF_PUSH_NOT_ENABLED_DIALOG_ID = 2;
 
     private NfcAdapter mNfcAdapter;
 
@@ -52,10 +53,6 @@ public class NdefPushSenderActivity extends PassFailButtons.Activity {
 
         NfcManager nfcManager = (NfcManager) getSystemService(NFC_SERVICE);
         mNfcAdapter = nfcManager.getDefaultAdapter();
-
-        if (!mNfcAdapter.isEnabled()) {
-            showDialog(NFC_NOT_ENABLED_DIALOG_ID);
-        }
     }
 
     private static NdefMessage getTestMessage() {
@@ -71,6 +68,14 @@ public class NdefPushSenderActivity extends PassFailButtons.Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!mNfcAdapter.isEnabled()) {
+            showDialog(NFC_NOT_ENABLED_DIALOG_ID);
+        } else if (!mNfcAdapter.isNdefPushEnabled()) {
+            /* Sender must have NDEF push enabled */
+            showDialog(NDEF_PUSH_NOT_ENABLED_DIALOG_ID);
+        }
+
         mNfcAdapter.enableForegroundNdefPush(this, TEST_MESSAGE);
     }
 
@@ -85,7 +90,8 @@ public class NdefPushSenderActivity extends PassFailButtons.Activity {
         switch (id) {
             case NFC_NOT_ENABLED_DIALOG_ID:
                 return NfcDialogs.createNotEnabledDialog(this);
-
+            case NDEF_PUSH_NOT_ENABLED_DIALOG_ID:
+                return NfcDialogs.createNdefPushNotEnabledDialog(this);
             default:
                 return super.onCreateDialog(id, args);
         }
