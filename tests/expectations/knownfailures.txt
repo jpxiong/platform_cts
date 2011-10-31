@@ -4,6 +4,10 @@
   bug: 5513533
 },
 {
+  name: "android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata",
+  bug: 5544055
+},
+{
   name: "android.hardware.cts.CameraGLTest#testSetPreviewTextureBothCallbacks",
   bug: 5534460
 },
@@ -14,10 +18,6 @@
 {
   name: "android.hardware.cts.CameraTest#testVideoSnapshot",
   bug: 5492725
-},
-{
-  name: "android.media.cts.MediaPlayerTest#testVideoSurfaceResetting",
-  bug: 5382086
 },
 {
   names: [
@@ -62,7 +62,11 @@
   bug: 5051682
 },
 {
-  name: "libcore.java.net.URLConnectionTest#testServerClosesSocket",
+  names: [
+    "libcore.java.net.URLConnectionTest#testServerClosesSocket",
+    "libcore.java.net.URLConnectionTest#testServerShutdownInput",
+    "libcore.java.net.URLConnectionTest#testServerShutdownOutput"
+  ],
   bug: 5534202
 },
 {
