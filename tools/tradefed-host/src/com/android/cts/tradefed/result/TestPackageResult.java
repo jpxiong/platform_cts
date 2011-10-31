@@ -15,6 +15,9 @@
  */
 package com.android.cts.tradefed.result;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
+import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
@@ -28,9 +31,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Data structure for a CTS test package result.
@@ -206,7 +211,54 @@ class TestPackageResult  extends AbstractXmlPullParser {
         if (digest != null) {
             setDigest(digest);
         }
-        mMetrics.putAll(metrics);
+        if (DeviceInfoCollector.APP_PACKAGE_NAME.equals(getAppPackageName())) {
+            storeDeviceMetrics(metrics);
+        } else {
+            mMetrics.putAll(metrics);
+        }
+    }
+
+    /**
+     * Check that the provided device info metrics are consistent with the currently stored metrics.
+     * <p/>
+     * If any inconsistencies occur, logs errors and stores error messages in the metrics map
+     *
+     * @param metrics
+     */
+    private void storeDeviceMetrics(Map<String, String> metrics) {
+        // TODO centralize all the device metrics handling into a single class
+        if (mMetrics.isEmpty()) {
+            // nothing to check!
+            mMetrics.putAll(metrics);
+            return;
+        }
+        // ensure all the metrics we expect to be identical actually are
+        checkMetrics(metrics, DeviceInfoConstants.BUILD_FINGERPRINT,
+                DeviceInfoConstants.BUILD_MODEL, DeviceInfoConstants.BUILD_BRAND,
+                DeviceInfoConstants.BUILD_MANUFACTURER, DeviceInfoConstants.BUILD_BOARD,
+                DeviceInfoConstants.BUILD_DEVICE, DeviceInfoConstants.PRODUCT_NAME,
+                DeviceInfoConstants.BUILD_ABI, DeviceInfoConstants.BUILD_ABI2,
+                DeviceInfoConstants.SCREEN_SIZE);
+    }
+
+    private void checkMetrics(Map<String, String> metrics, String... keysToCheck) {
+        Set<String> keyCheckSet = new HashSet<String>();
+        Collections.addAll(keyCheckSet, keysToCheck);
+        for (Map.Entry<String, String> metricEntry : metrics.entrySet()) {
+            String currentValue = mMetrics.get(metricEntry.getKey());
+            if (keyCheckSet.contains(metricEntry.getKey()) && currentValue != null
+                    && !metricEntry.getValue().equals(currentValue)) {
+                CLog.e("Inconsistent info collected from devices. "
+                        + "Current result has %s='%s', Received '%s'. Are you sharding or " +
+                        "resuming a test run across different devices and/or builds?",
+                        metricEntry.getKey(), currentValue, metricEntry.getValue());
+                mMetrics.put(metricEntry.getKey(),
+                        String.format("ERROR: Inconsistent results: %s, %s",
+                                metricEntry.getValue(), currentValue));
+            } else {
+                mMetrics.put(metricEntry.getKey(), metricEntry.getValue());
+            }
+        }
     }
 
     /**

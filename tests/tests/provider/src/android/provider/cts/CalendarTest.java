@@ -82,7 +82,7 @@ public class CalendarTest extends InstrumentationTestCase {
                 Calendars.NAME,
                 Calendars.CALENDAR_DISPLAY_NAME,
                 Calendars.CALENDAR_COLOR,
-                Calendars.CALENDAR_COLOR_INDEX,
+                Calendars.CALENDAR_COLOR_KEY,
                 Calendars.CALENDAR_ACCESS_LEVEL,
                 Calendars.VISIBLE,
                 Calendars.SYNC_EVENTS,
@@ -308,7 +308,7 @@ public class CalendarTest extends InstrumentationTestCase {
             Events.EVENT_TIMEZONE,
             Events.EVENT_END_TIMEZONE,
             Events.EVENT_COLOR,
-            Events.EVENT_COLOR_INDEX,
+            Events.EVENT_COLOR_KEY,
             Events.DURATION,
             Events.ALL_DAY,
             Events.ACCESS_LEVEL,
@@ -635,7 +635,7 @@ public class CalendarTest extends InstrumentationTestCase {
         public static final String WHERE_COLOR_ACCOUNT = Colors.ACCOUNT_NAME + "=? AND "
                 + Colors.ACCOUNT_TYPE + "=?";
         public static final String WHERE_COLOR_ACCOUNT_AND_INDEX = WHERE_COLOR_ACCOUNT + " AND "
-                + Colors.COLOR_INDEX + "=?";
+                + Colors.COLOR_KEY + "=?";
 
         public static final String[] COLORS_PROJECTION = new String[] {
                 Colors._ID, // 0
@@ -643,7 +643,7 @@ public class CalendarTest extends InstrumentationTestCase {
                 Colors.ACCOUNT_TYPE, // 2
                 Colors.DATA, // 3
                 Colors.COLOR_TYPE, // 4
-                Colors.COLOR_INDEX, // 5
+                Colors.COLOR_KEY, // 5
                 Colors.COLOR, // 6
         };
         // indexes into projection
@@ -688,7 +688,7 @@ public class CalendarTest extends InstrumentationTestCase {
 
             ContentValues colorValues = new ContentValues();
             colorValues.put(Colors.DATA, data);
-            colorValues.put(Colors.COLOR_INDEX, index);
+            colorValues.put(Colors.COLOR_KEY, index);
             colorValues.put(Colors.COLOR_TYPE, type);
             colorValues.put(Colors.COLOR, color);
             Uri result = resolver.insert(uri, colorValues);
@@ -1459,7 +1459,7 @@ public class CalendarTest extends InstrumentationTestCase {
         // Account name/type must be in the query params, so may be left
         // out here
         colorValues.put(Colors.DATA, "0");
-        colorValues.put(Colors.COLOR_INDEX, "1");
+        colorValues.put(Colors.COLOR_KEY, "1");
         colorValues.put(Colors.COLOR_TYPE, 0);
         colorValues.put(Colors.COLOR, 0xff000000);
 
@@ -1516,7 +1516,7 @@ public class CalendarTest extends InstrumentationTestCase {
         Uri col2 = mContentResolver.insert(uri2, colorValues);
 
         // And a different index on the same account
-        colorValues.put(Colors.COLOR_INDEX, "2");
+        colorValues.put(Colors.COLOR_KEY, "2");
         Uri col3 = mContentResolver.insert(uri2, colorValues);
 
         // Verify that all three colors are in the table
@@ -1553,7 +1553,7 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Test inserting a calendar with an invalid color index
         ContentValues cv = CalendarHelper.getNewCalendarValues(account, seed++);
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, "badIndex");
+        cv.put(Calendars.CALENDAR_COLOR_KEY, "badIndex");
         Uri calSyncUri = asSyncAdapter(Calendars.CONTENT_URI, account, CTS_TEST_TYPE);
         Uri colSyncUri = asSyncAdapter(Colors.CONTENT_URI, account, CTS_TEST_TYPE);
 
@@ -1567,7 +1567,7 @@ public class CalendarTest extends InstrumentationTestCase {
         // Test updating a calendar with an invalid color index
         long calendarId = createAndVerifyCalendar(account, seed++, null);
         cv.clear();
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, "badIndex2");
+        cv.put(Calendars.CALENDAR_COLOR_KEY, "badIndex2");
         Uri calendarUri = ContentUris.withAppendedId(Calendars.CONTENT_URI, calendarId);
         try {
             mContentResolver.update(calendarUri, cv, null, null);
@@ -1580,7 +1580,7 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Test that inserting a valid color index works
         cv = CalendarHelper.getNewCalendarValues(account, seed++);
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
+        cv.put(Calendars.CALENDAR_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
 
         Uri uri = mContentResolver.insert(calSyncUri, cv);
         long calendarId2 = ContentUris.parseId(uri);
@@ -1592,10 +1592,10 @@ public class CalendarTest extends InstrumentationTestCase {
         // Test that updating a valid color index also updates the color in a
         // calendar
         cv.clear();
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
+        cv.put(Calendars.CALENDAR_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_0]);
         mContentResolver.update(calendarUri, cv, null, null);
         Cursor c = mContentResolver.query(calendarUri,
-                new String[] { Calendars.CALENDAR_COLOR_INDEX, Calendars.CALENDAR_COLOR },
+                new String[] { Calendars.CALENDAR_COLOR_KEY, Calendars.CALENDAR_COLOR },
                 null, null, null);
         try {
             c.moveToFirst();
@@ -1610,10 +1610,10 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // And clearing it doesn't change the color
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, (String) null);
+        cv.put(Calendars.CALENDAR_COLOR_KEY, (String) null);
         mContentResolver.update(calendarUri, cv, null, null);
         c = mContentResolver.query(calendarUri,
-                new String[] { Calendars.CALENDAR_COLOR_INDEX, Calendars.CALENDAR_COLOR },
+                new String[] { Calendars.CALENDAR_COLOR_KEY, Calendars.CALENDAR_COLOR },
                 null, null, null);
         try {
             c.moveToFirst();
@@ -1628,7 +1628,7 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // Test that setting a calendar color to an event color fails
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
+        cv.put(Calendars.CALENDAR_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
         try {
             mContentResolver.update(calendarUri, cv, null, null);
             fail("Should not allow a calendar to use an event color");
@@ -1637,7 +1637,7 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // Test that you can't remove a color that is referenced by a calendar
-        cv.put(Calendars.CALENDAR_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_3]);
+        cv.put(Calendars.CALENDAR_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_3]);
         mContentResolver.update(calendarUri, cv, null, null);
 
         try {
@@ -1674,7 +1674,7 @@ public class CalendarTest extends InstrumentationTestCase {
         Uri colSyncUri = asSyncAdapter(Colors.CONTENT_URI, account, CTS_TEST_TYPE);
 
         ContentValues ev = EventHelper.getNewEventValues(account, seed++, cal_id, false);
-        ev.put(Events.EVENT_COLOR_INDEX, "badIndex");
+        ev.put(Events.EVENT_COLOR_KEY, "badIndex");
 
         try {
             Uri uri = mContentResolver.insert(Events.CONTENT_URI, ev);
@@ -1686,7 +1686,7 @@ public class CalendarTest extends InstrumentationTestCase {
         // Test updating an event with an invalid color index fails
         long event_id = createAndVerifyEvent(account, seed++, cal_id, false, null);
         ev.clear();
-        ev.put(Events.EVENT_COLOR_INDEX, "badIndex2");
+        ev.put(Events.EVENT_COLOR_KEY, "badIndex2");
         Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, event_id);
         try {
             mContentResolver.update(eventUri, ev, null, null);
@@ -1699,7 +1699,7 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Test that inserting a valid color index works
         ev = EventHelper.getNewEventValues(account, seed++, cal_id, false);
-        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
+        ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
 
         Uri uri = mContentResolver.insert(Events.CONTENT_URI, ev);
         long eventId2 = ContentUris.parseId(uri);
@@ -1711,10 +1711,10 @@ public class CalendarTest extends InstrumentationTestCase {
         // Test that updating a valid color index also updates the color in an
         // event
         ev.clear();
-        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+        ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
         mContentResolver.update(eventUri, ev, null, null);
         Cursor c = mContentResolver.query(eventUri, new String[] {
-                Events.EVENT_COLOR_INDEX, Events.EVENT_COLOR
+                Events.EVENT_COLOR_KEY, Events.EVENT_COLOR
         }, null, null, null);
         try {
             c.moveToFirst();
@@ -1729,10 +1729,10 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // And clearing it doesn't change the color
-        ev.put(Events.EVENT_COLOR_INDEX, (String) null);
+        ev.put(Events.EVENT_COLOR_KEY, (String) null);
         mContentResolver.update(eventUri, ev, null, null);
         c = mContentResolver.query(eventUri, new String[] {
-                Events.EVENT_COLOR_INDEX, Events.EVENT_COLOR
+                Events.EVENT_COLOR_KEY, Events.EVENT_COLOR
         }, null, null, null);
         try {
             c.moveToFirst();
@@ -1747,7 +1747,7 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // Test that setting an event color to a calendar color fails
-        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_2]);
+        ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.C_COLOR_2]);
         try {
             mContentResolver.update(eventUri, ev, null, null);
             fail("Should not allow an event to use a calendar color");
@@ -1756,7 +1756,7 @@ public class CalendarTest extends InstrumentationTestCase {
         }
 
         // Test that you can't remove a color that is referenced by an event
-        ev.put(Events.EVENT_COLOR_INDEX, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+        ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
         mContentResolver.update(eventUri, ev, null, null);
         try {
             mContentResolver.delete(colSyncUri, ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX,
@@ -2059,6 +2059,26 @@ public class CalendarTest extends InstrumentationTestCase {
 
         removeAndVerifyEvent(eventUri, eventValues, account);
 
+        // Attempt to create an event without a calendar ID.
+        ContentValues badValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        badValues.remove(Events.CALENDAR_ID);
+        try {
+            createAndVerifyEvent(account, seed, calendarId, true, badValues);
+            fail("was allowed to create an event without CALENDAR_ID");
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
+
+        // Validation may be relaxed for content providers, so test missing timezone as app.
+        badValues = EventHelper.getNewEventValues(account, seed++, calendarId, false);
+        badValues.remove(Events.EVENT_TIMEZONE);
+        try {
+            createAndVerifyEvent(account, seed, calendarId, false, badValues);
+            fail("was allowed to create an event without EVENT_TIMEZONE");
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
+
         removeAndVerifyCalendar(account, calendarId);
     }
 
@@ -2086,6 +2106,17 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals(1, mContentResolver.update(eventUri, updateValues, null, null));
         updateValues.put(Events.DIRTY, 1);      // provider should have marked as dirty
         verifyEvent(updateValues, eventId);
+
+        // Try nulling out a required value.
+        ContentValues badValues = new ContentValues(updateValues);
+        badValues.putNull(Events.EVENT_TIMEZONE);
+        badValues.remove(Events.DIRTY);
+        try {
+            mContentResolver.update(eventUri, badValues, null, null);
+            fail("was allowed to null out EVENT_TIMEZONE");
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
 
         removeAndVerifyEvent(eventUri, eventValues, account);
 
@@ -3050,6 +3081,7 @@ public class CalendarTest extends InstrumentationTestCase {
             insertUri = asSyncAdapter(insertUri, account, CTS_TEST_TYPE);
         }
         Uri uri = mContentResolver.insert(insertUri, values);
+        assertNotNull(uri);
 
         // Verify
         EventHelper.addDefaultReadOnlyValues(values, account, asSyncAdapter);
