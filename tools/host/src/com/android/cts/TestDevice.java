@@ -682,7 +682,7 @@ public class TestDevice implements DeviceObserver {
          * @return The screen resolution.
          */
         public String getScreenResolution() {
-            return mInfoMap.get(SCREEN_WIDTH) + "x" + mInfoMap.get(SCREEN_HEIGHT);
+            return mInfoMap.get(RESOLUTION);
         }
 
         /**

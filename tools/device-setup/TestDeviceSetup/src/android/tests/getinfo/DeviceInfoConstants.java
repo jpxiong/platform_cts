@@ -40,8 +40,7 @@ public interface DeviceInfoConstants {
     public static final String SCREEN_SIZE = "screen_size";
     public static final String SCREEN_DENSITY_BUCKET = "screen_density_bucket";
     public static final String SCREEN_DENSITY = "screen_density";
-    public static final String SCREEN_HEIGHT = "screen_height";
-    public static final String SCREEN_WIDTH = "screen_width";
+    public static final String RESOLUTION = "resolution";
     public static final String VERSION_SDK = "androidPlatformVersion";
     public static final String VERSION_RELEASE = "buildVersion";
     public static final String BUILD_ABI = "build_abi";
@@ -57,5 +56,5 @@ public interface DeviceInfoConstants {
     public static final String BUILD_ID = "buildID";
     public static final String BUILD_VERSION = "buildVersion";
     public static final String BUILD_TAGS = "build_tags";
-    public static final String SERIAL_NUMBER = "serialNumber";
+    public static final String SERIAL_NUMBER = "deviceID";
 }
