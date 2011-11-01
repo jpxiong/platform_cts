@@ -74,6 +74,10 @@
   bug: 5534165
 },
 {
+  name: "libcore.java.util.logging.OldFormatterTest",
+  bug: 5498103
+},
+{
   description: "Test exceeds Tradefed's 10 minute timeout",
   name: "libcore.java.security.KeyPairGeneratorTest",
   bug: 5513723
