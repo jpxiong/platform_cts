@@ -345,7 +345,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             // Check the order: startPreview->setPreviewTexture, with a PreviewCallback as well
             mPreviewDone.close();
             initializeMessageLooper(cameraId);
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mCamera.startPreview();
             mCamera.setPreviewTexture(mSurfaceTexture);
             noTimeout = waitForPreviewDone();
@@ -354,7 +354,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
             // Check the order: setPreviewTexture->startPreview.
             initializeMessageLooper(cameraId);
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mCamera.setPreviewTexture(mSurfaceTexture);
             mCamera.startPreview();
             noTimeout = waitForPreviewDone();
@@ -362,7 +362,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
             // Check the order: setting preview display to null->startPreview->
             // setPreviewTexture.
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mCamera.setPreviewTexture(null);
             mCamera.startPreview();
             mCamera.setPreviewTexture(mSurfaceTexture);
@@ -387,7 +387,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mSurfaceTextureDone.close();
             initializeMessageLooper(cameraId);
             mRenderer.setCameraSizing(mCamera.getParameters().getPreviewSize());
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mSurfaceTexture.setOnFrameAvailableListener(mSurfaceTextureCallback);
             mCamera.setPreviewTexture(mSurfaceTexture);
             mCamera.startPreview();
@@ -404,7 +404,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mSurfaceTextureDone.close();
             initializeMessageLooper(cameraId);
             mRenderer.setCameraSizing(mCamera.getParameters().getPreviewSize());
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mSurfaceTexture.setOnFrameAvailableListener(mSurfaceTextureCallback);
             mCamera.startPreview();
             mCamera.setPreviewTexture(mSurfaceTexture);
@@ -417,7 +417,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             mGLView.requestRender();
 
             // Check the order: setting preview to null->startPreview->setPreviewTexture
-            mCamera.setPreviewCallback(mPreviewCallback);
+            mCamera.setOneShotPreviewCallback(mPreviewCallback);
             mCamera.setPreviewTexture(null);
             mSurfaceTexture.setOnFrameAvailableListener(mSurfaceTextureCallback);
             mCamera.startPreview();
