@@ -29,11 +29,10 @@ function rtt () {
 	fi;
 
     croot && \
-	mmm cts/tests/ && \
-	mmm cts/tests/tests/theme/ && \
-	adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
-	adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
-	runtest -b --path cts/tests/tests/theme/src
+    make -j16 adb CtsTestStubs CtsThemeTestCases && \
+    adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
+    adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
+    runtest -b --path cts/tests/tests/theme/src
 }
 
 # Builds the Theme Tests and installs them to the device.
@@ -44,13 +43,10 @@ function tt () {
 	    return;
 	fi;
 
-	croot && \
-    adb root && \
-	mmm cts/tests/ && \
-	mmm cts/tests/tests/theme/ && \
-	adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
-	adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
-	adb shell rm -r data/data/com.android.cts.stub/files/
+    croot && \
+    make -j16 adb CtsTestStubs CtsThemeTestCases && \
+    adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
+    adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk
 }
 
 # Builds the theme tests and generates the masters for an xhdpi device.
@@ -62,8 +58,8 @@ function gttxhdpi () {
 	fi;
 
     croot && \
+    make -j16 adb CtsTestStubs CtsThemeTestCases && \
     adb root && \
-    make CtsTestStubs CtsThemeTestCases && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
@@ -83,9 +79,8 @@ function gtthdpi () {
 	fi;
 
     croot && \
+    make -j16 adb CtsTestStubs CtsThemeTestCases && \
     adb root && \
-    mmm cts/tests/ && \
-    mmm cts/tests/tests/theme/ && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
@@ -107,9 +102,8 @@ function gttmdpi () {
 	fi;
 
     croot && \
+    make -j16 adb CtsTestStubs CtsThemeTestCases && \
     adb root && \
-    mmm cts/tests/ && \
-    mmm cts/tests/tests/theme/ && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
@@ -123,7 +117,7 @@ function gttmdpi () {
     adb shell am instrument -w -e class android.theme.cts.ThemeGenerator#generateThemeBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.ActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.SplitActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
-    mkdir -p $ANDROID_HOST_OUT/cts/theme-assets-hdpi && \
+    mkdir -p $ANDROID_HOST_OUT/cts/theme-assets-mdpi && \
     adb pull data/data/com.android.cts.stub/files/ $ANDROID_HOST_OUT/cts/theme-assets-mdpi/ && \
     adb shell am display-size reset
 
