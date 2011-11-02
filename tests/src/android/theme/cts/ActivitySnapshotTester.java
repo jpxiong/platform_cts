@@ -157,6 +157,7 @@ public class ActivitySnapshotTester {
             mShouldRequestLayout = shouldRequestLayout;
         }
 
+        @Override
         public void run() {
             SnapshotActivity activity = mTestCases.getActivity();
 
@@ -193,7 +194,7 @@ public class ActivitySnapshotTester {
             if (mGenerate) {
                 processor = new BitmapSaver(activity, testName, mSplitMode);
             } else {
-                processor = new BitmapComparer(activity, null, testName, true, mSplitMode);
+                processor = new BitmapComparer(activity, testName, true, mSplitMode);
             }
 
             Bitmap bmp = activity.getBitmapOfWindow();
