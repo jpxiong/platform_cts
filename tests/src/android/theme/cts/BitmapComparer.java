@@ -37,12 +37,9 @@ public class BitmapComparer implements BitmapProcessor {
     private String mBitmapIdName;
     private boolean mShouldAssert;
     private Activity mActivity;
-    private ImageView mReferenceImage;
 
-    public BitmapComparer(Activity activity, ImageView referenceImage,
-            String filename, boolean shouldAssert, boolean splitMode) {
+    public BitmapComparer(Activity activity, String filename, boolean shouldAssert, boolean splitMode) {
         mActivity = activity;
-        mReferenceImage = referenceImage;
         mShouldAssert = shouldAssert;
 
         if (splitMode) {
@@ -70,12 +67,10 @@ public class BitmapComparer implements BitmapProcessor {
 
         Bitmap bmp2 = drawable.getBitmap();
 
-        if (mReferenceImage != null) {
-            mReferenceImage.setImageBitmap(bmp2);
-        }
-
         // pixel-perfect matching - could easily re-write to use a fuzzy-matching algorithm
+
         boolean identical = bmp2.sameAs(bitmap);
+        bmp2.recycle();
 
         // the second and third options are for the manual lookup version
         if (mShouldAssert) {
