@@ -35,6 +35,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
@@ -48,7 +49,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
-import android.view.animation.cts.DelayedCheck;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,7 +176,7 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         final Intent broadcastIntent = new Intent(ResultReceiver.MOCK_ACTION);
         mContextWrapper.sendOrderedBroadcast(broadcastIntent, null);
-        new DelayedCheck(BROADCAST_TIMEOUT) {
+        new PollingCheck(BROADCAST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return highPriorityReceiver.hasReceivedBroadCast()
@@ -188,7 +188,7 @@ public class ContextWrapperTest extends AndroidTestCase {
             highPriorityReceiver.notify();
         }
 
-        new DelayedCheck(BROADCAST_TIMEOUT) {
+        new PollingCheck(BROADCAST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return highPriorityReceiver.hasReceivedBroadCast()
@@ -957,7 +957,7 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         mContextWrapper.sendBroadcast(new Intent(ResultReceiver.MOCK_ACTION));
 
-        new DelayedCheck(BROADCAST_TIMEOUT){
+        new PollingCheck(BROADCAST_TIMEOUT){
             @Override
             protected boolean check() {
                 return receiver.hasReceivedBroadCast();
@@ -977,7 +977,7 @@ public class ContextWrapperTest extends AndroidTestCase {
 
         mContextWrapper.sendBroadcast(new Intent(ResultReceiver.MOCK_ACTION), null);
 
-        new DelayedCheck(BROADCAST_TIMEOUT){
+        new PollingCheck(BROADCAST_TIMEOUT){
             @Override
             protected boolean check() {
                 return receiver.hasReceivedBroadCast();

@@ -17,6 +17,7 @@
 package android.view.animation.cts;
 
 import android.app.Instrumentation;
+import android.cts.util.PollingCheck;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -66,7 +67,7 @@ public final class AnimationTestUtils {
         });
 
         // check whether it has started
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return animation.hasStarted();
@@ -74,7 +75,7 @@ public final class AnimationTestUtils {
         }.run();
 
         // check whether it has ended after duration
-        new DelayedCheck(duration + TIMEOUT_DELTA) {
+        new PollingCheck(duration + TIMEOUT_DELTA) {
             @Override
             protected boolean check() {
                 return animation.hasEnded();

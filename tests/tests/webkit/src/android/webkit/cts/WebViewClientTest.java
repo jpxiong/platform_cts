@@ -22,11 +22,11 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -99,19 +99,19 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertFalse(webViewClient.hasOnPageFinishedCalled());
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasOnPageStartedCalled();
             }
         }.run();
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasOnLoadResourceCalled();
             }
         }.run();
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasOnPageFinishedCalled();
             }
@@ -155,7 +155,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertFalse(url.equals(mWebView.getUrl()));
         // reloading the current URL should trigger the callback
         mWebView.reload();
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasOnFormResubmissionCalled();
             }
@@ -177,7 +177,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         String url2 = mWebServer.getAssetUrl(TestHtmlConstants.BR_TAG_URL);
         assertLoadUrlSuccessfully(mWebView, url1);
         assertLoadUrlSuccessfully(mWebView, url2);
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasDoUpdateVisitedHistoryCalled();
             }
@@ -231,7 +231,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertFalse(webViewClient.hasOnUnhandledKeyEventCalled());
         sendKeys(KeyEvent.KEYCODE_1);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return webViewClient.hasOnUnhandledKeyEventCalled();
             }
@@ -260,7 +260,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     private void assertLoadUrlSuccessfully(final WebView view, String url) {
         view.loadUrl(url);
         // wait until load is complete
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return view.getProgress() == 100;

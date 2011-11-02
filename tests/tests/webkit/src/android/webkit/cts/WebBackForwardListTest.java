@@ -21,8 +21,8 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebView;
@@ -90,7 +90,7 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
     }
 
     private void checkBackForwardList(final WebView view, final String... url) {
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 if (view.getProgress() < 100) {
                     return false;

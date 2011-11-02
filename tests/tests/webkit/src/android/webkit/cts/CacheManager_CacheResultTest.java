@@ -24,8 +24,8 @@ import dalvik.annotation.TestTargets;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.cookie.DateUtils;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -139,7 +139,7 @@ public class CacheManager_CacheResultTest
         mWebServer.setDocumentValidity(validity);
 
         mWebView.clearCache(true);
-        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
                 CacheResult result =
@@ -175,7 +175,7 @@ public class CacheManager_CacheResultTest
     private void loadUrl(String url){
         mWebView.loadUrl(url);
         // check whether loadURL successfully
-        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;

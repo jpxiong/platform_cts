@@ -24,11 +24,11 @@ import dalvik.annotation.TestTargets;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.SearchRecentSuggestions;
 import android.test.ProviderTestCase2;
-import android.view.animation.cts.DelayedCheck;
 
 @TestTargetClass(android.provider.SearchRecentSuggestions.class)
 public class SearchRecentSuggestionsTest extends
@@ -227,7 +227,7 @@ public class SearchRecentSuggestionsTest extends
 
     private void waitForCursorCount(final Uri uri, final String[] projection,
             final int expectedCount) {
-        new DelayedCheck() {
+        new PollingCheck() {
             protected boolean check() {
                 Cursor cursor = null;
                 try {

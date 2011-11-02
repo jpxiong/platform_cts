@@ -26,6 +26,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.res.XmlResourceParser;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.AttributeSet;
 import android.util.Xml;
@@ -355,7 +356,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         // test repeat mode REVERSE
         anim.setRepeatCount(1);
         anim.setRepeatMode(Animation.REVERSE);
-        // we have to DelayedCheck the animation status on test thread,
+        // we have to PollingCheck the animation status on test thread,
         // it cannot be done on UI thread, so we invoke runOnMainSync method here.
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
@@ -364,7 +365,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         });
 
         // check whether animation has started
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return anim.hasStarted();
@@ -386,7 +387,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
 
         // wait for animation has ended.
         // timeout is larger than duration, in case the system is sluggish
-        new DelayedCheck(duration * 2 + 1000) {
+        new PollingCheck(duration * 2 + 1000) {
             @Override
             protected boolean check() {
                 return anim.hasEnded();
@@ -414,7 +415,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
 
         // test repeat mode RESTART
         anim.setRepeatMode(Animation.RESTART);
-        // we have to DelayedCheck the animation status on test thread,
+        // we have to PollingCheck the animation status on test thread,
         // it cannot be done on UI thread, so we invoke runOnMainSync method here.
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
@@ -423,7 +424,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         });
 
         // check whether animation has started
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return anim.hasStarted();
@@ -445,7 +446,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
 
         // wait for animation has ended.
         // timeout is larger than duration, in case the system is sluggish
-        new DelayedCheck(duration * 2 + 1000) {
+        new PollingCheck(duration * 2 + 1000) {
             @Override
             protected boolean check() {
                 return anim.hasEnded();
@@ -627,7 +628,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         final Animation anim = AnimationUtils.loadAnimation(mActivity, R.anim.accelerate_alpha);
         assertFalse(anim.hasStarted());
 
-        // we have to DelayedCheck the animation status on test thread,
+        // we have to PollingCheck the animation status on test thread,
         // it cannot be done on UI thread, so we invoke runOnMainSync method here.
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
@@ -636,7 +637,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         });
 
         // check whether animation has started
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return anim.hasStarted();
@@ -662,7 +663,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
 
         // wait for animation has ended.
         // timeout is larger than duration, in case the system is sluggish
-        new DelayedCheck(2000) {
+        new PollingCheck(2000) {
             @Override
             protected boolean check() {
                 return anim.hasEnded();

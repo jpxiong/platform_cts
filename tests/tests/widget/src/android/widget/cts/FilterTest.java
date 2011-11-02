@@ -20,8 +20,8 @@ import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.Filter;
 import android.widget.Filter.FilterListener;
 
@@ -70,7 +70,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
             }
         });
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mMockFilter.hadPerformedFiltering();
@@ -78,7 +78,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         }.run();
         assertEquals(TEST_CONSTRAINT, mMockFilter.getPerformFilteringConstraint());
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mMockFilter.hadPublishedResults();
@@ -102,7 +102,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
             }
         });
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mMockFilter.hadPerformedFiltering();
@@ -110,7 +110,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         }.run();
         assertEquals(TEST_CONSTRAINT, mMockFilter.getPerformFilteringConstraint());
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mMockFilter.hadPublishedResults();
@@ -119,7 +119,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(TEST_CONSTRAINT, mMockFilter.getPublishResultsConstraint());
         assertSame(mMockFilter.getExpectResults(), mMockFilter.getResults());
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mockFilterListener.hasCalledOnFilterComplete();

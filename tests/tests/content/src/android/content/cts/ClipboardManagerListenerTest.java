@@ -18,9 +18,9 @@ package android.content.cts;
 
 import android.content.ClipData;
 import android.content.ClipboardManager.OnPrimaryClipChangedListener;
+import android.cts.util.PollingCheck;
 import android.net.Uri;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 
 
 public class ClipboardManagerListenerTest
@@ -57,7 +57,7 @@ public class ClipboardManagerListenerTest
     }
 
     private void assertClipChangedCount(final int expectedCount) {
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return expectedCount == mListener.getCount();

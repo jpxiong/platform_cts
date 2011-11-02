@@ -18,9 +18,9 @@ package android.app.cts;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.cts.util.PollingCheck;
 import android.os.Binder;
 import android.os.IBinder;
-import android.view.animation.cts.DelayedCheck;
 
 public class IntentServiceStub extends IntentService {
     public IntentServiceStub() {
@@ -50,7 +50,7 @@ public class IntentServiceStub extends IntentService {
     }
 
     public static void waitToFinish(long timeout) throws Throwable {
-        new DelayedCheck(timeout) {
+        new PollingCheck(timeout) {
             @Override
             protected boolean check() {
                 return IntentServiceStub.onDestroyCalled;

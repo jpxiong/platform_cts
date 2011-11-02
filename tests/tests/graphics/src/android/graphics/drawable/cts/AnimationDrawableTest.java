@@ -30,12 +30,12 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
+import android.cts.util.PollingCheck;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Xml;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.ImageView;
 import android.widget.cts.ImageViewStubActivity;
 
@@ -107,7 +107,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertSame(mAnimationDrawable.getFrame(FIRST_FRAME_INDEX),
                 mAnimationDrawable.getCurrent());
 
-        delayedCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -159,7 +159,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertTrue(mAnimationDrawable.isRunning());
         assertSame(mAnimationDrawable.getFrame(FIRST_FRAME_INDEX),
                 mAnimationDrawable.getCurrent());
-        delayedCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -167,7 +167,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
                 mAnimationDrawable.start();
             }
         });
-        delayedCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
+        pollingCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -210,7 +210,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         });
 
         assertTrue(mAnimationDrawable.isRunning());
-        delayedCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -342,10 +342,10 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
                 mAnimationDrawable.start();
             }
         });
-        delayedCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
-        delayedCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
         // begin to repeat
-        delayedCheckDrawable(FIRST_FRAME_INDEX, THIRD_FRAME_DURATION);
+        pollingCheckDrawable(FIRST_FRAME_INDEX, THIRD_FRAME_DURATION);
 
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -355,8 +355,8 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
                 mAnimationDrawable.start();
             }
         });
-        delayedCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
-        delayedCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(THIRD_FRAME_INDEX, SECOND_FRAME_DURATION);
         // do not repeat
         assertStoppedAnimation(THIRD_FRAME_INDEX, THIRD_FRAME_DURATION);
     }
@@ -471,12 +471,12 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
     }
 
     /**
-     * Delayed check specific frame should be current one in timeout.
+     * Polling check specific frame should be current one in timeout.
      * @param index - expected index of frame.
      * @param timeout - timeout.
      */
-    private void delayedCheckDrawable(final int index, long timeout) {
-        new DelayedCheck(timeout + TOLERANCE) {
+    private void pollingCheckDrawable(final int index, long timeout) {
+        new PollingCheck(timeout + TOLERANCE) {
             Drawable expected = mAnimationDrawable.getFrame(index);
             @Override
             protected boolean check() {

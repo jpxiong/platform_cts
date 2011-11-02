@@ -26,13 +26,13 @@ import dalvik.annotation.TestTargets;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View.MeasureSpec;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -214,7 +214,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
                 mVideoView.setVideoPath(mVideoPath);
             }
         });
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return preparedListener.isTriggered();
@@ -228,7 +228,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
             }
         });
         // wait time is longer than duration in case system is sluggish
-        new DelayedCheck(mVideoView.getDuration() + TIME_OUT) {
+        new PollingCheck(mVideoView.getDuration() + TIME_OUT) {
             @Override
             protected boolean check() {
                 return completionListener.isTriggered();
@@ -254,7 +254,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
         });
         mInstrumentation.waitForIdleSync();
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return listener.isTriggered();
@@ -278,7 +278,7 @@ public class VideoViewTest extends ActivityInstrumentationTestCase2<VideoViewStu
         });
         mInstrumentation.waitForIdleSync();
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return prepareListener.isTriggered();

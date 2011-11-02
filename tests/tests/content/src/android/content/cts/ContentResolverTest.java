@@ -29,13 +29,13 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.cts.util.PollingCheck;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import android.view.animation.cts.DelayedCheck;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -637,7 +637,7 @@ public class ContentResolverTest extends AndroidTestCase {
         values.put(COLUMN_KEY_NAME, "key10");
         values.put(COLUMN_VALUE_NAME, 10);
         mContentResolver.update(TABLE1_URI, values, null, null);
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return mco.hadOnChanged();
@@ -689,7 +689,7 @@ public class ContentResolverTest extends AndroidTestCase {
         assertFalse(mco.hadOnChanged());
 
         mContentResolver.notifyChange(TABLE1_URI, mco);
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return mco.hadOnChanged();
@@ -713,7 +713,7 @@ public class ContentResolverTest extends AndroidTestCase {
         assertFalse(mco.hadOnChanged());
 
         mContentResolver.notifyChange(TABLE1_URI, mco, false);
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return mco.hadOnChanged();

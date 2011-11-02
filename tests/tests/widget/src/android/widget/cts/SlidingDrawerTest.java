@@ -28,13 +28,13 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.ImageView;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
@@ -192,7 +192,7 @@ public class SlidingDrawerTest
         assertFalse(drawer.isOpened());
         assertEquals(View.GONE, content.getVisibility());
 
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return !drawer.isMoving();
@@ -210,7 +210,7 @@ public class SlidingDrawerTest
         assertTrue(drawer.isOpened());
         assertEquals(View.GONE, content.getVisibility());
 
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return !drawer.isMoving();
@@ -253,7 +253,7 @@ public class SlidingDrawerTest
         assertFalse(drawer.isOpened());
         assertEquals(View.GONE, content.getVisibility());
 
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return !drawer.isMoving();
@@ -271,7 +271,7 @@ public class SlidingDrawerTest
         assertTrue(drawer.isOpened());
         assertEquals(View.GONE, content.getVisibility());
 
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return !drawer.isMoving();

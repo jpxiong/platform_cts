@@ -35,6 +35,7 @@ import android.app.Instrumentation.ActivityMonitor;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -86,7 +87,6 @@ import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
-import android.view.animation.cts.DelayedCheck;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
@@ -2580,7 +2580,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
 
         // it will get transformed after a while
-        new DelayedCheck(TIMEOUT) {
+        new PollingCheck(TIMEOUT) {
             @Override
             protected boolean check() {
                 // "******"
@@ -3432,7 +3432,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         // wait for the marquee to run
         // fading is shown on both sides if the marquee runs for a while
-        new DelayedCheck(TIMEOUT) {
+        new PollingCheck(TIMEOUT) {
             @Override
             protected boolean check() {
                 return textView.getLeftFadingEdgeStrength() > 0.0f
@@ -3446,7 +3446,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         // wait for the marquee to continue
         // the left fading becomes thicker while the right fading becomes thiner
         // as the text moves towards left
-        new DelayedCheck(TIMEOUT) {
+        new PollingCheck(TIMEOUT) {
             @Override
             protected boolean check() {
                 return leftFadingEdgeStrength < textView.getLeftFadingEdgeStrength()

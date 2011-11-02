@@ -27,13 +27,13 @@ import dalvik.annotation.ToBeFixed;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.ListView;
 import android.widget.ZoomButton;
 
@@ -157,7 +157,7 @@ public class ZoomButtonTest extends ActivityInstrumentationTestCase2<ZoomButtonS
 
         assertFalse(listener.hasOnClickCalled());
         mZoomButton.performLongClick();
-        new DelayedCheck(speed + 500) {
+        new PollingCheck(speed + 500) {
             @Override
             protected boolean check() {
                 return listener.hasOnClickCalled();

@@ -26,6 +26,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.cts.util.PollingCheck;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
@@ -33,7 +34,6 @@ import android.test.UiThreadTest;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -78,7 +78,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
     }
 
     private void assertShowToast(final View view) {
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return null != view.getParent();
@@ -88,7 +88,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
 
     private void assertShowAndHide(final View view) {
         assertShowToast(view);
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return null == view.getParent();

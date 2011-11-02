@@ -22,8 +22,8 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
 import android.webkit.WebView;
 import android.webkit.CacheManager.CacheResult;
@@ -98,7 +98,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.EMBEDDED_IMG_URL);
 
         // Wait for CacheManager#init() finish.
-        new DelayedCheck(CACHEMANAGER_INIT_TIMEOUT) {
+        new PollingCheck(CACHEMANAGER_INIT_TIMEOUT) {
             @Override
             protected boolean check() {
                 return CacheManager.getCacheFileBaseDir() != null;
@@ -106,7 +106,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         }.run();
 
         mWebView.clearCache(true);
-        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
@@ -115,7 +115,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         }.run();
 
         loadUrl(url);
-        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
@@ -141,7 +141,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
     private void loadUrl(String url){
         mWebView.loadUrl(url);
         // check whether loadURL successfully
-        new DelayedCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_DELAY) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;

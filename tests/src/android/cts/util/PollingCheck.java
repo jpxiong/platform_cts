@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package android.view.animation.cts;
+package android.cts.util;
 
 import junit.framework.Assert;
 
-public abstract class DelayedCheck {
+public abstract class PollingCheck {
     private static final long TIME_SLICE = 200;
     private long mTimeout = 3000;
 
-    public DelayedCheck() {
-
+    public PollingCheck() {
     }
 
-    public DelayedCheck(long timeout) {
+    public PollingCheck(long timeout) {
         mTimeout = timeout;
     }
 

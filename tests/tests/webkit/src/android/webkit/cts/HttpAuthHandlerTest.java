@@ -23,8 +23,8 @@ import dalvik.annotation.TestTargets;
 
 import org.apache.http.HttpStatus;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -133,7 +133,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
     private void assertLoadUrlSuccessfully(String url) throws InterruptedException {
         mWebView.loadUrl(url);
-        new DelayedCheck(TIMEOUT) {
+        new PollingCheck(TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;
