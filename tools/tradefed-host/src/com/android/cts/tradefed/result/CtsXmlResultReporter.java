@@ -16,10 +16,7 @@
 
 package com.android.cts.tradefed.result;
 
-import android.tests.getinfo.DeviceInfoConstants;
-
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.build.CtsBuildProvider;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.Log;
@@ -46,9 +43,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,12 +64,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     /** the XML namespace */
     static final String ns = null;
 
-    // XML constants
-    static final String SUMMARY_TAG = "Summary";
-    static final String PASS_ATTR = "pass";
-    static final String TIMEOUT_ATTR = "timeout";
-    static final String NOT_EXECUTED_ATTR = "notExecuted";
-    static final String FAILED_ATTR = "failed";
     static final String RESULT_TAG = "TestResult";
     static final String PLAN_ATTR = "testPlan";
 
@@ -101,6 +89,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private String mDeviceSerial;
     private TestResults mResults = new TestResults();
     private TestPackageResult mCurrentPkgResult = null;
+    private boolean mIsDeviceInfoRun = false;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -189,15 +178,18 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             // display results from previous run
             logCompleteRun(mCurrentPkgResult);
         }
-        if (name.equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
+        mIsDeviceInfoRun = name.equals(DeviceInfoCollector.APP_PACKAGE_NAME);
+        if (mIsDeviceInfoRun) {
             logResult("Collecting device info");
-        } else  if (mCurrentPkgResult == null || !name.equals(
-                mCurrentPkgResult.getAppPackageName())) {
-            logResult("-----------------------------------------");
-            logResult("Test package %s started", name);
-            logResult("-----------------------------------------");
+        } else  {
+            if (mCurrentPkgResult == null || !name.equals(mCurrentPkgResult.getAppPackageName())) {
+                logResult("-----------------------------------------");
+                logResult("Test package %s started", name);
+                logResult("-----------------------------------------");
+            }
+            mCurrentPkgResult = mResults.getOrCreatePackage(name);
         }
-        mCurrentPkgResult = mResults.getOrCreatePackage(name);
+
     }
 
     /**
@@ -233,7 +225,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
-        mCurrentPkgResult.populateMetrics(runMetrics);
+        if (mIsDeviceInfoRun) {
+            mResults.populateDeviceInfoMetrics(runMetrics);
+        } else {
+            mCurrentPkgResult.populateMetrics(runMetrics);
+        }
     }
 
     /**
@@ -317,191 +313,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
 
-        serializeDeviceInfo(serializer);
-        serializeHostInfo(serializer);
-        serializeTestSummary(serializer);
         mResults.serialize(serializer);
         // TODO: not sure why, but the serializer doesn't like this statement
         //serializer.endTag(ns, RESULT_TAG);
-    }
-
-    /**
-     * Output the device info XML.
-     *
-     * @param serializer
-     */
-    private void serializeDeviceInfo(KXmlSerializer serializer) throws IOException {
-        serializer.startTag(ns, "DeviceInfo");
-
-        Map<String, String> deviceInfoMetrics = mResults.getDeviceInfoMetrics();
-        if (deviceInfoMetrics == null || deviceInfoMetrics.isEmpty()) {
-            // this might be expected, if device info collection was turned off
-            CLog.d("Could not find device info");
-            return;
-        }
-
-        // Extract metrics that need extra handling, and then dump the remainder into BuildInfo
-        Map<String, String> metricsCopy = new HashMap<String, String>(
-                deviceInfoMetrics);
-        serializer.startTag(ns, "Screen");
-        String screenWidth = metricsCopy.remove(DeviceInfoConstants.SCREEN_WIDTH);
-        String screenHeight = metricsCopy.remove(DeviceInfoConstants.SCREEN_HEIGHT);
-        serializer.attribute(ns, "resolution", String.format("%sx%s", screenWidth, screenHeight));
-        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY,
-                metricsCopy.remove(DeviceInfoConstants.SCREEN_DENSITY));
-        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY_BUCKET,
-                metricsCopy.remove(DeviceInfoConstants.SCREEN_DENSITY_BUCKET));
-        serializer.attribute(ns, DeviceInfoConstants.SCREEN_SIZE,
-                metricsCopy.remove(DeviceInfoConstants.SCREEN_SIZE));
-        serializer.endTag(ns, "Screen");
-
-        serializer.startTag(ns, "PhoneSubInfo");
-        serializer.attribute(ns, "subscriberId", metricsCopy.remove(
-                DeviceInfoConstants.PHONE_NUMBER));
-        serializer.endTag(ns, "PhoneSubInfo");
-
-        String featureData = metricsCopy.remove(DeviceInfoConstants.FEATURES);
-        String processData = metricsCopy.remove(DeviceInfoConstants.PROCESSES);
-
-        // dump the remaining metrics without translation
-        serializer.startTag(ns, "BuildInfo");
-        for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
-            serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
-        }
-        serializer.attribute(ns, "deviceID", mDeviceSerial);
-        serializer.endTag(ns, "BuildInfo");
-
-        serializeFeatureInfo(serializer, featureData);
-        serializeProcessInfo(serializer, processData);
-
-        serializer.endTag(ns, "DeviceInfo");
-    }
-
-    /**
-     * Prints XML indicating what features are supported by the device. It parses a string from the
-     * featureData argument that is in the form of "feature1:true;feature2:false;featuer3;true;"
-     * with a trailing semi-colon.
-     *
-     * <pre>
-     *  <FeatureInfo>
-     *     <Feature name="android.name.of.feature" available="true" />
-     *     ...
-     *   </FeatureInfo>
-     * </pre>
-     *
-     * @param serializer used to create XML
-     * @param featureData raw unparsed feature data
-     */
-    private void serializeFeatureInfo(KXmlSerializer serializer, String featureData) throws IOException {
-        serializer.startTag(ns, "FeatureInfo");
-
-        if (featureData == null) {
-            featureData = "";
-        }
-
-        String[] featurePairs = featureData.split(";");
-        for (String featurePair : featurePairs) {
-            String[] nameTypeAvailability = featurePair.split(":");
-            if (nameTypeAvailability.length >= 3) {
-                serializer.startTag(ns, "Feature");
-                serializer.attribute(ns, "name", nameTypeAvailability[0]);
-                serializer.attribute(ns, "type", nameTypeAvailability[1]);
-                serializer.attribute(ns, "available", nameTypeAvailability[2]);
-                serializer.endTag(ns, "Feature");
-            }
-        }
-        serializer.endTag(ns, "FeatureInfo");
-    }
-
-    /**
-     * Prints XML data indicating what particular processes of interest were running on the device.
-     * It parses a string from the rootProcesses argument that is in the form of
-     * "processName1;processName2;..." with a trailing semi-colon.
-     *
-     * <pre>
-     *   <ProcessInfo>
-     *     <Process name="long_cat_viewer" uid="0" />
-     *     ...
-     *   </ProcessInfo>
-     * </pre>
-     */
-    private void serializeProcessInfo(KXmlSerializer serializer, String rootProcesses)
-            throws IOException {
-        serializer.startTag(ns, "ProcessInfo");
-
-        if (rootProcesses == null) {
-            rootProcesses = "";
-        }
-
-        String[] processNames = rootProcesses.split(";");
-        for (String processName : processNames) {
-            processName = processName.trim();
-            if (processName.length() > 0) {
-                serializer.startTag(ns, "Process");
-                serializer.attribute(ns, "name", processName);
-                serializer.attribute(ns, "uid", "0");
-                serializer.endTag(ns, "Process");
-            }
-        }
-        serializer.endTag(ns, "ProcessInfo");
-    }
-
-    /**
-     * Output the host info XML.
-     *
-     * @param serializer
-     */
-    private void serializeHostInfo(KXmlSerializer serializer) throws IOException {
-        serializer.startTag(ns, "HostInfo");
-
-        String hostName = "";
-        try {
-            hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException ignored) {}
-        serializer.attribute(ns, "name", hostName);
-
-        serializer.startTag(ns, "Os");
-        serializer.attribute(ns, "name", System.getProperty("os.name"));
-        serializer.attribute(ns, "version", System.getProperty("os.version"));
-        serializer.attribute(ns, "arch", System.getProperty("os.arch"));
-        serializer.endTag(ns, "Os");
-
-        serializer.startTag(ns, "Java");
-        serializer.attribute(ns, "name", System.getProperty("java.vendor"));
-        serializer.attribute(ns, "version", System.getProperty("java.version"));
-        serializer.endTag(ns, "Java");
-
-        serializer.startTag(ns, "Cts");
-        serializer.attribute(ns, "version", CtsBuildProvider.CTS_BUILD_VERSION);
-        // TODO: consider outputting other tradefed options here
-        serializer.startTag(ns, "IntValue");
-        serializer.attribute(ns, "name", "testStatusTimeoutMs");
-        // TODO: create a constant variable for testStatusTimeoutMs value. Currently it cannot be
-        // changed
-        serializer.attribute(ns, "value", "600000");
-        serializer.endTag(ns, "IntValue");
-        serializer.endTag(ns, "Cts");
-
-        serializer.endTag(ns, "HostInfo");
-    }
-
-    /**
-     * Output the test summary XML containing summary totals for all tests.
-     *
-     * @param serializer
-     * @throws IOException
-     */
-    private void serializeTestSummary(KXmlSerializer serializer) throws IOException {
-        serializer.startTag(ns, SUMMARY_TAG);
-        serializer.attribute(ns, FAILED_ATTR, Integer.toString(mResults.countTests(
-                CtsTestStatus.FAIL)));
-        serializer.attribute(ns, NOT_EXECUTED_ATTR,  Integer.toString(mResults.countTests(
-                CtsTestStatus.NOT_EXECUTED)));
-        // ignore timeouts - these are reported as errors
-        serializer.attribute(ns, TIMEOUT_ATTR, "0");
-        serializer.attribute(ns, PASS_ATTR, Integer.toString(mResults.countTests(
-                CtsTestStatus.PASS)));
-        serializer.endTag(ns, SUMMARY_TAG);
     }
 
     /**
