@@ -1214,9 +1214,15 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
 
     private static class MockView extends View {
         public boolean isShowContextMenuCalled;
+        protected OnCreateContextMenuListener mOnCreateContextMenuListener;
 
         public MockView(Context context) {
             super(context);
+        }
+
+        public void setOnCreateContextMenuListener(OnCreateContextMenuListener l) {
+            super.setOnCreateContextMenuListener(l);
+            mOnCreateContextMenuListener = l;
         }
 
         public OnCreateContextMenuListener getOnCreateContextMenuListener() {
