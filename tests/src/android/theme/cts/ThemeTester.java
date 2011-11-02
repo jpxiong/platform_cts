@@ -19,22 +19,10 @@ package android.theme.cts;
 import com.android.cts.stub.R;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import junit.framework.Assert;
 
 /**
  * This class runs the series of tests for a specific theme in the activity.
@@ -45,8 +33,6 @@ import junit.framework.Assert;
 public class ThemeTester {
     private Activity mActivity;
     private String mThemeName;
-    private ImageView mReferenceImage;
-    private ImageView mGeneratedImage;
     private TesterViewGroup mRoot;
     private boolean mShouldAssert;
 
@@ -60,9 +46,6 @@ public class ThemeTester {
         mThemeName = themeName;
         mRoot = (TesterViewGroup) mActivity.findViewById(R.id.test_group);
         mShouldAssert = true;
-
-        mReferenceImage = (ImageView) mActivity.findViewById(R.id.reference_image);
-        mGeneratedImage = (ImageView) mActivity.findViewById(R.id.generated_image);
     }
 
     public void setShouldAssert(boolean shouldAssert) {
@@ -93,6 +76,7 @@ public class ThemeTester {
      */
     private void runTest(final ThemeTestInfo test) {
         mRoot.post(new Runnable() {
+            @Override
             public void run() {
                 testViewFromId(test);
             }
@@ -106,6 +90,7 @@ public class ThemeTester {
         ThemeTestInfo[] tests = ThemeTests.getTests();
         for (final ThemeTestInfo test : tests) {
             mRoot.post(new Runnable() {
+                @Override
                 public void run() {
                     generateViewFromId(test);
                 }
@@ -115,8 +100,8 @@ public class ThemeTester {
 
     private void testViewFromId(ThemeTestInfo test) {
         processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
-                new BitmapComparer(mActivity, mReferenceImage,
-                        mThemeName + "_" + test.getTestName(), mShouldAssert, false));
+                new BitmapComparer(mActivity, mThemeName + "_" + test.getTestName(),
+                        mShouldAssert, false));
     }
 
     private void generateViewFromId(ThemeTestInfo test) {
@@ -129,13 +114,13 @@ public class ThemeTester {
         final View view = constructViewFromLayoutId(resid, modifier);
 
         view.post(new Runnable() {
+            @Override
             public void run() {
                 Bitmap bitmap = Bitmap.createBitmap(
                         view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
 
                 Canvas canvas = new Canvas(bitmap);
                 view.draw(canvas);
-                mGeneratedImage.setImageBitmap(bitmap);
 
                 processor.processBitmap(bitmap);
                 bitmap.recycle();
