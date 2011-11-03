@@ -74,7 +74,11 @@
   bug: 5534165
 },
 {
-  name: "libcore.java.util.logging.OldFormatterTest",
+  names: [
+    "libcore.java.util.logging.OldFormatterTest",
+    "libcore.java.util.prefs.OldPreferencesTest#testAddNodeChangeListener",
+    "libcore.net.http.HttpResponseCacheTest#testClientPrematureDisconnectWithChunkedEncoding"
+  ],
   bug: 5498103
 },
 {
