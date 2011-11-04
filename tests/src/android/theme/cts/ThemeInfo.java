@@ -17,12 +17,27 @@
 package android.theme.cts;
 
 public class ThemeInfo {
+
+    /** Height is greater than width when in portrait mode. */
+    static final int FULL_SCREEN_TYPE = 0;
+
+    /** Height is not greater than width when in portrait mode. */
+    static final int DIALOG_TYPE = 1;
+
+    /**
+     * Height is greater than width when in portrait mode on smaller screens,
+     * but height is not greater than width in portrait mode on larger screens.
+     */
+    static final int DIALOG_WHEN_LARGE_TYPE = 2;
+
     private int mResourceId;
     private String mThemeName;
+    private int mThemeType;
 
-    public ThemeInfo(int resourceId, String themeName) {
+    public ThemeInfo(int resourceId, String themeName, int themeType) {
         mResourceId = resourceId;
         mThemeName = themeName;
+        mThemeType = themeType;
     }
 
     public int getResourceId() {
@@ -31,5 +46,9 @@ public class ThemeInfo {
 
     public String getThemeName() {
         return mThemeName;
+    }
+
+    public int getThemeType() {
+        return mThemeType;
     }
 }

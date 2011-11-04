@@ -24,6 +24,8 @@ import android.graphics.Canvas;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import junit.framework.Assert;
+
 /**
  * This class runs the series of tests for a specific theme in the activity.
  *
@@ -99,20 +101,20 @@ public class ThemeTester {
     }
 
     private void testViewFromId(ThemeTestInfo test) {
-        processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
-                new BitmapComparer(mActivity, mThemeName + "_" + test.getTestName(),
-                        mShouldAssert, false));
+        processBitmapFromViewId(test, false,
+                new BitmapComparer(mActivity, mThemeName + "_" + test.getTestName(), false));
     }
 
     private void generateViewFromId(ThemeTestInfo test) {
-        processBitmapFromViewId(test.getLayoutResourceId(), test.getThemeModifier(),
+        processBitmapFromViewId(test, true,
                 new BitmapSaver(mActivity, mThemeName + "_" + test.getTestName(), false));
     }
 
-    private void processBitmapFromViewId(
-            int resid, ThemeTestModifier modifier, final BitmapProcessor processor) {
-        final View view = constructViewFromLayoutId(resid, modifier);
-
+    private void processBitmapFromViewId(final ThemeTestInfo test,
+            final boolean generate, final BitmapProcessor processor) {
+        int resId = test.getLayoutResourceId();
+        ThemeTestModifier modifier = test.getThemeModifier();
+        final View view = constructViewFromLayoutId(resId, modifier);
         view.post(new Runnable() {
             @Override
             public void run() {
@@ -122,7 +124,12 @@ public class ThemeTester {
                 Canvas canvas = new Canvas(bitmap);
                 view.draw(canvas);
 
-                processor.processBitmap(bitmap);
+                boolean success = processor.processBitmap(bitmap);
+                if (!generate && !success && mShouldAssert) {
+                    String testName = mThemeName + "_" + test.getTestName();
+                    Assert.fail(testName);
+                }
+
                 bitmap.recycle();
 
                 mRoot.removeView(view);
@@ -153,8 +160,4 @@ public class ThemeTester {
 
         return view;
     }
-
-
-
-
 }
