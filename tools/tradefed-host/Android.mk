@@ -18,7 +18,7 @@ include $(CLEAR_VARS)
 
 # Only compile source java files in this lib.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
-LOCAL_JAVA_RESOURCE_DIRS := res ../host/src/res
+LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_MODULE := cts-tradefed
 LOCAL_MODULE_TAGS := optional
@@ -29,4 +29,3 @@ include $(BUILD_HOST_JAVA_LIBRARY)
 
 # Build all sub-directories
 include $(call all-makefiles-under,$(LOCAL_PATH))
-
