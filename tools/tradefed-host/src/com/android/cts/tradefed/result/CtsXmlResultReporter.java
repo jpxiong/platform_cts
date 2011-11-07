@@ -334,7 +334,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     private void copyFormattingFiles(File resultsDir) {
         for (String resultFileName : CTS_RESULT_RESOURCES) {
-            InputStream configStream = getClass().getResourceAsStream(String.format("/%s",
+            InputStream configStream = getClass().getResourceAsStream(String.format("/report/%s",
                     resultFileName));
             if (configStream != null) {
                 File resultFile = new File(resultsDir, resultFileName);
