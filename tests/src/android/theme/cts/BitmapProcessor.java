@@ -26,7 +26,9 @@ public interface BitmapProcessor {
     /**
      * Processes the bitmap that is passed into this function, either saving it or comparing
      * it against a previously generated version.
+     *
      * @param bitmap The bitmap to process.
+     * @return true if the bitmap was processed correctly...
      */
-    public void processBitmap(Bitmap bitmap);
+    public boolean processBitmap(Bitmap bitmap);
 }

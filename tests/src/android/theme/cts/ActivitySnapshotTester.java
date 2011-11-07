@@ -21,19 +21,29 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
+
+import junit.framework.Assert;
 
 /**
  * This class serves as the main driver for the activity screenshot tests.
  */
 public class ActivitySnapshotTester {
+
+    private static final String TAG = ActivitySnapshotTester.class.getSimpleName();
+
+    private static final int MAX_RETRIES = 3;
+
     private ActivityInstrumentationTestCase2<? extends SnapshotActivity> mTestCases;
     private boolean mSplitMode;
     private boolean mShouldRetryTest;
+    private int mAttempt;
 
     /**
      * Creates an {@link ActivitySnapshotTester} to run all of the tests in the given
@@ -85,6 +95,7 @@ public class ActivitySnapshotTester {
     private void genOrTestActivityBitmap(
             final ThemeInfo theme, final ActivityTestInfo test, final int testIndex,
             final int orientation, final boolean generate) {
+        mAttempt = 0;
         mShouldRetryTest = true;
         while (mShouldRetryTest) {
             mShouldRetryTest = false;
@@ -98,13 +109,19 @@ public class ActivitySnapshotTester {
             intent.putExtra(ThemeTests.EXTRA_ORIENTATION, orientation);
             intent.putExtra(ThemeTests.EXTRA_ACTIVITY_TEST_INDEX, testIndex);
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
+            Log.i(TAG, "Theme Id: " + theme.getResourceId());
+            Log.i(TAG, "Theme Name: " + theme.getThemeName());
+            Log.i(TAG, "Theme Orientation: " + orientation);
+            Log.i(TAG, "Theme Activity Test Index: " + testIndex);
+
             mTestCases.setActivityIntent(intent);
 
             SnapshotActivity activity = mTestCases.getActivity();
 
             // run the test
             activity.runOnUiThread(
-                    new ActivitySnapshotRunnable(theme, test, orientation, generate));
+                    new ActivitySnapshotRunnable(theme, test, orientation, generate, true));
 
             instrumentation.waitForIdleSync();
 
@@ -124,19 +141,6 @@ public class ActivitySnapshotTester {
         private int mOrientation;
         private boolean mGenerate;
         private boolean mShouldRequestLayout;
-
-        /**
-         * Creates a new ActivitySnapshotRunnable.
-         * @param theme The {@link ThemeInfo} to test.
-         * @param test The {@link ActivityTestInfo} to test.
-         * @param orientation The orientation in which the test should be.
-         * @param generate Whether we should be generating a known-good version
-         * or comparing to the previously generated version.
-         */
-        public ActivitySnapshotRunnable(ThemeInfo theme, ActivityTestInfo test,
-                int orientation, boolean generate) {
-            this(theme, test, orientation, generate, true);
-        }
 
         /**
          * Creates a new ActivitySnapshotRunnable.
@@ -166,7 +170,10 @@ public class ActivitySnapshotTester {
             String testName = mTheme.getThemeName() + "_" + orientationString +
                     "_" + mTest.getTestName();
 
-            Configuration config = activity.getResources().getConfiguration();
+            Log.i(TAG, testName + " Attempt: " + mAttempt);
+
+            Resources resources = activity.getResources();
+            Configuration config = resources.getConfiguration();
 
             int realOrientation;
             switch (config.orientation) {
@@ -181,25 +188,102 @@ public class ActivitySnapshotTester {
                     break;
             }
 
+            if (mOrientation != realOrientation) {
+                Log.i(TAG, "Retrying test because orientation didn't match...");
+                mShouldRetryTest = true;
+                return;
+            }
+
             // seems more stable if we make sure to request the layout again
             // can't hurt if it's just one more time
             if (mShouldRequestLayout) {
+                Log.i(TAG, "Delaying snapshot of activity...");
                 delaySnapshot(activity, false);
                 return;
             }
 
-            BitmapProcessor processor;
-
-            // whether we should generate the bitmap or compare it to the good version
-            if (mGenerate) {
-                processor = new BitmapSaver(activity, testName, mSplitMode);
-            } else {
-                processor = new BitmapComparer(activity, testName, true, mSplitMode);
-            }
-
             Bitmap bmp = activity.getBitmapOfWindow();
-            processor.processBitmap(bmp);
-            bmp.recycle();
+            try {
+                if (!hasExpectedDimensions(config, bmp)) {
+                    Log.i(TAG, "Bitmap doesn't have expected dimensions...");
+                    mShouldRetryTest = true;
+                    return;
+                }
+
+                BitmapProcessor processor;
+                if (mGenerate) {
+                    processor = new BitmapSaver(activity, testName, mSplitMode);
+                } else {
+                    processor = new BitmapComparer(activity, testName, mSplitMode);
+                }
+
+                boolean success = processor.processBitmap(bmp);
+                if (!mGenerate && !success) {
+                    mAttempt++;
+                    if (mAttempt >= MAX_RETRIES) {
+                        Assert.fail(testName);
+                    } else {
+                        mShouldRetryTest = true;
+                    }
+                }
+            } finally {
+                if (bmp != null) {
+                    bmp.recycle();
+                }
+            }
+        }
+
+        private boolean hasExpectedDimensions(Configuration config, Bitmap bmp) {
+            switch (mTheme.getThemeType()) {
+                case ThemeInfo.FULL_SCREEN_TYPE:
+                    return hasExpectedFullScreenDimensions(bmp);
+
+                case ThemeInfo.DIALOG_TYPE:
+                    return hasExpectedDialogDimensions(bmp);
+
+                case ThemeInfo.DIALOG_WHEN_LARGE_TYPE:
+                    int screenSize = config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+                    if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        return hasExpectedDialogDimensions(bmp);
+                    } else {
+                        return hasExpectedFullScreenDimensions(bmp);
+                    }
+
+                default:
+                    throw new IllegalArgumentException("Theme type: " + mTheme.getThemeType());
+            }
+        }
+
+        private boolean hasExpectedFullScreenDimensions(Bitmap bmp) {
+            /*
+             * +---------+
+             * |         |
+             * |         |
+             * |         |
+             * |         |
+             * |         |
+             * +---------+
+             */
+            return mOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    && bmp.getWidth() < bmp.getHeight()
+                    || mOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    && bmp.getHeight() < bmp.getWidth();
+        }
+
+        private boolean hasExpectedDialogDimensions(Bitmap bmp) {
+            /*
+             * +---------+
+             * |         |
+             * | +-----+ |
+             * | |     | |
+             * | +-----+ |
+             * |         |
+             * +---------+
+             */
+            return mOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    && bmp.getHeight() < bmp.getWidth()
+                    || mOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    && bmp.getHeight() < bmp.getWidth();
         }
 
         /**

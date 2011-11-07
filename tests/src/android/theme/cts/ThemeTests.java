@@ -44,8 +44,8 @@ public class ThemeTests {
 
     /**
      * Sets the orientation of the tests. Options are
-     * {@link ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} or
-     * {@link ActivityInfo.SCREEN_ORIENTATION_PORTRAIT}.
+     * {@link ActivityInfo#SCREEN_ORIENTATION_LANDSCAPE} or
+     * {@link ActivityInfo#SCREEN_ORIENTATION_PORTRAIT}.
      */
     public static final String EXTRA_ORIENTATION = "android.intent.extra.ORIENTATION";
 
@@ -177,41 +177,76 @@ public class ThemeTests {
      * 2. There is no step 2. You're done. Congrats.
      */
     private static final ThemeInfo[] THEMES = new ThemeInfo[] {
-        // The themes marked with asterisks seem to blow up when generating a 0x0 bitmap...
-        new ThemeInfo(android.R.style.Theme_Holo, "holo"),
-        new ThemeInfo(android.R.style.Theme_Holo_Dialog, "holo_dialog"),
-        new ThemeInfo(android.R.style.Theme_Holo_Dialog_MinWidth, "holo_dialog_minwidth"),
+        // TODO: These themes don't have a decor view that reports a width and height when applied
+        //       to an activity and it may not make sense to apply these themes to an activity.
+        //       Find a way to test these themes...
+        //
+        // new ThemeInfo(android.R.style.Theme_Holo_InputMethod, "holo_inputmethod"),
+        // new ThemeInfo(android.R.style.Theme_Holo_Light_Panel, "holo_light_panel"),
+        // new ThemeInfo(android.R.style.Theme_Holo_Panel, "holo_panel"),
+
+        new ThemeInfo(android.R.style.Theme_Holo,
+                "holo", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog,
+                "holo_dialog", ThemeInfo.DIALOG_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Dialog_MinWidth,
+                "holo_dialog_minwidth", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Dialog_NoActionBar,
-                "holo_dialog_noactionbar"),
+                "holo_dialog_noactionbar", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Dialog_NoActionBar_MinWidth,
-                "holo_dialog_noactionbar_minwidth"),
-        new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge, "holo_dialogwhenlarge"),
+                "holo_dialog_noactionbar_minwidth", ThemeInfo.DIALOG_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge,
+                "holo_dialogwhenlarge", ThemeInfo.DIALOG_WHEN_LARGE_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_DialogWhenLarge_NoActionBar,
-                "holo_dialogwhenlarge_noactionbar"),
-        new ThemeInfo(android.R.style.Theme_Holo_InputMethod, "holo_inputmethod"), // *
-        new ThemeInfo(android.R.style.Theme_Holo_Light, "holo_light"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light_DarkActionBar, "holo_light_darkactionbar"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog, "holo_light_dialog"),
+                "holo_dialogwhenlarge_noactionbar", ThemeInfo.DIALOG_WHEN_LARGE_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Light,
+                "holo_light", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Light_DarkActionBar,
+                "holo_light_darkactionbar", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog,
+                "holo_light_dialog", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                "holo_light_dialog_minwidth"),
+                "holo_light_dialog_minwidth", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_NoActionBar,
-                "holo_light_dialog_noactionbar"),
+                "holo_light_dialog_noactionbar", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth,
-                "holo_light_dialog_noactionbar_minwidth"),
+                "holo_light_dialog_noactionbar_minwidth", ThemeInfo.DIALOG_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_DialogWhenLarge,
-                "holo_light_dialogwhenlarge"),
+                "holo_light_dialogwhenlarge", ThemeInfo.DIALOG_WHEN_LARGE_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_DialogWhenLarge_NoActionBar,
-                "holo_light_dialogwhenlarge_noactionbar"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar, "holo_light_noactionbar"),
+                "holo_light_dialogwhenlarge_noactionbar", ThemeInfo.DIALOG_WHEN_LARGE_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar,
+                "holo_light_noactionbar", ThemeInfo.FULL_SCREEN_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_Light_NoActionBar_Fullscreen,
-                "holo_light_noactionbar_fullscreen"),
-        new ThemeInfo(android.R.style.Theme_Holo_Light_Panel, "holo_light_panel"), // *
-        new ThemeInfo(android.R.style.Theme_Holo_NoActionBar, "holo_noactionbar"),
+                "holo_light_noactionbar_fullscreen", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_NoActionBar,
+                "holo_noactionbar", ThemeInfo.FULL_SCREEN_TYPE),
+
         new ThemeInfo(android.R.style.Theme_Holo_NoActionBar_Fullscreen,
-                "holo_noactionbar_fullscreen"),
-        new ThemeInfo(android.R.style.Theme_Holo_Panel, "holo_panel"), // *
-        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper, "holo_wallpaper"),
-        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper_NoTitleBar, "holo_wallpaper_notitlebar")
+                "holo_noactionbar_fullscreen", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper,
+                "holo_wallpaper", ThemeInfo.FULL_SCREEN_TYPE),
+
+        new ThemeInfo(android.R.style.Theme_Holo_Wallpaper_NoTitleBar,
+                "holo_wallpaper_notitlebar", ThemeInfo.FULL_SCREEN_TYPE)
     };
 
     /**
@@ -229,7 +264,7 @@ public class ThemeTests {
     /**
      * The list of Activity snapshot tests.<p>
      * In order to create a new test, follow these steps.<p>
-     * 1. Create a class that inherits from {@link ActivitytestInfo}.<br>
+     * 1. Create a class that inherits from {@link ActivityTestInfo}.<br>
      * 2. Add an initialization of that class to the array below.<br>
      * 3. Done.
      */
@@ -251,7 +286,7 @@ public class ThemeTests {
     /**
      * Returns the list of Activity snapshot tests.<p>
      * In order to create a new test, follow these steps.<p>
-     * 1. Create a class that inherits from {@link ActivitytestInfo}.<br>
+     * 1. Create a class that inherits from {@link ActivityTestInfo}.<br>
      * 2. Add an initialization of that class to the array below.<br>
      * 3. Done.
      * @return The list of Activity snapshot tests.
