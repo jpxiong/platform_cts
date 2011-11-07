@@ -58,6 +58,7 @@ public class SplitActivitySnapshotTests
         tester.genOrTestActivityBitmaps(false, false);
     }
 
+    @Override
     public void reset() {
         try {
             tearDown();

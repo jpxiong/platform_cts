@@ -19,24 +19,25 @@ package android.theme.cts;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import junit.framework.Assert;
 
 /**
  * Implementation of {@link BitmapProcessor} that saves a known-good version of a
  * bitmap and saves it to the application's data folder.
  */
 public class BitmapSaver implements BitmapProcessor {
+
+    private static final String TAG = BitmapSaver.class.getSimpleName();
+
     private String mFilename;
     private Activity mActivity;
 
     public BitmapSaver(Activity activity, String filename, boolean splitMode) {
         mActivity = activity;
-
         if (splitMode) {
             mFilename = filename + "_split.png";
         } else {
@@ -45,15 +46,19 @@ public class BitmapSaver implements BitmapProcessor {
     }
 
     @Override
-    public void processBitmap(Bitmap bitmap) {
+    public boolean processBitmap(Bitmap bitmap) {
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = mActivity.openFileOutput(mFilename, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos = mActivity.openFileOutput(mFilename, Context.MODE_PRIVATE);
+            boolean success = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();
+            return success;
         } catch (FileNotFoundException e) {
-            Assert.fail("Test Failed: FileNotFoundException thrown");
+            Log.e(TAG, "FileNotFoundException for " + mFilename, e);
+            return false;
         } catch (IOException e) {
-            Assert.fail("Test Failed: IOException thrown");
+            Log.e(TAG, "IOException occurred", e);
+            return false;
         }
     }
 }
