@@ -21,8 +21,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.cts.util.PollingCheck;
 import android.os.IBinder;
-import android.view.animation.cts.DelayedCheck;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -106,7 +106,7 @@ public class IntentServiceTest extends ActivityTestsBase {
     public void testIntentServiceLifeCycle() throws Throwable {
         // start service
         mContext.startService(mIntent);
-        new DelayedCheck(TIMEOUT_MSEC) {
+        new PollingCheck(TIMEOUT_MSEC) {
             protected boolean check() {
                 return IntentServiceStub.onHandleIntentCalled > 0;
             }
@@ -117,7 +117,7 @@ public class IntentServiceTest extends ActivityTestsBase {
         // bind service
         ServiceConnection conn = new TestConnection();
         mContext.bindService(mIntent, conn, Context.BIND_AUTO_CREATE);
-        new DelayedCheck(TIMEOUT_MSEC) {
+        new PollingCheck(TIMEOUT_MSEC) {
             protected boolean check() {
                 return mConnected;
             }

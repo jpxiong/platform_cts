@@ -22,8 +22,8 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -187,7 +187,7 @@ public class CookieManagerTest extends
 
         // sync cookie from RAM to FLASH, because hasCookies() only counts FLASH cookies
         CookieSyncManager.getInstance().sync();
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             @Override
             protected boolean check() {
                 return mCookieManager.hasCookies();
@@ -196,7 +196,7 @@ public class CookieManagerTest extends
 
         // clean up all cookies
         mCookieManager.removeAllCookie();
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             @Override
             protected boolean check() {
                 return !mCookieManager.hasCookies();
@@ -247,7 +247,7 @@ public class CookieManagerTest extends
         assertTrue(allCookies.contains(cookie3));
 
         mCookieManager.removeSessionCookie();
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && c.contains(cookie3);
@@ -256,7 +256,7 @@ public class CookieManagerTest extends
 
         Thread.sleep(expiration + 1000); // wait for cookie to expire
         mCookieManager.removeExpiredCookie();
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && !c.contains(cookie3);
@@ -264,7 +264,7 @@ public class CookieManagerTest extends
         }.run();
 
         mCookieManager.removeAllCookie();
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             protected boolean check() {
                 return mCookieManager.getCookie(url) == null;
             }
@@ -273,7 +273,7 @@ public class CookieManagerTest extends
 
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             protected boolean check() {
                 return mWebView.getProgress() == 100;
             }
@@ -281,7 +281,7 @@ public class CookieManagerTest extends
     }
 
     private void waitForCookie(final String url) {
-        new DelayedCheck(TEST_DELAY) {
+        new PollingCheck(TEST_DELAY) {
             protected boolean check() {
                 return mCookieManager.getCookie(url) != null;
             }

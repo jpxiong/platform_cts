@@ -32,6 +32,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.cts.util.PollingCheck;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
@@ -42,7 +43,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -684,7 +684,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         mInstrumentation.waitForIdleSync();
 
         // Wait until TestDialog#OnWindowFocusChanged() is called
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return d.isOnWindowFocusChangedCalled;
             }

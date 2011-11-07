@@ -25,6 +25,7 @@ import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -48,7 +49,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
 import android.webkit.ConsoleMessage;
@@ -472,7 +472,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url = mWebServer.getDelayedAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
         mWebView.stopLoading();
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return 100 == mWebView.getProgress();
@@ -524,37 +524,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url3 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
         assertLoadUrlSuccessfully(url1);
-        delayedCheckWebBackForwardList(url1, 0, 1);
+        pollingCheckWebBackForwardList(url1, 0, 1);
         assertGoBackOrForwardBySteps(false, -1);
         assertGoBackOrForwardBySteps(false, 1);
 
         assertLoadUrlSuccessfully(url2);
-        delayedCheckWebBackForwardList(url2, 1, 2);
+        pollingCheckWebBackForwardList(url2, 1, 2);
         assertGoBackOrForwardBySteps(true, -1);
         assertGoBackOrForwardBySteps(false, 1);
 
         assertLoadUrlSuccessfully(url3);
-        delayedCheckWebBackForwardList(url3, 2, 3);
+        pollingCheckWebBackForwardList(url3, 2, 3);
         assertGoBackOrForwardBySteps(true, -2);
         assertGoBackOrForwardBySteps(false, 1);
 
         mWebView.goBack();
-        delayedCheckWebBackForwardList(url2, 1, 3);
+        pollingCheckWebBackForwardList(url2, 1, 3);
         assertGoBackOrForwardBySteps(true, -1);
         assertGoBackOrForwardBySteps(true, 1);
 
         mWebView.goForward();
-        delayedCheckWebBackForwardList(url3, 2, 3);
+        pollingCheckWebBackForwardList(url3, 2, 3);
         assertGoBackOrForwardBySteps(true, -2);
         assertGoBackOrForwardBySteps(false, 1);
 
         mWebView.goBackOrForward(-2);
-        delayedCheckWebBackForwardList(url1, 0, 3);
+        pollingCheckWebBackForwardList(url1, 0, 3);
         assertGoBackOrForwardBySteps(false, -1);
         assertGoBackOrForwardBySteps(true, 2);
 
         mWebView.goBackOrForward(2);
-        delayedCheckWebBackForwardList(url3, 2, 3);
+        pollingCheckWebBackForwardList(url3, 2, 3);
         assertGoBackOrForwardBySteps(true, -2);
         assertGoBackOrForwardBySteps(false, 1);
     }
@@ -864,7 +864,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertLoadUrlSuccessfully(url);
             }
         });
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > 0;
             }
@@ -879,7 +879,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 assertLoadUrlSuccessfully(newUrl);
             }
         });
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return listener.callCount > oldCallCount;
             }
@@ -931,7 +931,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             });
 
             // File saving is done in a separate thread.
-            new DelayedCheck() {
+            new PollingCheck() {
                 @Override
                 protected boolean check() {
                     return f.length() > 0;
@@ -1243,7 +1243,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testFindNext() throws Throwable {
         final ScrollRunnable runnable = new ScrollRunnable();
 
-        final class StopScrollingDelayedCheck extends DelayedCheck {
+        final class StopScrollingPollingCheck extends PollingCheck {
             private int mPreviousScrollY = -1;
             @Override
             protected boolean check() {
@@ -1292,25 +1292,25 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // Focus "all" in the second page and assert that the view scrolls.
         runTestOnUiThread(new FindNextRunnable(true));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() > previousScrollY);
         previousScrollY = runnable.getScrollY();
 
         // Focus "all" in the first page and assert that the view scrolls.
         runTestOnUiThread(new FindNextRunnable(true));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() < previousScrollY);
         previousScrollY = runnable.getScrollY();
 
         // Focus "all" in the second page and assert that the view scrolls.
         runTestOnUiThread(new FindNextRunnable(false));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() > previousScrollY);
         previousScrollY = runnable.getScrollY();
 
         // Focus "all" in the first page and assert that the view scrolls.
         runTestOnUiThread(new FindNextRunnable(false));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() < previousScrollY);
         previousScrollY = runnable.getScrollY();
 
@@ -1324,11 +1324,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // can not scroll any more
         runTestOnUiThread(new FindNextRunnable(false));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() == previousScrollY);
 
         runTestOnUiThread(new FindNextRunnable(true));
-        new StopScrollingDelayedCheck().run();
+        new StopScrollingPollingCheck().run();
         assertTrue(runnable.getScrollY() == previousScrollY);
     }
 
@@ -1377,7 +1377,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.documentHasImages(response);
             }
         });
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return handler.hasCalledHandleMessage();
@@ -1558,7 +1558,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
         waitForLoadComplete();
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
@@ -1575,7 +1575,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         mWebView.clearCache(true);
         // check the files are deleted
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return cacheFileBaseDir.list().length == 0;
@@ -1714,7 +1714,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.requestFocusNodeHref(hrefMsg);
             }
         });
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return handler.hasCalledHandleMessage();
@@ -1732,7 +1732,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.requestFocusNodeHref(hrefMsg2);
             }
         });
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return handler.hasCalledHandleMessage();
@@ -1800,7 +1800,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.requestImageRef(msg);
             }
         });
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return handler.hasCalledHandleMessage();
@@ -1989,18 +1989,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url3 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
         assertLoadUrlSuccessfully(url1);
-        delayedCheckWebBackForwardList(url1, 0, 1);
+        pollingCheckWebBackForwardList(url1, 0, 1);
 
         assertLoadUrlSuccessfully(url2);
-        delayedCheckWebBackForwardList(url2, 1, 2);
+        pollingCheckWebBackForwardList(url2, 1, 2);
 
         assertLoadUrlSuccessfully(url3);
-        delayedCheckWebBackForwardList(url3, 2, 3);
+        pollingCheckWebBackForwardList(url3, 2, 3);
 
         mWebView.clearHistory();
 
         // only current URL is left after clearing
-        delayedCheckWebBackForwardList(url3, 0, 1);
+        pollingCheckWebBackForwardList(url3, 0, 1);
     }
 
     @TestTargets({
@@ -2033,11 +2033,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // make a history list
         assertLoadUrlSuccessfully(url1);
-        delayedCheckWebBackForwardList(url1, 0, 1);
+        pollingCheckWebBackForwardList(url1, 0, 1);
         assertLoadUrlSuccessfully(url2);
-        delayedCheckWebBackForwardList(url2, 1, 2);
+        pollingCheckWebBackForwardList(url2, 1, 2);
         assertLoadUrlSuccessfully(url3);
-        delayedCheckWebBackForwardList(url3, 2, 3);
+        pollingCheckWebBackForwardList(url3, 2, 3);
 
         // save the list
         Bundle bundle = new Bundle();
@@ -2063,7 +2063,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(2, saveList.getCurrentIndex());
         /* ToBeFixed: The WebHistoryItems do not get inflated. Uncomment remaining tests when fixed.
         // wait for the list items to get inflated
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return restoreList.getItemAtIndex(0).getUrl() != null &&
@@ -2169,7 +2169,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                new DelayedCheck(TEST_TIMEOUT) {
+                new PollingCheck(TEST_TIMEOUT) {
                     @Override
                     protected boolean check() {
                         return mWebView.getCertificate() == null;
@@ -2213,7 +2213,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                new DelayedCheck(TEST_TIMEOUT) {
+                new PollingCheck(TEST_TIMEOUT) {
                     @Override
                     protected boolean check() {
                         return mWebView.getCertificate() != null;
@@ -2508,7 +2508,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         });
         getInstrumentation().waitForIdleSync();
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER);
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return listener.called;
@@ -2607,7 +2607,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         });
         getInstrumentation().waitForIdleSync();
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.onProgressChangedCalled();
@@ -2837,9 +2837,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    private void delayedCheckWebBackForwardList(final String currUrl, final int currIndex,
+    private void pollingCheckWebBackForwardList(final String currUrl, final int currIndex,
             final int size) {
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 WebBackForwardList list = mWebView.copyBackForwardList();
@@ -2935,7 +2935,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     private void waitForLoadComplete() {
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;

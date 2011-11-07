@@ -21,10 +21,10 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -79,7 +79,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnProgressChanged());
         mWebView.loadUrl(TestHtmlConstants.HELLO_WORLD_URL);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnProgressChanged();
@@ -102,7 +102,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnReceivedTitle();
@@ -140,7 +140,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnReceivedIcon();
@@ -180,14 +180,14 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         // after which the child will be closed
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.JS_WINDOW_URL));
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnCreateWindow();
             }
         }.run();
         assertFalse(webChromeClient.hadOnRequestFocus());
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnCloseWindow();
@@ -216,7 +216,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         // unload should trigger when we try to navigate away
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnJsBeforeUnload();
@@ -245,7 +245,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_ALERT_URL);
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnJsAlert();
@@ -274,7 +274,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_CONFIRM_URL);
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnJsConfirm();
@@ -305,14 +305,14 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_PROMPT_URL);
         mWebView.loadUrl(url);
 
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return webChromeClient.hadOnJsPrompt();
             }
         }.run();
         // the result returned by the client gets set as the page title
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return mWebView.getTitle().equals(promptResult);
             }
@@ -322,7 +322,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new DelayedCheck(TEST_TIMEOUT) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return mWebView.getProgress() == 100;
             }

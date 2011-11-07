@@ -25,6 +25,7 @@ import dalvik.annotation.TestTargets;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.Editable;
@@ -35,7 +36,6 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.cts.DelayedCheck;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -260,7 +260,7 @@ public class BaseInputConnectionTest extends
         // dummy mode
         BaseInputConnection dummyConnection = new BaseInputConnection(mView, false);
         dummyConnection.commitText(inputText, inputText.length());
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return text2.toString().equals(mView.getText().toString());
@@ -323,7 +323,7 @@ public class BaseInputConnectionTest extends
         BaseInputConnection dummyConnection = new BaseInputConnection(mView, false);
         dummyConnection.setComposingText(str, str.length());
         dummyConnection.finishComposingText();
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return text.toString().equals(mView.getText().toString());
@@ -359,7 +359,7 @@ public class BaseInputConnectionTest extends
             mInstrumentation.sendStringSync("q");
             mInstrumentation.waitForIdleSync();
         }
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return "q".equals(mView.getText().toString());

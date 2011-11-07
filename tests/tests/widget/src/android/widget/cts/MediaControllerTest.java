@@ -29,6 +29,7 @@ import org.xmlpull.v1.XmlPullParser;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -36,7 +37,6 @@ import android.util.Xml;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -222,7 +222,7 @@ public class MediaControllerTest extends
         assertTrue(mMediaController.isShowing());
 
         // isShowing() should return false, but MediaController still shows, this may be a bug.
-        new DelayedCheck(timeout + 500) {
+        new PollingCheck(timeout + 500) {
             @Override
             protected boolean check() {
                 return mMediaController.isShowing();

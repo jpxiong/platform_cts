@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -69,7 +70,6 @@ import android.view.WindowManagerImpl;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.cts.DelayedCheck;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -287,7 +287,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertTrue(view.hasCalledOnAnimationStart());
 
         // check whether it has ended after duration, and alpha changed during this time.
-        new DelayedCheck(duration + TIMEOUT_DELTA) {
+        new PollingCheck(duration + TIMEOUT_DELTA) {
             @Override
             protected boolean check() {
                 return view.hasCalledOnSetAlpha() && view.hasCalledOnAnimationEnd();
@@ -2257,7 +2257,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         // mAttachInfo is not null
         final View view2 = mActivity.findViewById(R.id.fit_windows);
         // Wait until the window has been focused.
-        new DelayedCheck(TIMEOUT_DELTA) {
+        new PollingCheck(TIMEOUT_DELTA) {
             @Override
             protected boolean check() {
                 return view2.hasWindowFocus();
@@ -4429,7 +4429,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         viewGroup.addView(editText);
         editText.requestFocus();
 
-        new DelayedCheck(TIMEOUT_DELTA) {
+        new PollingCheck(TIMEOUT_DELTA) {
             @Override
             protected boolean check() {
                 return editText.isFocused();

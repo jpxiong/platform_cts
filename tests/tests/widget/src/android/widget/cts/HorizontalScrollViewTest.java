@@ -28,6 +28,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -39,7 +40,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup.LayoutParams;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
@@ -363,7 +363,7 @@ public class HorizontalScrollViewTest
                 mScrollView.fullScroll(View.FOCUS_RIGHT);
             }
         });
-        delayedCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
+        pollingCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
         assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
 
         runTestOnUiThread(new Runnable() {
@@ -371,7 +371,7 @@ public class HorizontalScrollViewTest
                 mScrollView.fullScroll(View.FOCUS_LEFT);
             }
         });
-        delayedCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
+        pollingCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
         assertEquals(0, mScrollView.getScrollX());
     }
 
@@ -521,7 +521,7 @@ public class HorizontalScrollViewTest
                 mScrollView.smoothScrollBy(SCROLL_RIGHT, 0);
             }
         });
-        delayedCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
+        pollingCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
         assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
 
@@ -530,7 +530,7 @@ public class HorizontalScrollViewTest
                 mScrollView.smoothScrollBy(-SCROLL_RIGHT, 0);
             }
         });
-        delayedCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
+        pollingCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
         assertEquals(0, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
     }
@@ -549,7 +549,7 @@ public class HorizontalScrollViewTest
                 mScrollView.smoothScrollTo(SCROLL_RIGHT, 0);
             }
         });
-        delayedCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
+        pollingCheckSmoothScrolling(0, SCROLL_RIGHT, 0, 0);
         assertEquals(SCROLL_RIGHT, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
 
@@ -558,7 +558,7 @@ public class HorizontalScrollViewTest
                 mScrollView.smoothScrollTo(0, 0);
             }
         });
-        delayedCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
+        pollingCheckSmoothScrolling(SCROLL_RIGHT, 0, 0, 0);
         assertEquals(0, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
     }
@@ -677,7 +677,7 @@ public class HorizontalScrollViewTest
                 mScrollView.fling(velocityX);
             }
         });
-        delayedCheckFling(0, true);
+        pollingCheckFling(0, true);
 
         final int currentX = mScrollView.getScrollX();
         // fling towards left
@@ -686,7 +686,7 @@ public class HorizontalScrollViewTest
                 mScrollView.fling(-velocityX);
             }
         });
-        delayedCheckFling(currentX, false);
+        pollingCheckFling(currentX, false);
     }
 
     @TestTargetNew(
@@ -832,7 +832,7 @@ public class HorizontalScrollViewTest
         return current <= from && current >= to;
     }
 
-    private void delayedCheckSmoothScrolling(final int fromX, final int toX,
+    private void pollingCheckSmoothScrolling(final int fromX, final int toX,
             final int fromY, final int toY) {
 
         if (fromX == toX && fromY == toY) {
@@ -840,7 +840,7 @@ public class HorizontalScrollViewTest
         }
 
         if (fromY != toY) {
-            new DelayedCheck() {
+            new PollingCheck() {
                 @Override
                 protected boolean check() {
                     return isInRange(mScrollView.getScrollY(), fromY, toY);
@@ -849,7 +849,7 @@ public class HorizontalScrollViewTest
         }
 
         if (fromX != toX) {
-            new DelayedCheck() {
+            new PollingCheck() {
                 @Override
                 protected boolean check() {
                     return isInRange(mScrollView.getScrollX(), fromX, toX);
@@ -857,7 +857,7 @@ public class HorizontalScrollViewTest
             }.run();
         }
 
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return toX == mScrollView.getScrollX() && toY == mScrollView.getScrollY();
@@ -865,8 +865,8 @@ public class HorizontalScrollViewTest
         }.run();
     }
 
-    private void delayedCheckFling(final int startPosition, final boolean movingRight) {
-        new DelayedCheck() {
+    private void pollingCheckFling(final int startPosition, final boolean movingRight) {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 if (movingRight) {
@@ -876,7 +876,7 @@ public class HorizontalScrollViewTest
             }
         }.run();
 
-        new DelayedCheck() {
+        new PollingCheck() {
             private int mPreviousScrollX = mScrollView.getScrollX();
 
             @Override

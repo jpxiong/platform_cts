@@ -22,12 +22,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.cts.CtsTestServer;
 
 import java.io.File;
@@ -314,7 +314,7 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     private void assertDownloadQueryableByStatus(final int status) {
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 Cursor cursor= null;

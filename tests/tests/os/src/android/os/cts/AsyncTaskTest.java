@@ -21,9 +21,9 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.cts.util.PollingCheck;
 import android.os.AsyncTask;
 import android.test.InstrumentationTestCase;
-import android.view.animation.cts.DelayedCheck;
 
 import java.util.concurrent.TimeUnit;
 
@@ -108,7 +108,7 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         }
 
         // wait for the task to finish completely (including onPostResult()).
-        new DelayedCheck(DURATION) {
+        new PollingCheck(DURATION) {
             protected boolean check() {
                 return mAsyncTask.getStatus() == AsyncTask.Status.FINISHED;
             }
@@ -132,7 +132,7 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         }
 
         // wait for progress update to be processed (happens asynchronously)
-        new DelayedCheck(DURATION) {
+        new PollingCheck(DURATION) {
             protected boolean check() {
                 return mAsyncTask.updateValue != null;
             }

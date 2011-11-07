@@ -22,6 +22,7 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.graphics.Rect;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
@@ -30,7 +31,6 @@ import android.text.Editable;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyCharacterMap;
 import android.view.View;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -175,7 +175,7 @@ public class PasswordTransformationMethodTest extends
         assertTrue(mMethod.hasCalledAfterTextChanged());
 
         // it will get transformed after a while
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 // "******"

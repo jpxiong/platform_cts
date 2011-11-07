@@ -17,12 +17,12 @@
 package android.view.cts;
 
 import android.app.Activity;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.animation.cts.AnimationTestUtils;
-import android.view.animation.cts.DelayedCheck;
 
 import com.android.cts.stub.R;
 
@@ -155,7 +155,7 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
             }
         });
 
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             @Override
             protected boolean check() {
                 return mAnimation.hasStarted();

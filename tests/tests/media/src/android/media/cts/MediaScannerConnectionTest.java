@@ -26,12 +26,12 @@ import dalvik.annotation.ToBeFixed;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
 import android.os.IBinder;
 import android.test.AndroidTestCase;
-import android.view.animation.cts.DelayedCheck;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -157,12 +157,12 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
     }
 
     private void checkMediaScannerConnection() {
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             protected boolean check() {
                 return mMediaScannerConnectionClient.isOnMediaScannerConnectedCalled;
             }
         }.run();
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             protected boolean check() {
                 return mMediaScannerConnectionClient.mediaPath != null;
             }
@@ -170,7 +170,7 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
     }
 
     private void checkConnectionState(final boolean expected) {
-        new DelayedCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT) {
             protected boolean check() {
                 return mMediaScannerConnection.isConnected() == expected;
             }

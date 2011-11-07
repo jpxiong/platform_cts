@@ -17,12 +17,12 @@
 package android.media.cts;
 
 import android.content.pm.PackageManager;
+import android.cts.util.PollingCheck;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import android.view.animation.cts.DelayedCheck;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +85,7 @@ public class AudioRecord_BufferSizeTest extends AndroidTestCase {
     }
 
     private void checkRecordingState(final int state) {
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return mAudioRecord.getRecordingState() == state;

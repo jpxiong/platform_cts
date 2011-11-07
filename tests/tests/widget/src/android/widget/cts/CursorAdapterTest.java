@@ -19,6 +19,7 @@ package android.widget.cts;
 import java.io.File;
 
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -29,7 +30,6 @@ import android.test.AndroidTestCase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.cts.DelayedCheck;
 import android.widget.CursorAdapter;
 import android.widget.Filter;
 import android.widget.FilterQueryProvider;
@@ -428,7 +428,7 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertFalse(mMockCursorAdapter.hasContentChanged());
         // insert a new row
         mDatabase.execSQL("INSERT INTO test (number) VALUES ('" + FIRST_NUMBER + "');");
-        new DelayedCheck(TEST_TIME_OUT) {
+        new PollingCheck(TEST_TIME_OUT) {
             @Override
             protected boolean check() {
                 return mMockCursorAdapter.hasContentChanged();

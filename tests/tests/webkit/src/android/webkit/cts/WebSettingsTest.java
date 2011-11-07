@@ -21,10 +21,10 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.MimeTypeMap;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -252,7 +252,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getBlockNetworkImage());
         assertTrue(mSettings.getLoadsImagesAutomatically());
         loadAssetUrl(url);
-        new DelayedCheck() {
+        new PollingCheck() {
             @Override
             protected boolean check() {
                 return !mWebServer.getLastRequestUrl().endsWith(ext);
@@ -543,7 +543,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptCanOpenWindowsAutomatically(false);
         assertFalse(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -554,7 +554,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         assertTrue(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -579,7 +579,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(true);
         assertTrue(mSettings.getJavaScriptEnabled());
         loadAssetUrl(TestHtmlConstants.JAVASCRIPT_URL);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             @Override
             protected boolean check() {
                 return mWebView.getTitle() != null;
@@ -590,7 +590,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(false);
         assertFalse(mSettings.getJavaScriptEnabled());
         loadAssetUrl(TestHtmlConstants.JAVASCRIPT_URL);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             @Override
             protected boolean check() {
                 return mWebView.getTitle() != null;
@@ -1013,7 +1013,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(true);
 
         loadUrl(url);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1021,7 +1021,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         mSettings.setAppCachePath("/data/foo");
         loadUrl(url);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1061,7 +1061,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      */
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;

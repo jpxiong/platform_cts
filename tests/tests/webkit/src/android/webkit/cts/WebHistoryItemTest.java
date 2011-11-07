@@ -23,9 +23,9 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
 
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
@@ -107,7 +107,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     private void assertLoadUrlSuccessfully(final WebView view, String url) {
         view.loadUrl(url);
         // wait for the page load to complete
-        new DelayedCheck(10000) {
+        new PollingCheck(10000) {
             @Override
             protected boolean check() {
                 return view.getProgress() == 100;

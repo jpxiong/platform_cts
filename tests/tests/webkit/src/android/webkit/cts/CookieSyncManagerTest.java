@@ -22,8 +22,8 @@ import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.animation.cts.DelayedCheck;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
@@ -65,7 +65,7 @@ public class CookieSyncManagerTest
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
-        new DelayedCheck(30000) {
+        new PollingCheck(30000) {
             @Override
             protected boolean check() {
                 return !cookieManager.hasCookies();
@@ -83,7 +83,7 @@ public class CookieSyncManagerTest
 
         // Store the cookie to the database.
         csm1.sync();
-        new DelayedCheck(30000) {
+        new PollingCheck(30000) {
             @Override
             protected boolean check() {
                 return cookieManager.hasCookies();
@@ -92,7 +92,7 @@ public class CookieSyncManagerTest
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
-        new DelayedCheck(30000) {
+        new PollingCheck(30000) {
             @Override
             protected boolean check() {
                 return !cookieManager.hasCookies();
