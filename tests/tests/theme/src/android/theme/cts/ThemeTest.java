@@ -62,6 +62,7 @@ public class ThemeTest extends ActivityInstrumentationTestCase2<ThemeTestRunnerA
         final ThemeTestRunnerActivity activity = getActivity();
 
         activity.runOnUiThread(new Runnable() {
+           @Override
            public void run() {
                activity.runTests();
            }

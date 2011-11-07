@@ -63,6 +63,7 @@ function gttxhdpi () {
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
+    rm -rf $ANDROID_HOST_OUT/cts/theme-assets-xhdpi && \
     adb shell am instrument -w -e class android.theme.cts.ThemeGenerator#generateThemeBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.ActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.SplitActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
@@ -84,6 +85,7 @@ function gtthdpi () {
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
+    rm -rf $ANDROID_HOST_OUT/cts/theme-assets-hdpi && \
     adb shell am instrument -w -e class android.theme.cts.ThemeGenerator#generateThemeBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.ActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.SplitActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
@@ -107,6 +109,7 @@ function gttmdpi () {
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsTestStubs.apk && \
     adb install -r $ANDROID_PRODUCT_OUT/data/app/CtsThemeTestCases.apk && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
+    rm -rf $ANDROID_HOST_OUT/cts/theme-assets-large-mdpi && \
     adb shell am instrument -w -e class android.theme.cts.ThemeGenerator#generateThemeBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.ActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.SplitActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
@@ -114,6 +117,7 @@ function gttmdpi () {
     adb pull data/data/com.android.cts.stub/files/ $ANDROID_HOST_OUT/cts/theme-assets-large-mdpi/ && \
     adb shell am display-size 800x480  && \
     adb shell rm -r data/data/com.android.cts.stub/files/ && \
+    rm -rf $ANDROID_HOST_OUT/cts/theme-assets-mdpi && \
     adb shell am instrument -w -e class android.theme.cts.ThemeGenerator#generateThemeBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.ActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \
     adb shell am instrument -w -e class android.theme.cts.SplitActivitySnapshotTests#generateActivityBitmaps com.android.cts.theme/android.test.InstrumentationCtsTestRunner && \

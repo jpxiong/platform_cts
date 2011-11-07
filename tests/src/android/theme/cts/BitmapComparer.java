@@ -16,17 +16,10 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
-
 import android.app.Activity;
 import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import junit.framework.Assert;
 
 /**
  * Implementation of {@link BitmapProcessor} that compares the created bitmap
@@ -35,13 +28,10 @@ import junit.framework.Assert;
  */
 public class BitmapComparer implements BitmapProcessor {
     private String mBitmapIdName;
-    private boolean mShouldAssert;
     private Activity mActivity;
 
-    public BitmapComparer(Activity activity, String filename, boolean shouldAssert, boolean splitMode) {
+    public BitmapComparer(Activity activity, String filename, boolean splitMode) {
         mActivity = activity;
-        mShouldAssert = shouldAssert;
-
         if (splitMode) {
             mBitmapIdName = filename + "_split";
         } else {
@@ -50,39 +40,17 @@ public class BitmapComparer implements BitmapProcessor {
     }
 
     @Override
-    public void processBitmap(Bitmap bitmap) {
-        // get the bitmap from the resource system
-        // since we only have the name, not the resource ID,
-        // we need to look up the ID first
+    public boolean processBitmap(Bitmap bitmap) {
         Resources r = mActivity.getResources();
         int resourceId = r.getIdentifier(mBitmapIdName, "drawable", mActivity.getPackageName());
-
-        BitmapDrawable drawable = null;
-
-        try {
-            drawable = (BitmapDrawable) r.getDrawable(resourceId);
-        } catch (NotFoundException e) {
-            Assert.fail("Test Failed: Resource not found - " + mBitmapIdName);
+        BitmapDrawable drawable = (BitmapDrawable) r.getDrawable(resourceId);
+        Bitmap referenceBitmap = drawable.getBitmap();
+        boolean identical = referenceBitmap.sameAs(bitmap);
+        if (!identical) {
+            BitmapSaver saver = new BitmapSaver(mActivity, "failed_image_" + mBitmapIdName, false);
+            saver.processBitmap(bitmap);
         }
-
-        Bitmap bmp2 = drawable.getBitmap();
-
-        // pixel-perfect matching - could easily re-write to use a fuzzy-matching algorithm
-
-        boolean identical = bmp2.sameAs(bitmap);
-        bmp2.recycle();
-
-        // the second and third options are for the manual lookup version
-        if (mShouldAssert) {
-            if (!identical) {
-                BitmapSaver saver = new BitmapSaver(mActivity, "failed_image_" + mBitmapIdName, false);
-                saver.processBitmap(bitmap);
-            }
-            Assert.assertTrue("Test failed: " + mBitmapIdName, identical);
-        } else if (identical) {
-            ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps identical");
-        } else {
-            ((TextView) mActivity.findViewById(R.id.text)).setText("Bitmaps differ");
-        }
+        referenceBitmap.recycle();
+        return identical;
     }
 }
