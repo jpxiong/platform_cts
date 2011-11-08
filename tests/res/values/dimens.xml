@@ -39,8 +39,5 @@
     <item name="frac25610pperc" type="dimen" format="fraction">25610%p</item>
     <item name="frac6553510pperc" type="dimen" format="fraction">6553510%p</item>
     <item name="frac6553610pperc" type="dimen" format="fraction">6553610%p</item>
-
-    <dimen name="reference_width">320dp</dimen>
-    <dimen name="reference_height">480dp</dimen>
 </resources>
 
