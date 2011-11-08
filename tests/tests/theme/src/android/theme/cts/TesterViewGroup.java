@@ -17,7 +17,7 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.theme.R;
 
 import android.content.Context;
 import android.content.res.Resources;
