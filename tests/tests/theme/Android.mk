@@ -22,13 +22,15 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-# Include all test java files.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+# Resource unit tests use a private locale and some densities
+LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c 320dpi -c 240dpi -c 160dpi
 
 LOCAL_PACKAGE_NAME := CtsThemeTestCases
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
+LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)

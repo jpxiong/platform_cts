@@ -16,7 +16,7 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.theme.R;
 
 import android.app.Activity;
 import android.content.Intent;

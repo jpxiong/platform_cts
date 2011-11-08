@@ -54,16 +54,4 @@
         <item>9</item>
         <item>10</item>
     </integer-array>
-
-    <string-array name="themes_array">
-        <item>holo</item>
-        <item>holo_light</item>
-        <item>holo_solidactionbar</item>
-        <item>holo_light_solidactionbar</item>
-        <item>holo_light_solidactionbar_inverse</item>
-        <item>holo_solidactionbar_splitactionbarwhennarrow</item>
-        <item>holo_light_solidactionbar_splitactionbarwhennarrow</item>
-        <item>holo_noactionbar</item>
-        <item>holo_light_noactionbar</item>
-    </string-array>
 </resources>

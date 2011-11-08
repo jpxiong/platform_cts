@@ -22,11 +22,68 @@
          which is needed when building test cases. -->
     <application>
         <uses-library android:name="android.test.runner" />
+        
+        <activity android:name="android.theme.cts.ThemeTestRunnerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.ThemeTestGeneratorActivity"
+                  android:label="Theme Check">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.ThemeSelectorActivity"
+                  android:theme="@android:style/Theme.Holo"
+                  android:label="Theme Check">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.TestListActivity"
+                  android:label="Theme Check">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.OrientationSelectorActivity"
+                  android:theme="@android:style/Theme.Holo"
+                  android:label="Theme Check">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.SnapshotActivity"
+                android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="android.theme.cts.SplitSnapshotActivity"
+                  android:uiOptions="splitActionBarWhenNarrow">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
     </application>
-
-  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-      android:targetPackage="com.android.cts.stub"
-      android:label="CTS tests for themes">
-  </instrumentation>
+    
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+            android:targetPackage="com.android.cts.theme"
+            android:label="CTS tests for themes "/>
 
 </manifest>
