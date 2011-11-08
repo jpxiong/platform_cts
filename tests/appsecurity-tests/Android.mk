@@ -23,7 +23,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := CtsAppSecurityTests
 
-LOCAL_JAVA_LIBRARIES := hosttestlib ddmlib-prebuilt junit
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 
