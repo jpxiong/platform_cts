@@ -16,7 +16,7 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.theme.R;
 
 import android.view.View;
 import android.widget.TabHost;

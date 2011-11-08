@@ -16,7 +16,7 @@
 
 package android.theme.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.theme.R;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,41 +24,56 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+
+import junit.framework.Assert;
 
 /**
- * This activity exists solely for debugging purposes. It allows the manual
- * verifier to select which theme to test.
+ * Exists for debugging purposes. Allows the manual verifier
+ * to select which test to look at. Displays a list of all of the
+ * tests. Selecting one shows the reference and generated images
+ * for that specific test.
  */
-public class ThemeSelectorActivity extends Activity {
-    private ThemeInfo[] mThemes;
+public class TestListActivity extends Activity {
+    private int mThemeId;
+    private String mThemeName;
     private int mOrientation;
+
     /**
      * Called with the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        mThemeId = intent.getIntExtra(ThemeTests.EXTRA_THEME_ID, 0);
+
+        // test should fail if no theme is set
+        Assert.assertTrue("No Theme Resource ID set", mThemeId != 0);
+
+        mThemeName = intent.getStringExtra(ThemeTests.EXTRA_THEME_NAME);
+
+        setTheme(mThemeId);
+
         setContentView(R.layout.themetestlistactivity);
 
         ListView lv = (ListView) findViewById(R.id.tests_list);
-
-        mThemes = ThemeTests.getThemes();
-        lv.setAdapter(new ThemesAdapter(this, mThemes));
+        lv.setAdapter(new ThemeTestAdapter(this, ThemeTests.getTests()));
 
         lv.setOnItemClickListener(mTestClickedListener);
 
-        mOrientation = getIntent().getIntExtra(ThemeTests.EXTRA_ORIENTATION,
+        mOrientation = intent.getIntExtra(ThemeTests.EXTRA_ORIENTATION,
                 ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     private OnItemClickListener mTestClickedListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(ThemeSelectorActivity.this, TestListActivity.class);
-            ThemeInfo theme = mThemes[position];
-            intent.putExtra(ThemeTests.EXTRA_THEME_ID, theme.getResourceId());
-            intent.putExtra(ThemeTests.EXTRA_THEME_NAME, theme.getThemeName());
+            Intent intent = new Intent(TestListActivity.this, ThemeTestRunnerActivity.class);
+            intent.putExtra(ThemeTests.EXTRA_THEME_ID, mThemeId);
+            intent.putExtra(ThemeTests.EXTRA_THEME_NAME, mThemeName);
+            intent.putExtra(ThemeTests.EXTRA_RUN_INDIVIDUAL_TEST, position);
             intent.putExtra(ThemeTests.EXTRA_ORIENTATION, mOrientation);
             startActivity(intent);
         }
