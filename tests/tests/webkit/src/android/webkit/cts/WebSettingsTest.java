@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 @TestTargetClass(android.webkit.WebSettings.class)
 public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
 
+    private static final int WEBVIEW_TIMEOUT = 5000;
     private static final String LOG_TAG = "WebSettingsTest";
 
     private WebView mWebView;
@@ -543,7 +544,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptCanOpenWindowsAutomatically(false);
         assertFalse(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -554,7 +555,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         assertTrue(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -579,7 +580,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(true);
         assertTrue(mSettings.getJavaScriptEnabled());
         loadAssetUrl(TestHtmlConstants.JAVASCRIPT_URL);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getTitle() != null;
@@ -590,7 +591,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(false);
         assertFalse(mSettings.getJavaScriptEnabled());
         loadAssetUrl(TestHtmlConstants.JAVASCRIPT_URL);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getTitle() != null;
@@ -1013,7 +1014,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setJavaScriptEnabled(true);
 
         loadUrl(url);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1021,7 +1022,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         mSettings.setAppCachePath("/data/foo");
         loadUrl(url);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1061,7 +1062,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      */
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new PollingCheck(10000) {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;

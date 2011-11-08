@@ -31,6 +31,8 @@ import android.webkit.CookieSyncManager;
 public class CookieSyncManagerTest
         extends ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
 
+    private final static int COOKIE_MANAGER_TIMEOUT = 5000;
+
     public CookieSyncManagerTest() {
         super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
     }
@@ -65,7 +67,7 @@ public class CookieSyncManagerTest
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
-        new PollingCheck(30000) {
+        new PollingCheck(COOKIE_MANAGER_TIMEOUT) {
             @Override
             protected boolean check() {
                 return !cookieManager.hasCookies();
@@ -83,7 +85,7 @@ public class CookieSyncManagerTest
 
         // Store the cookie to the database.
         csm1.sync();
-        new PollingCheck(30000) {
+        new PollingCheck(COOKIE_MANAGER_TIMEOUT) {
             @Override
             protected boolean check() {
                 return cookieManager.hasCookies();
@@ -92,7 +94,7 @@ public class CookieSyncManagerTest
 
         // Remove all cookies from the database.
         cookieManager.removeAllCookie();
-        new PollingCheck(30000) {
+        new PollingCheck(COOKIE_MANAGER_TIMEOUT) {
             @Override
             protected boolean check() {
                 return !cookieManager.hasCookies();

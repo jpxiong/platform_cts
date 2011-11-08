@@ -32,8 +32,8 @@ import java.util.Map;
 
 @TestTargetClass(android.webkit.CacheManager.class)
 public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
-    private static final long CACHEMANAGER_INIT_TIMEOUT = 5000l;
-    private static final long NETWORK_OPERATION_DELAY = 10000l;
+    private static final long CACHEMANAGER_INIT_TIMEOUT = 5000L;
+    private static final long NETWORK_OPERATION_TIMEOUT = 10000L;
 
     private WebView mWebView;
     private CtsTestServer mWebServer;
@@ -106,7 +106,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         }.run();
 
         mWebView.clearCache(true);
-        new PollingCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
@@ -115,7 +115,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         }.run();
 
         loadUrl(url);
-        new PollingCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
             @Override
             protected boolean check() {
                 CacheResult result = CacheManager.getCacheFile(url, null);
@@ -141,7 +141,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
     private void loadUrl(String url){
         mWebView.loadUrl(url);
         // check whether loadURL successfully
-        new PollingCheck(NETWORK_OPERATION_DELAY) {
+        new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mWebView.getProgress() == 100;
