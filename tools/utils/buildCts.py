@@ -261,7 +261,7 @@ def RunDescriptionGeneratorDoclet(android_root, doclet_path, source_root, output
   # To determine whether a class is a JUnit test, the Doclet needs to have all intermediate
   # subclasses of TestCase as well as the JUnit framework itself on the source path.
   # Annotation classes are also required, since test annotations go into the description.
-  source_path = [
+  sourcepath = [
       'frameworks/base/core/java',            # android test classes
       'frameworks/base/test-runner/src',      # test runner
       'libcore/junit/src/main/java',          # junit classes
@@ -270,9 +270,14 @@ def RunDescriptionGeneratorDoclet(android_root, doclet_path, source_root, output
       'cts/tests/src',                        # cts test stubs
       source_root                             # the source for this package
   ]
-  source_path = [os.path.join(android_root, x) for x in source_path]
+  sourcepath = [os.path.join(android_root, x) for x in sourcepath]
+  classpath = [
+      'prebuilt/common/tradefed/tradefed-prebuilt.jar',
+  ]
+  classpath = [os.path.join(android_root, x) for x in classpath]
   cmd = ('javadoc -o %s -J-Xmx512m -quiet -doclet DescriptionGenerator -docletpath %s'
-         ' -sourcepath %s ') % (output_file, doclet_path, ':'.join(source_path))
+         ' -sourcepath %s -classpath %s ') % (output_file, doclet_path, ':'.join(sourcepath),
+         ':'.join(classpath))
   sources = []
 
   def AddFile(sources, folder, names):
