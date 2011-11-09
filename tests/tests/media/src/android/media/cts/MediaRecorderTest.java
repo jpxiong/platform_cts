@@ -42,7 +42,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int RECORD_TIME = 3000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
-    private static final int FRAME_RATE = 15;
     private static final long MAX_FILE_SIZE = 5000;
     private static final int MAX_DURATION_MSEC = 200;
     private boolean mOnInfoCalled;
@@ -126,11 +125,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setVideoFrameRate",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "setVideoSize",
             args = {int.class, int.class}
         ),
@@ -157,7 +151,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setVideoFrameRate(FRAME_RATE);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
         mMediaRecorder.prepare();
@@ -167,22 +160,36 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         checkOutputExist();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCamera",
-        args = {Camera.class}
-    )
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setVideoFrameRate",
+            args = {int.class}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setCamera",
+            args = {Camera.class}
+        )
+    })
     @UiThreadTest
     public void testSetCamera() throws Exception {
         int nCamera = Camera.getNumberOfCameras();
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
             mCamera = Camera.open(cameraId);
+
+            // FIXME:
+            // We should add some test case to use Camera.Parameters.getPreviewFpsRange()
+            // to get the supported video frame rate range.
+            Camera.Parameters params = mCamera.getParameters();
+            int frameRate = params.getPreviewFrameRate();
+
             mCamera.unlock();
             mMediaRecorder.setCamera(mCamera);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            mMediaRecorder.setVideoFrameRate(FRAME_RATE);
+            mMediaRecorder.setVideoFrameRate(frameRate);
             mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
             mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
             mMediaRecorder.setOutputFile(OUTPUT_PATH);
@@ -236,11 +243,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         ),
         @TestTargetNew(
             level = TestLevel.COMPLETE,
-            method = "setVideoFrameRate",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
             method = "setVideoSize",
             args = {int.class, int.class}
         ),
@@ -274,7 +276,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setOutputFile(OUTPUT_PATH2);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
-        mMediaRecorder.setVideoFrameRate(FRAME_RATE);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
         FileOutputStream fos = new FileOutputStream(OUTPUT_PATH2);
         FileDescriptor fd = fos.getFD();
