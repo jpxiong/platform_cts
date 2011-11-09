@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 public class CookieManagerTest extends
         ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
 
-    private static final int TEST_DELAY = 5000;
+    private static final int TEST_TIMEOUT = 5000;
 
     private WebView mWebView;
     private CookieManager mCookieManager;
@@ -116,7 +116,7 @@ public class CookieManagerTest extends
         String url = server.getCookieUrl("conquest.html");
         loadUrl(url);
         assertEquals(null, mWebView.getTitle()); // no cookies passed
-        Thread.sleep(TEST_DELAY);
+        Thread.sleep(500);
         assertNull(mCookieManager.getCookie(url));
 
         mCookieManager.setAcceptCookie(true);
@@ -187,7 +187,7 @@ public class CookieManagerTest extends
 
         // sync cookie from RAM to FLASH, because hasCookies() only counts FLASH cookies
         CookieSyncManager.getInstance().sync();
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return mCookieManager.hasCookies();
@@ -196,7 +196,7 @@ public class CookieManagerTest extends
 
         // clean up all cookies
         mCookieManager.removeAllCookie();
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
                 return !mCookieManager.hasCookies();
@@ -247,7 +247,7 @@ public class CookieManagerTest extends
         assertTrue(allCookies.contains(cookie3));
 
         mCookieManager.removeSessionCookie();
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && c.contains(cookie3);
@@ -256,7 +256,7 @@ public class CookieManagerTest extends
 
         Thread.sleep(expiration + 1000); // wait for cookie to expire
         mCookieManager.removeExpiredCookie();
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && !c.contains(cookie3);
@@ -264,7 +264,7 @@ public class CookieManagerTest extends
         }.run();
 
         mCookieManager.removeAllCookie();
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return mCookieManager.getCookie(url) == null;
             }
@@ -273,7 +273,7 @@ public class CookieManagerTest extends
 
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return mWebView.getProgress() == 100;
             }
@@ -281,7 +281,7 @@ public class CookieManagerTest extends
     }
 
     private void waitForCookie(final String url) {
-        new PollingCheck(TEST_DELAY) {
+        new PollingCheck(TEST_TIMEOUT) {
             protected boolean check() {
                 return mCookieManager.getCookie(url) != null;
             }
