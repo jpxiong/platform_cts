@@ -52,6 +52,8 @@ public class RingtoneTest extends AndroidTestCase {
         int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
         mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume / 2,
                 AudioManager.FLAG_ALLOW_RINGER_MODES);
+        // make sure that we are not in silent mode
+        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
     @Override
@@ -110,6 +112,9 @@ public class RingtoneTest extends AndroidTestCase {
         assertEquals(AudioManager.STREAM_MUSIC, mRingtone.getStreamType());
         mRingtone.setStreamType(AudioManager.STREAM_ALARM);
         assertEquals(AudioManager.STREAM_ALARM, mRingtone.getStreamType());
+        // make sure we play on STREAM_RING because we the volume on this stream is not 0
+        mRingtone.setStreamType(AudioManager.STREAM_RING);
+        assertEquals(AudioManager.STREAM_RING, mRingtone.getStreamType());
 
         mRingtone.play();
         assertTrue(mRingtone.isPlaying());
