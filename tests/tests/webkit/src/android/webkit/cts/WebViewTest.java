@@ -1943,7 +1943,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         runTestOnUiThread(new Runnable() {
             public void run() {
-                assertEquals(0.5f, mWebView.getScale(), .02f);
+                // setInitialScale() accepts initial scale in percentage (of display density)
+                assertEquals(defaultScale * 50 / 100f, mWebView.getScale(), .02f);
 
                 mWebView.setInitialScale(0);
                 mWebView.loadData("<html><body>" + p + "4" + "</body></html>", "text/html", null);
