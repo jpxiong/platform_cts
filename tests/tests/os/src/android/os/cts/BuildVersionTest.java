@@ -16,8 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestTargetClass;
-
 import android.os.Build;
 import android.util.Log;
 
@@ -27,14 +25,14 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(Build.VERSION.class)
 public class BuildVersionTest extends TestCase {
 
     private static final String LOG_TAG = "BuildVersionTest";
     private static final Set<String> EXPECTED_RELEASES =
-        new HashSet<String>(Arrays.asList("4.0", "4.0.1"));
-    private static final int EXPECTED_SDK = 14;
+            new HashSet<String>(Arrays.asList("4.1"));
+    private static final int EXPECTED_SDK = 15;
 
+    @SuppressWarnings("deprecation")
     public void testReleaseVersion() {
         // Applications may rely on the exact release version
         assertTrue("Your Build.VERSION.RELEASE of " + Build.VERSION.RELEASE
@@ -50,7 +48,7 @@ public class BuildVersionTest extends TestCase {
     }
 
     /**
-     * Verifies {@link Build.FINGERPRINT} follows expected format:
+     * Verifies {@link Build#FINGERPRINT} follows expected format:
      * <p/>
      * <code>
      * (BRAND)/(PRODUCT)/(DEVICE):(VERSION.RELEASE)/(BUILD_ID)/
