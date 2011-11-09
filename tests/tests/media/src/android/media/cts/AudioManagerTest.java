@@ -493,6 +493,9 @@ public class AudioManagerTest extends AndroidTestCase {
                           AudioManager.STREAM_VOICE_CALL,
                           AudioManager.STREAM_RING };
 
+        // set ringer mode to back normal to not interfere with volume tests
+        mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
+
         TelephonyManager tm =
             (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
         //FIXME: use TelephonyManager.isVoiceCapable() when public
@@ -528,6 +531,9 @@ public class AudioManagerTest extends AndroidTestCase {
                     FLAG_SHOW_UI | FLAG_ALLOW_RINGER_MODES);
             mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
             assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
+
+            // set ringer mode to back normal to not interfere with volume tests
+            mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
 
             // volume raise
             mAudioManager.setStreamVolume(streams[i], 0, FLAG_SHOW_UI);
