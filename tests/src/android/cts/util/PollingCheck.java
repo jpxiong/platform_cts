@@ -19,7 +19,7 @@ package android.cts.util;
 import junit.framework.Assert;
 
 public abstract class PollingCheck {
-    private static final long TIME_SLICE = 200;
+    private static final long TIME_SLICE = 50;
     private long mTimeout = 3000;
 
     public PollingCheck() {
@@ -32,6 +32,10 @@ public abstract class PollingCheck {
     protected abstract boolean check();
 
     public void run() {
+        if (check()) {
+            return;
+        }
+
         long timeout = mTimeout;
         while (timeout > 0) {
             try {
