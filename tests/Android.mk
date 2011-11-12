@@ -28,7 +28,9 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 LOCAL_JNI_SHARED_LIBRARIES := libcts_jni
 
 # Resource unit tests use a private locale and some densities
-LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c 320dpi -c 240dpi -c 160dpi
+LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c 320dpi -c 240dpi -c 160dpi -c 32dpi \
+        --preferred-configurations 320dpi --preferred-configurations 240dpi \
+        --preferred-configurations 160dpi --preferred-configurations 32dpi
 
 LOCAL_PACKAGE_NAME := CtsTestStubs
 
