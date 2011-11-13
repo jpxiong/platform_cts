@@ -2056,73 +2056,83 @@ public class TextUtilsTest extends AndroidTestCase {
             "1. doesn't explain @param and @return" +
             "2. not clear is it the supposed result when the CharSequence is null.")
     public void testWriteToParcel() {
-        Parcel p = Parcel.obtain();
-
         Parcelable.Creator<CharSequence> creator = TextUtils.CHAR_SEQUENCE_CREATOR;
-
         String string = "String";
-        TextUtils.writeToParcel(string, p, 0);
-        p.setDataPosition(0);
-        assertEquals(string, creator.createFromParcel(p).toString());
-        p.recycle();
+        Parcel p = Parcel.obtain();
+        try {
+            TextUtils.writeToParcel(string, p, 0);
+            p.setDataPosition(0);
+            assertEquals(string, creator.createFromParcel(p).toString());
+        } finally {
+            p.recycle();
+        }
 
         p = Parcel.obtain();
-        TextUtils.writeToParcel(null, p, 0);
-        p.setDataPosition(0);
-        assertNull(creator.createFromParcel(p));
-        p.recycle();
+        try {
+            TextUtils.writeToParcel(null, p, 0);
+            p.setDataPosition(0);
+            assertNull(creator.createFromParcel(p));
+        } finally {
+            p.recycle();
+        }
 
-        p = Parcel.obtain();
         SpannableString spannableString = new SpannableString("Spannable String");
-        URLSpan urlSpan = new URLSpan("URL Span");
         int urlSpanStart = spannableString.length() >> 1;
         int urlSpanEnd = spannableString.length();
-        spannableString.setSpan(urlSpan, urlSpanStart, urlSpanEnd,
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        TextUtils.writeToParcel(spannableString, p, 0);
-        p.setDataPosition(0);
-        SpannableString ret = (SpannableString) creator.createFromParcel(p);
-        assertEquals("Spannable String", ret.toString());
-        Object[] spans = ret.getSpans(0, ret.length(), Object.class);
-        assertEquals(1, spans.length);
-        assertEquals("URL Span", ((URLSpan) spans[0]).getURL());
-        assertEquals(urlSpanStart, ret.getSpanStart(spans[0]));
-        assertEquals(urlSpanEnd, ret.getSpanEnd(spans[0]));
-        assertEquals(Spanned.SPAN_INCLUSIVE_INCLUSIVE, ret.getSpanFlags(spans[0]));
-        p.recycle();
+        p = Parcel.obtain();
+        try {
+            URLSpan urlSpan = new URLSpan("URL Span");
+            spannableString.setSpan(urlSpan, urlSpanStart, urlSpanEnd,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            TextUtils.writeToParcel(spannableString, p, 0);
+            p.setDataPosition(0);
+            SpannableString ret = (SpannableString) creator.createFromParcel(p);
+            assertEquals("Spannable String", ret.toString());
+            Object[] spans = ret.getSpans(0, ret.length(), Object.class);
+            assertEquals(1, spans.length);
+            assertEquals("URL Span", ((URLSpan) spans[0]).getURL());
+            assertEquals(urlSpanStart, ret.getSpanStart(spans[0]));
+            assertEquals(urlSpanEnd, ret.getSpanEnd(spans[0]));
+            assertEquals(Spanned.SPAN_INCLUSIVE_INCLUSIVE, ret.getSpanFlags(spans[0]));
+        } finally {
+            p.recycle();
+        }
 
         p = Parcel.obtain();
-        ColorStateList colors = new ColorStateList(new int[][] {
-                new int[] {android.R.attr.state_focused}, new int[0]},
-                new int[] {Color.rgb(0, 255, 0), Color.BLACK});
-        int textSize = 20;
-        TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(
-                null, Typeface.ITALIC, textSize, colors, null);
-        int textAppearanceSpanStart = 0;
-        int textAppearanceSpanEnd = spannableString.length() >> 1;
-        spannableString.setSpan(textAppearanceSpan, textAppearanceSpanStart,
-                textAppearanceSpanEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        TextUtils.writeToParcel(spannableString, p, -1);
-        p.setDataPosition(0);
-        ret = (SpannableString) creator.createFromParcel(p);
-        assertEquals("Spannable String", ret.toString());
-        spans = ret.getSpans(0, ret.length(), Object.class);
-        assertEquals(2, spans.length);
-        assertEquals("URL Span", ((URLSpan) spans[0]).getURL());
-        assertEquals(urlSpanStart, ret.getSpanStart(spans[0]));
-        assertEquals(urlSpanEnd, ret.getSpanEnd(spans[0]));
-        assertEquals(Spanned.SPAN_INCLUSIVE_INCLUSIVE, ret.getSpanFlags(spans[0]));
-        assertEquals(null, ((TextAppearanceSpan) spans[1]).getFamily());
+        try {
+            ColorStateList colors = new ColorStateList(new int[][] {
+                    new int[] {android.R.attr.state_focused}, new int[0]},
+                    new int[] {Color.rgb(0, 255, 0), Color.BLACK});
+            int textSize = 20;
+            TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan(
+                    null, Typeface.ITALIC, textSize, colors, null);
+            int textAppearanceSpanStart = 0;
+            int textAppearanceSpanEnd = spannableString.length() >> 1;
+            spannableString.setSpan(textAppearanceSpan, textAppearanceSpanStart,
+                    textAppearanceSpanEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            TextUtils.writeToParcel(spannableString, p, -1);
+            p.setDataPosition(0);
+            SpannableString ret = (SpannableString) creator.createFromParcel(p);
+            assertEquals("Spannable String", ret.toString());
+            Object[] spans = ret.getSpans(0, ret.length(), Object.class);
+            assertEquals(2, spans.length);
+            assertEquals("URL Span", ((URLSpan) spans[0]).getURL());
+            assertEquals(urlSpanStart, ret.getSpanStart(spans[0]));
+            assertEquals(urlSpanEnd, ret.getSpanEnd(spans[0]));
+            assertEquals(Spanned.SPAN_INCLUSIVE_INCLUSIVE, ret.getSpanFlags(spans[0]));
+            assertEquals(null, ((TextAppearanceSpan) spans[1]).getFamily());
 
-        assertEquals(Typeface.ITALIC, ((TextAppearanceSpan) spans[1]).getTextStyle());
-        assertEquals(textSize, ((TextAppearanceSpan) spans[1]).getTextSize());
+            assertEquals(Typeface.ITALIC, ((TextAppearanceSpan) spans[1]).getTextStyle());
+            assertEquals(textSize, ((TextAppearanceSpan) spans[1]).getTextSize());
 
-        assertEquals(colors.toString(), ((TextAppearanceSpan) spans[1]).getTextColor().toString());
-        assertEquals(null, ((TextAppearanceSpan) spans[1]).getLinkTextColor());
-        assertEquals(textAppearanceSpanStart, ret.getSpanStart(spans[1]));
-        assertEquals(textAppearanceSpanEnd, ret.getSpanEnd(spans[1]));
-        assertEquals(Spanned.SPAN_INCLUSIVE_EXCLUSIVE, ret.getSpanFlags(spans[1]));
-        p.recycle();
+            assertEquals(colors.toString(), ((TextAppearanceSpan) spans[1]).getTextColor().toString());
+            assertEquals(null, ((TextAppearanceSpan) spans[1]).getLinkTextColor());
+            assertEquals(textAppearanceSpanStart, ret.getSpanStart(spans[1]));
+            assertEquals(textAppearanceSpanEnd, ret.getSpanEnd(spans[1]));
+            assertEquals(Spanned.SPAN_INCLUSIVE_EXCLUSIVE, ret.getSpanFlags(spans[1]));
+        } finally {
+            p.recycle();
+        }
 
         try {
             TextUtils.writeToParcel(spannableString, null, 0);

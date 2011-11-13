@@ -46,11 +46,15 @@ public class ScaleXSpanTest extends TestCase {
         ScaleXSpan scaleXSpan = new ScaleXSpan(1.5f);
 
         Parcel p = Parcel.obtain();
-        scaleXSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new ScaleXSpan(p);
+        try {
+            scaleXSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new ScaleXSpan(p);
 
-        new ScaleXSpan(-2.5f);
+            new ScaleXSpan(-2.5f);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -148,12 +152,15 @@ public class ScaleXSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        float proportion = 3.0f;
-        ScaleXSpan scaleXSpan = new ScaleXSpan(proportion);
-        scaleXSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        ScaleXSpan newSpan = new ScaleXSpan(p);
-        assertEquals(proportion, newSpan.getScaleX());
-        p.recycle();
+        try {
+            float proportion = 3.0f;
+            ScaleXSpan scaleXSpan = new ScaleXSpan(proportion);
+            scaleXSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            ScaleXSpan newSpan = new ScaleXSpan(p);
+            assertEquals(proportion, newSpan.getScaleX());
+        } finally {
+            p.recycle();
+        }
     }
 }

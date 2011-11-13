@@ -46,9 +46,13 @@ public class StrikethroughSpanTest extends TestCase {
         StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
 
         Parcel p = Parcel.obtain();
-        strikethroughSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new StrikethroughSpan(p);
+        try {
+            strikethroughSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new StrikethroughSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -102,10 +106,13 @@ public class StrikethroughSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
-        strikethroughSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new StrikethroughSpan(p);
-        p.recycle();
+        try {
+            StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
+            strikethroughSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new StrikethroughSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 }

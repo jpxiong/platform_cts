@@ -67,10 +67,13 @@ public class BulletSpanTest extends TestCase {
         BulletSpan b = new BulletSpan(BulletSpan.STANDARD_GAP_WIDTH, Color.RED);
 
         final Parcel p = Parcel.obtain();
-        b.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new BulletSpan(p);
-        p.recycle();
+        try {
+            b.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new BulletSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -178,21 +181,30 @@ public class BulletSpanTest extends TestCase {
     )
     @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testWriteToParcel() {
+        int leadingMargin1 = 0;
+        int leadingMargin2 = 0;
+
         Parcel p = Parcel.obtain();
-        BulletSpan bulletSpan = new BulletSpan(BulletSpan.STANDARD_GAP_WIDTH, Color.RED);
-        bulletSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        BulletSpan b = new BulletSpan(p);
-        int leadingMargin1 = b.getLeadingMargin(true);
-        p.recycle();
+        try {
+            BulletSpan bulletSpan = new BulletSpan(BulletSpan.STANDARD_GAP_WIDTH, Color.RED);
+            bulletSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            BulletSpan b = new BulletSpan(p);
+            leadingMargin1 = b.getLeadingMargin(true);
+        } finally {
+            p.recycle();
+        }
 
         p = Parcel.obtain();
-        bulletSpan = new BulletSpan(10, Color.BLACK);
-        bulletSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        b = new BulletSpan(p);
-        int leadingMargin2 = b.getLeadingMargin(true);
-        p.recycle();
+        try {
+            BulletSpan bulletSpan = new BulletSpan(10, Color.BLACK);
+            bulletSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            BulletSpan b = new BulletSpan(p);
+            leadingMargin2 = b.getLeadingMargin(true);
+        } finally {
+            p.recycle();
+        }
 
         assertTrue(leadingMargin2 > leadingMargin1);
         // TODO: Test color. How?
