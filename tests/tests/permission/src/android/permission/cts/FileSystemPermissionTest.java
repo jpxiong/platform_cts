@@ -200,6 +200,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/btips/TI",
                     "/data/btips/TI/opp",
                     "/data/dalvik-cache",
+                    "/data/data",
                     "/data/data/.drm",
                     "/data/data/.drm/.wmdrm",
                     "/data/dontpanic",
