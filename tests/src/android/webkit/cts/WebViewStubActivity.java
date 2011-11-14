@@ -35,4 +35,10 @@ public class WebViewStubActivity extends Activity {
     public WebView getWebView() {
         return mWebView;
     }
+
+    @Override
+    public void onDestroy() {
+        mWebView.destroy();
+        super.onDestroy();
+    }
 }
