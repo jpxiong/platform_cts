@@ -34,6 +34,7 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
     private int mNumNotExecuted = 0;
     private int mNumPassed = 0;
     private String mPlan = "NA";
+    private String mStartTime = "unknown";
 
     /**
      * @param id
@@ -102,6 +103,7 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
             if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
                     CtsXmlResultReporter.RESULT_TAG)) {
                 mPlan = getAttribute(parser, CtsXmlResultReporter.PLAN_ATTR);
+                mStartTime = getAttribute(parser, CtsXmlResultReporter.STARTTIME_ATTR);
             } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
                     TestResults.SUMMARY_TAG)) {
                 mNumFailed = parseIntAttr(parser, TestResults.FAILED_ATTR) +
@@ -113,6 +115,14 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
             eventType = parser.next();
         }
         throw new XmlPullParserException("Could not find Summary tag");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getStartTime() {
+        return mStartTime;
     }
 }
 
