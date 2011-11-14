@@ -67,8 +67,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U8(mRS)).setX(x).create();
         Allocation out = Allocation.createTyped(mRS, t);
         fe_i8.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -82,8 +84,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U8_2(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -97,8 +101,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U8_3(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -112,8 +118,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U8_4(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -125,8 +133,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U16(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i16.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i16.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -140,8 +150,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U16_2(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i16_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i16_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -155,8 +167,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U16_3(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i16_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i16_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -170,8 +184,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U16_4(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i16_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i16_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -183,8 +199,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U32(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i32.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i32.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -198,8 +216,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U32_2(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i32_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i32_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -213,8 +233,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U32_3(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i32_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i32_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -228,8 +250,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U32_4(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i32_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i32_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -241,8 +265,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U64(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i64.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i64.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -256,8 +282,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U64_2(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i64_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i64_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -271,8 +299,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U64_3(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i64_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i64_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -286,8 +316,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.U64_4(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i64_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i64_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -298,8 +330,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f32.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f32.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -313,8 +347,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.F32_2(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_f32_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f32_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -327,8 +363,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f32_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f32_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -341,8 +379,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f32_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f32_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -353,8 +393,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f64.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f64.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -367,8 +409,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f64_2.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f64_2.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -381,8 +425,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f64_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f64_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -395,8 +441,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_f64_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_f64_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -408,8 +456,10 @@ public class ForEachTest extends RSBaseCompute {
         in = new ScriptField_fe_test(mRS, x).getAllocation();
         out = new ScriptField_fe_test(mRS, x).getAllocation();
         fe_struct.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_struct.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -420,8 +470,10 @@ public class ForEachTest extends RSBaseCompute {
         in = Allocation.createTyped(mRS, t);
         out = Allocation.createTyped(mRS, t);
         fe_bool.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_bool.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -432,8 +484,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.A_8(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -444,8 +498,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.RGBA_8888(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8_4.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8_4.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
@@ -456,8 +512,10 @@ public class ForEachTest extends RSBaseCompute {
         t = new Type.Builder(mRS, Element.RGB_888(mRS)).setX(x).create();
         out = Allocation.createTyped(mRS, t);
         fe_i8_3.forEach_root(in, out);
+        mRS.finish();
         try {
             fe_i8_3.forEach_root(in, badOut);
+            mRS.finish();
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
