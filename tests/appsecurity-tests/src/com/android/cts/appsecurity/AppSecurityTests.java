@@ -108,7 +108,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(getTestAppFile(SHARED_UI_APK),
                     false);
-            assertNull("failed to install shared uid app", installResult);
+            assertNull(String.format("failed to install shared uid app, Reason: %s", installResult),
+                    installResult);
             installResult = getDevice().installPackage(getTestAppFile(SHARED_UI_DIFF_CERT_APK),
                     false);
             assertNotNull("shared uid app with different cert than existing app installed " +
@@ -133,7 +134,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(getTestAppFile(SIMPLE_APP_APK),
                     false);
-            assertNull("failed to install simple app", installResult);
+            assertNull(String.format("failed to install simple app. Reason: %s", installResult),
+                    installResult);
             installResult = getDevice().installPackage(getTestAppFile(SIMPLE_APP_DIFF_CERT_APK),
                     true /* reinstall */);
             assertNotNull("app upgrade with different cert than existing app installed " +
@@ -157,14 +159,16 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
                     false);
-            assertNull("failed to install app with data", installResult);
+            assertNull(String.format("failed to install app with data. Reason: %s", installResult),
+                    installResult);
             // run appwithdata's tests to create private data
             assertTrue("failed to create app's private data", runDeviceTests(APP_WITH_DATA_PKG,
                     APP_WITH_DATA_CLASS, APP_WITH_DATA_CREATE_METHOD));
 
             installResult = getDevice().installPackage(getTestAppFile(APP_ACCESS_DATA_APK),
                     false);
-            assertNull("failed to install app access data", installResult);
+            assertNull(String.format("failed to install app access data. Reason: %s",
+                    installResult), installResult);
             // run appaccessdata's tests which attempt to access appwithdata's private data
             assertTrue("could access app's private data", runDeviceTests(APP_ACCESS_DATA_PKG));
         }
@@ -185,7 +189,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
                     false);
-            assertNull("failed to install app with data", installResult);
+            assertNull(String.format("failed to install app with data. Reason: %s", installResult),
+                    installResult);
             // run appwithdata's tests to create private data
             assertTrue("failed to create app's private data", runDeviceTests(APP_WITH_DATA_PKG,
                     APP_WITH_DATA_CLASS, APP_WITH_DATA_CREATE_METHOD));
@@ -194,7 +199,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             installResult = getDevice().installPackage(getTestAppFile(APP_WITH_DATA_APK),
                     false);
-            assertNull("failed to install app with data second time", installResult);
+            assertNull(String.format("failed to install app with data second time. Reason: %s",
+                    installResult), installResult);
             // run appwithdata's 'check if file exists' test
             assertTrue("app's private data still exists after install", runDeviceTests(
                     APP_WITH_DATA_PKG, APP_WITH_DATA_CLASS, APP_WITH_DATA_CHECK_NOEXIST_METHOD));
@@ -217,12 +223,15 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(
                     getTestAppFile(TARGET_INSTRUMENT_APK), false);
-            assertNull("failed to install target instrumentation app", installResult);
+            assertNull(String.format("failed to install target instrumentation app. Reason: %s",
+                    installResult), installResult);
 
             // the app will install, but will get error at runtime when starting instrumentation
             installResult = getDevice().installPackage(getTestAppFile(INSTRUMENT_DIFF_CERT_APK),
                     false);
-            assertNull("failed to install instrumentation app with diff cert", installResult);
+            assertNull(String.format(
+                    "failed to install instrumentation app with diff cert. Reason: %s",
+                    installResult), installResult);
             // run INSTRUMENT_DIFF_CERT_PKG tests
             // this test will attempt to call startInstrumentation directly and verify
             // SecurityException is thrown
@@ -248,12 +257,14 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
             String installResult = getDevice().installPackage(
                     getTestAppFile(DECLARE_PERMISSION_APK), false);
-            assertNull("failed to install declare permission app", installResult);
+            assertNull(String.format("failed to install declare permission app. Reason: %s",
+                    installResult), installResult);
 
             // the app will install, but will get error at runtime
             installResult = getDevice().installPackage(getTestAppFile(PERMISSION_DIFF_CERT_APK),
                     false);
-            assertNull("failed to install permission app with diff cert", installResult);
+            assertNull(String.format("failed to install permission app with diff cert. Reason: %s",
+                    installResult), installResult);
             // run PERMISSION_DIFF_CERT_PKG tests which try to access the permission
             assertTrue("unexpected result when running permission tests",
                     runDeviceTests(PERMISSION_DIFF_CERT_PKG));
