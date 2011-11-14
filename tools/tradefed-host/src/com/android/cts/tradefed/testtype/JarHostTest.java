@@ -55,12 +55,14 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
     private long mTimeoutMs = 10 * 60 * 1000;
     private String mRunName;
     private CtsBuildHelper mCtsBuild = null;
+    private IBuildInfo mBuildInfo = null;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void setBuild(IBuildInfo buildInfo) {
+        mBuildInfo = buildInfo;
         mCtsBuild = CtsBuildHelper.createBuildHelper(buildInfo);
     }
 
@@ -194,6 +196,9 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
             com.android.hosttest.DeviceTest deviceTest = (com.android.hosttest.DeviceTest)junitTest;
             deviceTest.setDevice(getDevice().getIDevice());
             deviceTest.setTestAppPath(mCtsBuild.getTestCasesDir().getAbsolutePath());
+        }
+        if (junitTest instanceof IBuildReceiver) {
+            ((IBuildReceiver)junitTest).setBuild(mBuildInfo);
         }
         TestRunnable testRunnable = new TestRunnable(junitTest, junitResult);
 
