@@ -948,6 +948,15 @@
 
         <activity android:name="android.opengl.cts.EglConfigStubActivity"/>
 
+        <activity android:name="android.opengl.cts.CompressedTextureStubActivity"
+            android:label="CompressedTextureStubActivity"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.preference.cts.PreferenceStubActivity">
             <meta-data android:name="android.preference" 
                     android:resource="@xml/preferences_from_intent" />
@@ -970,6 +979,7 @@
         <activity android:name="android.renderscript.cts.RenderscriptGLStubActivity"
                   android:label="RenderscriptGLStub"/>
     </application>
+
 
     <!--Test for PackageManager, please put this at the very beginning-->
     <instrumentation android:name="android.content.pm.cts.TestPmInstrumentation"
