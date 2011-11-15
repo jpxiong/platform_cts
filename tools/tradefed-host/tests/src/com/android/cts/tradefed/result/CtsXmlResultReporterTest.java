@@ -131,7 +131,7 @@ public class CtsXmlResultReporterTest extends TestCase {
     public void testSingleFail() {
         Map<String, String> emptyMap = Collections.emptyMap();
         final TestIdentifier testId = new TestIdentifier("FooTest", "testFoo");
-        final String trace = "this is a trace\nmore trace";
+        final String trace = "this is a trace\nmore trace\nyet more trace";
         mResultReporter.invocationStarted(mMockBuild);
         mResultReporter.testRunStarted("run", 1);
         mResultReporter.testStarted(testId);
@@ -145,7 +145,8 @@ public class CtsXmlResultReporterTest extends TestCase {
         assertTrue(output.contains(
                 "<Summary failed=\"1\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />"));
         final String failureTag =
-                "<FailedScene message=\"this is a trace\">     <StackTrace>this is a tracemore trace";
+            "<FailedScene message=\"this is a trace&#10;more trace\">     " +
+            "<StackTrace>this is a tracemore traceyet more trace</StackTrace>";
         assertTrue(output.contains(failureTag));
     }
 

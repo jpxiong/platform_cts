@@ -149,12 +149,22 @@ class Test extends AbstractXmlPullParser {
         }
     }
 
-    private static String getFailureMessageFromStackTrace(String stack) {
-        // This is probably too simplistic to work in all cases, but for now, just return first
-        // line of stack as failure message
-        int firstNewLine = stack.indexOf('\n');
-        if (firstNewLine != -1) {
-            return stack.substring(0, firstNewLine);
+    /**
+     * Gets the failure message to show from the stack trace.
+     * <p/>
+     * Exposed for unit testing
+     *
+     * @param stack the full stack trace
+     * @return the failure message
+     */
+    static String getFailureMessageFromStackTrace(String stack) {
+        // return the first two lines of stack as failure message
+        int endPoint = stack.indexOf('\n');
+        if (endPoint != -1) {
+            int nextLine = stack.indexOf('\n', endPoint + 1);
+            if (nextLine != -1) {
+                return stack.substring(0, nextLine);
+            }
         }
         return stack;
     }
