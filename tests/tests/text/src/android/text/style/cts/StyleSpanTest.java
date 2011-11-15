@@ -47,11 +47,15 @@ public class StyleSpanTest extends TestCase {
         StyleSpan styleSpan = new StyleSpan(2);
 
         Parcel p = Parcel.obtain();
-        styleSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new StyleSpan(p);
-
-        new StyleSpan(-2);
+        try {
+            styleSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            StyleSpan fromParcel = new StyleSpan(p);
+            assertEquals(2, fromParcel.getStyle());
+            new StyleSpan(-2);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -151,11 +155,14 @@ public class StyleSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
-        styleSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        StyleSpan newSpan = new StyleSpan(p);
-        assertEquals(Typeface.BOLD, newSpan.getStyle());
-        p.recycle();
+        try {
+            StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
+            styleSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            StyleSpan newSpan = new StyleSpan(p);
+            assertEquals(Typeface.BOLD, newSpan.getStyle());
+        } finally {
+            p.recycle();
+        }
     }
 }

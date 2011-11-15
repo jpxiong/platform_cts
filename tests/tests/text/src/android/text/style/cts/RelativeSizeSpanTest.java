@@ -46,11 +46,15 @@ public class RelativeSizeSpanTest extends TestCase {
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(1.0f);
 
         Parcel p = Parcel.obtain();
-        relativeSizeSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new RelativeSizeSpan(p);
+        try {
+            relativeSizeSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new RelativeSizeSpan(p);
 
-        new RelativeSizeSpan(-1.0f);
+            new RelativeSizeSpan(-1.0f);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -153,12 +157,15 @@ public class RelativeSizeSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        float proportion = 3.0f;
-        RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(proportion);
-        relativeSizeSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        RelativeSizeSpan newSpan = new RelativeSizeSpan(p);
-        assertEquals(proportion, newSpan.getSizeChange());
-        p.recycle();
+        try {
+            float proportion = 3.0f;
+            RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(proportion);
+            relativeSizeSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            RelativeSizeSpan newSpan = new RelativeSizeSpan(p);
+            assertEquals(proportion, newSpan.getSizeChange());
+        } finally {
+            p.recycle();
+        }
     }
 }

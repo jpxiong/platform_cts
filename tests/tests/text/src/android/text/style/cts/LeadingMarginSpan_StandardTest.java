@@ -59,10 +59,13 @@ public class LeadingMarginSpan_StandardTest extends TestCase {
 
         Standard standard = new Standard(10, 20);
         final Parcel p = Parcel.obtain();
-        standard.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new Standard(p);
-        p.recycle();
+        try {
+            standard.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new Standard(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -133,20 +136,27 @@ public class LeadingMarginSpan_StandardTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        Standard s = new Standard(10, 20);
-        s.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        Standard standard = new Standard(p);
-        assertEquals(10, standard.getLeadingMargin(true));
-        assertEquals(20, standard.getLeadingMargin(false));
-        p.recycle();
+        try {
+            Standard s = new Standard(10, 20);
+            s.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            Standard standard = new Standard(p);
+            assertEquals(10, standard.getLeadingMargin(true));
+            assertEquals(20, standard.getLeadingMargin(false));
+        } finally {
+            p.recycle();
+        }
 
-        s = new Standard(3);
-        s.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        standard = new Standard(p);
-        assertEquals(3, standard.getLeadingMargin(true));
-        assertEquals(3, standard.getLeadingMargin(false));
-        p.recycle();
+        p = Parcel.obtain();
+        try {
+            Standard s = new Standard(3);
+            s.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            Standard standard = new Standard(p);
+            assertEquals(3, standard.getLeadingMargin(true));
+            assertEquals(3, standard.getLeadingMargin(false));
+        } finally {
+            p.recycle();
+        }
     }
 }

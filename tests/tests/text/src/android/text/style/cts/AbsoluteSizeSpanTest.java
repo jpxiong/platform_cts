@@ -51,10 +51,13 @@ public class AbsoluteSizeSpanTest extends TestCase {
 
         AbsoluteSizeSpan asp = new AbsoluteSizeSpan(10);
         final Parcel p = Parcel.obtain();
-        asp.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new AbsoluteSizeSpan(p);
-        p.recycle();
+        try {
+            asp.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new AbsoluteSizeSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -161,19 +164,25 @@ public class AbsoluteSizeSpanTest extends TestCase {
     @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        AbsoluteSizeSpan asp = new AbsoluteSizeSpan(2);
-        asp.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        AbsoluteSizeSpan absoluteSizeSpan = new AbsoluteSizeSpan(p);
-        assertEquals(2, absoluteSizeSpan.getSize());
-        p.recycle();
+        try {
+            AbsoluteSizeSpan asp = new AbsoluteSizeSpan(2);
+            asp.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            AbsoluteSizeSpan absoluteSizeSpan = new AbsoluteSizeSpan(p);
+            assertEquals(2, absoluteSizeSpan.getSize());
+        } finally {
+            p.recycle();
+        }
 
         p = Parcel.obtain();
-        asp = new AbsoluteSizeSpan(-5);
-        asp.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        absoluteSizeSpan = new AbsoluteSizeSpan(p);
-        assertEquals(-5, absoluteSizeSpan.getSize());
-        p.recycle();
+        try {
+            AbsoluteSizeSpan asp = new AbsoluteSizeSpan(-5);
+            asp.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            AbsoluteSizeSpan absoluteSizeSpan = new AbsoluteSizeSpan(p);
+            assertEquals(-5, absoluteSizeSpan.getSize());
+        } finally {
+            p.recycle();
+        }
     }
 }
