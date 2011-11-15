@@ -46,9 +46,13 @@ public class SuperscriptSpanTest extends TestCase {
         SuperscriptSpan superscriptSpan = new SuperscriptSpan();
 
         Parcel p = Parcel.obtain();
-        superscriptSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new SuperscriptSpan(p);
+        try {
+            superscriptSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new SuperscriptSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -130,10 +134,13 @@ public class SuperscriptSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        SuperscriptSpan superscriptSpan = new SuperscriptSpan();
-        superscriptSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new SuperscriptSpan(p);
-        p.recycle();
+        try {
+            SuperscriptSpan superscriptSpan = new SuperscriptSpan();
+            superscriptSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new SuperscriptSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 }

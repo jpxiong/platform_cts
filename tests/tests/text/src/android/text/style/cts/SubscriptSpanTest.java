@@ -46,9 +46,13 @@ public class SubscriptSpanTest extends TestCase {
         SubscriptSpan subscriptSpan = new SubscriptSpan();
 
         Parcel p = Parcel.obtain();
-        subscriptSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new SubscriptSpan(p);
+        try {
+            subscriptSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new SubscriptSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -130,10 +134,13 @@ public class SubscriptSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        SubscriptSpan subscriptSpan = new SubscriptSpan();
-        subscriptSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new SubscriptSpan(p);
-        p.recycle();
+        try {
+            SubscriptSpan subscriptSpan = new SubscriptSpan();
+            subscriptSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new SubscriptSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 }

@@ -52,10 +52,13 @@ public class TypefaceSpanTest extends TestCase {
         TypefaceSpan t = new TypefaceSpan(FAMILY);
 
         final Parcel p = Parcel.obtain();
-        t.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new TypefaceSpan(p);
-        p.recycle();
+        try {
+            t.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new TypefaceSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -158,11 +161,14 @@ public class TypefaceSpanTest extends TestCase {
     @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        TypefaceSpan typefaceSpan = new TypefaceSpan(FAMILY);
-        typefaceSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        TypefaceSpan t = new TypefaceSpan(p);
-        assertEquals(FAMILY, t.getFamily());
-        p.recycle();
+        try {
+            TypefaceSpan typefaceSpan = new TypefaceSpan(FAMILY);
+            typefaceSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            TypefaceSpan t = new TypefaceSpan(p);
+            assertEquals(FAMILY, t.getFamily());
+        } finally {
+            p.recycle();
+        }
     }
 }

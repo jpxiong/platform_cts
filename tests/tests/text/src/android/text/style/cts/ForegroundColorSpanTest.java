@@ -50,10 +50,13 @@ public class ForegroundColorSpanTest extends TestCase {
         ForegroundColorSpan f = new ForegroundColorSpan(Color.GREEN);
 
         final Parcel p = Parcel.obtain();
-        f.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new ForegroundColorSpan(p);
-        p.recycle();
+        try {
+            f.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new ForegroundColorSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -132,19 +135,25 @@ public class ForegroundColorSpanTest extends TestCase {
     @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
-        foregroundColorSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        ForegroundColorSpan f = new ForegroundColorSpan(p);
-        assertEquals(Color.RED, f.getForegroundColor());
-        p.recycle();
+        try {
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
+            foregroundColorSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            ForegroundColorSpan f = new ForegroundColorSpan(p);
+            assertEquals(Color.RED, f.getForegroundColor());
+        } finally {
+            p.recycle();
+        }
 
         p = Parcel.obtain();
-        foregroundColorSpan = new ForegroundColorSpan(Color.MAGENTA);
-        foregroundColorSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        f = new ForegroundColorSpan(p);
-        assertEquals(Color.MAGENTA, f.getForegroundColor());
-        p.recycle();
+        try {
+            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.MAGENTA);
+            foregroundColorSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            ForegroundColorSpan f = new ForegroundColorSpan(p);
+            assertEquals(Color.MAGENTA, f.getForegroundColor());
+        } finally {
+            p.recycle();
+        }
     }
 }
