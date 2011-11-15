@@ -28,10 +28,13 @@ import com.android.tradefed.config.ArgsOptionParser;
 import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.util.FileUtil;
 import com.android.tradefed.util.RegexTrie;
+import com.android.tradefed.util.TableFormatter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -198,13 +201,19 @@ public class CtsConsole extends Console {
     }
 
     private void listResults(CtsBuildHelper ctsBuild) {
-        printLine("Session\t\tPass\tFail\tNot Executed\tStart time\t\tPlan name");
+        TableFormatter tableFormatter = new TableFormatter();
+        List<List<String>> table = new ArrayList<List<String>>();
+        table.add(Arrays.asList("Session","Pass", "Fail","Not Executed","Start time","Plan name"));
         ITestResultRepo testResultRepo = new TestResultRepo(ctsBuild.getResultsDir());
         for (ITestSummary result : testResultRepo.getSummaries()) {
-            printLine(String.format("%d\t\t%d\t%d\t%d\t\t%s\t%s", result.getId(),
-                    result.getNumPassed(), result.getNumFailed(),
-                    result.getNumIncomplete(), result.getTimestamp(), result.getTestPlan()));
+            table.add(Arrays.asList(Integer.toString(result.getId()),
+                    Integer.toString(result.getNumPassed()),
+                    Integer.toString(result.getNumFailed()),
+                    Integer.toString(result.getNumIncomplete()),
+                    result.getTimestamp(),
+                    result.getTestPlan()));
         }
+        tableFormatter.displayTable(table, new PrintWriter(System.out, true));
     }
 
     private void addDerivedPlan(CtsBuildHelper ctsBuild, String[] flatArgs) {
