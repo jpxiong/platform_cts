@@ -119,6 +119,13 @@ public class CtsBuildHelper {
     }
 
     /**
+     * @return a {@link File} representing the directory to store result logs.
+     */
+    public File getLogsDir() {
+        return new File(getRepositoryDir(), "logs");
+    }
+
+    /**
      * @return a {@link File} representing the test cases directory
      */
     public File getTestCasesDir() {
