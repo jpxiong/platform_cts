@@ -49,8 +49,11 @@ public class UnderlineSpanTest extends TestCase {
         new UnderlineSpan();
 
         final Parcel p = Parcel.obtain();
-        new UnderlineSpan(p);
-        p.recycle();
+        try {
+            new UnderlineSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -109,9 +112,12 @@ public class UnderlineSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        UnderlineSpan underlineSpan = new UnderlineSpan();
-        underlineSpan.writeToParcel(p, 0);
-        new UnderlineSpan(p);
-        p.recycle();
+        try {
+            UnderlineSpan underlineSpan = new UnderlineSpan();
+            underlineSpan.writeToParcel(p, 0);
+            new UnderlineSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 }

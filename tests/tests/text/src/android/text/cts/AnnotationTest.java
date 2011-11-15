@@ -107,13 +107,17 @@ public class AnnotationTest extends AndroidTestCase {
     })
     public void testWriteToParcel() {
         Parcel dest = Parcel.obtain();
-        mAnnotation = new Annotation(KEY1, VALUE1);
-        mAnnotation.writeToParcel(dest, NOFLAG);
-        dest.setDataPosition(0);
-        Annotation out = new Annotation(dest);
-        assertEquals(out.getKey(), mAnnotation.getKey());
-        assertEquals(out.getValue(), mAnnotation.getValue());
+        try {
+            mAnnotation = new Annotation(KEY1, VALUE1);
+            mAnnotation.writeToParcel(dest, NOFLAG);
+            dest.setDataPosition(0);
+            Annotation out = new Annotation(dest);
+            assertEquals(out.getKey(), mAnnotation.getKey());
+            assertEquals(out.getValue(), mAnnotation.getValue());
 
-        assertEquals(0, out.describeContents());
+            assertEquals(0, out.describeContents());
+        } finally {
+            dest.recycle();
+        }
     }
 }

@@ -67,10 +67,13 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
         URLSpan urlSpan = new URLSpan(TEST_URL);
 
         final Parcel p = Parcel.obtain();
-        urlSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new URLSpan(p);
-        p.recycle();
+        try {
+            urlSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new URLSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -163,11 +166,14 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        URLSpan urlSpan = new URLSpan(TEST_URL);
-        urlSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        URLSpan u = new URLSpan(p);
-        assertEquals(TEST_URL, u.getURL());
-        p.recycle();
+        try {
+            URLSpan urlSpan = new URLSpan(TEST_URL);
+            urlSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            URLSpan u = new URLSpan(p);
+            assertEquals(TEST_URL, u.getURL());
+        } finally {
+            p.recycle();
+        }
     }
 }

@@ -67,10 +67,13 @@ public class TextAppearanceSpanTest extends AndroidTestCase {
 
         TextAppearanceSpan textAppearanceSpan = new TextAppearanceSpan("sans", 1, 6, csl, csl);
         Parcel p = Parcel.obtain();
-        textAppearanceSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new TextAppearanceSpan(p);
-
+        try {
+            textAppearanceSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new TextAppearanceSpan(p);
+        } finally {
+            p.recycle();
+        }
         try {
             new TextAppearanceSpan(null, -1);
             fail("should throw NullPointerException.");

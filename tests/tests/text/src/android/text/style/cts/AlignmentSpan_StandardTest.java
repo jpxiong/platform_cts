@@ -53,10 +53,13 @@ public class AlignmentSpan_StandardTest extends TestCase {
 
         Standard standard = new Standard(Alignment.ALIGN_NORMAL);
         final Parcel p = Parcel.obtain();
-        standard.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new Standard(p);
-        p.recycle();
+        try {
+            standard.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new Standard(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -110,25 +113,36 @@ public class AlignmentSpan_StandardTest extends TestCase {
     @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        Standard s = new Standard(Alignment.ALIGN_NORMAL);
-        s.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        Standard standard = new Standard(p);
-        assertEquals(Alignment.ALIGN_NORMAL, standard.getAlignment());
-        p.recycle();
+        try {
+            Standard s = new Standard(Alignment.ALIGN_NORMAL);
+            s.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            Standard standard = new Standard(p);
+            assertEquals(Alignment.ALIGN_NORMAL, standard.getAlignment());
+        } finally {
+            p.recycle();
+        }
 
-        s = new Standard(Alignment.ALIGN_OPPOSITE);
-        s.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        standard = new Standard(p);
-        assertEquals(Alignment.ALIGN_OPPOSITE, standard.getAlignment());
-        p.recycle();
+        p = Parcel.obtain();
+        try {
+            Standard s = new Standard(Alignment.ALIGN_OPPOSITE);
+            s.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            Standard standard = new Standard(p);
+            assertEquals(Alignment.ALIGN_OPPOSITE, standard.getAlignment());
+        } finally {
+            p.recycle();
+        }
 
-        s = new Standard(Alignment.ALIGN_CENTER);
-        s.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        standard = new Standard(p);
-        assertEquals(Alignment.ALIGN_CENTER, standard.getAlignment());
-        p.recycle();
+        p = Parcel.obtain();
+        try {
+            Standard s = new Standard(Alignment.ALIGN_CENTER);
+            s.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            Standard standard = new Standard(p);
+            assertEquals(Alignment.ALIGN_CENTER, standard.getAlignment());
+        } finally {
+            p.recycle();
+        }
     }
 }

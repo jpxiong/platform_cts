@@ -58,10 +58,13 @@ public class QuoteSpanTest extends TestCase {
         QuoteSpan q = new QuoteSpan(Color.RED);
 
         final Parcel p = Parcel.obtain();
-        q.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        new QuoteSpan(p);
-        p.recycle();
+        try {
+            q.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            new QuoteSpan(p);
+        } finally {
+            p.recycle();
+        }
     }
 
     @TestTargetNew(
@@ -152,19 +155,24 @@ public class QuoteSpanTest extends TestCase {
     )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
-        QuoteSpan quoteSpan = new QuoteSpan(Color.RED);
-        quoteSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        QuoteSpan q = new QuoteSpan(p);
-        assertEquals(Color.RED, q.getColor());
-        p.recycle();
-
+        try {
+            QuoteSpan quoteSpan = new QuoteSpan(Color.RED);
+            quoteSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            QuoteSpan q = new QuoteSpan(p);
+            assertEquals(Color.RED, q.getColor());
+        } finally {
+            p.recycle();
+        }
         p = Parcel.obtain();
-        quoteSpan = new QuoteSpan(Color.MAGENTA);
-        quoteSpan.writeToParcel(p, 0);
-        p.setDataPosition(0);
-        q = new QuoteSpan(p);
-        assertEquals(Color.MAGENTA, q.getColor());
-        p.recycle();
+        try {
+            QuoteSpan quoteSpan = new QuoteSpan(Color.MAGENTA);
+            quoteSpan.writeToParcel(p, 0);
+            p.setDataPosition(0);
+            QuoteSpan q = new QuoteSpan(p);
+            assertEquals(Color.MAGENTA, q.getColor());
+        } finally {
+            p.recycle();
+        }
     }
 }
