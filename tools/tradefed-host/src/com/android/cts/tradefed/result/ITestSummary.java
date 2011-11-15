@@ -26,7 +26,7 @@ public interface ITestSummary {
     int getId();
 
     /**
-     * @return the starting timestamp
+     * @return the starting timestamp, also known as result directory name
      */
     String getTimestamp();
 
@@ -49,5 +49,12 @@ public interface ITestSummary {
      * @return the test plan associated with result
      */
     String getTestPlan();
+
+    /**
+     * Return the user-friendly displayed start time stored in result XML.
+     * <p/>
+     * Expected format: {@link TimeUtil#getTimestamp()}
+     */
+    String getStartTime();
 
 }
