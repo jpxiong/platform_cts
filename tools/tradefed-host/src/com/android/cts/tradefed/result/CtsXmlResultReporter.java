@@ -53,7 +53,6 @@ import java.util.Map;
  * Outputs xml in format governed by the cts_result.xsd
  */
 public class CtsXmlResultReporter implements ITestInvocationListener {
-
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
@@ -66,6 +65,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
 
     static final String RESULT_TAG = "TestResult";
     static final String PLAN_ATTR = "testPlan";
+    static final String STARTTIME_ATTR = "starttime";
 
     private static final String REPORT_DIR_NAME = "output-file-path";
     @Option(name=REPORT_DIR_NAME, description="root file system path to directory to store xml " +
@@ -90,6 +90,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private TestResults mResults = new TestResults();
     private TestPackageResult mCurrentPkgResult = null;
     private boolean mIsDeviceInfoRun = false;
+
+    private File mLogDir;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -117,7 +119,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
                         mContinueSessionId));
             }
             mPlanName = resultRepo.getSummaries().get(mContinueSessionId).getTestPlan();
-            mStartTime = resultRepo.getSummaries().get(mContinueSessionId).getTimestamp();
+            mStartTime = resultRepo.getSummaries().get(mContinueSessionId).getStartTime();
             mReportDir = resultRepo.getReportDir(mContinueSessionId);
         } else {
             if (mReportDir == null) {
@@ -130,6 +132,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             mStartTime = getTimestamp();
             logResult("Created result dir %s", mReportDir.getName());
         }
+        // TODO: allow customization of log dir
+        // create a unique directory for saving logs, with same name as result dir
+        File rootLogDir = getBuildHelper(ctsBuild).getLogsDir();
+        mLogDir = new File(rootLogDir, mReportDir.getName());
+        mLogDir.mkdirs();
     }
 
     /**
@@ -166,7 +173,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      * Exposed for unit testing.
      */
     ILogFileSaver getLogFileSaver() {
-        return new LogFileSaver(mReportDir);
+        return new LogFileSaver(mLogDir);
     }
 
     /**
@@ -309,7 +316,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             throws IOException {
         serializer.startTag(ns, RESULT_TAG);
         serializer.attribute(ns, PLAN_ATTR, mPlanName);
-        serializer.attribute(ns, "starttime", startTime);
+        serializer.attribute(ns, STARTTIME_ATTR, startTime);
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
 

@@ -146,7 +146,7 @@ public class CtsConsole extends Console {
         helpBuilder.append("  run cts --package/-p : run a CTS test package\n");
         helpBuilder.append("  run cts --class/-c [--method/-m] : run a specific test class and/or");
         helpBuilder.append("method\n");
-        helpBuilder.append("  run cts --continue-session-id session_ID: run all not executed ");
+        helpBuilder.append("  run cts --continue-session session_ID: run all not executed ");
         helpBuilder.append("tests from a previous CTS session\n");
         helpBuilder.append("  run cts [options] --serial/s device_ID: run CTS on specified ");
         helpBuilder.append("device\n");
