@@ -16,24 +16,23 @@
 
 package android.widget.cts;
 
-import org.xmlpull.v1.XmlPullParser;
-
 import com.android.cts.stub.R;
 
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
+
+import org.xmlpull.v1.XmlPullParser;
+
 import android.app.Activity;
-import android.content.Context;
 import android.test.ActivityInstrumentationTestCase;
-import android.test.UiThreadTest;
 import android.util.AttributeSet;
 import android.util.Xml;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ViewFlipper}.
@@ -114,36 +113,63 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
             args = {}
         )
     })
-    @UiThreadTest
-    public void testViewFlipper() {
-        ViewFlipper viewFlipper = (ViewFlipper) mActivity.findViewById(R.id.viewflipper_test);
-
+    public void testViewFlipper() throws Throwable {
+        // NOTE: This value needs to be kept in sync with the value set in
+        // layout/viewflipper_layout.xml
         final int FLIP_INTERVAL = 1000;
-        TextView iv1 = (TextView) mActivity.findViewById(R.id.viewflipper_textview1);
-        TextView iv2 = (TextView) mActivity.findViewById(R.id.viewflipper_textview2);
 
-        assertFalse(viewFlipper.isFlipping());
-        assertSame(iv1, viewFlipper.getCurrentView());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                ViewFlipper viewFlipper =
+                        (ViewFlipper) mActivity.findViewById(R.id.viewflipper_test);
 
-        viewFlipper.startFlipping();
-        assertTrue(viewFlipper.isFlipping());
-        assertSame(iv1, viewFlipper.getCurrentView());
-        assertEquals(View.VISIBLE, iv1.getVisibility());
-        assertEquals(View.GONE, iv2.getVisibility());
+                TextView iv1 = (TextView) mActivity.findViewById(R.id.viewflipper_textview1);
+                TextView iv2 = (TextView) mActivity.findViewById(R.id.viewflipper_textview2);
+
+                assertFalse(viewFlipper.isFlipping());
+                assertSame(iv1, viewFlipper.getCurrentView());
+
+                viewFlipper.startFlipping();
+                assertTrue(viewFlipper.isFlipping());
+                assertSame(iv1, viewFlipper.getCurrentView());
+                assertEquals(View.VISIBLE, iv1.getVisibility());
+                assertEquals(View.GONE, iv2.getVisibility());
+            }
+        });
 
         // wait for a longer time to make sure the view flipping is completed.
         waitForViewFlipping(FLIP_INTERVAL + 200);
-        assertSame(iv2, viewFlipper.getCurrentView());
-        assertEquals(View.GONE, iv1.getVisibility());
-        assertEquals(View.VISIBLE, iv2.getVisibility());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                ViewFlipper viewFlipper =
+                        (ViewFlipper) mActivity.findViewById(R.id.viewflipper_test);
+
+                TextView iv1 = (TextView) mActivity.findViewById(R.id.viewflipper_textview1);
+                TextView iv2 = (TextView) mActivity.findViewById(R.id.viewflipper_textview2);
+
+                assertSame(iv2, viewFlipper.getCurrentView());
+                assertEquals(View.GONE, iv1.getVisibility());
+                assertEquals(View.VISIBLE, iv2.getVisibility());
+            }
+        });
 
         waitForViewFlipping(FLIP_INTERVAL + 200);
-        assertSame(iv1, viewFlipper.getCurrentView());
-        assertEquals(View.VISIBLE, iv1.getVisibility());
-        assertEquals(View.GONE, iv2.getVisibility());
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                ViewFlipper viewFlipper =
+                        (ViewFlipper) mActivity.findViewById(R.id.viewflipper_test);
 
-        viewFlipper.stopFlipping();
-        assertFalse(viewFlipper.isFlipping());
+                TextView iv1 = (TextView) mActivity.findViewById(R.id.viewflipper_textview1);
+                TextView iv2 = (TextView) mActivity.findViewById(R.id.viewflipper_textview2);
+
+                assertSame(iv1, viewFlipper.getCurrentView());
+                assertEquals(View.VISIBLE, iv1.getVisibility());
+                assertEquals(View.GONE, iv2.getVisibility());
+
+                viewFlipper.stopFlipping();
+                assertFalse(viewFlipper.isFlipping());
+            }
+        });
     }
 
     private void waitForViewFlipping(int timeout) {
