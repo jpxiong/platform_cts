@@ -25,9 +25,9 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.util.Log;
 
-import javax.microedition.khronos.opengles.GL10;
-
+import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 /**
  * Test that the screen refresh rate claimed by
@@ -70,67 +70,60 @@ public class DisplayRefreshRateTest extends
     }
 
     private class Renderer implements GLSurfaceView.Renderer {
-        private static final int HISTORY_SIZE = 32;
-        private static final long MAX_TEST_NS = 5000000000L; // 5 seconds
+        // Measurement knobs.
+        // NB: Some devices need a surprisingly long warmup period before the
+        // framerate becomes stable.
+        private static final float WARMUP_SECONDS = 2.0f;
+        private static final float TEST_SECONDS   = 8.0f;
 
-        // Keep trying until the standard deviation of frametimes is within 15%
-        // of the mean frametime. The goal is to establish confidence that the
-        // mean is accurate, not to achieve a highly stable framerate, so a
-        // relatively large standard deviation is okay. This value determined
-        // experimentally; adjust as needed.
-        private static final float MAX_STDDEV_DIV_MEAN = 0.15f;
+        // Test states
+        private static final int STATE_START  = 0;
+        private static final int STATE_WARMUP = 1;
+        private static final int STATE_TEST   = 2;
+        private static final int STATE_DONE   = 3;
 
         private FpsResult mResult;
-        private long mStartNs;
-        private long mPrevNs;
-        private int mNumFrames = 0;
-        private float[] mFrameTimes;
-        private boolean mDone = false;
+        private int       mState     = STATE_START;
+        private float     mStartTime = 0.0f;
+        private int       mNumFrames = 0;
 
         public Renderer(FpsResult result) {
             mResult = result;
-            mStartNs = mPrevNs = System.nanoTime();
-            mFrameTimes = new float[HISTORY_SIZE];
         }
 
         public void onDrawFrame(GL10 gl) {
-            long timeNs = System.nanoTime();
-            if (timeNs - mStartNs >= MAX_TEST_NS) {
-                mResult.notifyResult(0.0f);
-                return;
-            }
-            float dt = (float)(timeNs - mPrevNs) * 1.0e-9f;
-            mFrameTimes[mNumFrames % HISTORY_SIZE] = dt;
-            mPrevNs = timeNs;
+            float t = (float)System.nanoTime() * 1.0e-9f;
+            switch (mState) {
+                case STATE_START:
+                    mStartTime = t;
+                    mState = STATE_WARMUP;
+                    break;
 
-            if (mNumFrames >= HISTORY_SIZE && !mDone) {
-                float mean = 0.0f;
-                for (int i = 0; i < HISTORY_SIZE; i++) {
-                    mean += mFrameTimes[i];
-                }
-                mean /= (float)HISTORY_SIZE;
+                case STATE_WARMUP:
+                    if ((t - mStartTime) >= WARMUP_SECONDS) {
+                        mStartTime = t;
+                        mNumFrames = 0;
+                        mState = STATE_TEST;
+                    }
+                    break;
 
-                float sumSqDiff = 0.0f;
-                for (int i = 0; i < HISTORY_SIZE; i++) {
-                    float d = mFrameTimes[i] - mean;
-                    sumSqDiff += d*d;
-                }
-                float stddev = (float)Math.sqrt(sumSqDiff / (float)HISTORY_SIZE);
+                case STATE_TEST:
+                    mNumFrames++;
+                    float elapsed = t - mStartTime;
+                    if (elapsed >= TEST_SECONDS) {
+                        mResult.notifyResult((float)mNumFrames / elapsed);
+                        mState = STATE_DONE;
+                    }
+                    break;
 
-                if ((stddev / mean) <= MAX_STDDEV_DIV_MEAN) {
-                    Log.d(TAG, "mean:" + mean +
-                               " stddev:" + stddev +
-                               " div:" + (stddev / mean));
-                    mResult.notifyResult(1.0f / mean);
-                    mDone = true;
-                }
+                case STATE_DONE:
+                    break;
             }
 
-            // prevent drivers from optimizing the frame away
-            gl.glClearColor(10*dt, 0.0f, 0.0f, 1.0f);
+            // prevent unwanted optimizations or hidden costs (e.g. reading
+            // previous frame on tilers).
+            gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             gl.glClear(gl.GL_COLOR_BUFFER_BIT);
-
-            mNumFrames++;
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
