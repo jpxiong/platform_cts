@@ -46,7 +46,7 @@ public class ListeningPortsTest extends TestCase {
         EXCEPTION_PATTERNS.add("[0-9A-F]{6}7F:[0-9A-F]{4}"); // IPv4 Loopback
 
         // IPv6 exceptions
-        EXCEPTION_PATTERNS.add("[0]{31}1:[0-9A-F]{4}"); // IPv6 Loopback
+        EXCEPTION_PATTERNS.add("[0]{25}1[0]{6}:[0-9A-F]{4}"); // IPv6 Loopback
         EXCEPTION_PATTERNS.add("[0]{16}[0]{4}[0]{4}[0-9A-F]{6}7F:[0-9A-F]{4}"); // IPv4-6 Conversion
         EXCEPTION_PATTERNS.add("[0]{16}[F]{4}[0]{4}[0-9A-F]{6}7F:[0-9A-F]{4}"); // IPv4-6 Conversion
     }

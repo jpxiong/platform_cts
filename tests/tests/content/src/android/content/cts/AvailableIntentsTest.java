@@ -187,21 +187,6 @@ public class AvailableIntentsTest extends AndroidTestCase {
         assertCanBeHandled(intent);
     }
 
-    /**
-     * Test launch inbox view of Mms application
-     */
-    public void testViewMessageInbox() {
-        PackageManager packageManager = mContext.getPackageManager();
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setType("vnd.android.cursor.dir/mms");
-            assertCanBeHandled(intent);
-
-            intent.setType("vnd.android-dir/mms-sms");
-            assertCanBeHandled(intent);
-        }
-    }
-
     public void testAlarmClock() {
         Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
         intent.putExtra(AlarmClock.EXTRA_MESSAGE, "Custom message");

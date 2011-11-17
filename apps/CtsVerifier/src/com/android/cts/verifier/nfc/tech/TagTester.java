@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
- * Copyright (C) 2007 The Android Open Source Project
+/*
+ * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- -->
+ */
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cts.performance2">
+package com.android.cts.verifier.nfc.tech;
 
-    <application>
-        <uses-library android:name="android.test.runner" />
-    </application>
+import android.nfc.Tag;
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.android.music"
-                     android:label="CTS tests of android.performance"/>
-</manifest>
+/** Tag tester that writes data to the tag and returns a way to confirm a successful write. */
+public interface TagTester {
+
+    /** @return true if the tag is testable by this {@link TagTester} */
+    boolean isTestableTag(Tag tag);
+
+    /** Writes some data to the tag and returns a {@link TagVerifier} to confirm it. */
+    TagVerifier writeTag(Tag tag) throws Exception;
+}
