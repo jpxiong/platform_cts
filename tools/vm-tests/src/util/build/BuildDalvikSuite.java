@@ -794,7 +794,7 @@ public class BuildDalvikSuite {
 	    scanner.close();
 	}
 	if (scanner2 != null) {
-	    scanner.close();
+	    scanner2.close();
 	}
         return md;
     }
