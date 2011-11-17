@@ -754,7 +754,8 @@
         </activity>
 
         <activity android:name="android.view.cts.GestureDetectorStubActivity"
-            android:label="GestureDetectorStubActivity"/>
+            android:label="GestureDetectorStubActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
 
         <!--Test for PackageManager-->
         <activity android:name="android.content.pm.cts.TestPmActivity"

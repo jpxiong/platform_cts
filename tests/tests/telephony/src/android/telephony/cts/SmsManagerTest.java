@@ -27,12 +27,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
-import android.telephony.SmsMessage;
-import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +46,6 @@ import java.util.List;
 @TestTargetClass(SmsManager.class)
 public class SmsManagerTest extends AndroidTestCase {
 
-    private static final int NUM_TEXT_PARTS = 3;
     private static final String LONG_TEXT =
         "This is a very long text. This text should be broken into three " +
         "separate messages.This is a very long text. This text should be broken into " +
@@ -96,8 +95,10 @@ public class SmsManagerTest extends AndroidTestCase {
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
-                    "30237",     // Fido
-                    "45008"     // KT
+                    "30237",    // Fido
+                    "45008",    // KT
+                    "45005",    // SKT Mobility
+                    "45002"     // SKT Mobility
             );
 
     // List of network operators that doesn't support Maltipart SMS message
@@ -155,9 +156,21 @@ public class SmsManagerTest extends AndroidTestCase {
     public void testDivideMessage() {
         ArrayList<String> dividedMessages = divideMessage(LONG_TEXT);
         assertNotNull(dividedMessages);
-        assertEquals(NUM_TEXT_PARTS, dividedMessages.size());
-        assertEquals(LONG_TEXT,
-                dividedMessages.get(0) + dividedMessages.get(1) + dividedMessages.get(2));
+        int numParts;
+        if (TelephonyUtils.isSkt(mTelephonyManager)) {
+            numParts = 5;
+        } else if (TelephonyUtils.isKt(mTelephonyManager)) {
+            numParts = 4;
+        } else {
+            numParts = 3;
+        }
+        assertEquals(numParts, dividedMessages.size());
+
+        String actualMessage = "";
+        for (int i = 0; i < numParts; i++) {
+            actualMessage += dividedMessages.get(i);
+        }
+        assertEquals(LONG_TEXT, actualMessage);
     }
 
     @TestTargets({
