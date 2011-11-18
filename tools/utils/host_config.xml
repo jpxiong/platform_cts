@@ -34,7 +34,7 @@
     <!-- Max time [ms] from start of package in batch mode and the first test status update. -->
     <IntValue name="batchStartTimeoutMs" value="1800000" />
     <!-- Max time [ms] from start of test in individual mode to the first test status update. -->
-    <IntValue name="individualStartTimeoutMs" value="300000" />
+    <IntValue name="individualStartTimeoutMs" value="600000" />
     <!-- Timeout [ms] for the signature check. -->
     <IntValue name="signatureTestTimeoutMs" value="600000" />
     <!-- Timeout [ms] for package installations. -->
