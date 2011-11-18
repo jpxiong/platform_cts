@@ -187,7 +187,10 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 featuresLeft.isEmpty());
     }
 
-    /** Get a list of feature constants in PackageManager matching a prefix. */
+    /**
+     * Get a list of feature constants in PackageManager matching a prefix using
+     * reflection to get the full list.
+     */
     private static Set<String> getFeatureConstantsNames(String prefix)
             throws IllegalArgumentException, IllegalAccessException {
         Set<String> features = new HashSet<String>();
