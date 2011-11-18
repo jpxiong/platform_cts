@@ -298,7 +298,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         }
 
         public boolean waitForConnection() throws InterruptedException {
-            return mReceiveLatch.await(10, TimeUnit.SECONDS);
+            return mReceiveLatch.await(30, TimeUnit.SECONDS);
         }
     }
 }

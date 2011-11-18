@@ -46,6 +46,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsLocationTestCases \
 	CtsMediaTestCases \
 	CtsNdefTestCases \
+	CtsNetTestCases \
 	CtsOsTestCases \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
@@ -61,13 +62,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
-	CtsWidgetTestCases \
-	CtsNetTestCases \
-	CtsPerformanceTestCases \
-	CtsPerformance2TestCases \
-	CtsPerformance3TestCases \
-	CtsPerformance4TestCases \
-	CtsPerformance5TestCases
+	CtsWidgetTestCases
 
 CTS_TEST_CASE_LIST := \
 	TestDeviceSetup \
