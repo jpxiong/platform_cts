@@ -17,7 +17,6 @@
 package android.dpi.cts;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -65,32 +64,5 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(metrics.density,
                 (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT,
                 0.5f / DisplayMetrics.DENSITY_DEFAULT);
-
-        Configuration mConfig = mContext.getResources().getConfiguration();
-        int screenLayout = mConfig.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-        int screenLayoutLong = mConfig.screenLayout & Configuration.SCREENLAYOUT_LONG_MASK;
-
-        int longSize = (int) (max / metrics.density);
-        int shortSize = (int) (min / metrics.density);
-
-        // Logic copied from WindowManagerService...
-        if (longSize < 470) {
-            assertEquals(Configuration.SCREENLAYOUT_SIZE_SMALL, screenLayout);
-            assertEquals(Configuration.SCREENLAYOUT_LONG_NO, screenLayoutLong);
-        } else {
-            if (longSize >= 960 && shortSize >= 720) {
-                assertEquals(Configuration.SCREENLAYOUT_SIZE_XLARGE, screenLayout);
-            } else if (longSize >= 640 && shortSize >= 480) {
-                assertEquals(Configuration.SCREENLAYOUT_SIZE_LARGE, screenLayout);
-            } else {
-                assertEquals(Configuration.SCREENLAYOUT_SIZE_NORMAL, screenLayout);
-            }
-
-            if (((longSize * 3) / 5) >= (shortSize - 1)) {
-                assertEquals(Configuration.SCREENLAYOUT_LONG_YES, screenLayoutLong);
-            } else {
-                assertEquals(Configuration.SCREENLAYOUT_LONG_NO, screenLayoutLong);
-            }
-        }
     }
 }
