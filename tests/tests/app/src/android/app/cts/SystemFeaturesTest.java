@@ -64,7 +64,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         Instrumentation instrumentation = getInstrumentation();
-        mContext = instrumentation.getContext();
+        mContext = instrumentation.getTargetContext();
         mPackageManager = mContext.getPackageManager();
         mAvailableFeatures = new HashSet<String>();
         if (mPackageManager.getSystemAvailableFeatures() != null) {
