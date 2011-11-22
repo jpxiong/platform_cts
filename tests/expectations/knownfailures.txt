@@ -75,6 +75,7 @@
 },
 {
   names: [
+    "libcore.java.net.ConcurrentCloseTest#test_read",
     "libcore.java.util.logging.OldFormatterTest",
     "libcore.java.util.prefs.OldPreferencesTest#testAddNodeChangeListener",
     "libcore.net.http.HttpResponseCacheTest#testClientPrematureDisconnectWithChunkedEncoding"
