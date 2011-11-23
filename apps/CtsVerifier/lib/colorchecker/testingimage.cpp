@@ -21,6 +21,7 @@
 #include <string.h>
 #include <cmath>
 #include <vector>
+#include <assert.h>
 #include "vec3.h"
 
 #include "testingimage.h"
@@ -99,6 +100,9 @@ TestingImage::~TestingImage() {
 }
 
 int TestingImage::getPixelValue(int row, int column, int channel) const {
+    assert ((row >= 0) && (row < mHeight));
+    assert ((column >= 0) && (column < mWidth));
+    assert ((channel >= 0) && (channel < mChannels));
     return (int)mImage[row * mRowSpan + column * mChannels + channel];
 }
 

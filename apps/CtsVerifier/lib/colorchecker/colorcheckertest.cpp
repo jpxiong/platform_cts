@@ -26,6 +26,7 @@
 #include "colorcheckertest.h"
 
 const float GAMMA_CORRECTION = 2.2f;
+const float COLOR_ERROR_THRESHOLD = 200.f;
 ColorCheckerTest::~ColorCheckerTest() {
     ALOGV("Deleting color checker test handler");
 
@@ -447,8 +448,31 @@ void ColorCheckerTest::findCheckerBoards(
         std::vector<std::vector<int> > verticalLines,
         std::vector<std::vector<int> > horizontalLines) {
     ALOGV("Start looking for Color checker");
-    int numVerticalLines = verticalLines.size();
-    int numHorizontalLines = horizontalLines.size();
+
+    int numHorizontalLines = mCandidateColors.size();
+    int numVerticalLines;
+    if (numHorizontalLines > 0) {
+        numVerticalLines = mCandidateColors[0].size();
+        for (int i = 0; i < numHorizontalLines; ++i) {
+            for (int j = 0; j < numVerticalLines; ++j) {
+                if (mCandidateColors[i][j] != NULL) {
+                    delete mCandidateColors[i][j];
+                }
+                if (mCandidatePositions[i][j] != NULL) {
+                    delete mCandidatePositions[i][j];
+                }
+            }
+            mCandidateColors[i].clear();
+            mCandidatePositions[i].clear();
+        }
+    }
+    mCandidateColors.clear();
+    mCandidatePositions.clear();
+
+    ALOGV("Candidates deleted!");
+
+    numVerticalLines = verticalLines.size();
+    numHorizontalLines = horizontalLines.size();
     Vec2f pointUpperLeft;
     Vec2f pointBottomRight;
 
@@ -470,6 +494,8 @@ void ColorCheckerTest::findCheckerBoards(
                                 pointCenter, color)) {
                 mCandidatePositions[j].push_back(pointCenter);
                 mCandidateColors[j].push_back(color);
+                ALOGV("Color at (%d, %d) is (%d, %d, %d)", j, i,color->r(), color->g(), color->b());
+
             } else {
                 mCandidatePositions[j].push_back(NULL);
                 mCandidateColors[j].push_back(NULL);
@@ -479,6 +505,7 @@ void ColorCheckerTest::findCheckerBoards(
         }
     }
 
+    ALOGV("Candidates Number (%d, %d)", mCandidateColors.size(), mCandidateColors[0].size());
     // Verifies whether the current line candidates form a valid color checker.
     verifyColorGrid();
 }
@@ -781,8 +808,10 @@ void ColorCheckerTest::findBestMatch(int i1, int i2, int j1, int j2) {
         // Finds the match start point where the error is minimized.
         for (int i = 0; i < numHorizontalGrid; ++i) {
             for (int j = 0; j < numVerticalGrid; ++j) {
-                error += mCandidateColors[i1 + i][j1 + j]->squareDistance<int>(
-                        *mReferenceColors[i][j]);
+                if (mCandidateColors[i1 + i][j1 + j] != NULL) {
+                    error += mCandidateColors[i1 + i][j1 + j]->squareDistance<int>(
+                            *mReferenceColors[i][j]);
+                }
             }
         }
         ALOGV("Error is %f", error);
@@ -796,9 +825,11 @@ void ColorCheckerTest::findBestMatch(int i1, int i2, int j1, int j2) {
 
                 for (int id = 0; id < numHorizontalGrid; ++id) {
                     for (int jd = 0; jd < numVerticalGrid; ++jd) {
-                        error += mCandidateColors[i1 + id][j1 + jd]->
-                                squareDistance<int>(
-                                        *mReferenceColors[i + id][j + jd]);
+                        if (mCandidateColors[i1 + id][j1 + jd] != NULL) {
+                            error += mCandidateColors[i1 + id][j1 + jd]->
+                                    squareDistance<int>(
+                                            *mReferenceColors[i + id][j + jd]);
+                        }
                     }
                 }
 
@@ -813,9 +844,11 @@ void ColorCheckerTest::findBestMatch(int i1, int i2, int j1, int j2) {
 
         for (int id = 0; id < numHorizontalGrid; ++id) {
             for (int jd = 0; jd < numVerticalGrid; ++jd) {
-                mMatchPositions[horizontalMatch + id][verticalMatch + jd] =
-                         new Vec2f(mCandidatePositions[i1 + id][j1 + jd]->x(),
-                                   mCandidatePositions[i1 + id][j1 + jd]->y());
+                if (mCandidatePositions[i1 + id][j1 + jd] != NULL) {
+                    mMatchPositions[horizontalMatch + id][verticalMatch + jd] =
+                            new Vec2f(mCandidatePositions[i1 + id][j1 + jd]->x(),
+                                      mCandidatePositions[i1 + id][j1 + jd]->y());
+                }
             }
         }
         ALOGV("Grid match starts at %d, %d", horizontalMatch, verticalMatch);
@@ -898,19 +931,22 @@ void ColorCheckerTest::fillRefColorGrid() {
                          jj <= static_cast<int>(mMatchPositions[i][j]->y() +
                                                 columnDistance/2);
                          ++jj) {
-                        Vec3i pixelColor = mImage->getPixelValue(ii,jj);
-                        float error = color.squareDistance<int>(pixelColor);
+                        if ((ii >= 0) && (ii < mImage->getHeight()) &&
+                            (jj >= 0) && (jj < mImage->getWidth())) {
+                            Vec3i pixelColor = mImage->getPixelValue(ii,jj);
+                            float error = color.squareDistance<int>(pixelColor);
 
-                        if (error < 200.f) {
-                            drawPoint(ii, jj, *mReferenceColors[i][j]);
-                            meanColor = meanColor + pixelColor;
-                            numPixels++;
-                            Vec2i pixelPosition(ii, jj);
+                            if (error < COLOR_ERROR_THRESHOLD) {
+                                drawPoint(ii, jj, *mReferenceColors[i][j]);
+                                meanColor = meanColor + pixelColor;
+                                numPixels++;
+                                Vec2i pixelPosition(ii, jj);
 
-                            if (pixelPosition.squareDistance<float>(
-                                    *mMatchPositions[i][j]) > radius) {
-                                radius = pixelPosition.squareDistance<float>(
-                                        *mMatchPositions[i][j]);
+                                if (pixelPosition.squareDistance<float>(
+                                        *mMatchPositions[i][j]) > radius) {
+                                    radius = pixelPosition.squareDistance<float>(
+                                            *mMatchPositions[i][j]);
+                                }
                             }
                         }
                     }
