@@ -24,9 +24,9 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := com_android_cts_verifier_camera_analyzer_CameraTests.cpp \
                 com_android_cts_verifier_camera_analyzer_ColorCheckerTest.cpp \
+                com_android_cts_verifier_camera_analyzer_AutoLockTest.cpp \
                 #com_android_cts_verifier_camera_analyzer_ExposureCompensationTest.cpp \
                 com_android_cts_verifier_camera_analyzer_WhiteBalanceTest.cpp \
-                com_android_cts_verifier_camera_analyzer_AutoLockTest.cpp \
                 com_android_cts_verifier_camera_analyzer_MeteringTest.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../include/colorchecker $(JNI_H_INCLUDE)

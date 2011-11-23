@@ -211,7 +211,7 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         //WhiteBalanceTest.getSingletonTest().updateCamera();
         //ExposureCompensationTest.getSingletonTest().updateCamera();
         //MeteringTest.getSingletonTest().updateCamera();
-        //AutoLockTest.getSingletonTest().updateCamera();
+        AutoLockTest.getSingletonTest().updateCamera();
     }
 
     public Camera getCameraInstance() {
@@ -379,15 +379,15 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
 
             // Loads the memory address of the checker centers and radius
             // from the this class and set the two values for the new test.
-            //AutoLockTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
+            AutoLockTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
 
             // Construct all base case test scenearios for the Auto Lock test.
             // Detailed documentation on each test can be found in native code.
-            /*AutoLockTest autoLockTest = AutoLockTest.getSingletonTest();
+            AutoLockTest autoLockTest = AutoLockTest.getSingletonTest();
             autoLockTest.setActivity(CameraAnalyzerActivity.this);
 
             mCurrentTest = autoLockTest;
-            initializeAdapter();*/
+            initializeAdapter();
 
         }
     };
