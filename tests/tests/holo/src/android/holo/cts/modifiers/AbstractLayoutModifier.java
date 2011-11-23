@@ -17,29 +17,13 @@
 package android.holo.cts.modifiers;
 
 import android.holo.cts.LayoutModifier;
-import android.view.View;
-import android.widget.CalendarView;
-
-import java.util.TimeZone;
 
 /**
- * {@LayoutModifier} to set a precise date on a {@link CalendarView}.
+ * {@link LayoutModifier} that does nothing in {@link #prepare()}.
  */
-public class CalendarViewModifier implements LayoutModifier {
-    /**
-     * Long representation of a date that is 30 years in milliseconds from
-     * Unix epoch (January 1, 1970 00:00:00).
-     */
-    private static final long DATE = 946707779241L;
+abstract class AbstractLayoutModifier implements LayoutModifier {
 
     @Override
     public void prepare() {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+00:00"));
-    }
-
-    @Override
-    public View modifyView(View view) {
-        ((CalendarView) view).setDate(DATE);
-        return view;
     }
 }

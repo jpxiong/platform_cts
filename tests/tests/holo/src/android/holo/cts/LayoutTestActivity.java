@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.TimeZone;
 
 /**
  * {@link Activity} that applies a theme, inflates a layout, and then either
@@ -73,6 +74,10 @@ public class LayoutTestActivity extends Activity {
 
         setTheme(themeInfo.getTheme());
         setContentView(R.layout.holo_test);
+
+        if (layoutInfo.hasModifier()) {
+            layoutInfo.getModifier().prepare();
+        }
 
         // Inflate the view in our special view group that is fixed at a certain size
         // and layout the inflated view with the fixed measurements...

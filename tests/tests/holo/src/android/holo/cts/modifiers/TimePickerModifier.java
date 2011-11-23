@@ -16,11 +16,10 @@
 
 package android.holo.cts.modifiers;
 
-import android.holo.cts.LayoutModifier;
 import android.view.View;
 import android.widget.TimePicker;
 
-public class TimePickerModifier implements LayoutModifier {
+public class TimePickerModifier extends AbstractLayoutModifier {
 
     @Override
     public View modifyView(View view) {
