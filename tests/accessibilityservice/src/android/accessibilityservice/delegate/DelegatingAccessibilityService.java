@@ -25,6 +25,9 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import java.util.List;
 
 /**
  * This class is an accessibility service mock to which the system is bound and
@@ -127,9 +130,36 @@ public class DelegatingAccessibilityService extends AccessibilityService {
         private class AccessibilityServiceDelegateConnection extends
                 IAccessibilityServiceDelegateConnection.Stub {
 
+            @Override
             public void setAccessibilityServiceDelegate(IBinder binder) {
                 sServiceDelegate.setDelegateInterface(IAccessibilityServiceDelegate.Stub
                         .asInterface(binder));
+            }
+
+            @Override
+            public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(
+                    AccessibilityNodeInfo root, String text) {
+                return root.findAccessibilityNodeInfosByText(text);
+            }
+
+            @Override
+            public AccessibilityNodeInfo getChild(AccessibilityNodeInfo parent, int index) {
+                return parent.getChild(index);
+            }
+
+            @Override
+            public AccessibilityNodeInfo getParent(AccessibilityNodeInfo child) {
+                return child.getParent();
+            }
+
+            @Override
+            public AccessibilityNodeInfo getSource(AccessibilityEvent event) {
+                return event.getSource();
+            }
+
+            @Override
+            public boolean performAccessibilityAction(AccessibilityNodeInfo target, int action) {
+                return target.performAction(action);
             }
         }
     }
