@@ -101,7 +101,7 @@
     <string name="da_screen_lock_test">Screen Lock Test</string>
     <string name="da_screen_lock_info">This test checks that the DevicePolicyManager\'s lockNow
         method immediately locks the screen. It should lock the screen immediately despite any
-        settings that may specify a timeout.\n\nClick the \"Force Lock\" button to lock the screen. 
+        settings that may specify a timeout.\n\nClick the \"Force Lock\" button to lock the screen.
         Your screen should be locked and require the password to be entered.
     </string>
     <string name="da_force_lock">Force Lock</string>
@@ -372,8 +372,14 @@
 
     <!-- Strings for Camera Analyzer -->
     <string name="camera_analyzer">Camera Analyzer</string>
-    <string name="ca_run_label">Find color checker</string>
-    <string name="ca_result_label">Patch values will be here</string>
+    <string name="ca_find_checkerboard_label">Find color checker</string>
+    <string name="ca_exposure_test_label">Exposure Comp. Test</string>
+    <string name="ca_result_label">Results will be here</string>
+    <string name="ca_wb_test_label">White Balance Test</string>
+    <string name="ca_lock_test_label">Auto Exposure Lock Test</string>
+    <string name="ca_metering_label">Metering Area Test</string>
+    <string name="ca_focus_modes_label">Focus Modes Test</string>
+    <string name="ca_info">This test checks the image quality of the camera of this device. It requires a MacBeth 4x6 color checker. With an ADK board and a lamp connected to it on the Relay 1 port, all tests can be run automatically. Without the ADK board, all the tests except the Auto Exposure Lock Test can be run automatically and the Auto Exposure Lock Test will require users to turn on/off a lamp according to the instruction given. </string>
 
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>

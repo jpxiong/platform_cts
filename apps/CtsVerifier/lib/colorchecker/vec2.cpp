@@ -13,25 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_NDEBUG 0
 
-#ifndef JNI_CAMERAANALYZER_COLORCHECKER_H
-#define JNI_CAMERAANALYZER_COLORCHECKER_H
+#define LOG_TAG "Vec2"
+#include <utils/Log.h>
+#include <utils/Timers.h>
 
-#include <jni.h>
-#include <stdio.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-JNIEXPORT jboolean JNICALL
-Java_com_android_cts_verifier_camera_analyzer_ColorChecker_findNative(
-    JNIEnv *env,
-    jobject thiz,
-    jobject inputBitmap);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* JNI_CAMERAANALYZER_COLORCHECKER_H */
+#include "vec2.h"

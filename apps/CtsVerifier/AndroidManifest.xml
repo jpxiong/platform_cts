@@ -5,9 +5,9 @@
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-  
+
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,17 +28,25 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.camera.front"
+                  android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus"
+                  android:required="false" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.usb.accessory" />
+    <uses-sdk android:minSdkVersion="10" />
+
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <application android:label="@string/app_name" 
+    <application android:label="@string/app_name"
             android:icon="@drawable/icon"
-            android:backupAgent="VerifierBackupAgent" 
+            android:backupAgent="VerifierBackupAgent"
             android:debuggable="true">
-            
+
+        <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIbK6ldcOzoeRtQ1u1dFVJ1A7KetRhit-a1Xa82Q" />
 
@@ -64,13 +72,9 @@
                     android:resource="@xml/accessory_filter" />
         </activity>
 
-        <activity android:name=".ReportViewerActivity"
-                android:configChanges="keyboardHidden|orientation"
-                android:label="@string/report_viewer" />
-
-        <provider android:name=".TestResultsProvider" 
+        <provider android:name=".TestResultsProvider"
                 android:authorities="com.android.cts.verifier.testresultsprovider" />
-                
+
         <activity android:name=".admin.PolicySerializationTestActivity"
                 android:label="@string/da_policy_serialization_test"
                 android:configChanges="keyboardHidden|orientation">
@@ -117,7 +121,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_networking" />
             <meta-data android:name="test_required_features" android:value="android.hardware.bluetooth" />
         </activity>
-        
+
         <activity android:name=".bluetooth.BluetoothToggleActivity"
                 android:label="@string/bt_toggle_bluetooth"
                 android:configChanges="keyboardHidden|orientation">
@@ -139,7 +143,7 @@
             <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
-        
+
         <activity android:name=".bluetooth.InsecureServerActivity"
                 android:label="@string/bt_insecure_server"
                 android:configChanges="keyboardHidden|orientation">
@@ -161,7 +165,7 @@
             <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
-        
+
         <activity android:name=".bluetooth.InsecureClientActivity"
                 android:label="@string/bt_insecure_client"
                 android:configChanges="keyboardHidden|orientation">
@@ -183,7 +187,7 @@
             <meta-data android:name="test_category" android:value="@string/bt_device_communication" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
         </activity>
-        
+
         <activity android:name=".bluetooth.ConnectionAccessClientActivity"
                 android:label="@string/bt_connection_access_client"
                 android:configChanges="keyboardHidden|orientation">
@@ -199,7 +203,7 @@
                 android:label="@string/bt_device_picker"
                 android:configChanges="keyboardHidden|orientation" />
 
-        <activity android:name=".suid.SuidFilesActivity" 
+        <activity android:name=".suid.SuidFilesActivity"
                 android:label="@string/suid_files"
                 android:configChanges="keyboardHidden|orientation">
             <intent-filter>
@@ -294,12 +298,19 @@
         <service android:name=".audioquality.ExperimentService" />
 
         <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
-                android:label="@string/camera_analyzer">
+                 android:label="@string/camera_analyzer"
+                 android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                android:resource="@xml/accessory_filter_adk" />
         </activity>
 
         <activity android:name=".usb.UsbAccessoryTestActivity"
@@ -315,4 +326,4 @@
 
    </application>
 
-</manifest> 
+</manifest>
