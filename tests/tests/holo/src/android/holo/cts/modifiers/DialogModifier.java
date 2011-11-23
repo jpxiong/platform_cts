@@ -25,7 +25,7 @@ import android.view.ViewGroup;
  * Wacky {@link LayoutModifier} that takes a {@link Dialog} and transplants into the
  * parent view group.
  */
-public class DialogModifier implements LayoutModifier {
+public class DialogModifier extends AbstractLayoutModifier {
 
     private DialogBuilder mBuilder;
 

@@ -18,11 +18,10 @@ package android.holo.cts.modifiers;
 
 import com.android.cts.holo.R;
 
-import android.holo.cts.LayoutModifier;
 import android.view.View;
 import android.widget.TabHost;
 
-public class TabHostModifier implements LayoutModifier {
+public class TabHostModifier extends AbstractLayoutModifier {
 
     @Override
     public View modifyView(View view) {

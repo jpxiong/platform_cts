@@ -23,7 +23,7 @@ import android.widget.DatePicker;
 /**
  * {@link LayoutModifier} that sets a precise date on a {@link DatePicker}.
  */
-public class DatePickerModifier implements LayoutModifier {
+public class DatePickerModifier extends AbstractLayoutModifier {
 
     @Override
     public View modifyView(View view) {
