@@ -208,7 +208,7 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         CameraTests.setCamera(mCamera);
 
         ColorCheckerTest.getSingletonTest().updateCamera();
-        //WhiteBalanceTest.getSingletonTest().updateCamera();
+        WhiteBalanceTest.getSingletonTest().updateCamera();
         ExposureCompensationTest.getSingletonTest().updateCamera();
         MeteringTest.getSingletonTest().updateCamera();
         AutoLockTest.getSingletonTest().updateCamera();
@@ -340,14 +340,14 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         public void onClick(View v) {
             Log.v(TAG, "Running new white balance tests!");
 
-            /*WhiteBalanceTest whiteBalanceTest = WhiteBalanceTest.getSingletonTest();
+            WhiteBalanceTest whiteBalanceTest = WhiteBalanceTest.getSingletonTest();
 
             mCurrentTest = whiteBalanceTest;
-            initializeAdapter();*/
+            initializeAdapter();
 
             // Loads the memory address of the checker centers and radius
             // from the this class and set the two values for the new test.
-            //WhiteBalanceTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
+            WhiteBalanceTest.setCheckerAddress(mCheckerCenterAddress, mCheckerRadiusAddress);
         }
     };
 
