@@ -68,9 +68,10 @@ void Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_crea
                                         checkerCenter, checkerRadius);
     testHandler->addDataToList((float) exposureValue, checkerValue);
     delete inputImage;
+    delete checkerValue;
 }
 
-void Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_processExposureCompensationTest(
+jstring Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_processExposureCompensationTest(
         JNIEnv*      env,
         jobject      thiz,
         jlong        inputHandlerAddress) {
@@ -80,4 +81,8 @@ void Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_proc
             (ExposureCompensationTest*) handlerAddress;
 
     testHandler->processData();
+
+    const char* nativeDebugText = testHandler->getDebugText();
+    ALOGV("%s", nativeDebugText);
+    return env->NewStringUTF(nativeDebugText);
 }

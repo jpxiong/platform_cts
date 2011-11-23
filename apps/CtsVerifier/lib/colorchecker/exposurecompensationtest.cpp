@@ -31,13 +31,28 @@ void ExposureCompensationTest::processData() {
     ALOGV("Start Processing Exposure Compensation Test Data!");
     clearDebugImage();
 
+    if (mDebugText != NULL) {
+        delete mDebugText;
+        mDebugText = NULL;
+    }
+
     int numTests = mExposureValues.size();
     int numPatches = mCheckerColors[0].size();
     ALOGV("Processing %d tests with %d patches", numTests, numPatches);
 
+    mDebugText = new char[320 * numTests];
+    mDebugText[0] = 0;
+    char* debugText = new char[50];
+
+    Vec3i red(255, 0, 0);
+    Vec3i green(0, 255, 0);
+    Vec3i blue(0, 0, 255);
+
     float minExposure = -3.0f;
     float scale = 9.0f;
     for (int i = 0; i < numTests; ++i) {
+        snprintf(debugText, 50, "Exposure is %f \n", mExposureValues[i]);
+        strcat(mDebugText, debugText);
         for (int j = 0; j < numPatches; ++j) {
             int exposureRed = static_cast<int>((
                 log(static_cast<float>(mReferenceColors[j].r()))
@@ -52,18 +67,13 @@ void ExposureCompensationTest::processData() {
                 / log(2.0f) * GAMMA_CORRECTION +
                 mExposureValues[i] - minExposure) * scale);
 
-            ALOGV("Match color at (%d, %d) is (%f, %f, %f)", i, j,
-                 mCheckerColors[i][j].r(),
-                 mCheckerColors[i][j].g(),
-                 mCheckerColors[i][j].b());
-            ALOGV("Response curve red (%d, %f), blue (%d, %f), green (%d, %f)",
-                 exposureRed, mCheckerColors[i][j].r(),
-                 exposureGreen, mCheckerColors[i][j].g(),
-                 exposureBlue, mCheckerColors[i][j].b());
+            snprintf(debugText, 50, "%d %f %d %f %d %f \n",
+                    exposureRed, mCheckerColors[i][j].r(),
+                    exposureGreen, mCheckerColors[i][j].g(),
+                    exposureBlue, mCheckerColors[i][j].b());
 
-            Vec3i red(255, 0, 0);
-            Vec3i green(0, 255, 0);
-            Vec3i blue(0, 0, 255);
+            ALOGV("%s", debugText);
+            strcat(mDebugText, debugText);
 
             drawPoint(200 - exposureRed, mCheckerColors[i][j].r(), red);
             drawPoint(200 - exposureGreen, mCheckerColors[i][j].g(), green);
