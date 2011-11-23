@@ -19,11 +19,10 @@ package android.holo.cts.modifiers;
 import com.android.cts.holo.R;
 
 import android.content.Context;
-import android.holo.cts.LayoutModifier;
 import android.view.View;
 import android.widget.SearchView;
 
-public class SearchViewModifier implements LayoutModifier {
+public class SearchViewModifier extends AbstractLayoutModifier {
 
     public static final int QUERY_HINT = 0;
     public static final int QUERY = 1;

@@ -16,10 +16,9 @@
 
 package android.holo.cts.modifiers;
 
-import android.holo.cts.LayoutModifier;
 import android.view.View;
 
-public class ViewPressedModifier implements LayoutModifier {
+public class ViewPressedModifier extends AbstractLayoutModifier {
 
     @Override
     public View modifyView(View view) {
