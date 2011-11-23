@@ -23,6 +23,9 @@ import android.view.View;
  */
 public interface LayoutModifier {
 
+    /** Actions to take before inflating the view. */
+    void prepare();
+
     /**
      * @param view inflated by the test activity
      * @return the same view or another view that will be snapshotted by the test
