@@ -33,7 +33,7 @@ import java.util.UUID;
 public class BasicAdapterTest extends AndroidTestCase {
     private static final int DISABLE_TIMEOUT = 5000;  // ms timeout for BT disable
     private static final int ENABLE_TIMEOUT = 10000;  // ms timeout for BT enable
-    private static final int POLL_TIME = 100;         // ms to poll BT state
+    private static final int POLL_TIME = 400;         // ms to poll BT state
 
     private boolean mHasBluetooth;
 
