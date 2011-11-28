@@ -65,7 +65,7 @@ public class OrientationListenerTest extends AndroidTestCase {
             level = TestLevel.COMPLETE,
             notes = "Test {@link OrientationListener#enable()}. "
                     + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is no way "
+                    + "The registration of the listener can not be tested because there is no way "
                     + "to simulate sensor events on the emulator",
             method = "enable",
             args = {}
@@ -74,14 +74,14 @@ public class OrientationListenerTest extends AndroidTestCase {
             level = TestLevel.COMPLETE,
             notes = "Test {@link OrientationListener#disable()}. "
                     + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is no way "
+                    + "The registration of the listener can not be tested because there is no way "
                     + "to simulate sensor events on the emulator",
             method = "disable",
             args = {}
         )
     })
     @ToBeFixed(explanation = "Can not simulate sensor events on the emulator.")
-    public void testRegisterationOfOrientationListener() {
+    public void testRegistrationOfOrientationListener() {
         // these methods are called to assure that no exception is thrown
         MockOrientationListener listener = new MockOrientationListener(mContext);
         listener.disable();

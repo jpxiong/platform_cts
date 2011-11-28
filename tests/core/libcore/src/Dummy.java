@@ -17,7 +17,7 @@
 /**
  * We really just want the core-tests classes from the static java
  * library, but the build system currently needs at least one input
- * file, not just becuase its a sanity check, but because the static
+ * file, not just because its a sanity check, but because the static
  * class files and resources are included in the output of the local
  * java compilation.
  */
