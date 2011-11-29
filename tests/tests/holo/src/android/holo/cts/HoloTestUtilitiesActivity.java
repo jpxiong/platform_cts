@@ -32,11 +32,13 @@ import android.widget.ListView;
  */
 public class HoloTestUtilitiesActivity extends ListActivity {
 
-    private static final int TASK_VIEW_TESTS = 0;
-    private static final int TASK_GENERATE_ONE_BITMAP = 1;
-    private static final int TASK_GENERATE_ALL_BITMAPS = 2;
-    private static final int TASK_CLEAR_REFERENCE_BITMAPS = 3;
-    private static final int TASK_CLEAR_FAILED_BITMAPS = 4;
+    private static final int TASK_VIEW_DISPLAY_INFO = 0;
+    private static final int TASK_VIEW_TESTS = 1;
+    private static final int TASK_GENERATE_ONE_BITMAP = 2;
+    private static final int TASK_GENERATE_ALL_BITMAPS = 3;
+    private static final int TASK_CLEAR_REFERENCE_BITMAPS = 4;
+    private static final int TASK_CLEAR_FAILED_BITMAPS = 5;
+    private static final int TASK_CLEAR_DIFF_BITMAPS = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class HoloTestUtilitiesActivity extends ListActivity {
 
         ArrayAdapter<Task> taskAdapter = new ArrayAdapter<Task>(this,
                 android.R.layout.simple_list_item_1);
+        taskAdapter.add(new Task(R.string.task_view_display_info, TASK_VIEW_DISPLAY_INFO));
         taskAdapter.add(new Task(R.string.task_view_tests, TASK_VIEW_TESTS));
         taskAdapter.add(new Task(R.string.task_generate_one_bitmap, TASK_GENERATE_ONE_BITMAP));
         taskAdapter.add(new Task(R.string.task_generate_all_bitmaps, TASK_GENERATE_ALL_BITMAPS));
@@ -51,6 +54,8 @@ public class HoloTestUtilitiesActivity extends ListActivity {
                 TASK_CLEAR_REFERENCE_BITMAPS));
         taskAdapter.add(new Task(R.string.task_clear_failure_bitmaps,
                 TASK_CLEAR_FAILED_BITMAPS));
+        taskAdapter.add(new Task(R.string.task_clear_diff_bitmaps,
+                TASK_CLEAR_DIFF_BITMAPS));
         setListAdapter(taskAdapter);
     }
 
@@ -79,6 +84,10 @@ public class HoloTestUtilitiesActivity extends ListActivity {
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         Task task = getListAdapter().getItem(position);
         switch (task.mTaskId) {
+            case TASK_VIEW_DISPLAY_INFO:
+                viewDisplayInfo();
+                break;
+
             case TASK_VIEW_TESTS:
                 viewTests();
                 break;
@@ -99,9 +108,18 @@ public class HoloTestUtilitiesActivity extends ListActivity {
                 clearBitmaps(BitmapAssets.TYPE_FAILED);
                 break;
 
+            case TASK_CLEAR_DIFF_BITMAPS:
+                clearBitmaps(BitmapAssets.TYPE_DIFF);
+                break;
+
             default:
                 throw new IllegalArgumentException("Bad task id: " + task.mTaskId);
         }
+    }
+
+    private void viewDisplayInfo() {
+        Intent intent = new Intent(this, DisplayInfoActivity.class);
+        startActivity(intent);
     }
 
     private void viewTests() {

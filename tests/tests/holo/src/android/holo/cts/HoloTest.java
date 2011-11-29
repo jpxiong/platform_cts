@@ -139,6 +139,9 @@ public class HoloTest extends ActivityInstrumentationTestCase2<ThemeTestActivity
 
         ThemeTestActivity activity = getActivity();
         Result result = activity.getResultFuture().get();
-        assertTrue(result.getMessage(), result.passed());
+        assertTrue("Failed bitmap names: " + result.getFailedBitmapNames()
+                + " Check " + BitmapAssets.getBitmapDir(BitmapAssets.TYPE_FAILED)
+                + " and " + BitmapAssets.getBitmapDir(BitmapAssets.TYPE_DIFF) + " for details."
+                , result.passed());
     }
 }
