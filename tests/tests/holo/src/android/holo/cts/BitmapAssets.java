@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.holo.cts.LayoutAdapter.LayoutInfo;
 import android.holo.cts.ThemeAdapter.ThemeInfo;
 import android.os.Environment;
@@ -46,6 +47,8 @@ class BitmapAssets {
 
     static final int TYPE_FAILED = 1;
 
+    static final int TYPE_DIFF = 2;
+
     public static boolean clearDirectory(int type) {
         if (!isExternalStorageReady()) {
             return false;
@@ -66,7 +69,7 @@ class BitmapAssets {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
-    private static File getBitmapDir(int type) {
+    public static File getBitmapDir(int type) {
         String subDir;
         switch (type) {
             case TYPE_REFERENCE:
@@ -74,6 +77,9 @@ class BitmapAssets {
                 break;
             case TYPE_FAILED:
                 subDir = "failed";
+                break;
+            case TYPE_DIFF:
+                subDir = "diff";
                 break;
             default:
                 throw new IllegalArgumentException("Bad type: " + type);
@@ -101,6 +107,9 @@ class BitmapAssets {
                 break;
             case TYPE_FAILED:
                 prefix = "failed_";
+                break;
+            case TYPE_DIFF:
+                prefix = "diff_";
                 break;
             default:
                 throw new IllegalArgumentException("Bad type: " + type);

@@ -15,23 +15,28 @@
 -->
 <resources>
     <string name="holo_test_utilities">Holo Test Utilities</string>
+    <string name="task_view_display_info">View Display Info</string>
     <string name="task_view_tests">View Tests</string>
     <string name="task_generate_one_bitmap">Generate Single Test Bitmaps</string>
     <string name="task_generate_all_bitmaps">Generate All Test Bitmaps</string>
     <string name="task_clear_reference_bitmaps">Clear Reference Bitmaps</string>
     <string name="task_clear_failure_bitmaps">Clear Failure Bitmaps</string>
+    <string name="task_clear_diff_bitmaps">Clear Diff Bitmaps</string>
+
+    <string name="display_info">Display Info</string>
+    <string name="display_info_text">Density DPI: %1$d\nDensity Bucket: %2$s</string>
 
     <string name="pick_theme">Pick Theme</string>
     <string name="pick_layout">Pick Layout</string>
-    
-        
+
     <string name="deleting_bitmaps">Deleting bitmaps...</string>
     <string name="deleting_bitmaps_finished">Successfully deleted bitmaps!</string>
     <string name="deleting_bitmaps_error">Failed to delete bitmaps. Is external storage mounted?</string>
     <string name="generate_bitmap_success">Saved bitmap to %s</string>
     <string name="generate_bitmap_failure">Failed to save bitmap to %s</string>
     <string name="comparison_success">Bitmap matches the reference bitmap!</string>
-    <string name="comparison_failure">Bitmap does not match reference bitmap. Saved %s</string>
+    <string name="comparison_failure">Bitmap does not match reference bitmap. 
+            Saved failed image to %1$s and diff analysis to %2$s.</string>
 
     <string name="button">Button</string>
     <string name="button_pressed">Button Pressed</string>
@@ -72,7 +77,7 @@
     <string name="togglebutton">ToggleButton</string>
     <string name="togglebutton_checked">ToggleButton Checked</string>
     <string name="zoomcontrols">ZoomControls</string>
-    
+
     <string name="alertdialog_onebutton">AlertDialog One Button</string>
     <string name="alertdialog_twobuttons">AlertDialog Two Buttons</string>
     <string name="alertdialog_threebuttons">AlertDialog Three Buttons</string>
@@ -81,7 +86,7 @@
     <string name="alertdialog_multichoice">AlertDialog Multiple Choice</string>
     <string name="progressdialog_spinner">ProgressDialog Spinner</string>
     <string name="progressdialog_horizontal">ProgressDialog Horizontal</string>
-    
+
     <string name="color_blue_bright">Bright Blue Color</string>
     <string name="color_blue_dark">Dark Blue Color</string>
     <string name="color_blue_light">Light Blue Color</string>
