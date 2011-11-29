@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.holo.cts.LayoutAdapter.LayoutInfo;
 import android.holo.cts.ThemeAdapter.ThemeInfo;
 import android.os.AsyncTask;
@@ -32,7 +33,6 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.TimeZone;
 
 /**
  * {@link Activity} that applies a theme, inflates a layout, and then either
@@ -151,36 +151,76 @@ public class LayoutTestActivity extends Activity {
         }
     }
 
-    class CompareBitmapTask extends AsyncTask<Void, Void, String> {
+    class CompareBitmapTask extends AsyncTask<Void, Void, String[]> {
         private Bitmap mBitmap;
+        private Bitmap mReferenceBitmap;
         private boolean mSame;
 
         @Override
         protected void onPreExecute() {
             mBitmap = getBitmap();
-            Bitmap referenceBitmap = BitmapAssets.getBitmap(getApplicationContext(), mBitmapName);
-            mSame = mBitmap.sameAs(referenceBitmap);
+            mReferenceBitmap = BitmapAssets.getBitmap(getApplicationContext(), mBitmapName);
+            mSame = mBitmap.sameAs(mReferenceBitmap);
         }
 
         @Override
-        protected String doInBackground(Void... devoid) {
+        protected String[] doInBackground(Void... devoid) {
             try {
                 if (!mSame) {
-                    return saveBitmap(mBitmap, BitmapAssets.TYPE_FAILED);
+                    String[] paths = new String[2];
+                    paths[0] = saveDiffBitmap(mBitmap, mReferenceBitmap);
+                    paths[1] = saveBitmap(mBitmap, BitmapAssets.TYPE_FAILED);
+                    return paths;
                 } else {
                     return null;
                 }
             } finally {
+                mReferenceBitmap.recycle();
+                mReferenceBitmap = null;
+
                 mBitmap.recycle();
                 mBitmap = null;
             }
         }
 
+        private String saveDiffBitmap(Bitmap bitmap1, Bitmap bitmap2) {
+            int width = Math.max(bitmap1.getWidth(), bitmap2.getWidth());
+            int height = Math.max(bitmap1.getHeight(), bitmap2.getHeight());
+            Bitmap diff = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+            try {
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
+                        boolean inBounds1 = i < bitmap1.getWidth() && j < bitmap1.getHeight();
+                        boolean inBounds2 = i < bitmap2.getWidth() && j < bitmap2.getHeight();
+                        int color;
+
+                        if (inBounds1 && inBounds2) {
+                            int color1 = bitmap1.getPixel(i, j);
+                            int color2 = bitmap2.getPixel(i, j);
+                            color = color1 == color2 ? color1 : Color.RED;
+                        } else if (inBounds1 && !inBounds2) {
+                            color = Color.BLUE;
+                        } else if (!inBounds1 && inBounds2) {
+                            color = Color.GREEN;
+                        } else {
+                            color = Color.MAGENTA;
+                        }
+                        diff.setPixel(i, j, color);
+                    }
+                }
+
+                return saveBitmap(diff, BitmapAssets.TYPE_DIFF);
+            } finally {
+                diff.recycle();
+            }
+        }
+
         @Override
-        protected void onPostExecute(String path) {
+        protected void onPostExecute(String[] paths) {
             String message = mSame
                     ? getString(R.string.comparison_success)
-                    : getString(R.string.comparison_failure, path);
+                    : getString(R.string.comparison_failure, paths[0], paths[1]);
             finishWithResult(mSame, message);
         }
     }

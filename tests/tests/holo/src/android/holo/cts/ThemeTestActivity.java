@@ -21,7 +21,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,7 @@ public class ThemeTestActivity extends Activity {
 
     private int mRequestCode;
     private Iterator<Intent> mIterator;
+    private Result mPendingResult;
     private ResultFuture<Result> mResultFuture;
 
     @Override
@@ -56,6 +59,7 @@ public class ThemeTestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mResultFuture = new ResultFuture<Result>();
+        mPendingResult = new Result();
 
         int task = getIntent().getIntExtra(EXTRA_TASK, -1);
         switch (task) {
@@ -102,7 +106,7 @@ public class ThemeTestActivity extends Activity {
             intent.setClass(this, LayoutTestActivity.class);
             startActivityForResult(intent, mRequestCode);
         } else {
-            mResultFuture.set(new Result(true, null));
+            mResultFuture.set(mPendingResult);
         }
     }
 
@@ -128,12 +132,11 @@ public class ThemeTestActivity extends Activity {
         }
 
         boolean success = data.getBooleanExtra(LayoutTestActivity.EXTRA_SUCCESS, false);
-        if (success) {
-            generateNextBitmap();
-        } else {
-            String message = data.getStringExtra(LayoutTestActivity.EXTRA_MESSAGE);
-            mResultFuture.set(new Result(false, message));
+        if (!success) {
+            String bitmapName = data.getStringExtra(LayoutTestActivity.EXTRA_BITMAP_NAME);
+            mPendingResult.addFailedBitmapName(bitmapName);
         }
+        generateNextBitmap();
     }
 
     public Future<Result> getResultFuture() {
@@ -142,21 +145,18 @@ public class ThemeTestActivity extends Activity {
 
     static class Result {
 
-        private boolean mPass;
-
-        private String mMessage;
-
-        Result(boolean pass, String message) {
-            mPass = pass;
-            mMessage = message;
-        }
+        private List<String> mFailedBitmapNames = new ArrayList<String>();
 
         public boolean passed() {
-            return mPass;
+            return mFailedBitmapNames.isEmpty();
         }
 
-        public String getMessage() {
-            return mMessage;
+        public List<String> getFailedBitmapNames() {
+            return mFailedBitmapNames;
+        }
+
+        private void addFailedBitmapName(String bitmapName) {
+            mFailedBitmapNames.add(bitmapName);
         }
     }
 

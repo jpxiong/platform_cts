@@ -29,6 +29,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity android:name="android.holo.cts.DisplayInfoActivity"
+                android:label="@string/display_info" />
 
         <activity android:name="android.holo.cts.ThemePickerActivity" 
                 android:label="@string/pick_theme" />

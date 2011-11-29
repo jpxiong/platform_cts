@@ -18,11 +18,7 @@ package android.holo.cts;
 
 import com.android.cts.holo.R;
 
-import android.app.ProgressDialog;
-import android.holo.cts.modifiers.AlertDialogBuilder;
 import android.holo.cts.modifiers.CalendarViewModifier;
-import android.holo.cts.modifiers.DialogModifier;
-import android.holo.cts.modifiers.ProgressDialogBuilder;
 import android.holo.cts.modifiers.SearchViewModifier;
 import android.holo.cts.modifiers.TabHostModifier;
 import android.holo.cts.modifiers.TimePickerModifier;
@@ -223,37 +219,40 @@ class LayoutAdapter extends BaseAdapter {
 
         // Dialogs
 
-        addLayout(R.string.alertdialog_onebutton, "alertdialog_onebutton", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.ONE_BUTTON)),
-                SHORT_TIMEOUT_MS);
 
-        addLayout(R.string.alertdialog_twobuttons, "alertdialog_twobuttons", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.TWO_BUTTONS)),
-                SHORT_TIMEOUT_MS);
+        // TODO: Dialogs are changing sizes depending on screen sizes, so we can't test these.
 
-        addLayout(R.string.alertdialog_threebuttons, "alertdialog_threebuttons", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.THREE_BUTTONS)),
-                SHORT_TIMEOUT_MS);
-
-        addLayout(R.string.alertdialog_list, "alertdialog_list", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.LIST)),
-                SHORT_TIMEOUT_MS);
-
-        addLayout(R.string.alertdialog_singlechoice, "alertdialog_singlechoice", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.SINGLE_CHOICE)),
-                SHORT_TIMEOUT_MS);
-
-        addLayout(R.string.alertdialog_multichoice, "alertdialog_multichoice", R.layout.empty,
-                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.MULTI_CHOICE)),
-                SHORT_TIMEOUT_MS);
+//        addLayout(R.string.alertdialog_onebutton, "alertdialog_onebutton", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.ONE_BUTTON)),
+//                SHORT_TIMEOUT_MS);
+//
+//        addLayout(R.string.alertdialog_twobuttons, "alertdialog_twobuttons", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.TWO_BUTTONS)),
+//                SHORT_TIMEOUT_MS);
+//
+//        addLayout(R.string.alertdialog_threebuttons, "alertdialog_threebuttons", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.THREE_BUTTONS)),
+//                SHORT_TIMEOUT_MS);
+//
+//        addLayout(R.string.alertdialog_list, "alertdialog_list", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.LIST)),
+//                SHORT_TIMEOUT_MS);
+//
+//        addLayout(R.string.alertdialog_singlechoice, "alertdialog_singlechoice", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.SINGLE_CHOICE)),
+//                SHORT_TIMEOUT_MS);
+//
+//        addLayout(R.string.alertdialog_multichoice, "alertdialog_multichoice", R.layout.empty,
+//                new DialogModifier(new AlertDialogBuilder(AlertDialogBuilder.MULTI_CHOICE)),
+//                SHORT_TIMEOUT_MS);
 
         // TODO: We can't test the spinner, because there is no way to halt the animation.
         // addLayout(R.string.progressdialog_spinner, "progressdialog_spinner", R.layout.empty,
         //      new DialogModifier(new ProgressDialogBuilder(ProgressDialog.STYLE_SPINNER)));
 
-        addLayout(R.string.progressdialog_horizontal, "progressdialog_horizontal", R.layout.empty,
-                new DialogModifier(new ProgressDialogBuilder(ProgressDialog.STYLE_HORIZONTAL)),
-                SHORT_TIMEOUT_MS);
+//        addLayout(R.string.progressdialog_horizontal, "progressdialog_horizontal", R.layout.empty,
+//                new DialogModifier(new ProgressDialogBuilder(ProgressDialog.STYLE_HORIZONTAL)),
+//                SHORT_TIMEOUT_MS);
 
         // Colors
 
