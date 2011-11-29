@@ -148,7 +148,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         try {
             buildHelper.validateStructure();
         } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Invalid CTS build", e);
+            // just log an error - it might be expected if we failed to retrieve a build
+            CLog.e("Invalid CTS build %s", ctsBuild.getRootDir());
         }
         return buildHelper;
     }
@@ -247,6 +248,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         // display the results of the last completed run
         if (mCurrentPkgResult != null) {
             logCompleteRun(mCurrentPkgResult);
+        }
+        if (mReportDir == null || mStartTime == null) {
+            // invocationStarted must have failed, abort
+            CLog.w("Unable to create XML report");
+            return;
         }
         createXmlResult(mReportDir, mStartTime, elapsedTime);
         copyFormattingFiles(mReportDir);
