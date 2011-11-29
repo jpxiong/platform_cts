@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <grp.h>
 #include <pwd.h>
+#include <unistd.h>
 
 static jclass gFileStatusClass;
 static jfieldID gFileStatusDevFieldID;
@@ -34,6 +35,7 @@ static jfieldID gFileStatusBlocksFieldID;
 static jfieldID gFileStatusAtimeFieldID;
 static jfieldID gFileStatusMtimeFieldID;
 static jfieldID gFileStatusCtimeFieldID;
+static jfieldID gFileStatusExecutableID;
 
 /* Copied from hidden API: frameworks/base/core/jni/android_os_FileUtils.cpp */
 jboolean com_android_cts_verifier_os_FileUtils_getFileStatus(JNIEnv* env, jobject thiz,
@@ -60,6 +62,11 @@ jboolean com_android_cts_verifier_os_FileUtils_getFileStatus(JNIEnv* env, jobjec
             env->SetLongField(fileStatus, gFileStatusAtimeFieldID, s.st_atime);
             env->SetLongField(fileStatus, gFileStatusMtimeFieldID, s.st_mtime);
             env->SetLongField(fileStatus, gFileStatusCtimeFieldID, s.st_ctime);
+        }
+        if (access(pathStr, X_OK) == 0) {
+            env->SetBooleanField(fileStatus, gFileStatusExecutableID, JNI_TRUE);
+        } else {
+            env->SetBooleanField(fileStatus, gFileStatusExecutableID, JNI_FALSE);
         }
     }
 
@@ -108,6 +115,7 @@ int register_com_android_cts_verifier_os_FileUtils(JNIEnv* env)
     gFileStatusAtimeFieldID = env->GetFieldID(gFileStatusClass, "atime", "J");
     gFileStatusMtimeFieldID = env->GetFieldID(gFileStatusClass, "mtime", "J");
     gFileStatusCtimeFieldID = env->GetFieldID(gFileStatusClass, "ctime", "J");
+    gFileStatusExecutableID = env->GetFieldID(gFileStatusClass, "executable", "Z");
 
     return env->RegisterNatives(clazz, gMethods, 
             sizeof(gMethods) / sizeof(JNINativeMethod)); 
