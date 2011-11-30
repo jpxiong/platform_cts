@@ -2626,8 +2626,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             parameters.setWhiteBalance(wbMode);
             mCamera.setParameters(parameters);
 
-            assert3ALockState("Changing WB mode did not clear AWB lock!",
-                    AUTOWHITEBALANCE_LOCK, false);
+            if (firstWb == wbMode) {
+                assert3ALockState("AWB lock was cleared when WB mode was unchanged!",
+                        AUTOWHITEBALANCE_LOCK, true);
+            } else {
+                assert3ALockState("Changing WB mode did not clear AWB lock!",
+                        AUTOWHITEBALANCE_LOCK, false);
+            }
         }
         mCamera.stopPreview();
     }
