@@ -22,6 +22,7 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.RemoteException;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.accessibility.AccessibilityEvent;
@@ -65,6 +66,8 @@ import java.util.concurrent.TimeoutException;
 public class AccessibilityWindowQueryActivityTest
         extends ActivityInstrumentationTestCase2<AccessibilityWindowQueryActivity> {
 
+    private static AccessibilityQueryBridge sQueryBridge;
+
     private interface AccessibilityEventFilter {
         public boolean accept(AccessibilityEvent event);
     }
@@ -82,16 +85,16 @@ public class AccessibilityWindowQueryActivityTest
     @LargeTest
     public void testFindByText() throws Exception {
         // find a view by text
-        List<AccessibilityNodeInfo> buttons = findAccessibilityNodeInfosByText(
-                getAwaitedAccessibilityEventSource(), "butto");
+        List<AccessibilityNodeInfo> buttons =
+            getQueryBridge().findAccessibilityNodeInfosByText("butto");
         assertEquals(9, buttons.size());
     }
 
     @LargeTest
     public void testFindByContentDescription() throws Exception {
         // find a view by text
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.contentDescription);
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.contentDescription));
         assertNotNull(button);
     }
 
@@ -117,7 +120,7 @@ public class AccessibilityWindowQueryActivityTest
         classNameAndTextList.add("android.widget.ButtonButton9");
 
         Queue<AccessibilityNodeInfo> fringe = new LinkedList<AccessibilityNodeInfo>();
-        fringe.add(getAwaitedAccessibilityEventSource());
+        fringe.add(getQueryBridge().getAwaitedAccessibilityEventSource());
 
         // do a BFS traversal and check nodes
         while (!fringe.isEmpty()) {
@@ -133,7 +136,7 @@ public class AccessibilityWindowQueryActivityTest
 
             final int childCount = current.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                AccessibilityNodeInfo child = current.getChild(i);
+                AccessibilityNodeInfo child = getQueryBridge().getChild(current, i);
                 fringe.add(child);
             }
         }
@@ -142,99 +145,97 @@ public class AccessibilityWindowQueryActivityTest
     @LargeTest
     public void testPerformActionFocus() throws Exception {
         // find a view and make sure it is not focused
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertFalse(button.isFocused());
 
         // focus the view
-        assertTrue(button.performAction(ACTION_FOCUS));
+        assertTrue(getQueryBridge().performAction(button, ACTION_FOCUS));
 
         // find the view again and make sure it is focused
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),
-                R.string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertTrue(button.isFocused());
     }
 
     @LargeTest
     public void testPerformActionClearFocus() throws Exception {
         // find a view and make sure it is not focused
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertFalse(button.isFocused());
 
         // focus the view
-        assertTrue(button.performAction(ACTION_FOCUS));
+        assertTrue(getQueryBridge().performAction(button, ACTION_FOCUS));
 
         // find the view again and make sure it is focused
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),
-                R.string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertTrue(button.isFocused());
 
         // unfocus the view
-        assertTrue(button.performAction(ACTION_CLEAR_FOCUS));
+        assertTrue(getQueryBridge().performAction(button, ACTION_CLEAR_FOCUS));
 
         // find the view again and make sure it is not focused
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),
-                R.string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(getString(
+                R.string.button5));
         assertFalse(button.isFocused());
     }
 
     @LargeTest
     public void testPerformActionSelect() throws Exception {
         // find a view and make sure it is not selected
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertFalse(button.isSelected());
 
         // select the view
-        assertTrue(button.performAction(ACTION_SELECT));
+        assertTrue(sQueryBridge.performAction(button, ACTION_SELECT));
 
         // find the view again and make sure it is selected
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),
-                R.string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertTrue(button.isSelected());
     }
 
     @LargeTest
     public void testPerformActionClearSelection() throws Exception {
         // find a view and make sure it is not selected
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertFalse(button.isSelected());
 
         // select the view
-        assertTrue(button.performAction(ACTION_SELECT));
+        assertTrue(sQueryBridge.performAction(button, ACTION_SELECT));
 
         // find the view again and make sure it is selected
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),R
-                .string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
 
         assertTrue(button.isSelected());
 
         // unselect the view
-        assertTrue(button.performAction(ACTION_CLEAR_SELECTION));
+        assertTrue(getQueryBridge().performAction(button, ACTION_CLEAR_SELECTION));
 
         // find the view again and make sure it is not selected
-        button = findAccessibilityNodeInfoByText(getAwaitedAccessibilityEventSource(),
-                R.string.button5);
+        button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+                getString(R.string.button5));
         assertFalse(button.isSelected());
     }
 
     @LargeTest
     public void testGetEventSource() throws Exception {
         // find a view and make sure it is not focused
-        final AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
+        final AccessibilityNodeInfo button =
+            getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
         assertFalse(button.isSelected());
 
         // focus and wait for the event
-        AccessibilityQueryBridge bridge = AccessibilityQueryBridge.getInstance(
-                getInstrumentation().getContext());
-        bridge.perfromActionAndWaitForEvent(
+        getQueryBridge().perfromActionAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
-                assertTrue(button.performAction(ACTION_FOCUS));
+                assertTrue(getQueryBridge().performAction(button, ACTION_FOCUS));
             }
         },
                 new AccessibilityEventFilter() {
@@ -245,7 +246,7 @@ public class AccessibilityWindowQueryActivityTest
         });
 
         // check that last event source
-        AccessibilityNodeInfo source = getAwaitedAccessibilityEventSource();
+        AccessibilityNodeInfo source = getQueryBridge().getAwaitedAccessibilityEventSource();
         assertNotNull(source);
 
         // bounds
@@ -280,12 +281,12 @@ public class AccessibilityWindowQueryActivityTest
     @LargeTest
     public void testObjectContract() throws Exception {
         // find a view and make sure it is not focused
-        AccessibilityNodeInfo button = findAccessibilityNodeInfoByText(
-                getAwaitedAccessibilityEventSource(), R.string.button5);
-        AccessibilityNodeInfo parent = button.getParent();
+        AccessibilityNodeInfo button = getQueryBridge().findAccessibilityNodeInfoByTextFromRoot(
+               getString(R.string.button5));
+        AccessibilityNodeInfo parent = getQueryBridge().getParent(button);
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            AccessibilityNodeInfo child = parent.getChild(i);
+            AccessibilityNodeInfo child = getQueryBridge().getChild(parent, i);
             assertNotNull(child);
             if (child.equals(button)) {
                 assertEquals("Equal objects must have same hasCode.", button.hashCode(),
@@ -301,14 +302,19 @@ public class AccessibilityWindowQueryActivityTest
         /* intentionally do not scrub */
     }
 
+    private AccessibilityQueryBridge getQueryBridge() {
+        if (sQueryBridge == null) {
+            sQueryBridge = new AccessibilityQueryBridge(getInstrumentation().getContext());
+        }
+        return sQueryBridge;
+    }
+
     /**
      * Starts the activity under tests and waits for the first accessibility
      * event from that activity.
      */
     private void startActivityAndWaitForFirstEvent() {
-        AccessibilityQueryBridge bridge = AccessibilityQueryBridge.getInstance(
-                getInstrumentation().getContext());
-        bridge.perfromActionAndWaitForEvent(
+        getQueryBridge().perfromActionAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -328,55 +334,10 @@ public class AccessibilityWindowQueryActivityTest
     }
 
     /**
-     * @return The source of the last accessibility event.
+     * @return The string for a given <code>resId</code>.
      */
-    private AccessibilityNodeInfo getAwaitedAccessibilityEventSource() {
-        AccessibilityQueryBridge bridge = AccessibilityQueryBridge.getInstance(
-                getInstrumentation().getContext());
-        AccessibilityEvent event = bridge.getAwaitedAccessibilityEvent();
-        if (event != null) {
-            return event.getSource();
-        }
-        return null;
-    }
-
-    private List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(AccessibilityNodeInfo root,
-            String text) {
-        if (root != null) {
-            return root.findAccessibilityNodeInfosByText(text);
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * Finds the first accessibility info that contains text. The search starts
-     * from the given <code>root</code>
-     *
-     * @param root Node from which to start the search.
-     * @param resId Resource id of the searched text.
-     * @return The node with this text or null.
-     */
-    private AccessibilityNodeInfo findAccessibilityNodeInfoByText(AccessibilityNodeInfo root,
-            int resId) {
-        return findAccessibilityNodeInfoByText(root,
-                getInstrumentation().getContext().getString(resId));
-    }
-
-    /**
-     * Finds the first accessibility info that contains text. The search starts
-     * from the given <code>root</code>
-     *
-     * @param root Node from which to start the search.
-     * @param text The searched text.
-     * @return The node with this text or null.
-     */
-    private AccessibilityNodeInfo findAccessibilityNodeInfoByText(AccessibilityNodeInfo root,
-            String text) {
-        List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfosByText(root, text);
-        if (nodes != null && !nodes.isEmpty()) {
-            return nodes.get(0);
-        }
-        return null;
+    private String getString(int resId) {
+        return getInstrumentation().getContext().getString(resId);
     }
 
     /**
@@ -384,11 +345,6 @@ public class AccessibilityWindowQueryActivityTest
      * The bride is connected of a delegating accessibility service.
      */
     static class AccessibilityQueryBridge extends AccessibilityService {
-
-        /**
-         * The singleton instance.
-         */
-        private static AccessibilityQueryBridge sInstance;
 
         /**
          * Helper for connecting to the delegating accessibility service.
@@ -410,23 +366,6 @@ public class AccessibilityWindowQueryActivityTest
          */
         private AccessibilityEventFilter mWaitedFilter;
 
-        /**
-         * Gets the {@link AccessibilityQueryBridge} singleton.
-         *
-         * @param context A context handle.
-         * @return The mock service.
-         */
-        public static AccessibilityQueryBridge getInstance(Context context) {
-            if (sInstance == null) {
-                // since we do bind once and do not unbind from the delegating
-                // service and JUnit3 does not support @BeforeTest and @AfterTest,
-                // we will leak a service connection after the test but this
-                // does not affect the test results and the test is twice as fast
-                sInstance = new AccessibilityQueryBridge(context);
-            }
-            return sInstance;
-        }
-
         private AccessibilityQueryBridge(Context context) {
             mAccessibilityDelegateHelper = new AccessibilityDelegateHelper(this);
             mAccessibilityDelegateHelper.bindToDelegatingAccessibilityService(context);
@@ -446,10 +385,91 @@ public class AccessibilityWindowQueryActivityTest
         }
 
         /**
+         * Finds the first accessibility info that contains text. The search starts
+         * from the given <code>root</code>
+         *
+         * @param text The searched text.
+         * @return The node with this text or null.
+         */
+        public AccessibilityNodeInfo findAccessibilityNodeInfoByTextFromRoot(String text) {
+            List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfosByText(text);
+            if (nodes != null && !nodes.isEmpty()) {
+                return nodes.get(0);
+            }
+            return null;
+        }
+
+        /**
          * @return The event that was waited for.
          */
-        public AccessibilityEvent getAwaitedAccessibilityEvent() {
-            return mAwaitedAccessbiliyEvent;
+        public AccessibilityNodeInfo getAwaitedAccessibilityEventSource() {
+            if (mAwaitedAccessbiliyEvent != null) {
+                return getSource(mAwaitedAccessbiliyEvent);
+            }
+            return null;
+        }
+
+        public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String text) {
+            AccessibilityNodeInfo root = getAwaitedAccessibilityEventSource();
+            if (root != null) {
+                // Sending a node info across processes recycles
+                // it so use a clone to avoid losing state
+                AccessibilityNodeInfo rootClone = AccessibilityNodeInfo.obtain(root);
+                try {
+                     return mAccessibilityDelegateHelper.getQueryConnection()
+                            .findAccessibilityNodeInfosByText(rootClone, text);
+                } catch (RemoteException re) {
+                    /* ignore */
+                }
+            }
+            return Collections.emptyList();
+        }
+
+        public AccessibilityNodeInfo getParent(AccessibilityNodeInfo child) {
+            try {
+                // Sending a node info across processes recycles
+                // it so use a clone to avoid losing state
+                AccessibilityNodeInfo childClone = AccessibilityNodeInfo.obtain(child);
+                return mAccessibilityDelegateHelper.getQueryConnection().getParent(childClone);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return null;
+        }
+
+        public AccessibilityNodeInfo getChild(AccessibilityNodeInfo parent, int index) {
+            try {
+                // Sending a node info across processes recycles
+                // it so use a clone to avoid losing state
+                AccessibilityNodeInfo parentClone = AccessibilityNodeInfo.obtain(parent);
+                return mAccessibilityDelegateHelper.getQueryConnection().getChild(parentClone,
+                        index);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return null;
+        }
+
+        public boolean performAction(AccessibilityNodeInfo target, int action) {
+            try {
+                // Sending a node info across processes recycles
+                // it so use a clone to avoid losing state
+                AccessibilityNodeInfo targetClone = AccessibilityNodeInfo.obtain(target);
+                return mAccessibilityDelegateHelper.getQueryConnection().performAccessibilityAction(
+                        targetClone, action);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return false;
+        }
+
+        private AccessibilityNodeInfo getSource(AccessibilityEvent event) {
+            try {
+                return mAccessibilityDelegateHelper.getQueryConnection().getSource(event);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return null;
         }
 
         /**
