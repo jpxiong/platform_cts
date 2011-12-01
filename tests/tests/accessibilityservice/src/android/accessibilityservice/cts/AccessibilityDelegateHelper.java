@@ -92,6 +92,11 @@ class AccessibilityDelegateHelper implements ServiceConnection {
     private boolean mInitialized;
 
     /**
+     * Query connection to the delegating accessibility service.
+     */
+    private IAccessibilityServiceDelegateConnection mQueryConnection;
+
+    /**
      * Creates a new instance.
      *
      * @param service The service to which to delegate.
@@ -180,10 +185,10 @@ class AccessibilityDelegateHelper implements ServiceConnection {
      * {@inheritDoc ServiceConnection#onServiceConnected(ComponentName,IBinder)}
      */
     public void onServiceConnected(ComponentName name, IBinder service) {
-        IAccessibilityServiceDelegateConnection connection =
-            IAccessibilityServiceDelegateConnection.Stub.asInterface(service);
+        mQueryConnection = IAccessibilityServiceDelegateConnection.Stub.asInterface(service);
         try {
-            connection.setAccessibilityServiceDelegate(new IAccessibilityServiceDelegate.Stub() {
+            mQueryConnection.setAccessibilityServiceDelegate(
+                    new IAccessibilityServiceDelegate.Stub() {
                 @Override
                 public void onAccessibilityEvent(AccessibilityEvent event) {
                     mAccessibilityService.onAccessibilityEvent(event);
@@ -208,5 +213,14 @@ class AccessibilityDelegateHelper implements ServiceConnection {
     public void onServiceDisconnected(ComponentName name) {
         mInitialized = false;
         /* do nothing */
+    }
+
+    /**
+     * Gets the query connection to the delegating accessibility service.
+     *
+     * @return The connection.
+     */
+    public IAccessibilityServiceDelegateConnection getQueryConnection() {
+        return mQueryConnection;
     }
 }
