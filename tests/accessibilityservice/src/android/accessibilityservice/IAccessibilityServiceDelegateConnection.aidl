@@ -16,15 +16,27 @@
 package android.accessibilityservice;
 
 import android.os.IBinder;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import java.util.List;
 
 /**
- * Interface for registering an accessibility service delegate.
+ * Interface for registering an accessibility service delegate
+ * and asking it to perform some querying of the window for us.
  */
-oneway interface IAccessibilityServiceDelegateConnection {
+interface IAccessibilityServiceDelegateConnection {
 
-    /**
-     * Sets the delegate interface to which the
-     * {@link DelegatingAccessibilityService} to delegate.
-     */
     void setAccessibilityServiceDelegate(in IBinder binder);
+
+    List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(in AccessibilityNodeInfo root,
+        String text);
+
+    AccessibilityNodeInfo getParent(in AccessibilityNodeInfo child);
+
+    AccessibilityNodeInfo getChild(in AccessibilityNodeInfo parent, int index);
+
+    boolean performAccessibilityAction(in AccessibilityNodeInfo target, int action);
+
+    AccessibilityNodeInfo getSource(in AccessibilityEvent event);
 }
