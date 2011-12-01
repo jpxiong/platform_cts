@@ -83,13 +83,14 @@ class CtsBuilder(object):
         self.test_repository, self.android_root, self.doclet_path])
 
     # generate test descriptions for android tests
+    results = []
     android_packages = GetSubDirectories(self.test_root)
     for package in android_packages:
-      pool.apply_async(GenerateTestDescription, [self.test_root, self.temp_dir,
-          self.test_repository, self.android_root, self.doclet_path, package])
-
+      results.append(pool.apply_async(GenerateTestDescription, [self.test_root, self.temp_dir,
+          self.test_repository, self.android_root, self.doclet_path, package]))
     pool.close()
     pool.join()
+    return sum(map(lambda result: result.get(), results))
 
   def __WritePlan(self, plan, plan_name):
     print 'Generating test plan %s' % plan_name
@@ -204,13 +205,13 @@ def GenerateTestDescription(test_root, temp_dir, test_repository, android_root,
   makefile_name = os.path.join(package_root, 'Android.mk')
   if not os.path.exists(makefile_name):
     print 'Skipping directory "%s" due to missing Android.mk' % package_root
-    return
+    return 0
   makefile_vars = GetMakeFileVars(makefile_name)
 
   manifest_name = os.path.join(package_root, 'AndroidManifest.xml')
   if not os.path.exists(manifest_name):
     print 'Skipping directory "%s" due to missing AndroidManifest.xml' % package_root
-    return
+    return 0
   manifest = tools.XmlFile(manifest_name)
 
   LogGenerateDescription(app_package_name)
@@ -220,7 +221,10 @@ def GenerateTestDescription(test_root, temp_dir, test_repository, android_root,
   # the document below, additional attributes should be passed to the Doclet as arguments.
   temp_desc = os.path.join(temp_dir, app_package_name + '-description.xml')
 
-  RunDescriptionGeneratorDoclet(android_root, doclet_path, package_root, temp_desc)
+  returncode = RunDescriptionGeneratorDoclet(android_root, doclet_path, package_root, temp_desc)
+  if returncode != 0:
+    print 'Error occurred while running description generator...'
+    return 1
 
   # obtain missing attribute values from the makefile and manifest
   package_name = makefile_vars['LOCAL_PACKAGE_NAME']
@@ -242,6 +246,7 @@ def GenerateTestDescription(test_root, temp_dir, test_repository, android_root,
   description = open(os.path.join(test_repository, package_name + '.xml'), 'w')
   doc.writexml(description, addindent='    ', encoding='UTF-8')
   description.close()
+  return 0
 
 def RunDescriptionGeneratorDoclet(android_root, doclet_path, source_root, output_file):
   """Generate a test package description by running the DescriptionGenerator doclet.
@@ -288,7 +293,9 @@ def RunDescriptionGeneratorDoclet(android_root, doclet_path, source_root, output
   cmd += ' '.join(sources)
   proc = subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
   # read and discard any output
-  proc.communicate()
+  (outdata, errdata) = proc.communicate()
+  if proc.returncode != 0:
+    print '%s\n%s' % (outdata, errdata)
   # wait for process to terminate and return exit value
   return proc.wait()
 
@@ -316,5 +323,7 @@ def RelPath(path, start=os.getcwd()):
 
 if __name__ == '__main__':
   builder = CtsBuilder(sys.argv)
-  builder.GenerateTestDescriptions()
+  result = builder.GenerateTestDescriptions()
+  if result != 0:
+    sys.exit(result)
   builder.GenerateTestPlans()
