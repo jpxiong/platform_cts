@@ -100,8 +100,8 @@ class LayoutAdapter extends BaseAdapter {
         addLayout(R.string.button, "button",
                 R.layout.button, null, NO_TIMEOUT_MS);
 
-        addLayout(R.string.button_pressed, "button_pressed",
-                R.layout.button, new ViewPressedModifier(), LONG_TIMEOUT_MS);
+//        addLayout(R.string.button_pressed, "button_pressed",
+//                R.layout.button, new ViewPressedModifier(), LONG_TIMEOUT_MS);
 
         addLayout(R.string.calendarview, "calendar_view",
                 R.layout.calendarview, new CalendarViewModifier(), SHORT_TIMEOUT_MS);
@@ -161,14 +161,14 @@ class LayoutAdapter extends BaseAdapter {
         addLayout(R.string.ratingbar_5, "ratingbar_5",
                 R.layout.ratingbar_5, null, NO_TIMEOUT_MS);
 
-        addLayout(R.string.ratingbar_0_pressed, "ratingbar_0_pressed",
-                R.layout.ratingbar_0, new ViewPressedModifier(), LONG_TIMEOUT_MS);
+//        addLayout(R.string.ratingbar_0_pressed, "ratingbar_0_pressed",
+//                R.layout.ratingbar_0, new ViewPressedModifier(), LONG_TIMEOUT_MS);
 
-        addLayout(R.string.ratingbar_2point5_pressed, "ratingbar_2point5_pressed",
-                R.layout.ratingbar_2point5, new ViewPressedModifier(), LONG_TIMEOUT_MS);
+//        addLayout(R.string.ratingbar_2point5_pressed, "ratingbar_2point5_pressed",
+//                R.layout.ratingbar_2point5, new ViewPressedModifier(), LONG_TIMEOUT_MS);
 
-        addLayout(R.string.ratingbar_5_pressed, "ratingbar_5_pressed",
-                R.layout.ratingbar_5, new ViewPressedModifier(), LONG_TIMEOUT_MS);
+//        addLayout(R.string.ratingbar_5_pressed, "ratingbar_5_pressed",
+//                R.layout.ratingbar_5, new ViewPressedModifier(), LONG_TIMEOUT_MS);
 
         addLayout(R.string.searchview, "searchview",
                 R.layout.searchview, null, NO_TIMEOUT_MS);
