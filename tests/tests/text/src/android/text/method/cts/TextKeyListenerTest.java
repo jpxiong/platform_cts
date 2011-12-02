@@ -244,11 +244,6 @@ public class TextKeyListenerTest extends
         }
     }
 
-    private int getKeyboardType() {
-        KeyCharacterMap kmap = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
-        return kmap.getKeyboardType();
-    }
-
     /**
      * Check point:
      * 1. press KEYCODE_4 once. if it's ALPHA key board, text will be "4", if it's
@@ -274,7 +269,6 @@ public class TextKeyListenerTest extends
     public void testPressKey() {
         final TextKeyListener textKeyListener
                 = TextKeyListener.getInstance(false, Capitalize.NONE);
-        int keyType = getKeyboardType();
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -290,7 +284,9 @@ public class TextKeyListenerTest extends
         sendKeys(KeyEvent.KEYCODE_4);
         waitForListenerTimeout();
         String text = mTextView.getText().toString();
-        if (KeyCharacterMap.ALPHA == keyType) {
+        int keyType = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD).getKeyboardType();
+        if (KeyCharacterMap.ALPHA == keyType
+                || KeyCharacterMap.FULL == keyType) {
             assertEquals("4", text);
         } else if (KeyCharacterMap.NUMERIC == keyType) {
             assertEquals("g", text);
