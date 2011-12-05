@@ -2503,6 +2503,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
                         "text/html", null);
                 waitForLoadComplete();
+            }
+        });
+        // Wait for layout to complete before setting focus.
+        getInstrumentation().waitForIdleSync();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
                 assertTrue(mWebView.requestFocus(View.FOCUS_DOWN, null));
             }
         });
