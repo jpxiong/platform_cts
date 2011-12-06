@@ -58,6 +58,7 @@ CTS_TEST_PACKAGES := \
 	CtsHoloTestCases \
 	CtsJniTestCases \
 	CtsLocationTestCases \
+	CtsMediaStressTestCases \
 	CtsMediaTestCases \
 	CtsNdefTestCases \
 	CtsNetTestCases \
