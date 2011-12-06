@@ -45,6 +45,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsHardwareTestCases \
 	CtsJniTestCases \
 	CtsLocationTestCases \
+	CtsMediaStressTestCases \
 	CtsMediaTestCases \
 	CtsNdefTestCases \
 	CtsNetTestCases \
