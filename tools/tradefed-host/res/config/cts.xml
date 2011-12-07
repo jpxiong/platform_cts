@@ -23,5 +23,6 @@
     <test class="com.android.cts.tradefed.testtype.CtsTest" />
     <logger class="com.android.tradefed.log.FileLogger" />
     <result_reporter class="com.android.cts.tradefed.result.CtsXmlResultReporter" />
+    <result_reporter class="com.android.cts.tradefed.result.IssueReporter" />
 
 </configuration>
