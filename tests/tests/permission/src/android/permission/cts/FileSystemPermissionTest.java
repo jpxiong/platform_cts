@@ -220,11 +220,13 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/wiper",
                     "/data/wpstiles",
                     "/dbdata/databases",
+                    "/efs/.android",
                     "/mnt_ext",
                     "/mnt_ext/badablk2",
                     "/mnt_ext/badablk3",
                     "/mnt_ext/cache",
-                    "/mnt_ext/data"
+                    "/mnt_ext/data",
+                    "/system/etc/security/drm"
             )
     );
 
