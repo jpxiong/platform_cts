@@ -16,6 +16,12 @@
 
 package android.webkit.cts;
 
+import android.cts.util.PollingCheck;
+import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.CacheManager;
+import android.webkit.CacheManager.CacheResult;
+import android.webkit.WebView;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -23,15 +29,6 @@ import dalvik.annotation.TestTargets;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.cookie.DateUtils;
-
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
-import android.webkit.cts.WaitForLoadUrl;
-import android.webkit.CacheManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.CacheManager.CacheResult;
 
 import java.io.File;
 import java.io.InputStream;
@@ -52,8 +49,7 @@ public class CacheManager_CacheResultTest
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
-        mWebView.setWebChromeClient(new WebChromeClient());
-        WaitForLoadUrl.initializeWebView(mWebView);
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
     }
 
     @Override
@@ -177,7 +173,6 @@ public class CacheManager_CacheResultTest
 
     private void loadUrl(final String url){
         mWebView.loadUrl(url);
-        WaitForLoadUrl.waitForLoadComplete(NETWORK_OPERATION_TIMEOUT);
-        assertEquals(100, mWebView.getProgress());
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 }

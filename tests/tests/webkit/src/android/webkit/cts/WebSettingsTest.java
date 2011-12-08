@@ -15,12 +15,6 @@
  */
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
 import android.cts.util.PollingCheck;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
@@ -28,11 +22,16 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.TextSize;
+import android.webkit.WebView;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+import dalvik.annotation.ToBeFixed;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -62,6 +61,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         // Set a web chrome client in order to receive progress updates.
         mWebView.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
 
         mSettings = mWebView.getSettings();
     }
@@ -538,13 +538,13 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         )
     })
     public void testAccessJavaScriptCanOpenWindowsAutomatically() throws Exception {
-        mWebView.setWebViewClient(new WebViewClient());
         mSettings.setJavaScriptEnabled(true);
 
         mSettings.setJavaScriptCanOpenWindowsAutomatically(false);
         assertFalse(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
         new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -556,6 +556,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getJavaScriptCanOpenWindowsAutomatically());
         loadAssetUrl(TestHtmlConstants.POPUP_URL);
         new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
             protected boolean check() {
                 String title = mWebView.getTitle();
                 return title != null && title.length() > 0;
@@ -1015,6 +1016,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         loadUrl(url);
         new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1023,6 +1025,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setAppCachePath("/data/foo");
         loadUrl(url);
         new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
             }
@@ -1062,12 +1065,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      */
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new PollingCheck(WEBVIEW_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
-        assertEquals(100, mWebView.getProgress());
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 }
