@@ -41,7 +41,8 @@ Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_createExp
         jlong        checkerRadiusAddress,
         jfloat       exposureValue);
 
-JNIEXPORT void JNICALL
+
+JNIEXPORT jstring JNICALL
 Java_com_android_cts_verifier_camera_analyzer_ExposureCompensationTest_processExposureCompensationTest(
         JNIEnv*      env,
         jobject      thiz,

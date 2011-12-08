@@ -32,13 +32,22 @@ public class ExposureCompensationTest extends CameraTests {
 
     private static final String TAG = "ExposureCompensationTest";
 
+    /** Records the current exposure level. */
     private float mExposureLevel;
+    /** Lock for the camera object.*/
     private final Object mProcessingImage = new Object();
+    /** Lock for the camera's auto focusing task.*/
     private final Object mAutoFocusing = new Object();
+    /** Memory address of the native test handler.*/
     private long mTestHandler;
+    /** Test results. */
     private String[] mTestResults;
+    /** Number of sub-tests. */
     private int mNumTests;
+    /** Camera Parameters. */
     private Camera.Parameters mParams;
+    /** Debug results in text. */
+    private String mDebugText;
 
     private static ExposureCompensationTest singletonTest = null;
 
@@ -46,6 +55,7 @@ public class ExposureCompensationTest extends CameraTests {
         super();
     }
 
+    /** Prepares the camera and the related parameters for the test.*/
     public void updateCamera() {
         mParams = mTestCamera.getParameters();
         Log.v(TAG, String.format("Exposure level is from %d to %d",
@@ -70,6 +80,7 @@ public class ExposureCompensationTest extends CameraTests {
     }
 
     private void initializeTest() {
+        mDebugText = new String();
         // Creates a native test handler with a 120x160 pixel debug output
         mTestHandler = createExposureCompensationTest(200, 280);
     }
@@ -89,6 +100,7 @@ public class ExposureCompensationTest extends CameraTests {
                     + mParams.getMinExposureCompensation();
         }
 
+        /** Checks for each exposure compensation setting within the test range.*/
         for (int i = testRangeMin;
                 i <= testRangeMax; i += 1){
             mExposureLevel = i * mParams.getExposureCompensationStep();
@@ -123,7 +135,8 @@ public class ExposureCompensationTest extends CameraTests {
                 }
             }
         }
-        processExposureCompensationTest(mTestHandler);
+
+        mDebugText = processExposureCompensationTest(mTestHandler);
         displayHandlerDebugOutput(mTestHandler);
 
         Log.v(TAG, "Callback has returned!");
@@ -135,14 +148,6 @@ public class ExposureCompensationTest extends CameraTests {
         public void onPictureTaken(byte[] data, Camera mCamera) {
             Log.v(TAG, "Shutter pressed down!");
             Log.v(TAG, String.format("Current exposure is %f", mExposureLevel));
-
-            try {
-                FileOutputStream outStream = new FileOutputStream(
-                    String.format("/sdcard/exposure%d.jpg", System.currentTimeMillis()));
-                outStream.write(data);
-                outStream.close();
-            } catch (FileNotFoundException e) {
-            } catch (IOException e) {}
 
             Bitmap inputImage;
 
@@ -192,12 +197,17 @@ public class ExposureCompensationTest extends CameraTests {
         return "Exposure Compensation Test: \n";
     }
 
+    @Override
+    public String getDebugText() {
+        return mDebugText;
+    }
+
     private native long createExposureCompensationTest(int outputHeight, int outputWidth);
 
     private native void createExposureCompensationClass(long bufferAddress, long handlerAddress,
             long checkerCenterAddress, long checkerAadiusAddress, float mExposureLevel);
 
-    private native void processExposureCompensationTest(long handlerAddress);
+    private native String processExposureCompensationTest(long handlerAddress);
 
     static {
         System.loadLibrary("cameraanalyzer");

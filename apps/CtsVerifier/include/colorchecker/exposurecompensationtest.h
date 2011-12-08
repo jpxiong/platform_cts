@@ -24,19 +24,24 @@
 class ExposureCompensationTest : public ImageTestHandler {
   public:
     ExposureCompensationTest() : ImageTestHandler() {
-      initializeReferenceColors();
+        mDebugText = NULL;
+        initializeReferenceColors();
     }
     ExposureCompensationTest(int debugHeight, int debugWidth) :
-        ImageTestHandler(debugHeight, debugWidth) {
-      initializeReferenceColors();
+            ImageTestHandler(debugHeight, debugWidth) {
+        mDebugText = NULL;
+        initializeReferenceColors();
     }
     ~ExposureCompensationTest() {}
 
     void addDataToList(const float exposureValue,
                   const std::vector<Vec3f>* checkerColors) {
-      mExposureValues.push_back(exposureValue);
-      mCheckerColors.push_back(*checkerColors);
-      delete checkerColors;
+        mExposureValues.push_back(exposureValue);
+        mCheckerColors.push_back(*checkerColors);
+    }
+
+    const char* getDebugText() {
+        return mDebugText;
     }
 
     void processData();
@@ -47,6 +52,8 @@ class ExposureCompensationTest : public ImageTestHandler {
     std::vector<std::vector<Vec3f> > mCheckerColors;
     std::vector<Vec3i> mReferenceColors;
     std::vector<float> mExposureValues;
+
+    char* mDebugText;
 };
 
 #endif
