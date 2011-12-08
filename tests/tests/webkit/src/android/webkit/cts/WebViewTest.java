@@ -2815,8 +2815,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         @Override
         public void handleMessage(Message msg) {
-            mHadRecieved = true;
             mResultUrl = msg.getData().getString("url");
+            mHadRecieved = true;
         }
     }
 
