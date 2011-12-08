@@ -51,6 +51,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
+import android.webkit.cts.WaitForLoadUrl;
+import android.webkit.cts.WaitForLoadUrl.WaitForLoadedClient;
 import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
 import android.webkit.SslErrorHandler;
@@ -76,7 +78,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
-    private static long TIME_FOR_LAYOUT = 1000L;
 
     private WebView mWebView;
     private CtsTestServer mWebServer;
@@ -99,6 +100,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         File f = getActivity().getFileStreamPath("snapshot");
         if (f.exists()) {
             f.delete();
+        }
+        try {
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    WaitForLoadUrl.initializeWebView(mWebView);
+                }
+            });
+        } catch (Throwable t) {
+            Log.w(LOGTAG, "setUp(): Caught exception while preparing for load wait");
         }
     }
 
@@ -440,7 +450,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 // handle loading a new URL. We set a WebViewClient as
                 // WebViewClient.shouldOverrideUrlLoading() returns false, so
                 // the WebView will load the new URL.
-                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.setWebViewClient(new WaitForLoadedClient());
                 mWebView.setWebChromeClient(new LoadCompleteWebChromeClient());
                 mWebView.loadUrl(redirectUrl);
             }
@@ -849,6 +859,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             public Picture picture;
 
             public void onNewPicture(WebView view, Picture picture) {
+                // Need to inform the listener tracking new picture
+                // for the "page loaded" knowledge since it has been replaced.
+                WaitForLoadUrl.onNewPicture();
                 this.callCount += 1;
                 this.webView = view;
                 this.picture = picture;
@@ -1795,6 +1808,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN,
                         location[0] + imgWidth / 2,
                         location[1] + imgHeight / 2, 0));
+        getInstrumentation().waitForIdleSync();
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mWebView.requestImageRef(msg);
@@ -2091,7 +2105,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {WebViewClient.class}
     )
     public void testSetWebViewClient() throws Throwable {
-        final class MockWebViewClient extends WebViewClient {
+        final class MockWebViewClient extends WaitForLoadedClient {
             private boolean mOnScaleChangedCalled = false;
             @Override
             public void onScaleChanged(WebView view, float oldScale, float newScale) {
@@ -2192,7 +2206,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testSecureSiteSetsCertificate() throws Throwable {
-        final class MockWebViewClient extends WebViewClient {
+        final class MockWebViewClient extends WaitForLoadedClient {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
@@ -2243,7 +2257,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {}
     )
     public void testOnReceivedSslError() throws Throwable {
-        final class MockWebViewClient extends WebViewClient {
+        final class MockWebViewClient extends WaitForLoadedClient {
             private String mErrorUrl;
             private WebView mWebView;
             @Override
@@ -2283,7 +2297,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {}
     )
     public void testOnReceivedSslErrorProceed() throws Throwable {
-        final class MockWebViewClient extends WebViewClient {
+        final class MockWebViewClient extends WaitForLoadedClient {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
@@ -2313,7 +2327,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         args = {}
     )
     public void testOnReceivedSslErrorCancel() throws Throwable {
-        final class MockWebViewClient extends WebViewClient {
+        final class MockWebViewClient extends WaitForLoadedClient {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.cancel();
@@ -2498,7 +2512,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 // handle loading a new URL. We set WebViewClient as
                 // WebViewClient.shouldOverrideUrlLoading() returns false, so
                 // the WebView will load the new URL.
-                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.setWebViewClient(new WaitForLoadedClient());
                 mWebView.setDownloadListener(listener);
                 mWebView.loadData("<html><body><a href=\"" + url + "\">link</a></body></html>",
                         "text/html", null);
@@ -2941,17 +2955,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     private void waitForLoadComplete() {
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
-        try {
-            Thread.sleep(TIME_FOR_LAYOUT);
-        } catch (InterruptedException e) {
-            Log.w(LOGTAG, "waitForLoadComplete() interrupted while sleeping for layout delay.");
-        }
+        WaitForLoadUrl.waitForLoadComplete(TEST_TIMEOUT);
     }
 
     private synchronized void notifyUiThreadDone() {
@@ -2983,7 +2987,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     // Note that this class is not thread-safe.
-    final class SslErrorWebViewClient extends WebViewClient {
+    final class SslErrorWebViewClient extends WaitForLoadedClient {
         private boolean mWasOnReceivedSslErrorCalled;
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
