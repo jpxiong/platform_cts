@@ -1247,6 +1247,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             private int mPreviousScrollY = -1;
             @Override
             protected boolean check() {
+                getInstrumentation().waitForIdleSync();
                 try {
                     runTestOnUiThread(runnable);
                 } catch (Throwable t) {}
