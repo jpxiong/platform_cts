@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := $(call all-src-files)
 LOCAL_MODULE := cts-dalvik-buildutil
 LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 
-LOCAL_JAVA_LIBRARIES := dx dasm cfassembler hosttestlib ddmlib
+LOCAL_JAVA_LIBRARIES := dx dasm cfassembler hosttestlib ddmlib junit
 LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
 
 include $(BUILD_HOST_JAVA_LIBRARY)
@@ -66,7 +66,7 @@ $(GENERATED_FILES): PRIVATE_LIB_FOLDER := $(LOCAL_PATH)/lib
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES := $(intermediates)/tests
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_MAIN_FILES := $(intermediates)/main_files
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES := $(intermediates)/hostjunit_files
-$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar  $(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar $(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar
+$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar  $(HOST_OUT_JAVA_LIBRARIES)/hosttestlib.jar $(HOST_OUT_JAVA_LIBRARIES)/ddmlib.jar $(HOST_OUT_JAVA_LIBRARIES)/junit.jar
 
 	$(hide) mkdir -p $@
 # copy Util class to compile later together with the generated host side junit tests	
