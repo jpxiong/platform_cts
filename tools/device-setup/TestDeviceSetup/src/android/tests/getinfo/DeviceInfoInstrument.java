@@ -131,6 +131,10 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         String partitions = getPartitions();
         addResult(PARTITIONS, partitions);
 
+        // System libraries
+        String sysLibraries = getSystemLibraries();
+        addResult(SYS_LIBRARIES, sysLibraries);
+
         finish(Activity.RESULT_OK, mResults);
     }
 
@@ -319,4 +323,18 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
             return "Not able to run df for partition information.";
         }
     }
+
+    private String getSystemLibraries() {
+        PackageManager pm = getContext().getPackageManager();
+        String list[] = pm.getSystemSharedLibraryNames();
+
+        StringBuilder builder = new StringBuilder();
+        for (String lib : list) {
+            builder.append(lib);
+            builder.append(";");
+        }
+
+        return builder.toString();
+    }
+
 }
