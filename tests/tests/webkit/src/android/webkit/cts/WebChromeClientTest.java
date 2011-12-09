@@ -48,6 +48,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+        WaitForLoadUrl.initializeWebView(mWebView);
         mWebServer = new CtsTestServer(getActivity());
     }
 
@@ -213,8 +214,10 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnJsBeforeUnload());
 
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.JS_UNLOAD_URL));
+        WaitForLoadUrl.waitForLoadComplete(TEST_TIMEOUT);
         // unload should trigger when we try to navigate away
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        WaitForLoadUrl.waitForLoadComplete(TEST_TIMEOUT);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
