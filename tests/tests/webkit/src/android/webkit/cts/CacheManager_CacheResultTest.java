@@ -26,6 +26,8 @@ import org.apache.http.impl.cookie.DateUtils;
 
 import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
+import android.webkit.cts.WaitForLoadUrl;
 import android.webkit.CacheManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -51,6 +53,7 @@ public class CacheManager_CacheResultTest
         super.setUp();
         mWebView = getActivity().getWebView();
         mWebView.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.initializeWebView(mWebView);
     }
 
     @Override
@@ -172,15 +175,9 @@ public class CacheManager_CacheResultTest
         assertNull(result.getInputStream());
     }
 
-    private void loadUrl(String url){
+    private void loadUrl(final String url){
         mWebView.loadUrl(url);
-        // check whether loadURL successfully
-        new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.waitForLoadComplete(NETWORK_OPERATION_TIMEOUT);
         assertEquals(100, mWebView.getProgress());
     }
 }
