@@ -177,11 +177,19 @@ public class BasicAdapterTest extends AndroidTestCase {
 
         // test bad addresses
         try {
-            adapter.getRemoteDevice(null);
+            adapter.getRemoteDevice((String)null);
             fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {}
         try {
             adapter.getRemoteDevice("00:00:00:00:00:00:00:00");
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {}
+        try {
+            adapter.getRemoteDevice((byte[])null);
+            fail("IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {}
+        try {
+            adapter.getRemoteDevice(new byte[] {0x00, 0x00, 0x00, 0x00, 0x00});
             fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {}
 
@@ -189,6 +197,10 @@ public class BasicAdapterTest extends AndroidTestCase {
         BluetoothDevice device = adapter.getRemoteDevice("00:11:22:AA:BB:CC");
         assertNotNull(device);
         assertEquals("00:11:22:AA:BB:CC", device.getAddress());
+        device = adapter.getRemoteDevice(
+                new byte[] {0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
+        assertNotNull(device);
+        assertEquals("01:02:03:04:05:06", device.getAddress());
     }
 
     public void test_listenUsingRfcommWithServiceRecord() throws IOException {
