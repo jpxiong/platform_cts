@@ -154,7 +154,6 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         /**
          * Return the test run name that should be used for the TestPackage
-         * @return
          */
         String getTestRunName() {
             return mPackageDef.getUri();
@@ -191,6 +190,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITestDevice getDevice() {
         return mDevice;
     }
@@ -198,6 +198,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDevice(ITestDevice device) {
         mDevice = device;
     }
@@ -359,8 +360,6 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
     /**
      * Build the list of test packages to run
-     *
-     * @return
      */
     private List<TestPackage> buildTestsToRun() {
         List<TestPackage> testPkgList = new LinkedList<TestPackage>();
@@ -471,7 +470,6 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /**
      * Return the list of unique prerequisite Android package names
      * @param testPackages
-     * @return
      */
     private Collection<String> getPrerequisitePackageNames(List<TestPackage> testPackages) {
         Set<String> pkgNames = new HashSet<String>();
@@ -487,7 +485,6 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /**
      * Return the list of unique prerequisite apks to install
      * @param testPackages
-     * @return
      */
     private Collection<String> getPrerequisiteApks(List<TestPackage> testPackages) {
         Set<String> apkNames = new HashSet<String>();
@@ -572,9 +569,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * <p/>
      * Exposed so unit tests can mock.
      *
-     * @param listeners
      * @throws DeviceNotAvailableException
-     * @throws FileNotFoundException
      */
     void collectDeviceInfo(ITestDevice device, CtsBuildHelper ctsBuild,
             ITestInvocationListener listener) throws DeviceNotAvailableException {
