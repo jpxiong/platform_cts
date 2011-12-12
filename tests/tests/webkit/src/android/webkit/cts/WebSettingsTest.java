@@ -100,13 +100,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(String.format("User agent string did not match expected pattern. \nExpected " +
                         "pattern:\n%s\nActual:\n%s", patternString, actualUserAgentString),
                         patternMatcher.find());
-        assertEquals(Build.VERSION.RELEASE, patternMatcher.group(1));
         Locale currentLocale = Locale.getDefault();
         assertEquals(currentLocale.getLanguage().toLowerCase(), patternMatcher.group(2));
         assertEquals(currentLocale.getCountry().toLowerCase(), patternMatcher.group(3));
-        // Model is only added in release builds
-        if ("REL".equals(Build.VERSION.CODENAME))
+        if ("REL".equals(Build.VERSION.CODENAME)) {
+            // Model is only added in release builds
             assertEquals(Build.MODEL, patternMatcher.group(4));
+            // Release version is valid only in release builds
+            assertEquals(Build.VERSION.RELEASE, patternMatcher.group(1));
+        }
         assertEquals(Build.ID, patternMatcher.group(5));
     }
 
