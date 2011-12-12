@@ -31,7 +31,7 @@ LOCAL_MODULE := cts-tf-dalvik-buildutil
 LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_JAVA_LIBRARIES := dx dasm cfassembler
+LOCAL_JAVA_LIBRARIES := dx dasm cfassembler junit
 LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
 
 include $(BUILD_HOST_JAVA_LIBRARY)
@@ -63,7 +63,7 @@ $(GENERATED_FILES): PRIVATE_LIB_FOLDER := $(LOCAL_PATH)/lib
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES := $(intermediates)/tests
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_MAIN_FILES := $(intermediates)/main_files
 $(GENERATED_FILES): PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES := $(intermediates)/hostjunit_files
-$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-tf-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar
+$(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-tf-dalvik-buildutil.jar $(HOST_OUT_JAVA_LIBRARIES)/dasm.jar $(HOST_OUT_JAVA_LIBRARIES)/dx.jar $(HOST_OUT_JAVA_LIBRARIES)/cfassembler.jar $(HOST_OUT_JAVA_LIBRARIES)/junit.jar
 
 	$(hide) mkdir -p $@
 	$(hide) mkdir -p $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES)/dot/junit
