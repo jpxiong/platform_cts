@@ -33,8 +33,8 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
     private static final long TIMEOUT = 10000;
 
-    private WebView mWebView;
     private CtsTestServer mWebServer;
+    private WebViewOnUiThread mOnUiThread;
 
     public HttpAuthHandlerTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -43,14 +43,13 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
+        mOnUiThread.clearHistory();
+        mOnUiThread.clearCache(true);
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -82,30 +81,30 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
         // wrong credentials
         MyWebViewClient client = new MyWebViewClient(true, "FakeUser", "FakePass");
-        mWebView.setWebViewClient(client);
+        mOnUiThread.setWebViewClient(client);
 
-        assertLoadUrlSuccessfully(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mWebView.getTitle());
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
         assertTrue(client.useHttpAuthUsernamePassword);
 
         // missing credentials
         client = new MyWebViewClient(true, null, null);
-        mWebView.setWebViewClient(client);
+        mOnUiThread.setWebViewClient(client);
 
-        assertLoadUrlSuccessfully(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals(CtsTestServer.AUTH_REALM, client.realm);
         assertEquals(
-                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mWebView.getTitle());
+                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
         assertTrue(client.useHttpAuthUsernamePassword);
 
         // correct credentials
         client = new MyWebViewClient(true, CtsTestServer.AUTH_USER, CtsTestServer.AUTH_PASS);
-        mWebView.setWebViewClient(client);
+        mOnUiThread.setWebViewClient(client);
 
-        assertLoadUrlSuccessfully(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
         assertTrue(client.useHttpAuthUsernamePassword);
     }
 
@@ -119,17 +118,12 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         MyWebViewClient client = new MyWebViewClient(false, null, null);
-        mWebView.setWebViewClient(client);
+        mOnUiThread.setWebViewClient(client);
 
-        assertLoadUrlSuccessfully(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals(CtsTestServer.AUTH_REALM, client.realm);
         assertEquals(
-                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mWebView.getTitle());
-    }
-
-    private void assertLoadUrlSuccessfully(String url) throws InterruptedException {
-        mWebView.loadUrl(url);
-        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
+                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
     }
 
     private static class MyWebViewClient extends WaitForLoadedClient {

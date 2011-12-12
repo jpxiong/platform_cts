@@ -38,7 +38,7 @@ public class CookieManagerTest extends
 
     private static final int TEST_TIMEOUT = 5000;
 
-    private WebView mWebView;
+    private WebViewOnUiThread mOnUiThread;
     private CookieManager mCookieManager;
 
     public CookieManagerTest() {
@@ -48,9 +48,7 @@ public class CookieManagerTest extends
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
 
         mCookieManager = CookieManager.getInstance();
         assertNotNull(mCookieManager);
@@ -112,8 +110,8 @@ public class CookieManagerTest extends
 
         CtsTestServer server = new CtsTestServer(getActivity(), false);
         String url = server.getCookieUrl("conquest.html");
-        loadUrl(url);
-        assertEquals(null, mWebView.getTitle()); // no cookies passed
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(null, mOnUiThread.getTitle()); // no cookies passed
         Thread.sleep(500);
         assertNull(mCookieManager.getCookie(url));
 
@@ -121,8 +119,8 @@ public class CookieManagerTest extends
         assertTrue(mCookieManager.acceptCookie());
 
         url = server.getCookieUrl("war.html");
-        loadUrl(url);
-        assertEquals(null, mWebView.getTitle()); // no cookies passed
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(null, mOnUiThread.getTitle()); // no cookies passed
         waitForCookie(url);
         String cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
@@ -133,8 +131,8 @@ public class CookieManagerTest extends
         assertEquals("0", m.group(1));
 
         url = server.getCookieUrl("famine.html");
-        loadUrl(url);
-        assertEquals("count=0", mWebView.getTitle()); // outgoing cookie
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals("count=0", mOnUiThread.getTitle()); // outgoing cookie
         waitForCookie(url);
         cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
@@ -144,8 +142,8 @@ public class CookieManagerTest extends
 
         url = server.getCookieUrl("death.html");
         mCookieManager.setCookie(url, "count=41");
-        loadUrl(url);
-        assertEquals("count=41", mWebView.getTitle()); // outgoing cookie
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals("count=41", mOnUiThread.getTitle()); // outgoing cookie
         waitForCookie(url);
         cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
@@ -270,11 +268,6 @@ public class CookieManagerTest extends
                 return mCookieManager.getCookie(url) == null;
             }
         }.run();
-    }
-
-    private void loadUrl(String url) {
-        mWebView.loadUrl(url);
-        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 
     private void waitForCookie(final String url) {

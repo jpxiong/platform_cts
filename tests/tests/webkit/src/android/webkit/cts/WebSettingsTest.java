@@ -25,7 +25,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.TextSize;
-import android.webkit.WebView;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -46,9 +45,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     private static final int WEBVIEW_TIMEOUT = 5000;
     private static final String LOG_TAG = "WebSettingsTest";
 
-    private WebView mWebView;
     private WebSettings mSettings;
     private CtsTestServer mWebServer;
+    private WebViewOnUiThread mOnUiThread;
 
     public WebSettingsTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -57,13 +56,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-
-        // Set a web chrome client in order to receive progress updates.
-        mWebView.setWebChromeClient(new WebChromeClient());
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
-
-        mSettings = mWebView.getSettings();
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        mSettings = mOnUiThread.getSettings();
     }
 
     @Override
@@ -72,7 +66,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             mWebServer.shutdown();
         }
         // clear the cache to prevent side effects
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         super.tearDown();
     }
 
@@ -128,26 +122,26 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         String defaultUserAgent = mSettings.getUserAgentString();
         assertNotNull(defaultUserAgent);
-        loadUrl(url);
-        assertEquals(defaultUserAgent, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(defaultUserAgent, mOnUiThread.getTitle());
 
         // attempting to set a null string has no effect
         mSettings.setUserAgentString(null);
         assertEquals(defaultUserAgent, mSettings.getUserAgentString());
-        loadUrl(url);
-        assertEquals(defaultUserAgent, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(defaultUserAgent, mOnUiThread.getTitle());
 
         // attempting to set an empty string has no effect
         mSettings.setUserAgentString("");
         assertEquals(defaultUserAgent, mSettings.getUserAgentString());
-        loadUrl(url);
-        assertEquals(defaultUserAgent, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(defaultUserAgent, mOnUiThread.getTitle());
 
         String customUserAgent = "Cts/test";
         mSettings.setUserAgentString(customUserAgent);
         assertEquals(customUserAgent, mSettings.getUserAgentString());
-        loadUrl(url);
-        assertEquals(customUserAgent, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(customUserAgent, mOnUiThread.getTitle());
     }
 
     @TestTargets({
@@ -169,37 +163,37 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         mSettings.setUserAgent(1);
         assertEquals(1, mSettings.getUserAgent());
-        loadUrl(url);
-        String userAgent1 = mWebView.getTitle();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        String userAgent1 = mOnUiThread.getTitle();
         assertNotNull(userAgent1);
 
         mSettings.setUserAgent(3);
         assertEquals(1, mSettings.getUserAgent());
-        loadUrl(url);
-        assertEquals(userAgent1, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(userAgent1, mOnUiThread.getTitle());
 
         mSettings.setUserAgent(2);
         assertEquals(2, mSettings.getUserAgent());
-        loadUrl(url);
-        String userAgent2 = mWebView.getTitle();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        String userAgent2 = mOnUiThread.getTitle();
         assertNotNull(userAgent2);
 
         mSettings.setUserAgent(3);
         assertEquals(2, mSettings.getUserAgent());
-        loadUrl(url);
-        assertEquals(userAgent2, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(userAgent2, mOnUiThread.getTitle());
 
         mSettings.setUserAgent(0);
         assertEquals(0, mSettings.getUserAgent());
-        loadUrl(url);
-        String userAgent0 = mWebView.getTitle();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        String userAgent0 = mOnUiThread.getTitle();
         assertNotNull(userAgent0);
 
         final String customUserAgent = "Cts/Test";
         mSettings.setUserAgentString(customUserAgent);
         assertEquals(-1, mSettings.getUserAgent());
-        loadUrl(url);
-        assertEquals(customUserAgent, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(customUserAgent, mOnUiThread.getTitle());
     }
 
 
@@ -220,15 +214,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getAllowFileAccess());
 
         String fileUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        loadUrl(fileUrl);
-        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
+        mOnUiThread.loadUrlAndWaitForCompletion(fileUrl);
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
 
         fileUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.BR_TAG_URL);
         mSettings.setAllowFileAccess(false);
         assertFalse(mSettings.getAllowFileAccess());
-        loadUrl(fileUrl);
+        mOnUiThread.loadUrlAndWaitForCompletion(fileUrl);
         // direct file:// access still works with access disabled
-        assertEquals(TestHtmlConstants.BR_TAG_TITLE, mWebView.getTitle());
+        assertEquals(TestHtmlConstants.BR_TAG_TITLE, mOnUiThread.getTitle());
 
         // ToBeFixed: How does this API prevent file access?
     }
@@ -249,7 +243,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         String url = TestHtmlConstants.EMBEDDED_IMG_URL;
         final String ext = MimeTypeMap.getFileExtensionFromUrl(url);
 
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         assertFalse(mSettings.getBlockNetworkImage());
         assertTrue(mSettings.getLoadsImagesAutomatically());
         loadAssetUrl(url);
@@ -260,7 +254,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             }
         }.run();
 
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         mSettings.setBlockNetworkImage(true);
         assertTrue(mSettings.getBlockNetworkImage());
         loadAssetUrl(url);
@@ -546,11 +540,11 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                String title = mWebView.getTitle();
+                String title = mOnUiThread.getTitle();
                 return title != null && title.length() > 0;
             }
         }.run();
-        assertEquals("Popup blocked", mWebView.getTitle());
+        assertEquals("Popup blocked", mOnUiThread.getTitle());
 
         mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         assertTrue(mSettings.getJavaScriptCanOpenWindowsAutomatically());
@@ -558,11 +552,11 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                String title = mWebView.getTitle();
+                String title = mOnUiThread.getTitle();
                 return title != null && title.length() > 0;
             }
         }.run();
-        assertEquals("Popup allowed", mWebView.getTitle());
+        assertEquals("Popup allowed", mOnUiThread.getTitle());
 }
 
     @TestTargets({
@@ -584,10 +578,10 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mWebView.getTitle() != null;
+                return mOnUiThread.getTitle() != null;
             }
         }.run();
-        assertEquals("javascript on", mWebView.getTitle());
+        assertEquals("javascript on", mOnUiThread.getTitle());
 
         mSettings.setJavaScriptEnabled(false);
         assertFalse(mSettings.getJavaScriptEnabled());
@@ -595,10 +589,10 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mWebView.getTitle() != null;
+                return mOnUiThread.getTitle() != null;
             }
         }.run();
-        assertEquals("javascript off", mWebView.getTitle());
+        assertEquals("javascript off", mOnUiThread.getTitle());
     }
 
     @TestTargets({
@@ -661,7 +655,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
             "take effect by automatic testing")
     public void testAccessLoadsImagesAutomatically() throws Exception {
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         assertTrue(mSettings.getLoadsImagesAutomatically());
         String url = TestHtmlConstants.EMBEDDED_IMG_URL;
         String ext = MimeTypeMap.getFileExtensionFromUrl(url);
@@ -669,7 +663,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         Thread.sleep(1000);
         assertFalse(mWebServer.getLastRequestUrl().endsWith(ext));
 
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         mSettings.setLoadsImagesAutomatically(false);
         assertFalse(mSettings.getLoadsImagesAutomatically());
         loadAssetUrl(url);
@@ -971,10 +965,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     })
     @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
             "take effect by automatic testing")
-    public void testAccessSupportZoom() {
+    public void testAccessSupportZoom() throws Throwable {
         assertTrue(mSettings.supportZoom());
 
-        mSettings.setSupportZoom(false);
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSettings.setSupportZoom(false);
+            }
+        });
         assertFalse(mSettings.supportZoom());
     }
 
@@ -992,10 +991,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     })
     @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
             "take effect by automatic testing")
-    public void testAccessBuiltInZoomControls() {
+    public void testAccessBuiltInZoomControls() throws Throwable {
         assertFalse(mSettings.getBuiltInZoomControls());
 
-        mSettings.setBuiltInZoomControls(true);
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSettings.setBuiltInZoomControls(true);
+            }
+        });
         assertTrue(mSettings.getBuiltInZoomControls());
     }
 
@@ -1014,20 +1018,20 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setAppCacheEnabled(true);
         mSettings.setJavaScriptEnabled(true);
 
-        loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
+                return mOnUiThread.getTitle() != null && mOnUiThread.getTitle().equals("Done");
             }
         }.run();
 
         mSettings.setAppCachePath("/data/foo");
-        loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mWebView.getTitle() != null && mWebView.getTitle().equals("Done");
+                return mOnUiThread.getTitle() != null && mOnUiThread.getTitle().equals("Done");
             }
         }.run();
     }
@@ -1055,16 +1059,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             startWebServer();
         }
         String url = mWebServer.getAssetUrl(asset);
-        loadUrl(url);
-    }
-
-    /**
-     * Fully load the page at the given URL.
-     *
-     * @param url The URL of the page to load.
-     */
-    private void loadUrl(String url) {
-        mWebView.loadUrl(url);
-        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
     }
 }

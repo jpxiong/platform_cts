@@ -38,8 +38,8 @@ public class CacheManager_CacheResultTest
         extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long NETWORK_OPERATION_TIMEOUT = 10000L;
 
-    private WebView mWebView;
     private CtsTestServer mWebServer;
+    private WebViewOnUiThread mOnUiThread;
 
     public CacheManager_CacheResultTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -48,8 +48,7 @@ public class CacheManager_CacheResultTest
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
     @Override
@@ -137,7 +136,7 @@ public class CacheManager_CacheResultTest
         mWebServer.setDocumentAge(age);
         mWebServer.setDocumentValidity(validity);
 
-        mWebView.clearCache(true);
+        mOnUiThread.clearCache(true);
         new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -147,7 +146,7 @@ public class CacheManager_CacheResultTest
             }
         }.run();
         final long time = System.currentTimeMillis();
-        loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         CacheResult result = CacheManager.getCacheFile(url, null);
         assertNotNull(result);
         assertNotNull(result.getInputStream());
@@ -169,10 +168,5 @@ public class CacheManager_CacheResultTest
 
         result.setInputStream(null);
         assertNull(result.getInputStream());
-    }
-
-    private void loadUrl(final String url){
-        mWebView.loadUrl(url);
-        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 }

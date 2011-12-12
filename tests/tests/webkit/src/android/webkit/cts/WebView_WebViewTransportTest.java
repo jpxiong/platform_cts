@@ -16,14 +16,14 @@
 
 package android.webkit.cts;
 
+import android.test.AndroidTestCase;
+import android.webkit.WebView;
+import android.webkit.WebView.WebViewTransport;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-
-import android.test.AndroidTestCase;
-import android.webkit.WebView;
-import android.webkit.WebView.WebViewTransport;
 
 @TestTargetClass(WebViewTransport.class)
 public class WebView_WebViewTransportTest extends AndroidTestCase {
