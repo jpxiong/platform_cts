@@ -46,6 +46,9 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private static final String FEATURE_TAG = "Feature";
     private static final String FEATURE_ATTR_DELIM = ":";
     private static final String FEATURE_DELIM = ";";
+    private static final String SYSLIB_INFO_TAG = "SystemLibrariesInfo";
+    private static final String SYSLIB_TAG = "Library";
+    private static final String SYSLIB_DELIM = ";";
     private static final String PROCESS_INFO_TAG = "ProcessInfo";
     private static final String PROCESS_TAG = "Process";
     private static final String PROCESS_DELIM = ";";
@@ -83,6 +86,7 @@ class DeviceInfoResult extends AbstractXmlPullParser {
 
             String featureData = getMetric(metricsCopy, DeviceInfoConstants.FEATURES);
             String processData = getMetric(metricsCopy, DeviceInfoConstants.PROCESSES);
+            String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
 
             // dump the remaining metrics without translation
             serializer.startTag(ns, BUILD_TAG);
@@ -93,6 +97,7 @@ class DeviceInfoResult extends AbstractXmlPullParser {
 
             serializeFeatureInfo(serializer, featureData);
             serializeProcessInfo(serializer, processData);
+            serializeSystemLibrariesInfo(serializer, sysLibData);
         } else {
             // this might be expected, if device info collection was turned off
             CLog.d("Could not find device info");
@@ -183,6 +188,39 @@ class DeviceInfoResult extends AbstractXmlPullParser {
         serializer.endTag(ns, PROCESS_INFO_TAG);
     }
 
+
+    /**
+     * Prints XML data listing available system libraries.
+     * It parses a string from the rootLibraries argument that is in the form of
+     * "libName1;libName2;..." with a trailing semi-colon.
+     *
+     * <pre>
+     *   <SystemLibrariesInfo>
+     *     <Library name="a.b.c" />
+     *     ...
+     *   </SystemLibrariesInfo>
+     * </pre>
+     */
+    private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String rootLibraries)
+            throws IOException {
+        serializer.startTag(ns, SYSLIB_INFO_TAG);
+
+        if (rootLibraries == null) {
+            rootLibraries = "";
+        }
+
+        String[] libNames = rootLibraries.split(SYSLIB_DELIM);
+        for (String libName : libNames) {
+            libName = libName.trim();
+            if (libName.length() > 0) {
+                serializer.startTag(ns, SYSLIB_TAG);
+                serializer.attribute(ns, "name", libName);
+                serializer.endTag(ns, SYSLIB_TAG);
+            }
+        }
+        serializer.endTag(ns, SYSLIB_INFO_TAG);
+    }
+
     /**
      * Populates this class with package result data parsed from XML.
      *
@@ -210,6 +248,10 @@ class DeviceInfoResult extends AbstractXmlPullParser {
                     // store processes into metrics map, in the same format as when collected from
                     // device
                     mMetrics.put(DeviceInfoConstants.PROCESSES, parseProcess(parser));
+                } else if (parser.getName().equals(SYSLIB_INFO_TAG)) {
+                    // store system libs into metrics map, in the same format as when collected from
+                    // device
+                    mMetrics.put(DeviceInfoConstants.SYS_LIBRARIES, parseSystemLibraries(parser));
                 }
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
@@ -269,6 +311,31 @@ class DeviceInfoResult extends AbstractXmlPullParser {
         }
         return featureString.toString();
 
+    }
+
+
+    /**
+     * Parse JavaLibrariesInfo XML, and return its contents as a delimited String
+     */
+    private String parseSystemLibraries(XmlPullParser parser) throws XmlPullParserException, IOException {
+        if (!parser.getName().equals(SYSLIB_INFO_TAG)) {
+            throw new XmlPullParserException(String.format(
+                    "invalid XML: Expected %s tag but received %s", SYSLIB_INFO_TAG,
+                    parser.getName()));
+        }
+        StringBuilder libsString = new StringBuilder();
+        int eventType = parser.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(SYSLIB_TAG)) {
+                libsString.append(getAttribute(parser, "name"));
+                libsString.append(SYSLIB_DELIM);
+            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(
+                    SYSLIB_INFO_TAG)) {
+                return libsString.toString();
+            }
+            eventType = parser.next();
+        }
+        return libsString.toString();
     }
 
     /**

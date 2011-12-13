@@ -81,6 +81,7 @@
     </xs:element>
     <xs:element name="FeatureInfo" type="featureInfoType"/>
     <xs:element name="ProcessInfo" type="processInfoType"/>
+    <xs:element name="SystemLibrariesInfo" type="systemLibrariesInfoType"/>
   </xs:sequence>
 </xs:complexType>
 
@@ -134,6 +135,16 @@
             <xs:complexType>
                 <xs:attribute name="name" type="xs:string" />
                 <xs:attribute name="uid" type="xs:integer" />
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="systemLibrariesInfoType">
+    <xs:sequence>
+        <xs:element name="Library" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
             </xs:complexType>
         </xs:element>
     </xs:sequence>
