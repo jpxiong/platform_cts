@@ -83,7 +83,7 @@ public class CtsXmlResultReporterTest extends TestCase {
         final String expectedHeaderOutput = "<?xml version='1.0' encoding='UTF-8' standalone='no' ?>" +
             "<?xml-stylesheet type=\"text/xsl\" href=\"cts_result.xsl\"?>";
         final String expectedTestOutput =
-            "<TestResult testPlan=\"NA\" starttime=\"ignore\" endtime=\"ignore\" version=\"1.11\"> ";
+            "<TestResult testPlan=\"NA\" starttime=\"ignore\" endtime=\"ignore\" version=\"1.12\"> ";
         final String expectedSummaryOutput =
             "<Summary failed=\"0\" notExecuted=\"0\" timeout=\"0\" pass=\"0\" />";
         final String expectedEndTag = "</TestResult>";

@@ -265,6 +265,16 @@
                                                 </UL>
                                             </TD>
                                         </TR>
+                                        <TR>
+                                            <TD class="rowtitle">System Libraries</TD>
+                                            <TD>
+                                                <UL>
+                                                    <xsl:for-each select="TestResult/DeviceInfo/SystemLibrariesInfo/Library">
+                                                        <LI><xsl:value-of select="@name" /></LI>
+                                                    </xsl:for-each>
+                                                </UL>
+                                            </TD>
+                                        </TR>
                                     </TABLE>
                                 </div>
                             </TD>
