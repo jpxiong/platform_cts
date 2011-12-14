@@ -50,6 +50,7 @@ class TestPackageDef implements ITestPackageDef {
     private String mRunner = null;
     private boolean mIsHostSideTest = false;
     private boolean mIsVMHostTest = false;
+    private String mTestType = null;
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
     private boolean mIsReferenceAppTest = false;
@@ -78,6 +79,7 @@ class TestPackageDef implements ITestPackageDef {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getUri() {
         return mUri;
     }
@@ -126,6 +128,10 @@ class TestPackageDef implements ITestPackageDef {
 
     boolean isVMHostTest() {
         return mIsVMHostTest;
+    }
+
+    void setTestType(String testType) {
+        mTestType = testType;
     }
 
     void setJarPath(String jarPath) {
@@ -229,6 +235,8 @@ class TestPackageDef implements ITestPackageDef {
             vmHostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
+        } else if ("native".equals(mTestType)) {
+            return new GeeTest(mUri, mName);
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml points to
             // specialized instrumentation. Eventually this special case for signatureTest can be
@@ -302,6 +310,7 @@ class TestPackageDef implements ITestPackageDef {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isKnownTest(TestIdentifier testDef) {
         return mTests.contains(testDef);
     }
@@ -309,6 +318,7 @@ class TestPackageDef implements ITestPackageDef {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isKnownTestClass(String className) {
         return mTestClasses.contains(className);
     }
