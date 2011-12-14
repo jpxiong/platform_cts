@@ -3,7 +3,7 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES:= \
     bionic \
@@ -29,4 +29,5 @@ LOCAL_MODULE:= NativeMediaTest_SL
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA)/nativetest
 
-include $(BUILD_EXECUTABLE)
+LOCAL_CTS_TEST_PACKAGE := android.nativemedia.sl
+include $(BUILD_CTS_EXECUTABLE)
