@@ -75,5 +75,12 @@ CTS_TEST_CASE_LIST := \
 	$(CTS_COVERAGE_TEST_CASE_LIST) \
 	$(CTS_SECURITY_APPS_LIST)
 
+CTS_NATIVE_EXES := \
+	CtsNativeMediaTestCases
+
+CTS_TEST_CASES := $(call cts-get-native-paths,$(CTS_NATIVE_EXES))
+
+CTS_TEST_XMLS := $(call cts-get-native-xmls,$(CTS_NATIVE_EXES))
+
 # The following files will be placed in the tools directory of the CTS distribution
 CTS_TOOLS_LIST :=
