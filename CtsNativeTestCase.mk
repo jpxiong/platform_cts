@@ -24,7 +24,7 @@ CTS_NATIVE_XML_OUT := $(HOST_OUT)/cts-native-xml
 CTS_NATIVE_XML_GENERATOR := $(HOST_OUT_EXECUTABLES)/cts-native-xml-generator
 
 define cts-get-native-paths
-	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(1))/$(1))
+	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe))/$(exe))
 endef
 
 define cts-get-native-xmls
