@@ -218,6 +218,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/data/com.htc.loggers/tmp",
                     "/data/data/com.htc.loggers/htcghost",
                     "/data/data/com.android.providers.drm/rights",
+                    "/data/data/recovery",
                     "/data/dontpanic",
                     "/data/drm",
                     "/data/drm/rights",
