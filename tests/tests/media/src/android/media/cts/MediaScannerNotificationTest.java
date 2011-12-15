@@ -24,84 +24,53 @@ import android.net.Uri;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class MediaScannerNotificationTest extends AndroidTestCase {
-    private static final int MEDIA_SCANNER_TIME_OUT = 2000;
 
-    private ScannerNotificationReceiver mScannerStartedReceiver;
-    private ScannerNotificationReceiver mScannerFinishedReceiver;
-    private boolean mScannerStarted;
-    private boolean mScannerFinished;
-
-    public void testMediaScannerNotification() throws InterruptedException {
-        mScannerStarted = false;
-        mScannerFinished = false;
-
-        IntentFilter scannerStartedIntentFilter = new IntentFilter(
+    public void testMediaScannerNotification() throws Exception {
+        ScannerNotificationReceiver startedReceiver = new ScannerNotificationReceiver(
                 Intent.ACTION_MEDIA_SCANNER_STARTED);
-        scannerStartedIntentFilter.addDataScheme("file");
-        IntentFilter scannerFinshedIntentFilter = new IntentFilter(
-                Intent.ACTION_MEDIA_SCANNER_FINISHED);
-        scannerFinshedIntentFilter.addDataScheme("file");
-
-        mScannerStartedReceiver = new ScannerNotificationReceiver(
-                Intent.ACTION_MEDIA_SCANNER_STARTED);
-        mScannerFinishedReceiver = new ScannerNotificationReceiver(
+        ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
                 Intent.ACTION_MEDIA_SCANNER_FINISHED);
 
-        getContext().registerReceiver(mScannerStartedReceiver, scannerStartedIntentFilter);
-        getContext().registerReceiver(mScannerFinishedReceiver, scannerFinshedIntentFilter);
+        IntentFilter startedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_STARTED);
+        startedIntentFilter.addDataScheme("file");
+        IntentFilter finshedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        finshedIntentFilter.addDataScheme("file");
 
-        getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-            + Environment.getExternalStorageDirectory())));
-        mScannerStartedReceiver.waitForCalls(1, MEDIA_SCANNER_TIME_OUT);
-        mScannerFinishedReceiver.waitForCalls(1, MEDIA_SCANNER_TIME_OUT);
+        mContext.registerReceiver(startedReceiver, startedIntentFilter);
+        mContext.registerReceiver(finishedReceiver, finshedIntentFilter);
 
-        assertTrue(mScannerStarted);
-        assertTrue(mScannerFinished);
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+                + Environment.getExternalStorageDirectory())));
+
+        startedReceiver.waitForBroadcast();
+        finishedReceiver.waitForBroadcast();
     }
 
-    class ScannerNotificationReceiver extends BroadcastReceiver {
-        private int mCalls;
-        private int mExpectedCalls;
-        private String mAction;
-        private Object mLock;
+    static class ScannerNotificationReceiver extends BroadcastReceiver {
+
+        private static final int TIMEOUT_MS = 30 * 1000;
+
+        private final String mAction;
+        private final CountDownLatch mLatch = new CountDownLatch(1);
 
         ScannerNotificationReceiver(String action) {
             mAction = action;
-            reset();
-            mLock = new Object();
-        }
-
-        void reset() {
-            mExpectedCalls = Integer.MAX_VALUE;
-            mCalls = 0;
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(mAction)) {
-                if (mAction.equals(Intent.ACTION_MEDIA_SCANNER_STARTED)) {
-                    mScannerStarted = true;
-                } else if (mAction.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
-                    mScannerFinished = true;
-                }
-                synchronized (mLock) {
-                    mCalls += 1;
-                    if (mCalls >= mExpectedCalls) {
-                        mLock.notify();
-                    }
-                }
+                mLatch.countDown();
             }
         }
 
-        public void waitForCalls(int expectedCalls, long timeout) throws InterruptedException {
-            synchronized(mLock) {
-                mExpectedCalls = expectedCalls;
-                if (mCalls < mExpectedCalls) {
-                    mLock.wait(timeout);
-                }
-            }
+        public void waitForBroadcast() throws InterruptedException {
+            assertTrue("Failed to receive broadcast for " + mAction,
+                    mLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS));
         }
     }
 }
