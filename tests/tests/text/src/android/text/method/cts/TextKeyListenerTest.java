@@ -273,9 +273,9 @@ public class TextKeyListenerTest extends
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
                 Selection.setSelection((Editable) mTextView.getText(), 0, 0);
                 mTextView.setKeyListener(textKeyListener);
+                mTextView.requestFocus();
             }
         });
         mInstrumentation.waitForIdleSync();
