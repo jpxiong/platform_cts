@@ -82,6 +82,6 @@ public class StatFsTest extends TestCase {
         assertTrue(blockSize > 0);
         assertTrue(totalBlocks > 0);
         assertTrue(freeBlocks >= availableBlocks);
-        assertTrue(availableBlocks > 0);
+        assertTrue(availableBlocks >= 0);
     }
 }

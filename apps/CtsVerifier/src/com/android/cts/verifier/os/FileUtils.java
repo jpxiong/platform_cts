@@ -62,6 +62,7 @@ public class FileUtils {
         private long atime;
         private long mtime;
         private long ctime;
+        private boolean executable;
 
         public int getUid() {
             return uid;
@@ -89,6 +90,10 @@ public class FileUtils {
 
         public boolean isSetGid() {
             return hasModeFlag(mode, S_ISGID);
+        }
+
+        public boolean isExecutableByCTS() {
+            return executable;
         }
     }
 
