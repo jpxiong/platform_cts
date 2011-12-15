@@ -231,9 +231,11 @@ public class SuidFilesActivity extends PassFailButtons.ListActivity {
             @Override
             public boolean accept(File pathname) {
                 if (FileUtils.getFileStatus(pathname.getPath(), status, true)) {
+                    // only files with setUid which can be executable by CTS are reported.
                     return !status.isDirectory()
                             && !status.isSymbolicLink()
-                            && status.isSetUid();
+                            && status.isSetUid()
+                            && status.isExecutableByCTS();
                 } else {
                     Log.w(TAG, "Could not stat " + pathname);
                     return false;
