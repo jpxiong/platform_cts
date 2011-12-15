@@ -554,15 +554,20 @@ public class CtsTestServer {
                     "  <head>" +
                     "    <title>Waiting</title>" +
                     "    <script>" +
-                    "      function updateTitle() { document.title = \"Done\"; }" +
-                    "      window.applicationCache.onnoupdate = updateTitle;" +
-                    "      window.applicationCache.oncached = updateTitle;" +
-                    "      window.applicationCache.onupdateready = updateTitle;" +
-                    "      window.applicationCache.onobsolete = updateTitle;" +
-                    "      window.applicationCache.onerror = updateTitle;" +
+                    "      function updateTitle(x) { document.title = x; }" +
+                    "      window.applicationCache.onnoupdate = " +
+                    "          function() { updateTitle(\"onnoupdate Callback\"); };" +
+                    "      window.applicationCache.oncached = " +
+                    "          function() { updateTitle(\"oncached Callback\"); };" +
+                    "      window.applicationCache.onupdateready = " +
+                    "          function() { updateTitle(\"onupdateready Callback\"); };" +
+                    "      window.applicationCache.onobsolete = " +
+                    "          function() { updateTitle(\"onobsolete Callback\"); };" +
+                    "      window.applicationCache.onerror = " +
+                    "          function() { updateTitle(\"onerror Callback\"); };" +
                     "    </script>" +
                     "  </head>" +
-                    "  <body>AppCache test</body>" +
+                    "  <body onload=\"updateTitle('Loaded');\">AppCache test</body>" +
                     "</html>"));
         } else if (path.equals(APPCACHE_MANIFEST_PATH)) {
             response = createResponse(HttpStatus.SC_OK);

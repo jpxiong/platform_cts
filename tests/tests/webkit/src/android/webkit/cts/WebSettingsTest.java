@@ -1014,11 +1014,46 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             args = {}
         )
     })
-    public void testSetAppCacheEnabled() throws Exception {
-        // Tests that when AppCache is enabled and used, but the database path
-        // is not set or is set to an inaccessible path, the WebView does not crash.
+    public void testAppCacheDisabled() throws Throwable {
+        // Test that when AppCache is disabled, we don't get any AppCache
+        // callbacks.
         startWebServer();
-        String url = mWebServer.getAppCacheUrl();
+        final String url = mWebServer.getAppCacheUrl();
+        mSettings.setJavaScriptEnabled(true);
+
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            protected boolean check() {
+                return "Loaded".equals(mOnUiThread.getTitle());
+            }
+        }.run();
+        // The page is now loaded. Wait for a further 1s to check no AppCache
+        // callbacks occur.
+        Thread.sleep(1000);
+        assertEquals("Loaded", mOnUiThread.getTitle());
+    }
+
+    @TestTargets({
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAppCacheEnabled",
+            args = {}
+        ),
+        @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "setAppCachePath",
+            args = {}
+        )
+    })
+    public void testAppCacheEnabled() throws Throwable {
+        // Note that the AppCache path can only be set once. This limits the
+        // amount of testing we can do, and means that we must test all aspects
+        // of setting the AppCache path in a single test to guarantee ordering.
+
+        // Test that when AppCache is enabled but no valid path is provided,
+        // we don't get any AppCache callbacks.
+        startWebServer();
+        final String url = mWebServer.getAppCacheUrl();
         mSettings.setAppCacheEnabled(true);
         mSettings.setJavaScriptEnabled(true);
 
@@ -1026,16 +1061,23 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mOnUiThread.getTitle() != null && mOnUiThread.getTitle().equals("Done");
+                return "Loaded".equals(mOnUiThread.getTitle());
             }
         }.run();
+        // The page is now loaded. Wait for a further 1s to check no AppCache
+        // callbacks occur.
+        Thread.sleep(1000);
+        assertEquals("Loaded", mOnUiThread.getTitle());
 
-        mSettings.setAppCachePath("/data/foo");
+        // Test that when AppCache is enabled and a valid path is provided, we
+        // get an AppCache callback of some kind.
+        mSettings.setAppCachePath(getActivity().getDir("appcache", 0).getPath());
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mOnUiThread.getTitle() != null && mOnUiThread.getTitle().equals("Done");
+                return mOnUiThread.getTitle() != null
+                        && mOnUiThread.getTitle().endsWith("Callback");
             }
         }.run();
     }
