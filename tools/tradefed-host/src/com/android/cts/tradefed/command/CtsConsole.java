@@ -159,8 +159,8 @@ public class CtsConsole extends Console {
         helpBuilder.append("  run cts --help/--help-all: get more help on running CTS\n");
         helpBuilder.append("List:\n");
         helpBuilder.append("  l/list d/devices: list connected devices and their state\n");
-        helpBuilder.append("  l/list p/packages: list CTS test packages\n");
-        helpBuilder.append("  l/list plans: list CTS test plans\n");
+        helpBuilder.append("  l/list packages: list CTS test packages\n");
+        helpBuilder.append("  l/list p/plans: list CTS test plans\n");
         helpBuilder.append("  l/list i/invocations: list invocations aka CTS test runs currently");
         helpBuilder.append("in progress\n");
         helpBuilder.append("  l/list c/commands: list commands: aka CTS test run commands ");
