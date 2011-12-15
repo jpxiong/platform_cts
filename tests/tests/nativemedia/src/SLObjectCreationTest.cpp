@@ -358,11 +358,6 @@ TEST_F(SLObjectCreationTest, testAudioPlayerFromAdtsAbqToPcmBqCreation) {
     AudioPlayerFromAdtsAbqToPcmBqCreation();
 }
 
-TEST_F(SLObjectCreationTest, testAudioRecorderCreation) {
-    LOGV("Test Fixture: AudioRecorderCreation");
-    AudioRecorderCreation();
-}
-
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
 
