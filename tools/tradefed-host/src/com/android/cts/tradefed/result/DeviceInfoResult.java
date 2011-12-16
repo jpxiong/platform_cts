@@ -46,6 +46,10 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private static final String FEATURE_TAG = "Feature";
     private static final String FEATURE_ATTR_DELIM = ":";
     private static final String FEATURE_DELIM = ";";
+    private static final String OPENGL_TEXTURE_FORMATS_INFO_TAG =
+            "OpenGLCompressedTextureFormatsInfo";
+    private static final String OPENGL_TEXTURE_FORMAT_TAG = "TextureFormat";
+    private static final String OPENGL_TEXTURE_FORMAT_DELIM = ";";
     private static final String SYSLIB_INFO_TAG = "SystemLibrariesInfo";
     private static final String SYSLIB_TAG = "Library";
     private static final String SYSLIB_DELIM = ";";
@@ -87,6 +91,8 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             String featureData = getMetric(metricsCopy, DeviceInfoConstants.FEATURES);
             String processData = getMetric(metricsCopy, DeviceInfoConstants.PROCESSES);
             String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
+            String textureData = getMetric(metricsCopy,
+                    DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS);
 
             // dump the remaining metrics without translation
             serializer.startTag(ns, BUILD_TAG);
@@ -98,6 +104,7 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             serializeFeatureInfo(serializer, featureData);
             serializeProcessInfo(serializer, processData);
             serializeSystemLibrariesInfo(serializer, sysLibData);
+            serializeOpenGLCompressedTextureFormatsInfo(serializer, textureData);
         } else {
             // this might be expected, if device info collection was turned off
             CLog.d("Could not find device info");
@@ -188,6 +195,55 @@ class DeviceInfoResult extends AbstractXmlPullParser {
         serializer.endTag(ns, PROCESS_INFO_TAG);
     }
 
+    /**
+     * Prints XML data in two level hierarchy.
+     * It parses a string from the root argument that is in the form of
+     * "element1-delimiter-element2-delimiter..." with a trailing delimiter
+     *
+     * <pre>
+     *   <infoTag>
+     *     <elementTag name="element1" />
+     *     ...
+     *   </infoTag>
+     * </pre>
+     */
+    private void serializeSimpleInfo(KXmlSerializer serializer, String root,
+            String infoTag, String elementTag, String delimiter)
+            throws IOException {
+        serializer.startTag(ns, infoTag);
+
+        if (root == null) {
+            root = "";
+        }
+
+        String[] elemNames = root.split(delimiter);
+        for (String elemName : elemNames) {
+            elemName = elemName.trim();
+            if (elemName.length() > 0) {
+                serializer.startTag(ns, elementTag);
+                serializer.attribute(ns, "name", elemName);
+                serializer.endTag(ns, elementTag);
+            }
+        }
+        serializer.endTag(ns, infoTag);
+    }
+
+    /**
+     * Prints XML data listing available OpenGL Compressed Texture Formats.
+     *
+     * <pre>
+     *   <OpenGLCompressedTextureFormatsInfo>
+     *     <TextureFormat name="abc" />
+     *     ...
+     *   </OpenGLCompressedTextureFormatsInfo>
+     * </pre>
+     */
+    private void serializeOpenGLCompressedTextureFormatsInfo(KXmlSerializer serializer,
+            String root) throws IOException {
+        serializeSimpleInfo(serializer, root, OPENGL_TEXTURE_FORMATS_INFO_TAG,
+                OPENGL_TEXTURE_FORMAT_TAG,
+                OPENGL_TEXTURE_FORMAT_DELIM);
+    }
 
     /**
      * Prints XML data listing available system libraries.
@@ -203,22 +259,7 @@ class DeviceInfoResult extends AbstractXmlPullParser {
      */
     private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String rootLibraries)
             throws IOException {
-        serializer.startTag(ns, SYSLIB_INFO_TAG);
-
-        if (rootLibraries == null) {
-            rootLibraries = "";
-        }
-
-        String[] libNames = rootLibraries.split(SYSLIB_DELIM);
-        for (String libName : libNames) {
-            libName = libName.trim();
-            if (libName.length() > 0) {
-                serializer.startTag(ns, SYSLIB_TAG);
-                serializer.attribute(ns, "name", libName);
-                serializer.endTag(ns, SYSLIB_TAG);
-            }
-        }
-        serializer.endTag(ns, SYSLIB_INFO_TAG);
+        serializeSimpleInfo(serializer, rootLibraries, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM);
     }
 
     /**
@@ -252,6 +293,11 @@ class DeviceInfoResult extends AbstractXmlPullParser {
                     // store system libs into metrics map, in the same format as when collected from
                     // device
                     mMetrics.put(DeviceInfoConstants.SYS_LIBRARIES, parseSystemLibraries(parser));
+                } else if (parser.getName().equals(OPENGL_TEXTURE_FORMATS_INFO_TAG)) {
+                    // store OpenGL texture formats into metrics map, in the same format as when
+                    // collected from device
+                    mMetrics.put(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
+                            parseOpenGLCompressedTextureFormats(parser));
                 }
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
@@ -313,29 +359,46 @@ class DeviceInfoResult extends AbstractXmlPullParser {
 
     }
 
+    /**
+     * Parse two-level hierarchy XML, and return its contents as a delimited String
+     */
+    private String parseSimpleInfo(XmlPullParser parser, String infoTag, String elementTag,
+            String delimiter) throws XmlPullParserException, IOException {
+        if (!parser.getName().equals(infoTag)) {
+            throw new XmlPullParserException(String.format(
+                    "invalid XML: Expected %s tag but received %s", infoTag,
+                    parser.getName()));
+        }
+        StringBuilder result = new StringBuilder();
+        int eventType = parser.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(elementTag)) {
+                result.append(getAttribute(parser, "name"));
+                result.append(delimiter);
+            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(
+                    infoTag)) {
+                return result.toString();
+            }
+            eventType = parser.next();
+        }
+        return result.toString();
+    }
 
     /**
      * Parse JavaLibrariesInfo XML, and return its contents as a delimited String
      */
-    private String parseSystemLibraries(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (!parser.getName().equals(SYSLIB_INFO_TAG)) {
-            throw new XmlPullParserException(String.format(
-                    "invalid XML: Expected %s tag but received %s", SYSLIB_INFO_TAG,
-                    parser.getName()));
-        }
-        StringBuilder libsString = new StringBuilder();
-        int eventType = parser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(SYSLIB_TAG)) {
-                libsString.append(getAttribute(parser, "name"));
-                libsString.append(SYSLIB_DELIM);
-            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(
-                    SYSLIB_INFO_TAG)) {
-                return libsString.toString();
-            }
-            eventType = parser.next();
-        }
-        return libsString.toString();
+    private String parseOpenGLCompressedTextureFormats(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        return parseSimpleInfo(parser, OPENGL_TEXTURE_FORMATS_INFO_TAG, OPENGL_TEXTURE_FORMAT_TAG,
+                OPENGL_TEXTURE_FORMAT_DELIM);
+    }
+
+    /**
+     * Parse JavaLibrariesInfo XML, and return its contents as a delimited String
+     */
+    private String parseSystemLibraries(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        return parseSimpleInfo(parser, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM);
     }
 
     /**

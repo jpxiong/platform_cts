@@ -213,6 +213,16 @@
                                             </TD>
                                         </TR>
                                         <TR>
+                                            <TD class="rowtitle">Open GL Compressed Texture Formats</TD>
+                                            <TD>
+                                                <UL>
+                                                    <xsl:for-each select="TestResult/DeviceInfo/OpenGLCompressedTextureFormatsInfo/TextureFormat">
+                                                        <LI><xsl:value-of select="@name" /></LI>
+                                                    </xsl:for-each>
+                                                </UL>
+                                            </TD>
+                                        </TR>
+                                        <TR>
                                             <TD class="rowtitle">Features</TD>
                                             <TD>
                                                 <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
