@@ -57,10 +57,15 @@ public class IssueReporter implements ITestInvocationListener {
     private String mServerUrl;
 
     private final ExecutorService mReporterService = Executors.newCachedThreadPool();
-    private Issue mCurrentIssue = new Issue();
+
+    private Issue mCurrentIssue;
+    private String mBuildId;
+    private String mBuildType;
+    private String mProductName;
 
     @Override
     public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+        mCurrentIssue = new Issue();
         mCurrentIssue.mTestName = test.toString();
         mCurrentIssue.mStackTrace = trace;
     }
@@ -81,25 +86,30 @@ public class IssueReporter implements ITestInvocationListener {
      * This is only called when the --bugreport option is enabled.
      */
     private void setBugReport(InputStreamSource dataStream) throws IOException {
-        InputStream input = dataStream.createInputStream();
-        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(BUGREPORT_SIZE);
-        GZIPOutputStream gzipOutput = new GZIPOutputStream(byteOutput);
-        for (byte[] buffer = new byte[1024]; input.read(buffer) >= 0; ) {
-            gzipOutput.write(buffer);
-        }
-        gzipOutput.close();
+        if (mCurrentIssue != null) {
+            InputStream input = dataStream.createInputStream();
+            ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(BUGREPORT_SIZE);
+            GZIPOutputStream gzipOutput = new GZIPOutputStream(byteOutput);
+            for (byte[] buffer = new byte[1024]; input.read(buffer) >= 0; ) {
+                gzipOutput.write(buffer);
+            }
+            gzipOutput.close();
 
-        // Only one bug report can be stored at a time and they are gzipped to
-        // about 0.5 MB so there shoudn't be any memory leak bringing down CTS.
-        mCurrentIssue.mBugReport = byteOutput.toByteArray();
+            // Only one bug report can be stored at a time and they are gzipped to
+            // about 0.5 MB so there shoudn't be any memory leak bringing down CTS.
+            mCurrentIssue.mBugReport = byteOutput.toByteArray();
+        } else {
+            CLog.e("setBugReport is getting called on an empty issue...");
+        }
     }
 
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        mReporterService.submit(mCurrentIssue);
-        mCurrentIssue = new Issue();
+        if (mCurrentIssue != null) {
+            mReporterService.submit(mCurrentIssue);
+            mCurrentIssue = null;
+        }
     }
-
 
     @Override
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
@@ -109,13 +119,13 @@ public class IssueReporter implements ITestInvocationListener {
     /** Set device information. Populated once when the device info app runs. */
     private void setDeviceMetrics(Map<String, String> metrics) {
         if (metrics.containsKey(BUILD_ID_KEY)) {
-            mCurrentIssue.mBuildId = metrics.get(BUILD_ID_KEY);
+            mBuildId = metrics.get(BUILD_ID_KEY);
         }
         if (metrics.containsKey(BUILD_TYPE_KEY)) {
-            mCurrentIssue.mBuildType = metrics.get(BUILD_TYPE_KEY);
+            mBuildType = metrics.get(BUILD_TYPE_KEY);
         }
         if (metrics.containsKey(PRODUCT_NAME_KEY)) {
-            mCurrentIssue.mProductName = metrics.get(PRODUCT_NAME_KEY);
+            mProductName = metrics.get(PRODUCT_NAME_KEY);
         }
     }
 
@@ -133,9 +143,6 @@ public class IssueReporter implements ITestInvocationListener {
 
     class Issue implements Callable<Void> {
 
-        private String mBuildId;
-        private String mBuildType;
-        private String mProductName;
         private String mTestName;
         private String mStackTrace;
         private byte[] mBugReport;
