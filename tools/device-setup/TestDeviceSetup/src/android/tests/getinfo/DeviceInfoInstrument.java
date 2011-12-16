@@ -39,44 +39,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-public class DeviceInfoInstrument extends Instrumentation {
+public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoConstants {
 
     private static final String TAG = "DeviceInfoInstrument";
 
-    // constants for device info attributes to be sent as instrumentation keys
-    // these values should correspond to attributes defined in cts_result.xsd
-    private static final String PARTITIONS = "partitions";
-    private static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
-    private static final String PROCESSES = "processes";
-    private static final String FEATURES = "features";
-    private static final String PHONE_NUMBER = "phoneNumber";
-    public static final String LOCALES = "locales";
-    private static final String IMSI = "imsi";
-    private static final String IMEI = "imei";
-    private static final String NETWORK = "network";
-    public static final String KEYPAD = "keypad";
-    public static final String NAVIGATION = "navigation";
-    public static final String TOUCH_SCREEN = "touch";
-    private static final String SCREEN_Y_DENSITY = "Ydpi";
-    private static final String SCREEN_X_DENSITY = "Xdpi";
-    private static final String SCREEN_SIZE = "screen_size";
-    private static final String SCREEN_DENSITY_BUCKET = "screen_density_bucket";
-    private static final String SCREEN_DENSITY = "screen_density";
-    private static final String SCREEN_HEIGHT = "screen_height";
-    private static final String SCREEN_WIDTH = "screen_width";
-    private static final String VERSION_SDK = "androidPlatformVersion";
-    private static final String VERSION_RELEASE = "buildVersion";
-    private static final String BUILD_ABI = "build_abi";
-    private static final String BUILD_ABI2 = "build_abi2";
-    private static final String BUILD_FINGERPRINT = "build_fingerprint";
-    private static final String BUILD_TYPE = "build_type";
-    private static final String BUILD_MODEL = "build_model";
-    private static final String BUILD_BRAND = "build_brand";
-    private static final String BUILD_MANUFACTURER = "build_manufacturer";
-    private static final String BUILD_BOARD = "build_board";
-    private static final String BUILD_DEVICE = "build_device";
-    private static final String PRODUCT_NAME = "buildName";
-    private static final String BUILD_ID = "buildID";
     private static Bundle mResults = new Bundle();
 
     public DeviceInfoInstrument() {
@@ -164,6 +130,10 @@ public class DeviceInfoInstrument extends Instrumentation {
         // partitions
         String partitions = getPartitions();
         addResult(PARTITIONS, partitions);
+
+        // System libraries
+        String sysLibraries = getSystemLibraries();
+        addResult(SYS_LIBRARIES, sysLibraries);
 
         finish(Activity.RESULT_OK, mResults);
     }
@@ -353,4 +323,18 @@ public class DeviceInfoInstrument extends Instrumentation {
             return "Not able to run df for partition information.";
         }
     }
+
+    private String getSystemLibraries() {
+        PackageManager pm = getContext().getPackageManager();
+        String list[] = pm.getSystemSharedLibraryNames();
+
+        StringBuilder builder = new StringBuilder();
+        for (String lib : list) {
+            builder.append(lib);
+            builder.append(";");
+        }
+
+        return builder.toString();
+    }
+
 }

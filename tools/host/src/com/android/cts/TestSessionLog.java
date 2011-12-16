@@ -46,7 +46,7 @@ public class TestSessionLog extends XMLResourceHandler {
     private static final String ATTRIBUTE_KNOWN_FAILURE = "KnownFailure";
 
     public static final String CTS_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.11";
+    private static final String CTS_RESULT_FILE_VERSION = "1.13";
 
     static final String ATTRIBUTE_STARTTIME = "starttime";
     static final String ATTRIBUTE_ENDTIME = "endtime";
@@ -74,7 +74,6 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String ATTRIBUTE_UID = "uid";
     static final String ATTRIBUTE_OPEN_GL_ES_VERSION = "openGlEsVersion";
     static final String ATTRIBUTE_PARTITIONS = "partitions";
-
     static final String ATTRIBUTE_PASS = "pass";
     static final String ATTRIBUTE_FAILED = "failed";
     static final String ATTRIBUTE_TIMEOUT = "timeout";
@@ -101,6 +100,11 @@ public class TestSessionLog extends XMLResourceHandler {
     static final String TAG_FAILED_SCENE = "FailedScene";
     static final String TAG_STACK_TRACE = "StackTrace";
     static final String TAG_FAILED_MESSAGE = "message";
+    static final String TAG_SYS_LIBS_INFO = "SystemLibrariesInfo";
+    static final String TAG_SYS_LIB = "Library";
+    static final String TAG_OPENGL_TEXTURE_FORMATS_INFO =
+            "OpenGLCompressedTextureFormatsInfo";
+    static final String TAG_OPENGL_TEXTURE_FORMAT = "TextureFormat";
 
     private Collection<TestPackage> mTestPackages;
     private Date mSessionStartTime;
@@ -354,6 +358,8 @@ public class TestSessionLog extends XMLResourceHandler {
 
                 addFeatureInfo(doc, deviceSettingNode, bldInfo);
                 addProcessInfo(doc, deviceSettingNode, bldInfo);
+                addSystemLibsInfo(doc, deviceSettingNode, bldInfo);
+                addOpenGlTextureFormatsInfo(doc, deviceSettingNode, bldInfo);
             }
 
             Node hostInfo = doc.createElement(TAG_HOSTINFO);
@@ -497,6 +503,56 @@ public class TestSessionLog extends XMLResourceHandler {
                 setAttribute(document, process, ATTRIBUTE_UID, "0");
             }
         }
+    }
+
+    /**
+     * Generate a simple XML tag with two levels of hierarchy.
+     *
+     * <pre>
+     *   <infoTag>
+     *     <elemTag name="xyz" />
+     *     ...
+     *   </infoTag>
+     * </pre>
+     *
+     * @param infoTag
+     * @param parentNode
+     * @param deviceInfo
+     * @param infoTag top level tag as shown above
+     * @param elemTag element tag which is child of infoTag and contains name attribute
+     * @param source data holding name attribute of one or multiple the child element
+     *        with ";" as separator.
+     */
+    private void addSimpleInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo, String infoTag, String elemTag, String source) {
+        Node nodeInfo = document.createElement(infoTag);
+        parentNode.appendChild(nodeInfo);
+
+        if (source == null) {
+            source = "";
+        }
+
+        String[] elemNames = source.split(";");
+        for (String elemName : elemNames) {
+            elemName = elemName.trim();
+            if (elemName.length() > 0) {
+                Node child = document.createElement(elemTag);
+                nodeInfo.appendChild(child);
+                setAttribute(document, child, ATTRIBUTE_NAME, elemName);
+            }
+        }
+    }
+
+    private void addSystemLibsInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        addSimpleInfo(document, parentNode, deviceInfo, TAG_SYS_LIBS_INFO, TAG_SYS_LIB,
+                deviceInfo.getSysLibs());
+    }
+
+    private void addOpenGlTextureFormatsInfo(Document document, Node parentNode,
+            DeviceParameterCollector deviceInfo) {
+        addSimpleInfo(document, parentNode, deviceInfo, TAG_OPENGL_TEXTURE_FORMATS_INFO,
+                TAG_OPENGL_TEXTURE_FORMAT, deviceInfo.getOpenGlTextureFormats());
     }
 
     /**
