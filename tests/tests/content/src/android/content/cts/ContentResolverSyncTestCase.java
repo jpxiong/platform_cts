@@ -57,6 +57,9 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
         // Need to clean up created account
         removeAccount(sAccountManager, ACCOUNT, null /* callback */);
 
+        // Need to cancel any sync that was started.
+        cancelSync(null, AUTHORITY, LATCH_TIMEOUT_MS);
+
         super.tearDown();
     }
 
@@ -87,8 +90,8 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
     }
 
     private CountDownLatch setNewLatch(CountDownLatch latch) {
-        getMockSyncAdapter().setLatch(latch);
         getMockSyncAdapter().clearData();
+        getMockSyncAdapter().setLatch(latch);
         return latch;
     }
 
@@ -101,7 +104,9 @@ public class ContentResolverSyncTestCase extends AndroidTestCase {
 
         // Wait with timeout for the callback to do its work
         try {
-            latch.await(latchTimeoutMs, TimeUnit.MILLISECONDS);
+            if (!latch.await(latchTimeoutMs, TimeUnit.MILLISECONDS)) {
+                fail("should not time out waiting on latch");
+            }
         } catch (InterruptedException e) {
             fail("should not throw an InterruptedException");
         }
