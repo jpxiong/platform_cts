@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
+import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +53,7 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
 
     static class ScannerNotificationReceiver extends BroadcastReceiver {
 
-        private static final int TIMEOUT_MS = 30 * 1000;
+        private static final int TIMEOUT_MS = 4 * 60 * 1000;
 
         private final String mAction;
         private final CountDownLatch mLatch = new CountDownLatch(1);
@@ -69,8 +70,26 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         }
 
         public void waitForBroadcast() throws InterruptedException {
-            assertTrue("Failed to receive broadcast for " + mAction,
-                    mLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS));
+            if (!mLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                int numFiles = countFiles(Environment.getExternalStorageDirectory());
+                fail("Failed to receive broadcast in " + TIMEOUT_MS + "ms for " + mAction
+                        + " while trying to scan " + numFiles + " files!");
+            }
+        }
+
+        private int countFiles(File dir) {
+            int count = 0;
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        count += countFiles(file);
+                    } else {
+                        count++;
+                    }
+                }
+            }
+            return count;
         }
     }
 }
