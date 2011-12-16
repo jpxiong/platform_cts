@@ -16,17 +16,17 @@
 
 package android.webkit.cts;
 
+import android.cts.util.PollingCheck;
+import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.CacheManager;
+import android.webkit.CacheManager.CacheResult;
+import android.webkit.WebView;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
-
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
-import android.webkit.CacheManager;
-import android.webkit.WebView;
-import android.webkit.CacheManager.CacheResult;
 
 import java.util.Map;
 
@@ -46,6 +46,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
     }
 
     @Override
@@ -141,12 +142,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
     private void loadUrl(String url){
         mWebView.loadUrl(url);
         // check whether loadURL successfully
-        new PollingCheck(NETWORK_OPERATION_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
         assertEquals(100, mWebView.getProgress());
     }
 }

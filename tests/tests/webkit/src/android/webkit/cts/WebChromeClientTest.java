@@ -16,21 +16,21 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.cts.WaitForLoadUrl.WaitForProgressClient;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(android.webkit.WebChromeClient.class)
 public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
@@ -48,7 +48,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
-        WaitForLoadUrl.initializeWebView(mWebView);
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
         mWebServer = new CtsTestServer(getActivity());
     }
 
@@ -214,10 +214,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnJsBeforeUnload());
 
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.JS_UNLOAD_URL));
-        WaitForLoadUrl.waitForLoadComplete(TEST_TIMEOUT);
         // unload should trigger when we try to navigate away
         loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
-        WaitForLoadUrl.waitForLoadComplete(TEST_TIMEOUT);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -316,6 +314,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }.run();
         // the result returned by the client gets set as the page title
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return mWebView.getTitle().equals(promptResult);
             }
@@ -325,14 +324,10 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new PollingCheck(TEST_TIMEOUT) {
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 
-    private class MockWebChromeClient extends WebChromeClient {
+    private class MockWebChromeClient extends WaitForProgressClient {
         private boolean mHadOnProgressChanged;
         private boolean mHadOnReceivedTitle;
         private String mPageTitle;

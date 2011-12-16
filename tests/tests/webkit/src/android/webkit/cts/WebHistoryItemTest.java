@@ -16,24 +16,20 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.BrokenTest;
+import android.graphics.Bitmap;
+import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.WebBackForwardList;
+import android.webkit.WebHistoryItem;
+import android.webkit.WebView;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
-import android.cts.util.PollingCheck;
-import android.graphics.Bitmap;
-import android.test.ActivityInstrumentationTestCase2;
-import android.webkit.WebBackForwardList;
-import android.webkit.WebChromeClient;
-import android.webkit.WebHistoryItem;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 @TestTargetClass(android.webkit.WebHistoryItem.class)
 public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
+    private final static long TEST_TIMEOUT = 10000;
     private CtsTestServer mWebServer;
 
     public WebHistoryItemTest() {
@@ -76,12 +72,12 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     })
     public void testWebHistoryItem() {
         final WebView view = getActivity().getWebView();
-        view.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.getInstance().initializeWebView(this, view);
         WebBackForwardList list = view.copyBackForwardList();
         assertEquals(0, list.getSize());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        assertLoadUrlSuccessfully(view, url);
+        loadUrlAndWaitForCompletion(view, url);
         list = view.copyBackForwardList();
         assertEquals(1, list.getSize());
         WebHistoryItem item = list.getCurrentItem();
@@ -94,7 +90,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertEquals(icon, item.getFavicon());
 
         url = mWebServer.getAssetUrl(TestHtmlConstants.BR_TAG_URL);
-        assertLoadUrlSuccessfully(view, url);
+        loadUrlAndWaitForCompletion(view, url);
         list = view.copyBackForwardList();
         assertEquals(2, list.getSize());
         item = list.getCurrentItem();
@@ -104,14 +100,9 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertTrue(firstId != secondId);
     }
 
-    private void assertLoadUrlSuccessfully(final WebView view, String url) {
+    private void loadUrlAndWaitForCompletion(final WebView view, String url) {
         view.loadUrl(url);
         // wait for the page load to complete
-        new PollingCheck(10000) {
-            @Override
-            protected boolean check() {
-                return view.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(view);
     }
 }

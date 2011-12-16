@@ -16,18 +16,17 @@
 
 package android.webkit.cts;
 
+import android.cts.util.PollingCheck;
+import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.WebView;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 import dalvik.annotation.ToBeFixed;
-
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -51,8 +50,7 @@ public class CookieManagerTest extends
         super.setUp();
         mWebView = getActivity().getWebView();
 
-        // Set a web chrome client in order to receive progress updates.
-        mWebView.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
 
         mCookieManager = CookieManager.getInstance();
         assertNotNull(mCookieManager);
@@ -248,6 +246,7 @@ public class CookieManagerTest extends
 
         mCookieManager.removeSessionCookie();
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && c.contains(cookie3);
@@ -257,6 +256,7 @@ public class CookieManagerTest extends
         Thread.sleep(expiration + 1000); // wait for cookie to expire
         mCookieManager.removeExpiredCookie();
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 String c = mCookieManager.getCookie(url);
                 return !c.contains(cookie1) && c.contains(cookie2) && !c.contains(cookie3);
@@ -265,6 +265,7 @@ public class CookieManagerTest extends
 
         mCookieManager.removeAllCookie();
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return mCookieManager.getCookie(url) == null;
             }
@@ -273,15 +274,12 @@ public class CookieManagerTest extends
 
     private void loadUrl(String url) {
         mWebView.loadUrl(url);
-        new PollingCheck(TEST_TIMEOUT) {
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 
     private void waitForCookie(final String url) {
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return mCookieManager.getCookie(url) != null;
             }

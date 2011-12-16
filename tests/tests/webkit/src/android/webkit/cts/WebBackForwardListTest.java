@@ -16,16 +16,16 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebView;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
 
 @TestTargetClass(WebBackForwardList.class)
 public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
@@ -62,6 +62,7 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
     })
     public void testGetCurrentItem() throws Exception {
         mWebView = getActivity().getWebView();
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
         WebBackForwardList list = mWebView.copyBackForwardList();
 
         assertNull(list.getCurrentItem());
@@ -77,12 +78,16 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
             String url3 = server.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
             mWebView.loadUrl(url1);
+            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
+
             checkBackForwardList(mWebView, url1);
 
             mWebView.loadUrl(url2);
+            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
             checkBackForwardList(mWebView, url1, url2);
 
             mWebView.loadUrl(url3);
+            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
             checkBackForwardList(mWebView, url1, url2, url3);
         } finally {
             server.shutdown();
@@ -91,6 +96,7 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
 
     private void checkBackForwardList(final WebView view, final String... url) {
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 if (view.getProgress() < 100) {
                     return false;

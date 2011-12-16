@@ -16,12 +16,6 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
-
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
@@ -31,8 +25,13 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebChromeClient;
- 
+import android.webkit.cts.WaitForLoadUrl.WaitForLoadedClient;
+
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetClass;
+import dalvik.annotation.TestTargetNew;
+import dalvik.annotation.TestTargets;
+
 @TestTargetClass(android.webkit.WebViewClient.class)
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
@@ -48,7 +47,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
-        mWebView.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
     }
 
     @Override
@@ -100,18 +99,21 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         mWebView.loadUrl(url);
 
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasOnPageStartedCalled();
             }
         }.run();
 
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasOnLoadResourceCalled();
             }
         }.run();
 
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasOnPageFinishedCalled();
             }
@@ -156,6 +158,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         // reloading the current URL should trigger the callback
         mWebView.reload();
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasOnFormResubmissionCalled();
             }
@@ -178,6 +181,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertLoadUrlSuccessfully(mWebView, url1);
         assertLoadUrlSuccessfully(mWebView, url2);
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasDoUpdateVisitedHistoryCalled();
             }
@@ -222,6 +226,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         mWebView.setWebViewClient(webViewClient);
 
         runTestOnUiThread(new Runnable() {
+            @Override
             public void run() {
                 mWebView.requestFocus();
             }
@@ -232,6 +237,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         sendKeys(KeyEvent.KEYCODE_1);
 
         new PollingCheck(TEST_TIMEOUT) {
+            @Override
             protected boolean check() {
                 return webViewClient.hasOnUnhandledKeyEventCalled();
             }
@@ -249,6 +255,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
         assertFalse(webViewClient.hasOnScaleChangedCalled());
         runTestOnUiThread(new Runnable() {
+            @Override
             public void run() {
                 mWebView.zoomIn();
             }
@@ -260,15 +267,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     private void assertLoadUrlSuccessfully(final WebView view, String url) {
         view.loadUrl(url);
         // wait until load is complete
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return view.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(view);
     }
 
-    private class MockWebViewClient extends WebViewClient {
+    private class MockWebViewClient extends WaitForLoadedClient {
         private boolean mOnPageStartedCalled;
         private boolean mOnPageFinishedCalled;
         private boolean mOnLoadResourceCalled;

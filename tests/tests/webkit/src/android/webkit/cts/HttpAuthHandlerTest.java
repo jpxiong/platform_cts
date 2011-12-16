@@ -16,19 +16,17 @@
 
 package android.webkit.cts;
 
+import android.test.ActivityInstrumentationTestCase2;
+import android.webkit.HttpAuthHandler;
+import android.webkit.WebView;
+import android.webkit.cts.WaitForLoadUrl.WaitForLoadedClient;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
 import org.apache.http.HttpStatus;
-
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
-import android.webkit.HttpAuthHandler;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 @TestTargetClass(android.webkit.HttpAuthHandler.class)
 public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
@@ -46,9 +44,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
     protected void setUp() throws Exception {
         super.setUp();
         mWebView = getActivity().getWebView();
-
-        // Set a web chrome client in order to receive progress updates.
-        mWebView.setWebChromeClient(new WebChromeClient());
+        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
     }
 
     @Override
@@ -133,15 +129,10 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
     private void assertLoadUrlSuccessfully(String url) throws InterruptedException {
         mWebView.loadUrl(url);
-        new PollingCheck(TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return mWebView.getProgress() == 100;
-            }
-        }.run();
+        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 
-    private static class MyWebViewClient extends WebViewClient {
+    private static class MyWebViewClient extends WaitForLoadedClient {
         String realm;
         boolean useHttpAuthUsernamePassword;
 
@@ -156,6 +147,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
             mPassword = password;
         }
 
+        @Override
         public void onReceivedHttpAuthRequest(WebView view,
                 HttpAuthHandler handler, String host, String realm) {
             ++mAuthCount;
