@@ -17,31 +17,33 @@
 package android.tests.getinfo;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
  * Collect device information on target device.
  */
 public class DeviceInfoActivity extends Activity {
-    private boolean isActivityFinished = false;
-    private Object sync = new Object();
+
+    // work done should be reported in GLES..View
+    private CountDownLatch mDone = new CountDownLatch(1);
+    private GLESSurfaceView mGLView;
 
     /**
      * Other classes can call this function to wait for this activity
      * to finish. */
     public void waitForAcitityToFinish() {
-        synchronized (sync) {
-            while (!isActivityFinished) {
-                try {
-                    sync.wait();
-                } catch (InterruptedException e) {
-                }
-            }
+        try {
+            mDone.await();
+        } catch (InterruptedException e) {
+            // just move on
         }
     }
 
@@ -49,9 +51,14 @@ public class DeviceInfoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TextView view = new TextView(this);
-        view.setText("hello");
-        setContentView(view);
+        ActivityManager am =
+                (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo info = am.getDeviceConfigurationInfo();
+        boolean useGL20 = (info.reqGlEsVersion >= 0x20000);
+
+        mGLView = new GLESSurfaceView(this, useGL20, mDone);
+        setContentView(mGLView);
+
         Configuration con = getResources().getConfiguration();
         String touchScreen = null;
         if (con.touchscreen == Configuration.TOUCHSCREEN_UNDEFINED) {
@@ -112,10 +119,5 @@ public class DeviceInfoActivity extends Activity {
         }
         DeviceInfoInstrument.addResult(DeviceInfoConstants.LOCALES,
                 localeList.toString());
-
-        synchronized (sync) {
-            sync.notify();
-            isActivityFinished = true;
-        }
     }
 }
