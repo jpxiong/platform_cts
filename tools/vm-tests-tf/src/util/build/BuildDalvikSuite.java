@@ -650,6 +650,7 @@ public class BuildDalvikSuite {
                 FileReader reader = new FileReader(file);
                 char[] charContents = new char[(int) file.length()];
                 reader.read(charContents);
+                reader.close();
                 String contents = new String(charContents);
                 if (contents.equals(content)) {
                     // System.out.println("skipping identical: "
