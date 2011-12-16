@@ -31,6 +31,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
 	CtsAdminTestCases \
+	CtsAnimationTestCases \
 	CtsAppTestCases \
 	CtsBluetoothTestCases \
 	CtsContentTestCases \
