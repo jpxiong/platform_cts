@@ -36,7 +36,7 @@ import dalvik.annotation.TestTargets;
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
 
-    private WebView mWebView;
+    private WebViewOnUiThread mOnUiThread;
     private CtsTestServer mWebServer;
 
     public WebViewClientTest() {
@@ -46,14 +46,13 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
+        mOnUiThread.clearHistory();
+        mOnUiThread.clearCache(true);
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
@@ -67,7 +66,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testShouldOverrideUrlLoading() {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        assertFalse(webViewClient.shouldOverrideUrlLoading(mWebView, null));
+        assertFalse(webViewClient.shouldOverrideUrlLoading(mOnUiThread.getWebView(), null));
     }
 
     @TestTargets({
@@ -89,14 +88,14 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     })
     public void testLoadPage() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
 
         assertFalse(webViewClient.hasOnPageStartedCalled());
         assertFalse(webViewClient.hasOnLoadResourceCalled());
         assertFalse(webViewClient.hasOnPageFinishedCalled());
-        mWebView.loadUrl(url);
+        mOnUiThread.loadUrl(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -127,11 +126,11 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testOnReceivedError() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
 
         String wrongUri = "invalidscheme://some/resource";
         assertEquals(0, webViewClient.hasOnReceivedErrorCode());
-        assertLoadUrlSuccessfully(mWebView, wrongUri);
+        mOnUiThread.loadUrlAndWaitForCompletion(wrongUri);
         assertEquals(WebViewClient.ERROR_UNSUPPORTED_SCHEME,
                 webViewClient.hasOnReceivedErrorCode());
     }
@@ -143,20 +142,20 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testOnFormResubmission() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
-        final WebSettings settings = mWebView.getSettings();
+        mOnUiThread.setWebViewClient(webViewClient);
+        final WebSettings settings = mOnUiThread.getSettings();
         settings.setJavaScriptEnabled(true);
         mWebServer = new CtsTestServer(getActivity());
 
         assertFalse(webViewClient.hasOnFormResubmissionCalled());
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_FORM_URL);
         // this loads a form, which automatically posts itself
-        assertLoadUrlSuccessfully(mWebView, url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         Thread.sleep(1000); // allow for javascript to post the form
         // the URL should have changed when the form was posted
-        assertFalse(url.equals(mWebView.getUrl()));
+        assertFalse(url.equals(mOnUiThread.getUrl()));
         // reloading the current URL should trigger the callback
-        mWebView.reload();
+        mOnUiThread.reload();
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -172,14 +171,14 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testDoUpdateVisitedHistory() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
 
         assertFalse(webViewClient.hasDoUpdateVisitedHistoryCalled());
         String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         String url2 = mWebServer.getAssetUrl(TestHtmlConstants.BR_TAG_URL);
-        assertLoadUrlSuccessfully(mWebView, url1);
-        assertLoadUrlSuccessfully(mWebView, url2);
+        mOnUiThread.loadUrlAndWaitForCompletion(url1);
+        mOnUiThread.loadUrlAndWaitForCompletion(url2);
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -195,12 +194,12 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testOnReceivedHttpAuthRequest() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
         mWebServer = new CtsTestServer(getActivity());
 
         assertFalse(webViewClient.hasOnReceivedHttpAuthRequestCalled());
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.EMBEDDED_IMG_URL);
-        assertLoadUrlSuccessfully(mWebView, url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertTrue(webViewClient.hasOnReceivedHttpAuthRequestCalled());
     }
 
@@ -211,9 +210,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testShouldOverrideKeyEvent() {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
 
-        assertFalse(webViewClient.shouldOverrideKeyEvent(mWebView, null));
+        assertFalse(webViewClient.shouldOverrideKeyEvent(mOnUiThread.getWebView(), null));
     }
 
     @TestTargetNew(
@@ -223,14 +222,9 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testOnUnhandledKeyEvent() throws Throwable {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
 
-        runTestOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mWebView.requestFocus();
-            }
-        });
+        mOnUiThread.requestFocus();
         getInstrumentation().waitForIdleSync();
 
         assertFalse(webViewClient.hasOnUnhandledKeyEventCalled());
@@ -251,23 +245,12 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     )
     public void testOnScaleChanged() throws Throwable {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        mWebView.setWebViewClient(webViewClient);
+        mOnUiThread.setWebViewClient(webViewClient);
 
         assertFalse(webViewClient.hasOnScaleChangedCalled());
-        runTestOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mWebView.zoomIn();
-            }
-        });
+        mOnUiThread.zoomIn();
         getInstrumentation().waitForIdleSync();
         assertTrue(webViewClient.hasOnScaleChangedCalled());
-    }
-
-    private void assertLoadUrlSuccessfully(final WebView view, String url) {
-        view.loadUrl(url);
-        // wait until load is complete
-        WaitForLoadUrl.getInstance().waitForLoadComplete(view);
     }
 
     private class MockWebViewClient extends WaitForLoadedClient {

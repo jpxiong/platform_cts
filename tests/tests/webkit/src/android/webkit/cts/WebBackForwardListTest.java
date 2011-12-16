@@ -20,7 +20,6 @@ import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
-import android.webkit.WebView;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -32,10 +31,15 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
 
     private static final int TEST_TIMEOUT = 10000;
 
-    private WebView mWebView;
+    private WebViewOnUiThread mOnUiThread;
 
     public WebBackForwardListTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
+    }
+
+    @Override
+    public void setUp() {
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
     @TestTargets({
@@ -61,9 +65,7 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
         )
     })
     public void testGetCurrentItem() throws Exception {
-        mWebView = getActivity().getWebView();
-        WaitForLoadUrl.getInstance().initializeWebView(this, mWebView);
-        WebBackForwardList list = mWebView.copyBackForwardList();
+        WebBackForwardList list = mOnUiThread.copyBackForwardList();
 
         assertNull(list.getCurrentItem());
         assertEquals(0, list.getSize());
@@ -77,31 +79,27 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
             String url2 = server.getAssetUrl(TestHtmlConstants.HTML_URL2);
             String url3 = server.getAssetUrl(TestHtmlConstants.HTML_URL3);
 
-            mWebView.loadUrl(url1);
-            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
+            mOnUiThread.loadUrlAndWaitForCompletion(url1);
+            checkBackForwardList(url1);
 
-            checkBackForwardList(mWebView, url1);
+            mOnUiThread.loadUrlAndWaitForCompletion(url2);
+            checkBackForwardList(url1, url2);
 
-            mWebView.loadUrl(url2);
-            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
-            checkBackForwardList(mWebView, url1, url2);
-
-            mWebView.loadUrl(url3);
-            WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
-            checkBackForwardList(mWebView, url1, url2, url3);
+            mOnUiThread.loadUrlAndWaitForCompletion(url3);
+            checkBackForwardList(url1, url2, url3);
         } finally {
             server.shutdown();
         }
     }
 
-    private void checkBackForwardList(final WebView view, final String... url) {
+    private void checkBackForwardList(final String... url) {
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
-                if (view.getProgress() < 100) {
+                if (mOnUiThread.getProgress() < 100) {
                     return false;
                 }
-                WebBackForwardList list = view.copyBackForwardList();
+                WebBackForwardList list = mOnUiThread.copyBackForwardList();
                 if (list.getSize() != url.length) {
                     return false;
                 }

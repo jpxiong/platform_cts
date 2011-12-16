@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
-import android.webkit.WebView;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -31,6 +30,7 @@ import dalvik.annotation.TestTargets;
 public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private final static long TEST_TIMEOUT = 10000;
     private CtsTestServer mWebServer;
+    private WebViewOnUiThread mOnUiThread;
 
     public WebHistoryItemTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -40,6 +40,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
     protected void setUp() throws Exception {
         super.setUp();
         mWebServer = new CtsTestServer(getActivity());
+        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
     @Override
@@ -71,14 +72,12 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         )
     })
     public void testWebHistoryItem() {
-        final WebView view = getActivity().getWebView();
-        WaitForLoadUrl.getInstance().initializeWebView(this, view);
-        WebBackForwardList list = view.copyBackForwardList();
+        WebBackForwardList list = mOnUiThread.copyBackForwardList();
         assertEquals(0, list.getSize());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        loadUrlAndWaitForCompletion(view, url);
-        list = view.copyBackForwardList();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        list = mOnUiThread.copyBackForwardList();
         assertEquals(1, list.getSize());
         WebHistoryItem item = list.getCurrentItem();
         assertNotNull(item);
@@ -86,23 +85,17 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertEquals(url, item.getUrl());
         assertNull(item.getOriginalUrl());
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, item.getTitle());
-        Bitmap icon = view.getFavicon();
+        Bitmap icon = mOnUiThread.getFavicon();
         assertEquals(icon, item.getFavicon());
 
         url = mWebServer.getAssetUrl(TestHtmlConstants.BR_TAG_URL);
-        loadUrlAndWaitForCompletion(view, url);
-        list = view.copyBackForwardList();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        list = mOnUiThread.copyBackForwardList();
         assertEquals(2, list.getSize());
         item = list.getCurrentItem();
         assertNotNull(item);
         assertEquals(TestHtmlConstants.BR_TAG_TITLE, item.getTitle());
         int secondId = item.getId();
         assertTrue(firstId != secondId);
-    }
-
-    private void loadUrlAndWaitForCompletion(final WebView view, String url) {
-        view.loadUrl(url);
-        // wait for the page load to complete
-        WaitForLoadUrl.getInstance().waitForLoadComplete(view);
     }
 }
