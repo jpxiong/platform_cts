@@ -58,8 +58,9 @@
     <classpathentry kind="src" path="cts/tests/tests/webkit/src"/>
     <classpathentry kind="src" path="cts/tests/tests/widget/src"/>
     <classpathentry kind="src" path="cts/tools/cts-api-coverage/src"/>
-    <classpathentry kind="src" path="cts/tools/cts-native-xml-generator/src"/>
+    <classpathentry kind="src" path="cts/tools/cts-native-scanner/src"/>
     <classpathentry kind="src" path="cts/tools/cts-reference-app-lib/src"/>
+    <classpathentry kind="src" path="cts/tools/cts-xml-generator/src"/>
     <classpathentry kind="src" path="cts/tools/dasm/src"/>
     <classpathentry kind="src" path="cts/tools/device-setup/TestDeviceSetup/src"/>
     <classpathentry kind="src" path="cts/tools/dex-tools/src"/>

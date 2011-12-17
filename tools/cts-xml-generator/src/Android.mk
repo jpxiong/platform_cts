@@ -15,14 +15,16 @@
 LOCAL_PATH := $(call my-dir)
 
 
-# cts-native-xml-generator java library
+# cts-xml-generator java library
 # ============================================================
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
 LOCAL_JAR_MANIFEST := MANIFEST.mf
 
-LOCAL_MODULE := cts-native-xml-generator
+LOCAL_MODULE := cts-xml-generator
 LOCAL_MODULE_TAGS := optional
+
+LOCAL_STATIC_JAVA_LIBRARIES := vogarexpectlib
 
 include $(BUILD_HOST_JAVA_LIBRARY)

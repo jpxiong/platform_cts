@@ -13,29 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.nativexml;
+package com.android.cts.xmlgenerator;
+
+import vogar.ExpectationStore;
+import vogar.ModeId;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class that searches a source directory for native gTests and outputs a
  * test package xml.
  */
-public class CtsNativeXmlGenerator {
+public class CtsXmlGenerator {
 
     private static void usage(String[] args) {
         System.err.println("Arguments: " + Arrays.asList(args));
         System.err.println("Usage: cts-native-xml-generator -p PACKAGE_NAME -n EXECUTABLE_NAME "
-                + "-s SOURCE_DIR [-o OUTPUT_FILE]");
+                + " [-e EXPECTATION_FILE] [-o OUTPUT_FILE]");
         System.exit(1);
     }
 
     public static void main(String[] args) throws Exception {
         String appPackageName = null;
         String name = null;
-        File sourceDir = null;
         String outputPath = null;
+        Set<File> expectationFiles = new HashSet<File>();
 
         for (int i = 0; i < args.length; i++) {
             if ("-p".equals(args[i])) {
@@ -52,18 +57,18 @@ public class CtsNativeXmlGenerator {
                     System.err.println("Missing value for executable name");
                     usage(args);
                 }
+            } else if ("-e".equals(args[i])) {
+                if (i + 1 < args.length) {
+                    expectationFiles.add(new File(args[++i]));
+                } else {
+                    System.err.println("Missing value for expectation store");
+                    usage(args);
+                }
             } else if ("-o".equals(args[i])) {
                 if (i + 1 < args.length) {
                     outputPath = args[++i];
                 } else {
                     System.err.println("Missing value for output file");
-                    usage(args);
-                }
-            } else if ("-s".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    sourceDir = new File(args[++i]);
-                } else {
-                    System.err.println("Missing value for source directory");
                     usage(args);
                 }
             } else {
@@ -78,12 +83,10 @@ public class CtsNativeXmlGenerator {
         } else if (name == null) {
             System.out.println("Executable name is required");
             usage(args);
-        } else if (sourceDir == null) {
-            System.out.println("Source directory is required");
-            usage(args);
         }
 
-        Generator generator = new Generator(appPackageName, name, sourceDir, outputPath);
+        ExpectationStore store = ExpectationStore.parse(expectationFiles, ModeId.DEVICE);
+        NativeXmlGenerator generator = new NativeXmlGenerator(store, appPackageName, name, outputPath);
         generator.writePackageXml();
     }
 }

@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package com.android.cts.nativexml;
+package com.android.cts.xmlgenerator;
+
+import vogar.Expectation;
+import vogar.ExpectationStore;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Generator of TestPackage XML files for native gTests.
+ * Generator of TestPackage XML files for native tests.
  *
- * It scours all the C++ source files in a given source directory looking
- * for test declarations and outputs a XML test listing.
+ * It takes in an input of the following form:
+ *
+ * class:TestClass1
+ * method:testMethod1
+ * method:testMethod2
+ * class:TestClass2
+ * method:testMethod1
  */
-class Generator {
+class NativeXmlGenerator {
 
     /** Test package name like "android.nativemedia" to group the tests. */
     private final String mAppPackageName;
@@ -41,17 +45,18 @@ class Generator {
     /** Name of the native executable. */
     private final String mName;
 
-    /** Directory to recursively scan for gTest test declarations. */
-    private final File mSourceDir;
-
     /** Path to output file or null to just dump to standard out. */
     private final String mOutputPath;
 
-    Generator(String appPackageName, String name, File sourceDir, String outputPath) {
+    /** ExpectationStore to filter out known failures. */
+    private final ExpectationStore mExpectations;
+
+    NativeXmlGenerator(ExpectationStore expectations, String appPackageName, String name,
+            String outputPath) {
         mAppPackageName = appPackageName;
         mName = name;
-        mSourceDir = sourceDir;
         mOutputPath = outputPath;
+        mExpectations = expectations;
     }
 
     public void writePackageXml() throws IOException {
@@ -81,7 +86,7 @@ class Generator {
         }
     }
 
-    private void writeTestPackage(PrintWriter writer) throws FileNotFoundException {
+    private void writeTestPackage(PrintWriter writer) {
         writer.append("<TestPackage appPackageName=\"")
                 .append(mAppPackageName)
                 .append("\" name=\"")
@@ -91,7 +96,7 @@ class Generator {
         writer.println("</TestPackage>");
     }
 
-    private void writeTestSuite(PrintWriter writer) throws FileNotFoundException {
+    private void writeTestSuite(PrintWriter writer) {
         /*
          * Given "android.foo.bar.baz"...
          *
@@ -111,7 +116,7 @@ class Generator {
                 writer.append("<TestSuite name=\"").append(packagePart).println("\">");
             }
 
-            writeTestCases(writer, mSourceDir);
+            writeTestCases(writer);
 
             for (; numLevels > 0; numLevels--) {
                 writer.println("</TestSuite>");
@@ -123,55 +128,38 @@ class Generator {
         }
     }
 
-    private void writeTestCases(PrintWriter writer, File dir) throws FileNotFoundException {
-        // Find both C++ files to find tests and directories to look for more tests!
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".cpp") || new File(dir, filename).isDirectory();
-            }
-        });
-
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory()) {
-                writeTestCases(writer, file);
-            } else {
-                // Take the test name from the name of the file. It's probably
-                // more accurate to take the name from inside the file...
-                String fileName = file.getName();
-                int extension = fileName.lastIndexOf('.');
-                if (extension != -1) {
-                    fileName = fileName.substring(0, extension);
+    private void writeTestCases(PrintWriter writer) {
+        String currentClassName = null;
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] tokens = line.split(":");
+            if (tokens.length > 1) {
+                String type = tokens[0];
+                String value = tokens[1];
+                if ("class".equals(type)) {
+                    if (currentClassName != null) {
+                        writer.append("</TestCase>");
+                    }
+                    currentClassName = value;
+                    writer.append("<TestCase name=\"").append(value).println("\">");
+                } else if ("method".equals(type)) {
+                    String fullClassName = mAppPackageName + "." + currentClassName;
+                    if (!isKnownFailure(mExpectations, fullClassName, value)) {
+                        writer.append("<Test name=\"").append(value).println("\" />");
+                    }
                 }
-
-                writer.append("<TestCase name=\"").append(fileName).println("\">");
-                writeTests(writer, file);
-                writer.println("</TestCase>");
             }
+        }
+        if (currentClassName != null) {
+            writer.println("</TestCase>");
         }
     }
 
-    // We want to find lines like TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation) { ...
-    // and extract the "testAudioPlayerFromFdCreation" as group #1
-    private static final Pattern TEST_REGEX = Pattern.compile("\\s*TEST_F\\(\\w+,\\s*(\\w+)\\).*");
-
-    private void writeTests(PrintWriter writer, File file) throws FileNotFoundException {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                Matcher matcher = TEST_REGEX.matcher(line);
-                if (matcher.matches()) {
-                    String name = matcher.group(1);
-                    writer.append("<Test name=\"").append(name).println("\" />");
-                }
-            }
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-        }
+    public static boolean isKnownFailure(ExpectationStore expectationStore,
+            String className, String methodName) {
+        String testName = String.format("%s#%s", className, methodName);
+        return expectationStore != null && expectationStore.get(testName) != Expectation.SUCCESS;
     }
 }
+
