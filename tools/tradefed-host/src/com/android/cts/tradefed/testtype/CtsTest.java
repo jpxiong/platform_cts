@@ -41,8 +41,6 @@ import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
-import junit.framework.Test;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
+import junit.framework.Test;
 
 /**
  * A {@link Test} for running CTS tests.
@@ -633,10 +633,6 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
         if (mCtsBuild == null) {
             throw new IllegalArgumentException("missing CTS build");
-        }
-        if ("CTS".equals(mPlanName)) {
-            CLog.i("Switching to CTS-TF plan instead of CTS plan for faster execution of vm-tests");
-            mPlanName = "CTS-TF";
         }
     }
 
