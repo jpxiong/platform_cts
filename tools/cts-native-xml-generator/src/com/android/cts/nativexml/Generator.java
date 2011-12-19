@@ -59,9 +59,12 @@ class Generator {
         if (mOutputPath != null) {
             File outputFile = new File(mOutputPath);
             File outputDir = outputFile.getParentFile();
-            if (!outputDir.exists() && !outputDir.mkdirs()) {
-                System.err.println("Couldn't make output directory: " + mOutputPath);
-                System.exit(1);
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+                if (!outputDir.exists()) {
+                    System.err.println("Couldn't make output directory: " + outputDir);
+                    System.exit(1);
+                }
             }
             output = new FileOutputStream(outputFile);
         }
