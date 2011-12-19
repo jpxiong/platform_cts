@@ -76,9 +76,6 @@ public class PassFailButtons {
 
         Button getPassButton();
 
-        /* Added to the interface just to make sure it isn't forgotten in the implementations. */
-        Dialog onCreateDialog(int id, Bundle args);
-
         /**
          * Returns a unique identifier for the test.  Usually, this is just the class name.
          */
