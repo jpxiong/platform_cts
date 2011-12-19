@@ -39,6 +39,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
 	CtsDrmTestCases \
+	CtsEffectTestCases \
 	CtsExampleTestCases \
 	CtsGestureTestCases \
 	CtsGraphicsTestCases \
