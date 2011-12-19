@@ -14,6 +14,7 @@
 {
   names: [
     "libcore.java.net.URLConnectionTest#testServerClosesSocket",
+    "libcore.java.net.URLConnectionTest#testServerShutdownInput",
     "libcore.java.net.URLConnectionTest#testServerShutdownOutput"
   ],
   bug: 5534202
