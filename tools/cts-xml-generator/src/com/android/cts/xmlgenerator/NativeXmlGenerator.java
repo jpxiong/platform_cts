@@ -63,14 +63,6 @@ class NativeXmlGenerator {
         OutputStream output = System.out;
         if (mOutputPath != null) {
             File outputFile = new File(mOutputPath);
-            File outputDir = outputFile.getParentFile();
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-                if (!outputDir.exists()) {
-                    System.err.println("Couldn't make output directory: " + outputDir);
-                    System.exit(1);
-                }
-            }
             output = new FileOutputStream(outputFile);
         }
 
@@ -162,4 +154,3 @@ class NativeXmlGenerator {
         return expectationStore != null && expectationStore.get(testName) != Expectation.SUCCESS;
     }
 }
-

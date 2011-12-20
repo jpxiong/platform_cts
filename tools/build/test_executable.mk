@@ -32,6 +32,7 @@ $(cts_executable_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_executable_xml): PRIVATE_EXECUTABLE := $(LOCAL_MODULE)
 $(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPECTATIONS) | $(CTS_NATIVE_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for native package $(PRIVATE_TEST_PACKAGE)
+	$(hide) mkdir -p $(CTS_NATIVE_XML_OUT)
 	$(hide) $(CTS_NATIVE_TEST_SCANNER) -s $(PRIVATE_PATH) | \
 			$(CTS_XML_GENERATOR) -n $(PRIVATE_EXECUTABLE) \
 						-p $(PRIVATE_TEST_PACKAGE) \
