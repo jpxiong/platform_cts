@@ -34,6 +34,8 @@ import android.util.Log;
  * the test results (score and report).
  */
 public class LoopbackExperiment extends Experiment {
+    private static final String TAG = "LoopbackExperiment";
+
     protected static final int TIMEOUT = 10;
 
     // Amount of silence in ms before and after playback
