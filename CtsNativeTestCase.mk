@@ -21,7 +21,11 @@ BUILD_CTS_EXECUTABLE := $(LOCAL_PATH)/tools/build/test_executable.mk
 
 CTS_NATIVE_XML_OUT := $(HOST_OUT)/cts-native-xml
 
-CTS_NATIVE_XML_GENERATOR := $(HOST_OUT_EXECUTABLES)/cts-native-xml-generator
+CTS_NATIVE_TEST_SCANNER := $(HOST_OUT_EXECUTABLES)/cts-native-scanner
+
+CTS_XML_GENERATOR := $(HOST_OUT_EXECUTABLES)/cts-xml-generator
+
+CTS_EXPECTATIONS := cts/tests/expectations/knownfailures.txt
 
 define cts-get-native-paths
 	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe))/$(exe))

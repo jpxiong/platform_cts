@@ -43,4 +43,4 @@ while expr "x$1" : 'x-J' >/dev/null; do
     shift
 done
 
-exec java $javaOpts -jar $libdir/cts-native-xml-generator.jar "$@"
+exec java $javaOpts -jar $libdir/cts-xml-generator.jar "$@"
