@@ -25,7 +25,7 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.cts.WaitForLoadUrl.WaitForLoadedClient;
+import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -95,7 +95,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertFalse(webViewClient.hasOnPageStartedCalled());
         assertFalse(webViewClient.hasOnLoadResourceCalled());
         assertFalse(webViewClient.hasOnPageFinishedCalled());
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -151,7 +151,8 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_FORM_URL);
         // this loads a form, which automatically posts itself
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        Thread.sleep(1000); // allow for javascript to post the form
+        // wait for JavaScript to post the form
+        mOnUiThread.waitForLoadCompletion();
         // the URL should have changed when the form was posted
         assertFalse(url.equals(mOnUiThread.getUrl()));
         // reloading the current URL should trigger the callback
@@ -263,6 +264,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         private boolean mOnReceivedHttpAuthRequestCalled;
         private boolean mOnUnhandledKeyEventCalled;
         private boolean mOnScaleChangedCalled;
+
+        public MockWebViewClient() {
+            super(mOnUiThread);
+        }
 
         public boolean hasOnPageStartedCalled() {
             return mOnPageStartedCalled;

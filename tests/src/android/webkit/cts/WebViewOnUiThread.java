@@ -16,43 +16,131 @@
 
 package android.webkit.cts;
 
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
+import android.graphics.Picture;
+import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.Looper;
+import android.os.Message;
+import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.webkit.DownloadListener;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebView.HitTestResult;
+import android.webkit.WebView.PictureListener;
 import android.webkit.WebViewClient;
 
 import junit.framework.Assert;
 
+import java.io.File;
+
 
 /**
  * Many tests need to run WebView code in the UI thread. This class
- * wraps a WebView so that calls are ensured to arrive on the UI Thread.
+ * wraps a WebView so that calls are ensured to arrive on the UI thread.
+ *
+ * All methods may be run on either the UI thread or test thread.
  */
 public class WebViewOnUiThread {
+    /**
+     * The maximum time, in milliseconds (10 seconds) to wait for a load
+     * to be triggered.
+     */
+    private static final long LOAD_TIMEOUT = 10000;
+
+    /**
+     * Set to true after onPageFinished is called.
+     */
+    private boolean mLoaded;
+
+    /**
+     * Set to true after onNewPicture is called. Reset when onPageStarted
+     * is called.
+     */
+    private boolean mNewPicture;
+
+    /**
+     * The progress, in percentage, of the page load. Valid values are between
+     * 0 and 100.
+     */
+    private int mProgress;
+
+    /**
+     * The test that this class is being used in. Used for runTestOnUiThread.
+     */
     private InstrumentationTestCase mTest;
+
+    /**
+     * The WebView that calls will be made on.
+     */
     private WebView mWebView;
 
     /**
      * Initializes the webView with a WebViewClient, WebChromeClient,
-     * and PictureListener as per WaitForLoadUrl.initializeWebView
-     * to prepare for loadUrl.
+     * and PictureListener to prepare for loadUrlAndWaitForCompletion.
      *
-     * This method should be called during setUp so as to reinitialize
-     * between calls.
+     * A new WebViewOnUiThread should be called during setUp so as to
+     * reinitialize between calls.
      *
      * @param test The test in which this is being run.
      * @param webView The webView that the methods should call.
-     * @see WaitForLoadUrl#initializeWebView
      * @see loadUrlAndWaitForCompletion
      */
     public WebViewOnUiThread(InstrumentationTestCase test, WebView webView) {
         mTest = test;
         mWebView = webView;
-        WaitForLoadUrl.getInstance().initializeWebView(mTest, mWebView);
+        final WebViewClient webViewClient = new WaitForLoadedClient(this);
+        final WebChromeClient webChromeClient = new WaitForProgressClient(this);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setWebViewClient(webViewClient);
+                mWebView.setWebChromeClient(webChromeClient);
+                mWebView.setPictureListener(new WaitForNewPicture());
+            }
+        });
+    }
+
+    /**
+     * Called from WaitForNewPicture, this is used to indicate that
+     * the page has been drawn.
+     */
+    synchronized public void onNewPicture() {
+        mNewPicture = true;
+        this.notifyAll();
+    }
+
+    /**
+     * Called from WaitForLoadedClient, this is used to clear the picture
+     * draw state so that draws before the URL begins loading don't count.
+     */
+    synchronized public void onPageStarted() {
+        mNewPicture = false; // Earlier paints won't count.
+    }
+
+    /**
+     * Called from WaitForLoadedClient, this is used to indicate that
+     * the page is loaded, but not drawn yet.
+     */
+    synchronized public void onPageFinished() {
+        mLoaded = true;
+        this.notifyAll();
+    }
+
+    /**
+     * Called from the WebChrome client, this sets the current progress
+     * for a page.
+     * @param progress The progress made so far between 0 and 100.
+     */
+    synchronized public void onProgressChanged(int progress) {
+        mProgress = progress;
+        this.notifyAll();
     }
 
     public void setWebViewClient(final WebViewClient webViewClient) {
@@ -69,6 +157,33 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.setWebChromeClient(webChromeClient);
+            }
+        });
+    }
+
+    public void setPictureListener(final PictureListener pictureListener) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setPictureListener(pictureListener);
+            }
+        });
+    }
+
+    public void setDownloadListener(final DownloadListener listener) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setDownloadListener(listener);
+            }
+        });
+    }
+
+    public void setBackgroundColor(final int color) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setBackgroundColor(color);
             }
         });
     }
@@ -109,20 +224,92 @@ public class WebViewOnUiThread {
         });
     }
 
-    public void reload() {
+    public void removeJavascriptInterface(final String interfaceName) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.reload();
+                mWebView.removeJavascriptInterface(interfaceName);
             }
         });
     }
 
-    public void loadUrl(final String url) {
+    public void addJavascriptInterface(final Object object, final String name) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.loadUrl(url);
+                mWebView.addJavascriptInterface(object, name);
+            }
+        });
+    }
+
+    public void flingScroll(final int vx, final int vy) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.flingScroll(vx, vy);
+            }
+        });
+    }
+
+    public void requestFocusNodeHref(final Message hrefMsg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.requestFocusNodeHref(hrefMsg);
+            }
+        });
+    }
+
+    public void requestImageRef(final Message msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.requestImageRef(msg);
+            }
+        });
+    }
+
+    public void setInitialScale(final int scaleInPercent) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setInitialScale(scaleInPercent);
+            }
+        });
+    }
+
+    public void clearSslPreferences() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.clearSslPreferences();
+            }
+        });
+    }
+
+    public void resumeTimers() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.resumeTimers();
+            }
+        });
+    }
+
+    public void findNext(final boolean forward) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.findNext(forward);
+            }
+        });
+    }
+
+    public void clearMatches() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.clearMatches();
             }
         });
     }
@@ -134,125 +321,262 @@ public class WebViewOnUiThread {
      * @param url The URL to load.
      */
     public void loadUrlAndWaitForCompletion(final String url) {
-        runOnUiThread(new Runnable() {
+        callAndWait(new Runnable() {
             @Override
             public void run() {
                 mWebView.loadUrl(url);
             }
         });
-        WaitForLoadUrl.getInstance().waitForLoadComplete(mWebView);
     }
 
-    public String getTitle() {
-        class TitleGetter implements Runnable {
-            private String mTitle;
-
+    public void loadDataAndWaitForCompletion(final String data,
+            final String mimeType, final String encoding) {
+        callAndWait(new Runnable() {
             @Override
             public void run() {
-                mTitle = mWebView.getTitle();
+                mWebView.loadData(data, mimeType, encoding);
             }
-
-            public String getTitle() {
-                return mTitle;
-            }
-        }
-        TitleGetter titleGetter = new TitleGetter();
-        runOnUiThread(titleGetter);
-        return titleGetter.getTitle();
+        });
     }
 
-    public WebSettings getSettings() {
-        class SettingsGetter implements Runnable {
-            private WebSettings mWebSettings;
-
+    public void loadDataWithBaseURLAndWaitForCompletion(final String baseUrl,
+            final String data, final String mimeType, final String encoding,
+            final String historyUrl) {
+        callAndWait(new Runnable() {
             @Override
             public void run() {
-                mWebSettings = mWebView.getSettings();
+                mWebView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding,
+                        historyUrl);
             }
-
-            public WebSettings getSettings() {
-                return mWebSettings;
-            }
-        }
-
-        SettingsGetter settingsGetter = new SettingsGetter();
-        runOnUiThread(settingsGetter);
-        return settingsGetter.getSettings();
-    }
-
-    public WebBackForwardList copyBackForwardList() {
-        class BackForwardCopier implements Runnable {
-            private WebBackForwardList mBackForwardList;
-
-            @Override
-            public void run() {
-                mBackForwardList = mWebView.copyBackForwardList();
-            }
-
-            public WebBackForwardList getBackForwardList() {
-                return mBackForwardList;
-            }
-        }
-        BackForwardCopier backForwardCopier = new BackForwardCopier();
-        runOnUiThread(backForwardCopier);
-        return backForwardCopier.getBackForwardList();
+        });
     }
 
     /**
-     * @see android.webkit.WebView.WebView#
+     * Reloads a page and waits for it to complete reloading. Use reload
+     * if it is a form resubmission and the onFormResubmission responds
+     * by telling WebView not to resubmit it.
      */
-    public Bitmap getFavicon() {
-        class FaviconGetter implements Runnable {
-            private Bitmap mFavicon;
-
+    public void reloadAndWaitForCompletion() {
+        callAndWait(new Runnable() {
             @Override
             public void run() {
-                mFavicon = mWebView.getFavicon();
+                mWebView.reload();
             }
+        });
+    }
 
-            public Bitmap getFavicon() {
-                return mFavicon;
+    /**
+     * Reload the previous URL. Use reloadAndWaitForCompletion unless
+     * it is a form resubmission and the onFormResubmission responds
+     * by telling WebView not to resubmit it.
+     */
+    public void reload() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.reload();
             }
+        });
+    }
+
+    /**
+     * Use this only when JavaScript causes a page load to wait for the
+     * page load to complete. Otherwise use loadUrlAndWaitForCompletion or
+     * similar functions.
+     */
+    public void waitForLoadCompletion() {
+        if (isUiThread()) {
+            waitOnUiThread();
+        } else {
+            waitOnTestThread();
         }
-        FaviconGetter favIconGetter = new FaviconGetter();
-        runOnUiThread(favIconGetter);
-        return favIconGetter.getFavicon();
+        clearLoad();
+    }
+
+    public String getTitle() {
+        return getValue(new ValueGetter<String>() {
+            @Override
+            public String capture() {
+                return mWebView.getTitle();
+            }
+        });
+    }
+
+    public WebSettings getSettings() {
+        return getValue(new ValueGetter<WebSettings>() {
+            @Override
+            public WebSettings capture() {
+                return mWebView.getSettings();
+            }
+        });
+    }
+
+    public WebBackForwardList copyBackForwardList() {
+        return getValue(new ValueGetter<WebBackForwardList>() {
+            @Override
+            public WebBackForwardList capture() {
+                return mWebView.copyBackForwardList();
+            }
+        });
+    }
+
+    public Bitmap getFavicon() {
+        return getValue(new ValueGetter<Bitmap>() {
+            @Override
+            public Bitmap capture() {
+                return mWebView.getFavicon();
+            }
+        });
     }
 
     public String getUrl() {
-        class UrlGetter implements Runnable {
-            private String mUrl;
-
+        return getValue(new ValueGetter<String>() {
             @Override
-            public void run() {
-                mUrl = mWebView.getUrl();
+            public String capture() {
+                return mWebView.getUrl();
             }
-
-            public String getUrl() {
-                return mUrl;
-            }
-        }
-        UrlGetter urlGetter = new UrlGetter();
-        runOnUiThread(urlGetter);
-        return urlGetter.getUrl();
+        });
     }
 
     public int getProgress() {
-        class ProgressGetter implements Runnable {
-            private int mProgress;
-
+        return getValue(new ValueGetter<Integer>() {
             @Override
-            public void run() {
-                mProgress = mWebView.getProgress();
+            public Integer capture() {
+                return mWebView.getProgress();
             }
+        });
+    }
 
-            public int getProgress() {
-                return mProgress;
+    public int getHeight() {
+        return getValue(new ValueGetter<Integer>() {
+            @Override
+            public Integer capture() {
+                return mWebView.getHeight();
             }
-        }
-        ProgressGetter progressGetter = new ProgressGetter();
-        runOnUiThread(progressGetter);
-        return progressGetter.getProgress();
+        });
+    }
+
+    public int getContentHeight() {
+        return getValue(new ValueGetter<Integer>() {
+            @Override
+            public Integer capture() {
+                return mWebView.getContentHeight();
+            }
+        });
+    }
+
+    public boolean savePicture(final Bundle b, final File dest) {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.savePicture(b, dest);
+            }
+        });
+    }
+
+    public boolean pageUp(final boolean top) {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.pageUp(top);
+            }
+        });
+    }
+
+    public boolean pageDown(final boolean bottom) {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.pageDown(bottom);
+            }
+        });
+    }
+
+    public int[] getLocationOnScreen() {
+        final int[] location = new int[2];
+        return getValue(new ValueGetter<int[]>() {
+            @Override
+            public int[] capture() {
+                mWebView.getLocationOnScreen(location);
+                return location;
+            }
+        });
+    }
+
+    public float getScale() {
+        return getValue(new ValueGetter<Float>() {
+            @Override
+            public Float capture() {
+                return mWebView.getScale();
+            }
+        });
+    }
+
+    public boolean requestFocus(final int direction,
+            final Rect previouslyFocusedRect) {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.requestFocus(direction, previouslyFocusedRect);
+            }
+        });
+    }
+
+    public HitTestResult getHitTestResult() {
+        return getValue(new ValueGetter<HitTestResult>() {
+            @Override
+            public HitTestResult capture() {
+                return mWebView.getHitTestResult();
+            }
+        });
+    }
+
+    public int getScrollX() {
+        return getValue(new ValueGetter<Integer>() {
+            @Override
+            public Integer capture() {
+                return mWebView.getScrollX();
+            }
+        });
+    }
+
+    public int getScrollY() {
+        return getValue(new ValueGetter<Integer>() {
+            @Override
+            public Integer capture() {
+                return mWebView.getScrollY();
+            }
+        });
+    }
+
+    public final DisplayMetrics getDisplayMetrics() {
+        return getValue(new ValueGetter<DisplayMetrics>() {
+            @Override
+            public DisplayMetrics capture() {
+                return mWebView.getContext().getResources().getDisplayMetrics();
+            }
+        });
+    }
+
+    public boolean requestChildRectangleOnScreen(final View child,
+            final Rect rect,
+            final boolean immediate) {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.requestChildRectangleOnScreen(child, rect,
+                        immediate);
+            }
+        });
+    }
+
+    public int findAll(final String find) {
+        return getValue(new ValueGetter<Integer>() {
+            @Override
+            public Integer capture() {
+                return mWebView.findAll(find);
+            }
+        });
     }
 
     /**
@@ -271,7 +595,8 @@ public class WebViewOnUiThread {
                 mTest.runTestOnUiThread(r);
             }
         } catch (Throwable t) {
-            Assert.fail("Unexpected error while running on UI thread.");
+            Assert.fail("Unexpected error while running on UI thread: "
+                    + t.getMessage());
         }
     }
 
@@ -283,11 +608,177 @@ public class WebViewOnUiThread {
         return mWebView;
     }
 
+    private <T> T getValue(ValueGetter<T> getter) {
+        runOnUiThread(getter);
+        return getter.getValue();
+    }
+
+    private abstract class ValueGetter<T> implements Runnable {
+        private T mValue;
+
+        @Override
+        public void run() {
+            mValue = capture();
+        }
+
+        protected abstract T capture();
+
+        public T getValue() {
+           return mValue;
+        }
+    }
+
     /**
      * Returns true if the current thread is the UI thread based on the
      * Looper.
      */
     private static boolean isUiThread() {
         return (Looper.myLooper() == Looper.getMainLooper());
+    }
+
+    /**
+     * @return Whether or not the load has finished.
+     */
+    private synchronized boolean isLoaded() {
+        return mLoaded && mNewPicture && mProgress == 100;
+    }
+
+    /**
+     * Makes a WebView call, waits for completion and then resets the
+     * load state in preparation for the next load call.
+     * @param call The call to make on the UI thread prior to waiting.
+     */
+    private void callAndWait(Runnable call) {
+        Assert.assertTrue("WebViewOnUiThread.load*AndWaitForCompletion calls "
+                + "may not be mixed with load* calls directly on WebView "
+                + "without calling waitForLoadCompletion after the load",
+                !mLoaded);
+        runOnUiThread(call);
+        waitForLoadCompletion();
+    }
+
+    /**
+     * Called whenever a load has been completed so that a subsequent call to
+     * waitForLoadCompletion doesn't return immediately.
+     */
+    synchronized private void clearLoad() {
+        mLoaded = false;
+        mNewPicture = false;
+        mProgress = 0;
+    }
+
+    /**
+     * Uses a polling mechanism, while pumping messages to check when the
+     * load completes.
+     */
+    private void waitOnUiThread() {
+        new PollingCheck(LOAD_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                pumpMessages();
+                return isLoaded();
+            }
+        }.run();
+    }
+
+    /**
+     * Uses a wait/notify to check when the load completes.
+     */
+    private synchronized void waitOnTestThread() {
+        try {
+            long waitEnd = SystemClock.uptimeMillis() + LOAD_TIMEOUT;
+            long timeRemaining = LOAD_TIMEOUT;
+            while (!isLoaded() && timeRemaining > 0) {
+                this.wait(timeRemaining);
+                timeRemaining = waitEnd - SystemClock.uptimeMillis();
+            }
+        } catch (InterruptedException e) {
+            // We'll just drop out of the loop and fail
+        }
+        Assert.assertTrue("Load failed to complete before timeout", isLoaded());
+    }
+
+    /**
+     * Pumps all currently-queued messages in the UI thread and then exits.
+     * This is useful to force processing while running tests in the UI thread.
+     */
+    private void pumpMessages() {
+        class ExitLoopException extends RuntimeException {
+        }
+
+        // Force loop to exit when processing this. Loop.quit() doesn't
+        // work because this is the main Loop.
+        mWebView.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                throw new ExitLoopException(); // exit loop!
+            }
+        });
+        try {
+            // Pump messages until our message gets through.
+            Looper.loop();
+        } catch (ExitLoopException e) {
+        }
+    }
+
+    /**
+     * A WebChromeClient used to capture the onProgressChanged for use
+     * in waitFor functions. If a test must override the WebChromeClient,
+     * it can derive from this class or call onProgressChanged
+     * directly.
+     */
+    public static class WaitForProgressClient extends WebChromeClient {
+        private WebViewOnUiThread mOnUiThread;
+
+        public WaitForProgressClient(WebViewOnUiThread onUiThread) {
+            mOnUiThread = onUiThread;
+        }
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            mOnUiThread.onProgressChanged(newProgress);
+        }
+    }
+
+    /**
+     * A WebViewClient that captures the onPageFinished for use in
+     * waitFor functions. Using initializeWebView sets the WaitForLoadedClient
+     * into the WebView. If a test needs to set a specific WebViewClient and
+     * needs the waitForCompletion capability then it should derive from
+     * WaitForLoadedClient or call WebViewOnUiThread.onPageFinished.
+     */
+    public static class WaitForLoadedClient extends WebViewClient {
+        private WebViewOnUiThread mOnUiThread;
+
+        public WaitForLoadedClient(WebViewOnUiThread onUiThread) {
+            mOnUiThread = onUiThread;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            mOnUiThread.onPageFinished();
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            mOnUiThread.onPageStarted();
+        }
+    }
+
+    /**
+     * A PictureListener that captures the onNewPicture for use in
+     * waitForLoadCompletion. Using initializeWebView sets the PictureListener
+     * into the WebView. If a test needs to set a specific PictureListener and
+     * needs the waitForCompletion capability then it should call
+     * WebViewOnUiThread.onNewPicture.
+     */
+    private class WaitForNewPicture implements PictureListener {
+        @Override
+        public void onNewPicture(WebView view, Picture picture) {
+            WebViewOnUiThread.this.onNewPicture();
+        }
     }
 }
