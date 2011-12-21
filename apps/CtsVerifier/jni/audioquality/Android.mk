@@ -20,11 +20,13 @@ LOCAL_CPP_EXTENSION := .cpp
 
 LOCAL_MODULE_TAGS := optional
 
-
+LOCAL_SHARED_LIBRARIES := \
+	libcutils
 
 LOCAL_MODULE    := libaudioquality
 LOCAL_SRC_FILES := Fft.cpp Window.cpp GlitchTest.cpp MeasureRms.cpp \
    OverflowCheck.cpp LinearityTest.cpp CompareSpectra.cpp \
-   GenerateSinusoid.cpp Wrapper.cpp
+   GenerateSinusoid.cpp Wrapper.cpp LinearityTestRms.cpp
+
 
 include $(BUILD_SHARED_LIBRARY)
