@@ -22,7 +22,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /** {@link Activity} that calls {@link #setRequestedOrientation(int)} with the extra value. */
-public class ConfigurationScreenLayoutActivity extends Activity {
+public class OrientationActivity extends Activity {
 
     static final String EXTRA_ORIENTATION = "orientation";
 

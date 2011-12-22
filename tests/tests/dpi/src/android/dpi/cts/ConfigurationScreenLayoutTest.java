@@ -27,7 +27,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class ConfigurationScreenLayoutTest
-        extends ActivityInstrumentationTestCase2<ConfigurationScreenLayoutActivity> {
+        extends ActivityInstrumentationTestCase2<OrientationActivity> {
 
     private static final int[] ORIENTATIONS = new int[] {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
@@ -37,7 +37,7 @@ public class ConfigurationScreenLayoutTest
     };
 
     public ConfigurationScreenLayoutTest() {
-        super(ConfigurationScreenLayoutActivity.class);
+        super(OrientationActivity.class);
     }
 
     public void testScreenLayout() throws Exception {
@@ -82,7 +82,7 @@ public class ConfigurationScreenLayoutTest
 
     private Activity startOrientationActivity(int orientation) {
         Intent intent = new Intent();
-        intent.putExtra(ConfigurationScreenLayoutActivity.EXTRA_ORIENTATION, orientation);
+        intent.putExtra(OrientationActivity.EXTRA_ORIENTATION, orientation);
         setActivityIntent(intent);
         return getActivity();
     }
