@@ -27,7 +27,7 @@ import android.util.Log;
  * The base class for all audio experiments.
  */
 public class Experiment implements Runnable {
-    protected static final String TAG = "AudioQualityVerifier";
+    private static final String TAG = "AudioQualityVerifier";
 
     private static final int DEFAULT_TIMEOUT = 5; // In seconds
 
