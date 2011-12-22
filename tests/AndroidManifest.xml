@@ -69,6 +69,7 @@
     <uses-permission android:name="android.permission.DUMP" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
 
     <!-- Used for PackageManager test, don't delete this INTERNET permission -->
     <uses-permission android:name="android.permission.INTERNET" />
