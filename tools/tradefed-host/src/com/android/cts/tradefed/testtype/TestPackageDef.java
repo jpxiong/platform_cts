@@ -48,7 +48,6 @@ class TestPackageDef implements ITestPackageDef {
     private String mAppNameSpace = null;
     private String mName = null;
     private String mRunner = null;
-    private boolean mIsHostSideTest = false;
     private boolean mIsVMHostTest = false;
     private String mTestType = null;
     private String mJarPath = null;
@@ -110,15 +109,6 @@ class TestPackageDef implements ITestPackageDef {
 
     String getRunner() {
         return mRunner;
-    }
-
-    void setIsHostSideTest(boolean hostSideTest) {
-        mIsHostSideTest = hostSideTest;
-
-    }
-
-    boolean isHostSideTest() {
-        return mIsHostSideTest;
     }
 
     void setIsVMHostTest(boolean vmHostTest) {
@@ -219,7 +209,7 @@ class TestPackageDef implements ITestPackageDef {
         mExcludedTestFilter.setTestInclusion(mClassName, mMethodName);
         mTests = filterTests();
 
-        if (mIsHostSideTest) {
+        if ("hostSideOnly".equals(mTestType)) {
             CLog.d("Creating host test for %s", mName);
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(getUri());

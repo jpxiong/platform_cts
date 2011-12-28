@@ -32,4 +32,4 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_SDK_VERSION := current
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_PACKAGE)

@@ -33,4 +33,4 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 # doesn't currently support setting LOCAL_SDK_VERSION to anything but
 # current.
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_PACKAGE)

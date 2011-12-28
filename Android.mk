@@ -14,6 +14,6 @@
 # limitations under the License.
 #
 
-include cts/CtsNativeTestCase.mk
-include cts/CtsTestCoverage.mk
+include cts/CtsBuild.mk
+include cts/CtsCoverage.mk
 include $(call all-subdir-makefiles)

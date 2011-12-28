@@ -29,5 +29,4 @@ LOCAL_PACKAGE_NAME := CtsViewTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-include $(BUILD_PACKAGE)
-
+include $(BUILD_CTS_PACKAGE)

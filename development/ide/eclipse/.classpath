@@ -58,6 +58,8 @@
     <classpathentry kind="src" path="cts/tests/tests/webkit/src"/>
     <classpathentry kind="src" path="cts/tests/tests/widget/src"/>
     <classpathentry kind="src" path="cts/tools/cts-api-coverage/src"/>
+    <classpathentry kind="src" path="cts/tools/cts-java-scanner/src"/>
+    <classpathentry kind="src" path="cts/tools/cts-java-scanner-doclet/src"/>
     <classpathentry kind="src" path="cts/tools/cts-native-scanner/src"/>
     <classpathentry kind="src" path="cts/tools/cts-reference-app-lib/src"/>
     <classpathentry kind="src" path="cts/tools/cts-xml-generator/src"/>

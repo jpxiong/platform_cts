@@ -29,4 +29,4 @@ LOCAL_PACKAGE_NAME := CtsSaxTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_PACKAGE)

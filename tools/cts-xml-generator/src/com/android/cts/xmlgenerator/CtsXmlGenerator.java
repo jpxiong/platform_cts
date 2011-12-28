@@ -15,6 +15,10 @@
  */
 package com.android.cts.xmlgenerator;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import vogar.ExpectationStore;
 import vogar.ModeId;
 
@@ -23,16 +27,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Class that searches a source directory for native gTests and outputs a
- * test package xml.
- */
+import javax.xml.parsers.DocumentBuilderFactory;
+
+/** Class that outputs a test package xml. */
 public class CtsXmlGenerator {
 
     private static void usage(String[] args) {
         System.err.println("Arguments: " + Arrays.asList(args));
-        System.err.println("Usage: cts-native-xml-generator -p PACKAGE_NAME -n EXECUTABLE_NAME "
-                + " [-e EXPECTATION_FILE] [-o OUTPUT_FILE]");
+        System.err.println("Usage: cts-xml-generator -p PACKAGE_NAME -n NAME [-t TEST_TYPE]"
+                + " [-j JAR_PATH] [-i INSTRUMENTATION] [-m MANIFEST_FILE] [-e EXPECTATION_FILE]"
+                + " [-o OUTPUT_FILE]");
         System.exit(1);
     }
 
@@ -41,40 +45,48 @@ public class CtsXmlGenerator {
         String name = null;
         String outputPath = null;
         Set<File> expectationFiles = new HashSet<File>();
+        File manifestFile = null;
+        String instrumentation = null;
+        String testType = null;
+        String jarPath = null;
 
         for (int i = 0; i < args.length; i++) {
             if ("-p".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    appPackageName = args[++i];
-                } else {
-                    System.err.println("Missing value for test package");
-                    usage(args);
-                }
+                appPackageName = getArg(args, ++i, "Missing value for test package");
             } else if ("-n".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    name = args[++i];
-                } else {
-                    System.err.println("Missing value for executable name");
-                    usage(args);
-                }
+                name = getArg(args, ++i, "Missing value for executable name");
+            } else if ("-t".equals(args[i])) {
+                testType = getArg(args, ++i, "Missing value for test type");
+            } else if ("-j".equals(args[i])) {
+                jarPath = getArg(args, ++i, "Missing value for jar path");
+            } else if ("-m".equals(args[i])) {
+                manifestFile = new File(getArg(args, ++i, "Missing value for manifest"));
+            } else if ("-i".equals(args[i])) {
+                instrumentation = getArg(args, ++i, "Missing value for instrumentation");
             } else if ("-e".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    expectationFiles.add(new File(args[++i]));
-                } else {
-                    System.err.println("Missing value for expectation store");
-                    usage(args);
-                }
+                expectationFiles.add(new File(getArg(args, ++i,
+                        "Missing value for expectation store")));
             } else if ("-o".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    outputPath = args[++i];
-                } else {
-                    System.err.println("Missing value for output file");
-                    usage(args);
-                }
+                outputPath = getArg(args, ++i, "Missing value for output file");
             } else {
                 System.err.println("Unsupported flag: " + args[i]);
                 usage(args);
             }
+        }
+
+        String appNameSpace = null;
+        String runner = null;
+        String targetNameSpace = null;
+
+        if (manifestFile != null) {
+            Document manifest = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                    .parse(manifestFile);
+            Element documentElement = manifest.getDocumentElement();
+            appNameSpace = documentElement.getAttribute("package");
+            runner = getElementAttribute(documentElement, "instrumentation",
+                    "android:name");
+            targetNameSpace = getElementAttribute(documentElement, "instrumentation",
+                    "android:targetPackage");
         }
 
         if (appPackageName == null) {
@@ -86,7 +98,28 @@ public class CtsXmlGenerator {
         }
 
         ExpectationStore store = ExpectationStore.parse(expectationFiles, ModeId.DEVICE);
-        NativeXmlGenerator generator = new NativeXmlGenerator(store, appPackageName, name, outputPath);
+        XmlGenerator generator = new XmlGenerator(store, appNameSpace, appPackageName,
+                name, runner, instrumentation, targetNameSpace, jarPath, testType, outputPath);
         generator.writePackageXml();
+    }
+
+    private static String getArg(String[] args, int index, String message) {
+        if (index < args.length) {
+            return args[index];
+        } else {
+            System.err.println(message);
+            usage(args);
+            return null;
+        }
+    }
+
+    private static String getElementAttribute(Element parentElement, String elementName,
+            String attributeName) {
+        NodeList nodeList = parentElement.getElementsByTagName(elementName);
+        if (nodeList.getLength() > 0) {
+             Element element = (Element) nodeList.item(0);
+             return element.getAttribute(attributeName);
+        }
+        return null;
     }
 }

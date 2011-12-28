@@ -30,6 +30,6 @@ LOCAL_PACKAGE_NAME := CtsPermissionTestCases
 # uncomment when dalvik test annotations are removed or part of SDK
 #LOCAL_SDK_VERSION := current
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_PACKAGE)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))

@@ -29,5 +29,4 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsAccountManagerTestCases
 
-include $(BUILD_PACKAGE)
-
+include $(BUILD_CTS_PACKAGE)

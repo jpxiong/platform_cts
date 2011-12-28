@@ -27,21 +27,19 @@ public class CtsNativeScanner {
 
     private static void usage(String[] args) {
         System.err.println("Arguments: " + Arrays.asList(args));
-        System.err.println("Usage: cts-native-scanner -s SOURCE_DIR");
+        System.err.println("Usage: cts-native-scanner -s SOURCE_DIR -t TEST_SUITE");
         System.exit(1);
     }
 
     public static void main(String[] args) throws Exception {
         File sourceDir = null;
+        String testSuite = null;
 
         for (int i = 0; i < args.length; i++) {
             if ("-s".equals(args[i])) {
-                if (i + 1 < args.length) {
-                    sourceDir = new File(args[++i]);
-                } else {
-                    System.err.println("Missing value for source directory");
-                    usage(args);
-                }
+                sourceDir = new File(getArg(args, ++i, "Missing value for source directory"));
+            } else if ("-t".equals(args[i])) {
+                testSuite = getArg(args, ++i, "Missing value for test suite");
             } else {
                 System.err.println("Unsupported flag: " + args[i]);
                 usage(args);
@@ -53,10 +51,25 @@ public class CtsNativeScanner {
             usage(args);
         }
 
-        TestScanner scanner = new TestScanner(sourceDir);
+        if (testSuite == null) {
+            System.out.println("Test suite is required");
+            usage(args);
+        }
+
+        TestScanner scanner = new TestScanner(sourceDir, testSuite);
         List<String> testNames = scanner.getTestNames();
         for (String name : testNames) {
             System.out.println(name);
+        }
+    }
+
+    private static String getArg(String[] args, int index, String message) {
+        if (index < args.length) {
+            return args[index];
+        } else {
+            System.err.println(message);
+            usage(args);
+            return null;
         }
     }
 }

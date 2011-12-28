@@ -43,8 +43,11 @@ class TestScanner {
     /** Directory to recursively scan for gTest test declarations. */
     private final File mSourceDir;
 
-    TestScanner(File sourceDir) {
+    private final String mTestSuite;
+
+    TestScanner(File sourceDir, String testSuite) {
         mSourceDir = sourceDir;
+        mTestSuite = testSuite;
     }
 
     public List<String> getTestNames() throws IOException {
@@ -90,13 +93,14 @@ class TestScanner {
                 String line = scanner.nextLine();
                 Matcher matcher = CLASS_REGEX.matcher(line);
                 if (matcher.matches()) {
-                    testNames.add("class:" + matcher.group(1));
+                    testNames.add("suite:" + mTestSuite);
+                    testNames.add("case:" + matcher.group(1));
                     continue;
                 }
 
                 matcher = METHOD_REGEX.matcher(line);
                 if (matcher.matches()) {
-                    testNames.add("method:" + matcher.group(1));
+                    testNames.add("test:" + matcher.group(1));
                     continue;
                 }
             }
