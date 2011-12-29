@@ -50,8 +50,10 @@ import dalvik.annotation.TestTargets;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -869,12 +871,21 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         Camera.Parameters parameters = mCamera.getParameters();
         if (!recording) mCamera.startPreview();
         double focalLength = parameters.getFocalLength();
+        Date date = new Date(System.currentTimeMillis());
+        String localDatetime = new SimpleDateFormat("yyyy:MM:dd HH:").format(date);
+
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
+
+        // Test various exif tags.
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         assertNotNull(exif.getAttribute(ExifInterface.TAG_MAKE));
         assertNotNull(exif.getAttribute(ExifInterface.TAG_MODEL));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_DATETIME));
+        String datetime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+        assertNotNull(datetime);
+        // Datetime should be local time.
+        assertTrue(datetime.startsWith(localDatetime));
+        assertTrue(datetime.length() == 19); // EXIF spec is "YYYY:MM:DD HH:MM:SS".
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
         assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
         checkGpsDataNull(exif);
