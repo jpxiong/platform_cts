@@ -48,6 +48,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsMediaTestCases \
 	CtsNdefTestCases \
 	CtsNetTestCases \
+	CtsOpenGlPerfTestCases \
 	CtsOsTestCases \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
