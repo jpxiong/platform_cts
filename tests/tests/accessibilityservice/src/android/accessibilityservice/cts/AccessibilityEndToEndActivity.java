@@ -19,7 +19,6 @@ package android.accessibilityservice.cts;
 import com.android.cts.accessibilityservice.R;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +32,7 @@ import android.widget.TextView;
  * testing of the accessibility feature by interaction with the
  * UI widgets.
  */
-public class AccessibilityEndToEndTestActivity extends Activity {
-
-    final Context context = this;
-
+public class AccessibilityEndToEndActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +41,7 @@ public class AccessibilityEndToEndTestActivity extends Activity {
         ListAdapter listAdapter = new BaseAdapter() {
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView textView = (TextView) View
-                        .inflate(context, R.layout.list_view_row, null);
+                        .inflate(AccessibilityEndToEndActivity.this, R.layout.list_view_row, null);
                 textView.setText((String) getItem(position));
                 return textView;
             }
@@ -56,9 +52,9 @@ public class AccessibilityEndToEndTestActivity extends Activity {
 
             public Object getItem(int position) {
                 if (position == 0) {
-                    return context.getString(R.string.first_list_item);
+                    return AccessibilityEndToEndActivity.this.getString(R.string.first_list_item);
                 } else {
-                    return context.getString(R.string.second_list_item);
+                    return AccessibilityEndToEndActivity.this.getString(R.string.second_list_item);
                 }
             }
 

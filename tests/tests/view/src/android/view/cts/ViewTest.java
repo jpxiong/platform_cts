@@ -3315,6 +3315,16 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         public void childHasTransientStateChanged(View child, boolean hasTransientState) {
 
         }
+
+        @Override
+        public ViewParent getParentForAccessibility() {
+            return null;
+        }
+
+        @Override
+        public void childAccessibilityStateChanged(View child) {
+
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {

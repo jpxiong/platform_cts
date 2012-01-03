@@ -17,6 +17,8 @@
 
 <resources>
 
+    <!-- AccessibilityEndToEndTest -->
+
     <!-- String title of the accessibility end-to-end test activity -->
     <string name="accessibility_end_to_end_test_activity">End-to-end test</string>
 
@@ -44,6 +46,7 @@
     <!-- String notification message -->
     <string name="notification_message">Notification message</string>
 
+    <!-- AccessibilityWindowQueryTest -->
 
     <!-- String title of the accessibility query window test activity -->
     <string name="accessibility_query_window_test_activity">Query window test</string>
@@ -77,5 +80,49 @@
 
     <!-- String Button9 text -->
     <string name="button9">Button9</string>
+
+    <!-- AccessibilityFocusTest -->
+
+    <!-- String title of the accessibility hierarchical focus test activity -->
+    <string name="accessibility_hierarchical_focus_test_activity">Accessibility hierarchical focus test</string>
+
+    <!-- String root LinearLayout text -->
+    <string name="rootLinearLayout">rootLinearLayout</string>
+
+    <!-- String first FrameLayout text -->
+    <string name="firstFrameLayout">firstFrameLayout</string>
+
+    <!-- String first LinearLayout text -->
+    <string name="firstLinearLayout">firstLinearLayout</string>
+
+    <!-- String first TextView text -->
+    <string name="firstTextView">firstTextView</string>
+
+    <!-- String first EditText text -->
+    <string name="firstEditText">firstEditText</string>
+
+    <!-- String first Button text -->
+    <string name="firstButton">firstButton</string>
+
+    <!-- String second FrameLayout text -->
+    <string name="secondFrameLayout">secondFrameLayout</string>
+
+    <!-- String second LinearLayout text -->
+    <string name="secondLinearLayout">secondLinearLayout</string>
+
+    <!-- String second TextView text -->
+    <string name="secondTextView">secondTextView</string>
+
+    <!-- String second EditText text -->
+    <string name="secondEditText">secondEditText</string>
+
+    <!-- String second Button text -->
+    <string name="secondButton">secondButton</string>
+
+    <!-- String title of the accessibility directional focus test activity -->
+    <string name="accessibility_directional_focus_test_activity">Accessibility directional focus test</string>
+
+    <!-- String title of the accessibility focus and input focus sync test activity -->
+    <string name="accessibility_focus_and_input_focus_sync_test_activity">Accessibility focus and input focus sync test</string>
 
 </resources>

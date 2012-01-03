@@ -16,18 +16,15 @@
 
 package android.accessibilityservice.cts;
 
-import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.MediumTest;
+import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,12 +32,8 @@ import android.widget.ListView;
 
 import com.android.cts.accessibilityservice.R;
 
-import junit.framework.TestCase;
-
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * This class performs end-to-end testing of the accessibility feature by
@@ -49,280 +42,292 @@ import java.util.Queue;
  * <p>
  * Note: The accessibility CTS tests are composed of two APKs, one with delegating
  * accessibility service and another with the instrumented activity and test cases.
- * The motivation for two APKs design is that CTS tests cannot access the secure
- * settings which is required for enabling accessibility services, hence there is
- * no way to manipulate accessibility settings programmaticaly. Further, manually
- * enabling an accessibility service in the tests APK will not work either because
- * the instrumentation restarts the process under test which would break the binding
- * between the accessibility service and the system.
- * <p>
- * Therefore, manual installation of the
- * <strong>CtsAccessibilityServiceTestMockService.apk</strong>
- * whose source is located at <strong>cts/tests/accessibility</strong> is required.
- * Once the former package has been installed the service must be enabled
- * (Settings -> Accessibility -> Delegating Accessibility Service), and then the CTS tests
- * in this package can be successfully run or running a command from the shell to
- * enable the service.
+ * The delegating service is installed and enabled during test execution. It serves
+ * as a proxy to the system used by the tests. This indirection is needed since the
+ * test runner stops the package before running the tests. Hence, if the accessibility
+ * service is in the test package running the tests would break the binding between
+ * the service and the system.  The delegating service is in
+ * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
+ * <strong>cts/tests/accessibilityservice</strong>.
  * </p>
  */
 public class AccessibilityEndToEndTest extends
-        ActivityInstrumentationTestCase2<AccessibilityEndToEndTestActivity> {
+        AccessibilityActivityTestCase<AccessibilityEndToEndActivity> {
 
     /**
-     * Timeout required for pending Binder calls or event processing to
-     * complete.
-     */
-    private static final long TIMEOUT_ASYNC_PROCESSING = 500;
-
-    /**
-     * Creates a new instance for testing {@link AccessibilityEndToEndTestActivity}.
+     * Creates a new instance for testing {@link AccessibilityEndToEndActivity}.
      *
      * @throws Exception If any error occurs.
      */
     public AccessibilityEndToEndTest() throws Exception {
-        super(AccessibilityEndToEndTestActivity.class);
+        super(AccessibilityEndToEndActivity.class);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeViewSelectedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
         // create and populate the expected event
-        AccessibilityEvent selectedEvent = AccessibilityEvent.obtain();
-        selectedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_SELECTED);
-        selectedEvent.setClassName(ListView.class.getName());
-        selectedEvent.setPackageName(getActivity().getPackageName());
-        selectedEvent.getText().add(activity.getString(R.string.second_list_item));
-        selectedEvent.setItemCount(2);
-        selectedEvent.setCurrentItemIndex(1);
-        selectedEvent.setEnabled(true);
-        selectedEvent.setScrollable(false);
-        selectedEvent.setFromIndex(0);
-        selectedEvent.setToIndex(1);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_VIEW_SELECTED);
+        expected.setClassName(ListView.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(getActivity().getString(R.string.second_list_item));
+        expected.setItemCount(2);
+        expected.setCurrentItemIndex(1);
+        expected.setEnabled(true);
+        expected.setScrollable(false);
+        expected.setFromIndex(0);
+        expected.setToIndex(1);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(selectedEvent);
-        service.replay();
+        final ListView listView = (ListView) getActivity().findViewById(R.id.listview);
 
-        // trigger the event
-        final ListView listView = (ListView) activity.findViewById(R.id.listview);
-        getActivity().runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                listView.setSelection(1);
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listView.setSelection(1);
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeViewClickedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
         // create and populate the expected event
-        AccessibilityEvent clickedEvent = AccessibilityEvent.obtain();
-        clickedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_CLICKED);
-        clickedEvent.setClassName(Button.class.getName());
-        clickedEvent.setPackageName(getActivity().getPackageName());
-        clickedEvent.getText().add(activity.getString(R.string.button_title));
-        clickedEvent.setEnabled(true);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_VIEW_CLICKED);
+        expected.setClassName(Button.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(getActivity().getString(R.string.button_title));
+        expected.setEnabled(true);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(clickedEvent);
-        service.replay();
+        final Button button = (Button) getActivity().findViewById(R.id.button);
 
-        // trigger the event
-        final Button button = (Button) activity.findViewById(R.id.button);
-        activity.runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                button.performClick();
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.performClick();
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeViewLongClickedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
         // create and populate the expected event
-        AccessibilityEvent longClickedEvent = AccessibilityEvent.obtain();
-        longClickedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
-        longClickedEvent.setClassName(Button.class.getName());
-        longClickedEvent.setPackageName(getActivity().getPackageName());
-        longClickedEvent.getText().add(activity.getString(R.string.button_title));
-        longClickedEvent.setEnabled(true);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
+        expected.setClassName(Button.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(getActivity().getString(R.string.button_title));
+        expected.setEnabled(true);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(longClickedEvent);
-        service.replay();
+        final Button button = (Button) getActivity().findViewById(R.id.button);
 
-        // trigger the event
-        final Button button = (Button) activity.findViewById(R.id.button);
-        activity.runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                button.performLongClick();
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.performLongClick();
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeViewFocusedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
         // create and populate the expected event
-        AccessibilityEvent focusedEvent = AccessibilityEvent.obtain();
-        focusedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_FOCUSED);
-        focusedEvent.setClassName(Button.class.getName());
-        focusedEvent.setPackageName(getActivity().getPackageName());
-        focusedEvent.getText().add(activity.getString(R.string.button_title));
-        focusedEvent.setItemCount(3);
-        focusedEvent.setCurrentItemIndex(2);
-        focusedEvent.setEnabled(true);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+        expected.setClassName(Button.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(getActivity().getString(R.string.button_title));
+        expected.setItemCount(3);
+        expected.setCurrentItemIndex(2);
+        expected.setEnabled(true);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(focusedEvent);
-        service.replay();
+        final Button button = (Button) getActivity().findViewById(R.id.button);
 
-        // trigger the event
-        final Button button = (Button) activity.findViewById(R.id.button);
-        activity.runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                button.requestFocus();
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.requestFocus();
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeViewTextChangedAccessibilityEvent() throws Throwable {
-        final Activity activity = getActivity();
-
         // focus the edit text
-        final EditText editText = (EditText) activity.findViewById(R.id.edittext);
-        activity.runOnUiThread(new Runnable() {
+        final EditText editText = (EditText) getActivity().findViewById(R.id.edittext);
+
+        AccessibilityEvent awaitedFocusEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                editText.requestFocus();
-            }
-        });
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        editText.requestFocus();
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return event.getEventType() == AccessibilityEvent.TYPE_VIEW_FOCUSED;
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected focuss event.", awaitedFocusEvent);
 
-        // wait for the generated focus event to be dispatched
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
-
-        final String beforeText = activity.getString(R.string.text_input_blah);
-        final String newText = activity.getString(R.string.text_input_blah_blah);
+        final String beforeText = getActivity().getString(R.string.text_input_blah);
+        final String newText = getActivity().getString(R.string.text_input_blah_blah);
         final String afterText = beforeText.substring(0, 3) + newText;
 
         // create and populate the expected event
-        AccessibilityEvent textChangedEvent = AccessibilityEvent.obtain();
-        textChangedEvent.setEventType(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED);
-        textChangedEvent.setClassName(EditText.class.getName());
-        textChangedEvent.setPackageName(getActivity().getPackageName());
-        textChangedEvent.getText().add(afterText);
-        textChangedEvent.setBeforeText(beforeText);
-        textChangedEvent.setFromIndex(3);
-        textChangedEvent.setAddedCount(9);
-        textChangedEvent.setRemovedCount(1);
-        textChangedEvent.setEnabled(true);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED);
+        expected.setClassName(EditText.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(afterText);
+        expected.setBeforeText(beforeText);
+        expected.setFromIndex(3);
+        expected.setAddedCount(9);
+        expected.setRemovedCount(1);
+        expected.setEnabled(true);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(textChangedEvent);
-        service.replay();
-
-        // trigger the event
-        activity.runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedTextChangeEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                editText.getEditableText().replace(3, 4, newText);
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        editText.getEditableText().replace(3, 4, newText);
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedTextChangeEvent);
     }
 
-    @LargeTest
+    @MediumTest
     public void testTypeWindowStateChangedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
-        String title = activity.getString(R.string.alert_title);
-        String message = activity.getString(R.string.alert_message);
-
         // create and populate the expected event
-        AccessibilityEvent windowStateChangedEvent = AccessibilityEvent.obtain();
-        windowStateChangedEvent.setEventType(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
-        windowStateChangedEvent.setClassName(AlertDialog.class.getName());
-        windowStateChangedEvent.setPackageName(getActivity().getPackageName());
-        windowStateChangedEvent.getText().add(title);
-        windowStateChangedEvent.getText().add(message);
-        windowStateChangedEvent.setEnabled(true);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+        expected.setClassName(AlertDialog.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(getActivity().getString(R.string.alert_title));
+        expected.getText().add(getActivity().getString(R.string.alert_message));
+        expected.setEnabled(true);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(windowStateChangedEvent);
-        service.replay();
+        final EditText editText = (EditText) getActivity().findViewById(R.id.edittext);
 
-        // trigger the event
-        final EditText editText = (EditText) activity.findViewById(R.id.edittext);
-        activity.runOnUiThread(new Runnable() {
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
             public void run() {
-                AlertDialog dialog = (new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.alert_title).setMessage(R.string.alert_message))
-                        .create();
-                dialog.show();
-            }
-        });
-
-        // verify if all expected methods have been called
-        service.verify();
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        (new AlertDialog.Builder(getActivity()).setTitle(R.string.alert_title)
+                                .setMessage(R.string.alert_message)).create().show();
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    @LargeTest
+    @MediumTest
+    @SuppressWarnings("deprecation")
     public void testTypeNotificationStateChangedAccessibilityEvent() throws Throwable {
-        Activity activity = getActivity();
-
-        // Wait for accessibility events to settle i.e. for all events generated
-        // while bringing the activity up to be delivered so they do not interfere.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
-
-        String message = activity.getString(R.string.notification_message);
+        String message = getActivity().getString(R.string.notification_message);
 
         // create the notification to send
-        int notificationId = 1;
-        Notification notification = new Notification();
+        final int notificationId = 1;
+        final Notification notification = new Notification();
         notification.icon = android.R.drawable.stat_notify_call_mute;
         notification.contentIntent = PendingIntent.getActivity(getActivity(), 0, new Intent(),
                 PendingIntent.FLAG_CANCEL_CURRENT);
@@ -330,296 +335,101 @@ public class AccessibilityEndToEndTest extends
         notification.setLatestEventInfo(getActivity(), "", "", notification.contentIntent);
 
         // create and populate the expected event
-        AccessibilityEvent notificationChangedEvent = AccessibilityEvent.obtain();
-        notificationChangedEvent.setEventType(AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED);
-        notificationChangedEvent.setClassName(Notification.class.getName());
-        notificationChangedEvent.setPackageName(getActivity().getPackageName());
-        notificationChangedEvent.getText().add(message);
-        notificationChangedEvent.setParcelableData(notification);
+        final AccessibilityEvent expected = AccessibilityEvent.obtain();
+        expected.setEventType(AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED);
+        expected.setClassName(Notification.class.getName());
+        expected.setPackageName(getActivity().getPackageName());
+        expected.getText().add(message);
+        expected.setParcelableData(notification);
 
-        // set expectations
-        MockAccessibilityService service = MockAccessibilityService.getInstance(activity);
-        service.expectEvent(notificationChangedEvent);
-        service.replay();
-
-        // trigger the event
-        NotificationManager notificationManager = (NotificationManager) activity
-                .getSystemService(Service.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, notification);
-
-        // verify if all expected methods have been called
-        service.verify();
-
-        // remove the notification
-        notificationManager.cancel(notificationId);
+        AccessibilityEvent awaitedEvent =
+            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                new Runnable() {
+            @Override
+            public void run() {
+                // trigger the event
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // trigger the event
+                        NotificationManager notificationManager =
+                            (NotificationManager) getActivity().getSystemService(
+                                    Service.NOTIFICATION_SERVICE);
+                        notificationManager.notify(notificationId, notification);
+                    }
+                });
+            }},
+            new AccessibilityEventFilter() {
+                // check the received event
+                @Override
+                public boolean accept(AccessibilityEvent event) {
+                    return equalsAccessiblityEvent(event, expected);
+                }
+            },
+            TIMEOUT_ASYNC_PROCESSING);
+        assertNotNull("Did not receive expected event: " + expected, awaitedEvent);
     }
 
-    static class MockAccessibilityService extends AccessibilityService {
+    /**
+     * Compares all properties of the <code>first</code> and the
+     * <code>second</code>.
+     */
+    private boolean equalsAccessiblityEvent(AccessibilityEvent first, AccessibilityEvent second) {
+         return first.getEventType() == second.getEventType()
+            && first.isChecked() == second.isChecked()
+            && first.getCurrentItemIndex() == second.getCurrentItemIndex()
+            && first.isEnabled() == second.isEnabled()
+            && first.getFromIndex() == second.getFromIndex()
+            && first.isFullScreen() == second.isFullScreen()
+            && first.getItemCount() == second.getItemCount()
+            && first.isPassword() == second.isPassword()
+            && first.getRemovedCount() == second.getRemovedCount()
+            && first.isScrollable()== second.isScrollable()
+            && first.getToIndex() == second.getToIndex()
+            && first.getRecordCount() == second.getRecordCount()
+            && first.getScrollX() == second.getScrollX()
+            && first.getScrollY() == second.getScrollY()
+            && first.getAddedCount() == second.getAddedCount()
+            && TextUtils.equals(first.getBeforeText(), second.getBeforeText())
+            && TextUtils.equals(first.getClassName(), second.getClassName())
+            && TextUtils.equals(first.getContentDescription(), second.getContentDescription())
+            && equalsNotificationAsParcelableData(first, second)
+            && equalsText(first, second);
+    }
 
-        /**
-         * Helper for connecting to the delegating accessibility service.
-         */
-        private final AccessibilityDelegateHelper mAccessibilityDelegateHelper;
-
-        /**
-         * The singleton instance.
-         */
-        private static MockAccessibilityService sInstance;
-
-        /**
-         * The events this service expects to receive.
-         */
-        private final Queue<AccessibilityEvent> mExpectedEvents =
-            new LinkedList<AccessibilityEvent>();
-
-        /**
-         * Reusable temporary builder.
-         */
-        private final StringBuilder mTempBuilder = new StringBuilder();
-
-        /**
-         * Interruption call this service expects to receive.
-         */
-        private boolean mExpectedInterrupt;
-
-        /**
-         * Flag if the mock is currently replaying.
-         */
-        private boolean mReplaying;
-
-        /**
-         * Lock for synchronization.
-         */
-        private final Object mLock = new Object();
-
-        /**
-         * Gets the {@link MockAccessibilityService} singleton.
-         *
-         * @param context A context handle.
-         * @return The mock service.
-         */
-        public static MockAccessibilityService getInstance(Context context) {
-            if (sInstance == null) {
-                // since we do bind once and do not unbind from the delegating
-                // service and JUnit3 does not support @BeforeTest and @AfterTest,
-                // we will leak a service connection after the test but this
-                // does not affect the test results and the test is twice as fast
-                sInstance = new MockAccessibilityService(context);
-            }
-            return sInstance;
+    /**
+     * Compares the {@link android.os.Parcelable} data of the
+     * <code>first</code> and <code>second</code>.
+     */
+    private boolean equalsNotificationAsParcelableData(AccessibilityEvent first,
+            AccessibilityEvent second) {
+        String message = "parcelableData has incorrect value";
+        Notification firstNotification = (Notification) first.getParcelableData();
+        Notification secondNotification = (Notification) second.getParcelableData();
+        if (firstNotification == null) {
+            return (secondNotification == null);
+        } else if (secondNotification == null) {
+            return false;
         }
+        return TextUtils.equals(firstNotification.tickerText, secondNotification.tickerText);
+    }
 
-        /**
-         * Creates a new instance.
-         */
-        private MockAccessibilityService(Context context) {
-            mAccessibilityDelegateHelper = new AccessibilityDelegateHelper(this);
-            mAccessibilityDelegateHelper.bindToDelegatingAccessibilityService(
-                    context);
+    /**
+     * Compares the text of the <code>first</code> and <code>second</code> text.
+     */
+    private boolean equalsText(AccessibilityEvent first, AccessibilityEvent second) {
+        List<CharSequence> firstText = first.getText();
+        List<CharSequence> secondText = second.getText();
+        if (firstText.size() != secondText.size()) {
+            return false;
         }
-
-        /**
-         * Starts replaying the mock.
-         */
-        public void replay() {
-            mReplaying = true;
-        }
-
-        /**
-         * Verifies the mock service.
-         *
-         * @throws IllegalStateException If the verification has failed.
-         */
-        public void verify() throws IllegalStateException {
-            StringBuilder problems = mTempBuilder;
-            final long startTime = SystemClock.uptimeMillis();
-            synchronized (mLock) {
-                while (true) {
-                    if (!mReplaying) {
-                        throw new IllegalStateException("Did you forget to call replay()?");
-                    }
-                    if (!mExpectedInterrupt && mExpectedEvents.isEmpty()) {
-                        reset();
-                        return; // success
-                    }
-                    problems.setLength(0);
-                    if (mExpectedInterrupt) {
-                        problems.append("Expected call to #interrupt() not received.");
-                    }
-                    if (!mExpectedEvents.isEmpty()) {
-                        problems.append("Expected a call to onAccessibilityEvent() for events \""
-                                + mExpectedEvents + "\" not received.");
-                    }
-                    final long elapsedTime = SystemClock.uptimeMillis() - startTime;
-                    final long remainingTime = TIMEOUT_ASYNC_PROCESSING - elapsedTime;
-                    if (remainingTime <= 0) {
-                        reset();
-                        if (problems.length() > 0) {
-                            throw new IllegalStateException(problems.toString());
-                        }
-                        return;
-                    }
-                    try {
-                        mLock.wait(remainingTime);
-                    } catch (InterruptedException ie) {
-                        /* ignore */
-                    }
-                }
+        Iterator<CharSequence> firstIterator = firstText.iterator();
+        Iterator<CharSequence> secondIterator = secondText.iterator();
+        for (int i = 0; i < firstText.size(); i++) {
+            if (!firstIterator.next().toString().equals(secondIterator.next().toString())) {
+                return false;
             }
         }
-
-        /**
-         * Resets this instance so it can be reused.
-         */
-        private void reset() {
-            synchronized (mLock) {
-                mExpectedEvents.clear();
-                mExpectedInterrupt = false;
-                mReplaying = false;
-                mLock.notifyAll();
-            }
-        }
-
-        /**
-         * Sets an expected call to
-         * {@link #onAccessibilityEvent(AccessibilityEvent)} with given event as
-         * argument.
-         *
-         * @param expectedEvent The expected event argument.
-         */
-        private void expectEvent(AccessibilityEvent expectedEvent) {
-            mExpectedEvents.add(expectedEvent);
-        }
-
-        /**
-         * Sets an expected call of {@link #onInterrupt()}.
-         */
-        public void expectInterrupt() {
-            mExpectedInterrupt = true;
-        }
-
-        @Override
-        public void onAccessibilityEvent(AccessibilityEvent receivedEvent) {
-            synchronized (mLock) {
-                if (!mReplaying) {
-                    return;
-                }
-                if (mExpectedEvents.isEmpty()) {
-                    throw new IllegalStateException("Unexpected event: " + receivedEvent);
-                }
-                AccessibilityEvent expectedEvent = mExpectedEvents.poll();
-                assertEqualsAccessiblityEvent(expectedEvent, receivedEvent);
-                mLock.notifyAll();
-            }
-        }
-
-        @Override
-        public void onInterrupt() {
-            synchronized (mLock) {
-                if (!mReplaying) {
-                    return;
-                }
-                if (!mExpectedInterrupt) {
-                    throw new IllegalStateException("Unexpected call to onInterrupt()");
-                }
-                mExpectedInterrupt = false;
-                mLock.notifyAll();
-            }
-        }
-
-        /**
-         * Compares all properties of the <code>expectedEvent</code> and the
-         * <code>receviedEvent</code> to verify that the received event is the
-         * one that is expected.
-         */
-        private void assertEqualsAccessiblityEvent(AccessibilityEvent expectedEvent,
-                AccessibilityEvent receivedEvent) {
-            TestCase.assertEquals("addedCount has incorrect value", expectedEvent.getAddedCount(),
-                    receivedEvent.getAddedCount());
-            TestCase.assertEquals("beforeText has incorrect value", expectedEvent.getBeforeText(),
-                    receivedEvent.getBeforeText());
-            TestCase.assertEquals("checked has incorrect value", expectedEvent.isChecked(),
-                    receivedEvent.isChecked());
-            TestCase.assertEquals("className has incorrect value", expectedEvent.getClassName(),
-                    receivedEvent.getClassName());
-            TestCase.assertEquals("contentDescription has incorrect value", expectedEvent
-                    .getContentDescription(), receivedEvent.getContentDescription());
-            TestCase.assertEquals("currentItemIndex has incorrect value", expectedEvent
-                    .getCurrentItemIndex(), receivedEvent.getCurrentItemIndex());
-            TestCase.assertEquals("enabled has incorrect value", expectedEvent.isEnabled(),
-                    receivedEvent.isEnabled());
-            TestCase.assertEquals("eventType has incorrect value", expectedEvent.getEventType(),
-                    receivedEvent.getEventType());
-            TestCase.assertEquals("fromIndex has incorrect value", expectedEvent.getFromIndex(),
-                    receivedEvent.getFromIndex());
-            TestCase.assertEquals("fullScreen has incorrect value", expectedEvent.isFullScreen(),
-                    receivedEvent.isFullScreen());
-            TestCase.assertEquals("itemCount has incorrect value", expectedEvent.getItemCount(),
-                    receivedEvent.getItemCount());
-            assertEqualsNotificationAsParcelableData(expectedEvent, receivedEvent);
-            TestCase.assertEquals("password has incorrect value", expectedEvent.isPassword(),
-                    receivedEvent.isPassword());
-            TestCase.assertEquals("removedCount has incorrect value", expectedEvent
-                    .getRemovedCount(), receivedEvent.getRemovedCount());
-            TestCase.assertEquals("scrollable has incorrect value", expectedEvent.isScrollable(),
-                    receivedEvent.isScrollable());
-            TestCase.assertEquals("toIndex has incorrect value", expectedEvent.getToIndex(),
-                    receivedEvent.getToIndex());
-            TestCase.assertEquals("recordCount has incorrect value", expectedEvent.getRecordCount(),
-                    receivedEvent.getRecordCount());
-            TestCase.assertEquals("scrollX has incorrect value", expectedEvent.getScrollX(),
-                    receivedEvent.getScrollX());
-            TestCase.assertEquals("scrollY has incorrect value", expectedEvent.getScrollY(),
-                    receivedEvent.getScrollY());
-
-            assertEqualsText(expectedEvent, receivedEvent);
-        }
-
-        /**
-         * Compares the {@link android.os.Parcelable} data of the
-         * <code>expectedEvent</code> and <code>receivedEvent</code> to verify
-         * that the received event is the one that is expected.
-         */
-        private void assertEqualsNotificationAsParcelableData(AccessibilityEvent expectedEvent,
-                AccessibilityEvent receivedEvent) {
-            String message = "parcelableData has incorrect value";
-            Notification expectedNotification = (Notification) expectedEvent.getParcelableData();
-            Notification receivedNotification = (Notification) receivedEvent.getParcelableData();
-
-            if (expectedNotification == null) {
-                if (receivedNotification == null) {
-                    return;
-                }
-            }
-
-            TestCase.assertNotNull(message, receivedNotification);
-
-            // we do a very simple sanity check
-            TestCase.assertEquals(message, expectedNotification.tickerText.toString(),
-                    receivedNotification.tickerText.toString());
-        }
-
-        /**
-         * Compares the text of the <code>expectedEvent</code> and
-         * <code>receivedEvent</code> by comparing the string representation of
-         * the corresponding {@link CharSequence}s.
-         */
-        private void assertEqualsText(AccessibilityEvent expectedEvent,
-                AccessibilityEvent receivedEvent) {
-            String message = "text has incorrect value";
-            List<CharSequence> expectedText = expectedEvent.getText();
-            List<CharSequence> receivedText = receivedEvent.getText();
-
-            TestCase.assertEquals(message, expectedText.size(), receivedText.size());
-
-            Iterator<CharSequence> expectedTextIterator = expectedText.iterator();
-            Iterator<CharSequence> receivedTextIterator = receivedText.iterator();
-
-            for (int i = 0; i < expectedText.size(); i++) {
-                // compare the string representation
-                TestCase.assertEquals(message, expectedTextIterator.next().toString(),
-                        receivedTextIterator.next().toString());
-            }
-        }
+        return true;
     }
 }

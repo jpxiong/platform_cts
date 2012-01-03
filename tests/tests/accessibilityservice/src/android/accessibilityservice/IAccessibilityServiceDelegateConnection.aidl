@@ -36,7 +36,13 @@ interface IAccessibilityServiceDelegateConnection {
 
     AccessibilityNodeInfo getChild(in AccessibilityNodeInfo parent, int index);
 
+    AccessibilityNodeInfo findFocus(in AccessibilityNodeInfo root, int focusType);
+
+    AccessibilityNodeInfo focusSearch(in AccessibilityNodeInfo current, int direction);
+
     boolean performAccessibilityAction(in AccessibilityNodeInfo target, int action);
 
     AccessibilityNodeInfo getSource(in AccessibilityEvent event);
+
+    void setFetchViewsNotExposedForAccessibility(boolean fetch);
 }

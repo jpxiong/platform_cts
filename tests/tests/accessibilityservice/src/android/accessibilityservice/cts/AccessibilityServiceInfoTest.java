@@ -20,7 +20,7 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Service;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class AccessibilityServiceInfoTest extends AndroidTestCase {
 
-    @SmallTest
+    @MediumTest
     public void testMarshalling() throws Exception {
 
         // fully populate the service info to marshal
@@ -52,7 +52,7 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
     /**
      * Tests whether the service info describes its contents consistently.
      */
-    @SmallTest
+    @MediumTest
     public void testDescribeContents() {
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
         assertSame("Accessibility service info always return 0 for this method.", 0,
@@ -65,7 +65,7 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
     /**
      * Tests whether a feedback type is correctly transformed to a string.
      */
-    @SmallTest
+    @MediumTest
     public void testFeedbackTypeToString() {
         assertEquals("[FEEDBACK_AUDIBLE]", AccessibilityServiceInfo.feedbackTypeToString(
                 AccessibilityServiceInfo.FEEDBACK_AUDIBLE));
@@ -85,7 +85,7 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
     /**
      * Tests whether a flag is correctly transformed to a string.
      */
-    @SmallTest
+    @MediumTest
     public void testFlagToString() {
         assertEquals("DEFAULT", AccessibilityServiceInfo.flagToString(
                 AccessibilityServiceInfo.DEFAULT));
@@ -95,7 +95,7 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
      * Tests whether a service can that requested it can retrieve
      * window content.
      */
-    @SmallTest
+    @MediumTest
     @SuppressWarnings("deprecation")
     public void testAccessibilityServiceInfoForEnabledService() {
         AccessibilityManager accessibilityManager = (AccessibilityManager)

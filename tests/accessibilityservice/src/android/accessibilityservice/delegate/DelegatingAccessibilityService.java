@@ -17,6 +17,7 @@
 package android.accessibilityservice.delegate;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accessibilityservice.IAccessibilityServiceDelegate;
 import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
 import android.app.Service;
@@ -153,6 +154,16 @@ public class DelegatingAccessibilityService extends AccessibilityService {
             }
 
             @Override
+            public AccessibilityNodeInfo findFocus(AccessibilityNodeInfo root, int focusType) {
+                return root.findFocus(focusType);
+            }
+
+            @Override
+            public AccessibilityNodeInfo focusSearch(AccessibilityNodeInfo current, int direction) {
+                return current.focusSearch(direction);
+            }
+
+            @Override
             public AccessibilityNodeInfo getSource(AccessibilityEvent event) {
                 return event.getSource();
             }
@@ -160,6 +171,17 @@ public class DelegatingAccessibilityService extends AccessibilityService {
             @Override
             public boolean performAccessibilityAction(AccessibilityNodeInfo target, int action) {
                 return target.performAction(action);
+            }
+
+            @Override
+            public void setFetchViewsNotExposedForAccessibility(boolean fetch) {
+                AccessibilityServiceInfo info = sServiceDelegate.getServiceInfo();
+                if (fetch) {
+                    info.flags |= AccessibilityServiceInfo.INCLUDE_NOT_IMPORTANT_VIEWS;
+                } else {
+                    info.flags &= ~AccessibilityServiceInfo.INCLUDE_NOT_IMPORTANT_VIEWS;
+                }
+                sServiceDelegate.setServiceInfo(info);
             }
         }
     }

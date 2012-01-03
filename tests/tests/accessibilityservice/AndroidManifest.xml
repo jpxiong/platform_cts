@@ -26,10 +26,19 @@
       <uses-library android:name="android.test.runner"/>
 
       <activity android:label="@string/accessibility_end_to_end_test_activity"
-              android:name="android.accessibilityservice.cts.AccessibilityEndToEndTestActivity"/>
+              android:name="android.accessibilityservice.cts.AccessibilityEndToEndActivity"/>
 
       <activity android:label="@string/accessibility_query_window_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityWindowQueryActivity"/>
+
+      <activity android:label="@string/accessibility_hierarchical_focus_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityHierarchicalFocusActivity"/>
+
+      <activity android:label="@string/accessibility_directional_focus_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityDirectionalFocusActivity"/>
+
+      <activity android:label="@string/accessibility_focus_and_input_focus_sync_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityFocusAndInputFocusSyncActivity"/>
 
   </application>
 

@@ -21,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
  */
 public class AccessibilitySettingsTest extends AndroidTestCase {
 
+    @MediumTest
     public void testAccessibilitySettingsIntentHandled() throws Throwable {
         PackageManager packageManager = mContext.getPackageManager();
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
