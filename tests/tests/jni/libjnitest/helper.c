@@ -58,7 +58,7 @@ char *runJniTests(JNIEnv *env, ...) {
 
         JniTestFunction *function = va_arg(args, JniTestFunction *);
 
-        LOGI("running %s", name);
+        ALOGI("running %s", name);
 
         char *oneResult = function(env);
         if (oneResult != NULL) {
