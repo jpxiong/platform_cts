@@ -77,6 +77,10 @@ class CurrentXmlHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name) throws SAXException {
         super.endElement(uri, localName, name);
         if ("constructor".equalsIgnoreCase(localName)) {
+            if (mCurrentParameterTypes.isEmpty()) {
+                // Don't add empty default constructors...
+                return;
+            }
             ApiConstructor apiConstructor = new ApiConstructor(mCurrentClassName,
                     mCurrentParameterTypes);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);

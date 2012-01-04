@@ -61,15 +61,15 @@
                     }
 
                     .red {
-                        background-color: #FF0000;
+                        background-color: #FF6666;
                     }
 
                     .yellow {
-                        background-color: #FFFF00;
+                        background-color: #FFFF66;
                     }
 
                     .green {
-                        background-color: #00FF00;
+                        background-color: #66FF66;
                     }
                 </style>
             </head>
