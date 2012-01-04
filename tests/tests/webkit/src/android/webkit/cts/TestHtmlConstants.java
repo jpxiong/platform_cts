@@ -56,6 +56,12 @@ public class TestHtmlConstants {
 
     public static final String EXT_WEB_URL1 = "http://www.example.com/";
 
+    public static final String LOCAL_FILESYSTEM_URL = "file:///etc/hosts";
+
+    // Must match the title of the page at
+    // android/frameworks/base/core/res/res/raw/loaderror.html
+    public static final String WEBPAGE_NOT_AVAILABLE_TITLE = "Webpage not available";
+
     public static final String getFileUrl(String assetName) {
         if (assetName.contains(":") || assetName.startsWith("/")) {
             throw new IllegalArgumentException();

@@ -214,7 +214,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             args = {boolean.class}
         )
     })
-    @ToBeFixed(explanation = "Cannot block file access using setAllowFileAccess(false)")
     public void testAccessAllowFileAccess() {
         assertTrue(mSettings.getAllowFileAccess());
 
@@ -225,11 +224,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         fileUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.BR_TAG_URL);
         mSettings.setAllowFileAccess(false);
         assertFalse(mSettings.getAllowFileAccess());
+
         loadUrl(fileUrl);
-        // direct file:// access still works with access disabled
+        // android_asset URLs should still be loaded when even with file access
+        // disabled.
         assertEquals(TestHtmlConstants.BR_TAG_TITLE, mWebView.getTitle());
 
-        // ToBeFixed: How does this API prevent file access?
+        // Files on the file system should not be loaded.
+        loadUrl(TestHtmlConstants.LOCAL_FILESYSTEM_URL);
+        assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mWebView.getTitle());
     }
 
     @TestTargets({
