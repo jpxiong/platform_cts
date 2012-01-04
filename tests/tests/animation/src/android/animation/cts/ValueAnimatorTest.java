@@ -15,24 +15,22 @@
  */
 package android.animation.cts;
 
+import android.animation.ArgbEvaluator;
+import android.animation.FloatEvaluator;
+import android.animation.IntEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Instrumentation;
-import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.animation.AccelerateInterpolator;
 
 public class ValueAnimatorTest extends
         ActivityInstrumentationTestCase2<AnimationActivity> {
     private AnimationActivity mActivity;
-    private Instrumentation mInstrumentation;
     private ValueAnimator mValueAnimator;
-    private long mDuration;
+    private long mDuration = 1000;
 
     public ValueAnimatorTest() {
-        super("com.android.cts.animation",AnimationActivity.class);
-    }
-
-    public ValueAnimatorTest(Class<AnimationActivity> activityClass) {
-        super("com.android.cts.animation",AnimationActivity.class);
+        super(AnimationActivity.class);
     }
 
     @Override
@@ -55,6 +53,16 @@ public class ValueAnimatorTest extends
         startAnimation(mValueAnimator);
         ValueAnimator valueAnimatorReturned = mActivity.view.bounceAnimator;
         assertTrue(valueAnimatorReturned.isRunning());
+    }
+
+    public void testIsStarted() throws Throwable {
+        assertFalse(mValueAnimator.isRunning());
+        assertFalse(mValueAnimator.isStarted());
+        long startDelay = 10000;
+        mValueAnimator.setStartDelay(startDelay);
+        startAnimation(mValueAnimator);
+        assertFalse(mValueAnimator.isRunning());
+        assertTrue(mValueAnimator.isStarted());
     }
 
     public void testRepeatMode() throws Throwable {
@@ -92,12 +100,164 @@ public class ValueAnimatorTest extends
         assertEquals(frameDelay, actualFrameDelay);
     }
 
-    private void startAnimation(final ValueAnimator mValueAnimator) throws Throwable {
+    public void testSetInterpolator() throws Throwable {
+        AccelerateInterpolator interpolator = new AccelerateInterpolator();
+        ValueAnimator mValueAnimator = mActivity.createAnimatorWithInterpolator(interpolator);
+        startAnimation(mValueAnimator);
+        assertTrue(interpolator.equals(mValueAnimator.getInterpolator()));
+    }
+
+    public void testCancel() throws Throwable {
+        startAnimation(mValueAnimator);
+        Thread.sleep(100);
+        mValueAnimator.cancel();
+        assertFalse(mValueAnimator.isRunning());
+    }
+
+    public void testEnd() throws Throwable {
+        Object object = mActivity.view.newBall;
+        String property = "y";
+        float startY = mActivity.mStartY;
+        float endY = mActivity.mStartY + mActivity.mDeltaY;
+        ObjectAnimator objAnimator = ObjectAnimator.ofFloat(object, property, startY, endY);
+        objAnimator.setDuration(mDuration);
+        objAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        objAnimator.setInterpolator(new AccelerateInterpolator());
+        objAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        startAnimation(objAnimator);
+        Thread.sleep(100);
+        endAnimation(objAnimator);
+        float y = mActivity.view.newBall.getY();
+        assertEquals(y, endY);
+    }
+
+    public void testGetAnimatedFraction() throws Throwable {
+        ValueAnimator objAnimator = getAnimator();
+        startAnimation(objAnimator);
+        assertNotNull(objAnimator);
+        float[] fractions = getValue(objAnimator, 10, "getAnimatedFraction()", 100l, null);
+        for(int j = 0; j < 9; j++){
+            assertTrue(fractions[j] >= 0.0);
+            assertTrue(fractions[j] <= 1.0);
+            assertTrue(fractions[j + 1] != fractions[j]);
+        }
+    }
+
+    public void testGetAnimatedValue() throws Throwable {
+        ValueAnimator objAnimator = getAnimator();
+        startAnimation(objAnimator);
+        assertNotNull(objAnimator);
+        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue()", 100l, null);
+
+        for(int j = 0; j < 9; j++){
+            assertTrue(animatedValues[j + 1] != animatedValues[j]);
+        }
+    }
+    public void testGetAnimatedValue_PropertyName() throws Throwable {
+        String property = "y";
+
+        ValueAnimator objAnimator = getAnimator();
+        startAnimation(objAnimator);
+        assertNotNull(objAnimator);
+        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue(property)", 100l,
+            property);
+        for(int j = 0; j < 9; j++){
+            assertTrue(animatedValues[j + 1] != animatedValues[j]);
+        }
+    }
+
+    public void testOfFloat() throws Throwable {
+        float start = 0.0f;
+        float end = 1.0f;
+        float[] values = {start, end};
+        final ValueAnimator valueAnimatorLocal = ValueAnimator.ofFloat(values);
+        valueAnimatorLocal.setDuration(mDuration);
+        valueAnimatorLocal.setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimatorLocal.setInterpolator(new AccelerateInterpolator());
+        valueAnimatorLocal.setRepeatMode(ValueAnimator.RESTART);
+
         this.runTestOnUiThread(new Runnable(){
-            public void run(){
-                mActivity.startAnimation(mValueAnimator);
+            public void run() {
+                valueAnimatorLocal.start();
             }
         });
+        Thread.sleep(100);
+        boolean isRunning = valueAnimatorLocal.isRunning();
+        assertTrue(isRunning);
+
+        Float animatedValue = (Float) valueAnimatorLocal.getAnimatedValue();
+        assertTrue(animatedValue >= start);
+        assertTrue(animatedValue <= end);
+    }
+
+    public void testOfInt() throws Throwable {
+        int start = 0;
+        int end = 10;
+        int[] values = {start, end};
+        final ValueAnimator valueAnimatorLocal = ValueAnimator.ofInt(values);
+        valueAnimatorLocal.setDuration(mDuration);
+        valueAnimatorLocal.setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimatorLocal.setInterpolator(new AccelerateInterpolator());
+        valueAnimatorLocal.setRepeatMode(ValueAnimator.RESTART);
+
+        this.runTestOnUiThread(new Runnable(){
+            public void run() {
+                valueAnimatorLocal.start();
+            }
+        });
+        Thread.sleep(100);
+        boolean isRunning = valueAnimatorLocal.isRunning();
+        assertTrue(isRunning);
+
+        Integer animatedValue = (Integer) valueAnimatorLocal.getAnimatedValue();
+        assertTrue(animatedValue >= start);
+        assertTrue(animatedValue <= end);
+    }
+
+    private ValueAnimator getAnimator() {
+        Object object = mActivity.view.newBall;
+        String property = "y";
+        float startY = mActivity.mStartY;
+        float endY = mActivity.mStartY + mActivity.mDeltaY;
+        ValueAnimator objAnimator = ObjectAnimator.ofFloat(object, property, startY, endY);
+        objAnimator.setDuration(mDuration);
+        objAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        objAnimator.setInterpolator(new AccelerateInterpolator());
+        objAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        return objAnimator;
+    }
+
+    private float[] getValue(ValueAnimator animator, int n, String methodName, 
+            long sleepTime, String property) throws InterruptedException {
+        float[] values = new float[n];
+        for(int i = 0; i < (n-1); i++){
+            Thread.sleep(sleepTime);
+            float value = 0.0f;
+            if(methodName.equals("getAnimatedFraction()")) {
+                value = animator.getAnimatedFraction();
+            }else if(methodName.equals("getAnimatedValue()")) {
+              value = ((Float)animator.getAnimatedValue()).floatValue();
+            }else if(methodName.equals("getAnimatedValue(property)")) {
+              value = ((Float)animator.getAnimatedValue(property)).floatValue();
+            }
+            values[i] = value;
+        }
+        return values;
+    }
+    private void startAnimation(final ValueAnimator mValueAnimator) throws Throwable {
+        this.runTestOnUiThread(new Runnable(){
+            public void run() {
+                  mActivity.startAnimation(mValueAnimator);
+            }
+        });
+    }
+    private void endAnimation(final ValueAnimator mValueAnimator) throws Throwable {
+        Thread animationRunnable = new Thread() {
+            public void run() {
+                mValueAnimator.end();
+            }
+        };
+        this.runTestOnUiThread(animationRunnable);
     }
 }
 
