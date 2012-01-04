@@ -69,8 +69,6 @@ public class PlayVideoActivity extends PassFailButtons.Activity
     private Handler mHandler = new Handler();
     private int mVideoWidth;
     private int mVideoHeight;
-    private boolean mIsVideoSizeKnown = false;
-    private boolean mIsVideoReadyToBePlayed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,17 +168,14 @@ public class PlayVideoActivity extends PassFailButtons.Activity
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-        mVideoWidth = width;
-        mVideoHeight = height;
-        mIsVideoSizeKnown = true;
-        if (mIsVideoReadyToBePlayed && mIsVideoSizeKnown) {
-            startVideoPlayback();
+        if (width != 0 && height != 0) {
+            mVideoWidth = width;
+            mVideoHeight = height;
+            fillScreen();
         }
     }
 
     private void startVideoPlayback() {
-        mHolder.setFixedSize(mVideoWidth, mVideoHeight);
-        fillScreen();
         mPlayer.start();
 
         // Enable Pass button after 60 seconds
@@ -189,13 +184,11 @@ public class PlayVideoActivity extends PassFailButtons.Activity
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        mIsVideoReadyToBePlayed = true;
-        if (mIsVideoReadyToBePlayed && mIsVideoSizeKnown) {
-            startVideoPlayback();
-        }
+        startVideoPlayback();
     }
 
     private void fillScreen() {
+        mHolder.setFixedSize(mVideoWidth, mVideoHeight);
         Rect rect = new Rect();
         mVideoFrame.getDrawingRect(rect);
         LayoutParams lp = mSurfaceView.getLayoutParams();
