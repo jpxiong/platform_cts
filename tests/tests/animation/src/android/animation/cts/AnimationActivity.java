@@ -58,7 +58,6 @@ public class AnimationActivity extends Activity {
     float mDeltaY = 200f;
     long mDuration = 1000;
     public AnimationView view = null;
-    private boolean isAnimationRunning = false;
 
     @Override
     public void onCreate(Bundle bundle){
@@ -92,12 +91,12 @@ public class AnimationActivity extends Activity {
     }
 
     public ValueAnimator createAnimatorWithRepeatMode(int repeatMode) {
-        return createAnimator(view.newBall, "y", 1000,ValueAnimator.INFINITE, repeatMode,
+        return createAnimator(view.newBall, "y", 1000, ValueAnimator.INFINITE, repeatMode,
                 new AccelerateInterpolator(), mStartY, mStartY + mDeltaY);
     }
 
     public ValueAnimator createAnimatorWithRepeatCount(int repeatCount) {
-        return createAnimator(view.newBall, "y", 1000,repeatCount, ValueAnimator.REVERSE,
+        return createAnimator(view.newBall, "y", 1000, repeatCount, ValueAnimator.REVERSE,
                 new AccelerateInterpolator(), mStartY, mStartY + mDeltaY);
     }
 
@@ -106,46 +105,98 @@ public class AnimationActivity extends Activity {
                 ValueAnimator.REVERSE,new AccelerateInterpolator(), mStartY, mStartY + mDeltaY);
     }
 
+    public ValueAnimator createAnimatorWithInterpolator(TimeInterpolator interpolator){
+        return createAnimator(view.newBall, "y", 1000, ValueAnimator.INFINITE, ValueAnimator.REVERSE,
+                interpolator, mStartY, mStartY + mDeltaY);
+    }
+
+    public ValueAnimator createObjectAnimatorForInt(Object object,String propertyName,
+            long duration, int repeatCount, int repeatMode, TimeInterpolator timeInterpolator,
+            int start, int end) {
+        ObjectAnimator objAnimator = ObjectAnimator.ofInt(object, propertyName, start,end);
+        objAnimator.setDuration(duration);
+
+        objAnimator.setRepeatCount(repeatCount);
+        objAnimator.setInterpolator(timeInterpolator);
+        objAnimator.setRepeatMode(repeatMode);
+        return objAnimator;
+    }
+
+    public ValueAnimator createObjectAnimatorForInt() {
+        ObjectAnimator objAnimator = ObjectAnimator.ofInt(view.newBall, "y", (int)mStartY,
+            (int)(mStartY + mDeltaY));
+        objAnimator.setDuration(mDuration);
+
+        objAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        objAnimator.setInterpolator(new AccelerateInterpolator());
+        objAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        return objAnimator;
+    }
+
     public void startAnimation(long duration){
         ValueAnimator bounceAnimator = ObjectAnimator.ofFloat(view.newBall, "y", mStartY,
-                mStartY + mDeltaY);
+            mStartY + mDeltaY);
         bounceAnimator.setDuration(duration);
         bounceAnimator.setRepeatCount(ValueAnimator.INFINITE);
         bounceAnimator.setInterpolator(new AccelerateInterpolator());
         bounceAnimator.setRepeatMode(ValueAnimator.REVERSE);
         view.bounceAnimator = bounceAnimator;
+        view.startColorAnimator();
         view.animateBall();
     }
 
     public void startAnimation(ValueAnimator valueAnimator){
         view.bounceAnimator = valueAnimator;
+        view.startColorAnimator();
         view.animateBall();
-        isAnimationRunning = true;
+    }
+
+    public void startAnimation(ObjectAnimator bounceAnimator) {
+        view.bounceAnimator = bounceAnimator;
+        view.startColorAnimator();
+        view.animateBall();
+    }
+
+    public void startAnimation(ObjectAnimator bounceAnimator, ObjectAnimator colorAnimator) {
+        view.bounceAnimator = bounceAnimator;
+        view.startColorAnimator(colorAnimator);
+        view.animateBall();
+    }
+
+    public void startColorAnimation(ValueAnimator colorAnimator){
+        view.startColorAnimator(colorAnimator);
     }
 
     public class AnimationView extends View {
-        private static final int RED = 0xffFF8080;
-        private static final int BLUE = 0xff8080FF;
+        public static final int RED = 0xffFF8080;
+        public static final int BLUE = 0xff8080FF;
         public ShapeHolder newBall = null;
         public final ArrayList<ShapeHolder> balls = new ArrayList<ShapeHolder>();
         AnimatorSet animation = null;
         public ValueAnimator bounceAnimator;
+        public ValueAnimator colorAnimator;
 
         public AnimationView(Context context) {
             super(context);
-            ValueAnimator colorAnim = ObjectAnimator.ofInt(this, "backgroundColor", RED, BLUE);
-            colorAnim.setDuration(1000);
-            colorAnim.setEvaluator(new ArgbEvaluator());
-            colorAnim.setRepeatCount(1);
-            colorAnim.setRepeatMode(ValueAnimator.REVERSE);
-            colorAnim.start();
             newBall = addBall(mBallHeight, mBallWidth);
+        }
+
+        public void startColorAnimator() {
+            colorAnimator = ObjectAnimator.ofInt(this, "backgroundColor", RED, BLUE);
+            colorAnimator.setDuration(1000);
+            colorAnimator.setEvaluator(new ArgbEvaluator());
+            colorAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
+            colorAnimator.start();
+        }
+
+        public void startColorAnimator(ValueAnimator animator) {
+            this.colorAnimator = animator;
+            colorAnimator.start();
         }
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-
-
             return true;
         }
 
@@ -203,4 +254,3 @@ public class AnimationActivity extends Activity {
         }
     }
 }
-
