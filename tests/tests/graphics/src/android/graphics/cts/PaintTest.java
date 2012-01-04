@@ -1247,6 +1247,18 @@ public class PaintTest extends AndroidTestCase {
         assertMeasureText(text, textChars, textSpan, 4, 7, widths[4] + widths[5] + widths[6]);
     }
 
+    public void testMeasureTextWithLongText() {
+        final int MAX_COUNT = 65535;
+        char[] longText = new char[MAX_COUNT];
+        for (int n = 0; n < MAX_COUNT; n++) {
+            longText[n] = 'm';
+        }
+
+        Paint p = new Paint();
+        float width = p.measureText(longText, 0, 1);
+        assertEquals(true, width > 0);
+    }
+
     /** Tests that all four overloads of measureText are the same and match some value. */
     private void assertMeasureText(String text, char[] textChars, SpannedString textSpan,
             int start, int end, float expectedWidth) {
