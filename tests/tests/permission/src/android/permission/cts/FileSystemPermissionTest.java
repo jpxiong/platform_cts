@@ -230,6 +230,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/misc/wifi/sockets",
                     "/data/property",
                     "/data/secure",
+                    "/data/sensors",
                     "/data/shared",
                     "/data/system",
                     "/data/wifi",
