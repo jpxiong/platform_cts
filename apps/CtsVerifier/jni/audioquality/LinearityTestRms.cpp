@@ -260,10 +260,10 @@ int linearityTestRms(short** pcms, int* sampleCounts, int numSignals,
     float outDet;
     if(!solveLeastSquares(levels, rmsValues, numSignals, NO_COEFFS,
                           coeffs, &outDet)) {
-        LOGI(" solveLeastSquares fails with det %f", outDet);
+        ALOGI(" solveLeastSquares fails with det %f", outDet);
         return ERROR_LINEAR_FITTING;
     }
-    LOGI(" coeffs offset %f linear %f", coeffs[0], coeffs[1]);
+    ALOGI(" coeffs offset %f linear %f", coeffs[0], coeffs[1]);
     float maxDev = 0.0f;
     for(int i = 0; i < numSignals; i++) {
         float residue = coeffs[0] + coeffs[1] * levels[i] - rmsValues[i];
@@ -271,7 +271,7 @@ int linearityTestRms(short** pcms, int* sampleCounts, int numSignals,
         // then normalize
         float devInDb = 20.0f * log10f((fabs(residue) + rmsValues[i])
                                        / rmsValues[i]);
-        LOGI(" %d-th residue %f dB", i, devInDb);
+        ALOGI(" %d-th residue %f dB", i, devInDb);
         if (devInDb > maxDev) {
             maxDev = devInDb;
         }
