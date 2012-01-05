@@ -46,12 +46,6 @@ public class ConfigurationTest extends AndroidTestCase {
         double density = 160.0d * metrics.density;
         assertTrue("Screen density must be at least 100 dpi: " + density, density >= 100.0d);
 
-        int max = Math.max(metrics.widthPixels, metrics.heightPixels);
-        int min = Math.min(metrics.widthPixels, metrics.heightPixels);
-        double aspectRatio = (double) max / min;
-        assertTrue("Aspect ratio must be between 1.333 and 1.86. It was " + aspectRatio,
-                aspectRatio >= 1.333 && aspectRatio <= 1.86);
-
         Set<Integer> allowedDensities = new HashSet<Integer>();
         allowedDensities.add(DisplayMetrics.DENSITY_LOW);
         allowedDensities.add(DisplayMetrics.DENSITY_MEDIUM);
