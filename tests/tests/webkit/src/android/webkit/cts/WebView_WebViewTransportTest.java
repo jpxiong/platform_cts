@@ -17,6 +17,7 @@
 package android.webkit.cts;
 
 import android.test.AndroidTestCase;
+import android.test.UiThreadTest;
 import android.webkit.WebView;
 import android.webkit.WebView.WebViewTransport;
 
@@ -39,6 +40,7 @@ public class WebView_WebViewTransportTest extends AndroidTestCase {
             args = {}
         )
     })
+    @UiThreadTest
     public void testAccessWebView() {
         WebView webView = new WebView(mContext);
         WebViewTransport transport = webView.new WebViewTransport();

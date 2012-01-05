@@ -25,7 +25,7 @@ import android.webkit.JsResult;
 import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.cts.WaitForLoadUrl.WaitForProgressClient;
+import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -77,7 +77,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         mOnUiThread.setWebChromeClient(webChromeClient);
 
         assertFalse(webChromeClient.hadOnProgressChanged());
-        mOnUiThread.loadUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(TestHtmlConstants.HELLO_WORLD_URL);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -100,7 +100,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
         assertFalse(webChromeClient.hadOnReceivedTitle());
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -138,7 +138,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnReceivedIcon());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -178,7 +178,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
         // load a page that opens a child window, requests focus for the child and sets a timeout
         // after which the child will be closed
-        mOnUiThread.loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.JS_WINDOW_URL));
+        mOnUiThread.loadUrlAndWaitForCompletion(mWebServer.
+                getAssetUrl(TestHtmlConstants.JS_WINDOW_URL));
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -243,7 +244,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnJsAlert());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_ALERT_URL);
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -272,7 +273,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertFalse(webChromeClient.hadOnJsConfirm());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_CONFIRM_URL);
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -303,7 +304,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         final String promptResult = "CTS";
         webChromeClient.setPromptResult(promptResult);
         String url = mWebServer.getAssetUrl(TestHtmlConstants.JS_PROMPT_URL);
-        mOnUiThread.loadUrl(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -335,6 +336,10 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         private boolean mHadOnCreateWindow;
         private boolean mHadOnRequestFocus;
         private boolean mHadOnReceivedIcon;
+
+        public MockWebChromeClient() {
+            super(mOnUiThread);
+        }
 
         public void setPromptResult(String promptResult) {
             mPromptResult = promptResult;

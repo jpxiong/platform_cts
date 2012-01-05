@@ -19,7 +19,7 @@ package android.webkit.cts;
 import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
-import android.webkit.cts.WaitForLoadUrl.WaitForLoadedClient;
+import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
@@ -126,7 +126,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
                 CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
     }
 
-    private static class MyWebViewClient extends WaitForLoadedClient {
+    private class MyWebViewClient extends WaitForLoadedClient {
         String realm;
         boolean useHttpAuthUsernamePassword;
 
@@ -136,6 +136,7 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         private int mAuthCount;
 
         MyWebViewClient(boolean proceed, String user, String password) {
+            super(mOnUiThread);
             mProceed = proceed;
             mUser = user;
             mPassword = password;
