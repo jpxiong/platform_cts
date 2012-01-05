@@ -57,6 +57,12 @@ extern "C" {
             JNIEnv *env, jobject obj,
             jobjectArray jpcms,
             jfloat sampleRate, jfloat dbStepSize, jint referenceStim);
+
+    JNIEXPORT jfloat JNICALL
+        Java_com_android_cts_verifier_audioquality_Native_linearityTestRms(
+            JNIEnv *env, jobject obj,
+            jobjectArray jpcms,
+            jfloat sampleRate, jfloat dbStepSize);
 };
 
 /* Returns an array of sinusoidal samples.
@@ -232,6 +238,44 @@ JNIEXPORT jfloat JNICALL
     float maxDeviation = -1.0;
     int ret = linearityTest(pcms, sampleCounts, numSignals,
             sampleRate, dbStepSize, referenceStim, &maxDeviation);
+    delete[] sampleCounts;
+    for (int i = 0; i < numSignals; i++) {
+        delete[] pcms[i];
+    }
+    delete[] pcms;
+    if (ret < 1) return ret;
+
+    return maxDeviation;
+}
+
+
+/* Return maximum deviation from linearity in dB.
+   On failure returns:
+      -1.0 The input signals or sample counts are missing.
+      -2.0 The number of input signals is < 2.
+      -3.0 The specified sample rate is <= 4000.0
+      -4.0 The dB step size for the increase in stimulus level is <= 0.0
+      -6.0 One or more of the stimuli is too short in duration.
+*/
+JNIEXPORT jfloat JNICALL
+    Java_com_android_cts_verifier_audioquality_Native_linearityTestRms(
+        JNIEnv *env, jobject obj,
+        jobjectArray jpcms,
+        jfloat sampleRate, jfloat dbStepSize) {
+    int numSignals = env->GetArrayLength(jpcms);
+    int *sampleCounts = new int[numSignals];
+    short **pcms = new shortPtr[numSignals];
+    jshortArray ja;
+    for (int i = 0; i < numSignals; i++) {
+        ja = (jshortArray) env->GetObjectArrayElement(jpcms, i);
+        sampleCounts[i] = env->GetArrayLength(ja);
+        pcms[i] = new short[sampleCounts[i]];
+        env->GetShortArrayRegion(ja, 0, sampleCounts[i], pcms[i]);
+    }
+
+    float maxDeviation = -1.0;
+    int ret = linearityTestRms(pcms, sampleCounts, numSignals,
+            sampleRate, dbStepSize, &maxDeviation);
     delete[] sampleCounts;
     for (int i = 0; i < numSignals; i++) {
         delete[] pcms[i];
