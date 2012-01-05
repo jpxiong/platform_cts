@@ -28,11 +28,6 @@ import com.android.tradefed.result.TestSummary;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -46,7 +41,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IssueReporter implements ITestInvocationListener {
 
-    private static final String FORM_DATA_BOUNDARY = "C75I55u3R3p0r73r";
     private static final int BUGREPORT_SIZE = 500 * 1024;
 
     private static final String PRODUCT_NAME_KEY = "buildName";
@@ -87,20 +81,40 @@ public class IssueReporter implements ITestInvocationListener {
      */
     private void setBugReport(InputStreamSource dataStream) throws IOException {
         if (mCurrentIssue != null) {
-            InputStream input = dataStream.createInputStream();
-            ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(BUGREPORT_SIZE);
-            GZIPOutputStream gzipOutput = new GZIPOutputStream(byteOutput);
-            for (byte[] buffer = new byte[1024]; input.read(buffer) >= 0; ) {
-                gzipOutput.write(buffer);
-            }
-            gzipOutput.close();
-
             // Only one bug report can be stored at a time and they are gzipped to
             // about 0.5 MB so there shoudn't be any memory leak bringing down CTS.
-            mCurrentIssue.mBugReport = byteOutput.toByteArray();
+            InputStream input = null;
+            try {
+                input = dataStream.createInputStream();
+                mCurrentIssue.mBugReport = getBytes(input, BUGREPORT_SIZE);
+            } finally {
+                if (input != null) {
+                    input.close();
+                }
+            }
         } else {
             CLog.e("setBugReport is getting called on an empty issue...");
         }
+    }
+
+    /**
+     * @param input that will be gzipped and returne as a byte array
+     * @param size of the output expected
+     * @return the byte array with the input's data
+     * @throws IOException
+     */
+    static byte[] getBytes(InputStream input, int size) throws IOException {
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(size);
+        GZIPOutputStream gzipOutput = new GZIPOutputStream(byteOutput);
+        for (byte[] buffer = new byte[1024]; ; ) {
+            int numRead = input.read(buffer);
+            if (numRead < 0) {
+                break;
+            }
+            gzipOutput.write(buffer, 0, numRead);
+        }
+        gzipOutput.close();
+        return byteOutput.toByteArray();
     }
 
     @Override
@@ -158,75 +172,20 @@ public class IssueReporter implements ITestInvocationListener {
                 return null;
             }
 
-            HttpURLConnection connection = null;
-
-            try {
-                URL url = new URL(mServerUrl);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type",
-                        "multipart/form-data; boundary=" + FORM_DATA_BOUNDARY);
-
-                byte[] body = getContentBody();
-                connection.setRequestProperty("Content-Length", Integer.toString(body.length));
-
-                OutputStream output = connection.getOutputStream();
-                output.write(body);
-                output.close();
-
-                // Open the stream to get a response. Otherwise request will be cancelled.
-                InputStream input = connection.getInputStream();
-                input.close();
-
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
+            new MultipartForm(mServerUrl)
+                    .addFormValue("productName", mProductName)
+                    .addFormValue("buildType", mBuildType)
+                    .addFormValue("buildId", mBuildId)
+                    .addFormValue("testName", mTestName)
+                    .addFormValue("stackTrace", mStackTrace)
+                    .addFormFile("bugReport", "bugreport.txt.gz", mBugReport)
+                    .submit();
 
             return null;
         }
 
         private boolean isEmpty(String value) {
             return value == null || value.trim().isEmpty();
-        }
-
-        private byte[] getContentBody() throws IOException {
-            ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(byteOutput));
-            writer.println();
-            writeFormField(writer, "productName", mProductName);
-            writeFormField(writer, "buildType", mBuildType);
-            writeFormField(writer, "buildId", mBuildId);
-            writeFormField(writer, "testName", mTestName);
-            writeFormField(writer, "stackTrace", mStackTrace);
-            if (mBugReport != null) {
-                writeFormFileHeader(writer, "bugReport", "bugReport.txt.gz");
-                writer.flush(); // Must flush here before writing to the byte stream!
-                byteOutput.write(mBugReport);
-                writer.println();
-            }
-            writer.append("--").append(FORM_DATA_BOUNDARY).println("--");
-            writer.flush();
-            writer.close();
-            return byteOutput.toByteArray();
-        }
-
-        private void writeFormField(PrintWriter writer, String name, String value) {
-            writer.append("--").println(FORM_DATA_BOUNDARY);
-            writer.append("Content-Disposition: form-data; name=\"").append(name).println("\"");
-            writer.println();
-            writer.println(value);
-        }
-
-        private void writeFormFileHeader(PrintWriter writer, String name, String fileName) {
-            writer.append("--").println(FORM_DATA_BOUNDARY);
-            writer.append("Content-Disposition: form-data; name=\"").append(name);
-            writer.append("\"; filename=\"").append(fileName).println("\"");
-            writer.println("Content-Type: application/x-gzip");
-            writer.println("Content-Transfer-Encoding: binary");
-            writer.println();
         }
     }
 
