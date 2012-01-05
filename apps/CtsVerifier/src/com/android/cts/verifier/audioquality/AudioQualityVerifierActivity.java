@@ -134,7 +134,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity
         fillAdapter();
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(this);
-        checkNotSilent();
+        adjustVolume();
     }
 
     @Override
@@ -142,18 +142,18 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity
         super.onResume();
         mAdapter.notifyDataSetChanged(); // Update List UI
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        checkNotSilent();
+        adjustVolume();
     }
 
-    private void checkNotSilent() {
+    private void adjustVolume() {
         AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mgr.setStreamMute(PLAYBACK_STREAM, false);
         int volume = mgr.getStreamVolume(PLAYBACK_STREAM);
         int max = mgr.getStreamMaxVolume(PLAYBACK_STREAM);
+        int target = (max * 2) / 3;
         Log.i(TAG, "Volume " + volume + ", max " + max);
-        if (volume <= max / 10) {
-            // Volume level is silent or very quiet; increase to two-thirds
-            mgr.setStreamVolume(PLAYBACK_STREAM, (max * 2) / 3, AudioManager.FLAG_SHOW_UI);
+        if (volume != target) {
+            mgr.setStreamVolume(PLAYBACK_STREAM, target, AudioManager.FLAG_SHOW_UI);
         }
     }
 
@@ -188,6 +188,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity
     // Implements AdapterView.OnItemClickListener
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mRunningExperiment) return;
+        adjustVolume();
         runExperiment(position, false);
     }
 
@@ -207,6 +208,7 @@ public class AudioQualityVerifierActivity extends PassFailButtons.Activity
 
     // Implements View.OnClickListener:
     public void onClick(View v) {
+        adjustVolume();
         if (v == mCalibrateButton) {
             Intent intent = new Intent(this, CalibrateVolumeActivity.class);
             startActivity(intent);
