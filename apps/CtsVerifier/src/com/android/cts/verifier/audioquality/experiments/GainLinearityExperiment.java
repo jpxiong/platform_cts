@@ -66,9 +66,8 @@ public class GainLinearityExperiment extends SequenceExperiment {
         for (int i = 0; i < LEVELS; i++) {
             pcms[i] = Utils.byteToShortArray(record[i]);
         }
-        // We specify the middle stimulus (LEVELS / 2) as the "reference":
-        float deviation = mNative.linearityTest(pcms, AudioQualityVerifierActivity.SAMPLE_RATE,
-                DB_STEP_SIZE, LEVELS / 2);
+        float deviation = mNative.linearityTestRms(pcms, AudioQualityVerifierActivity.SAMPLE_RATE,
+                DB_STEP_SIZE);
         if (deviation < 0.0f) {
             setScore(getString(R.string.aq_fail));
             setReport(String.format(getString(R.string.aq_linearity_report_error), deviation));
