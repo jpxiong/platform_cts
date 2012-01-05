@@ -21,7 +21,7 @@
     <application>
         <uses-library android:name="android.test.runner" />
 
-        <activity android:name="android.dpi.cts.ConfigurationScreenLayoutActivity"
+        <activity android:name="android.dpi.cts.OrientationActivity"
                 android:configChanges="orientation" />
     </application>
 
