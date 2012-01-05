@@ -31,6 +31,8 @@ public class Native {
             float sampleRate);
     public native float linearityTest(short[][] pcms,
         float sampleRate, float dbStepSize, int referenceStim);
+    public native float linearityTestRms(short[][] pcms,
+        float sampleRate, float dbStepSize);
 
     // The following indexes must match those in wrapper.cc
     public static final int MEASURE_RMS_RMS = 0;
