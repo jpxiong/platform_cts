@@ -84,6 +84,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     @Option(name = "quiet-output", description = "Mute display of test results.")
     private boolean mQuietOutput = false;
 
+    @Option(name = "result-server", description = "Server to publish test results.")
+    private String mResultServer;
+
     protected IBuildInfo mBuildInfo;
     private String mStartTime;
     private String mDeviceSerial;
@@ -254,9 +257,18 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             CLog.w("Unable to create XML report");
             return;
         }
-        createXmlResult(mReportDir, mStartTime, elapsedTime);
+
+        File reportFile = getResultFile(mReportDir);
+        createXmlResult(reportFile, mStartTime, elapsedTime);
         copyFormattingFiles(mReportDir);
         zipResults(mReportDir);
+
+        try {
+            ResultReporter reporter = new ResultReporter(mResultServer, reportFile);
+            reporter.reportResult();
+        } catch (IOException e) {
+            CLog.e(e);
+        }
     }
 
     private void logResult(String format, Object... args) {
@@ -281,12 +293,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     /**
      * Creates a report file and populates it with the report data from the completed tests.
      */
-    private void createXmlResult(File reportDir, String startTimestamp, long elapsedTime) {
+    private void createXmlResult(File reportFile, String startTimestamp, long elapsedTime) {
         String endTime = getTimestamp();
-
         OutputStream stream = null;
         try {
-            stream = createOutputResultStream(reportDir);
+            stream = createOutputResultStream(reportFile);
             KXmlSerializer serializer = new KXmlSerializer();
             serializer.setOutput(stream, "UTF-8");
             serializer.startDocument("UTF-8", false);
@@ -331,11 +342,14 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         //serializer.endTag(ns, RESULT_TAG);
     }
 
+    private File getResultFile(File reportDir) {
+        return new File(reportDir, TEST_RESULT_FILE_NAME);
+    }
+
     /**
      * Creates the output stream to use for test results. Exposed for mocking.
      */
-    OutputStream createOutputResultStream(File reportDir) throws IOException {
-        File reportFile = new File(reportDir, TEST_RESULT_FILE_NAME);
+    OutputStream createOutputResultStream(File reportFile) throws IOException {
         logResult("Created xml report file at file://%s", reportFile.getAbsolutePath());
         return new FileOutputStream(reportFile);
     }
