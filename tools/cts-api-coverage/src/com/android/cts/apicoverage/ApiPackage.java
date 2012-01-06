@@ -29,9 +29,10 @@ class ApiPackage implements HasCoverage {
     private final Map<String, ApiClass> mApiClassMap = new HashMap<String, ApiClass>();
 
     ApiPackage(String name) {
-        this.mName = name;
+        mName = name;
     }
 
+    @Override
     public String getName() {
         return mName;
     }
@@ -64,6 +65,7 @@ class ApiPackage implements HasCoverage {
         return total;
     }
 
+    @Override
     public float getCoveragePercentage() {
         return (float) getNumCoveredMethods() / getTotalMethods() * 100;
     }

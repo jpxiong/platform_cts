@@ -36,6 +36,8 @@ class CurrentXmlHandler extends DefaultHandler {
 
     private String mCurrentMethodReturnType;
 
+    private boolean mDeprecated;
+
     private List<String> mCurrentParameterTypes = new ArrayList<String>();
 
     private ApiCoverage mApiCoverage = new ApiCoverage();
@@ -49,27 +51,30 @@ class CurrentXmlHandler extends DefaultHandler {
             throws SAXException {
         super.startElement(uri, localName, name, attributes);
         if ("package".equalsIgnoreCase(localName)) {
-            mCurrentPackageName = CurrentXmlHandler.getValue(attributes, "name");
+            mCurrentPackageName = getValue(attributes, "name");
 
             ApiPackage apiPackage = new ApiPackage(mCurrentPackageName);
             mApiCoverage.addPackage(apiPackage);
 
         } else if ("class".equalsIgnoreCase(localName)
                 || "interface".equalsIgnoreCase(localName)) {
-            mCurrentClassName = CurrentXmlHandler.getValue(attributes, "name");
+            mCurrentClassName = getValue(attributes, "name");
+            mDeprecated = isDeprecated(attributes);
 
-            ApiClass apiClass = new ApiClass(mCurrentClassName);
+            ApiClass apiClass = new ApiClass(mCurrentClassName, mDeprecated);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             apiPackage.addClass(apiClass);
 
         } else if ("constructor".equalsIgnoreCase(localName)) {
+            mDeprecated = isDeprecated(attributes);
             mCurrentParameterTypes.clear();
         }  else if ("method".equalsIgnoreCase(localName)) {
-            mCurrentMethodName = CurrentXmlHandler.getValue(attributes, "name");
-            mCurrentMethodReturnType = CurrentXmlHandler.getValue(attributes, "return");
+            mDeprecated = isDeprecated(attributes);
+            mCurrentMethodName = getValue(attributes, "name");
+            mCurrentMethodReturnType = getValue(attributes, "return");
             mCurrentParameterTypes.clear();
         } else if ("parameter".equalsIgnoreCase(localName)) {
-            mCurrentParameterTypes.add(CurrentXmlHandler.getValue(attributes, "type"));
+            mCurrentParameterTypes.add(getValue(attributes, "type"));
         }
     }
 
@@ -82,13 +87,13 @@ class CurrentXmlHandler extends DefaultHandler {
                 return;
             }
             ApiConstructor apiConstructor = new ApiConstructor(mCurrentClassName,
-                    mCurrentParameterTypes);
+                    mCurrentParameterTypes, mDeprecated);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             ApiClass apiClass = apiPackage.getClass(mCurrentClassName);
             apiClass.addConstructor(apiConstructor);
         }  else if ("method".equalsIgnoreCase(localName)) {
             ApiMethod apiMethod = new ApiMethod(mCurrentMethodName, mCurrentParameterTypes,
-                    mCurrentMethodReturnType);
+                    mCurrentMethodReturnType, mDeprecated);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             ApiClass apiClass = apiPackage.getClass(mCurrentClassName);
             apiClass.addMethod(apiMethod);
@@ -100,5 +105,9 @@ class CurrentXmlHandler extends DefaultHandler {
         return attributes.getValue(key)
                 .replaceAll("<.+>", "")
                 .replace("$", ".");
+    }
+
+    private boolean isDeprecated(Attributes attributes) {
+        return "deprecated".equals(attributes.getValue("deprecated"));
     }
 }
