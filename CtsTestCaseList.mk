@@ -80,6 +80,7 @@ cts_test_packages := \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \
 	CtsTextTestCases \
+	CtsThemeTestCases \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
