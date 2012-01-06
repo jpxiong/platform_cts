@@ -33,7 +33,7 @@ public class SpectrumShapeExperiment extends LoopbackExperiment {
     private static final int DURATION = 3;
 
     public SpectrumShapeExperiment() {
-        super(true);
+        super(false); // disable temporarily
     }
 
     @Override
