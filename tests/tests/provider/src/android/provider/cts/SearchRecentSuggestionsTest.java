@@ -16,11 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,7 +25,6 @@ import android.net.Uri;
 import android.provider.SearchRecentSuggestions;
 import android.test.ProviderTestCase2;
 
-@TestTargetClass(android.provider.SearchRecentSuggestions.class)
 public class SearchRecentSuggestionsTest extends
         ProviderTestCase2<TestSearchRecentSuggestionsProvider> {
     private final static String AUTHORITY_HEAD = "content://"
@@ -38,14 +32,14 @@ public class SearchRecentSuggestionsTest extends
 
     private Uri mTestUri;
     private TestSearchRecentSuggestionsProvider mTestSRSProvider;
-    private Context mContext;
+    private Context mProviderContext;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         mTestUri = Uri.parse(AUTHORITY_HEAD + "/suggestions");
         mTestSRSProvider = getProvider();
-        mContext = mTestSRSProvider.getContext();
+        mProviderContext = mTestSRSProvider.getContext();
     }
 
     public SearchRecentSuggestionsTest() {
@@ -53,40 +47,13 @@ public class SearchRecentSuggestionsTest extends
                 TestSearchRecentSuggestionsProvider.AUTHORITY);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SearchRecentSuggestions",
-        args = {android.content.Context.class, java.lang.String.class, int.class}
-    )
     public void testConstructor() {
-        new SearchRecentSuggestions(mContext, TestSearchRecentSuggestionsProvider.AUTHORITY,
+        new SearchRecentSuggestions(mProviderContext, TestSearchRecentSuggestionsProvider.AUTHORITY,
                 TestSearchRecentSuggestionsProvider.MODE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SearchRecentSuggestions",
-            args = {android.content.Context.class, java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveRecentQuery",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearHistory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "truncateHistory",
-            args = {android.content.ContentResolver.class, int.class}
-        )
-    })
     public void testSearchRecentSuggestions() {
-        MySearchRecentSuggestions srs = new MySearchRecentSuggestions(mContext,
+        SearchRecentSuggestions srs = new MySearchRecentSuggestions(mProviderContext,
                 TestSearchRecentSuggestionsProvider.AUTHORITY,
                 TestSearchRecentSuggestionsProvider.MODE);
         Cursor c = mTestSRSProvider.query(mTestUri, null, null, null, null);
@@ -123,8 +90,8 @@ public class SearchRecentSuggestionsTest extends
             waitForCursorCount(mTestUri, null, 3);
 
             // truncateHistory will delete the oldest one record
-            ContentResolver cr = mContext.getContentResolver();
-            srs.truncateHistory(cr, 2);
+            ContentResolver cr = mProviderContext.getContentResolver();
+            ((MySearchRecentSuggestions) srs).truncateHistory(cr, 2);
 
             waitForCursorCount(mTestUri, SearchRecentSuggestions.QUERIES_PROJECTION_2LINE, 2);
 
@@ -220,6 +187,7 @@ public class SearchRecentSuggestionsTest extends
             super(context, authority, mode);
         }
 
+        @Override
         protected void truncateHistory(ContentResolver cr, int maxEntries) {
             super.truncateHistory(cr, maxEntries);
         }
@@ -228,6 +196,7 @@ public class SearchRecentSuggestionsTest extends
     private void waitForCursorCount(final Uri uri, final String[] projection,
             final int expectedCount) {
         new PollingCheck() {
+            @Override
             protected boolean check() {
                 Cursor cursor = null;
                 try {
