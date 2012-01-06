@@ -36,7 +36,7 @@ jlong Java_com_android_cts_verifier_camera_analyzer_CameraTests_findNative(
     AndroidBitmap_getInfo(env, inputBitmap, &inputInfo);
     if (inputInfo.format != ANDROID_BITMAP_FORMAT_RGBA_8888 &&
         inputInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
-        LOGE("Only RGBA_8888 and RGB_565 bitmaps are supported, type was %d.",
+        ALOGE("Only RGBA_8888 and RGB_565 bitmaps are supported, type was %d.",
              inputInfo.format);
     }
 
@@ -52,7 +52,7 @@ jlong Java_com_android_cts_verifier_camera_analyzer_CameraTests_findNative(
             reinterpret_cast<void**>(&inputBuffer));
 
     if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
-        LOGE("Unable to lock input bitmap");
+        ALOGE("Unable to lock input bitmap");
     }
 
     uint8_t *outputImage = NULL;
@@ -107,7 +107,7 @@ jlong Java_com_android_cts_verifier_camera_analyzer_CameraTests_findNative(
 
     result = AndroidBitmap_unlockPixels(env, inputBitmap);
     if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
-        LOGE("Unable to unlock input bitmap");
+        ALOGE("Unable to unlock input bitmap");
     }
 
     if (freeInputRGBA) {
@@ -201,14 +201,14 @@ void Java_com_android_cts_verifier_camera_analyzer_CameraTests_displayHandlerDeb
                 reinterpret_cast<void**>(&outputBuffer) );
 
         if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
-            LOGE("Unable to lock output bitmap");
+            ALOGE("Unable to lock output bitmap");
         }
 
         memcpy(outputBuffer, outputImage, outputWidth * outputHeight * 4);
 
         result = AndroidBitmap_unlockPixels(env, outputBitmap);
         if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
-            LOGE("Unable to unlock output bitmap");
+            ALOGE("Unable to unlock output bitmap");
         }
 
         // Write new Bitmap reference into mDebugOutput class member

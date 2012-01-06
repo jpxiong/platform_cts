@@ -236,7 +236,7 @@ void ColorCheckerTest::edgeDetection() {
         delete[] gradientDirection;
 
     } else {
-        LOGE("Not a color image!");
+        ALOGE("Not a color image!");
     }
 
     delete[] edgeMap;
