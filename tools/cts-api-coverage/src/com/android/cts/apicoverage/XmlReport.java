@@ -72,12 +72,14 @@ class XmlReport {
                         out.println("<class name=\"" + apiClass.getName()
                                 + "\" numCovered=\"" + apiClass.getNumCoveredMethods()
                                 + "\" numTotal=\"" + apiClass.getTotalMethods()
+                                + "\" deprecated=\"" + apiClass.isDeprecated()
                                 + "\" coveragePercentage=\""
                                     + Math.round(apiClass.getCoveragePercentage())
                                 + "\">");
 
                         for (ApiConstructor constructor : apiClass.getConstructors()) {
                             out.println("<constructor name=\"" + constructor.getName()
+                                    + "\" deprecated=\"" + constructor.isDeprecated()
                                     + "\" covered=\"" + constructor.isCovered() + "\">");
 
                             for (String parameterType : constructor.getParameterTypes()) {
@@ -90,6 +92,7 @@ class XmlReport {
                         for (ApiMethod method : apiClass.getMethods()) {
                             out.println("<method name=\"" + method.getName()
                                     + "\" returnType=\"" + method.getReturnType()
+                                    + "\" deprecated=\"" + method.isDeprecated()
                                     + "\" covered=\"" + method.isCovered() + "\">");
 
                             for (String parameterType : method.getParameterTypes()) {

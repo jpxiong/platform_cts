@@ -71,6 +71,10 @@
                     .green {
                         background-color: #66FF66;
                     }
+
+                    .deprecated {
+                        text-decoration: line-through;
+                    }
                 </style>
             </head>
             <body>
@@ -118,7 +122,7 @@
     
     <xsl:template name="packageOrClassListItem">
         <xsl:param name="bulletClass" />
-        
+
         <xsl:variable name="colorClass">
             <xsl:choose>
                 <xsl:when test="@coveragePercentage &lt;= 50">red</xsl:when>
@@ -127,8 +131,15 @@
             </xsl:choose>
         </xsl:variable>
         
+        <xsl:variable name="deprecatedClass">
+            <xsl:choose>
+                <xsl:when test="@deprecated = 'true'">deprecated</xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <li class="{$bulletClass}" onclick="toggleVisibility('{@name}')">
-            <span class="{$colorClass}">
+            <span class="{$colorClass} {$deprecatedClass}">
                 <b><xsl:value-of select="@name" /></b>
                 &nbsp;<xsl:value-of select="@coveragePercentage" />%
                 &nbsp;(<xsl:value-of select="@numCovered" />/<xsl:value-of select="@numTotal" />)
@@ -137,7 +148,15 @@
     </xsl:template>
   
   <xsl:template name="methodListItem">
-    <span class="method">
+
+    <xsl:variable name="deprecatedClass">
+        <xsl:choose>
+            <xsl:when test="@deprecated = 'true'">deprecated</xsl:when>
+            <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <span class="method {$deprecatedClass}">
       <xsl:choose>
         <xsl:when test="@covered = 'true'">[X]</xsl:when>
         <xsl:otherwise>[ ]</xsl:otherwise>
@@ -147,7 +166,7 @@
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template name="formatParameters">(<xsl:for-each select="parameter">
       <xsl:value-of select="@type" />
       <xsl:if test="not(position() = last())">,&nbsp;</xsl:if>
