@@ -45,6 +45,7 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
     private final Context mContext;
     private final PlanetsRenderingParam mParam;
     private final RenderCompletionListener mListener;
+    private final RenderingWatchDog mWatchDog;
 
     private final Sphere[] mSpheres;
     private final int mNumSpheres;
@@ -94,10 +95,11 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
      * @param listener
      */
     public PlanetsRenderer(Context context, PlanetsRenderingParam param,
-            RenderCompletionListener listener) {
+            RenderCompletionListener listener, RenderingWatchDog watchDog) {
         resetTimer();
         mContext = context;
         mParam = param;
+        mWatchDog = watchDog;
         mNumSpheres = mParam.mNumPlanets + 1; // 1 for sun
         mNumIndices = mNumSpheres * mParam.mNumIndicesPerVertex;
         mSpheres = new Sphere[mNumSpheres];
@@ -136,12 +138,14 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onDrawFrame(GL10 glUnused) {
+        mWatchDog.reset();
         long currentTime = System.currentTimeMillis();
 
         mFrameCount++;
         if ((mFrameCount % FPS_DISPLAY_INTERVAL == 0) && (mFrameCount != 0)) {
             float fps = (((float) FPS_DISPLAY_INTERVAL)
                     / ((float) (currentTime - mLastFPSTime)) * 1000.0f);
+            // FPS is not correct if activity is paused/resumed.
             Log.i(TAG, "FPS " + fps);
             mLastFPSTime = currentTime;
         }
@@ -370,11 +374,11 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
             checkGlError("glGenBuffers Vertex");
             for (int i = 0; i < mNumSpheres; i++) {
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mVboVertices[i]);
+                checkGlError("glBindBuffer Vertex");
                 FloatBuffer vertices = mSpheres[i].getVertices();
                 GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertices.limit()
                         * Sphere.FLOAT_SIZE, vertices, GLES20.GL_STATIC_DRAW);
                 checkGlError("glBufferData Vertex");
-                mSpheres[i].releaseVertexBuffer(); // release memory
             }
         }
         if (mParam.mUseVboForIndices) {
@@ -393,7 +397,6 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
                     checkGlError("glBufferData Index");
 
                 }
-                mSpheres[i].releaseIndexBuffer(); // release memory
             }
         }
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
