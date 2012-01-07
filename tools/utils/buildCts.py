@@ -78,7 +78,6 @@ class CtsBuilder(object):
 
     # individually generate descriptions not following conventions
     pool.apply_async(GenerateSignatureCheckDescription, [self.test_repository])
-    pool.apply_async(GenerateReferenceAppDescription, [self.test_repository])
 
     # generate test descriptions for android tests
     results = []
@@ -123,10 +122,6 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'Signature')
 
     plan = tools.TestPlan(packages)
-    plan.Include(r'android\.apidemos\.cts')
-    self.__WritePlan(plan, 'RefApp')
-
-    plan = tools.TestPlan(packages)
     plan.Include(r'android\.tests\.appsecurity')
     self.__WritePlan(plan, 'AppSecurity')
 
@@ -142,20 +137,6 @@ def GenerateSignatureCheckDescription(test_repository):
   package.AddAttribute('runner', '.InstrumentationRunner')
   package.AddTest('android.tests.sigtest.SignatureTest.signatureTest')
   description = open(os.path.join(test_repository, 'SignatureTest.xml'), 'w')
-  package.WriteDescription(description)
-  description.close()
-
-def GenerateReferenceAppDescription(test_repository):
-  """Generate the test description for the reference app tests."""
-  LogGenerateDescription('android.apidemos.cts')
-  package = tools.TestPackage('ApiDemosReferenceTest', 'android.apidemos.cts')
-  package.AddAttribute('appNameSpace', 'android.apidemos.cts')
-  package.AddAttribute('packageToTest', 'com.example.android.apis')
-  package.AddAttribute('apkToTestName', 'ApiDemos')
-  package.AddAttribute('runner', 'android.test.InstrumentationTestRunner')
-  package.AddAttribute('referenceAppTest', 'true')
-  package.AddTest('android.apidemos.cts.ApiDemosTest.testNumberOfItemsInListView')
-  description = open(os.path.join(test_repository, 'ApiDemosReferenceTest.xml'), 'w')
   package.WriteDescription(description)
   description.close()
 

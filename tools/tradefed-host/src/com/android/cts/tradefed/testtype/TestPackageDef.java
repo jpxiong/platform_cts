@@ -52,9 +52,6 @@ class TestPackageDef implements ITestPackageDef {
     private String mTestType = null;
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
-    private boolean mIsReferenceAppTest = false;
-    private String mPackageToTest = null;
-    private String mApkToTestName = null;
     private String mTestPackageName = null;
     private String mDigest = null;
 
@@ -140,24 +137,8 @@ class TestPackageDef implements ITestPackageDef {
         return mIsSignatureTest;
     }
 
-    void setIsReferenceApp(boolean isReferenceApp) {
-        mIsReferenceAppTest = isReferenceApp;
-    }
-
-    boolean isReferenceApp() {
-        return mIsReferenceAppTest;
-    }
-
-    void setPackageToTest(String packageName) {
-        mPackageToTest = packageName;
-    }
-
     void setTestPackageName(String testPackageName) {
         mTestPackageName = testPackageName;
-    }
-
-    void setApkToTest(String apkName) {
-        mApkToTestName = apkName;
     }
 
     void setTargetBinaryName(String targetBinaryName) {
@@ -245,11 +226,6 @@ class TestPackageDef implements ITestPackageDef {
             instrTest.addInstallApk(String.format("%s.apk", mName), mAppNameSpace);
             mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
             return instrTest;
-        } else if (mIsReferenceAppTest) {
-            // a reference app test is just a InstrumentationTest with one extra apk to install
-            InstrumentationApkTest instrTest = new InstrumentationApkTest();
-            instrTest.addInstallApk(String.format("%s.apk", mApkToTestName), mPackageToTest);
-            return setInstrumentationTest(instrTest, testCaseDir);
         } else {
             CLog.d("Creating instrumentation test for %s", mName);
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
@@ -261,8 +237,6 @@ class TestPackageDef implements ITestPackageDef {
      * Populates given {@link InstrumentationApkTest} with data from the package xml.
      *
      * @param testCaseDir
-     * @param className
-     * @param methodName
      * @param instrTest
      * @return the populated {@link InstrumentationTest} or <code>null</code>
      */
@@ -314,9 +288,9 @@ class TestPackageDef implements ITestPackageDef {
     }
 
     /**
-     * Add a {@link TestDef} to the list of tests in this package.
+     * Add a {@link TestIdentifier} to the list of tests in this package.
      *
-     * @param testdef
+     * @param testDef
      */
     void addTest(TestIdentifier testDef) {
         mTests.add(testDef);
@@ -357,7 +331,8 @@ class TestPackageDef implements ITestPackageDef {
             MessageDigest md = MessageDigest.getInstance(algorithm);
             d = new DigestInputStream(fileStream, md);
             byte[] buffer = new byte[8196];
-            while (d.read(buffer) != -1);
+            while (d.read(buffer) != -1) {
+            }
             return toHexString(md.digest());
         } catch (NoSuchAlgorithmException e) {
             return algorithm + " not found";
