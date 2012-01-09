@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,8 +106,8 @@ public class AnimationActivity extends Activity {
     }
 
     public ValueAnimator createAnimatorWithInterpolator(TimeInterpolator interpolator){
-        return createAnimator(view.newBall, "y", 1000, ValueAnimator.INFINITE, ValueAnimator.REVERSE,
-                interpolator, mStartY, mStartY + mDeltaY);
+        return createAnimator(view.newBall, "y", 1000, ValueAnimator.INFINITE,
+                ValueAnimator.REVERSE, interpolator, mStartY, mStartY + mDeltaY);
     }
 
     public ValueAnimator createObjectAnimatorForInt(Object object,String propertyName,
@@ -140,27 +140,38 @@ public class AnimationActivity extends Activity {
         bounceAnimator.setRepeatCount(ValueAnimator.INFINITE);
         bounceAnimator.setInterpolator(new AccelerateInterpolator());
         bounceAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        view.bounceAnimator = bounceAnimator;
+        view.bounceYAnimator = bounceAnimator;
         view.startColorAnimator();
         view.animateBall();
     }
 
     public void startAnimation(ValueAnimator valueAnimator){
-        view.bounceAnimator = valueAnimator;
+        view.bounceYAnimator = valueAnimator;
+        view.startColorAnimator();
+        view.animateBall();
+    }
+
+    public void startAnimation(Animator animator){
+        view.bounceYAnimator = (ValueAnimator)animator;
         view.startColorAnimator();
         view.animateBall();
     }
 
     public void startAnimation(ObjectAnimator bounceAnimator) {
-        view.bounceAnimator = bounceAnimator;
+        view.bounceYAnimator = bounceAnimator;
         view.startColorAnimator();
         view.animateBall();
     }
 
     public void startAnimation(ObjectAnimator bounceAnimator, ObjectAnimator colorAnimator) {
-        view.bounceAnimator = bounceAnimator;
+        view.bounceYAnimator = bounceAnimator;
         view.startColorAnimator(colorAnimator);
         view.animateBall();
+    }
+
+    public void startAnimatorSet(AnimatorSet set){
+        view.startColorAnimator();
+        view.animateBall(set);
     }
 
     public void startColorAnimation(ValueAnimator colorAnimator){
@@ -173,7 +184,8 @@ public class AnimationActivity extends Activity {
         public ShapeHolder newBall = null;
         public final ArrayList<ShapeHolder> balls = new ArrayList<ShapeHolder>();
         AnimatorSet animation = null;
-        public ValueAnimator bounceAnimator;
+        public ValueAnimator bounceYAnimator;
+        public ValueAnimator bounceXAnimator;
         public ValueAnimator colorAnimator;
 
         public AnimationView(Context context) {
@@ -201,10 +213,8 @@ public class AnimationActivity extends Activity {
         }
 
         public void animateBall() {
-            float startY = mStartY;
-            float endY = startY + mDeltaY;
             AnimatorSet bouncer = new AnimatorSet();
-            bouncer.play(bounceAnimator);
+            bouncer.play(bounceYAnimator);
             // Fading animation - remove the ball when the animation is done
             ValueAnimator fadeAnim = ObjectAnimator.ofFloat(newBall, "alpha", 1f, 0f);
             fadeAnim.setDuration(250);
@@ -219,6 +229,10 @@ public class AnimationActivity extends Activity {
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.play(bouncer).before(fadeAnim);
             animatorSet.start();
+        }
+
+        public void animateBall(AnimatorSet set) {
+            set.start();
         }
 
         private ShapeHolder addBall(float x, float y) {
@@ -254,3 +268,4 @@ public class AnimationActivity extends Activity {
         }
     }
 }
+

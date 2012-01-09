@@ -16,10 +16,13 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.cts.animation">
-
+    <uses-sdk android:minSdkVersion="11" />
+    <uses-permission android:name="android.permission.INJECT_EVENTS"></uses-permission>
     <application>
         <activity android:name="android.animation.cts.AnimationActivity"
             android:label="AnimationActivity"/>
+        <activity
+           android:name="android.animation.cts.LayoutAnimationActivity" />
         <uses-library android:name="android.test.runner" />
     </application>
 
