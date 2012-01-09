@@ -33,8 +33,6 @@ CTS_TEST_CASE_LIST := \
 	CtsDeviceAdmin \
 	CtsTestStubs \
 	SignatureTest \
-	ApiDemos \
-	ApiDemosReferenceTest \
 	$(CTS_SECURITY_APPS_LIST)
 
 # Test packages that require an associated test package XML.

@@ -20,7 +20,6 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.util.xml.AbstractXmlParser;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.Iterator;
@@ -58,8 +57,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
         private Stack<String> mClassNameStack = new Stack<String>();
 
         @Override
-        public void startElement(String uri, String localName, String name, Attributes attributes)
-                throws SAXException {
+        public void startElement(String uri, String localName, String name, Attributes attributes) {
             if (TEST_PACKAGE_TAG.equals(localName)) {
                 // appPackageName is used as the uri
                 final String entryUriValue = attributes.getValue("appPackageName");
@@ -70,9 +68,6 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String testType = attributes.getValue("testType");
                 final String jarPath = attributes.getValue("jarPath");
                 final String signatureCheck = attributes.getValue("signatureCheck");
-                final String referenceApp = attributes.getValue("referenceAppTest");
-                final String apkToTest = attributes.getValue("apkToTestName");
-                final String packageToTest = attributes.getValue("packageToTest");
                 final String javaPackageFilter = attributes.getValue("javaPackageFilter");
                 final String targetBinaryName = attributes.getValue("targetBinaryName");
                 final String targetNameSpace = attributes.getValue("targetNameSpace");
@@ -86,9 +81,6 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setTestType(testType);
                 mPackageDef.setJarPath(jarPath);
                 mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
-                mPackageDef.setIsReferenceApp(parseBoolean(referenceApp));
-                mPackageDef.setApkToTest(apkToTest);
-                mPackageDef.setPackageToTest(packageToTest);
                 mPackageDef.setTestPackageName(javaPackageFilter);
                 mPackageDef.setTargetBinaryName(targetBinaryName);
                 mPackageDef.setTargetNameSpace(targetNameSpace);
@@ -138,7 +130,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
         }
 
         @Override
-        public void endElement (String uri, String localName, String qName) throws SAXException {
+        public void endElement (String uri, String localName, String qName) {
             if (TEST_SUITE_TAG.equals(localName) || TEST_CASE_TAG.equals(localName)) {
                 mClassNameStack.pop();
             }
