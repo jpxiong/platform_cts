@@ -57,6 +57,10 @@ public class TestPackageXmlParserTest extends TestCase {
         "<TestPackage hostSideOnly=\"blah\" >" +
         "</TestPackage>";
 
+    private static String VM_HOST_TEST_XML = "<TestPackage vmHostTest=\"true\"></TestPackage>";
+
+    private static String NATIVE_TEST_XML = "<TestPackage testType=\"native\"></TestPackage>";
+
     private static String NO_TEST_DATA =
         "<invalid />";
 
@@ -79,7 +83,7 @@ public class TestPackageXmlParserTest extends TestCase {
         TestPackageXmlParser parser = new TestPackageXmlParser();
         parser.parse(getStringAsStream(HOST_TEST_DATA));
         TestPackageDef def = parser.getTestPackageDef();
-        // assertTrue(def.isHostSideTest());
+        assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
         assertEquals(3, def.getTests().size());
         Iterator<TestIdentifier> iterator = def.getTests().iterator();
 
@@ -103,7 +107,22 @@ public class TestPackageXmlParserTest extends TestCase {
         TestPackageXmlParser parser = new TestPackageXmlParser();
         parser.parse(getStringAsStream(BAD_HOST_TEST_DATA));
         TestPackageDef def = parser.getTestPackageDef();
-        // assertFalse(def.isHostSideTest());
+        assertFalse(TestPackageDef.HOST_SIDE_ONLY_TEST.equals(def.getTestType()));
+    }
+
+    public void testParse_vmHostTest() throws ParseException  {
+        assertTestType(TestPackageDef.VM_HOST_TEST, VM_HOST_TEST_XML);
+    }
+
+    public void testParse_nativeTest() throws ParseException  {
+        assertTestType(TestPackageDef.NATIVE_TEST, NATIVE_TEST_XML);
+    }
+
+    private void assertTestType(String expectedType, String xml) throws ParseException {
+        TestPackageXmlParser parser = new TestPackageXmlParser();
+        parser.parse(getStringAsStream(xml));
+        TestPackageDef def = parser.getTestPackageDef();
+        assertEquals(expectedType, def.getTestType());
     }
 
     /**

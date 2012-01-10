@@ -64,8 +64,6 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 final String testPackageNameSpace = attributes.getValue("appNameSpace");
                 final String packageName = attributes.getValue("name");
                 final String runnerName = attributes.getValue("runner");
-                final String vmHostTest = attributes.getValue("vmHostTest");
-                final String testType = attributes.getValue("testType");
                 final String jarPath = attributes.getValue("jarPath");
                 final String signatureCheck = attributes.getValue("signatureCheck");
                 final String javaPackageFilter = attributes.getValue("javaPackageFilter");
@@ -77,8 +75,7 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setAppNameSpace(testPackageNameSpace);
                 mPackageDef.setName(packageName);
                 mPackageDef.setRunner(runnerName);
-                mPackageDef.setIsVMHostTest(parseBoolean(vmHostTest));
-                mPackageDef.setTestType(testType);
+                mPackageDef.setTestType(getTestType(attributes));
                 mPackageDef.setJarPath(jarPath);
                 mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
                 mPackageDef.setTestPackageName(javaPackageFilter);
@@ -127,6 +124,16 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 }
             }
 
+        }
+
+        private String getTestType(Attributes attributes) {
+            if (parseBoolean(attributes.getValue("hostSideOnly"))) {
+                return TestPackageDef.HOST_SIDE_ONLY_TEST;
+            } else if (parseBoolean(attributes.getValue("vmHostTest"))) {
+                return TestPackageDef.VM_HOST_TEST;
+            } else {
+                return attributes.getValue("testType");
+            }
         }
 
         @Override

@@ -41,6 +41,10 @@ import java.util.LinkedHashSet;
  */
 class TestPackageDef implements ITestPackageDef {
 
+    public static final String HOST_SIDE_ONLY_TEST = "hostSideOnly";
+    public static final String NATIVE_TEST = "native";
+    public static final String VM_HOST_TEST = "vmHostTest";
+
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
 
@@ -108,17 +112,12 @@ class TestPackageDef implements ITestPackageDef {
         return mRunner;
     }
 
-    void setIsVMHostTest(boolean vmHostTest) {
-        mIsVMHostTest = vmHostTest;
-
-    }
-
-    boolean isVMHostTest() {
-        return mIsVMHostTest;
-    }
-
     void setTestType(String testType) {
         mTestType = testType;
+    }
+
+    String getTestType() {
+        return mTestType;
     }
 
     void setJarPath(String jarPath) {
@@ -190,7 +189,7 @@ class TestPackageDef implements ITestPackageDef {
         mExcludedTestFilter.setTestInclusion(mClassName, mMethodName);
         mTests = filterTests();
 
-        if ("hostSideOnly".equals(mTestType)) {
+        if (HOST_SIDE_ONLY_TEST.equals(mTestType)) {
             CLog.d("Creating host test for %s", mName);
             JarHostTest hostTest = new JarHostTest();
             hostTest.setRunName(getUri());
@@ -198,7 +197,7 @@ class TestPackageDef implements ITestPackageDef {
             hostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return hostTest;
-        } else if (mIsVMHostTest) {
+        } else if (VM_HOST_TEST.equals(mTestType)) {
             CLog.d("Creating vm host test for %s", mName);
             VMHostTest vmHostTest = new VMHostTest();
             vmHostTest.setRunName(getUri());
@@ -206,7 +205,7 @@ class TestPackageDef implements ITestPackageDef {
             vmHostTest.setTests(mTests);
             mDigest = generateDigest(testCaseDir, mJarPath);
             return vmHostTest;
-        } else if ("native".equals(mTestType)) {
+        } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml points to
