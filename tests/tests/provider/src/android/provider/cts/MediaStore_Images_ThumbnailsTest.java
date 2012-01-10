@@ -18,11 +18,6 @@ package android.provider.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,15 +26,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
-import android.util.Log;
 
 import java.util.ArrayList;
 
-@TestTargetClass(MediaStore.Images.Thumbnails.class)
 public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
     private ArrayList<Uri> mRowsAdded;
 
@@ -75,19 +67,7 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         mRowsAdded = new ArrayList<Uri>();
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "queryMiniThumbnails",
-        args = {ContentResolver.class, Uri.class, int.class, String[].class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {ContentResolver.class, Uri.class, String[].class}
-      )
-    })
-    public void testQueryInternalThumbnails() {
+    public void testQueryInternalThumbnails() throws Exception {
         Cursor c = Thumbnails.queryMiniThumbnails(mContentResolver,
                 Thumbnails.INTERNAL_CONTENT_URI, Thumbnails.MICRO_KIND, null);
         int previousMicroKindCount = c.getCount();
@@ -125,18 +105,6 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         c.close();
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "queryMiniThumbnail",
-        args = {ContentResolver.class, long.class, int.class, String[].class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {ContentResolver.class, Uri.class, String[].class}
-      )
-    })
     public void testQueryExternalMiniThumbnails() {
         // insert the image by bitmap
         Bitmap src = BitmapFactory.decodeResource(mContext.getResources(), R.raw.scenery);
@@ -174,11 +142,6 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
         c.close();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(Thumbnails.getContentUri("internal"), null, null,
                 null, null));
