@@ -509,14 +509,18 @@
 
         <activity android:name="android.widget.cts.GalleryStubActivity"
             android:label="GalleryStubActivity">
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
         </activity>
 
         <activity android:name="android.widget.cts.MockPopupWindowStubActivity"
             android:label="MockPopupWindowStubActivity">
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
         </activity>
 
        <activity android:name="android.media.cts.FaceDetectorStub"
@@ -652,9 +656,11 @@
 
         <activity android:name="android.app.cts.InstrumentationTestActivity"
             android:label="InstrumentationTestActivity">
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <data android:mimeType="vnd.android.cursor.dir/person" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/person" />
+            </intent-filter>
         </activity>
 
         <activity android:name="android.app.cts.AliasActivityStub">
@@ -763,8 +769,10 @@
 
         <activity android:name="android.view.cts.FocusFinderStubActivity"
             android:label="FocusFinderStubActivity">
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.DEFAULT" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <activity android:name="android.view.cts.GestureDetectorStubActivity"
