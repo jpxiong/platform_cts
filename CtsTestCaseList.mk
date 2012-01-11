@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CTS_SECURITY_APPS_LIST := \
+cts_security_apps_list := \
 	CtsAppAccessData \
 	CtsAppWithData \
 	CtsInstrumentationAppDiffCert \
@@ -24,20 +24,26 @@ CTS_SECURITY_APPS_LIST := \
 	CtsTargetInstrumentationApp \
 	CtsUsePermissionDiffCert
 
-# Any APKs that need to be copied to the CTS distribution's testcases
-# directory but do not require an associated test package XML.
-CTS_TEST_CASE_LIST := \
-	TestDeviceSetup \
+cts_support_packages := \
 	CtsAccelerationTestStubs \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
 	CtsTestStubs \
 	SignatureTest \
+	TestDeviceSetup \
+	$(cts_security_apps_list)
+
+cts_external_packages := \
 	replicaisland \
-	$(CTS_SECURITY_APPS_LIST)
+
+# Any APKs that need to be copied to the CTS distribution's testcases
+# directory but do not require an associated test package XML.
+CTS_TEST_CASE_LIST := \
+	$(cts_support_packages) \
+	$(cts_external_packages)
 
 # Test packages that require an associated test package XML.
-CTS_TEST_PACKAGES := \
+cts_test_packages := \
 	CtsAccelerationTestCases \
 	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
@@ -80,29 +86,29 @@ CTS_TEST_PACKAGES := \
 
 # All APKs that need to be scanned by the coverage utilities.
 CTS_COVERAGE_TEST_CASE_LIST := \
-	$(CTS_TEST_CASE_LIST) \
-	$(CTS_TEST_PACKAGES)
+	$(cts_support_packages) \
+	$(cts_test_packages)
 
 # Host side only tests
-CTS_HOST_LIBRARIES := \
+cts_host_libraries := \
     CtsAppSecurityTests
 
 # Native test executables that need to have associated test XMLs.
-CTS_NATIVE_EXES := \
+cts_native_exes := \
 	NativeMediaTest_SL \
 	NativeMediaTest_XA
 
 # All the files that will end up under the repository/testcases
 # directory of the final CTS distribution.
-CTS_TEST_CASES := $(call cts-get-lib-paths,$(CTS_HOST_LIBRARIES)) \
-		$(call cts-get-package-paths,$(CTS_TEST_PACKAGES)) \
-		$(call cts-get-native-paths,$(CTS_NATIVE_EXES))
+CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
+		$(call cts-get-package-paths,$(cts_test_packages)) \
+		$(call cts-get-native-paths,$(cts_native_exes))
 
 # All the XMLs that will end up under the repository/testcases
 # and that need to be created before making the final CTS distribution.
-CTS_TEST_XMLS := $(call cts-get-test-xmls,$(CTS_HOST_LIBRARIES)) \
-		$(call cts-get-test-xmls,$(CTS_TEST_PACKAGES)) \
-		$(call cts-get-test-xmls,$(CTS_NATIVE_EXES))
+CTS_TEST_XMLS := $(call cts-get-test-xmls,$(cts_host_libraries)) \
+		$(call cts-get-test-xmls,$(cts_test_packages)) \
+		$(call cts-get-test-xmls,$(cts_native_exes))
 
 # The following files will be placed in the tools directory of the CTS distribution
 CTS_TOOLS_LIST :=
