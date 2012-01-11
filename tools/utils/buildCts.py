@@ -100,7 +100,6 @@ class CtsBuilder(object):
       packages.append(doc.GetAttr('TestPackage', 'appPackageName'))
 
     plan = tools.TestPlan(packages)
-    plan.Exclude('android\.core\.vm-tests')
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
     self.__WritePlan(plan, 'CTS-TF')
