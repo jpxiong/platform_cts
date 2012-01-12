@@ -724,4 +724,12 @@ public class UriTest extends AndroidTestCase {
         assertTrue(uri.isHierarchical());
         assertEquals(uriString, uri.toString());
     }
+
+    public void testNormalize() {
+        assertEquals(Uri.parse(""), Uri.parse("").normalize());
+        assertEquals(Uri.parse("http://www.android.com"),
+                Uri.parse("http://www.android.com").normalize());
+        assertEquals(Uri.parse("http://USER@WWW.ANDROID.COM:100/ABOUT?foo=blah@bar=bleh#c"),
+                Uri.parse("HTTP://USER@WWW.ANDROID.COM:100/ABOUT?foo=blah@bar=bleh#c").normalize());
+    }
 }
