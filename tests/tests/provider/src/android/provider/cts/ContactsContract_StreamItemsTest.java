@@ -36,9 +36,13 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
     private static final String ACCOUNT_TYPE = "com.android.cts";
     private static final String ACCOUNT_NAME = "ContactsContract_StreamItemsTest";
 
-    private static final String STREAM_TEXT = "Wrote a test for the StreamItems class";
-    private static final long STREAM_TIMESTAMP = 3007;
-    private static final String STREAM_COMMENTS = "1337 people reshared this";
+    private static final String INSERT_TEXT = "Wrote a test for the StreamItems class";
+    private static final long INSERT_TIMESTAMP = 3007;
+    private static final String INSERT_COMMENTS = "1337 people reshared this";
+
+    private static final String UPDATE_TEXT = "Wrote more tests for the StreamItems class";
+    private static final long UPDATE_TIMESTAMP = 8008;
+    private static final String UPDATE_COMMENTS = "3007 people reshared this";
 
     private ContentResolver mResolver;
 
@@ -48,7 +52,7 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
         mResolver = mContext.getContentResolver();
     }
 
-    public void testInsert_byContentDirectory() throws Exception {
+    public void testContentDirectoryUri() throws Exception {
         // Create a contact to attach the stream item to it.
         ContentValues values = new ContentValues();
         values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
@@ -62,9 +66,9 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
         values.clear();
         values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
         values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
-        values.put(StreamItems.TEXT, STREAM_TEXT);
-        values.put(StreamItems.TIMESTAMP, STREAM_TIMESTAMP);
-        values.put(StreamItems.COMMENTS, STREAM_COMMENTS);
+        values.put(StreamItems.TEXT, INSERT_TEXT);
+        values.put(StreamItems.TIMESTAMP, INSERT_TIMESTAMP);
+        values.put(StreamItems.COMMENTS, INSERT_COMMENTS);
 
         Uri contactStreamUri = Uri.withAppendedPath(
                 ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId),
@@ -81,10 +85,22 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
                         .build());
 
         // Check that the provider stored what we put into it.
-        assertStreamItem(streamItemUri);
+        assertInsertedItem(streamItemUri);
+
+        // Update the stream item.
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
+        values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
+        values.put(StreamItems.TEXT, UPDATE_TEXT);
+        values.put(StreamItems.TIMESTAMP, UPDATE_TIMESTAMP);
+        values.put(StreamItems.COMMENTS, UPDATE_COMMENTS);
+
+        assertEquals(1, mResolver.update(streamItemUri, values, null, null));
+        assertUpdatedItem(streamItemUri);
     }
 
-    public void testInsert_byContentUri() throws Exception {
+    public void testContentUri() throws Exception {
         // Create a contact with one stream item in it.
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
@@ -97,9 +113,9 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
                 .withValueBackReference(Data.RAW_CONTACT_ID, 0)
                 .withValue(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE)
                 .withValue(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME)
-                .withValue(StreamItems.TEXT, STREAM_TEXT)
-                .withValue(StreamItems.TIMESTAMP, STREAM_TIMESTAMP)
-                .withValue(StreamItems.COMMENTS, STREAM_COMMENTS)
+                .withValue(StreamItems.TEXT, INSERT_TEXT)
+                .withValue(StreamItems.TIMESTAMP, INSERT_TIMESTAMP)
+                .withValue(StreamItems.COMMENTS, INSERT_COMMENTS)
                 .build());
 
         ContentProviderResult[] results = mResolver.applyBatch(ContactsContract.AUTHORITY, ops);
@@ -115,18 +131,41 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
                 ContentUris.withAppendedId(StreamItems.CONTENT_URI, streamItemId));
 
         // Check that the provider stored what we put into it.
-        assertStreamItem(streamItemUri);
+        assertInsertedItem(streamItemUri);
+
+        // Update the stream item.
+        ops.clear();
+        ops.add(ContentProviderOperation.newUpdate(streamItemUri)
+                .withValue(Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE)
+                .withValue(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME)
+                .withValue(StreamItems.TEXT, UPDATE_TEXT)
+                .withValue(StreamItems.TIMESTAMP, UPDATE_TIMESTAMP)
+                .withValue(StreamItems.COMMENTS, UPDATE_COMMENTS)
+                .build());
+
+        results = mResolver.applyBatch(ContactsContract.AUTHORITY, ops);
+        assertEquals(Integer.valueOf(1), results[0].count);
+        assertUpdatedItem(streamItemUri);
     }
 
-    private void assertStreamItem(Uri itemUri) {
-        Cursor cursor = mResolver.query(itemUri, null, null, null, null);
+    private void assertInsertedItem(Uri itemUri) {
+        assertStreamItem(itemUri, INSERT_TEXT, INSERT_TIMESTAMP, INSERT_COMMENTS);
+    }
+
+    private void assertUpdatedItem(Uri itemUri) {
+        assertStreamItem(itemUri, UPDATE_TEXT, UPDATE_TIMESTAMP, UPDATE_COMMENTS);
+    }
+
+    private void assertStreamItem(Uri uri, String text, long timestamp, String comments) {
+        Cursor cursor = mResolver.query(uri, null, null, null, null);
         try {
             assertTrue(cursor.moveToFirst());
-            assertEquals(STREAM_TEXT, cursor.getString(
+            assertEquals(text, cursor.getString(
                     cursor.getColumnIndexOrThrow(StreamItems.TEXT)));
-            assertEquals(STREAM_TIMESTAMP, cursor.getLong(
+            assertEquals(timestamp, cursor.getLong(
                     cursor.getColumnIndexOrThrow(StreamItems.TIMESTAMP)));
-            assertEquals(STREAM_COMMENTS, cursor.getString(
+            assertEquals(comments, cursor.getString(
                     cursor.getColumnIndexOrThrow(StreamItems.COMMENTS)));
         } finally {
             cursor.close();
