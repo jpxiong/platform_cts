@@ -146,14 +146,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
          * http://en.wikipedia.org/wiki/Postal_address#United_States
          * http://www.usps.com/
          */
+        // full address, invalid zip code
+        assertNull(WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92926"));
         // full address
-        assertEquals("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92926",
-                WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92926"));
+        assertEquals("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92826",
+                WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFORNIA 92826"));
         // full address ( with abbreviated street type and state)
-        assertEquals("455 LARKSPUR DR CALIFORNIA SPRINGS CA 92926",
-                WebView.findAddress("455 LARKSPUR DR CALIFORNIA SPRINGS CA 92926"));
+        assertEquals("455 LARKSPUR DR CALIFORNIA SPRINGS CA 92826",
+                WebView.findAddress("455 LARKSPUR DR CALIFORNIA SPRINGS CA 92826"));
         // misspell the state ( CALIFORNIA -> CALIFONIA )
-        assertNull(WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFONIA 92926"));
+        assertNull(WebView.findAddress("455 LARKSPUR DRIVE CALIFORNIA SPRINGS CALIFONIA 92826"));
         // without optional zip code
         assertEquals("455 LARKSPUR DR CALIFORNIA SPRINGS CA",
                 WebView.findAddress("455 LARKSPUR DR CALIFORNIA SPRINGS CA"));
