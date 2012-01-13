@@ -198,6 +198,10 @@ public class ContactsContract_TestDataBuilder {
             return mCursor.getLong(mCursor.getColumnIndex(columnName));
         }
 
+        public String getString(String columnName) {
+            return mCursor.getString(mCursor.getColumnIndex(columnName));
+        }
+
         public void assertColumn(String columnName, long value) {
             assertEquals(value, mCursor.getLong(getColumnIndex(columnName)));
         }
