@@ -35,7 +35,13 @@ public class TestPackageXmlParser extends AbstractXmlParser {
 
     private static final String LOG_TAG = "TestPackageXmlParser";
 
+    private final boolean mIncludeKnownFailures;
+
     private TestPackageDef mPackageDef;
+
+    public TestPackageXmlParser(boolean includeKnownFailures) {
+        mIncludeKnownFailures = includeKnownFailures;
+    }
 
     /**
      * SAX callback object. Handles parsing data from the xml tags.
@@ -118,9 +124,13 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                             classNameBuilder.append(".");
                         }
                     }
-                    TestIdentifier testdef = new TestIdentifier(classNameBuilder.toString(),
+
+                    TestIdentifier testId = new TestIdentifier(classNameBuilder.toString(),
                             methodName);
-                    mPackageDef.addTest(testdef);
+                    boolean isKnownFailure = "failure".equals(attributes.getValue("expectation"));
+                    if (!isKnownFailure || mIncludeKnownFailures) {
+                        mPackageDef.addTest(testId);
+                    }
                 }
             }
 

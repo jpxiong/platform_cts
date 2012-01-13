@@ -135,7 +135,7 @@ public class CtsBuildHelper {
     /**
      * @return a {@link File} representing the test plan directory
      */
-    public File getTestPlansDir() throws FileNotFoundException {
+    public File getTestPlansDir() {
         return new File(getRepositoryDir(), "plans");
     }
 

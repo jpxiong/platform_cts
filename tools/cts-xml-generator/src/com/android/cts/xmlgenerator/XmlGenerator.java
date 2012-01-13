@@ -178,9 +178,12 @@ class XmlGenerator {
             StringBuilder nameCollector) {
         for (String test : tests) {
             nameCollector.append('#').append(test);
-            if (!isKnownFailure(mExpectations, nameCollector.toString())) {
-                writer.append("<Test name=\"").append(test).println("\" />");
+            writer.append("<Test name=\"").append(test).append("\"");
+            if (isKnownFailure(mExpectations, nameCollector.toString())) {
+                writer.append(" expectation=\"failure\"");
             }
+            writer.println(" />");
+
             nameCollector.delete(nameCollector.length() - test.length() - 1,
                     nameCollector.length());
         }
