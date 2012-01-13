@@ -618,48 +618,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("object", mWebView.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addJavascriptInterface",
-            args = {Object.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeJavascriptInterface",
-            args = {String.class}
-        )
-    })
-    @UiThreadTest
-    public void testAddJavascriptInterfaceOddName() throws Exception {
-        WebSettings settings = mWebView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        final Object obj = new Object();
-
-        // We should be able to use any character other than a single quote.
-        // TODO: We currently fail when the name contains '#', '\', '\n' or '\r'.
-        // See b/3279426
-        //String oddNames[] = {" x y ", "`!\"$%^&*()-=_+[]{};#:@~\\|,./<>?\n\r ", " ", "\n", ""};
-        String oddNames[] = {" x y ", "`!\"$%^&*()-=_+[]{};:@~|,./<>? ", " ", ""};
-        for (String name : oddNames) {
-            String setTitleToPropertyTypeHtml = "<html><head>" +
-                    "<script>function updateTitle() { document.title = typeof window['" +
-                    name +
-                    "']; }</script>" +
-                    "</head><body onload=\"updateTitle();\"></body></html>";
-
-            mWebView.addJavascriptInterface(obj, name);
-            mOnUiThread.loadDataAndWaitForCompletion(
-                    Uri.encode(setTitleToPropertyTypeHtml), "text/html", null);
-            assertEquals("object", mWebView.getTitle());
-
-            mWebView.removeJavascriptInterface(name);
-            mOnUiThread.loadDataAndWaitForCompletion(
-                    Uri.encode(setTitleToPropertyTypeHtml), "text/html", null);
-            assertEquals("undefined", mWebView.getTitle());
-        }
-    }
-
     @TestTargetNew(
         level = TestLevel.COMPLETE,
         method = "removeJavascriptInterface",
