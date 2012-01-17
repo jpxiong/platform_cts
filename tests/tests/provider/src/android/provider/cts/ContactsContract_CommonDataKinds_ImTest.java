@@ -61,9 +61,9 @@ public class ContactsContract_CommonDataKinds_ImTest extends AndroidTestCase {
     }
 
     private void assertCustomProtocolLabel(String label) {
-        int res = Im.getProtocolLabelResource(Im.TYPE_CUSTOM);
+        int res = Im.getProtocolLabelResource(Im.PROTOCOL_CUSTOM);
         assertTrue(res != 0);
-        assertEquals(label, Im.getProtocolLabel(mResources, Im.TYPE_CUSTOM, label));
+        assertEquals(label, Im.getProtocolLabel(mResources, Im.PROTOCOL_CUSTOM, label));
     }
 
     private void assertGetTypeLabel(int type) {
