@@ -19,6 +19,7 @@ package android.provider.cts;
 import android.content.Context;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,36 +58,36 @@ public class FileCopyHelper {
      * @param fileName the file name
      *
      * @return the absolute path of the destination file
+     * @throws IOException
      */
-    public String copy(int resId, String fileName) {
-        InputStream source = null;
-        OutputStream target = null;
+    public String copy(int resId, String fileName) throws IOException {
+        InputStream source = mContext.getResources().openRawResource(resId);
+        OutputStream target = mContext.openFileOutput(fileName, Context.MODE_WORLD_READABLE);
+        copyFile(source, target);
+        mFilesList.add(fileName);
+        return mContext.getFileStreamPath(fileName).getAbsolutePath();
+    }
 
+    public void copyToExternalStorage(int resId, File path) throws IOException {
+        InputStream source = mContext.getResources().openRawResource(resId);
+        OutputStream target = new FileOutputStream(path);
+        copyFile(source, target);
+    }
+
+    private void copyFile(InputStream source, OutputStream target) throws IOException {
         try {
-            source = mContext.getResources().openRawResource(resId);
-            target = mContext.openFileOutput(fileName, Context.MODE_WORLD_READABLE);
-
             byte[] buffer = new byte[1024];
             for (int len = source.read(buffer); len > 0; len = source.read(buffer)) {
                 target.write(buffer, 0, len);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
-            try {
-                if (source != null) {
-                    source.close();
-                }
-                if (target != null) {
-                    target.close();
-                }
-            } catch (IOException e) {
-                // Ignore the IOException.
+            if (source != null) {
+                source.close();
+            }
+            if (target != null) {
+                target.close();
             }
         }
-
-        mFilesList.add(fileName);
-        return mContext.getFileStreamPath(fileName).getAbsolutePath();
     }
 
     /**

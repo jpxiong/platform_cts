@@ -18,11 +18,6 @@ package android.provider.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,18 +26,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
-@TestTargetClass(MediaStore.Images.Media.class)
 public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
     private static final String MIME_TYPE_JPEG = "image/jpeg";
 
@@ -87,33 +78,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         mRowsAdded = new ArrayList<Uri>();
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "This test will fail if there is no sdcard attached because the method "
-                    + "{@link Images#Media#insertImage(ContentResolver, String, String, String)} "
-                    + "will store images on the sdcard",
-        method = "insertImage",
-        args = {ContentResolver.class, String.class, String.class, String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {ContentResolver.class, Uri.class, String[].class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {ContentResolver.class, Uri.class, String[].class, String.class, String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {ContentResolver.class, Uri.class, String[].class,  String.class, String[].class,
-                String.class}
-      )
-    })
-    public void testInsertImageWithImagePath() {
+    public void testInsertImageWithImagePath() throws Exception {
         Cursor c = Media.query(mContentResolver, Media.EXTERNAL_CONTENT_URI, null, null,
                 "_id ASC");
         int previousCount = c.getCount();
@@ -184,21 +149,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         c.close();
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "This test will fail if there is no sdcard attached because the method "
-                + "will store images on the sdcard",
-        method = "insertImage",
-        args = {ContentResolver.class, Bitmap.class, String.class, String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBitmap",
-        args = {ContentResolver.class, Uri.class}
-      )
-    })
-    public void testInsertImageWithBitmap() {
+    public void testInsertImageWithBitmap() throws Exception {
         // insert the image by bitmap
         Bitmap src = BitmapFactory.decodeResource(mContext.getResources(), R.raw.scenery);
         String stringUrl = null;
@@ -215,27 +166,15 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
                 null, "_id ASC");
         c.moveToFirst();
         // get the bimap by the path
-        Bitmap result = null;
-        try {
-            result = Media.getBitmap(mContentResolver,
+        Bitmap result = Media.getBitmap(mContentResolver,
                     Uri.fromFile(new File(c.getString(c.getColumnIndex(Media.DATA)))));
-        } catch (FileNotFoundException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+
         // can not check the identity between the result and source bitmap because
         // source bitmap is compressed before it is saved as result bitmap
-        assertNotNull(result);
         assertEquals(src.getWidth(), result.getWidth());
         assertEquals(src.getHeight(), result.getHeight());
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(Media.getContentUri("internal"), null, null, null,
                 null));

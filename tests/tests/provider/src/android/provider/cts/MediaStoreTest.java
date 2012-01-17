@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -27,7 +23,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(MediaStore.class)
 public class MediaStoreTest extends InstrumentationTestCase {
     private static final String TEST_VOLUME_NAME = "volume_for_cts";
 
@@ -62,11 +57,7 @@ public class MediaStoreTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getMediaScannerUri",
-      args = {}
-    )
+
     public void testGetMediaScannerUri() {
         ContentValues values = new ContentValues();
         String selection = MediaStore.MEDIA_SCANNER_VOLUME + "=?";
@@ -92,5 +83,10 @@ public class MediaStoreTest extends InstrumentationTestCase {
         // delete
         assertEquals(1, mContentResolver.delete(mScannerUri, null, null));
         assertNull(mContentResolver.query(mScannerUri, PROJECTION, null, null, null));
+    }
+
+    public void testGetVersion() {
+        // Could be a version string or null...just check it doesn't blow up.
+        MediaStore.getVersion(getInstrumentation().getTargetContext());
     }
 }

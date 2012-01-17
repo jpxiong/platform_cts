@@ -39,6 +39,8 @@
     <!--  need app that has CALL_PHONE but not PROCESS_OUTGOING_CALL -->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
 
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+
     <instrumentation android:name="android.test.InstrumentationTestRunner"
                      android:targetPackage="com.android.cts.permission2"
                      android:label="More CTS tests for permissions"/>

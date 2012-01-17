@@ -18,23 +18,17 @@ package android.provider.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Video;
 import android.provider.MediaStore.Video.VideoColumns;
 import android.test.InstrumentationTestCase;
 
 import java.util.ArrayList;
 
-@TestTargetClass(MediaStore.Video.class)
 public class MediaStore_VideoTest extends InstrumentationTestCase {
     private static final String TEST_VIDEO_3GP = "testVideo.3gp";
 
@@ -64,12 +58,7 @@ public class MediaStore_VideoTest extends InstrumentationTestCase {
         mRowsAdded = new ArrayList<Uri>();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "query",
-      args = {ContentResolver.class, Uri.class, String[].class}
-    )
-    public void testQuery() {
+    public void testQuery() throws Exception {
         ContentValues values = new ContentValues();
         String valueOfData = mHelper.copy(R.raw.testvideo, TEST_VIDEO_3GP);
         values.put(VideoColumns.DATA, valueOfData);
