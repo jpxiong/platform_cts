@@ -16,20 +16,18 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
-
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Genres;
+import android.provider.MediaStore.Audio.Media;
+import android.provider.MediaStore.Audio.Genres.Members;
+import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(Genres.class)
 public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -40,14 +38,6 @@ public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document related to the possible values of param volumeName. @throw clause "
-            + "should be added in to javadoc when getting uri for internal volume.")
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(
                 Genres.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME), null, null,
@@ -102,5 +92,45 @@ public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
         values.put(Genres.NAME, "POP");
         Uri uri = mContentResolver.insert(Genres.INTERNAL_CONTENT_URI, values);
         assertNull(uri);
+    }
+
+    public void testGetContentUriForAudioId() {
+        // Insert an audio file into the content provider.
+        ContentValues values = Audio1.getInstance().getContentValues(true);
+        Uri audioUri = mContentResolver.insert(Media.EXTERNAL_CONTENT_URI, values);
+        long audioId = ContentUris.parseId(audioUri);
+        assertTrue(audioId != -1);
+
+        // Insert a genre into the content provider.
+        values.clear();
+        values.put(Genres.NAME, "Soda Pop");
+        Uri genreUri = mContentResolver.insert(Genres.EXTERNAL_CONTENT_URI, values);
+        long genreId = ContentUris.parseId(genreUri);
+        assertTrue(genreId != -1);
+
+        Cursor cursor = null;
+        try {
+            String volumeName = MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME;
+
+            // Check that the audio file has no genres yet.
+            Uri audioGenresUri = Genres.getContentUriForAudioId(volumeName, (int) audioId);
+            cursor = mContentResolver.query(audioGenresUri, null, null, null, null);
+            assertFalse(cursor.moveToNext());
+
+            // Link the audio file to the genre.
+            values.clear();
+            values.put(Members.AUDIO_ID, audioId);
+            Uri membersUri = Members.getContentUri(volumeName, genreId);
+            assertNotNull(mContentResolver.insert(membersUri, values));
+
+            // Check that the audio file has the genre it was linked to.
+            cursor = mContentResolver.query(audioGenresUri, null, null, null, null);
+            assertTrue(cursor.moveToNext());
+            assertEquals(genreId, cursor.getLong(cursor.getColumnIndex(Genres._ID)));
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }
