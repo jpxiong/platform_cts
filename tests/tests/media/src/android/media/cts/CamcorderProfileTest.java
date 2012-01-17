@@ -21,6 +21,7 @@ import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
 import dalvik.annotation.TestTargets;
 
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -237,6 +238,16 @@ public class CamcorderProfileTest extends AndroidTestCase {
         )
     })
     public void testGet() {
+        /*
+         * Device may not have rear camera for checkGet(-1).
+         * Checking PackageManager.FEATURE_CAMERA is included or not to decide the flow.
+         * Continue if the feature is included.
+         * Otherwise, exit test.
+         */
+        PackageManager pm = mContext.getPackageManager();
+        if (!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            return;
+        }
         checkGet(-1);
     }
 
