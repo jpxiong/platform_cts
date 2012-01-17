@@ -16,6 +16,7 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.cts.tradefed.testtype.ITestPackageDef;
 import com.android.cts.tradefed.testtype.ITestPackageRepo;
 import com.android.cts.tradefed.testtype.ITestPlan;
@@ -55,6 +56,9 @@ public class PlanCreator {
             importance=Importance.IF_UNSET)
     private String mResultFilterString = null;
 
+    @Option(name = CtsTest.RUN_KNOWN_FAILURES_OPTION)
+    private boolean mIncludeKnownFailures = false;
+
     private CtsTestStatus mResultFilter = null;
     private TestResults mResult = null;
 
@@ -63,7 +67,8 @@ public class PlanCreator {
     /**
      * Create an empty {@link PlanCreator}.
      * <p/>
-     * All {@link Option} fields must be populated via {@link ArgsOptionParser}
+     * All {@link Option} fields must be populated via
+     * {@link com.android.tradefed.config.ArgsOptionParser}
      */
     public PlanCreator() {
     }
@@ -102,12 +107,13 @@ public class PlanCreator {
      * {@link Option} values must all be set before this is called.
      *
      * @param build
-     * @return
+     * @return test plan
      * @throws ConfigurationException
      */
     public ITestPlan createDerivedPlan(CtsBuildHelper build) throws ConfigurationException {
         checkFields(build);
-        ITestPackageRepo pkgDefRepo = new TestPackageRepo(build.getTestCasesDir());
+        ITestPackageRepo pkgDefRepo = new TestPackageRepo(build.getTestCasesDir(),
+                mIncludeKnownFailures);
         ITestPlan derivedPlan = new TestPlan(mPlanName);
         for (TestPackageResult pkg : mResult.getPackages()) {
             Collection<TestIdentifier> filteredTests = pkg.getTestsWithStatus(mResultFilter);

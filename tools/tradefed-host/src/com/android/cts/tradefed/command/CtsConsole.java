@@ -183,18 +183,13 @@ public class CtsConsole extends Console {
                 return name.endsWith(".xml");
             }
         };
-        try {
-            for (File planFile : ctsBuild.getTestPlansDir().listFiles(xmlFilter)) {
-                printLine(FileUtil.getBaseName(planFile.getName()));
-            }
-        }
-        catch (FileNotFoundException e) {
-            printLine("Could not find CTS plan folder");
+        for (File planFile : ctsBuild.getTestPlansDir().listFiles(xmlFilter)) {
+            printLine(FileUtil.getBaseName(planFile.getName()));
         }
     }
 
     private void listPackages(CtsBuildHelper ctsBuild) {
-        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir());
+        ITestPackageRepo testCaseRepo = new TestPackageRepo(ctsBuild.getTestCasesDir(), false);
         for (String packageUri : testCaseRepo.getPackageNames()) {
             printLine(packageUri);
         }

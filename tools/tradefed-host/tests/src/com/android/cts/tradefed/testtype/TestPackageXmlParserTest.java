@@ -42,7 +42,7 @@ public class TestPackageXmlParserTest extends TestCase {
         "        <TestSuite name=\"example\" >\n" +
         "            <TestCase name=\"ExampleTest\" >\n" +
         "                <Test name=\"testFoo\" />\n" +
-        "                <Test name=\"testFoo2\" />\n" +
+        "                <Test name=\"testFoo2\" expectation=\"failure\" />\n" +
         "            </TestCase>\n" +
         "        </TestSuite>\n" +
         "        <TestSuite name=\"example2\" >\n" +
@@ -68,7 +68,7 @@ public class TestPackageXmlParserTest extends TestCase {
      * Test parsing test case xml containing an instrumentation test definition.
      */
     public void testParse_instrPackage() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(true);
         parser.parse(getStringAsStream(INSTR_TEST_DATA));
         TestPackageDef def = parser.getTestPackageDef();
         assertEquals("com.example", def.getAppNameSpace());
@@ -80,7 +80,7 @@ public class TestPackageXmlParserTest extends TestCase {
      * Test parsing test case xml containing an host test attribute and test data.
      */
     public void testParse_hostTest() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(true);
         parser.parse(getStringAsStream(HOST_TEST_DATA));
         TestPackageDef def = parser.getTestPackageDef();
         assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
@@ -98,13 +98,34 @@ public class TestPackageXmlParserTest extends TestCase {
         TestIdentifier thirdTest = iterator.next();
         assertEquals("com.example2.Example2Test", thirdTest.getClassName());
         assertEquals("testFoo", thirdTest.getTestName());
+
+        assertFalse(iterator.hasNext());
+    }
+
+    public void testParse_hostTest_noKnownFailures() throws ParseException  {
+        TestPackageXmlParser parser = new TestPackageXmlParser(false);
+        parser.parse(getStringAsStream(HOST_TEST_DATA));
+        TestPackageDef def = parser.getTestPackageDef();
+        assertEquals(TestPackageDef.HOST_SIDE_ONLY_TEST, def.getTestType());
+        assertEquals(2, def.getTests().size());
+        Iterator<TestIdentifier> iterator = def.getTests().iterator();
+
+        TestIdentifier firstTest = iterator.next();
+        assertEquals("com.example.ExampleTest", firstTest.getClassName());
+        assertEquals("testFoo", firstTest.getTestName());
+
+        TestIdentifier thirdTest = iterator.next();
+        assertEquals("com.example2.Example2Test", thirdTest.getClassName());
+        assertEquals("testFoo", thirdTest.getTestName());
+
+        assertFalse(iterator.hasNext());
     }
 
     /**
      * Test parsing test case xml containing an invalid host test attribute.
      */
     public void testParse_badHostTest() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(true);
         parser.parse(getStringAsStream(BAD_HOST_TEST_DATA));
         TestPackageDef def = parser.getTestPackageDef();
         assertFalse(TestPackageDef.HOST_SIDE_ONLY_TEST.equals(def.getTestType()));
@@ -119,7 +140,7 @@ public class TestPackageXmlParserTest extends TestCase {
     }
 
     private void assertTestType(String expectedType, String xml) throws ParseException {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(true);
         parser.parse(getStringAsStream(xml));
         TestPackageDef def = parser.getTestPackageDef();
         assertEquals(expectedType, def.getTestType());
@@ -129,7 +150,7 @@ public class TestPackageXmlParserTest extends TestCase {
      * Test parsing a test case xml with no test package data.
      */
     public void testParse_noData() throws ParseException  {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(true);
         parser.parse(getStringAsStream(NO_TEST_DATA));
         assertNull(parser.getTestPackageDef());
     }

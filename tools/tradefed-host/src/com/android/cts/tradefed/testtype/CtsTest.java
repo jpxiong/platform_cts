@@ -72,6 +72,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     private static final String CLASS_OPTION = "class";
     private static final String METHOD_OPTION = "method";
     public static final String CONTINUE_OPTION = "continue-session";
+    public static final String RUN_KNOWN_FAILURES_OPTION = "run-known-failures";
 
     public static final String PACKAGE_NAME_METRIC = "packageName";
     public static final String PACKAGE_DIGEST_METRIC = "packageDigest";
@@ -126,6 +127,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         "take a bugreport after each failed test. " +
         "Warning: can potentially use a lot of disk space.")
     private boolean mBugreport = false;
+
+    @Option(name = RUN_KNOWN_FAILURES_OPTION, shortName = 'k', description =
+        "run tests including known failures")
+    private boolean mIncludeKnownFailures;
 
     /** data structure for a {@link IRemoteTest} and its known tests */
     class TestPackage {
@@ -584,7 +589,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
      * Exposed for unit testing
      */
     ITestPackageRepo createTestCaseRepo() {
-        return new TestPackageRepo(mCtsBuild.getTestCasesDir());
+        return new TestPackageRepo(mCtsBuild.getTestCasesDir(), mIncludeKnownFailures);
     }
 
     /**

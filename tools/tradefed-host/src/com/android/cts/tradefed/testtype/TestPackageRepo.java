@@ -38,19 +38,22 @@ public class TestPackageRepo implements ITestPackageRepo {
 
     private static final String LOG_TAG = "TestCaseRepo";
 
-    private File mTestCaseDir;
+    private final File mTestCaseDir;
 
     /** mapping of uri to test definition */
-    private Map<String, TestPackageDef> mTestMap;
+    private final Map<String, TestPackageDef> mTestMap;
+
+    private final boolean mIncludeKnownFailures;
 
     /**
      * Creates a {@link TestPackageRepo}, initialized from provided repo files
      *
      * @param testCaseDir directory containing all test case definition xml and build files
      */
-    public TestPackageRepo(File testCaseDir) {
+    public TestPackageRepo(File testCaseDir, boolean includeKnownFailures) {
         mTestCaseDir = testCaseDir;
         mTestMap = new Hashtable<String, TestPackageDef>();
+        mIncludeKnownFailures = includeKnownFailures;
         parse(mTestCaseDir);
     }
 
@@ -64,12 +67,8 @@ public class TestPackageRepo implements ITestPackageRepo {
         }
     }
 
-    /**
-     * @param xmlFile
-     * @throws ParseException
-     */
     private void parseTestFromXml(File xmlFile)  {
-        TestPackageXmlParser parser = new TestPackageXmlParser();
+        TestPackageXmlParser parser = new TestPackageXmlParser(mIncludeKnownFailures);
         try {
             parser.parse(createStreamFromFile(xmlFile));
             TestPackageDef def = parser.getTestPackageDef();
@@ -96,7 +95,7 @@ public class TestPackageRepo implements ITestPackageRepo {
      * Exposed for unit testing
      *
      * @param xmlFile
-     * @return
+     * @return stream to read data
      *
      */
     InputStream createStreamFromFile(File xmlFile) throws FileNotFoundException {
@@ -108,6 +107,7 @@ public class TestPackageRepo implements ITestPackageRepo {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accept(File dir, String name) {
             return name.endsWith(".xml");
         }
@@ -135,9 +135,9 @@ public class TestPackageRepo implements ITestPackageRepo {
     }
 
     /**
-     * Return a list of all package names found in repo.
-     * @return
+     * @return list of all package names found in repo
      */
+    @Override
     public Collection<String> getPackageNames() {
         List<String> packageNames = new ArrayList<String>();
         packageNames.addAll(mTestMap.keySet());
