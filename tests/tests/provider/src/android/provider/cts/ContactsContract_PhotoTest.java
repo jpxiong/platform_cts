@@ -22,6 +22,8 @@ import android.content.ContentResolver;
 import android.content.IContentProvider;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract.Contacts;
+import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
@@ -35,12 +37,13 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
 
     private static final byte[] EMPTY_TEST_PHOTO_DATA = "".getBytes();
 
+    private ContentResolver mResolver;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        ContentResolver contentResolver =
-                getInstrumentation().getTargetContext().getContentResolver();
-        IContentProvider provider = contentResolver.acquireProvider(ContactsContract.AUTHORITY);
+        mResolver = getInstrumentation().getTargetContext().getContentResolver();
+        IContentProvider provider = mResolver.acquireProvider(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 
@@ -51,7 +54,13 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
     }
 
     public void testAddPhoto() throws Exception {
-        TestRawContact rawContact = mBuilder.newRawContact().insert();
+        TestRawContact rawContact = mBuilder.newRawContact().insert().load();
+        TestContact contact = rawContact.getContact().load();
+
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri()));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), true));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
+
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
                 .with(Photo.PHOTO, getTestPhotoData())
                 .insert();
@@ -59,14 +68,28 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
         photoData.load();
         photoData.assertColumn(Photo.RAW_CONTACT_ID, rawContact.getId());
         photoData.assertBlobColumnNotNull(Photo.PHOTO);
+
+        assertPhotoStream(Contacts.openContactPhotoInputStream(mResolver, contact.getUri()));
+        assertPhotoStream(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), true));
+        assertPhotoStream(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
     }
 
     public void testAddEmptyPhoto() throws Exception {
-        TestRawContact rawContact = mBuilder.newRawContact().insert();
+        TestRawContact rawContact = mBuilder.newRawContact().insert().load();
+        TestContact contact = rawContact.getContact().load();
+
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri()));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), true));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
+
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
                 .with(Photo.PHOTO, EMPTY_TEST_PHOTO_DATA)
                 .insert();
         assertNotNull(photoData.load());
+
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri()));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), true));
+        assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
     }
 
     private byte[] getTestPhotoData() {
@@ -88,6 +111,18 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
             throw new RuntimeException(e);
         }
         return os.toByteArray();
+    }
+
+    private void assertPhotoStream(InputStream photoStream) throws IOException {
+        try {
+            assertNotNull(photoStream);
+            byte[] actualBytes = readInputStreamFully(photoStream);
+            assertTrue(actualBytes.length > 0);
+        } finally {
+            if (photoStream != null) {
+                photoStream.close();
+            }
+        }
     }
 }
 
