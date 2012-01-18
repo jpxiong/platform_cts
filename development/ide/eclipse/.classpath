@@ -76,6 +76,7 @@
     <classpathentry kind="src" path="cts/tools/tradefed-host/tests/src"/>
     <classpathentry kind="src" path="cts/tools/utils"/>
     <classpathentry kind="src" path="cts/tools/vm-tests/src"/>
+    <classpathentry kind="src" path="external/easymock/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsAccessibilityServiceTestCases_intermediates/src/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsTestStubs_intermediates/src/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsVerifier_intermediates/src"/>

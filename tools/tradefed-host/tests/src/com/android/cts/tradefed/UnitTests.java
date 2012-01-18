@@ -16,9 +16,14 @@
 package com.android.cts.tradefed;
 
 import com.android.cts.tradefed.result.CtsXmlResultReporterTest;
+import com.android.cts.tradefed.result.DeviceInfoResultTest;
+import com.android.cts.tradefed.result.TestPackageResultTest;
+import com.android.cts.tradefed.result.TestResultsTest;
+import com.android.cts.tradefed.result.TestSummaryXmlTest;
 import com.android.cts.tradefed.result.TestTest;
 import com.android.cts.tradefed.testtype.CtsTestTest;
 import com.android.cts.tradefed.testtype.JarHostTestTest;
+import com.android.cts.tradefed.testtype.TestFilterTest;
 import com.android.cts.tradefed.testtype.TestPackageDefTest;
 import com.android.cts.tradefed.testtype.TestPackageXmlParserTest;
 import com.android.cts.tradefed.testtype.TestPlanTest;
@@ -36,13 +41,22 @@ public class UnitTests extends TestSuite {
 
     public UnitTests() {
         super();
+
+        // result package
         addTestSuite(CtsXmlResultReporterTest.class);
-        addTestSuite(JarHostTestTest.class);
-        addTestSuite(CtsTestTest.class);
-        addTestSuite(TestPlanTest.class);
-        addTestSuite(TestPackageXmlParserTest.class);
-        addTestSuite(TestPackageDefTest.class);
+        addTestSuite(DeviceInfoResultTest.class);
+        addTestSuite(TestPackageResultTest.class);
+        addTestSuite(TestResultsTest.class);
+        addTestSuite(TestSummaryXmlTest.class);
         addTestSuite(TestTest.class);
+
+        // testtype package
+        addTestSuite(CtsTestTest.class);
+        addTestSuite(JarHostTestTest.class);
+        addTestSuite(TestFilterTest.class);
+        addTestSuite(TestPackageDefTest.class);
+        addTestSuite(TestPackageXmlParserTest.class);
+        addTestSuite(TestPlanTest.class);
     }
 
     public static Test suite() {

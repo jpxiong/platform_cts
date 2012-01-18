@@ -16,8 +16,8 @@
  -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://compatibility.android.com/cts_result/1.13"
-           xmlns="http://compatibility.android.com/cts_result/1.13"
+           targetNamespace="http://compatibility.android.com/cts_result/1.14"
+           xmlns="http://compatibility.android.com/cts_result/1.14"
            elementFormDefault="qualified">
 
 <xs:element name="TestResult">
@@ -83,6 +83,8 @@
     <xs:element name="ProcessInfo" type="processInfoType"/>
     <xs:element name="SystemLibrariesInfo" type="systemLibrariesInfoType"/>
     <xs:element name="OpenGLCompressedTextureFormatsInfo" type="openGLCompressedTextureFormatsInfoType"/>
+    <xs:element name="PackageInfo" type="packageInfoType"/>
+    <xs:element name="PropertyInfo" type="propertyInfoType"/>
   </xs:sequence>
 </xs:complexType>
 
@@ -156,6 +158,27 @@
         <xs:element name="TextureFormat" minOccurs="0" maxOccurs="unbounded">
             <xs:complexType>
                 <xs:attribute name="name" type="xs:string" />
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="packageInfoType">
+    <xs:sequence>
+        <xs:element name="Package" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="propertyInfoType">
+    <xs:sequence>
+        <xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="value" type="xs:string" />
             </xs:complexType>
         </xs:element>
     </xs:sequence>

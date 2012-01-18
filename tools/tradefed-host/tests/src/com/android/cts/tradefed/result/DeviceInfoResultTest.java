@@ -15,19 +15,21 @@
  */
 package com.android.cts.tradefed.result;
 
-import android.tests.getinfo.DeviceInfoConstants;
-
-import junit.framework.TestCase;
+import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import android.tests.getinfo.DeviceInfoConstants;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link DeviceInfoResult}
@@ -55,31 +57,53 @@ public class DeviceInfoResultTest extends TestCase {
         };
     }
 
-    /**
-     * Test the roundtrip setting of device process details, serializing and parsing from/to XML.
-     */
-    public void testProcess() throws Exception {
-        final String processString = "ueventd;netd;";
-        DeviceInfoResult serializedInfo = new DeviceInfoResult();
-        addMetric(DeviceInfoConstants.PROCESSES, processString, serializedInfo);
-        String serializedOutput = serialize(serializedInfo);
-        mDeserializingInfo.parse(new StringReader(serializedOutput));
-        assertEquals(processString, mDeserializingInfo.getMetrics().get(
-                DeviceInfoConstants.PROCESSES));
+    public void testFeatures() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.FEATURES, "");
+        assertSerializeParse(DeviceInfoConstants.FEATURES,
+                "android.hardware.audio.low_latency:sdk:false;");
+        assertSerializeParse(DeviceInfoConstants.FEATURES, "android.hardware.audio.low_latency:"
+                + "sdk:false;android.hardware.bluetooth:sdk:true;");
     }
 
-    /**
-     * Test the roundtrip setting of device feature details, serializing and parsing from/to XML.
-     */
-    public void testFeature() throws Exception {
-        final String featureString =
-            "android.hardware.audio.low_latency:sdk:false;android.hardware.bluetooth:sdk:true;";
+    public void testProcesses() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.PROCESSES, "");
+        assertSerializeParse(DeviceInfoConstants.PROCESSES, "ueventd:0;");
+        assertSerializeParse(DeviceInfoConstants.PROCESSES, "ueventd:0;netd:0;");
+    }
+
+    public void testOpenGlTextureFormats() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS, "");
+        assertSerializeParse(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS, "texture1;");
+        assertSerializeParse(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
+                "texture1;texture2;");
+    }
+
+    public void testSystemLibraries() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.SYS_LIBRARIES, "");
+        assertSerializeParse(DeviceInfoConstants.SYS_LIBRARIES, "lib1;");
+        assertSerializeParse(DeviceInfoConstants.SYS_LIBRARIES, "lib1;lib2;");
+    }
+
+    public void testPackages() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.PACKAGES, "");
+        assertSerializeParse(DeviceInfoConstants.PACKAGES, "package1;");
+        assertSerializeParse(DeviceInfoConstants.PACKAGES, "package1;package2;");
+    }
+
+    public void testProperties() throws Exception {
+        assertSerializeParse(DeviceInfoConstants.PROPERTIES, "");
+        assertSerializeParse(DeviceInfoConstants.PROPERTIES, "prop1name;prop1value!");
+        assertSerializeParse(DeviceInfoConstants.PROPERTIES,
+                "prop1name;prop1value!prop2name;prop2value!");
+    }
+
+    private void assertSerializeParse(String name, String value)
+            throws IOException, ParseException {
         DeviceInfoResult serializedInfo = new DeviceInfoResult();
-        addMetric(DeviceInfoConstants.FEATURES, featureString, serializedInfo);
+        addMetric(name, value, serializedInfo);
         String serializedOutput = serialize(serializedInfo);
         mDeserializingInfo.parse(new StringReader(serializedOutput));
-        assertEquals(featureString, mDeserializingInfo.getMetrics().get(
-                DeviceInfoConstants.FEATURES));
+        assertEquals(value, mDeserializingInfo.getMetrics().get(name));
     }
 
     /**

@@ -21,14 +21,21 @@
     <xsl:template match="/">
 
         <html>
-            <STYLE type="text/css">
-                @import "cts_result.css";
-            </STYLE>
-
+            <head>
+                <title>Test Report for <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_model" /> - <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/></title>
+                <script>
+                    function toggle(id) {
+                        e = document.getElementById(id)
+                        e.style.display = e.style.display == "none" ? "block" : "none"
+                    }
+                </script>
+                <STYLE type="text/css">
+                    @import "cts_result.css";
+                </STYLE>
+            </head>
             <body>
-                <!-- Title of the Report -->
-                <DIV id="title">
-                    <TABLE>
+                <DIV>
+                    <TABLE class="title">
                         <TR>
                             <TD width="40%" align="left"><img src="logo.gif"></img></TD>
                             <TD width="60%" align="left">
@@ -42,325 +49,358 @@
                 <img src="newrule-green.png" align="left"></img>
 
                 <br></br>
+
+                <center>
+                    <a href="#" onclick="toggle('summary');">Show Device Information</a>
+                </center>
+
                 <br></br>
 
-                <!-- Header with phone and plan information -->
-                <DIV id="summary">
-                    <TABLE width="90%" frame="none">
+                <DIV id="summary" style="display: none">
+                    <TABLE class="summary">
                         <TR>
-                            <TH>Device Information</TH>
-                            <TH>Test Summary</TH>
+                            <TH colspan="4">Device Information</TH>
                         </TR>
-
                         <TR>
-                            <TD>
+                            <TD width="25%">
                                 <!-- Device information -->
-                                <div id="summaryinfo">
-                                    <TABLE width="75%">
-                                        <TR>
-                                            <TD class="rowtitle">Build Model</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_model"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build Name</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildName"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build Brand</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_brand"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build Manufacturer</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_manufacturer"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Device ID</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Firmware Version</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildVersion"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Firmware Build Number</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildID"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build Fingerprint</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_fingerprint"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build ABI</TD>
-                                            <TD>
-                                                <xsl:value-of
-                                                  select="TestResult/DeviceInfo/BuildInfo/@build_abi"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Build ABI2</TD>
-                                            <TD>
-                                                <xsl:value-of
-                                                  select="TestResult/DeviceInfo/BuildInfo/@build_abi2"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Android Platform Version</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@androidPlatformVersion"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Supported Locales</TD>
-                                            <TD>
-                                                <xsl:call-template name="formatDelimitedString">
-                                                    <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@locales"/>
-                                                </xsl:call-template>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Screen Size</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_size"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Resolution</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/Screen/@resolution"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Density</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density"/>
-                                                (<xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density_bucket"/>)
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Phone number</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/PhoneSubInfo/@subscriberId"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">X dpi</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Xdpi"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Y dpi</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Ydpi"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Touch</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@touch"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Navigation</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@navigation"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Keypad</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@keypad"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Network</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@network"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">IMEI</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imei"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">IMSI</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imsi"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Open GL ES Version</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@openGlEsVersion"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Open GL Compressed Texture Formats</TD>
-                                            <TD>
-                                                <UL>
-                                                    <xsl:for-each select="TestResult/DeviceInfo/OpenGLCompressedTextureFormatsInfo/TextureFormat">
-                                                        <LI><xsl:value-of select="@name" /></LI>
-                                                    </xsl:for-each>
-                                                </UL>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Features</TD>
-                                            <TD>
-                                                <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
-                                                    <xsl:text>[</xsl:text>
-                                                    <xsl:choose>
-                                                        <xsl:when test="@available = 'true'">
-                                                            <xsl:text>X</xsl:text>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <xsl:text>_</xsl:text>
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                    <xsl:text>] </xsl:text>
-
-                                                    <xsl:value-of select="@name" />
-                                                    <br />
+                                <TABLE>
+                                    <TR>
+                                        <TD class="rowtitle">Build Model</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_model"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Name</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildName"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Brand</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_brand"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Manufacturer</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_manufacturer"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Device ID</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@deviceID"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Firmware Version</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildVersion"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Firmware Build Number</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildID"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build Fingerprint</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@build_fingerprint"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build ABI</TD>
+                                        <TD>
+                                            <xsl:value-of
+                                              select="TestResult/DeviceInfo/BuildInfo/@build_abi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Build ABI2</TD>
+                                        <TD>
+                                            <xsl:value-of
+                                              select="TestResult/DeviceInfo/BuildInfo/@build_abi2"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Android Platform Version</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@androidPlatformVersion"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Supported Locales</TD>
+                                        <TD>
+                                            <xsl:call-template name="formatDelimitedString">
+                                                <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@locales"/>
+                                            </xsl:call-template>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Screen Size</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_size"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Resolution</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/Screen/@resolution"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Density</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density"/>
+                                            (<xsl:value-of select="TestResult/DeviceInfo/Screen/@screen_density_bucket"/>)
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Phone number</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/PhoneSubInfo/@subscriberId"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">X dpi</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Xdpi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Y dpi</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@Ydpi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Touch</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@touch"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Navigation</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@navigation"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Keypad</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@keypad"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Network</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@network"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">IMEI</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imei"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">IMSI</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@imsi"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Open GL ES Version</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@openGlEsVersion"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Open GL Compressed Texture Formats</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/OpenGLCompressedTextureFormatsInfo/TextureFormat">
+                                                    <LI><xsl:value-of select="@name" /></LI>
                                                 </xsl:for-each>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Other Features</TD>
-                                            <TD>
-                                                <UL>
-                                                    <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='other']">
-                                                        <LI><xsl:value-of select="@name" /></LI>
-                                                    </xsl:for-each>
-                                                </UL>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Root Processes</TD>
-                                            <TD>
-                                                <UL>
-                                                    <xsl:for-each select="TestResult/DeviceInfo/ProcessInfo/Process[@uid='0']">
-                                                        <LI><xsl:value-of select="@name" /></LI>
-                                                    </xsl:for-each>
-                                                </UL>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Partitions</TD>
-                                            <TD>
-                                                <UL>
-                                                    <pre>
-                                                        <xsl:call-template name="formatDelimitedString">
-                                                            <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@partitions" />
-                                                            <xsl:with-param name="numTokensPerRow" select="1" />
-                                                        </xsl:call-template>
-                                                    </pre>
-                                                </UL>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">System Libraries</TD>
-                                            <TD>
-                                                <UL>
-                                                    <xsl:for-each select="TestResult/DeviceInfo/SystemLibrariesInfo/Library">
-                                                        <LI><xsl:value-of select="@name" /></LI>
-                                                    </xsl:for-each>
-                                                </UL>
-                                            </TD>
-                                        </TR>
-                                    </TABLE>
-                                </div>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">System Libraries</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/SystemLibrariesInfo/Library">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Root Processes</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/ProcessInfo/Process[@uid='0']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+
+                                </TABLE>
                             </TD>
 
-                            <!-- plan information -->
-                            <TD>
-                                <div id="summaryinfo">
-                                    <TABLE width="75%">
-                                        <TR>
-                                            <TD class="rowtitle">CTS version</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/HostInfo/Cts/@version"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Test timeout</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/HostInfo/Cts/IntValue[@name='testStatusTimeoutMs']/@value" /> ms
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Host Info</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/HostInfo/@name"/>
-                                                (<xsl:value-of select="TestResult/HostInfo/Os/@name"/> - 
-                                                  <xsl:value-of select="TestResult/HostInfo/Os/@version"/>)
-                                            </TD>
-                                        </TR>
-                                        <TR><TD><BR></BR></TD><TD></TD></TR>
-                                        <TR>
-                                            <TD class="rowtitle">Plan name</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/@testPlan"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Start time</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/@starttime"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">End time</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/@endtime"/>
-                                            </TD>
-                                        </TR>
+                            <TD width="25%">
+                                <TABLE>
 
-                                        <!-- Test Summary -->
-                                        <TR><TD><BR></BR></TD><TD></TD></TR>
-                                        <TR>
-                                            <TD class="rowtitle">Tests Passed</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/Summary/@pass"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Tests Failed</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/Summary/@failed"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Tests Timed out</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/Summary/@timeout"/>
-                                            </TD>
-                                        </TR>
-                                        <TR>
-                                            <TD class="rowtitle">Tests Not Executed</TD>
-                                            <TD>
-                                                <xsl:value-of select="TestResult/Summary/@notExecuted"/>
-                                            </TD>
-                                        </TR>
-                                    </TABLE>
-                                </div>
+                                    <TR>
+                                        <TD class="rowtitle">Features</TD>
+                                        <TD>
+                                            <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='sdk']">
+                                                <xsl:text>[</xsl:text>
+                                                <xsl:choose>
+                                                    <xsl:when test="@available = 'true'">
+                                                        <xsl:text>X</xsl:text>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xsl:text>_</xsl:text>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                                <xsl:text>] </xsl:text>
+
+                                                <xsl:value-of select="@name" />
+                                                <br />
+                                            </xsl:for-each>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Other Features</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/FeatureInfo/Feature[@type='other']">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Partitions</TD>
+                                        <TD>
+                                            <pre>
+                                                <xsl:call-template name="formatDelimitedString">
+                                                    <xsl:with-param name="string" select="TestResult/DeviceInfo/BuildInfo/@partitions" />
+                                                    <xsl:with-param name="numTokensPerRow" select="1" />
+                                                </xsl:call-template>
+                                            </pre>
+                                        </TD>
+                                    </TR>
+                                </TABLE>
+                            </TD>
+
+                            <TD width="25%">
+                                <TABLE>
+                                    <TR>
+                                        <TD class="rowtitle">Packages</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/PackageInfo/Package">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                </TABLE>
+                            </TD>
+
+                            <TD width="25%">
+                                <TABLE>
+                                    <TR>
+                                        <TD class="rowtitle">Properties</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/PropertyInfo/Property">
+                                                    <LI><xsl:value-of select="@name" />: <xsl:value-of select="@value" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                </TABLE>
+                            </TD>
+                        </TR>
+                    </TABLE>
+                    <br />
+                    <br />
+                </DIV>
+
+                <DIV>
+                    <TABLE class="summary">
+                        <TR>
+                            <TH colspan="2">Test Summary</TH>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">CTS version</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/HostInfo/Cts/@version"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Test timeout</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/HostInfo/Cts/IntValue[@name='testStatusTimeoutMs']/@value" /> ms
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Host Info</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/HostInfo/@name"/>
+                                (<xsl:value-of select="TestResult/HostInfo/Os/@name"/> - 
+                                  <xsl:value-of select="TestResult/HostInfo/Os/@version"/>)
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Plan name</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/@testPlan"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Start time</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/@starttime"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">End time</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/@endtime"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Tests Passed</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/Summary/@pass"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Tests Failed</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/Summary/@failed"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Tests Timed out</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/Summary/@timeout"/>
+                            </TD>
+                        </TR>
+                        <TR>
+                            <TD class="rowtitle">Tests Not Executed</TD>
+                            <TD>
+                                <xsl:value-of select="TestResult/Summary/@notExecuted"/>
                             </TD>
                         </TR>
                     </TABLE>
@@ -368,8 +408,8 @@
 
                 <!-- High level summary of test execution -->
                 <h2 align="center">Test Summary by Package</h2>
-                <DIV id="testsummary">
-                    <TABLE>
+                <DIV>
+                    <TABLE class="testsummary">
                         <TR>
                             <TH>Test Package</TH>
                             <TH>Passed</TH>
@@ -435,26 +475,23 @@
 
     <xsl:template name="detailedTestReport">
         <xsl:param name="resultFilter" />
-        <DIV id="testdetail">
+        <DIV>
             <xsl:for-each select="TestResult/TestPackage">
                 <xsl:if test="$resultFilter=''
                         or count(TestSuite//TestCase/Test[@result=$resultFilter]) &gt; 0">
-                    <DIV id="none">
-                        <TABLE>
-                            <TR>
-                                <TD class="none" align="left">
-                                    <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
-                                    <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/></a>
-                                </TD>
-                            </TR>
-                        </TABLE>
-                    </DIV>
 
-                    <TABLE>
+                    <TABLE class="testdetails">
                         <TR>
-                            <TH width="25%">Test</TH>
-                            <TH width="7%">Result</TH>
-                            <TH width="68%">Failure Details</TH>
+                            <TD class="package" colspan="3">
+                                <xsl:variable name="href"><xsl:value-of select="@appPackageName"/></xsl:variable>
+                                <a name="{$href}">Compatibility Test Package: <xsl:value-of select="@appPackageName"/></a>
+                            </TD>
+                        </TR>
+
+                        <TR>
+                            <TH width="30%">Test</TH>
+                            <TH width="5%">Result</TH>
+                            <TH>Failure Details</TH>
                         </TR>
 
                         <!-- test case -->
@@ -505,7 +542,7 @@
                                                         </div>
                                                     </TD>
                                                    <TD class="failuredetails">
-                                                        <div id="details">
+                                                        <div class="details">
                                                             A test that was a known failure actually passed. Please check.
                                                         </div>
                                                    </TD>
@@ -529,7 +566,7 @@
                                                         </div>
                                                     </TD>
                                                     <TD class="failuredetails">
-                                                        <div id="details">
+                                                        <div class="details">
                                                             <xsl:value-of select="FailedScene/@message"/>
                                                         </div>
                                                     </TD>
