@@ -20,7 +20,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
-LOCAL_JAVA_RESOURCE_DIRS := res
+LOCAL_JAVA_RESOURCE_DIRS := 
 LOCAL_JAR_MANIFEST := MANIFEST.mf
 
 LOCAL_MODULE := cts-native-xml-generator
