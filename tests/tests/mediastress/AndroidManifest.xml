@@ -34,6 +34,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name="android.mediastress.cts.NativeMediaActivity"
+                  android:label="NativeMedia" />
     </application>
     <instrumentation android:name="android.test.InstrumentationTestRunner"
             android:targetPackage="com.android.cts.mediastress"
