@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package android.animation.cts;
 
-import android.animation.ArgbEvaluator;
-import android.animation.FloatEvaluator;
-import android.animation.IntEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.test.ActivityInstrumentationTestCase2;
@@ -51,7 +48,7 @@ public class ValueAnimatorTest extends
     public void testIsRunning() throws Throwable {
         assertFalse(mValueAnimator.isRunning());
         startAnimation(mValueAnimator);
-        ValueAnimator valueAnimatorReturned = mActivity.view.bounceAnimator;
+        ValueAnimator valueAnimatorReturned = mActivity.view.bounceYAnimator;
         assertTrue(valueAnimatorReturned.isRunning());
     }
 
@@ -66,7 +63,8 @@ public class ValueAnimatorTest extends
     }
 
     public void testRepeatMode() throws Throwable {
-        ValueAnimator mValueAnimator = mActivity.createAnimatorWithRepeatMode(ValueAnimator.RESTART);
+        ValueAnimator mValueAnimator = mActivity.createAnimatorWithRepeatMode(
+            ValueAnimator.RESTART);
         startAnimation(mValueAnimator);
         assertEquals(ValueAnimator.RESTART, mValueAnimator.getRepeatMode());
     }
