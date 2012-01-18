@@ -52,6 +52,22 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
             }
         }
 
+        public synchronized void waitForSignal(long millis) throws InterruptedException {
+            if (millis == 0) {
+                waitForSignal();
+                return;
+            }
+
+            long deadline = System.currentTimeMillis() + millis;
+            while (!signalled) {
+                long delay = deadline - System.currentTimeMillis();
+                if (delay <= 0) {
+                    break;
+                }
+                wait(delay);
+            }
+        }
+
         public synchronized boolean isSignalled() {
             return signalled;
         }

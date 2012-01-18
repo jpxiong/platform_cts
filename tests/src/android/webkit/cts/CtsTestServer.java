@@ -39,6 +39,7 @@ import org.apache.http.params.HttpParams;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -95,6 +96,7 @@ public class CtsTestServer {
     private static final String NUM_BYTES_PARAMETER = "numBytes";
 
     public static final String ASSET_PREFIX = "/assets/";
+    public static final String RAW_PREFIX = "raw/";
     public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
     public static final String APPCACHE_PATH = "/appcache.html";
     public static final String APPCACHE_MANIFEST_PATH = "/appcache.manifest";
@@ -124,6 +126,7 @@ public class CtsTestServer {
     private String mServerUri;
     private AssetManager mAssets;
     private Context mContext;
+    private Resources mResources;
     private boolean mSsl;
     private MimeTypeMap mMap;
     private String mLastQuery;
@@ -166,6 +169,7 @@ public class CtsTestServer {
         sInstance = this;
         mContext = context;
         mAssets = mContext.getAssets();
+        mResources = mContext.getResources();
         mSsl = ssl;
         if (mSsl) {
             mServerUri = "https://localhost:" + SSL_SERVER_PORT;
@@ -482,7 +486,18 @@ public class CtsTestServer {
             path = path.substring(ASSET_PREFIX.length());
             // request for an asset file
             try {
-                InputStream in = mAssets.open(path);
+                InputStream in;
+                if (path.startsWith(RAW_PREFIX)) {
+                  String resourceName = path.substring(RAW_PREFIX.length());
+                  int id = mResources.getIdentifier(resourceName, "raw", mContext.getPackageName());
+                  if (id == 0) {
+                    Log.w(TAG, "Can't find raw resource " + resourceName);
+                    throw new IOException();
+                  }
+                  in = mResources.openRawResource(id);
+                } else {
+                  in = mAssets.open(path);
+                }
                 response = createResponse(HttpStatus.SC_OK);
                 InputStreamEntity entity = new InputStreamEntity(in, in.available());
                 String mimeType =
@@ -680,6 +695,10 @@ public class CtsTestServer {
         }
     }
 
+    protected DefaultHttpServerConnection createHttpServerConnection() {
+        return new DefaultHttpServerConnection();
+    }
+
     private static class ServerThread extends Thread {
         private CtsTestServer mServer;
         private ServerSocket mSocket;
@@ -772,7 +791,7 @@ public class CtsTestServer {
                 try {
                     Socket socket = mSocket.accept();
 
-                    DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
+                    DefaultHttpServerConnection conn = mServer.createHttpServerConnection();
                     HttpParams params = new BasicHttpParams();
                     params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_0);
                     conn.bind(socket, params);
