@@ -147,14 +147,7 @@ public class Sphere {
     public int getTotalIndices() {
         return mTotalIndices;
     }
-    /** once VBO buffer is generated, model data can be dropped */
-    public void releaseVertexBuffer() {
-        mVertices = null;
-    }
 
-    public void releaseIndexBuffer() {
-        mVertices = null;
-    }
 
     private int max(int[] array) {
         int max = array[0];
