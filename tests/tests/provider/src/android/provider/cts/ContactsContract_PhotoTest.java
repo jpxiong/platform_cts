@@ -16,9 +16,8 @@
 
 package android.provider.cts;
 
-import com.android.cts.stub.R;
-
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.IContentProvider;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
@@ -28,7 +27,6 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,12 +35,16 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
 
     private static final byte[] EMPTY_TEST_PHOTO_DATA = "".getBytes();
 
+    private Context mContext;
+
     private ContentResolver mResolver;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mResolver = getInstrumentation().getTargetContext().getContentResolver();
+
+        mContext= getInstrumentation().getTargetContext();
+        mResolver = mContext.getContentResolver();
         IContentProvider provider = mResolver.acquireProvider(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
@@ -62,7 +64,7 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
         assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
 
         TestData photoData = rawContact.newDataRow(Photo.CONTENT_ITEM_TYPE)
-                .with(Photo.PHOTO, getTestPhotoData())
+                .with(Photo.PHOTO, PhotoUtil.getTestPhotoData(mContext))
                 .insert();
 
         photoData.load();
@@ -92,31 +94,10 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
         assertNull(Contacts.openContactPhotoInputStream(mResolver, contact.getUri(), false));
     }
 
-    private byte[] getTestPhotoData() {
-        InputStream input = getInstrumentation().getTargetContext().getResources()
-                .openRawResource(R.drawable.testimage);
-        return readInputStreamFully(input);
-    }
-
-    protected byte[] readInputStreamFully(InputStream is) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buffer = new byte[10000];
-        int count;
-        try {
-            while ((count = is.read(buffer)) != -1) {
-                os.write(buffer, 0, count);
-            }
-            is.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return os.toByteArray();
-    }
-
     private void assertPhotoStream(InputStream photoStream) throws IOException {
         try {
             assertNotNull(photoStream);
-            byte[] actualBytes = readInputStreamFully(photoStream);
+            byte[] actualBytes = FileCopyHelper.readInputStreamFully(photoStream);
             assertTrue(actualBytes.length > 0);
         } finally {
             if (photoStream != null) {
