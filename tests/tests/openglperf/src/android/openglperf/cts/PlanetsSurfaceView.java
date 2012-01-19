@@ -20,23 +20,27 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 
 class PlanetsSurfaceView extends GLSurfaceView {
+    private final long RENDERING_TIMEOUT = 1900; // in msec, close to 2 secs
+    private final RenderingWatchDog mWatchDog = new RenderingWatchDog(RENDERING_TIMEOUT);
 
     public PlanetsSurfaceView(Context context, PlanetsRenderingParam param,
             RenderCompletionListener listener) {
         super(context);
 
         setEGLContextClientVersion(2);
-        setRenderer(new PlanetsRenderer(context, param, listener));
+        setRenderer(new PlanetsRenderer(context, param, listener, mWatchDog));
     }
 
     @Override
     public void onPause() {
+        mWatchDog.stop();
         super.onPause();
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
     public void onResume() {
+        mWatchDog.start();
         setRenderMode(RENDERMODE_CONTINUOUSLY);
         super.onResume();
     }

@@ -71,6 +71,7 @@ CTS_TEST_CASE_LIST := \
 	TestDeviceSetup \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
+	replicaisland \
 	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
