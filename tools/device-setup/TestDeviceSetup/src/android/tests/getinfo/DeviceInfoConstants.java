@@ -23,6 +23,8 @@ package android.tests.getinfo;
  */
 public interface DeviceInfoConstants {
 
+    public static final String PROPERTIES = "properties";
+    public static final String PACKAGES = "packages";
     public static final String OPEN_GL_COMPRESSED_TEXTURE_FORMATS =
             "openGlCompressedTextureFormats";
     public static final String SYS_LIBRARIES = "systemlibraries";

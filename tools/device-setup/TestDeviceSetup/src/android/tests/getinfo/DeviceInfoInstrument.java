@@ -21,6 +21,7 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.FeatureInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -38,6 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoConstants {
 
@@ -134,6 +137,14 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         // System libraries
         String sysLibraries = getSystemLibraries();
         addResult(SYS_LIBRARIES, sysLibraries);
+
+        // Packages
+        String packages = getPackages();
+        addResult(PACKAGES, packages);
+
+        // Properties
+        String properties = getProperties();
+        addResult(PROPERTIES, properties);
 
         finish(Activity.RESULT_OK, mResults);
     }
@@ -288,7 +299,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         try {
             String[] rootProcesses = RootProcessScanner.getRootProcesses();
             for (String rootProcess : rootProcesses) {
-                builder.append(rootProcess).append(';');
+                builder.append(rootProcess).append(':').append(0).append(';');
             }
         } catch (Exception exception) {
             Log.e(TAG, "Error getting processes: " + exception.getMessage(), exception);
@@ -344,4 +355,38 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         return builder.toString();
     }
 
+    private String getPackages() {
+        StringBuilder value = new StringBuilder();
+        PackageManager pm = getContext().getPackageManager();
+        for (PackageInfo pkg : pm.getInstalledPackages(0)) {
+            value.append(pkg.packageName).append(";");
+        }
+        return value.toString();
+    }
+
+    private String getProperties() {
+        Pattern pattern = Pattern.compile("\\[(ro\\..+)\\]: \\[(.+)\\]");
+        StringBuilder props = new StringBuilder();
+        Scanner scanner = null;
+        try {
+            Process getprop = new ProcessBuilder("getprop").start();
+            scanner = new Scanner(getprop.getInputStream());
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.matches()) {
+                    String name = matcher.group(1);
+                    String value = matcher.group(2);
+                    props.append(name).append(';').append(value).append('!');
+                }
+            }
+        } catch (IOException e) {
+            return "Not able to run geprop for properties information.";
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+        }
+        return props.toString();
+    }
 }

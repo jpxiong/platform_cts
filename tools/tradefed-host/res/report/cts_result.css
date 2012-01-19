@@ -22,18 +22,8 @@ body {
     margin:10;
 }
 
-table {
-    font-size:1em;
-    margin:0 0 1em;
-    padding:0;
-    border-collapse:collapse;
-    border-width:0;
-    empty-cells:show;
-    width: 95%;
-}
-
 /* Report logo and device name */
-#title table {
+table.title {
     padding:5px;
     border-width: 0px;
     margin-left:auto;
@@ -41,120 +31,82 @@ table {
     vertical-align:middle;
 }
 
-/* Device and test plan summary below the title */
-#summary table {
+table.summary {
     background-color: rgb(212, 233, 169);
-    -moz-border-radius:5px;
-    border-radius:5px;
-    padding:5px;
-    border-color: #A5C639 #A5C639 #A5C639 #A5C639;
-    border-width: 0px 0px 0px 0px;
+    border-collapse:collapse;
+    border: 0px solid #A5C639;
     margin-left:auto;
     margin-right:auto;
-    width:80%;
 }
 
-#summary th {
+table.summary th {
     background-color: #A5C639;
-    font-size:1.2em;
-    height: 2em;
-    width: 50%;
+    font-size: 1.2em;
+    padding: 0.5em;
 }
 
-#summary td {
+table.summary td {
     border-width: 0px 0px 0px 0px;
     border-color: gray;
     border-style: inset;
-    font-size:1em;
+    font-size: 1em;
+    padding: 0.5em;
     vertical-align: top;
 }
 
-#summaryinfo table {
+table.testsummary {
     background-color: rgb(212, 233, 169);
-    padding:5px;
-    border-width:0;
+    border-collapse:collapse;
     margin-left:auto;
     margin-right:auto;
 }
 
-#summaryinfo td {
-    padding:1px;
-    border-width: 0px 0px 0px 0px;
-    vertical-align: top;
-}
-
-/* The test summary */
-#testsummary table {
-    background-color: rgb(212, 233, 169);
-    padding:5px;
-    border-width:1;
-    border-color: #A5C639;
-    margin-left:auto;
-    margin-right:auto;
-    width: 40%;
-}
-
-#testsummary th {
+table.testsummary th {
     background-color: #A5C639;
-    border-width: 1px;
-    border-color: gray;
-    border-style: outset;
-    height: 2em;
+    border: 1px outset gray;
+    padding: 0.5em;
 }
 
-#testsummary td {
-    border-width: 1px;
-    border-color: #A5C639;
-    border-style: outset;
+table.testsummary td {
+    border: 1px outset #A5C639;
+    padding: 0.5em;
     text-align: center;
 }
 
-/* The test details */
-#testdetail table {
+table.testdetails {
     background-color: rgb(212, 233, 169);
-    padding:5px;
+    border-collapse:collapse;
     border-width:1;
     border-color: #A5C639;
     margin-left:auto;
     margin-right:auto;
-    width: 95%;
-    table-layout:fixed;
+    margin-bottom: 2em;
     vertical-align: top;
+    width: 95%;
 }
 
-#testdetail th {
+table.testdetails th {
     background-color: #A5C639;
     border-width: 1px;
     border-color: gray;
     border-style: outset;
     height: 2em;
+    padding: 0.2em;
 }
 
-#testdetail td {
+table.testdetails td {
     border-width: 1px;
     border-color: #A5C639;
     border-style: outset;
     text-align: left;
     vertical-align: top;
-    padding:1;
+    padding: 0.2em;
 }
 
-/* The test package name */
-#none table {
-    border-width:0;
-    border-color: white;
+table.testdetails td.package {
     background-color: white;
-    text-align:left;
-    border-collapse:collapse;
-}
-
-#none td {
-    border-width:0;
-    border-color: white;
-    background-color: white;
-    text-align:left;
-    border-collapse:collapse;
-    font-weight:bold;
+    border: 0px;
+    font-weight: bold;
 }
 
 /* Test cell details */
@@ -224,7 +176,7 @@ td.testsuite {
     font-weight:bold;
 }
 
-#details {
+div.details {
     white-space: pre-wrap;       /* css-3 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */

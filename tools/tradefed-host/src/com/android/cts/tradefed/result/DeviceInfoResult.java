@@ -15,13 +15,13 @@
  */
 package com.android.cts.tradefed.result;
 
-import android.tests.getinfo.DeviceInfoConstants;
-
 import com.android.tradefed.log.LogUtil.CLog;
 
 import org.kxml2.io.KXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import android.tests.getinfo.DeviceInfoConstants;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -42,20 +42,35 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private static final String BUILD_TAG = "BuildInfo";
     private static final String PHONE_TAG = "PhoneSubInfo";
     private static final String SCREEN_TAG = "Screen";
+
     private static final String FEATURE_INFO_TAG = "FeatureInfo";
     private static final String FEATURE_TAG = "Feature";
     private static final String FEATURE_ATTR_DELIM = ":";
     private static final String FEATURE_DELIM = ";";
+
     private static final String OPENGL_TEXTURE_FORMATS_INFO_TAG =
             "OpenGLCompressedTextureFormatsInfo";
     private static final String OPENGL_TEXTURE_FORMAT_TAG = "TextureFormat";
     private static final String OPENGL_TEXTURE_FORMAT_DELIM = ";";
+
     private static final String SYSLIB_INFO_TAG = "SystemLibrariesInfo";
     private static final String SYSLIB_TAG = "Library";
     private static final String SYSLIB_DELIM = ";";
+
     private static final String PROCESS_INFO_TAG = "ProcessInfo";
     private static final String PROCESS_TAG = "Process";
     private static final String PROCESS_DELIM = ";";
+    private static final String PROCESS_ATTR_DELIM = ":";
+
+    private static final String PACKAGE_INFO_TAG = "PackageInfo";
+    private static final String PACKAGE_TAG = "Package";
+    private static final String PACKAGE_DELIM = ";";
+
+    private static final String PROPERTY_INFO_TAG = "PropertyInfo";
+    private static final String PROPERTY_TAG = "Property";
+    private static final String PROPERTY_ATTR_DELIM = ";";
+    private static final String PROPERTY_DELIM = "!";
+
 
     private Map<String, String> mMetrics = new HashMap<String, String>();
 
@@ -93,6 +108,8 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
             String textureData = getMetric(metricsCopy,
                     DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS);
+            String packages = getMetric(metricsCopy, DeviceInfoConstants.PACKAGES);
+            String properties = getMetric(metricsCopy, DeviceInfoConstants.PROPERTIES);
 
             // dump the remaining metrics without translation
             serializer.startTag(ns, BUILD_TAG);
@@ -105,6 +122,8 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             serializeProcessInfo(serializer, processData);
             serializeSystemLibrariesInfo(serializer, sysLibData);
             serializeOpenGLCompressedTextureFormatsInfo(serializer, textureData);
+            serializePackageInfo(serializer, packages);
+            serializePropertyInfo(serializer, properties);
         } else {
             // this might be expected, if device info collection was turned off
             CLog.d("Could not find device info");
@@ -125,141 +144,85 @@ class DeviceInfoResult extends AbstractXmlPullParser {
         return value;
     }
 
-    /**
-     * Prints XML indicating what features are supported by the device. It parses a string from the
-     * featureData argument that is in the form of "feature1:true;feature2:false;featuer3;true;"
-     * with a trailing semi-colon.
-     *
-     * <pre>
-     *  <FeatureInfo>
-     *     <Feature name="android.name.of.feature" available="true" />
-     *     ...
-     *   </FeatureInfo>
-     * </pre>
-     *
-     * @param serializer used to create XML
-     * @param featureData raw unparsed feature data
-     */
     private void serializeFeatureInfo(KXmlSerializer serializer, String featureData)
             throws IOException {
-        serializer.startTag(ns, FEATURE_INFO_TAG);
-
-        if (featureData == null) {
-            featureData = "";
-        }
-
-        String[] featurePairs = featureData.split(FEATURE_DELIM);
-        for (String featurePair : featurePairs) {
-            String[] nameTypeAvailability = featurePair.split(FEATURE_ATTR_DELIM);
-            if (nameTypeAvailability.length >= 3) {
-                serializer.startTag(ns, FEATURE_TAG);
-                serializer.attribute(ns, "name", nameTypeAvailability[0]);
-                serializer.attribute(ns, "type", nameTypeAvailability[1]);
-                serializer.attribute(ns, "available", nameTypeAvailability[2]);
-                serializer.endTag(ns, FEATURE_TAG);
-            }
-        }
-        serializer.endTag(ns, FEATURE_INFO_TAG);
+        serialize(serializer, FEATURE_INFO_TAG, FEATURE_TAG, FEATURE_DELIM, FEATURE_ATTR_DELIM,
+                featureData, "name", "type", "available");
     }
 
-    /**
-     * Prints XML data indicating what particular processes of interest were running on the device.
-     * It parses a string from the rootProcesses argument that is in the form of
-     * "processName1;processName2;..." with a trailing semi-colon.
-     *
-     * <pre>
-     *   <ProcessInfo>
-     *     <Process name="long_cat_viewer" uid="0" />
-     *     ...
-     *   </ProcessInfo>
-     * </pre>
-     */
     private void serializeProcessInfo(KXmlSerializer serializer, String rootProcesses)
             throws IOException {
-        serializer.startTag(ns, PROCESS_INFO_TAG);
-
-        if (rootProcesses == null) {
-            rootProcesses = "";
-        }
-
-        String[] processNames = rootProcesses.split(PROCESS_DELIM);
-        for (String processName : processNames) {
-            processName = processName.trim();
-            if (processName.length() > 0) {
-                serializer.startTag(ns, PROCESS_TAG);
-                serializer.attribute(ns, "name", processName);
-                serializer.attribute(ns, "uid", "0");
-                serializer.endTag(ns, PROCESS_TAG);
-            }
-        }
-        serializer.endTag(ns, PROCESS_INFO_TAG);
+        serialize(serializer, PROCESS_INFO_TAG, PROCESS_TAG, PROCESS_DELIM, PROCESS_ATTR_DELIM,
+                rootProcesses, "name", "uid");
     }
 
-    /**
-     * Prints XML data in two level hierarchy.
-     * It parses a string from the root argument that is in the form of
-     * "element1-delimiter-element2-delimiter..." with a trailing delimiter
-     *
-     * <pre>
-     *   <infoTag>
-     *     <elementTag name="element1" />
-     *     ...
-     *   </infoTag>
-     * </pre>
-     */
-    private void serializeSimpleInfo(KXmlSerializer serializer, String root,
-            String infoTag, String elementTag, String delimiter)
-            throws IOException {
-        serializer.startTag(ns, infoTag);
-
-        if (root == null) {
-            root = "";
-        }
-
-        String[] elemNames = root.split(delimiter);
-        for (String elemName : elemNames) {
-            elemName = elemName.trim();
-            if (elemName.length() > 0) {
-                serializer.startTag(ns, elementTag);
-                serializer.attribute(ns, "name", elemName);
-                serializer.endTag(ns, elementTag);
-            }
-        }
-        serializer.endTag(ns, infoTag);
-    }
-
-    /**
-     * Prints XML data listing available OpenGL Compressed Texture Formats.
-     *
-     * <pre>
-     *   <OpenGLCompressedTextureFormatsInfo>
-     *     <TextureFormat name="abc" />
-     *     ...
-     *   </OpenGLCompressedTextureFormatsInfo>
-     * </pre>
-     */
     private void serializeOpenGLCompressedTextureFormatsInfo(KXmlSerializer serializer,
-            String root) throws IOException {
-        serializeSimpleInfo(serializer, root, OPENGL_TEXTURE_FORMATS_INFO_TAG,
-                OPENGL_TEXTURE_FORMAT_TAG,
-                OPENGL_TEXTURE_FORMAT_DELIM);
+            String formats) throws IOException {
+        serialize(serializer, OPENGL_TEXTURE_FORMATS_INFO_TAG, OPENGL_TEXTURE_FORMAT_TAG,
+                OPENGL_TEXTURE_FORMAT_DELIM, null, formats, "name");
+    }
+
+    private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String libs)
+            throws IOException {
+        serialize(serializer, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM, null, libs, "name");
+    }
+
+    private void serializePackageInfo(KXmlSerializer serializer, String packages)
+            throws IOException {
+        serialize(serializer, PACKAGE_INFO_TAG, PACKAGE_TAG, PACKAGE_DELIM, null, packages, "name");
+    }
+
+    private void serializePropertyInfo(KXmlSerializer serializer, String propertyData)
+            throws IOException {
+        serialize(serializer, PROPERTY_INFO_TAG, PROPERTY_TAG, PROPERTY_DELIM, PROPERTY_ATTR_DELIM,
+                propertyData, "name", "value");
     }
 
     /**
-     * Prints XML data listing available system libraries.
-     * It parses a string from the rootLibraries argument that is in the form of
-     * "libName1;libName2;..." with a trailing semi-colon.
+     * Serializes a XML structure where there is an outer tag with tags inside it.
      *
      * <pre>
-     *   <SystemLibrariesInfo>
-     *     <Library name="a.b.c" />
-     *     ...
-     *   </SystemLibrariesInfo>
+     *   Input: value1:value2;value3:value4
+     *
+     *   Output:
+     *   <OuterTag>
+     *     <SubTag attr1="value1" attr2="value2" />
+     *     <SubTag attr1="value3" attr2="value4" />
+     *   </OuterTag>
      * </pre>
+     *
+     * @param serializer to do it
+     * @param tag would be "OuterTag"
+     * @param subTag would be "SubTag"
+     * @param delim would be ";"
+     * @param attrDelim would be ":" in the example but can be null if only one attrName given
+     * @param data would be "value1:value2;value3:value4"
+     * @param attrNames would be an array with "attr1", "attr2"
+     * @throws IOException if there is a problem
      */
-    private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String rootLibraries)
-            throws IOException {
-        serializeSimpleInfo(serializer, rootLibraries, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM);
+    private void serialize(KXmlSerializer serializer, String tag, String subTag,
+            String delim, String attrDelim, String data, String... attrNames) throws IOException {
+        serializer.startTag(ns, tag);
+
+        if (data == null) {
+            data = "";
+        }
+
+        String[] values = data.split(delim);
+        for (String value : values) {
+            if (!value.isEmpty()) {
+                String[] attrValues = attrDelim != null ? value.split(attrDelim) : new String[] {value};
+                if (attrValues.length == attrNames.length) {
+                    serializer.startTag(ns, subTag);
+                    for (int i = 0; i < attrNames.length; i++) {
+                        serializer.attribute(ns, attrNames[i], attrValues[i]);
+                    }
+                    serializer.endTag(ns,  subTag);
+                }
+            }
+        }
+
+        serializer.endTag(ns, tag);
     }
 
     /**
@@ -282,22 +245,18 @@ class DeviceInfoResult extends AbstractXmlPullParser {
                         parser.getName().equals(BUILD_TAG)) {
                     addMetricsFromAttributes(parser);
                 } else if (parser.getName().equals(FEATURE_INFO_TAG)) {
-                    // store features into metrics map, in the same format as when collected from
-                    // device
                     mMetrics.put(DeviceInfoConstants.FEATURES, parseFeatures(parser));
                 } else if (parser.getName().equals(PROCESS_INFO_TAG)) {
-                    // store processes into metrics map, in the same format as when collected from
-                    // device
                     mMetrics.put(DeviceInfoConstants.PROCESSES, parseProcess(parser));
                 } else if (parser.getName().equals(SYSLIB_INFO_TAG)) {
-                    // store system libs into metrics map, in the same format as when collected from
-                    // device
                     mMetrics.put(DeviceInfoConstants.SYS_LIBRARIES, parseSystemLibraries(parser));
                 } else if (parser.getName().equals(OPENGL_TEXTURE_FORMATS_INFO_TAG)) {
-                    // store OpenGL texture formats into metrics map, in the same format as when
-                    // collected from device
                     mMetrics.put(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
                             parseOpenGLCompressedTextureFormats(parser));
+                } else if (parser.getName().equals(PACKAGE_INFO_TAG)) {
+                    mMetrics.put(DeviceInfoConstants.PACKAGES, parsePackages(parser));
+                } else if (parser.getName().equals(PROPERTY_INFO_TAG)) {
+                    mMetrics.put(DeviceInfoConstants.PROPERTIES, parseProperties(parser));
                 }
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
@@ -306,99 +265,88 @@ class DeviceInfoResult extends AbstractXmlPullParser {
         }
     }
 
-    /**
-     * Parse process XML, and return its contents as a delimited String
-     */
-    private String parseProcess(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (!parser.getName().equals(PROCESS_INFO_TAG)) {
-            throw new XmlPullParserException(String.format(
-                    "invalid XML: Expected %s tag but received %s", PROCESS_INFO_TAG,
-                    parser.getName()));
-        }
-        StringBuilder processString = new StringBuilder();
-        int eventType = parser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(PROCESS_TAG)) {
-                processString.append(getAttribute(parser, "name"));
-                processString.append(PROCESS_DELIM);
-            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(
-                    PROCESS_INFO_TAG)) {
-                return processString.toString();
-            }
-            eventType = parser.next();
-        }
-        return processString.toString();
-    }
-
-    /**
-     * Parse feature XML, and return its contents as a delimited String
-     */
     private String parseFeatures(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (!parser.getName().equals(FEATURE_INFO_TAG)) {
-            throw new XmlPullParserException(String.format(
-                    "invalid XML: Expected %s tag but received %s", FEATURE_INFO_TAG,
-                    parser.getName()));
-        }
-        StringBuilder featureString = new StringBuilder();
-        int eventType = parser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(FEATURE_TAG)) {
-                featureString.append(getAttribute(parser, "name"));
-                featureString.append(FEATURE_ATTR_DELIM);
-                featureString.append(getAttribute(parser, "type"));
-                featureString.append(FEATURE_ATTR_DELIM);
-                featureString.append(getAttribute(parser, "available"));
-                featureString.append(FEATURE_DELIM);
-            } else if (eventType == XmlPullParser.END_TAG
-                    && parser.getName().equals(FEATURE_INFO_TAG)) {
-                return featureString.toString();
-            }
-            eventType = parser.next();
-        }
-        return featureString.toString();
-
+        return parseTag(parser, FEATURE_INFO_TAG, FEATURE_TAG, FEATURE_DELIM, FEATURE_ATTR_DELIM,
+                "name", "type", "available");
     }
 
-    /**
-     * Parse two-level hierarchy XML, and return its contents as a delimited String
-     */
-    private String parseSimpleInfo(XmlPullParser parser, String infoTag, String elementTag,
-            String delimiter) throws XmlPullParserException, IOException {
-        if (!parser.getName().equals(infoTag)) {
-            throw new XmlPullParserException(String.format(
-                    "invalid XML: Expected %s tag but received %s", infoTag,
-                    parser.getName()));
-        }
-        StringBuilder result = new StringBuilder();
-        int eventType = parser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(elementTag)) {
-                result.append(getAttribute(parser, "name"));
-                result.append(delimiter);
-            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(
-                    infoTag)) {
-                return result.toString();
-            }
-            eventType = parser.next();
-        }
-        return result.toString();
+    private String parseProcess(XmlPullParser parser) throws XmlPullParserException, IOException {
+        return parseTag(parser, PROCESS_INFO_TAG, PROCESS_TAG, PROCESS_DELIM,
+                PROCESS_ATTR_DELIM, "name", "uid");
     }
 
-    /**
-     * Parse JavaLibrariesInfo XML, and return its contents as a delimited String
-     */
     private String parseOpenGLCompressedTextureFormats(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        return parseSimpleInfo(parser, OPENGL_TEXTURE_FORMATS_INFO_TAG, OPENGL_TEXTURE_FORMAT_TAG,
-                OPENGL_TEXTURE_FORMAT_DELIM);
+        return parseTag(parser, OPENGL_TEXTURE_FORMATS_INFO_TAG, OPENGL_TEXTURE_FORMAT_TAG,
+                OPENGL_TEXTURE_FORMAT_DELIM, null, "name");
+    }
+
+    private String parseSystemLibraries(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        return parseTag(parser, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM, null, "name");
+    }
+
+    private String parsePackages(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        return parseTag(parser, PACKAGE_INFO_TAG, PACKAGE_TAG, PACKAGE_DELIM, null, "name");
+    }
+
+    private String parseProperties(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        return parseTag(parser, PROPERTY_INFO_TAG, PROPERTY_TAG, PROPERTY_DELIM,
+                PROPERTY_ATTR_DELIM, "name", "value");
     }
 
     /**
-     * Parse JavaLibrariesInfo XML, and return its contents as a delimited String
+     * Converts XML into a flattened string.
+     *
+     * <pre>
+     *   Input:
+     *   <OuterTag>
+     *     <SubTag attr1="value1" attr2="value2" />
+     *     <SubTag attr1="value3" attr2="value4" />
+     *   </OuterTag>
+     *
+     *   Output: value1:value2;value3:value4
+     * </pre>
+     *
+     * @param parser that parses the xml
+     * @param tag like "OuterTag"
+     * @param subTag like "SubTag"
+     * @param delim like ";"
+     * @param attrDelim like ":" or null if tehre is only one attribute
+     * @param attrNames like "attr1", "attr2"
+     * @return flattened string like "value1:value2;value3:value4"
+     * @throws XmlPullParserException
+     * @throws IOException
      */
-    private String parseSystemLibraries(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
-        return parseSimpleInfo(parser, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM);
+    private String parseTag(XmlPullParser parser, String tag, String subTag, String delim,
+            String attrDelim, String... attrNames) throws XmlPullParserException, IOException {
+        if (!parser.getName().equals(tag)) {
+            throw new XmlPullParserException(String.format(
+                    "invalid XML: Expected %s tag but received %s", tag,
+                    parser.getName()));
+        }
+        StringBuilder flattened = new StringBuilder();
+
+        for (int eventType = parser.getEventType();
+                eventType != XmlPullParser.END_DOCUMENT;
+                eventType = parser.next()) {
+
+            if (eventType == XmlPullParser.START_TAG && parser.getName().equals(subTag)) {
+                for (int i = 0; i < attrNames.length; i++) {
+                    flattened.append(getAttribute(parser, attrNames[i]));
+                    if (i + 1 < attrNames.length) {
+                        flattened.append(attrDelim);
+                    }
+                }
+                flattened.append(delim);
+            } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(tag)) {
+                break;
+            }
+        }
+
+        return flattened.toString();
     }
 
     /**
@@ -416,8 +364,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
      * <p/>
      * Check that the provided device info metrics are consistent with the currently stored metrics.
      * If any inconsistencies occur, logs errors and stores error messages in the metrics map
-     *
-     * @param runResult
      */
     public void populateMetrics(Map<String, String> metrics) {
         if (mMetrics.isEmpty()) {
