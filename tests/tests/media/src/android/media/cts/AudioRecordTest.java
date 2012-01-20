@@ -47,6 +47,10 @@ public class AudioRecordTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
+        if (!hasMicrophone()) {
+            return;
+        }
+
         /*
          * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
          * for the current thread. However, since we don't actually call loop() in the test,
@@ -80,8 +84,10 @@ public class AudioRecordTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        mAudioRecord.release();
-        mLooper.quit();
+        if (hasMicrophone()) {
+            mAudioRecord.release();
+            mLooper.quit();
+        }
         super.tearDown();
     }
 
