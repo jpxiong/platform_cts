@@ -19,6 +19,7 @@ package android.provider.cts;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.IContentProvider;
+import android.os.cts.FileUtils;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.Contacts;
@@ -97,7 +98,7 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
     private void assertPhotoStream(InputStream photoStream) throws IOException {
         try {
             assertNotNull(photoStream);
-            byte[] actualBytes = FileCopyHelper.readInputStreamFully(photoStream);
+            byte[] actualBytes = FileUtils.readInputStreamFully(photoStream);
             assertTrue(actualBytes.length > 0);
         } finally {
             if (photoStream != null) {

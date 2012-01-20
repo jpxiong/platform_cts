@@ -19,6 +19,7 @@ package android.provider.cts;
 import com.android.cts.stub.R;
 
 import android.content.Context;
+import android.os.cts.FileUtils;
 
 import java.io.InputStream;
 
@@ -26,6 +27,6 @@ public class PhotoUtil {
 
     public static byte[] getTestPhotoData(Context context) {
         InputStream input = context.getResources().openRawResource(R.drawable.testimage);
-        return FileCopyHelper.readInputStreamFully(input);
+        return FileUtils.readInputStreamFully(input);
     }
 }

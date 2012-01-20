@@ -18,7 +18,6 @@ package android.provider.cts;
 
 import android.content.Context;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -98,34 +97,4 @@ public class FileCopyHelper {
             mContext.deleteFile(path);
         }
     }
-
-    public static void createFile(File file, int numBytes) throws IOException {
-        File parentFile = file.getParentFile();
-        if (parentFile != null) {
-            parentFile.mkdirs();
-        }
-        byte[] buffer = new byte[numBytes];
-        FileOutputStream output = new FileOutputStream(file);
-        try {
-            output.write(buffer);
-        } finally {
-            output.close();
-        }
-    }
-
-    public static byte[] readInputStreamFully(InputStream is) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buffer = new byte[10000];
-        int count;
-        try {
-            while ((count = is.read(buffer)) != -1) {
-                os.write(buffer, 0, count);
-            }
-            is.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return os.toByteArray();
-    }
-
 }

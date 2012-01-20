@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.cts.FileUtils;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.test.InstrumentationTestCase;
@@ -193,7 +194,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
                 "/testimage1.jpg";
 
         int numBytes = 1337;
-        FileCopyHelper.createFile(new File(externalPath), numBytes);
+        FileUtils.createFile(new File(externalPath), numBytes);
 
         ContentValues values = new ContentValues();
         values.put(Media.ORIENTATION, 0);

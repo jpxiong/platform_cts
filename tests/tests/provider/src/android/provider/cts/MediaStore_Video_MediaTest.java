@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.cts.FileUtils;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Media;
 import android.test.InstrumentationTestCase;
@@ -65,7 +66,7 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
                 "/video/testvideo1.3gp";
 
         int numBytes = 1337;
-        FileCopyHelper.createFile(new File(externalVideoPath), numBytes);
+        FileUtils.createFile(new File(externalVideoPath), numBytes);
 
         ContentValues values = new ContentValues();
         values.put(Media.ALBUM, "cts");
