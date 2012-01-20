@@ -84,19 +84,6 @@ public class DeviceInfoResultTest extends TestCase {
         assertSerializeParse(DeviceInfoConstants.SYS_LIBRARIES, "lib1;lib2;");
     }
 
-    public void testPackages() throws Exception {
-        assertSerializeParse(DeviceInfoConstants.PACKAGES, "");
-        assertSerializeParse(DeviceInfoConstants.PACKAGES, "package1;");
-        assertSerializeParse(DeviceInfoConstants.PACKAGES, "package1;package2;");
-    }
-
-    public void testProperties() throws Exception {
-        assertSerializeParse(DeviceInfoConstants.PROPERTIES, "");
-        assertSerializeParse(DeviceInfoConstants.PROPERTIES, "prop1name;prop1value!");
-        assertSerializeParse(DeviceInfoConstants.PROPERTIES,
-                "prop1name;prop1value!prop2name;prop2value!");
-    }
-
     private void assertSerializeParse(String name, String value)
             throws IOException, ParseException {
         DeviceInfoResult serializedInfo = new DeviceInfoResult();

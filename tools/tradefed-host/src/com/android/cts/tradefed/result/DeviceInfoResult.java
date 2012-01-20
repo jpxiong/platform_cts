@@ -62,16 +62,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private static final String PROCESS_DELIM = ";";
     private static final String PROCESS_ATTR_DELIM = ":";
 
-    private static final String PACKAGE_INFO_TAG = "PackageInfo";
-    private static final String PACKAGE_TAG = "Package";
-    private static final String PACKAGE_DELIM = ";";
-
-    private static final String PROPERTY_INFO_TAG = "PropertyInfo";
-    private static final String PROPERTY_TAG = "Property";
-    private static final String PROPERTY_ATTR_DELIM = ";";
-    private static final String PROPERTY_DELIM = "!";
-
-
     private Map<String, String> mMetrics = new HashMap<String, String>();
 
     /**
@@ -108,8 +98,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
             String textureData = getMetric(metricsCopy,
                     DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS);
-            String packages = getMetric(metricsCopy, DeviceInfoConstants.PACKAGES);
-            String properties = getMetric(metricsCopy, DeviceInfoConstants.PROPERTIES);
 
             // dump the remaining metrics without translation
             serializer.startTag(ns, BUILD_TAG);
@@ -122,8 +110,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             serializeProcessInfo(serializer, processData);
             serializeSystemLibrariesInfo(serializer, sysLibData);
             serializeOpenGLCompressedTextureFormatsInfo(serializer, textureData);
-            serializePackageInfo(serializer, packages);
-            serializePropertyInfo(serializer, properties);
         } else {
             // this might be expected, if device info collection was turned off
             CLog.d("Could not find device info");
@@ -165,17 +151,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String libs)
             throws IOException {
         serialize(serializer, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM, null, libs, "name");
-    }
-
-    private void serializePackageInfo(KXmlSerializer serializer, String packages)
-            throws IOException {
-        serialize(serializer, PACKAGE_INFO_TAG, PACKAGE_TAG, PACKAGE_DELIM, null, packages, "name");
-    }
-
-    private void serializePropertyInfo(KXmlSerializer serializer, String propertyData)
-            throws IOException {
-        serialize(serializer, PROPERTY_INFO_TAG, PROPERTY_TAG, PROPERTY_DELIM, PROPERTY_ATTR_DELIM,
-                propertyData, "name", "value");
     }
 
     /**
@@ -253,10 +228,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
                 } else if (parser.getName().equals(OPENGL_TEXTURE_FORMATS_INFO_TAG)) {
                     mMetrics.put(DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
                             parseOpenGLCompressedTextureFormats(parser));
-                } else if (parser.getName().equals(PACKAGE_INFO_TAG)) {
-                    mMetrics.put(DeviceInfoConstants.PACKAGES, parsePackages(parser));
-                } else if (parser.getName().equals(PROPERTY_INFO_TAG)) {
-                    mMetrics.put(DeviceInfoConstants.PROPERTIES, parseProperties(parser));
                 }
             } else if (eventType == XmlPullParser.END_TAG && parser.getName().equals(TAG)) {
                 return;
@@ -284,17 +255,6 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private String parseSystemLibraries(XmlPullParser parser)
             throws XmlPullParserException, IOException {
         return parseTag(parser, SYSLIB_INFO_TAG, SYSLIB_TAG, SYSLIB_DELIM, null, "name");
-    }
-
-    private String parsePackages(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
-        return parseTag(parser, PACKAGE_INFO_TAG, PACKAGE_TAG, PACKAGE_DELIM, null, "name");
-    }
-
-    private String parseProperties(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
-        return parseTag(parser, PROPERTY_INFO_TAG, PROPERTY_TAG, PROPERTY_DELIM,
-                PROPERTY_ATTR_DELIM, "name", "value");
     }
 
     /**

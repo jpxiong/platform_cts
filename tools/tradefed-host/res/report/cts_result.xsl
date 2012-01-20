@@ -59,10 +59,10 @@
                 <DIV id="summary" style="display: none">
                     <TABLE class="summary">
                         <TR>
-                            <TH colspan="4">Device Information</TH>
+                            <TH colspan="2">Device Information</TH>
                         </TR>
                         <TR>
-                            <TD width="25%">
+                            <TD width="50%">
                                 <!-- Device information -->
                                 <TABLE>
                                     <TR>
@@ -231,16 +231,6 @@
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">System Libraries</TD>
-                                        <TD>
-                                            <UL>
-                                                <xsl:for-each select="TestResult/DeviceInfo/SystemLibrariesInfo/Library">
-                                                    <LI><xsl:value-of select="@name" /></LI>
-                                                </xsl:for-each>
-                                            </UL>
-                                        </TD>
-                                    </TR>
-                                    <TR>
                                         <TD class="rowtitle">Root Processes</TD>
                                         <TD>
                                             <UL>
@@ -254,7 +244,7 @@
                                 </TABLE>
                             </TD>
 
-                            <TD width="25%">
+                            <TD width="50%">
                                 <TABLE>
 
                                     <TR>
@@ -288,6 +278,16 @@
                                         </TD>
                                     </TR>
                                     <TR>
+                                        <TD class="rowtitle">System Libraries</TD>
+                                        <TD>
+                                            <UL>
+                                                <xsl:for-each select="TestResult/DeviceInfo/SystemLibrariesInfo/Library">
+                                                    <LI><xsl:value-of select="@name" /></LI>
+                                                </xsl:for-each>
+                                            </UL>
+                                        </TD>
+                                    </TR>
+                                    <TR>
                                         <TD class="rowtitle">Partitions</TD>
                                         <TD>
                                             <pre>
@@ -296,36 +296,6 @@
                                                     <xsl:with-param name="numTokensPerRow" select="1" />
                                                 </xsl:call-template>
                                             </pre>
-                                        </TD>
-                                    </TR>
-                                </TABLE>
-                            </TD>
-
-                            <TD width="25%">
-                                <TABLE>
-                                    <TR>
-                                        <TD class="rowtitle">Packages</TD>
-                                        <TD>
-                                            <UL>
-                                                <xsl:for-each select="TestResult/DeviceInfo/PackageInfo/Package">
-                                                    <LI><xsl:value-of select="@name" /></LI>
-                                                </xsl:for-each>
-                                            </UL>
-                                        </TD>
-                                    </TR>
-                                </TABLE>
-                            </TD>
-
-                            <TD width="25%">
-                                <TABLE>
-                                    <TR>
-                                        <TD class="rowtitle">Properties</TD>
-                                        <TD>
-                                            <UL>
-                                                <xsl:for-each select="TestResult/DeviceInfo/PropertyInfo/Property">
-                                                    <LI><xsl:value-of select="@name" />: <xsl:value-of select="@value" /></LI>
-                                                </xsl:for-each>
-                                            </UL>
                                         </TD>
                                     </TR>
                                 </TABLE>
