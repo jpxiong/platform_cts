@@ -11,26 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+LOCAL_PATH := $(call my-dir)
 
-LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-# don't include this package in any target
+LOCAL_MODULE    := libctsmediastress_jni
+
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_SRC_FILES := native-media-jni.cpp
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsmediastress_jni
+LOCAL_CFLAGS += -Isystem/media/wilhelm/include
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SHARED_LIBRARIES := libandroid libnativehelper liblog libOpenMAXAL
 
-LOCAL_PACKAGE_NAME := CtsMediaStressTestCases
-
-LOCAL_SDK_VERSION := current
-
-include $(BUILD_CTS_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
-
+include $(BUILD_SHARED_LIBRARY)
