@@ -53,27 +53,8 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
     }
 
     public void testContentDirectoryUri() throws Exception {
-        // Create a contact to attach the stream item to it.
-        ContentValues values = new ContentValues();
-        values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
-        values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
-
-        Uri contactUri = mResolver.insert(RawContacts.CONTENT_URI, values);
-        long rawContactId = ContentUris.parseId(contactUri);
-        assertTrue(rawContactId != -1);
-
-        // Attach a stream item to the contact.
-        values.clear();
-        values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
-        values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
-        values.put(StreamItems.TEXT, INSERT_TEXT);
-        values.put(StreamItems.TIMESTAMP, INSERT_TIMESTAMP);
-        values.put(StreamItems.COMMENTS, INSERT_COMMENTS);
-
-        Uri contactStreamUri = Uri.withAppendedPath(
-                ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId),
-                RawContacts.StreamItems.CONTENT_DIRECTORY);
-        Uri streamItemUri = mResolver.insert(contactStreamUri, values);
+        long rawContactId = insertRawContact(mResolver);
+        Uri streamItemUri = insertViaContentDirectoryUri(mResolver, rawContactId);
         long streamItemId = ContentUris.parseId(streamItemUri);
         assertTrue(streamItemId != -1);
 
@@ -88,7 +69,7 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
         assertInsertedItem(streamItemUri);
 
         // Update the stream item.
-        values.clear();
+        ContentValues values = new ContentValues();
         values.put(Data.RAW_CONTACT_ID, rawContactId);
         values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
         values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
@@ -98,6 +79,33 @@ public class ContactsContract_StreamItemsTest extends AndroidTestCase {
 
         assertEquals(1, mResolver.update(streamItemUri, values, null, null));
         assertUpdatedItem(streamItemUri);
+    }
+
+    static long insertRawContact(ContentResolver resolver) {
+        // Create a contact to attach the stream item to it.
+        ContentValues values = new ContentValues();
+        values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
+        values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
+
+        Uri contactUri = resolver.insert(RawContacts.CONTENT_URI, values);
+        long rawContactId = ContentUris.parseId(contactUri);
+        assertTrue(rawContactId != -1);
+        return rawContactId;
+    }
+
+    static Uri insertViaContentDirectoryUri(ContentResolver resolver, long rawContactId) {
+        // Attach a stream item to the contact.
+        ContentValues values = new ContentValues();
+        values.put(RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE);
+        values.put(RawContacts.ACCOUNT_NAME, ACCOUNT_NAME);
+        values.put(StreamItems.TEXT, INSERT_TEXT);
+        values.put(StreamItems.TIMESTAMP, INSERT_TIMESTAMP);
+        values.put(StreamItems.COMMENTS, INSERT_COMMENTS);
+
+        Uri contactStreamUri = Uri.withAppendedPath(
+                ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId),
+                RawContacts.StreamItems.CONTENT_DIRECTORY);
+        return resolver.insert(contactStreamUri, values);
     }
 
     public void testContentUri() throws Exception {

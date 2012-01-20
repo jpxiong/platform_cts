@@ -18,8 +18,8 @@ package android.provider.cts;
 
 import android.content.Context;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,4 +112,20 @@ public class FileCopyHelper {
             output.close();
         }
     }
+
+    public static byte[] readInputStreamFully(InputStream is) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buffer = new byte[10000];
+        int count;
+        try {
+            while ((count = is.read(buffer)) != -1) {
+                os.write(buffer, 0, count);
+            }
+            is.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return os.toByteArray();
+    }
+
 }
