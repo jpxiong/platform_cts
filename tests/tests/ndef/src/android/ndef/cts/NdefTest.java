@@ -332,28 +332,49 @@ public class NdefTest extends TestCase {
                 new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "text/plain".getBytes(ASCII), null,
                         "foo".getBytes()),
                 NdefRecord.createMime("text/plain",  "foo".getBytes()));
+
+        try {
+            NdefRecord.createMime("", null);
+            fail("IllegalArgumentException not throw");
+        } catch (IllegalArgumentException e) { }
+
+        try {
+            NdefRecord.createMime("/", null);
+            fail("IllegalArgumentException not throw");
+        } catch (IllegalArgumentException e) { }
+
+        try {
+            NdefRecord.createMime("a/", null);
+            fail("IllegalArgumentException not throw");
+        } catch (IllegalArgumentException e) { }
+
+        try {
+            NdefRecord.createMime("/b", null);
+            fail("IllegalArgumentException not throw");
+        } catch (IllegalArgumentException e) { }
+
+        // The following are valid MIME types and should not throw
+        NdefRecord.createMime("foo/bar", null);
+        NdefRecord.createMime("   ^@#/*   ", null);
+        NdefRecord.createMime("text/plain; charset=us_ascii", null);
     }
 
     public void testCreateExternal() {
-        // invalid character
         try {
-            NdefRecord.createExternal("a.b\n", "c", null);
+            NdefRecord.createExternal("", "c", null);
             fail("IllegalArgumentException not throw");
         } catch (IllegalArgumentException e) { }
 
-        // invalid character
         try {
-            NdefRecord.createExternal("a.b", "c\t", null);
+            NdefRecord.createExternal("a", "", null);
             fail("IllegalArgumentException not throw");
         } catch (IllegalArgumentException e) { }
 
-        // invalid character
         try {
-            NdefRecord.createExternal("a!b", "c", null);
+            NdefRecord.createExternal("   ", "c", null);
             fail("IllegalArgumentException not throw");
         } catch (IllegalArgumentException e) { }
 
-        // valid
         assertEquals(
                 new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, "a.b:c".getBytes(ASCII), null, null),
                 NdefRecord.createExternal("a.b", "c", null));
@@ -457,6 +478,55 @@ public class NdefTest extends TestCase {
                 1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,
                 1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,
                 1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,})).toByteArray());
+    }
+
+    public void testToUri() {
+        // absolute uri
+        assertEquals(Uri.parse("http://www.android.com"),
+                new NdefRecord(NdefRecord.TNF_ABSOLUTE_URI,
+                "http://www.android.com".getBytes(), null, null).toUri());
+        // wkt uri
+        assertEquals(Uri.parse("http://www.android.com"),
+                NdefRecord.createUri("http://www.android.com").toUri());
+        // smart poster with absolute uri
+        assertEquals(Uri.parse("http://www.android.com"),
+                new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_SMART_POSTER, null,
+                new NdefMessage(new NdefRecord(NdefRecord.TNF_ABSOLUTE_URI,
+                "http://www.android.com".getBytes(), null, null)).toByteArray()).toUri());
+        // smart poster with wkt uri
+        assertEquals(Uri.parse("http://www.android.com"),
+                new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_SMART_POSTER, null,
+                new NdefMessage(
+                NdefRecord.createUri("http://www.android.com")).toByteArray()).toUri());
+        // smart poster with text and wkt uri
+        assertEquals(Uri.parse("http://www.android.com"),
+                new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_SMART_POSTER, null,
+                new NdefMessage(new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, null,
+                null), NdefRecord.createUri("http://www.android.com")).toByteArray()).toUri());
+        // external type
+        assertEquals(Uri.parse("vnd.android.nfc://ext/com.foo.bar:type"),
+                NdefRecord.createExternal("com.foo.bar", "type", null).toUri());
+        // check normalization
+        assertEquals(Uri.parse("http://www.android.com"),
+                new NdefRecord(NdefRecord.TNF_ABSOLUTE_URI, "HTTP://WWW.ANDROID.COM".getBytes(),
+                null, null).toUri());
+
+        // not uri's
+        assertEquals(null, NdefRecord.createMime("text/plain", null).toUri());
+        assertEquals(null, new NdefRecord(NdefRecord.TNF_EMPTY, null, null, null).toUri());
+    }
+
+    public void testToMimeType() {
+        assertEquals(null, NdefRecord.createUri("http://www.android.com").toMimeType());
+        assertEquals(null, new NdefRecord(NdefRecord.TNF_EMPTY, null, null, null).toMimeType());
+        assertEquals(null, NdefRecord.createExternal("com.foo.bar", "type", null).toMimeType());
+
+        assertEquals("a/b", NdefRecord.createMime("a/b", null).toMimeType());
+        assertEquals("text/plain", new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT,
+                null, null).toMimeType());
+        assertEquals("a/b", NdefRecord.createMime("A/B", null).toMimeType());
+        assertEquals("a/b", new NdefRecord(NdefRecord.TNF_MIME_MEDIA, " A/B ".getBytes(),
+                null, null).toMimeType());
     }
 
     static void assertEquals(byte[] expected, byte[] actual) {
