@@ -27,7 +27,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsOpenGlPerfTestCases
 
-LOCAL_INSTRUMENTATION_FOR := replicaisland
+LOCAL_INSTRUMENTATION_FOR := com.replica.replicaisland
+
 # block this to allow usage of hidden API, only for GB
 #LOCAL_SDK_VERSION := current
 
