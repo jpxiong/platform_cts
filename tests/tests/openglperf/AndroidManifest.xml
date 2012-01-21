@@ -25,7 +25,7 @@
 
     <!-- Two activities are used -->
     <instrumentation
-        android:targetPackage="replicaisland"
+        android:targetPackage="com.replica.replicaisland"
         android:name="android.test.InstrumentationTestRunner" />
     <instrumentation
         android:targetPackage="com.android.cts.openglperf"

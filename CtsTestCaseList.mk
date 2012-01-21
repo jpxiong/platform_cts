@@ -72,7 +72,7 @@ CTS_TEST_CASE_LIST := \
 	TestDeviceSetup \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
-	replicaisland \
+	com.replica.replicaisland \
 	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
