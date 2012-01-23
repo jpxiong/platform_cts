@@ -34,7 +34,7 @@ cts_support_packages := \
 	$(cts_security_apps_list)
 
 cts_external_packages := \
-	replicaisland \
+	com.replica.replicaisland
 
 # Any APKs that need to be copied to the CTS distribution's testcases
 # directory but do not require an associated test package XML.
