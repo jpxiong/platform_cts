@@ -24,10 +24,13 @@ import dalvik.annotation.ToBeFixed;
 
 import android.database.ContentObservable;
 import android.database.ContentObserver;
+import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
 @TestTargetClass(ContentObservable.class)
 public class ContentObservableTest extends InstrumentationTestCase {
+    private static final Uri CONTENT_URI = Uri.parse("content://uri");
+
     ContentObservable mContentObservable;
     MyContentObserver mObserver;
 
@@ -95,6 +98,7 @@ public class ContentObservableTest extends InstrumentationTestCase {
         assertFalse(mObserver.hasChanged());
         mContentObservable.dispatchChange(false);
         assertTrue(mObserver.hasChanged());
+        assertNull(mObserver.getUri());
 
         mObserver.resetStatus();
         assertFalse(mObserver.hasChanged());
@@ -103,6 +107,7 @@ public class ContentObservableTest extends InstrumentationTestCase {
         mObserver.setDeliverSelfNotifications(true);
         mContentObservable.dispatchChange(true);
         assertTrue(mObserver.hasChanged());
+        assertNull(mObserver.getUri());
 
         mContentObservable.unregisterObserver(mObserver);
         mObserver.resetStatus();
@@ -111,18 +116,44 @@ public class ContentObservableTest extends InstrumentationTestCase {
         assertFalse(mObserver.hasChanged());
     }
 
+    public void testDispatchChangeWithUri() {
+        mContentObservable.registerObserver(mObserver);
+        mObserver.resetStatus();
+        assertFalse(mObserver.hasChanged());
+        mContentObservable.dispatchChange(false, CONTENT_URI);
+        assertTrue(mObserver.hasChanged());
+        assertEquals(CONTENT_URI, mObserver.getUri());
+
+        mObserver.resetStatus();
+        assertFalse(mObserver.hasChanged());
+        mContentObservable.dispatchChange(true, CONTENT_URI);
+        assertFalse(mObserver.hasChanged());
+        mObserver.setDeliverSelfNotifications(true);
+        mContentObservable.dispatchChange(true, CONTENT_URI);
+        assertTrue(mObserver.hasChanged());
+        assertEquals(CONTENT_URI, mObserver.getUri());
+
+        mContentObservable.unregisterObserver(mObserver);
+        mObserver.resetStatus();
+        assertFalse(mObserver.hasChanged());
+        mContentObservable.dispatchChange(false, CONTENT_URI);
+        assertFalse(mObserver.hasChanged());
+    }
+
     private static class MyContentObserver extends ContentObserver {
         private boolean mHasChanged = false;
         private boolean mDeliverSelfNotifications = false;
+        private Uri mUri;
 
         public MyContentObserver() {
             super(null);
         }
 
         @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
             mHasChanged = true;
+            mUri = uri;
         }
 
         public boolean deliverSelfNotifications() {
@@ -135,10 +166,15 @@ public class ContentObservableTest extends InstrumentationTestCase {
 
         protected void resetStatus() {
             mHasChanged = false;
+            mUri = null;
         }
 
         protected void setDeliverSelfNotifications(boolean b) {
             mDeliverSelfNotifications = b;
+        }
+
+        protected Uri getUri() {
+            return mUri;
         }
     }
 }
