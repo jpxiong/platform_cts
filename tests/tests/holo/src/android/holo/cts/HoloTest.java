@@ -131,6 +131,7 @@ public class HoloTest extends ActivityInstrumentationTestCase2<ThemeTestActivity
         Intent intent = new Intent();
         intent.putExtra(ThemeTestActivity.EXTRA_TASK, ThemeTestActivity.TASK_COMPARE_BITMAPS);
         intent.putExtra(ThemeTestActivity.EXTRA_THEME_INDEX, themeIndex);
+        intent.putExtra(ThemeTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, LayoutAdapter.MODE_TESTING);
         setActivityIntent(intent);
 
         // Enable touch mode or else widgets will be highlighted causing bitmap
