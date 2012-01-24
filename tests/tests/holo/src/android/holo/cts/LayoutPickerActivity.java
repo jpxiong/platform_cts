@@ -38,7 +38,7 @@ public class LayoutPickerActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         mThemeIndex = getIntent().getIntExtra(EXTRA_THEME_INDEX, -1);
         mTestTask = getIntent().getIntExtra(EXTRA_TASK, -1);
-        setListAdapter(new LayoutAdapter(getLayoutInflater()));
+        setListAdapter(new LayoutAdapter(getLayoutInflater(), LayoutAdapter.MODE_VIEWING));
     }
 
     @Override
@@ -47,6 +47,7 @@ public class LayoutPickerActivity extends ListActivity {
         intent.putExtra(ThemeTestActivity.EXTRA_THEME_INDEX, mThemeIndex);
         intent.putExtra(ThemeTestActivity.EXTRA_LAYOUT_INDEX, position);
         intent.putExtra(ThemeTestActivity.EXTRA_TASK, mTestTask);
+        intent.putExtra(ThemeTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, LayoutAdapter.MODE_VIEWING);
         startActivity(intent);
     }
 }

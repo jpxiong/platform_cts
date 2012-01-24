@@ -20,6 +20,8 @@ import android.holo.cts.LayoutModifier;
 import android.view.View;
 import android.widget.CalendarView;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 /**
@@ -30,16 +32,31 @@ public class CalendarViewModifier implements LayoutModifier {
      * Long representation of a date that is 30 years in milliseconds from
      * Unix epoch (January 1, 1970 00:00:00).
      */
-    private static final long DATE = 946707779241L;
+    private static final long JANUARY_DATE = 946707779241L;
+
+    private static final long FEBRUARY_DATE = 951033600000L;
+
+    private static final TimeZone TZ = TimeZone.getTimeZone("GMT+00:00");
+
+    private final boolean mJanuary;
+
+    public CalendarViewModifier(boolean january) {
+        mJanuary = january;
+    }
 
     @Override
     public void prepare() {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+00:00"));
+        TimeZone.setDefault(TZ);
     }
 
     @Override
     public View modifyView(View view) {
-        ((CalendarView) view).setDate(DATE);
+        ((CalendarView) view).setDate(mJanuary ? JANUARY_DATE : FEBRUARY_DATE);
         return view;
+    }
+
+    public static boolean isMonth(int month) {
+        Calendar cal = new GregorianCalendar(TZ);
+        return cal.get(Calendar.MONTH) == month;
     }
 }

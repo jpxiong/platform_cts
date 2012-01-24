@@ -46,6 +46,7 @@ public class LayoutTestActivity extends Activity {
     static final String EXTRA_THEME_INDEX = "themeIndex";
     static final String EXTRA_LAYOUT_INDEX = "layoutIndex";
     static final String EXTRA_TASK = "task";
+    static final String EXTRA_LAYOUT_ADAPTER_MODE = "layoutAdapterMode";
 
     // Output extras
     static final String EXTRA_BITMAP_NAME = "bitmapName";
@@ -63,10 +64,11 @@ public class LayoutTestActivity extends Activity {
 
         int themeIndex = getIntent().getIntExtra(EXTRA_THEME_INDEX, -1);
         int layoutIndex = getIntent().getIntExtra(EXTRA_LAYOUT_INDEX, -1);
+        int layoutMode = getIntent().getIntExtra(EXTRA_LAYOUT_ADAPTER_MODE, -1);
         int task = getIntent().getIntExtra(EXTRA_TASK, -1);
 
         ThemeAdapter themeAdapter = new ThemeAdapter(getLayoutInflater());
-        LayoutAdapter layoutAdapter = new LayoutAdapter(getLayoutInflater());
+        LayoutAdapter layoutAdapter = new LayoutAdapter(getLayoutInflater(), layoutMode);
 
         ThemeInfo themeInfo = themeAdapter.getItem(themeIndex);
         LayoutInfo layoutInfo = layoutAdapter.getItem(layoutIndex);

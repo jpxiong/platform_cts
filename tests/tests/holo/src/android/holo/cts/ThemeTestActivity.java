@@ -40,6 +40,7 @@ public class ThemeTestActivity extends Activity {
     static final String EXTRA_TASK = "task";
     static final String EXTRA_THEME_INDEX = "themeIndex";
     static final String EXTRA_LAYOUT_INDEX = "layoutIndex";
+    static final String EXTRA_LAYOUT_ADAPTER_MODE = "layoutAdapterMode";
 
     static final int TASK_VIEW_LAYOUTS = 1;
     static final int TASK_GENERATE_BITMAPS = 2;
@@ -82,17 +83,18 @@ public class ThemeTestActivity extends Activity {
 
         int themeIndex = getIntent().getIntExtra(EXTRA_THEME_INDEX, -1);
         int layoutIndex = getIntent().getIntExtra(EXTRA_LAYOUT_INDEX, -1);
+        int adapterMode = getIntent().getIntExtra(EXTRA_LAYOUT_ADAPTER_MODE, -1);
 
         Log.i(TAG, "Theme index: " + themeIndex + " Layout index: " + layoutIndex);
 
         if (themeIndex < 0 && layoutIndex < 0) {
-            mIterator = new AllThemesIterator(task);
+            mIterator = new AllThemesIterator(task, adapterMode);
         } else if (themeIndex >= 0 && layoutIndex >= 0) {
-            mIterator = new SingleThemeLayoutIterator(themeIndex, layoutIndex, task);
+            mIterator = new SingleThemeLayoutIterator(themeIndex, layoutIndex, task, adapterMode);
         } else if (layoutIndex >= 0) {
-            mIterator = new SingleLayoutIterator(layoutIndex, task);
+            mIterator = new SingleLayoutIterator(layoutIndex, task, adapterMode);
         } else if (themeIndex >= 0) {
-            mIterator = new SingleThemeIterator(themeIndex, task);
+            mIterator = new SingleThemeIterator(themeIndex, task, adapterMode);
         } else {
             throw new IllegalStateException();
         }

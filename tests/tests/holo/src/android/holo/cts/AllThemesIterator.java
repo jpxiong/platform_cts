@@ -26,14 +26,17 @@ import java.util.Iterator;
 class AllThemesIterator implements Iterator<Intent> {
 
     private final ThemeAdapter mThemeAdapter = new ThemeAdapter(null);
-    private final LayoutAdapter mLayoutAdapter = new LayoutAdapter(null);
+    private final LayoutAdapter mLayoutAdapter;
 
     private final int mTask;
+    private final int mAdapterMode;
     private int mThemeIndex;
     private int mLayoutIndex;
 
-    AllThemesIterator(int task) {
+    AllThemesIterator(int task, int adapterMode) {
         mTask = task;
+        mAdapterMode = adapterMode;
+        mLayoutAdapter = new LayoutAdapter(null, adapterMode);
     }
 
     @Override
@@ -46,6 +49,7 @@ class AllThemesIterator implements Iterator<Intent> {
         Intent intent = new Intent();
         intent.putExtra(LayoutTestActivity.EXTRA_THEME_INDEX, mThemeIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_INDEX, mLayoutIndex);
+        intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, mAdapterMode);
         intent.putExtra(LayoutTestActivity.EXTRA_TASK, mTask);
 
         mLayoutIndex++;

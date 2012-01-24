@@ -29,10 +29,12 @@ class SingleLayoutIterator implements Iterator<Intent> {
 
     private final int mTask;
     private final int mLayoutIndex;
+    private final int mLayoutAdapterMode;
     private int mThemeIndex;
 
-    SingleLayoutIterator(int layoutIndex, int task) {
+    SingleLayoutIterator(int layoutIndex, int task, int layoutAdapterMode) {
         mTask = task;
+        mLayoutAdapterMode = layoutAdapterMode;
         mLayoutIndex = layoutIndex;
     }
 
@@ -47,6 +49,7 @@ class SingleLayoutIterator implements Iterator<Intent> {
         intent.putExtra(LayoutTestActivity.EXTRA_THEME_INDEX, mThemeIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_INDEX, mLayoutIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_TASK, mTask);
+        intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, mLayoutAdapterMode);
 
         mThemeIndex++;
 
