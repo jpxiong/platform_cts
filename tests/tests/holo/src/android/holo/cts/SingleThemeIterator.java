@@ -25,14 +25,17 @@ import java.util.Iterator;
  */
 class SingleThemeIterator implements Iterator<Intent> {
 
-    private final LayoutAdapter mLayoutAdapter = new LayoutAdapter(null);
+    private final LayoutAdapter mLayoutAdapter;
 
     private final int mTask;
     private final int mThemeIndex;
+    private final int mLayoutAdapterMode;
     private int mLayoutIndex;
 
-    SingleThemeIterator(int themeIndex, int task) {
+    SingleThemeIterator(int themeIndex, int task, int layoutAdapterMode) {
         mTask = task;
+        mLayoutAdapterMode = layoutAdapterMode;
+        mLayoutAdapter = new LayoutAdapter(null, layoutAdapterMode);
         mThemeIndex = themeIndex;
     }
 
@@ -47,6 +50,7 @@ class SingleThemeIterator implements Iterator<Intent> {
         intent.putExtra(LayoutTestActivity.EXTRA_THEME_INDEX, mThemeIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_INDEX, mLayoutIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_TASK, mTask);
+        intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, mLayoutAdapterMode);
 
         mLayoutIndex++;
 
