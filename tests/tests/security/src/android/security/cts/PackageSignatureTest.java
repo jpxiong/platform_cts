@@ -83,7 +83,10 @@ public class PackageSignatureTest extends AndroidTestCase {
             "android.tests.devicesetup",
 
             // APK for the Android core tests runner used only during CTS
-            "android.core.tests.runner"
+            "android.core.tests.runner",
+
+            // Wifi test utility used by Tradefed...
+            "com.android.tradefed.utils.wifi"
             ));
 
     private boolean isWhitelistedPackage(String packageName) {
