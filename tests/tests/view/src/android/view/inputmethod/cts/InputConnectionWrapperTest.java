@@ -251,7 +251,7 @@ public class InputConnectionWrapperTest extends AndroidTestCase {
             return false;
         }
 
-        public boolean deleteSurroundingText(int leftLength, int rightLength) {
+        public boolean deleteSurroundingText(int beforeLength, int afterLength) {
             isDeleteSurroundingTextCalled = true;
             return false;
         }
