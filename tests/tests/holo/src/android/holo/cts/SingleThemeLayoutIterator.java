@@ -25,13 +25,15 @@ class SingleThemeLayoutIterator implements Iterator<Intent> {
     private final int mThemeIndex;
     private final int mLayoutIndex;
     private final int mTask;
+    private final int mLayoutAdapterMode;
 
     private boolean hasNext = true;
 
-    SingleThemeLayoutIterator(int themeIndex, int layoutIndex, int task) {
+    SingleThemeLayoutIterator(int themeIndex, int layoutIndex, int task, int layoutAdapterMode) {
         mThemeIndex = themeIndex;
         mLayoutIndex = layoutIndex;
         mTask = task;
+        mLayoutAdapterMode = layoutAdapterMode;
     }
 
     @Override
@@ -45,6 +47,7 @@ class SingleThemeLayoutIterator implements Iterator<Intent> {
         intent.putExtra(LayoutTestActivity.EXTRA_THEME_INDEX, mThemeIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_INDEX, mLayoutIndex);
         intent.putExtra(LayoutTestActivity.EXTRA_TASK, mTask);
+        intent.putExtra(LayoutTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, mLayoutAdapterMode);
 
         hasNext = false;
 

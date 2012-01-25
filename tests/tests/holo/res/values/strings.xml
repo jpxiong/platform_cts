@@ -40,7 +40,8 @@
 
     <string name="button">Button</string>
     <string name="button_pressed">Button Pressed</string>
-    <string name="calendarview">CalendarView</string>
+    <string name="calendarview_jan">CalendarView (January)</string>
+    <string name="calendarview_feb">CalendarView (February)</string>
     <string name="checkbox">CheckBox</string>
     <string name="checkbox_checked">CheckBox Checked</string>
     <string name="chronometer">Chronometer</string>

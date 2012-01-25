@@ -22,7 +22,6 @@ import android.holo.cts.modifiers.CalendarViewModifier;
 import android.holo.cts.modifiers.SearchViewModifier;
 import android.holo.cts.modifiers.TabHostModifier;
 import android.holo.cts.modifiers.TimePickerModifier;
-import android.holo.cts.modifiers.ViewPressedModifier;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +29,19 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
  * {@link BaseAdapter} for all the layouts used to test the Holo theme.
  */
 class LayoutAdapter extends BaseAdapter {
+
+    /** Mode where we are just viewing all the layouts. */
+    static final int MODE_VIEWING = 0;
+
+    /** Mode where we are testing and may not include some layouts based on the device state. */
+    static final int MODE_TESTING = 1;
 
     /** No timeout for widgets in layouts that aren't changed after inflation.  */
     private static final int NO_TIMEOUT_MS = 0;
@@ -92,7 +98,7 @@ class LayoutAdapter extends BaseAdapter {
 
     private final LayoutInflater mInflater;
 
-    LayoutAdapter(LayoutInflater inflater) {
+    LayoutAdapter(LayoutInflater inflater, int adapterMode) {
         mInflater = inflater;
 
         // Widgets
@@ -103,8 +109,7 @@ class LayoutAdapter extends BaseAdapter {
         addLayout(R.string.button_pressed, "button_pressed",
                 R.layout.button, new ViewPressedModifier(), LONG_TIMEOUT_MS);
 
-        addLayout(R.string.calendarview, "calendar_view",
-                R.layout.calendarview, new CalendarViewModifier(), SHORT_TIMEOUT_MS);
+        addCalendarLayouts(adapterMode);
 
         addLayout(R.string.checkbox, "checkbox",
                 R.layout.checkbox, null, NO_TIMEOUT_MS);
@@ -289,7 +294,31 @@ class LayoutAdapter extends BaseAdapter {
 
     private void addLayout(int displayName, String fileName, int layout, LayoutModifier modifier,
             long timeoutMs) {
-        mLayoutInfos.add(new LayoutInfo(displayName, fileName, layout, modifier, timeoutMs));
+        addLayout(new LayoutInfo(displayName, fileName, layout, modifier, timeoutMs));
+    }
+
+    private void addLayout(LayoutInfo info) {
+        mLayoutInfos.add(info);
+    }
+
+    private void addCalendarLayouts(int adapterMode) {
+        if (adapterMode == MODE_VIEWING || !CalendarViewModifier.isMonth(Calendar.JANUARY)) {
+            addLayout(getCalendarLayoutInfo());
+        }
+
+        if (adapterMode == MODE_VIEWING || !CalendarViewModifier.isMonth(Calendar.FEBRUARY)) {
+            addLayout(getFebruaryCalendarLayoutInfo());
+        }
+    }
+
+    private LayoutInfo getCalendarLayoutInfo() {
+        return new LayoutInfo(R.string.calendarview_jan, "calendar_view",
+            R.layout.calendarview, new CalendarViewModifier(true), SHORT_TIMEOUT_MS);
+    }
+
+    private LayoutInfo getFebruaryCalendarLayoutInfo() {
+        return new LayoutInfo(R.string.calendarview_feb, "calendar_view_feb",
+            R.layout.calendarview, new CalendarViewModifier(false), SHORT_TIMEOUT_MS);
     }
 
     @Override

@@ -137,6 +137,7 @@ public class HoloTestUtilitiesActivity extends ListActivity {
     private void generateAllBitmaps() {
         Intent intent = new Intent(this, ThemeTestActivity.class);
         intent.putExtra(ThemeTestActivity.EXTRA_TASK, ThemeTestActivity.TASK_GENERATE_BITMAPS);
+        intent.putExtra(ThemeTestActivity.EXTRA_LAYOUT_ADAPTER_MODE, LayoutAdapter.MODE_TESTING);
         startActivity(intent);
     }
 
