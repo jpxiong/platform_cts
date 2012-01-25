@@ -2189,6 +2189,13 @@ public class IntentTest extends AndroidTestCase {
         assertEquals(intentValue, actualValue);
     }
 
+    public void testNormalizeMimeType() {
+        assertEquals(null, Intent.normalizeMimeType(null));
+        assertEquals("text/plain", Intent.normalizeMimeType("text/plain; charset=UTF-8"));
+        assertEquals("text/x-vcard", Intent.normalizeMimeType("text/x-vCard"));
+        assertEquals("foo/bar", Intent.normalizeMimeType("   foo/bar    "));
+    }
+
     private static class TestSerializable implements Serializable {
         static final long serialVersionUID = 1l;
         public String Name;
