@@ -22,6 +22,7 @@ import android.holo.cts.modifiers.CalendarViewModifier;
 import android.holo.cts.modifiers.SearchViewModifier;
 import android.holo.cts.modifiers.TabHostModifier;
 import android.holo.cts.modifiers.TimePickerModifier;
+import android.holo.cts.modifiers.ViewPressedModifier;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
