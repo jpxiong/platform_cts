@@ -39,7 +39,7 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     private static String TAG = "MediaRecorderStressTest";
     private static final int NUMBER_OF_CAMERA_STRESS_LOOPS = 50;
     private static final int NUMBER_OF_RECORDER_STRESS_LOOPS = 50;
-    private static final int NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS = 50;
+    private static final int NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS = 25;
     private static final int NUMBER_OF_SWTICHING_LOOPS_BW_CAMERA_AND_RECORDER = 50;
     private static final long WAIT_TIME_CAMERA_TEST = 3000;  // in ms
     private static final long WAIT_TIME_RECORDER_TEST = 5000;  // in ms
@@ -60,7 +60,6 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     private static CamcorderProfile profile =
                         CamcorderProfile.get(mCameraId, mProfileQuality);
 
-    private int mIterations = 50;
     private int mVideoEncoder;
     private int mAudioEncoder;
     private int mFrameRate;
@@ -326,7 +325,7 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
                 + NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS + "\n");
 
         output.write("No of loop: ");
-        for (int i = 0; i < mIterations; i++){
+        for (int i = 0; i < NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS; i++){
             filename = OUTPUT_FILE + i + OUTPUT_FILE_EXT;
             Log.v(TAG, filename);
             runOnLooper(new Runnable() {
@@ -335,7 +334,7 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
                     mRecorder = new MediaRecorder();
                 }
             });
-            Log.v(TAG, "iterations : " + mIterations);
+            Log.v(TAG, "iterations : " + i);
             Log.v(TAG, "videoEncoder : " + mVideoEncoder);
             Log.v(TAG, "audioEncoder : " + mAudioEncoder);
             Log.v(TAG, "frameRate : " + mFrameRate);
