@@ -75,6 +75,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
+    /**
+     * This is the minimum number of milliseconds to wait for scrolling to
+     * start. If no scrolling has started before this timeout then it is
+     * assumed that no scrolling will happen.
+     */
+    private static final long MIN_SCROLL_WAIT_MS = 1000;
+    /**
+     * Once scrolling has started, this is the interval that scrolling
+     * is checked to see if there is a change. If no scrolling change
+     * has happened in the given time then it is assumed that scrolling
+     * has stopped.
+     */
+    private static final long SCROLL_WAIT_INTERVAL_MS = 200;
 
     private WebView mWebView;
     private CtsTestServer mWebServer;
@@ -1149,19 +1162,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         )
     })
     public void testFindNext() throws Throwable {
-        final class StopScrollingPollingCheck extends PollingCheck {
-            private int mPreviousScrollY = -1;
-            @Override
-            protected boolean check() {
-                getInstrumentation().waitForIdleSync();
-                int scrollY = mOnUiThread.getScrollY();
-                boolean hasStopped =
-                    (mPreviousScrollY == -1 ? false : (scrollY == mPreviousScrollY));
-                mPreviousScrollY = scrollY;
-                return hasStopped;
-            }
-        }
-
         // Reset the scaling so that finding the next "all" text will require scrolling.
         mOnUiThread.setInitialScale(100);
 
@@ -1181,25 +1181,25 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // Focus "all" in the second page and assert that the view scrolls.
         mOnUiThread.findNext(true);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() > previousScrollY);
         previousScrollY = mOnUiThread.getScrollY();
 
         // Focus "all" in the first page and assert that the view scrolls.
         mOnUiThread.findNext(true);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() < previousScrollY);
         previousScrollY = mOnUiThread.getScrollY();
 
         // Focus "all" in the second page and assert that the view scrolls.
         mOnUiThread.findNext(false);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() > previousScrollY);
         previousScrollY = mOnUiThread.getScrollY();
 
         // Focus "all" in the first page and assert that the view scrolls.
         mOnUiThread.findNext(false);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() < previousScrollY);
         previousScrollY = mOnUiThread.getScrollY();
 
@@ -1209,11 +1209,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // can not scroll any more
         mOnUiThread.findNext(false);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() == previousScrollY);
 
         mOnUiThread.findNext(true);
-        new StopScrollingPollingCheck().run();
+        waitForScrollingComplete(previousScrollY);
         assertTrue(mOnUiThread.getScrollY() == previousScrollY);
     }
 
@@ -2535,6 +2535,31 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 }
             }
         return true;
+    }
+
+    /**
+     * Waits at least MIN_SCROLL_WAIT_MS for scrolling to start. Once started,
+     * scrolling is checked every SCROLL_WAIT_INTERVAL_MS for changes. Once
+     * changes have stopped, the function exits. If no scrolling has happened
+     * then the function exits after MIN_SCROLL_WAIT milliseconds.
+     * @param previousScrollY The Y scroll position prior to waiting.
+     */
+    private void waitForScrollingComplete(int previousScrollY)
+            throws InterruptedException {
+        int scrollY = previousScrollY;
+        // wait at least MIN_SCROLL_WAIT for something to happen.
+        long noChangeMinWait = SystemClock.uptimeMillis() + MIN_SCROLL_WAIT_MS;
+        boolean scrollChanging = false;
+        boolean scrollChanged = false;
+        boolean minWaitExpired = false;
+        while (scrollChanging || (!scrollChanged && !minWaitExpired)) {
+            Thread.sleep(SCROLL_WAIT_INTERVAL_MS);
+            int oldScrollY = scrollY;
+            scrollY = mOnUiThread.getScrollY();
+            scrollChanging = (scrollY != oldScrollY);
+            scrollChanged = (scrollY != previousScrollY);
+            minWaitExpired = (SystemClock.uptimeMillis() > noChangeMinWait);
+        }
     }
 
     // Note that this class is not thread-safe.
