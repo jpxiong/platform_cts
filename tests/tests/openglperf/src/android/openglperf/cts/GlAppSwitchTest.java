@@ -85,8 +85,6 @@ public class GlAppSwitchTest extends
         mTaskIdSelf = activity.getTaskId();
         // wait further to render some frames
         Thread.sleep(1000);
-        // terminate if it is already running
-        terminateReplicaIsland();
 
         Intent intentIsland = new Intent(Intent.ACTION_MAIN);
         intentIsland.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -103,7 +101,6 @@ public class GlAppSwitchTest extends
     @Override
     protected void tearDown() throws Exception {
         showOrHideReplicaIsland(false);
-        terminateReplicaIsland();
         super.tearDown();
     }
 
@@ -145,7 +142,8 @@ public class GlAppSwitchTest extends
         List<ActivityManager.RunningTaskInfo> tasks =
                 mActivityManager.getRunningTasks(MAX_RUNNING_TASKS);
         for (ActivityManager.RunningTaskInfo info : tasks) {
-            if (info.id == mTaskIdReplica) {
+            String packageName = info.baseActivity.getPackageName();
+            if (packageName.contentEquals(REPLICA_ISLAND_PACKAGE)) {
                 foundReplica = true;
                 break;
             }
@@ -166,13 +164,5 @@ public class GlAppSwitchTest extends
             // System dead, we will be dead too soon!
             Assert.fail("RemoteException from moveTaskToFront");
         }
-    }
-
-    /**
-     * this API works only when the replica island is in background.
-     */
-    private void terminateReplicaIsland() {
-        mActivityManager.killBackgroundProcesses(REPLICA_ISLAND_PACKAGE);
-        getInstrumentation().waitForIdleSync();
     }
 }
