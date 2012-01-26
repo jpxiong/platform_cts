@@ -70,10 +70,13 @@ public class CamcorderProfileTest extends AndroidTestCase {
         )
     })
     public void testGet() {
-        CamcorderProfile lowProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
-        CamcorderProfile highProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        checkProfile(lowProfile);
-        checkProfile(highProfile);
+        int nCamera = Camera.getNumberOfCameras();
+        if (nCamera != 0) {
+            CamcorderProfile lowProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
+            CamcorderProfile highProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+            checkProfile(lowProfile);
+            checkProfile(highProfile);
+        }
     }
 
     @TestTargets({
