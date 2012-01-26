@@ -72,7 +72,7 @@ public class ContactsContract_TestDataBuilder {
 
             assertNotNull("Row has not be inserted or loaded yet", mUri);
 
-            Cursor cursor = mProvider.query(mUri, IdQuery.COLUMNS, null, null, null);
+            Cursor cursor = mProvider.query(mUri, IdQuery.COLUMNS, null, null, null, null);
             if (cursor != null) {
                 try {
                     cursor.moveToFirst();
@@ -152,7 +152,7 @@ public class ContactsContract_TestDataBuilder {
             close();
             mLoadedRows.add(this);
 
-            mCursor = mProvider.query(getUri(), null, null, null, null);
+            mCursor = mProvider.query(getUri(), null, null, null, null, null);
             if (mCursor == null || !mCursor.moveToFirst()) {
                 return null;
             } else {
@@ -186,7 +186,7 @@ public class ContactsContract_TestDataBuilder {
             }
             mCursor = mProvider.query(getContentUri(), null,
                     selection.toString(),
-                    selectionArgs.toArray(new String[0]), null);
+                    selectionArgs.toArray(new String[0]), null, null);
             if (mCursor == null || !mCursor.moveToFirst()) {
                 fail("No data rows for " + getContentUri() + "[" + mValues.toString() + "]");
             }

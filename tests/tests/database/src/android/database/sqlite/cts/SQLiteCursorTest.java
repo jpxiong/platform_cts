@@ -61,7 +61,7 @@ public class SQLiteCursorTest extends AndroidTestCase {
 
     public void testConstructor() {
         SQLiteDirectCursorDriver cursorDriver = new SQLiteDirectCursorDriver(mDatabase,
-                TEST_SQL, TABLE_NAME);
+                TEST_SQL, TABLE_NAME, null);
         try {
             new SQLiteCursor(mDatabase, cursorDriver, TABLE_NAME, null);
             fail("constructor didn't throw IllegalArgumentException when SQLiteQuery is null");

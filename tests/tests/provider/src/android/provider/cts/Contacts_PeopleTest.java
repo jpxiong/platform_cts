@@ -119,13 +119,13 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
 
             // People: test_people_0, Group: Groups.GROUP_MY_CONTACTS
             cursor = mProvider.query(mPeopleRowsAdded.get(0), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             int personId = cursor.getInt(PEOPLE_ID_INDEX);
             cursor.close();
             mRowsAdded.add(People.addToMyContactsGroup(mContentResolver, personId));
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
-                    Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null);
+                    Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null, null);
             cursor.moveToFirst();
             int groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
@@ -142,14 +142,14 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             values.put(People.LAST_TIME_CONTACTED, 0);
             mRowsAdded.add(People.createPersonInMyContactsGroup(mContentResolver, values));
             cursor = mProvider.query(People.CONTENT_URI, PEOPLE_PROJECTION,
-                    People.NAME + " = 'test_people_create'", null, null);
+                    People.NAME + " = 'test_people_create'", null, null, null);
 
             cursor.moveToFirst();
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             mRowsAdded.add(ContentUris.withAppendedId(People.CONTENT_URI, personId));
             cursor.close();
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
-                    Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null);
+                    Groups.SYSTEM_ID + "='" + Groups.GROUP_MY_CONTACTS + "'", null, null, null);
             cursor.moveToFirst();
             groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
@@ -161,12 +161,12 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
 
             // People: test_people_1, Group: test_group_0
             cursor = mProvider.query(mPeopleRowsAdded.get(1), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             cursor.close();
             cursor = mProvider.query(mGroupRowsAdded.get(0), GROUPS_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             groupId = cursor.getInt(GROUPS_ID_INDEX);
             cursor.close();
@@ -179,7 +179,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
 
             // People: test_people_2, Group: test_group_1
             cursor = mProvider.query(mPeopleRowsAdded.get(2), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             personId = cursor.getInt(PEOPLE_ID_INDEX);
             cursor.close();
@@ -191,7 +191,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             groupId = cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX);
             cursor.close();
             cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
-                    Groups._ID + "=" + groupId, null, null);
+                    Groups._ID + "=" + groupId, null, null, null);
             cursor.moveToFirst();
             assertEquals(groupName, cursor.getString(GROUPS_NAME_INDEX));
             cursor.close();
@@ -204,14 +204,14 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         Cursor cursor;
         try {
             cursor = mProvider.query(mPeopleRowsAdded.get(0), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             int personId = cursor.getInt(PEOPLE_ID_INDEX);
             long oldLastContacted = cursor.getLong(PEOPLE_LAST_CONTACTED_INDEX);
             cursor.close();
             People.markAsContacted(mContentResolver, personId);
             cursor = mProvider.query(mPeopleRowsAdded.get(0), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             long lastContacted = cursor.getLong(PEOPLE_LAST_CONTACTED_INDEX);
             assertTrue(oldLastContacted < lastContacted);
@@ -220,7 +220,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
 
             People.markAsContacted(mContentResolver, personId);
             cursor = mProvider.query(mPeopleRowsAdded.get(0), PEOPLE_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             cursor.moveToFirst();
             lastContacted = cursor.getLong(PEOPLE_LAST_CONTACTED_INDEX);
             assertTrue(oldLastContacted < lastContacted);

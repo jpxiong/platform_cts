@@ -104,7 +104,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
         Cursor cursor = mVoicemailProvider.query(
                 mVoicemailContentUri, VOICEMAILS_PROJECTION,
                 Voicemails.NUMBER + " = ?",
-                new String[] {insertCallsNumber}, null);
+                new String[] {insertCallsNumber}, null, null);
         assertTrue(cursor.moveToNext());
         assertEquals(insertCallsNumber, cursor.getString(NUMBER_INDEX));
         assertEquals(insertDate, cursor.getLong(DATE_INDEX));
@@ -127,7 +127,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
 
         mVoicemailProvider.update(uri, value, null, null);
         cursor = mVoicemailProvider.query(mVoicemailContentUri, VOICEMAILS_PROJECTION,
-                Voicemails._ID + " = " + id, null, null);
+                Voicemails._ID + " = " + id, null, null, null);
         assertEquals(1, cursor.getCount());
         assertTrue(cursor.moveToNext());
         assertEquals(mSourcePackageName, cursor.getString(SOURCE_PACKAGE_INDEX));
@@ -140,7 +140,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
         // Test: delete
         mVoicemailProvider.delete(mVoicemailContentUri, Voicemails._ID + " = " + id, null);
         cursor = mVoicemailProvider.query(mVoicemailContentUri, VOICEMAILS_PROJECTION,
-                Voicemails._ID + " = " + id, null, null);
+                Voicemails._ID + " = " + id, null, null, null);
         assertEquals(0, cursor.getCount());
         cursor.close();
     }
@@ -178,7 +178,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
 
         Uri uri = mStatusProvider.insert(mStatusContentUri, value);
         Cursor cursor = mStatusProvider.query(
-                mStatusContentUri, STATUS_PROJECTION, null, null, null);
+                mStatusContentUri, STATUS_PROJECTION, null, null, null, null);
         assertTrue(cursor.moveToNext());
         assertEquals(mSourcePackageName, cursor.getString(SOURCE_PACKAGE_INDEX));
         assertEquals(insertConfigurationState, cursor.getInt(CONFIGURATION_STATE_INDEX));
@@ -199,7 +199,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
 
         mStatusProvider.update(uri, value, null, null);
         cursor = mStatusProvider.query(mStatusContentUri, STATUS_PROJECTION,
-                Voicemails._ID + " = " + id, null, null);
+                Voicemails._ID + " = " + id, null, null, null);
         assertEquals(1, cursor.getCount());
         assertTrue(cursor.moveToNext());
         assertEquals(mSourcePackageName, cursor.getString(SOURCE_PACKAGE_INDEX));
@@ -212,7 +212,7 @@ public class VoicemailContractTest extends InstrumentationTestCase {
         // Test: delete
         mStatusProvider.delete(mStatusContentUri, Voicemails._ID + " = " + id, null);
         cursor = mStatusProvider.query(mStatusContentUri, STATUS_PROJECTION,
-                Voicemails._ID + " = " + id, null, null);
+                Voicemails._ID + " = " + id, null, null, null);
         assertEquals(0, cursor.getCount());
         cursor.close();
     }

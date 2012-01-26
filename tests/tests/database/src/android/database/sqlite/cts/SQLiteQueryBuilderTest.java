@@ -17,7 +17,9 @@
 package android.database.sqlite.cts;
 
 
+import android.content.CancelationSignal;
 import android.content.Context;
+import android.content.OperationCanceledException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
@@ -28,6 +30,7 @@ import android.test.AndroidTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class SQLiteQueryBuilderTest extends AndroidTestCase {
     private SQLiteDatabase mDatabase;
@@ -195,20 +198,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
     }
 
     public void testQuery() {
-        mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " +
-                "name TEXT, month INTEGER, salary INTEGER);");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('Mike', '1', '1000');");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('Mike', '2', '3000');");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('jack', '1', '2000');");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('jack', '3', '1500');");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('Jim', '1', '1000');");
-        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
-                "VALUES ('Jim', '3', '3500');");
+        createEmployeeTable();
 
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         sqliteQueryBuilder.setTables("Employee");
@@ -279,5 +269,207 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         expected = "SELECT name, age, location FROM employee WHERE (age=25) " +
                 "UNION SELECT name, age, location FROM people WHERE (location=LA)";
         assertEquals(expected, unionQuery);
+    }
+
+    public void testCancelableQuery_WhenNotCanceled_ReturnsResultSet() {
+        createEmployeeTable();
+
+        CancelationSignal cancelationSignal = new CancelationSignal();
+        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+        sqliteQueryBuilder.setTables("Employee");
+        Cursor cursor = sqliteQueryBuilder.query(mDatabase,
+                new String[] { "name", "sum(salary)" }, null, null,
+                "name", "sum(salary)>1000", "name", null, cancelationSignal);
+
+        assertEquals(3, cursor.getCount());
+    }
+
+    public void testCancelableQuery_WhenCanceledBeforeQuery_ThrowsImmediately() {
+        createEmployeeTable();
+
+        CancelationSignal cancelationSignal = new CancelationSignal();
+        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+        sqliteQueryBuilder.setTables("Employee");
+
+        cancelationSignal.cancel();
+        try {
+            sqliteQueryBuilder.query(mDatabase,
+                    new String[] { "name", "sum(salary)" }, null, null,
+                    "name", "sum(salary)>1000", "name", null, cancelationSignal);
+            fail("Expected OperationCanceledException");
+        } catch (OperationCanceledException ex) {
+            // expected
+        }
+    }
+
+    public void testCancelableQuery_WhenCanceledAfterQuery_ThrowsWhenExecuted() {
+        createEmployeeTable();
+
+        CancelationSignal cancelationSignal = new CancelationSignal();
+        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+        sqliteQueryBuilder.setTables("Employee");
+
+        Cursor cursor = sqliteQueryBuilder.query(mDatabase,
+                new String[] { "name", "sum(salary)" }, null, null,
+                "name", "sum(salary)>1000", "name", null, cancelationSignal);
+
+        cancelationSignal.cancel();
+        try {
+            cursor.getCount(); // force execution
+            fail("Expected OperationCanceledException");
+        } catch (OperationCanceledException ex) {
+            // expected
+        }
+    }
+
+    public void testCancelableQuery_WhenCanceledDueToContention_StopsWaitingAndThrows() {
+        createEmployeeTable();
+
+        for (int i = 0; i < 5; i++) {
+            final CancelationSignal cancelationSignal = new CancelationSignal();
+            final Semaphore barrier1 = new Semaphore(0);
+            final Semaphore barrier2 = new Semaphore(0);
+            Thread contentionThread = new Thread() {
+                @Override
+                public void run() {
+                    mDatabase.beginTransaction(); // acquire the only available connection
+                    barrier1.release(); // release query to start running
+                    try {
+                        barrier2.acquire(); // wait for test to end
+                    } catch (InterruptedException e) {
+                    }
+                    mDatabase.endTransaction(); // release the connection
+                }
+            };
+            Thread cancelationThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException ex) {
+                    }
+                    cancelationSignal.cancel();
+                }
+            };
+            try {
+                SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+                sqliteQueryBuilder.setTables("Employee");
+
+                contentionThread.start();
+                cancelationThread.start();
+
+                try {
+                    barrier1.acquire(); // wait for contention thread to start transaction
+                } catch (InterruptedException e) {
+                }
+
+                final long startTime = System.nanoTime();
+                try {
+                    Cursor cursor = sqliteQueryBuilder.query(mDatabase,
+                            new String[] { "name", "sum(salary)" }, null, null,
+                            "name", "sum(salary)>1000", "name", null, cancelationSignal);
+                    cursor.getCount(); // force execution
+                    fail("Expected OperationCanceledException");
+                } catch (OperationCanceledException ex) {
+                    // expected
+                }
+
+                // We want to confirm that the query really was blocked trying to acquire a
+                // connection for a certain amount of time before it was freed by cancel.
+                final long waitTime = System.nanoTime() - startTime;
+                if (waitTime > 150 * 1000000L) {
+                    return; // success!
+                }
+            } finally {
+                barrier1.release();
+                barrier2.release();
+                try {
+                    contentionThread.join();
+                    cancelationThread.join();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // Occasionally we might miss the timing deadline due to factors in the
+        // environment, but if after several trials we still couldn't demonstrate
+        // that the query was blocked, then the test must be broken.
+        fail("Could not prove that the query actually blocked before cancel() was called.");
+    }
+
+    public void testCancelableQuery_WhenCanceledDuringLongRunningQuery_CancelsQueryAndThrows() {
+        // Populate a table with a bunch of integers.
+        mDatabase.execSQL("CREATE TABLE x (v INTEGER);");
+        for (int i = 0; i < 100; i++) {
+            mDatabase.execSQL("INSERT INTO x VALUES (?)", new Object[] { i });
+        }
+
+        for (int i = 0; i < 5; i++) {
+            final CancelationSignal cancelationSignal = new CancelationSignal();
+            Thread cancelationThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException ex) {
+                    }
+                    cancelationSignal.cancel();
+                }
+            };
+            try {
+                // Build an unsatisfiable 5-way cross-product query over 100 values but
+                // produces no output.  This should force SQLite to loop for a long time
+                // as it tests 10^10 combinations.
+                SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+                sqliteQueryBuilder.setTables("x AS a, x AS b, x AS c, x AS d, x AS e");
+
+                cancelationThread.start();
+
+                final long startTime = System.nanoTime();
+                try {
+                    Cursor cursor = sqliteQueryBuilder.query(mDatabase, null,
+                            "a.v + b.v + c.v + d.v + e.v > 1000000",
+                            null, null, null, null, null, cancelationSignal);
+                    cursor.getCount(); // force execution
+                    fail("Expected OperationCanceledException");
+                } catch (OperationCanceledException ex) {
+                    // expected
+                }
+
+                // We want to confirm that the query really was running and then got
+                // canceled midway.
+                final long waitTime = System.nanoTime() - startTime;
+                if (waitTime > 150 * 1000000L && waitTime < 600 * 1000000L) {
+                    return; // success!
+                }
+            } finally {
+                try {
+                    cancelationThread.join();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // Occasionally we might miss the timing deadline due to factors in the
+        // environment, but if after several trials we still couldn't demonstrate
+        // that the query was canceled, then the test must be broken.
+        fail("Could not prove that the query actually canceled midway during execution.");
+    }
+
+    private void createEmployeeTable() {
+        mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " +
+                "name TEXT, month INTEGER, salary INTEGER);");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('Mike', '1', '1000');");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('Mike', '2', '3000');");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('jack', '1', '2000');");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('jack', '3', '1500');");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('Jim', '1', '1000');");
+        mDatabase.execSQL("INSERT INTO employee (name, month, salary) " +
+                "VALUES ('Jim', '3', '3500');");
     }
 }

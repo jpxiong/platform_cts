@@ -20,13 +20,16 @@ import com.android.cts.stub.R;
 
 
 import android.accounts.Account;
+import android.content.CancelationSignal;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationCanceledException;
 import android.content.res.AssetFileDescriptor;
 import android.cts.util.PollingCheck;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -44,6 +47,8 @@ public class ContentResolverTest extends AndroidTestCase {
 
     private static final String AUTHORITY = "ctstest";
     private static final Uri TABLE1_URI = Uri.parse("content://" + AUTHORITY + "/testtable1/");
+    private static final Uri TABLE1_CROSS_URI =
+            Uri.parse("content://" + AUTHORITY + "/testtable1/cross");
     private static final Uri TABLE2_URI = Uri.parse("content://" + AUTHORITY + "/testtable2/");
 
     private static final Account ACCOUNT = new Account("cts", "cts");
@@ -163,6 +168,85 @@ public class ContentResolverTest extends AndroidTestCase {
         } catch (NullPointerException e) {
             //expected.
         }
+    }
+
+    public void testCancelableQuery_WhenNotCanceled_ReturnsResultSet() {
+        CancelationSignal cancelationSignal = new CancelationSignal();
+
+        Cursor cursor = mContentResolver.query(TABLE1_URI, null, null, null, null,
+                cancelationSignal);
+        assertEquals(3, cursor.getCount());
+        cursor.close();
+    }
+
+    public void testCancelableQuery_WhenCanceledBeforeQuery_ThrowsImmediately() {
+        CancelationSignal cancelationSignal = new CancelationSignal();
+        cancelationSignal.cancel();
+
+        try {
+            mContentResolver.query(TABLE1_URI, null, null, null, null, cancelationSignal);
+            fail("Expected OperationCanceledException");
+        } catch (OperationCanceledException ex) {
+            // expected
+        }
+    }
+
+    public void testCancelableQuery_WhenCanceledDuringLongRunningQuery_CancelsQueryAndThrows() {
+        // Populate a table with a bunch of integers.
+        mContentResolver.delete(TABLE1_URI, null, null);
+        ContentValues values = new ContentValues();
+        for (int i = 0; i < 100; i++) {
+            values.put(COLUMN_KEY_NAME, i);
+            values.put(COLUMN_VALUE_NAME, i);
+            mContentResolver.insert(TABLE1_URI, values);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            final CancelationSignal cancelationSignal = new CancelationSignal();
+            Thread cancelationThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException ex) {
+                    }
+                    cancelationSignal.cancel();
+                }
+            };
+            try {
+                // Build an unsatisfiable 5-way cross-product query over 100 values but
+                // produces no output.  This should force SQLite to loop for a long time
+                // as it tests 10^10 combinations.
+                cancelationThread.start();
+
+                final long startTime = System.nanoTime();
+                try {
+                    mContentResolver.query(TABLE1_CROSS_URI, null,
+                            "a.value + b.value + c.value + d.value + e.value > 1000000",
+                            null, null, cancelationSignal);
+                    fail("Expected OperationCanceledException");
+                } catch (OperationCanceledException ex) {
+                    // expected
+                }
+
+                // We want to confirm that the query really was running and then got
+                // canceled midway.
+                final long waitTime = System.nanoTime() - startTime;
+                if (waitTime > 150 * 1000000L && waitTime < 600 * 1000000L) {
+                    return; // success!
+                }
+            } finally {
+                try {
+                    cancelationThread.join();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        // Occasionally we might miss the timing deadline due to factors in the
+        // environment, but if after several trials we still couldn't demonstrate
+        // that the query was canceled, then the test must be broken.
+        fail("Could not prove that the query actually canceled midway during execution.");
     }
 
     public void testOpenInputStream() throws IOException {

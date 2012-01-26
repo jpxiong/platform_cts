@@ -23,6 +23,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ICancelationSignal;
 import android.content.IContentProvider;
 import android.content.ContentProviderResult;
 import android.content.ContentProviderOperation;
@@ -286,7 +287,8 @@ public class ContentProviderTest extends AndroidTestCase {
 
             @Override
             public Cursor query(Uri url, String[] projection, String selection,
-                    String[] selectionArgs, String sortOrder) {
+                    String[] selectionArgs, String sortOrder,
+                    ICancelationSignal cancelationSignal) {
                 return null;
             }
 
@@ -314,6 +316,11 @@ public class ContentProviderTest extends AndroidTestCase {
             @Override
             public AssetFileDescriptor openTypedAssetFile(Uri url, String mimeType, Bundle opts)
                     throws RemoteException, FileNotFoundException {
+                return null;
+            }
+
+            @Override
+            public ICancelationSignal createCancelationSignal() throws RemoteException {
                 return null;
             }
         };

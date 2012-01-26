@@ -72,7 +72,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         ContentResolver.setMasterSyncAutomatically(false);
 
         // backup the current contents in database
-        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, null, null, null);
+        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             String[] colNames = cursor.getColumnNames();
             while (!cursor.isAfterLast()) {
@@ -106,7 +106,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
         cursor.close();
 
-        cursor = mProvider.query(Browser.SEARCHES_URI, null, null, null, null);
+        cursor = mProvider.query(Browser.SEARCHES_URI, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 ContentValues value = new ContentValues();
@@ -168,7 +168,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(searchString,
@@ -179,7 +179,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             Browser.addSearchUrl(mContentResolver, searchString);
             cursor = mProvider.query(Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             long date = cursor.getLong(Browser.SEARCHES_PROJECTION_DATE_INDEX);
@@ -191,7 +191,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             Browser.addSearchUrl(mContentResolver, searchStringAnother);
             cursor = mProvider.query(Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(2, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(searchString,
@@ -205,7 +205,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(0, cursor.getCount());
         } catch (RemoteException e) {
             fail("Unexpected RemoteException");
@@ -290,14 +290,14 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(0, cursor.getCount());
             cursor.close();
             Browser.updateVisitedHistory(mContentResolver, visitedHistoryUrl, true);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(visitedHistoryUrl, cursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX));
@@ -312,7 +312,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(visitedHistoryUrl, cursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX));
@@ -359,14 +359,14 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(MAX_HISTORY_COUNT, cursor.getCount());
             cursor.close();
             Browser.truncateHistory(mContentResolver);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(MAX_HISTORY_COUNT, cursor.getCount());
             cursor.close();
 
@@ -380,14 +380,14 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(MAX_HISTORY_COUNT + 1, cursor.getCount());
             cursor.close();
             Browser.truncateHistory(mContentResolver);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, null);
+                    null, null, null, null);
             assertEquals(MAX_HISTORY_COUNT + 1 - Browser.TRUNCATE_N_OLDEST, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(Browser.TRUNCATE_N_OLDEST + 1,
@@ -399,7 +399,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             int historyCountBeforeDelete = cursor.getCount();
             cursor.moveToLast();
             assertEquals(MAX_HISTORY_COUNT, cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
@@ -410,7 +410,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             int historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - 1, historyCountAfterDelete);
             cursor.moveToLast();
@@ -425,7 +425,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete, historyCountAfterDelete);
             cursor.close();
@@ -439,7 +439,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - (end - begin), historyCountAfterDelete);
             cursor.moveToFirst();
@@ -456,7 +456,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - (end - firstDate), historyCountAfterDelete);
             cursor.moveToFirst();
@@ -474,7 +474,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
                     BookmarkColumns.BOOKMARK + " = 0",
-                    null, BookmarkColumns.DATE);
+                    null, BookmarkColumns.DATE, null);
             historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - (lastDate - begin + 1),
                     historyCountAfterDelete);
@@ -488,7 +488,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
                     Browser.HISTORY_PROJECTION,
-                    null, null, BookmarkColumns.DATE);
+                    null, null, BookmarkColumns.DATE, null);
             assertEquals(1, cursor.getCount());
             cursor.moveToFirst();
             assertEquals(bookmarkUrl, cursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX));
@@ -601,7 +601,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     BOOKMARKS_PROJECTION,
                     BookmarkColumns.TITLE + " = ?",
                     new String[] {insertBookmarkTitle},
-                    BookmarkColumns.DATE);
+                    BookmarkColumns.DATE, null);
             assertTrue(cursor.moveToNext());
             assertEquals(insertBookmarkTitle, cursor.getString(TITLE_INDEX));
             assertEquals(insertBookmarkUrl,cursor.getString(URL_INDEX));
@@ -628,7 +628,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     BOOKMARKS_PROJECTION,
                     BookmarkColumns._ID + " = " + Id,
-                    null, null);
+                    null, null, null);
             assertTrue(cursor.moveToNext());
             assertEquals(updateBookmarkTitle, cursor.getString(TITLE_INDEX));
             assertEquals(updateBookmarkUrl,cursor.getString(URL_INDEX));
@@ -645,7 +645,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     Browser.BOOKMARKS_URI,
                     BOOKMARKS_PROJECTION,
                     BookmarkColumns._ID + " = " + Id,
-                    null, null);
+                    null, null, null);
             assertEquals(0, cursor.getCount());
         } catch (RemoteException e) {
             fail("Unexpected RemoteException");
@@ -672,7 +672,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             Uri insertUri = mProvider.insert(Browser.SEARCHES_URI, value);
             Cursor cursor = mProvider.query(Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION, SearchColumns.SEARCH + " = ?",
-                    new String[] {insertSearch}, null);
+                    new String[] {insertSearch}, null, null);
             assertTrue(cursor.moveToNext());
             assertEquals(insertSearch,
                     cursor.getString(Browser.SEARCHES_PROJECTION_SEARCH_INDEX));
@@ -691,7 +691,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     SearchColumns._ID + " = " + Id, null);
             cursor = mProvider.query(Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    SearchColumns._ID + " = " + Id, null, null);
+                    SearchColumns._ID + " = " + Id, null, null, null);
             assertTrue(cursor.moveToNext());
             assertEquals(updateSearch,
                     cursor.getString(Browser.SEARCHES_PROJECTION_SEARCH_INDEX));
@@ -703,7 +703,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             mProvider.delete(insertUri, null, null);
             cursor = mProvider.query(Browser.SEARCHES_URI,
                     Browser.SEARCHES_PROJECTION,
-                    SearchColumns._ID + " = " + Id, null, null);
+                    SearchColumns._ID + " = " + Id, null, null, null);
             assertEquals(0, cursor.getCount());
         } catch (RemoteException e) {
             fail("Unexpected RemoteException");

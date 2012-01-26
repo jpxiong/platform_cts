@@ -18,6 +18,7 @@ package android.content.cts;
 
 import java.util.HashMap;
 
+import android.content.CancelationSignal;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -42,8 +43,9 @@ public class MockContentProvider extends ContentProvider {
     private static final UriMatcher URL_MATCHER;
     private static final int TESTTABLE1 = 1;
     private static final int TESTTABLE1_ID = 2;
-    private static final int TESTTABLE2 = 3;
-    private static final int TESTTABLE2_ID = 4;
+    private static final int TESTTABLE1_CROSS = 3;
+    private static final int TESTTABLE2 = 4;
+    private static final int TESTTABLE2_ID = 5;
 
     private static HashMap<String, String> CTSDBTABLE1_LIST_PROJECTION_MAP;
     private static HashMap<String, String> CTSDBTABLE2_LIST_PROJECTION_MAP;
@@ -123,6 +125,8 @@ public class MockContentProvider extends ContentProvider {
             return "vnd.android.cursor.dir/com.android.content.testtable1";
         case TESTTABLE1_ID:
             return "vnd.android.cursor.item/com.android.content.testtable1";
+        case TESTTABLE1_CROSS:
+            return "vnd.android.cursor.cross/com.android.content.testtable1";
         case TESTTABLE2:
             return "vnd.android.cursor.dir/com.android.content.testtable2";
         case TESTTABLE2_ID:
@@ -176,6 +180,12 @@ public class MockContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sortOrder) {
+        return query(uri, projection, selection, selectionArgs, sortOrder);
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection,
+            String[] selectionArgs, String sortOrder, CancelationSignal cancelationSignal) {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
@@ -188,6 +198,13 @@ public class MockContentProvider extends ContentProvider {
         case TESTTABLE1_ID:
             qb.setTables("TestTable1");
             qb.appendWhere("_id=" + uri.getPathSegments().get(1));
+            break;
+
+        case TESTTABLE1_CROSS:
+            // Create a ridiculous cross-product of the test table.  This is done
+            // to create an artificially long-running query to enable us to test
+            // remote query cancelation in ContentResolverTest.
+            qb.setTables("TestTable1 a, TestTable1 b, TestTable1 c, TestTable1 d, TestTable1 e");
             break;
 
         case TESTTABLE2:
@@ -212,7 +229,8 @@ public class MockContentProvider extends ContentProvider {
             orderBy = sortOrder;
 
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
+        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy,
+                null, cancelationSignal);
 
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
@@ -260,6 +278,7 @@ public class MockContentProvider extends ContentProvider {
         URL_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         URL_MATCHER.addURI(AUTHORITY, "testtable1", TESTTABLE1);
         URL_MATCHER.addURI(AUTHORITY, "testtable1/#", TESTTABLE1_ID);
+        URL_MATCHER.addURI(AUTHORITY, "testtable1/cross", TESTTABLE1_CROSS);
         URL_MATCHER.addURI(AUTHORITY, "testtable2", TESTTABLE2);
         URL_MATCHER.addURI(AUTHORITY, "testtable2/#", TESTTABLE2_ID);
 
